@@ -1,0 +1,53 @@
+---
+description: 레이어 구조 및 의존성 방향 (app → screens → widgets → components)
+alwaysApply: true
+---
+
+# 레이어 구조 (의존성 방향)
+
+**원칙**: 상위 레이어만 하위 레이어를 참조한다. 하위는 상위를 import 하지 않는다.
+
+```
+app (라우트)  →  screens  →  widgets  →  components
+                  ↓            ↓            ↓
+               hooks, lib, types (공용)
+```
+
+## 레이어 역할
+
+| 레이어 | 경로 | 역할 | import 가능 |
+|--------|------|------|-------------|
+| **app** | `src/app/` | 라우트·레이아웃만. page.tsx는 Screen만 렌더. | screens, layout 공용 |
+| **screens** | `src/screens/` | 한 페이지/플로우 단위 화면. widgets·components 조합. | widgets, components, hooks, lib, types |
+| **widgets** | `src/widgets/` | 복합 UI 블록 (Header, Card, Form 블록 등). | components, hooks, lib, types |
+| **components** | `src/components/` | 원자 UI (Button, Input, Text 등). | hooks, lib, types, 다른 components |
+
+## 규칙
+
+- **app**: `screens`만 import. widgets/components 직접 사용 금지.
+- **screens**: `widgets`, `components` 사용. 다른 screen import 금지.
+- **widgets**: `components` 및 공용만. `screens` import 금지.
+- **components**: `screens`, `widgets` import 금지. lib, hooks, types, 동일 레이어만.
+
+## 예시
+
+```tsx
+// ✅ app/page.tsx
+import { HomeScreen } from '@screens/HomeScreen'
+export default function HomePage() {
+  return <HomeScreen />
+}
+
+// ✅ screens/HomeScreen.tsx
+import { Header } from '@widgets/Header'
+import { Button } from '@components/Button'
+
+// ✅ widgets/Header.tsx
+import { Button } from '@components/Button'
+import { cn } from '@lib'
+```
+
+## 네이밍
+
+- Screen: `*Screen.tsx` (예: HomeScreen, LoginScreen)
+- Widget: 도메인/역할 기준 (예: Header, ProductCard, UserProfile)

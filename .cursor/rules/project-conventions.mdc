@@ -1,0 +1,48 @@
+---
+description: 프로젝트 공통 규칙 및 컨벤션
+alwaysApply: true
+---
+
+# misaeng_temp_web 공통 규칙
+
+## 응답 및 문서
+- AI 응답과 코드 주석은 **항상 한국어**로 작성한다.
+
+## 스택
+- **프레임워크**: Next.js 16 (App Router)
+- **UI**: React 19, Tailwind CSS 4
+- **언어**: TypeScript 5
+
+## 코드 스타일
+- 프로젝트 루트 `.prettierrc.json`을 따른다. (singleQuote, semi: false, tabWidth: 2)
+- 저장 시 포맷·ESLint 자동 수정을 사용한다.
+- 들여쓰기 2칸, 문자열은 작은따옴표, JSX는 self-closing 태그 사용.
+- **네이밍**: 컴포넌트 PascalCase, 훅 `use` 접두사+camelCase, 유틸/함수 camelCase, 상수 UPPER_SNAKE_CASE.
+
+## 패키지 매니저
+- **npm** 사용. `npm install`, `npm run dev`, `npm run build` 등.
+- 패키지 추가/제거는 `npm add`, `npm remove` 사용.
+
+## 프로젝트 구조 (레이어)
+
+- **app** (`src/app/`): 라우트·레이아웃만. 각 page는 **screens**만 import.
+- **screens** (`src/screens/`): 화면 단위. **widgets**, **components** 조합.
+- **widgets** (`src/widgets/`): 복합 UI 블록. **components** 및 공용만 사용.
+- **components** (`src/components/`): 원자 UI. **screens/widgets** import 금지.
+- **hooks, lib, types**: 모든 레이어에서 공용.
+
+**lib 하위 구조** (`src/lib/`):
+- **utils**: 순수 유틸 (cn, formatDate, formatNumber, 검증 헬퍼 등). `@lib/utils`
+- **api**: API 클라이언트·엔드포인트 (fetch 래퍼, getUser, postLogin 등). `@lib/api`
+- **constants**: 앱 상수 (API URL, 라우트 경로, 옵션 목록 등). `@lib/constants`
+- **validators**: 스키마·검증 (zod 등, 폼/요청 검증). `@lib/validators`
+
+의존성: `app` → `screens` → `widgets` → `components` (상위만 하위 참조). 자세한 규칙은 `architecture.mdc` 참고.
+
+## 재사용 컴포넌트
+- 동일한 UI 패턴이 2곳 이상에서 쓰이면 해당 레이어에 맞게 추출 (widget vs component).
+- 컴포넌트는 props로 설정 가능하게, 제네릭하게 만든다.
+
+## 기타
+- 새 패키지 추가 전에 `package.json` 의존성을 확인한다.
+- 린트/타입 오류를 남기지 않는다.
