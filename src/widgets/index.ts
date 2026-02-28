@@ -5,4 +5,5 @@
  * - 예: src/widgets/Header.tsx, src/widgets/ProductCard.tsx
  */
 
-export {}
+export { Navbar } from './Navbar'
+export { Hero } from './Hero'

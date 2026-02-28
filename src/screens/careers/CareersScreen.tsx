@@ -1,111 +1,358 @@
-export function CareersScreen() {
+'use client'
+
+import Link from 'next/link'
+import { useState, useEffect } from 'react'
+
+type JobData = {
+  title: string
+  summary: string
+  jobDescription: {
+    roleOverview: string
+    keyResponsibilities: string[]
+  }
+  requirements: string[]
+  performanceCareerPath: string[]
+}
+
+const PARTNERSHIP_JOB: JobData = {
+  title: 'Partnership & Operations Intern',
+  summary:
+    'Support partnership outreach, operations, and day-to-day execution as we scale Ellieo in NYC. Ideal for someone detail-oriented and eager to learn startup operations.',
+  jobDescription: {
+    roleOverview:
+      'We are looking for a results-driven Partnership Intern to join our team in New York. This role is focused on the front-line expansion of our housing platform, Ellieo. You will be responsible for identifying potential housing providers and assisting students in discovering verified housing options. This is a hands-on role where your efforts in market outreach directly impact our growth in the NYC market.',
+    keyResponsibilities: [
+      'Identify potential housing partners, including independent landlords, property management companies, licensed real estate brokers, and co-living spaces across NYC.',
+      'Visit potential properties to verify their condition and collect necessary visual/descriptive data for platform listing.',
+      'Schedule and coordinate introductory meetings between senior management and potential partners.',
+      'Represent Misaeng/Ellieo at campus events or student housing fairs to drive user community growth.',
+      'Document outreach data and partnership leads in our internal CRM/tracking system.',
+      'Prepare weekly reports on outreach success rates and partner feedback.',
+      'Collaborate with the marketing team to align partnership pitches with current promotional campaigns.',
+    ],
+  },
+  requirements: [
+    'Proactive Mindset: A self-starter who takes initiative in identifying new opportunities and managing outreach.',
+    'Communication: Superior verbal and written communication skills; comfortable engaging with various stakeholders.',
+    'Availability: Must be able to commit to 10–20 hours per week (Flexible schedule; approx. 15 hours/week preferred).',
+  ],
+  performanceCareerPath: [
+    'Weekly Individual Performance Meetings to review outreach activity, property data collection, and successful partner onboarding.',
+    'Career Growth: High-performing interns will be considered for Full-time Operations or Management positions after a 2-month evaluation period.',
+    'Assessment will be based on the accuracy of property information collected and the efficiency of partnership outreach.',
+  ],
+}
+
+const MARKETING_JOB: JobData = {
+  title: 'Marketing & Content Strategy Intern',
+  summary:
+    'Build Ellieo’s brand presence and community engagement through viral-ready content, social channels, and NYC trend-driven marketing. Ideal for someone creative and trend-savvy.',
+  jobDescription: {
+    roleOverview:
+      'We are looking for a creative and trend-savvy Marketing Intern to join our team in New York. This role focuses on supporting Ellieo’s brand presence through AI-driven storytelling. Working closely with the Operations Manager, you will assist in creating content and managing social channels. This is a hands-on role where you will learn to use cutting-edge AI technology to fuel our user growth and platform credibility.',
+    keyResponsibilities: [
+      'AI-Powered Content Execution: Support the production of high-fidelity short-form videos (Reels/TikToks) by utilizing the Higgsfield Creator Plan under the guidance of the management team.',
+      'Content Production: Script, film, and edit high-quality short-form videos (Reels/TikToks) focusing on NYC lifestyle, housing tips, and property showcases.',
+      'Trend Analysis: Monitor and analyze the latest memes, social media trends, and NYC-specific viral topics to integrate them into our content calendar.',
+      'Sales Support: Create visually compelling marketing materials (pitch decks, brochures) to assist the Partnership team in onboarding new housing providers.',
+      'Community Engagement: Interact with student groups and international communities in NYC to foster trust and drive user acquisition.',
+      'Brand Monitoring: Track engagement metrics and community feedback to optimize content performance and growth strategies.',
+    ],
+  },
+  requirements: [
+    'Creative Flair: Proficiency in video editing tools (CapCut or Premiere) and design platforms (Canva or Adobe).',
+    'Trend Sensitivity: A deep understanding of Gen Z/Millennial digital culture and a "social-first" mindset.',
+    'Communication: Strong storytelling skills with the ability to create witty, relatable, and professional copy.',
+    'Availability: Must be able to commit to 10–20 hours per week (Flexible schedule; approx. 15 hours/week preferred).',
+  ],
+  performanceCareerPath: [
+    'Weekly Creative Sync: Individual meetings to review content performance (engagement, reach) and brainstorm upcoming trend-based campaigns.',
+    'Career Growth: High-performing interns will be considered for Full-time Creative Lead or Marketing Management positions after a 2-month evaluation period.',
+    'Assessment: Based on the quality/consistency of content produced and the growth of Ellieo’s digital community engagement.',
+  ],
+}
+
+const JOBS = [
+  { key: 'partnership', job: PARTNERSHIP_JOB },
+  { key: 'marketing', job: MARKETING_JOB },
+] as const
+
+function JobCard({
+  job,
+  onClick,
+}: {
+  job: JobData
+  onClick: () => void
+}) {
   return (
-    <div className='mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16'>
-      <section className='space-y-6'>
-        <div className='space-y-3'>
-          <p className='text-xs font-semibold uppercase tracking-[0.25em] text-zinc-400'>
+    <button
+      type="button"
+      onClick={onClick}
+      className="group relative flex w-full cursor-pointer flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#F64310]/30 hover:shadow-md hover:shadow-[#F64310]/[0.06] sm:p-5"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#F64310]">
+          Intern
+        </p>
+        <span className="rounded-full bg-[#F64310]/10 px-2.5 py-1 text-[10px] font-medium text-[#F64310]">
+          NYC Internship
+        </span>
+      </div>
+      <h3 className="mt-3 line-clamp-2 text-base font-bold tracking-tight text-[var(--foreground)] sm:text-lg">
+        {job.title}
+      </h3>
+      <p className="mt-2 line-clamp-3 text-xs leading-[1.5] text-[var(--muted-foreground)]">
+        {job.summary}
+      </p>
+      <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#F64310]">
+        View details
+        <span className="transition group-hover:translate-x-0.5" aria-hidden>→</span>
+      </span>
+    </button>
+  )
+}
+
+function JobDetailModal({
+  job,
+  onClose,
+}: {
+  job: JobData
+  onClose: () => void
+}) {
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [onClose])
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="job-modal-title"
+    >
+      <div
+        className="absolute inset-0 bg-[var(--foreground)]/50 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden
+      />
+      <div className="relative z-10 flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--background)] shadow-xl">
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-[var(--border)] bg-[var(--background)] p-6 sm:p-8">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#F64310]">
+              Intern · NYC
+            </p>
+            <h2 id="job-modal-title" className="mt-1 text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl">
+              {job.title}
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 cursor-pointer rounded-lg p-2 text-[var(--muted-foreground)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
+            aria-label="Close"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-6 sm:p-8">
+          <div className="space-y-8">
+            <section>
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">
+                Job Description
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted-foreground)]">
+                {job.jobDescription.roleOverview}
+              </p>
+              <p className="mt-8 text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Key Responsibilities</p>
+              <ul className="mt-1.5 list-inside list-disc space-y-1 text-sm leading-relaxed text-[var(--muted-foreground)]">
+                {job.jobDescription.keyResponsibilities.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">
+                Requirements
+              </h3>
+              <ul className="mt-3 list-inside list-disc space-y-1 text-sm leading-relaxed text-[var(--muted-foreground)]">
+                {job.requirements.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">
+                Performance & Career Path
+              </h3>
+              <ul className="mt-3 list-inside list-disc space-y-1 text-sm leading-relaxed text-[var(--muted-foreground)]">
+                {job.performanceCareerPath.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a
+              href="#apply"
+              onClick={onClose}
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[#F64310] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#d93a0e]"
+            >
+              How to apply
+            </a>
+            <Link
+              href="/contact"
+              onClick={onClose}
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] px-5 py-2.5 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--surface-elevated)]"
+            >
+              Contact us
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function CareersScreen() {
+  const [selectedJob, setSelectedJob] = useState<JobData | null>(null)
+
+  return (
+    <div className="min-h-screen bg-[var(--background)]">
+      {/* Hero */}
+      <header className="bg-[var(--background)]">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]">
             Careers
           </p>
-          <h1 className='text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl md:text-4xl'>
-            Part-time Marketers (NYC-based)
+          <h1 className="mt-3 text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15]">
+            Join Misaeng
           </h1>
-          <p className='text-sm leading-relaxed text-zinc-600'>
-            Ahead of our full launch, we are looking for{' '}
-            <span className='font-semibold text-zinc-900'>part-time marketers</span> to help us
-            validate real demand and channels in New York. This is a hands-on role where you shape
-            and read the earliest market signals.
+          <p className="mt-3 max-w-xl text-sm leading-[1.65] text-[var(--muted-foreground)] sm:mt-4 sm:text-base sm:leading-[1.7]">
+            We are building Ellieo—next-gen housing for NYC. We’re looking for driven interns to help
+            us grow from the ground up.
           </p>
-          <div className='inline-flex items-center gap-2 rounded-full border border-[#FF6C25]/40 bg-[#FF6C25]/10 px-4 py-2 text-xs text-[#FF6C25]'>
-            <span className='h-1.5 w-1.5 rounded-full bg-[#FF6C25]' />
-            Currently hiring · Market research &amp; early traction
+
+          {/* Open positions – glass card */}
+          <div
+            className="mt-6 rounded-2xl border border-[var(--border)]/80 bg-[var(--surface)]/80 p-5 shadow-lg shadow-[var(--foreground)]/[0.03] backdrop-blur-xl sm:mt-8 sm:p-8"
+            style={{ backgroundColor: 'color-mix(in srgb, var(--surface) 92%, transparent)' }}
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
+              Open positions
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--foreground)] sm:text-base">
+              <strong className="font-semibold text-[var(--foreground)]">Partnership & Operations Intern</strong>
+              —support partnership outreach and day-to-day execution.{' '}
+              <strong className="font-semibold text-[var(--foreground)]">Marketing & Content Strategy Intern</strong>—shape
+              our brand, content, and growth channels. Both roles are NYC-based and ideal for those
+              eager to learn startup operations.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <a
+                href="#apply"
+                className="animate-shimmer inline-flex min-h-[48px] min-w-[140px] items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#F64310]/25 transition duration-300 hover:shadow-[#F64310]/35 active:scale-[0.98]"
+              >
+                How to apply
+                <span className="text-white/90" aria-hidden>↓</span>
+              </a>
+              <Link
+                href="/contact"
+                className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-6 py-3 text-sm font-semibold text-[var(--foreground)] transition duration-200 hover:border-[var(--border-muted)] hover:bg-[var(--surface)] active:scale-[0.98]"
+              >
+                Contact us
+                <span aria-hidden>→</span>
+              </Link>
+            </div>
           </div>
+        </div>
+      </header>
+
+      {/* Job cards – 4-column grid */}
+      <section
+        className="mx-auto max-w-7xl px-4 pt-6 pb-14 sm:px-6 sm:pt-8 sm:pb-20 lg:px-8"
+        aria-labelledby="openings-heading"
+      >
+        <h2 id="openings-heading" className="sr-only">
+          Open positions
+        </h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+          {JOBS.map(({ key, job }) => (
+            <JobCard
+              key={key}
+              job={job}
+              onClick={() => setSelectedJob(job)}
+            />
+          ))}
         </div>
       </section>
 
-      <section className='grid gap-8 text-sm text-zinc-600 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]'>
-        <div className='space-y-6 rounded-3xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-sm'>
-          <div className='space-y-2'>
-            <h2 className='text-sm font-semibold text-zinc-50'>
-              Role: Part-time Marketer (New York)
-            </h2>
-            <p className='text-xs text-zinc-400'>
-              Location: New York &amp; nearby / Type: Part-time · Contract · Freelance (flexible)
-            </p>
-          </div>
+      {selectedJob && (
+        <JobDetailModal
+          job={selectedJob}
+          onClose={() => setSelectedJob(null)}
+        />
+      )}
 
-          <div className='space-y-3'>
-            <h3 className='text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400'>
-              Responsibilities
-            </h3>
-            <ul className='space-y-2 text-sm leading-relaxed text-zinc-600'>
-              <li>· Identify and test channels to reach Korean/Asian residents in or moving to NYC</li>
-              <li>· Recruit early users for interviews and surveys via community, schools, and workplaces</li>
-              <li>· Use this beta website to run landing page experiments and measure conversion</li>
-              <li>· Support co-marketing ideas with partner brokers/buildings</li>
-              <li>· Share on-the-ground insights with the team on a regular basis</li>
-            </ul>
-          </div>
+      <div className="h-4 sm:h-6" />
 
-          <div className='space-y-3'>
-            <h3 className='text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400'>
-              Requirements
-            </h3>
-            <ul className='space-y-2 text-sm leading-relaxed text-zinc-600'>
-              <li>· Based in NYC or with deep familiarity with the NYC community</li>
-              <li>· Korean fluency preferred, with working English communication</li>
-              <li>· Experience in marketing, community building, or sales is a plus</li>
-              <li>· Able to commit at least 10 hours per week</li>
-            </ul>
-          </div>
-
-          <div className='space-y-3'>
-            <h3 className='text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400'>
-              Compensation
-            </h3>
-            <ul className='space-y-2 text-sm leading-relaxed text-zinc-600'>
-              <li>· Hourly or project-based compensation, depending on experience and network</li>
-              <li>· Early joiners may receive additional incentives or strong references after launch</li>
-              <li>· Remote / hybrid is possible, with occasional in-person meetings at Rockefeller Plaza</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className='space-y-5'>
-          <div className='rounded-3xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-sm'>
-            <h3 className='text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400'>
-              How to apply
-            </h3>
-            <p className='mt-3 text-sm leading-relaxed text-zinc-600'>
-              Please send a brief application and resume including the points below:
-            </p>
-            <ul className='mt-3 space-y-2 text-sm leading-relaxed text-zinc-600'>
-              <li>· Short self-introduction (what you do now, and your connection to NYC)</li>
-              <li>· Relevant experience (marketing, community, sales, etc.)</li>
-              <li>· Weekly availability and preferred working style</li>
-              <li>· Contact details (Kakao / email)</li>
-            </ul>
-            <div className='mt-4 rounded-2xl border border-[#FF6C25]/40 bg-[#FF6C25]/10 p-3 text-xs text-zinc-900'>
-              <p className='font-semibold'>Example</p>
-              <p className='mt-1'>
-                Email: careers@example.com
-                <br />
-                Subject: [Part-time Marketer] Your name / Location
-              </p>
+      {/* How to apply – floating glass card */}
+      <section
+        id="apply"
+        className="sticky bottom-0 z-20 rounded-t-3xl border-t border-[var(--border)] bg-[var(--surface)]/90 shadow-[0_-8px_32px_rgba(15,23,42,0.08)] backdrop-blur-xl"
+        aria-labelledby="apply-heading"
+        style={{ backgroundColor: 'color-mix(in srgb, var(--surface) 94%, transparent)' }}
+      >
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+          <h2
+            id="apply-heading"
+            className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]"
+          >
+            How to apply
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--foreground)] sm:text-base md:whitespace-nowrap">
+            Please send your <strong className="font-semibold">resume</strong> and{' '}
+            <strong className="font-semibold">cover letter</strong> to the email below. We’ll get back to qualified candidates as we review applications.
+          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-3 sm:gap-x-6">
+            <div className="flex flex-col gap-0.5 sm:gap-1">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
+                Email
+              </span>
+              <a
+                href="mailto:ain@misaeng.com"
+                className="font-mono text-sm font-medium text-[var(--foreground)] underline decoration-[var(--border)] underline-offset-2 transition hover:decoration-[#F64310]/50 hover:text-[#F64310]"
+              >
+                ain@misaeng.com
+              </a>
             </div>
-          </div>
-
-          <div className='rounded-3xl border border-zinc-200 bg-white p-5 sm:p-6 text-xs text-zinc-600 shadow-sm'>
-            <p className='font-semibold text-zinc-900'>Purpose of this job posting</p>
-            <p className='mt-2 leading-relaxed'>
-              This posting is for a real part-time hiring need and also serves as a clear signal of
-              our intent to employ. It is written so that even an immigration officer can see that
-              this is not a generic statement, but a role with concrete responsibilities and
-              expectations.
-            </p>
+            <div className="flex flex-col gap-0.5 sm:gap-1">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
+                Subject
+              </span>
+              <span className="font-mono text-sm text-[var(--foreground)]">
+                [Intern – Role] Your Name
+              </span>
+            </div>
+            <div className="flex flex-col gap-0.5 sm:gap-1">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
+                Example
+              </span>
+              <span className="font-mono text-sm text-[var(--foreground)]">
+                [Partnership & Operations Intern] Jane Doe
+              </span>
+            </div>
           </div>
         </div>
       </section>
     </div>
   )
 }
-

@@ -1,22 +1,48 @@
 @import 'tailwindcss';
 
+/* 기본: 밝은 테마 */
 :root {
   --background: #ffffff;
-  --foreground: #020617;
+  --foreground: #0f172a;
+  --surface: #f8fafc;
+  --surface-elevated: #ffffff;
+  --border: #e2e8f0;
+  --border-muted: #cbd5e1;
+  --muted: #64748b;
+  --muted-foreground: #475569;
+  --navy: #0f172a;
+  --navy-light: #1e293b;
+  --navy-muted: #334155;
+  --slate: #475569;
+  --slate-light: #64748b;
+  --slate-muted: #94a3b8;
+  --brand: #F64310;
+  --brand-hover: #d93a0e;
+  --brand-light: #fff5f2;
+  --brand-muted: rgba(246, 67, 16, 0.12);
+  --accent: #F64310;
+  --accent-muted: #fff5f2;
+  --btn-primary-bg: #F64310;
+  --btn-primary-hover: #d93a0e;
+  --btn-secondary-border: #e2e8f0;
+  --btn-secondary-bg: #ffffff;
+  --btn-secondary-hover: #f1f5f9;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand: var(--brand);
+  --color-navy: var(--navy);
+  --color-navy-light: var(--navy-light);
+  --color-navy-muted: var(--navy-muted);
+  --color-slate: var(--slate);
+  --color-slate-light: var(--slate-light);
+  --color-slate-muted: var(--slate-muted);
+  --color-accent: var(--accent);
+  --color-accent-muted: var(--accent-muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #ffffff;
-    --foreground: #020617;
-  }
 }
 
 body {
@@ -24,4 +50,36 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 모바일: 가로 스크롤 방지, 터치 영역 개선 */
+@layer base {
+  html {
+    overflow-x: hidden;
+  }
+}
+
+/* Shimmer effect for primary CTA */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--btn-primary-bg) 0%,
+    #ff6b3d 25%,
+    var(--btn-primary-bg) 50%,
+    #ff6b3d 75%,
+    var(--btn-primary-bg) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.5s ease-in-out infinite;
 }
