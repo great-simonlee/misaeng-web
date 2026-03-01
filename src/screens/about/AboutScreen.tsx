@@ -107,7 +107,7 @@ export function AboutScreen() {
                 'Behavioral preference analysis',
                 'Identity-secured onboarding',
                 'Verified listing operations',
-                'NYC-specific rental intelligence',
+                'New York City-specific rental intelligence',
               ].map((item, i) => (
                 <li
                   key={i}
@@ -193,7 +193,7 @@ export function AboutScreen() {
                 As the Founder and Major Investor of Misaeng, I am currently leading the strategic
                 deployment of capital and the establishment of our U.S. operational infrastructure.
                 My focus is on architecting a scalable business model that brings transparency to
-                the NYC housing market through verified data and AI-driven systems.
+                the New York City housing market through verified data and AI-driven systems.
               </p>
               <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
                 To maintain the highest level of governance, I oversee the high-level corporate
@@ -212,7 +212,7 @@ export function AboutScreen() {
                       As the Founder and Major Investor of Misaeng, I am currently leading the
                       strategic deployment of capital and the establishment of our U.S. operational
                       infrastructure. My focus is on architecting a scalable business model that
-                      brings transparency to the NYC housing market through verified data and
+                      brings transparency to the New York City housing market through verified data and
                       AI-driven systems.
                     </p>
                     <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>

@@ -24,19 +24,19 @@ export function Hero() {
       {/* Ellieo 한줄 소개: 배너 맨 위 고정, 검정 70% 투명 */}
       <div className="absolute left-0 right-0 top-0 z-10 bg-black/70 px-4 py-1.5 text-center sm:px-6 sm:py-2">
         <p className="mx-auto max-w-4xl overflow-x-auto text-xs text-white/90 sm:whitespace-nowrap sm:text-base">
-          <strong className="font-bold text-white">Ellieo</strong>—Misaeng&apos;s NYC app for verified housing & roommates. Launching this Spring. 🚀
+          <strong className="font-bold text-white">Ellieo</strong>—Misaeng&apos;s New York City app for verified housing & roommates. Launching this Spring. 🚀
         </p>
       </div>
 
       <div className="relative z-10 flex w-full max-w-5xl flex-col items-center px-4 pt-12 pb-8 text-center sm:px-6 sm:pt-16 sm:pb-14 lg:px-8 lg:pt-24">
-        {/* Decorative line: Next-Gen Housing for NYC 바로 위에 붙임 (선 + 가운데 점) */}
+        {/* Decorative line: Next-Gen Housing for New York City 바로 위에 붙임 (선 + 가운데 점) */}
         <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
           <div className="h-px w-8 bg-[#F64310]/80 sm:w-12" aria-hidden />
           <div className="h-1 w-1 shrink-0 rounded-full bg-[#F64310]" aria-hidden />
           <div className="h-px w-8 bg-[#F64310]/80 sm:w-12" aria-hidden />
         </div>
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/80 sm:tracking-[0.28em]">
-          Next-Gen Housing for NYC
+          Next-Gen Housing for New York City
         </p>
         <p className="mt-1.5 text-base font-semibold tracking-tight text-white drop-shadow-sm sm:mt-3 sm:text-xl md:text-2xl">
           Half the Rent, Twice the Story.
@@ -82,7 +82,7 @@ export function Hero() {
           </span>
           <span className="flex items-center gap-1.5">
             <span className="h-1 w-1 rounded-full bg-[#F64310]" />
-            NYC launch 2026
+            New York City launch 2026
           </span>
         </div>
       </div>

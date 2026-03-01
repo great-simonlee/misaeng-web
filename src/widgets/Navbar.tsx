@@ -55,9 +55,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-1">
           <Link
-            href="https://ellieo.com/#early"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/contact"
             className="hidden rounded-full bg-[#F64310] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-[#F64310]/25 transition hover:bg-[#d93a0e] hover:shadow-[#F64310]/35 sm:inline-block"
           >
             Partner Inquiry
@@ -104,9 +102,7 @@ export function Navbar() {
             </Link>
           ))}
           <Link
-            href="https://ellieo.com/#early"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/contact"
             onClick={() => setMobileOpen(false)}
             className="mx-4 mb-3 mt-2 flex min-h-[48px] items-center justify-center rounded-xl bg-[#F64310] text-sm font-semibold text-white active:bg-[#d93a0e]"
           >

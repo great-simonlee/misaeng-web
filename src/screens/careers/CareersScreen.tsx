@@ -17,12 +17,12 @@ type JobData = {
 const PARTNERSHIP_JOB: JobData = {
   title: 'Partnership & Operations Intern',
   summary:
-    'Support partnership outreach, operations, and day-to-day execution as we scale Ellieo in NYC. Ideal for someone detail-oriented and eager to learn startup operations.',
+    'Support partnership outreach, operations, and day-to-day execution as we scale Ellieo in New York City. Ideal for someone detail-oriented and eager to learn startup operations.',
   jobDescription: {
     roleOverview:
-      'We are looking for a results-driven Partnership Intern to join our team in New York. This role is focused on the front-line expansion of our housing platform, Ellieo. You will be responsible for identifying potential housing providers and assisting students in discovering verified housing options. This is a hands-on role where your efforts in market outreach directly impact our growth in the NYC market.',
+      'We are looking for a results-driven Partnership Intern to join our team in New York. This role is focused on the front-line expansion of our housing platform, Ellieo. You will be responsible for identifying potential housing providers and assisting students in discovering verified housing options. This is a hands-on role where your efforts in market outreach directly impact our growth in the New York City market.',
     keyResponsibilities: [
-      'Identify potential housing partners, including independent landlords, property management companies, licensed real estate brokers, and co-living spaces across NYC.',
+      'Identify potential housing partners, including independent landlords, property management companies, licensed real estate brokers, and co-living spaces across New York City.',
       'Visit potential properties to verify their condition and collect necessary visual/descriptive data for platform listing.',
       'Schedule and coordinate introductory meetings between senior management and potential partners.',
       'Represent Misaeng/Ellieo at campus events or student housing fairs to drive user community growth.',
@@ -46,16 +46,16 @@ const PARTNERSHIP_JOB: JobData = {
 const MARKETING_JOB: JobData = {
   title: 'Marketing & Content Strategy Intern',
   summary:
-    'Build Ellieo’s brand presence and community engagement through viral-ready content, social channels, and NYC trend-driven marketing. Ideal for someone creative and trend-savvy.',
+    'Build Ellieo’s brand presence and community engagement through viral-ready content, social channels, and New York City trend-driven marketing. Ideal for someone creative and trend-savvy.',
   jobDescription: {
     roleOverview:
       'We are looking for a creative and trend-savvy Marketing Intern to join our team in New York. This role focuses on supporting Ellieo’s brand presence through AI-driven storytelling. Working closely with the Operations Manager, you will assist in creating content and managing social channels. This is a hands-on role where you will learn to use cutting-edge AI technology to fuel our user growth and platform credibility.',
     keyResponsibilities: [
       'AI-Powered Content Execution: Support the production of high-fidelity short-form videos (Reels/TikToks) by utilizing the Higgsfield Creator Plan under the guidance of the management team.',
-      'Content Production: Script, film, and edit high-quality short-form videos (Reels/TikToks) focusing on NYC lifestyle, housing tips, and property showcases.',
-      'Trend Analysis: Monitor and analyze the latest memes, social media trends, and NYC-specific viral topics to integrate them into our content calendar.',
+      'Content Production: Script, film, and edit high-quality short-form videos (Reels/TikToks) focusing on New York City lifestyle, housing tips, and property showcases.',
+      'Trend Analysis: Monitor and analyze the latest memes, social media trends, and New York City-specific viral topics to integrate them into our content calendar.',
       'Sales Support: Create visually compelling marketing materials (pitch decks, brochures) to assist the Partnership team in onboarding new housing providers.',
-      'Community Engagement: Interact with student groups and international communities in NYC to foster trust and drive user acquisition.',
+      'Community Engagement: Interact with student groups and international communities in New York City to foster trust and drive user acquisition.',
       'Brand Monitoring: Track engagement metrics and community feedback to optimize content performance and growth strategies.',
     ],
   },
@@ -95,7 +95,7 @@ function JobCard({
           Intern
         </p>
         <span className="rounded-full bg-[#F64310]/10 px-2.5 py-1 text-[10px] font-medium text-[#F64310]">
-          NYC Internship
+          New York City Internship
         </span>
       </div>
       <h3 className="mt-3 line-clamp-2 text-base font-bold tracking-tight text-[var(--foreground)] sm:text-lg">
@@ -143,7 +143,7 @@ function JobDetailModal({
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-[var(--border)] bg-[var(--background)] p-6 sm:p-8">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#F64310]">
-              Intern · NYC
+              Intern · New York City
             </p>
             <h2 id="job-modal-title" className="mt-1 text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl">
               {job.title}
@@ -237,7 +237,7 @@ export function CareersScreen() {
             Join Misaeng
           </h1>
           <p className="mt-3 max-w-xl text-sm leading-[1.65] text-[var(--muted-foreground)] sm:mt-4 sm:text-base sm:leading-[1.7]">
-            We are building Ellieo—next-gen housing for NYC. We’re looking for driven interns to help
+            We are building Ellieo—next-gen housing for New York City. We’re looking for driven interns to help
             us grow from the ground up.
           </p>
 
@@ -253,7 +253,7 @@ export function CareersScreen() {
               <strong className="font-semibold text-[var(--foreground)]">Partnership & Operations Intern</strong>
               —support partnership outreach and day-to-day execution.{' '}
               <strong className="font-semibold text-[var(--foreground)]">Marketing & Content Strategy Intern</strong>—shape
-              our brand, content, and growth channels. Both roles are NYC-based and ideal for those
+              our brand, content, and growth channels. Both roles are New York City-based and ideal for those
               eager to learn startup operations.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-3">

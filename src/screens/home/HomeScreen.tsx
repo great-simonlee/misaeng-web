@@ -106,7 +106,7 @@ export function HomeScreen() {
                 id='careers-heading'
                 className='mt-1.5 text-lg font-bold tracking-tight text-white sm:mt-2 sm:text-2xl'
               >
-                Join Misaeng in NYC
+                Join Misaeng in New York City
               </h2>
               <p className='mt-1 max-w-xl text-sm text-white/80 sm:mt-1.5'>
                 Partnership & Operations Intern · Marketing Intern. Grow with us from the ground up.
@@ -251,7 +251,7 @@ export function HomeScreen() {
         </div>
       </section>
 
-      {/* NYC First — horizontal layout */}
+      {/* New York City First — horizontal layout */}
       <section
         id='roadmap'
         className='relative overflow-hidden border-t border-[var(--border)] bg-[var(--surface)] pt-12 sm:pt-20 md:pt-24'
@@ -270,7 +270,7 @@ export function HomeScreen() {
               />
               <div className='absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/20 md:to-transparent' />
               <span className='absolute bottom-3 left-3 rounded-full bg-[#F64310] px-2.5 py-1 text-xs font-semibold text-white shadow-md sm:bottom-4 sm:left-4 sm:px-3 sm:py-1.5'>
-                NYC · 2026
+                New York City · 2026
               </span>
             </div>
             <div className='flex flex-col justify-center p-4 sm:p-6 md:p-7 lg:p-8'>
@@ -281,7 +281,7 @@ export function HomeScreen() {
                 id='roadmap-heading'
                 className='mt-1.5 text-lg font-bold tracking-tight text-[var(--foreground)] sm:mt-2 sm:text-2xl md:text-3xl'
               >
-                NYC first—then we scale
+                New York City first—then we scale
               </h2>
               <p className='mt-2 text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-3 sm:text-base'>
                 Ellieo launches in New York City in 2026. We’re building density and trust in one

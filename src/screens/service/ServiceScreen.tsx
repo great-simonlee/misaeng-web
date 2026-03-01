@@ -25,7 +25,7 @@ function HeroSection() {
             />
             <span style={{ color: ELLIEO_BLUE }}>Ellieo:</span>
           </span>{' '}
-          Next-Gen Housing for NYC
+          Next-Gen Housing for New York City
         </h1>
         <p className='mt-3 max-w-xl text-sm leading-[1.65] text-[var(--muted-foreground)] sm:mt-4 sm:text-base sm:leading-[1.7]'>
           New York&apos;s rental market operates at extreme speed. We turn shared housing into a
@@ -439,10 +439,10 @@ function VerifiedStandardSection() {
   )
 }
 
-/* ─── Operational Business Model + NYC: 다크 배경(How we do it 스타일) 안으로 통합 ─── */
+/* ─── Operational Business Model + New York City: 다크 배경(How we do it 스타일) 안으로 통합 ─── */
 const REVENUE_ITEMS = [
   'Subscription-based access tiers for room seekers seeking verified visibility and structured roommate alignment',
-  "Premium listing placements for agents and verified listers operating within NYC's competitive rental landscape",
+  "Premium listing placements for agents and verified listers operating within New York City's competitive rental landscape",
   'AI-enhanced compatibility insights tailored to urban co-living dynamics',
   'Brokerage coordination partnerships aligned with New York City leasing practices',
 ]
@@ -502,7 +502,7 @@ function BusinessModelSection() {
               support through local team members.
             </p>
             <p className='mt-4 text-base leading-relaxed text-white'>
-              Our NYC base supports platform integrity, agent coordination, and shared housing
+              Our New York City base supports platform integrity, agent coordination, and shared housing
               oversight — ensuring that digital activity aligns with real-world housing processes.
             </p>
             <div

@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Misaeng – Ellieo | Verified Housing for NYC Students & Professionals',
+  title: 'Misaeng – Ellieo | Verified Housing for New York City Students & Professionals',
   description:
-    'Official corporate site for Misaeng and Ellieo—next-gen housing platform for NYC. Identity verification, scam prevention, roommate matching. U.S. business expansion.',
+    'Official corporate site for Misaeng and Ellieo—next-gen housing platform for New York City. Identity verification, scam prevention, roommate matching. U.S. business expansion.',
 }
 
 export default function RootLayout({
@@ -50,8 +50,9 @@ export default function RootLayout({
                   Status
                 </div>
                 <p className='max-w-xs leading-relaxed text-white/90'>
-                  Ellieo official launch in <strong className='text-white'>Spring 2026</strong>.
-                  This site is for market research and partner inquiries.
+                  Official launch: <strong className='text-white'>Spring 2026</strong>.
+                  <br />
+                  Currently in controlled market rollout.
                 </p>
               </div>
               <div className='min-w-0 space-y-1.5'>

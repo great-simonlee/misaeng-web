@@ -1,0 +1,205 @@
+<table
+  role="presentation"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+  width="100%"
+  style="
+    background: #f8fafc;
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0;
+  "
+>
+  <tr>
+    <td
+      align="center"
+      style="
+        padding: 48px 20px;
+        background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%);
+      "
+    >
+      <table
+        role="presentation"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        width="100%"
+        style="
+          max-width: 560px;
+          background: #ffffff;
+          border-radius: 24px;
+          overflow: hidden;
+          box-shadow:
+            0 4px 6px -1px rgba(15, 23, 42, 0.06),
+            0 20px 40px -10px rgba(15, 23, 42, 0.12),
+            0 0 0 1px rgba(15, 23, 42, 0.04);
+        "
+      >
+        <!-- 헤더: 로고 + 타이틀 -->
+        <tr>
+          <td style="background: #0f172a; padding: 40px 32px 36px; text-align: center">
+            <!-- 로고: src를 구글 드라이브 직접 링크(uc?export=view&id=파일ID) 또는 웹 호스팅 URL로 변경 -->
+            <img
+              src="https://drive.google.com/uc?export=view&id=1ZWPHhM1JFbjc6GeAG4VWIEvIz7OdxCCa"
+              width="128"
+              height="44"
+              alt="Misaeng"
+              style="display: inline-block; max-width: 128px; height: auto; margin-bottom: 24px"
+            />
+            <p
+              style="
+                margin: 0 0 8px;
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.25em;
+                text-transform: uppercase;
+                color: rgba(255, 255, 255, 0.6);
+              "
+            >
+              New message
+            </p>
+            <p
+              style="
+                margin: 0;
+                font-size: 22px;
+                font-weight: 700;
+                color: #ffffff;
+                letter-spacing: -0.04em;
+              "
+            >
+              Contact form
+            </p>
+            <table
+              role="presentation"
+              cellpadding="0"
+              cellspacing="0"
+              border="0"
+              align="center"
+              style="margin-top: 16px"
+            >
+              <tr>
+                <td style="height: 4px; width: 56px; background: #f64310; border-radius: 2px"></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- 본문 -->
+        <tr>
+          <td style="padding: 36px 36px 32px">
+            <p style="margin: 0 0 28px; font-size: 15px; line-height: 1.7; color: #475569">
+              A message from <strong style="color: #0f172a">{{name}}</strong> has been received.
+              Please reply at your earliest convenience.
+            </p>
+            <!-- 발신자 카드 -->
+            <table
+              role="presentation"
+              cellpadding="0"
+              cellspacing="0"
+              border="0"
+              width="100%"
+              style="margin-bottom: 28px"
+            >
+              <tr>
+                <td
+                  style="
+                    border-radius: 16px;
+                    border: 1px solid #e2e8f0;
+                    background: #fafbfc;
+                    overflow: hidden;
+                    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+                  "
+                >
+                  <table
+                    role="presentation"
+                    cellpadding="0"
+                    cellspacing="0"
+                    border="0"
+                    width="100%"
+                  >
+                    <tr>
+                      <td style="width: 6px; background: #f64310; vertical-align: top"></td>
+                      <td style="padding: 24px 26px; vertical-align: top">
+                        <p
+                          style="
+                            margin: 0 0 6px;
+                            font-size: 10px;
+                            font-weight: 700;
+                            letter-spacing: 0.14em;
+                            text-transform: uppercase;
+                            color: #94a3b8;
+                          "
+                        >
+                          From
+                        </p>
+                        <p
+                          style="
+                            margin: 0 0 10px;
+                            font-size: 18px;
+                            font-weight: 700;
+                            color: #0f172a;
+                          "
+                        >
+                          {{name}}
+                        </p>
+                        <p style="margin: 0; font-size: 14px; color: #64748b">
+                          Reply to:
+                          <a
+                            href="mailto:{{email}}"
+                            style="color: #f64310; font-weight: 600; text-decoration: none"
+                            >{{email}}</a
+                          >
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+            <!-- 메시지 -->
+            <p
+              style="
+                margin: 0 0 10px;
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: #94a3b8;
+              "
+            >
+              Message
+            </p>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+              <tr>
+                <td
+                  style="
+                    border-radius: 16px;
+                    border: 1px solid #e2e8f0;
+                    background: #f8fafc;
+                    padding: 22px 24px;
+                    font-size: 14px;
+                    line-height: 1.7;
+                    color: #334155;
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+                  "
+                >
+                  {{message}}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- 푸터 -->
+        <tr>
+          <td style="padding: 26px 36px 30px; border-top: 1px solid #f1f5f9; background: #fafbfc">
+            <p style="margin: 0; font-size: 12px; color: #94a3b8">
+              Reply to this email to reach {{name}}.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
