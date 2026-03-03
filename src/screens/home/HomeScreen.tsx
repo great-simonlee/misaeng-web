@@ -86,7 +86,7 @@ function IconMap() {
  */
 export function HomeScreen() {
   return (
-    <div className='flex flex-col overflow-x-hidden'>
+    <div className='flex min-w-0 flex-col overflow-x-hidden'>
       <Hero />
 
       {/* We're hiring — compact CTA strip */}
@@ -109,7 +109,10 @@ export function HomeScreen() {
                 Join Misaeng in New York City
               </h2>
               <p className='mt-1 max-w-xl text-sm text-white/80 sm:mt-1.5'>
-                Partnership & Operations Intern · Marketing Intern. Grow with us from the ground up.
+                Partnership & Operations Intern. <br className='sm:hidden' />
+                Marketing & Content Strategy Intern. <br className='sm:hidden' />
+                <br className='sm:hidden' />
+                Grow with us from the ground up.{' '}
               </p>
             </div>
             <Link
@@ -129,7 +132,7 @@ export function HomeScreen() {
         aria-labelledby='about-ellieo-title'
       >
         <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <div className='grid gap-8 sm:gap-12 lg:grid-cols-12 lg:gap-16'>
+          <div className='grid gap-8 text-center sm:gap-12 sm:text-left lg:grid-cols-12 lg:gap-16'>
             <div className='lg:col-span-5'>
               <span className='inline-block text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]'>
                 What is Ellieo?
@@ -146,15 +149,21 @@ export function HomeScreen() {
             <div className='space-y-4 sm:space-y-5 lg:col-span-7 lg:pt-2'>
               <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base sm:text-lg'>
                 <strong className='font-semibold text-[var(--foreground)]'>Ellieo</strong> is
-                Misaeng’s flagship app for students and professionals in New York City. We combine
-                verified listings, identity-checked roommates, and scam-resistant flows so you can
-                find a place—and roommates—you can trust.
+                Misaeng’s flagship app for
+                <br className='sm:hidden' /> students and professionals in New York City.
+                <br className='sm:hidden' /> We combine verified listings, identity-checked
+                roommates, and scam-resistant flows
+                <br className='sm:hidden' />
+                so you can find a place and roommates.
               </p>
               <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base'>
-                No fake ads. No surprise fees. Just transparent, secure housing search and
-                matching—backed by identity verification and a focus on safety first.
+                No fake ads. No surprise fees.
+                <br className='sm:hidden' />
+                Just transparent, secure housing search
+                <br className='sm:hidden' /> and matching backed by identity verification
+                <br className='sm:hidden' /> and the focus on safety first.
               </p>
-              <div className='flex flex-wrap gap-2 pt-1 sm:gap-3 sm:pt-2'>
+              <div className='hidden sm:flex flex-wrap justify-center gap-2 pt-1  sm:justify-start sm:gap-3 sm:pt-2'>
                 <span className='rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)] sm:px-4 sm:py-2 sm:text-sm'>
                   Verified listings
                 </span>
@@ -177,14 +186,14 @@ export function HomeScreen() {
         aria-labelledby='why-ellieo-heading'
       >
         <div className='relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <div className='grid gap-8 sm:gap-12 lg:grid-cols-12 lg:gap-16'>
+          <div className='grid gap-8 text-center sm:gap-12 sm:text-left lg:grid-cols-12 lg:gap-16'>
             <div className='lg:col-span-5'>
               <span className='inline-block text-[10px] font-semibold uppercase tracking-[0.28em] text-[#3478F6]'>
                 Three pillars
               </span>
               <h2
                 id='why-ellieo-heading'
-                className='mt-3 flex flex-wrap items-center gap-2 text-2xl font-bold tracking-tight text-[var(--foreground)] sm:mt-4 sm:gap-3 sm:text-4xl md:text-[2.75rem] md:leading-[1.15]'
+                className='mt-3 flex flex-wrap items-center justify-center gap-2 text-2xl font-bold tracking-tight text-[var(--foreground)] sm:mt-4 sm:justify-start sm:gap-3 sm:text-4xl md:text-[2.75rem] md:leading-[1.15]'
               >
                 Why
                 <Image
@@ -200,12 +209,13 @@ export function HomeScreen() {
                 </span>
               </h2>
               <p className='mt-3 text-sm text-[var(--muted-foreground)] sm:mt-4 sm:text-lg'>
-                Three pillars that make finding a home and roommates safer and simpler.
+                Three pillars that make finding a home
+                <br className='sm:hidden' /> and roommates safer and simpler.
               </p>
             </div>
             <div className='space-y-6 sm:space-y-8 lg:col-span-7 lg:pt-2'>
               <div className='space-y-2'>
-                <div className='flex items-center gap-3'>
+                <div className='flex items-center justify-center gap-3 sm:justify-start'>
                   <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#3478F6]/18 text-[#3478F6] sm:h-10 sm:w-10'>
                     <IconVerified />
                   </span>
@@ -214,12 +224,15 @@ export function HomeScreen() {
                   </h3>
                 </div>
                 <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base'>
-                  Every listing is vetted. We verify properties and landlords so you avoid scams and
-                  hidden fees—from search to lease.
+                  Every listing is vetted. <br className='sm:hidden' />
+                  We verify properties and landlords
+                  <br className='sm:hidden' /> so you avoid scams and hidden fees
+                  <br className='sm:hidden' />
+                  from search to lease.
                 </p>
               </div>
               <div className='space-y-2'>
-                <div className='flex items-center gap-3'>
+                <div className='flex items-center justify-center gap-3 sm:justify-start'>
                   <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#3478F6]/18 text-[#3478F6] sm:h-10 sm:w-10'>
                     <IconRoommates />
                   </span>
@@ -228,12 +241,14 @@ export function HomeScreen() {
                   </h3>
                 </div>
                 <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base'>
-                  Get matched with roommates based on lifestyle, budget, and location. Identity
-                  verification keeps everyone accountable and safe.
+                  Get matched with roommates
+                  <br className='sm:hidden' /> based on lifestyle, budget, and location.
+                  <br className='sm:hidden' /> Identity verification keeps everyone{' '}
+                  <br className='sm:hidden' /> accountable and safe.
                 </p>
               </div>
               <div className='space-y-2'>
-                <div className='flex items-center gap-3'>
+                <div className='flex items-center justify-center gap-3 sm:justify-start'>
                   <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#3478F6]/18 text-[#3478F6] sm:h-10 sm:w-10'>
                     <IconHome />
                   </span>
@@ -242,8 +257,9 @@ export function HomeScreen() {
                   </h3>
                 </div>
                 <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base'>
-                  Identity verification and listing checks are built in. No fake ads, no
-                  bait-and-switch—just transparent, secure housing.
+                  Identity verification and listing checks are built in.{' '}
+                  <br className='sm:hidden' /> No fake ads, no bait-and-switch
+                  <br className='sm:hidden' /> Just transparent, secure housing.
                 </p>
               </div>
             </div>
@@ -284,9 +300,9 @@ export function HomeScreen() {
                 New York City first—then we scale
               </h2>
               <p className='mt-2 text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-3 sm:text-base'>
-                Ellieo launches in New York City in 2026. We’re building density and trust in one
-                market first, then expanding to Boston, Chicago, and LA. Our roadmap is built for
-                national scale—one city at a time.
+                Ellieo launches in New York City in 2026. <br className='sm:hidden' /> We’re
+                building density and trust in one market first, then expanding to Boston, Chicago,
+                and LA. Our roadmap is built for national scale—one city at a time.
               </p>
               <div className='mt-4 flex flex-wrap gap-2 sm:mt-5'>
                 <span className='inline-flex items-center gap-1.5 rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)] sm:px-3.5 sm:py-2 sm:text-sm'>
@@ -321,9 +337,10 @@ export function HomeScreen() {
             Partner with Ellieo
           </h2>
           <p className='mt-3 text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-4 sm:text-base sm:text-lg'>
-            Landlords and strategic partners: we’re building the future of verified,
-            student-friendly housing together. Get in touch to list properties, explore
-            integrations, or join our ecosystem.
+            Landlords and strategic partners: <br className='sm:hidden' /> we’re building the future
+            of verified, <br className='sm:hidden' /> student-friendly housing together. <br />
+            <br className='sm:hidden' /> Get in touch to list properties,{' '}
+            <br className='sm:hidden' /> explore integrations, or join our ecosystem.
           </p>
           <Link
             href='https://ellieo.com/#early'
@@ -334,7 +351,8 @@ export function HomeScreen() {
             Join Early Access
           </Link>
           <p className='mt-4 text-xs text-[var(--muted-foreground)] sm:mt-6'>
-            Partner & partnership inquiries and early access are handled on Ellieo.
+            Partner & partnership inquiries and early access <br className='sm:hidden' /> are
+            handled on Ellieo.
           </p>
         </div>
       </section>

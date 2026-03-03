@@ -9,7 +9,7 @@ const ELLIEO_BLUE = '#00A5FF'
 function HeroSection() {
   return (
     <header className='bg-[var(--background)]'>
-      <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-8 lg:px-8 lg:py-10'>
+      <div className='mx-auto max-w-7xl px-4 py-8 text-center sm:px-6 sm:py-8 sm:text-left lg:px-8 lg:py-10'>
         <p className='text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]'>
           Our Service
         </p>
@@ -28,9 +28,10 @@ function HeroSection() {
           Next-Gen Housing for New York City
         </h1>
         <p className='mt-3 max-w-xl text-sm leading-[1.65] text-[var(--muted-foreground)] sm:mt-4 sm:text-base sm:leading-[1.7]'>
-          New York&apos;s rental market operates at extreme speed. We turn shared housing into a
-          structured, accountable process—Half the Rent means financial efficiency; Twice the Story
-          means better roommate alignment and a smoother move-in experience.
+          New York&apos;s rental market operates at extreme speed. <br className='sm:hidden' /> We
+          turn shared housing into a structured, accountable process—Half the Rent means financial
+          efficiency; Twice the Story means better roommate alignment and a smoother move-in
+          experience.
         </p>
       </div>
     </header>
@@ -115,7 +116,7 @@ function WorkflowSection() {
 
       <div className='relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         {/* Section header */}
-        <div className='text-left'>
+        <div className='text-center sm:text-left'>
           <h2
             id='workflow-heading'
             className='text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl'
@@ -123,7 +124,8 @@ function WorkflowSection() {
             How Ellieo Works
           </h2>
           <p className='mt-4 max-w-xl text-base leading-relaxed text-[var(--muted-foreground)]'>
-            From listing to move-in — structured, verified, and coordinated.
+            From listing to move-in <br className='sm:hidden' /> — structured, verified, and
+            coordinated.
           </p>
         </div>
 
@@ -357,18 +359,20 @@ function VerifiedStandardSection() {
       aria-labelledby='verified-heading'
     >
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <h2
-          id='verified-heading'
-          className='text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl'
-        >
-          Ellieo Verified Standard
-        </h2>
-        <p className='mt-4 text-[var(--muted-foreground)] leading-relaxed'>
-          Ellieo&apos;s Verified Standard establishes structured accountability across listings,
-          participants, and lease processes. Rather than relying solely on digital postings, our
-          framework enforces documentation standards, participant transparency, and structured
-          coordination to reduce uncertainty in shared housing.
-        </p>
+        <div className='text-center sm:text-left'>
+          <h2
+            id='verified-heading'
+            className='text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl'
+          >
+            Ellieo Verified Standard
+          </h2>
+          <p className='mt-4 text-[var(--muted-foreground)] leading-relaxed'>
+            Ellieo&apos;s Verified Standard establishes structured accountability across listings,
+            participants, and lease processes. Rather than relying solely on digital postings, our
+            framework enforces documentation standards, participant transparency, and structured
+            coordination to reduce uncertainty in shared housing.
+          </p>
+        </div>
         <div className='mt-12 rounded-3xl border border-[var(--border)] bg-[var(--foreground)] p-4 shadow-2xl sm:p-10 lg:p-12'>
           {/* 상단 2열: Listing Integrity, Lease Clarity */}
           <div className='grid grid-cols-1 gap-10 sm:grid-cols-2'>
@@ -475,7 +479,9 @@ function BusinessModelSection() {
               {REVENUE_ITEMS.map((item) => (
                 <li key={item} className='flex items-start gap-3'>
                   <span className='mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#00A5FF]' aria-hidden />
-                  <span className='min-w-0 text-sm font-medium text-white break-words sm:text-base'>{item}</span>
+                  <span className='min-w-0 text-sm font-medium text-white break-words sm:text-base'>
+                    {item}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -502,8 +508,9 @@ function BusinessModelSection() {
               support through local team members.
             </p>
             <p className='mt-4 text-base leading-relaxed text-white'>
-              Our New York City base supports platform integrity, agent coordination, and shared housing
-              oversight — ensuring that digital activity aligns with real-world housing processes.
+              Our New York City base supports platform integrity, agent coordination, and shared
+              housing oversight — ensuring that digital activity aligns with real-world housing
+              processes.
             </p>
             <div
               className='relative mt-8 aspect-[2/1] max-w-md overflow-hidden rounded-2xl border border-white/10 bg-white/5'
@@ -535,14 +542,14 @@ function CTASection() {
         className='absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_100%,rgba(0,165,255,0.25),transparent_60%)]'
         aria-hidden
       />
-      <div className='relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8'>
+      <div className='relative mx-auto max-w-7xl px-4 text-left sm:px-6 sm:text-center lg:px-8'>
         <h2 id='cta-heading' className='text-2xl font-bold tracking-tight text-white sm:text-3xl'>
           Purpose-built for New York City —
         </h2>
         <p className='mt-3 text-slate-400'>
           integrating verification, coordination, and structured shared housing operations.
         </p>
-        <div className='mt-8'>
+        <div className='mt-8 flex justify-start sm:justify-center'>
           <Link
             href='/contact'
             className='inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-[var(--brand)] px-8 py-4 text-base font-semibold text-white shadow-xl shadow-[var(--brand)]/30 transition hover:bg-[var(--brand-hover)] hover:shadow-[var(--brand)]/40 active:scale-[0.98]'
@@ -558,7 +565,7 @@ function CTASection() {
 
 export function ServiceScreen() {
   return (
-    <div className='min-h-screen bg-[var(--background)]'>
+    <div className='min-h-screen min-w-0 overflow-x-hidden bg-[var(--background)]'>
       <HeroSection />
       <WorkflowSection />
       <VerifiedStandardSection />

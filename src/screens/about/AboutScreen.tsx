@@ -9,7 +9,7 @@ export function AboutScreen() {
     <div className='min-h-screen min-w-0 overflow-x-hidden bg-[var(--background)]'>
       {/* Hero */}
       <header className='bg-[var(--background)]'>
-        <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-8 lg:px-8 lg:py-10'>
+        <div className='mx-auto max-w-7xl px-4 py-8 text-center sm:px-6 sm:py-8 sm:text-left lg:px-8 lg:py-10'>
           <p className='text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]'>
             About Us
           </p>
@@ -17,17 +17,18 @@ export function AboutScreen() {
             Half the Rent, <span className='font-bold'>Twice the Story.</span>
           </p>
           <p className='mt-4 text-base font-semibold tracking-tight text-[#F64310] sm:mt-6 sm:text-xl md:text-2xl'>
-            AI-Driven Roommate Matching Built for New York City.
+            AI-Driven Roommate Matching <br className='sm:hidden' /> Built for New York City.
           </p>
           <p className='mt-3 text-sm leading-[1.65] text-[var(--muted-foreground)] sm:mt-4 sm:text-base sm:leading-[1.7]'>
-            Transforming shared living through verified listings, structured compatibility, and
-            faster move-in coordination.
+            Transforming shared living through verified listings, <br className='sm:hidden' />{' '}
+            structured compatibility, and
+            <br className='sm:hidden' /> faster move-in coordination.
           </p>
         </div>
       </header>
 
       {/* SECTION 1 — The Meaning Behind the Slogan */}
-      <section className='mx-auto max-w-7xl border-t border-[var(--border)] px-4 pt-8 pb-8 sm:px-6 sm:pt-12 sm:pb-14 lg:px-8'>
+      <section className='mx-auto max-w-7xl border-t border-[var(--border)] px-4 pt-8 pb-8 text-center sm:px-6 sm:pt-12 sm:pb-14 sm:text-left lg:px-8'>
         <h2 className='text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl'>
           What We Stand For
         </h2>
@@ -89,14 +90,14 @@ export function AboutScreen() {
       </section>
 
       {/* SECTION 2 — AI + Verification */}
-      <section className='mx-auto max-w-7xl border-t border-[var(--border)] px-4 pt-8 pb-8 sm:px-6 sm:pt-12 sm:pb-14 lg:px-8'>
+      <section className='mx-auto max-w-7xl border-t border-[var(--border)] px-4 pt-8 pb-8 text-center sm:px-6 sm:pt-12 sm:pb-14 sm:text-left lg:px-8'>
         <h2 className='text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl'>
           Smarter Matching
         </h2>
         <p className='mt-3 text-base text-[var(--muted-foreground)]'>
           How Ellieo Improves Matching Success
         </p>
-        <div className='mt-6 grid grid-cols-1 gap-4 sm:mt-8 sm:gap-6 lg:grid-cols-2'>
+        <div className='mt-6 grid grid-cols-1 gap-4 text-left sm:mt-8 sm:gap-6 lg:grid-cols-2'>
           <div className='rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm sm:p-8'>
             <h3 className='text-xs font-bold uppercase tracking-wider text-[#F64310] sm:text-sm'>
               Ellieo integrates
@@ -212,8 +213,8 @@ export function AboutScreen() {
                       As the Founder and Major Investor of Misaeng, I am currently leading the
                       strategic deployment of capital and the establishment of our U.S. operational
                       infrastructure. My focus is on architecting a scalable business model that
-                      brings transparency to the New York City housing market through verified data and
-                      AI-driven systems.
+                      brings transparency to the New York City housing market through verified data
+                      and AI-driven systems.
                     </p>
                     <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
                       To maintain the highest level of governance, I oversee the high-level
@@ -293,9 +294,7 @@ export function AboutScreen() {
         <h2 className='text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl'>
           Get in Touch
         </h2>
-        <p className='mt-3 text-base text-[var(--muted-foreground)]'>
-          Office & Contact
-        </p>
+        <p className='mt-3 text-base text-[var(--muted-foreground)]'>Office & Contact</p>
         <div className='mt-4 flex flex-col gap-1 text-sm text-[var(--foreground)] sm:mt-5 sm:gap-2'>
           <p className='font-medium'>45 Rockefeller Plaza, Fl 20, New York, NY 10111</p>
           <p>

@@ -174,20 +174,26 @@ function PhaseIcon({ icon }: { icon: string }) {
 
 export function RoadmapScreen() {
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen min-w-0 overflow-x-hidden bg-[var(--background)]">
       {/* ─── Hero ─── */}
       <header className="bg-[var(--background)]">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+        <div className="mx-auto max-w-7xl px-4 py-8 text-center sm:px-6 sm:py-8 sm:text-left lg:px-8 lg:py-10">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]">
             Roadmap
           </p>
           <h1 className="mt-3 text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15]">
-            New York City first. Then we scale.
+            New York City first.
+            <br className="sm:hidden" />
+            Then we scale.
           </h1>
           <p className="mt-2 text-sm font-medium text-[#F64310] sm:text-base">
-            Rental is the backbone of real estate cash flow and client relationships.
+            Rental is the backbone of real estate
+            <br className="sm:hidden" />
+            cash flow and client relationships.
             <br />
-            New York is where we build density, trust, and operational control.
+            New York is where we build density,
+            <br className="sm:hidden" />
+            trust, and operational control.
           </p>
           <p className="mt-3 max-w-xl text-sm leading-[1.65] text-[var(--muted-foreground)] sm:mt-4 sm:text-base sm:leading-[1.7]">
             We prove density, trust, and operational playbooks in New York before expanding to
@@ -261,29 +267,31 @@ export function RoadmapScreen() {
           aria-hidden
         />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]">
-            Future growth
-          </p>
-          <h2 id="phases-heading" className="mt-2 text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl lg:text-4xl">
-            From one city to many
-          </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base">
-            Prove rental density and operational control in New York City (2025 Q4 MVP through 2026 full service), then replicate city by city. Product milestones and city expansion aligned.
-          </p>
+          <div className="text-center sm:text-left">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]">
+              Future growth
+            </p>
+            <h2 id="phases-heading" className="mt-2 text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl lg:text-4xl">
+              From one city to many
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base">
+              Prove rental density and operational control in New York City (2025 Q4 MVP through 2026 full service), then replicate city by city. Product milestones and city expansion aligned.
+            </p>
+          </div>
 
           {/* Phase timeline: 2026, 2027, 2028+ ─── */}
-          <div className="mt-10 sm:mt-14 lg:mt-16">
+          <div className="mt-10 text-center sm:mt-14 sm:text-left lg:mt-16">
             <div className="flex flex-col gap-0 lg:grid lg:grid-cols-4 lg:gap-8">
               {ROADMAP.cityPhases.map((phase) => (
                 <div
                   key={phase.year}
-                  className="relative flex gap-6 pb-12 last:pb-0 lg:flex-col lg:gap-4 lg:pb-0"
+                  className="relative flex flex-col gap-4 pb-12 last:pb-0 sm:gap-6 lg:flex-col lg:gap-4 lg:pb-0"
                 >
-                  <div className="relative z-10 flex shrink-0 items-start gap-4 lg:flex-col lg:gap-3">
+                  <div className="relative z-10 flex shrink-0 items-center justify-center gap-4 sm:justify-start lg:flex-col lg:items-start lg:gap-3">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#F64310] bg-[var(--background)] text-[#F64310] lg:h-16 lg:w-16 lg:border-[3px]">
                       <span className="text-xs font-bold sm:text-sm lg:text-base">{phase.year}</span>
                     </div>
-                    <div className="min-w-0 flex-1 lg:flex-none">
+                    <div className="min-w-0 flex-none sm:flex-1 lg:flex-none">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
                         {phase.label}
                       </p>
@@ -292,11 +300,11 @@ export function RoadmapScreen() {
                       </h3>
                     </div>
                   </div>
-                  <p className="ml-[52px] text-sm leading-[1.65] text-[var(--muted-foreground)] sm:ml-[56px] lg:ml-0 lg:mt-2">
+                  <p className="mt-0 text-sm leading-[1.65] text-[var(--muted-foreground)] sm:mt-0 lg:mt-2">
                     {phase.description}
                   </p>
                   {'microLine' in phase && phase.microLine && (
-                    <p className="ml-[52px] mt-2 text-xs font-semibold text-[#F64310] sm:ml-[56px] lg:ml-0">
+                    <p className="mt-2 text-xs font-semibold text-[#F64310]">
                       {phase.microLine}
                     </p>
                   )}
@@ -307,12 +315,12 @@ export function RoadmapScreen() {
 
           {/* City expansion + Product milestones: two rows ─── */}
           <div className="mt-14 flex flex-col gap-8 sm:mt-16 lg:gap-10">
-            {/* Row 1: City expansion timeline */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] p-6 sm:p-8">
-              <p className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
+            {/* Row 1: City expansion timeline (모바일에서 숨김) */}
+            <div className="hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] p-6 sm:block sm:p-8">
+              <p className="text-center text-xs font-semibold uppercase tracking-wider text-[var(--muted)] sm:text-left">
                 City expansion timeline
               </p>
-              <p className="mt-1 text-sm text-[var(--muted-foreground)]">
+              <p className="mt-1 text-center text-sm text-[var(--muted-foreground)] sm:text-left">
                 One city at a time—verified operations before scale.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:mt-8">
@@ -322,16 +330,16 @@ export function RoadmapScreen() {
                   return (
                     <div
                       key={row.year}
-                      className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3"
+                      className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:gap-3 sm:items-start"
                     >
-                      <span className="w-14 shrink-0 text-xs font-medium text-[var(--foreground)] sm:w-20 sm:text-sm">
+                      <span className="w-full text-center text-xs font-medium text-[var(--foreground)] sm:w-20 sm:text-left sm:text-sm">
                         {row.year}
                       </span>
-                      <div className="flex flex-1 flex-wrap gap-1 sm:grid sm:grid-cols-5">
+                      <div className="grid w-full grid-cols-5 gap-1 sm:flex-1">
                         {cities.map((city) => (
                           <span
                             key={city}
-                            className="rounded-lg bg-[#F64310] px-3 py-2 text-xs font-semibold text-white sm:text-sm"
+                            className="min-w-0 truncate rounded-lg bg-[#F64310] px-2 py-2 text-center text-xs font-semibold text-white sm:px-3 sm:text-sm"
                           >
                             {city}
                           </span>
@@ -340,7 +348,7 @@ export function RoadmapScreen() {
                           Array.from({ length: placeholders }).map((_, i) => (
                             <span
                               key={`ph-${i}`}
-                              className="rounded-lg bg-[var(--border)] px-3 py-2 text-xs text-[var(--muted-foreground)] sm:text-sm"
+                              className="rounded-lg bg-[var(--border)] px-2 py-2 text-center text-xs text-[var(--muted-foreground)] sm:px-3 sm:text-sm"
                             >
                               —
                             </span>
@@ -389,29 +397,37 @@ export function RoadmapScreen() {
         aria-labelledby="key-numbers-heading"
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]">
-            By the numbers
-          </p>
-          <h2 id="key-numbers-heading" className="mt-1.5 text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl lg:text-3xl">
-            Key metrics at a glance
-          </h2>
-          <p className="mt-2 max-w-xl text-xs leading-relaxed text-[var(--muted-foreground)] sm:text-sm">
-            KPI targets from our business plan. Numbers update as we hit them.
-          </p>
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:gap-4 lg:grid-cols-3 lg:gap-5">
+          <div className="text-center sm:text-left">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]">
+              By the numbers
+            </p>
+            <h2 id="key-numbers-heading" className="mt-1.5 text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl lg:text-3xl">
+              Key metrics at a glance
+            </h2>
+            <p className="mx-auto mt-2 max-w-xl text-xs leading-relaxed text-[var(--muted-foreground)] sm:mx-0 sm:text-sm">
+              KPI targets from our business plan.
+              <br className="sm:hidden" />
+              Numbers update as we hit them.
+            </p>
+          </div>
+          <div className="mt-4 grid grid-cols-1 gap-2 sm:mt-8 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-5">
             {ROADMAP.kpis.map((item) => (
               <div
                 key={item.label}
-                className="relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-4 shadow-sm sm:p-5"
+                className="relative min-w-0 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3 text-center shadow-sm sm:p-5 sm:text-left"
               >
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+                <p className="hidden text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)] break-words sm:block">
                   {item.targetLabel}
                 </p>
-                <p className="mt-1.5 flex flex-wrap items-baseline gap-1 text-2xl font-bold tabular-nums tracking-tight text-[var(--foreground)] sm:text-3xl lg:text-4xl">
+                <p className="mt-0 flex flex-wrap items-baseline justify-center gap-1 text-2xl font-bold tabular-nums tracking-tight text-[var(--foreground)] sm:mt-1.5 sm:justify-start sm:text-3xl lg:text-4xl">
                   {item.value}
                 </p>
-                <p className="mt-0.5 text-xs font-semibold text-[var(--foreground)]">{item.label}</p>
-                <p className="mt-0.5 text-[11px] text-[var(--muted-foreground)]">{item.sub}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--foreground)] sm:mt-0.5 sm:text-xs">
+                  {item.label}
+                </p>
+                <p className="mt-0.5 text-xs font-medium text-[var(--muted-foreground)] sm:text-[11px] sm:font-normal">
+                  {item.sub}
+                </p>
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-[var(--border)]" aria-hidden>
                   <div className="h-full w-full rounded-r-full bg-[#F64310]" />
                 </div>
@@ -427,19 +443,24 @@ export function RoadmapScreen() {
         aria-labelledby="pillars-heading"
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]">
-            Four pillars
-          </p>
-          <h2 id="pillars-heading" className="mt-1.5 text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl lg:text-3xl">
-            How we grow
-          </h2>
-          <p className="mt-2 max-w-xl text-xs leading-relaxed text-[var(--muted-foreground)] sm:text-sm">
-            We scale city by city with an operations-first model that builds trust, density, and
-            repeatable playbooks.
-          </p>
-          <p className="mt-2 text-sm font-semibold text-[var(--foreground)] sm:text-base">
-            Rental density is our engine. Operational control is our moat.
-          </p>
+          <div className="text-center sm:text-left">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]">
+              Four pillars
+            </p>
+            <h2 id="pillars-heading" className="mt-1.5 text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl lg:text-3xl">
+              How we grow
+            </h2>
+            <p className="mx-auto mt-2 max-w-xl text-xs leading-relaxed text-[var(--muted-foreground)] sm:mx-0 sm:text-sm">
+              We scale city by city with an operations-first model
+              <br className="sm:hidden" />
+              that builds trust, density, and repeatable playbooks.
+            </p>
+            <p className="mt-2 text-sm font-semibold text-[var(--foreground)] sm:text-base">
+              Rental density is our engine.
+              <br className="sm:hidden" />
+              Operational control is our moat.
+            </p>
+          </div>
 
           {/* Growth loop: hero strip ─── */}
           <div
@@ -552,13 +573,15 @@ export function RoadmapScreen() {
             Building in public
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-center text-sm text-white/70 sm:text-base">
-            Milestones are tracked publicly. Execution over promises.
+            Milestones are tracked publicly.
+            <br className="sm:hidden" />
+            Execution over promises.
           </p>
           <div className="mt-10 grid grid-cols-1 gap-4 sm:mt-14 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
             {ROADMAP.buildingInPublic.map((m) => (
               <div
                 key={m.value}
-                className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8"
+                className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur-sm sm:p-8 sm:text-left"
               >
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-white/60">
                   {m.label}
@@ -578,7 +601,7 @@ export function RoadmapScreen() {
         className="border-t border-[var(--border)] bg-[var(--surface)] py-14 sm:py-20"
         aria-labelledby="roadmap-cta-heading"
       >
-        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl px-4 text-left sm:px-6 sm:text-center lg:px-8">
           <h2
             id="roadmap-cta-heading"
             className="text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl"
@@ -588,7 +611,7 @@ export function RoadmapScreen() {
           <p className="mt-3 text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base">
             Access verified listings and structured roommate matching before public scale.
           </p>
-          <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <div className="mt-8 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-center">
             <Link
               href="https://ellieo.com/#early"
               target="_blank"
