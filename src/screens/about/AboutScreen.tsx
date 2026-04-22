@@ -1,10 +1,10 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+
+import { AboutTeamSection } from './AboutTeamSection'
 
 export function AboutScreen() {
-  const [bioExpanded, setBioExpanded] = useState(false)
   return (
     <div className='min-h-screen min-w-0 overflow-x-hidden bg-[var(--background)]'>
       {/* Hero */}
@@ -148,146 +148,7 @@ export function AboutScreen() {
         </p>
       </section>
 
-      {/* Executive Profile */}
-      <section className='mx-auto max-w-7xl border-t border-[var(--border)] px-4 pt-8 pb-8 sm:px-6 sm:pt-12 sm:pb-14 lg:px-8'>
-        <h2 className='text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl'>
-          Executive Profile
-        </h2>
-        {/* Mobile: photo + name in one row; below: subtitle, bio, email */}
-        <div className='mt-6 flex flex-col sm:mt-8 sm:flex-row sm:items-start sm:gap-8'>
-          <div className='relative flex shrink-0 flex-row items-center gap-4 sm:flex-col sm:items-start sm:gap-0'>
-            <div className='relative h-[120px] w-[120px] shrink-0 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] sm:h-56 sm:w-56'>
-              <Image
-                src='/img/simon_image.JPG'
-                alt='Seunghoon Lee — Founder & Managing Member'
-                fill
-                className='object-cover object-top'
-                sizes='(max-width: 640px) 120px, 224px'
-                priority
-              />
-            </div>
-            <div className='min-w-0 flex-1 sm:hidden'>
-              <h2 className='text-lg font-bold tracking-tight text-[var(--foreground)]'>
-                Seunghoon Lee
-              </h2>
-              <p className='mt-0.5 text-sm font-semibold text-[#F64310]'>
-                Founder & Managing Member
-              </p>
-              <p className='mt-1 text-xs leading-snug text-[var(--muted-foreground)]'>
-                Chief of Strategic Investment & Business Architecture
-              </p>
-            </div>
-          </div>
-          <div className='min-w-0 flex-1 mt-4 sm:mt-0'>
-            <h2 className='hidden text-xl font-bold tracking-tight text-[var(--foreground)] sm:block sm:text-2xl'>
-              Seunghoon Lee
-            </h2>
-            <p className='mt-1 hidden text-sm font-semibold text-[#F64310] sm:mt-0 sm:block sm:text-base'>
-              Founder & Managing Member
-            </p>
-            <p className='mt-0.5 hidden text-xs text-[var(--muted-foreground)] sm:mt-1 sm:block sm:text-sm'>
-              Chief of Strategic Investment & Business Architecture
-            </p>
-            {/* Desktop: bio always visible */}
-            <div className='mt-5 hidden space-y-4 sm:mt-6 sm:block'>
-              <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
-                As the Founder and Major Investor of Misaeng, I am currently leading the strategic
-                deployment of capital and the establishment of our U.S. operational infrastructure.
-                My focus is on architecting a scalable business model that brings transparency to
-                the New York City housing market through verified data and AI-driven systems.
-              </p>
-              <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
-                To maintain the highest level of governance, I oversee the high-level corporate
-                strategy and investment roadmap, while our New York-based Operations Manager
-                executes daily field activities and partnership management. This structural
-                separation ensures that our expansion is driven by robust professional standards and
-                long-term investment goals.
-              </p>
-            </div>
-            {/* Mobile: expand/collapse */}
-            <div className='mt-1 sm:hidden'>
-              {bioExpanded ? (
-                <>
-                  <div className='space-y-4'>
-                    <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
-                      As the Founder and Major Investor of Misaeng, I am currently leading the
-                      strategic deployment of capital and the establishment of our U.S. operational
-                      infrastructure. My focus is on architecting a scalable business model that
-                      brings transparency to the New York City housing market through verified data
-                      and AI-driven systems.
-                    </p>
-                    <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
-                      To maintain the highest level of governance, I oversee the high-level
-                      corporate strategy and investment roadmap, while our New York-based Operations
-                      Manager executes daily field activities and partnership management. This
-                      structural separation ensures that our expansion is driven by robust
-                      professional standards and long-term investment goals.
-                    </p>
-                  </div>
-                  <button
-                    type='button'
-                    onClick={() => setBioExpanded(false)}
-                    className='mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] py-2.5 text-sm font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--surface-elevated)] hover:text-[var(--foreground)]'
-                    aria-expanded='true'
-                  >
-                    Show less
-                    <svg
-                      className='h-4 w-4 shrink-0'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      stroke='currentColor'
-                      strokeWidth={2}
-                    >
-                      <path strokeLinecap='round' strokeLinejoin='round' d='M5 15l7-7 7 7' />
-                    </svg>
-                  </button>
-                </>
-              ) : (
-                <button
-                  type='button'
-                  onClick={() => setBioExpanded(true)}
-                  className='flex w-full items-center justify-center gap-2 rounded-full border border-[#F64310]/30 bg-[#F64310]/5 py-2.5 text-sm font-medium text-[#F64310] transition-colors hover:bg-[#F64310]/10'
-                  aria-expanded='false'
-                >
-                  Read bio
-                  <svg
-                    className='h-4 w-4 shrink-0'
-                    fill='none'
-                    viewBox='0 0 24 24'
-                    stroke='currentColor'
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap='round' strokeLinejoin='round' d='M19 9l-7 7-7-7' />
-                  </svg>
-                </button>
-              )}
-            </div>
-            <div className='mt-5 flex items-center gap-2.5 sm:mt-6'>
-              <span
-                className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F64310]/10 text-[#F64310]'
-                aria-hidden
-              >
-                <svg
-                  className='h-4 w-4'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                  strokeWidth={1.5}
-                  stroke='currentColor'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    d='M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75'
-                  />
-                </svg>
-              </span>
-              <span className='text-sm font-medium text-[var(--foreground)]'>
-                simon@misaeng.com
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AboutTeamSection />
 
       {/* Office & Contact */}
       <section className='mx-auto max-w-7xl border-t border-[var(--border)] px-4 pt-8 pb-12 sm:px-6 sm:pt-10 sm:pb-16 lg:px-8'>
