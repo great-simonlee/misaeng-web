@@ -14,9 +14,34 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://misaeng.com'),
   title: 'Misaeng – Ellieo | Verified Housing for New York City Students & Professionals',
   description:
     'Official corporate site for Misaeng and Ellieo—next-gen housing platform for New York City. Identity verification, scam prevention, roommate matching. U.S. business expansion.',
+  openGraph: {
+    title: 'Misaeng – Ellieo | Verified Housing for New York City Students & Professionals',
+    description:
+      'Official corporate site for Misaeng and Ellieo—next-gen housing platform for New York City. Identity verification, scam prevention, roommate matching. U.S. business expansion.',
+    url: 'https://misaeng.com',
+    siteName: 'Misaeng',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'Misaeng – Ellieo verified housing platform',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Misaeng – Ellieo | Verified Housing for New York City Students & Professionals',
+    description:
+      'Official corporate site for Misaeng and Ellieo—next-gen housing platform for New York City. Identity verification, scam prevention, roommate matching. U.S. business expansion.',
+    images: ['/twitter-image'],
+  },
 }
 
 export default function RootLayout({
