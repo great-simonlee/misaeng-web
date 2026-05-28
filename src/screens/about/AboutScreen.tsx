@@ -17,12 +17,12 @@ export function AboutScreen() {
             Half the Rent, <span className='font-bold'>Twice the Story.</span>
           </p>
           <p className='mt-4 text-base font-semibold tracking-tight text-[#F64310] sm:mt-6 sm:text-xl md:text-2xl'>
-            AI-Driven Roommate Matching <br className='sm:hidden' /> Built for New York City.
+            Real Estate Professionals <br className='sm:hidden' /> Matching People in New York City.
           </p>
           <p className='mt-3 text-sm leading-[1.65] text-[var(--muted-foreground)] sm:mt-4 sm:text-base sm:leading-[1.7]'>
-            Transforming shared living through verified listings, <br className='sm:hidden' />{' '}
-            structured compatibility, and
-            <br className='sm:hidden' /> faster move-in coordination.
+            With years of experience in NYC rentals, we help students and young working{' '}
+            <br className='sm:hidden' />
+            professionals find roommates and homes that fit their lifestyle, budget, and goals.
           </p>
         </div>
       </header>
@@ -89,26 +89,26 @@ export function AboutScreen() {
         </div>
       </section>
 
-      {/* SECTION 2 — AI + Verification */}
+      {/* SECTION 2 — Professional matching */}
       <section className='mx-auto max-w-7xl border-t border-[var(--border)] px-4 pt-8 pb-8 text-center sm:px-6 sm:pt-12 sm:pb-14 sm:text-left lg:px-8'>
         <h2 className='text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl'>
-          Smarter Matching
+          How We Match
         </h2>
         <p className='mt-3 text-base text-[var(--muted-foreground)]'>
-          How Ellieo Improves Matching Success
+          Preference-based placement by experienced NYC real estate professionals
         </p>
         <div className='mt-6 grid grid-cols-1 gap-4 text-left sm:mt-8 sm:gap-6 lg:grid-cols-2'>
           <div className='rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm sm:p-8'>
             <h3 className='text-xs font-bold uppercase tracking-wider text-[#F64310] sm:text-sm'>
-              Ellieo integrates
+              What we bring
             </h3>
             <ul className='mt-3 space-y-2 sm:mt-4 sm:space-y-2.5'>
               {[
-                'Structured lifestyle compatibility scoring',
-                'Behavioral preference analysis',
-                'Identity-secured onboarding',
-                'Verified listing operations',
-                'New York City-specific rental intelligence',
+                'Years of experience in the New York City rental market',
+                'One-on-one conversations about lifestyle and preferences',
+                'Hands-on guidance for roommates and shared housing',
+                'Verified listings and identity-secured onboarding',
+                'Support from search through move-in coordination',
               ].map((item, i) => (
                 <li
                   key={i}
@@ -122,7 +122,7 @@ export function AboutScreen() {
           </div>
           <div className='rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm sm:p-8'>
             <h3 className='text-xs font-bold uppercase tracking-wider text-[#F64310] sm:text-sm'>
-              Compatibility indicators we analyze
+              Preferences we match on
             </h3>
             <ul className='mt-3 space-y-2 sm:mt-4 sm:space-y-2.5'>
               {[
@@ -144,7 +144,9 @@ export function AboutScreen() {
           </div>
         </div>
         <p className='mt-4 max-w-2xl text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-6'>
-          This increases roommate success rates while reducing failed match risk and lease delays.
+          We match people—not algorithms. Our team listens, asks the right questions, and connects
+          you with roommates and listings that align with how you actually live and work in New York
+          City.
         </p>
       </section>
 

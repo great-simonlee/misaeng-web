@@ -160,8 +160,9 @@ export function AboutTeamSection() {
               <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
                 As the Founder and Major Investor of Misaeng, I am currently leading the strategic
                 deployment of capital and the establishment of our U.S. operational infrastructure. My
-                focus is on architecting a scalable business model that brings transparency to the New
-                York City housing market through verified data and AI-driven systems.
+                focus is on building a scalable business model that brings transparency to the New York
+                City housing market through verified listings and professional, preference-based
+                matching.
               </p>
               <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
                 To maintain the highest level of governance, I oversee the high-level corporate strategy
@@ -177,8 +178,9 @@ export function AboutTeamSection() {
                     <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
                       As the Founder and Major Investor of Misaeng, I am currently leading the strategic
                       deployment of capital and the establishment of our U.S. operational infrastructure.
-                      My focus is on architecting a scalable business model that brings transparency to the
-                      New York City housing market through verified data and AI-driven systems.
+                      My focus is on building a scalable business model that brings transparency to the
+                      New York City housing market through verified listings and professional,
+                      preference-based matching.
                     </p>
                     <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
                       To maintain the highest level of governance, I oversee the high-level corporate
