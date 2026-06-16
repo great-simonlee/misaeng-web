@@ -10,8 +10,7 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
-    "@next/swc-darwin-arm64": "^16.1.6",
-    "next": "16.1.6",
+    "next": "^16.2.9",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
