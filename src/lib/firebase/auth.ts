@@ -1,54 +1,29 @@
 import type { User } from 'firebase/auth'
 
-// 임시: 파이어베이스 Auth 연동 비활성화
-// import {
-//   GoogleAuthProvider,
-//   createUserWithEmailAndPassword,
-//   onAuthStateChanged,
-//   sendPasswordResetEmail,
-//   signInWithEmailAndPassword,
-//   signInWithPopup,
-//   signOut,
-//   type User,
-// } from 'firebase/auth'
-// import { getFirebaseAuth, isFirebaseConfigured } from './client'
-//
-// const googleProvider = new GoogleAuthProvider()
+import {
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from 'firebase/auth'
 
-const DISABLED_MESSAGE =
-  'Firebase가 일시적으로 비활성화되어 있어요'
+import { getFirebaseAuth, isFirebaseConfigured } from './client'
 
-export function subscribeToAuth(callback: (user: User | null) => void) {
-  callback(null)
-  return () => {}
-}
+const googleProvider = new GoogleAuthProvider()
 
-export async function signUpWithEmail(_email: string, _password: string) {
-  throw new Error(DISABLED_MESSAGE)
-}
+googleProvider.setCustomParameters({
+  prompt: 'select_account',
+})
 
-export async function signInWithEmail(_email: string, _password: string) {
-  throw new Error(DISABLED_MESSAGE)
-}
-
-export async function signInWithGoogle() {
-  throw new Error(DISABLED_MESSAGE)
-}
-
-export async function sendPasswordReset(_email: string) {
-  throw new Error(DISABLED_MESSAGE)
-}
-
-export async function signOutUser() {
-  return
-}
-
-/*
 export function subscribeToAuth(callback: (user: User | null) => void) {
   if (!isFirebaseConfigured()) {
     callback(null)
     return () => {}
   }
+
   return onAuthStateChanged(getFirebaseAuth(), callback)
 }
 
@@ -71,4 +46,3 @@ export async function sendPasswordReset(email: string) {
 export async function signOutUser() {
   return signOut(getFirebaseAuth())
 }
-*/

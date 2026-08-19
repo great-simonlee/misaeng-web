@@ -81,3 +81,21 @@ misaeng_temp_web/
 
 Next.js 앱은 [Vercel](https://vercel.com) 에서 쉽게 배포할 수 있습니다.  
 [배포 가이드](https://nextjs.org/docs/app/building-your-application/deploying) 를 참고하세요.
+
+## Supabase + AppConnect 설정
+
+이 프로젝트는 인증을 Ellieo(AppConnect) API 세션으로 처리하고, 파일 스토리지는 Supabase를 사용합니다.
+
+필수 환경 변수:
+
+- `APP_CONNECT_API_BASE_URL`: Ellieo API base URL (`https://.../v1/api`)
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID`: Google Identity Services 웹 클라이언트 ID
+- `NEXT_PUBLIC_SUPABASE_URL`: Supabase 프로젝트 URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anon key
+- `SUPABASE_SERVICE_ROLE_KEY`: 서버 전용 service role key
+- `SUPABASE_AVATAR_BUCKET`: 프로필 이미지 버킷 이름 (기본값: `avatars`)
+
+권장:
+
+- Supabase 버킷 `avatars`는 public URL 조회가 가능해야 합니다.
+- Vercel 환경 변수는 `Production/Preview/Development` 모두 동일하게 맞춰 주세요.

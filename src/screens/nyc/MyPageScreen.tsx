@@ -5,12 +5,12 @@ import { useEffect, useRef, useState } from 'react'
 
 import { LoadingState, BottomSheet, BottomSheetSelect } from '@components'
 import { useAuth } from '@hooks/useAuth'
-import { getErrorMessage, useToast } from '@hooks/useToast'
-import { MBTI_TYPES } from '@lib/constants/mbti'
 import {
   MAX_NICKNAME_LEN,
   MIN_NICKNAME_LEN,
-} from '@lib/firebase/profile'
+} from '@lib/constants/profile'
+import { getErrorMessage, useToast } from '@hooks/useToast'
+import { MBTI_TYPES } from '@lib/constants/mbti'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
 import { ProfileVerificationSection } from '@widgets/nyc/ProfileVerificationSection'

@@ -9,33 +9,13 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import type { User } from 'firebase/auth'
 
-// 임시: 파이어베이스 Auth/Profile 연동 비활성화
-// import {
-//   signInWithEmail,
-//   signInWithGoogle,
-//   signOutUser,
-//   signUpWithEmail,
-//   sendPasswordReset,
-//   subscribeToAuth,
-// } from '@lib/firebase/auth'
-import { isFirebaseConfigured } from '@lib/firebase/client'
 import { isMisaengEmail } from '@lib/constants/nyc'
-// import {
-//   ensureUserProfile,
-//   subscribeUserProfile,
-//   updateNickname,
-//   updateMbti,
-//   uploadProfilePhoto,
-// } from '@lib/firebase/profile'
+import type { AuthUser } from '@/types/auth'
 import type { NycUserProfile } from '@/types/nyc'
 
-const DISABLED_MESSAGE =
-  'Firebase가 일시적으로 비활성화되어 있어요'
-
 interface AuthContextValue {
-  user: User | null
+  user: AuthUser | null
   profile: NycUserProfile | null
   /** 미생에 등록한 사진 우선, 없으면 null(기본 아이콘) */
   avatarURL: string | null
@@ -47,7 +27,11 @@ interface AuthContextValue {
   isMisaengUser: boolean
   signInEmail: (email: string, password: string) => Promise<void>
   signUpEmail: (email: string, password: string) => Promise<void>
-  signInGoogle: () => Promise<void>
+  signInGoogle: (params: {
+    idToken: string
+    email?: string | null
+    name?: string | null
+  }) => Promise<void>
   resetPassword: (email: string) => Promise<void>
   logout: () => Promise<void>
   uploadAvatar: (file: File) => Promise<string>
@@ -57,95 +41,242 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
+interface SessionResponse {
+  configured: boolean
+  connected: boolean
+  user: AuthUser | null
+  profile?: Record<string, unknown> | null
+}
+
+function mapProfile(uid: string, email: string, raw: Record<string, unknown> | null | undefined): NycUserProfile {
+  const now = Date.now()
+
+  return {
+    uid,
+    email,
+    displayName: typeof raw?.name === 'string' ? raw.name : null,
+    nickname: typeof raw?.nickname === 'string' ? raw.nickname : null,
+    mbti: typeof raw?.mbti === 'string' ? raw.mbti : null,
+    photoURL:
+      typeof raw?.photoURL === 'string'
+        ? raw.photoURL
+        : typeof raw?.profileImage === 'string'
+          ? raw.profileImage
+          : null,
+    roommatePostId: null,
+    schoolEmail: typeof raw?.schoolEmail === 'string' ? raw.schoolEmail : null,
+    schoolEmailVerified: Boolean(raw?.schoolEmailVerified),
+    verifiedSchoolId:
+      typeof raw?.verifiedSchoolId === 'string' ? raw.verifiedSchoolId : null,
+    verifiedSchoolName:
+      typeof raw?.verifiedSchoolName === 'string'
+        ? raw.verifiedSchoolName
+        : null,
+    phone: typeof raw?.phone === 'string' ? raw.phone : null,
+    phoneVerified: Boolean(raw?.phoneVerified),
+    instagramHandle: null,
+    instagramVerified: false,
+    otpQuota: null,
+    createdAt: now,
+    updatedAt: now,
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<AuthUser | null>(null)
   const [profile, setProfile] = useState<NycUserProfile | null>(null)
   const [loading, setLoading] = useState(true)
-  const configured = isFirebaseConfigured()
+  const [configured, setConfigured] = useState(true)
 
-  useEffect(() => {
-    // 임시: 파이어베이스 Auth 구독 비활성화
-    setUser(null)
-    setProfile(null)
-    setLoading(false)
-    /*
-    if (!configured) {
-      setLoading(false)
-      return
-    }
-    const unsub = subscribeToAuth((next) => {
-      setUser(next)
-      if (!next) {
+  const loadSession = useCallback(async () => {
+    try {
+      const response = await fetch('/api/agent-auth/session', {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+      })
+
+      const data = (await response.json().catch(() => null)) as
+        | SessionResponse
+        | null
+
+      if (!data) {
+        setConfigured(true)
+        setUser(null)
         setProfile(null)
-        setLoading(false)
+        return
       }
-    })
-    return unsub
-    */
-  }, [configured])
+
+      setConfigured(Boolean(data.configured))
+      setUser(data.user ?? null)
+
+      if (data.user) {
+        const rawProfile =
+          data.profile &&
+          typeof data.profile === 'object' &&
+          'data' in data.profile
+            ? (data.profile.data as Record<string, unknown>)
+            : (data.profile as Record<string, unknown> | null | undefined)
+
+        setProfile(mapProfile(data.user.uid, data.user.email, rawProfile ?? null))
+      } else {
+        setProfile(null)
+      }
+    } catch {
+      setConfigured(true)
+      setUser(null)
+      setProfile(null)
+    }
+  }, [])
 
   useEffect(() => {
-    // 임시: 파이어베이스 프로필 구독 비활성화
-    return
-    /*
-    if (!configured || !user) return
-
-    let unsubProfile: (() => void) | undefined
     let cancelled = false
-
     ;(async () => {
       try {
-        await ensureUserProfile(user)
-        if (cancelled) return
-        unsubProfile = subscribeUserProfile(user.uid, (next) => {
-          setProfile(next)
-          setLoading(false)
-        })
-      } catch {
-        if (!cancelled) {
-          setProfile(null)
-          setLoading(false)
-        }
+        await loadSession()
+      } finally {
+        if (!cancelled) setLoading(false)
       }
     })()
 
     return () => {
       cancelled = true
-      unsubProfile?.()
     }
-    */
-  }, [configured, user])
+  }, [loadSession])
 
-  const signInEmailFn = useCallback(async (_email: string, _password: string) => {
-    throw new Error(DISABLED_MESSAGE)
-    // await signInWithEmail(email, password)
-  }, [])
+  const signInEmailFn = useCallback(async (email: string, password: string) => {
+    const response = await fetch('/api/agent-auth/email', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        mode: 'login',
+        email,
+        password,
+      }),
+    })
 
-  const signUpEmailFn = useCallback(async (_email: string, _password: string) => {
-    throw new Error(DISABLED_MESSAGE)
-    // await signUpWithEmail(email, password)
-  }, [])
+    if (!response.ok) {
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string }
+        | null
+      throw new Error(data?.error || '로그인에 실패했어요')
+    }
 
-  const signInGoogleFn = useCallback(async () => {
-    throw new Error(DISABLED_MESSAGE)
-    // await signInWithGoogle()
-  }, [])
+    await loadSession()
+  }, [loadSession])
 
-  const resetPasswordFn = useCallback(async (_email: string) => {
-    throw new Error(DISABLED_MESSAGE)
-    // await sendPasswordReset(email)
+  const signUpEmailFn = useCallback(async (email: string, password: string) => {
+    const response = await fetch('/api/agent-auth/email', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        mode: 'signup',
+        email,
+        password,
+      }),
+    })
+
+    if (!response.ok) {
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string }
+        | null
+      throw new Error(data?.error || '회원가입에 실패했어요')
+    }
+
+    await loadSession()
+  }, [loadSession])
+
+  const signInGoogleFn = useCallback(
+    async (params: { idToken: string; email?: string | null; name?: string | null }) => {
+      const response = await fetch('/api/agent-auth/google', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          idToken: params.idToken,
+          email: params.email,
+          name: params.name,
+        }),
+      })
+
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as
+          | { error?: string }
+          | null
+        throw new Error(data?.error || 'Google 로그인에 실패했어요')
+      }
+
+      await loadSession()
+    },
+    [loadSession],
+  )
+
+  const resetPasswordFn = useCallback(async (email: string) => {
+    const response = await fetch('/api/agent-auth/email', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        mode: 'reset',
+        email,
+      }),
+    })
+    if (!response.ok) {
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string }
+        | null
+      throw new Error(data?.error || '비밀번호 재설정 요청에 실패했어요')
+    }
   }, [])
 
   const logout = useCallback(async () => {
-    // await signOutUser()
+    await fetch('/api/agent-auth/session', {
+      method: 'DELETE',
+      credentials: 'include',
+    }).catch(() => null)
+    setUser(null)
     setProfile(null)
   }, [])
 
   const uploadAvatar = useCallback(
     async (_file: File) => {
       if (!user) throw new Error('로그인이 필요해요')
-      throw new Error(DISABLED_MESSAGE)
-      // return uploadProfilePhoto(user, file)
+      const formData = new FormData()
+      formData.append('file', _file)
+
+      const response = await fetch('/api/agent-auth/avatar', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      })
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string; photoURL?: string }
+        | null
+
+      if (!response.ok || !data?.photoURL) {
+        throw new Error(data?.error || '프로필 사진 업로드에 실패했어요')
+      }
+
+      setProfile((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          photoURL: data.photoURL ?? prev.photoURL,
+          updatedAt: Date.now(),
+        }
+      })
+
+      return data.photoURL
     },
     [user],
   )
@@ -153,8 +284,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const saveNickname = useCallback(
     async (_nickname: string) => {
       if (!user) throw new Error('로그인이 필요해요')
-      throw new Error(DISABLED_MESSAGE)
-      // return updateNickname(user, nickname)
+      const response = await fetch('/api/agent-auth/profile', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname: _nickname }),
+      })
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string; profile?: Record<string, unknown> }
+        | null
+      if (!response.ok) {
+        throw new Error(data?.error || '닉네임 저장에 실패했어요')
+      }
+      setProfile(mapProfile(user.uid, user.email, data?.profile ?? null))
+      return _nickname.trim()
     },
     [user],
   )
@@ -162,8 +305,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const saveMbti = useCallback(
     async (_mbti: string | null) => {
       if (!user) throw new Error('로그인이 필요해요')
-      throw new Error(DISABLED_MESSAGE)
-      // return updateMbti(user, mbti)
+      const response = await fetch('/api/agent-auth/profile', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mbti: _mbti }),
+      })
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string; profile?: Record<string, unknown> }
+        | null
+      if (!response.ok) {
+        throw new Error(data?.error || 'MBTI 저장에 실패했어요')
+      }
+      setProfile(mapProfile(user.uid, user.email, data?.profile ?? null))
+      return _mbti?.trim().toUpperCase() || null
     },
     [user],
   )
