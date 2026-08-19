@@ -24,7 +24,9 @@ let gisScriptPromise: Promise<void> | null = null
 
 function loadGoogleIdentityScript() {
   if (typeof window === 'undefined') {
-    return Promise.reject(new Error('Google 로그인은 브라우저에서만 사용할 수 있어요.'))
+    return Promise.reject(
+      new Error('Google 로그인은 브라우저에서만 사용할 수 있어요.'),
+    )
   }
 
   if (window.google?.accounts?.id) {
@@ -92,10 +94,11 @@ function GoogleSignInInner({
   onError,
 }: GoogleSignInButtonProps) {
   const clientId = getGoogleClientId()
-  const shellRef = useRef<HTMLDivElement>(null)
-  const overlayRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const googleRef = useRef<HTMLDivElement>(null)
   const [ready, setReady] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [buttonWidth, setButtonWidth] = useState(0)
 
   const handleCredential = useCallback(
     (response: GoogleCredentialResponse) => {
@@ -120,13 +123,32 @@ function GoogleSignInInner({
   )
 
   useEffect(() => {
-    if (!clientId || !shellRef.current || !overlayRef.current) return
+    const container = containerRef.current
+    if (!container) return
+
+    function measure() {
+      const width = Math.floor(container!.getBoundingClientRect().width)
+      if (width > 0) {
+        setButtonWidth(width)
+      }
+    }
+
+    measure()
+
+    const observer = new ResizeObserver(measure)
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!clientId || !googleRef.current || buttonWidth <= 0) return
 
     let cancelled = false
+    const googleRoot = googleRef.current
 
     void loadGoogleIdentityScript()
       .then(() => {
-        if (cancelled || !window.google?.accounts?.id || !overlayRef.current) {
+        if (cancelled || !window.google?.accounts?.id || !googleRoot) {
           return
         }
 
@@ -137,19 +159,14 @@ function GoogleSignInInner({
           auto_select: false,
         })
 
-        const width = Math.max(
-          240,
-          Math.floor(shellRef.current?.getBoundingClientRect().width ?? 320),
-        )
-
-        overlayRef.current.innerHTML = ''
-        window.google.accounts.id.renderButton(overlayRef.current, {
+        googleRoot.innerHTML = ''
+        window.google.accounts.id.renderButton(googleRoot, {
           type: 'standard',
           theme: 'outline',
           size: 'large',
           text: 'continue_with',
           shape: 'pill',
-          width,
+          width: buttonWidth,
         })
 
         setReady(true)
@@ -166,55 +183,37 @@ function GoogleSignInInner({
 
     return () => {
       cancelled = true
+      setReady(false)
     }
-  }, [clientId, handleCredential, onError])
-
-  useEffect(() => {
-    if (!ready || !shellRef.current) return
-
-    const shell = shellRef.current
-
-    const syncWidth = () => {
-      if (!overlayRef.current || !window.google?.accounts?.id) return
-
-      const width = Math.max(240, Math.floor(shell.getBoundingClientRect().width))
-      overlayRef.current.innerHTML = ''
-      window.google.accounts.id.renderButton(overlayRef.current, {
-        type: 'standard',
-        theme: 'outline',
-        size: 'large',
-        text: 'continue_with',
-        shape: 'pill',
-        width,
-      })
-    }
-
-    const observer = new ResizeObserver(() => {
-      syncWidth()
-    })
-
-    observer.observe(shell)
-    return () => observer.disconnect()
-  }, [ready])
+  }, [buttonWidth, clientId, handleCredential, onError])
 
   const isDisabled = disabled || submitting || !ready
+  const label = submitting
+    ? 'Google 계정 연결 중…'
+    : !ready
+      ? 'Google 로그인 준비 중…'
+      : 'Google로 계속하기'
 
   return (
-    <div ref={shellRef} className='relative w-full'>
+    <div ref={containerRef} className='relative w-full min-h-[48px]'>
       <div
         aria-hidden
-        className='flex min-h-[48px] w-full items-center justify-center gap-3 rounded-full border border-[#dde2ea] bg-white px-4 text-[15px] font-medium text-[#344054]'
+        className={`pointer-events-none flex min-h-[48px] w-full items-center justify-center gap-3 rounded-full border border-[#dde2ea] bg-white px-4 text-[15px] font-medium text-[#344054] transition ${
+          isDisabled ? 'opacity-50' : ''
+        }`}
       >
         <GoogleLogo />
-        {submitting ? 'Google 계정 연결 중…' : 'Google로 계속하기'}
+        {label}
       </div>
 
       <div
-        ref={overlayRef}
-        className={`absolute inset-0 z-10 overflow-hidden rounded-full opacity-0 ${
-          isDisabled ? 'pointer-events-none' : ''
-        } [&>div]:!h-full [&>div]:!w-full [&_iframe]:!h-full [&_iframe]:!w-full`}
+        ref={googleRef}
         aria-label='Google로 계속하기'
+        className={`absolute inset-0 z-10 overflow-hidden rounded-full [&>div]:!h-full [&>div]:!w-full [&_iframe]:!h-full [&_iframe]:!w-full ${
+          isDisabled
+            ? 'pointer-events-none invisible'
+            : 'cursor-pointer opacity-[0.001]'
+        }`}
       />
     </div>
   )
