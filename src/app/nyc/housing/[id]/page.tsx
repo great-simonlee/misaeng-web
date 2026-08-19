@@ -3,6 +3,8 @@ import { Suspense } from 'react'
 import { LoadingState } from '@components'
 import { HousingDetailScreen } from '@screens/nyc/HousingDetailScreen'
 
+export const runtime = 'edge'
+
 interface HousingDetailPageProps {
   params: Promise<{ id: string }>
 }
