@@ -231,29 +231,33 @@ export function NycNavbar() {
               </Link>
             )}
 
-            {!loading && user && isMisaengUser && (
-              <span className='text-[13px] font-semibold tracking-wide text-[#F64310] sm:text-sm'>
-                Agent
-              </span>
-            )}
-
-            {/* 모바일: 전체 메뉴 */}
-            <button
-              type='button'
-              onClick={() => setMobileOpen((o) => !o)}
-              className='inline-flex h-9 shrink-0 cursor-pointer items-center gap-0.5 rounded-full border border-[var(--border)] bg-white p-0.5 touch-manipulation transition hover:bg-[var(--surface)] md:hidden'
-              aria-expanded={mobileOpen}
-              aria-label={mobileOpen ? '메뉴 닫기' : '메뉴 열기'}
-            >
-              <ProfileAvatar photoURL={avatarURL} displayName={displayName} />
-              <span className='inline-flex size-7 items-center justify-center text-[var(--muted-foreground)]'>
-                {mobileOpen ? <CloseIcon /> : <MenuIcon />}
-              </span>
-            </button>
-
-            {/* 데스크톱: 계정 드롭다운 (마이페이지 / 내가 올린 글 / 좋아요) */}
             {!loading && user && (
-              <div ref={accountRef} className='relative hidden md:block'>
+              <>
+                {isMisaengUser && (
+                  <span className='text-[13px] font-semibold tracking-wide text-[#F64310] sm:text-sm'>
+                    Agent
+                  </span>
+                )}
+
+                {/* 모바일: 프로필 + 전체 메뉴 */}
+                <button
+                  type='button'
+                  onClick={() => setMobileOpen((o) => !o)}
+                  className='inline-flex h-9 shrink-0 cursor-pointer items-center gap-0.5 rounded-full border border-[var(--border)] bg-white p-0.5 touch-manipulation transition hover:bg-[var(--surface)] md:hidden'
+                  aria-expanded={mobileOpen}
+                  aria-label={mobileOpen ? '메뉴 닫기' : '메뉴 열기'}
+                >
+                  <ProfileAvatar
+                    photoURL={avatarURL}
+                    displayName={displayName}
+                  />
+                  <span className='inline-flex size-7 items-center justify-center text-[var(--muted-foreground)]'>
+                    {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+                  </span>
+                </button>
+
+                {/* 데스크톱: 계정 드롭다운 (마이페이지 / 내가 올린 글 / 좋아요) */}
+                <div ref={accountRef} className='relative hidden md:block'>
                 <button
                   type='button'
                   onClick={() => setAccountOpen((o) => !o)}
@@ -295,7 +299,8 @@ export function NycNavbar() {
                     ))}
                   </div>
                 )}
-              </div>
+                </div>
+              </>
             )}
           </div>
         </div>
