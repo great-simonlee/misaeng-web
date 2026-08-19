@@ -1,0 +1,449 @@
+export const MISAENG_EMAIL_DOMAIN = '@misaeng.com'
+
+/** 카카오톡 문의 채널/오픈채팅 URL (미설정 시 문의 버튼에서 안내) */
+export const KAKAO_INQUIRY_URL =
+  process.env.NEXT_PUBLIC_KAKAO_INQUIRY_URL?.trim() || ''
+
+export const NYC_CATEGORIES = [
+  {
+    id: 'housing',
+    title: '하우징',
+    description: 'Misaeng 팀이 올리는 NYC 매물',
+    href: '/nyc/housing',
+    postHref: '/nyc/housing/new',
+    available: true,
+  },
+  {
+    id: 'events',
+    title: '이벤트',
+    description: '모임·공연·행사 공유',
+    href: '/nyc/events',
+    postHref: '/nyc/events/new',
+    available: false,
+  },
+  {
+    id: 'food',
+    title: '맛집',
+    description: '맛집·카페 추천',
+    href: '/nyc/food',
+    postHref: '/nyc/food/new',
+    available: false,
+  },
+  {
+    id: 'marketplace',
+    title: '중고거래',
+    description: '생활용품 사고팔기',
+    href: '/nyc/marketplace',
+    postHref: '/nyc/marketplace/new',
+    available: false,
+  },
+  {
+    id: 'cpt-opt',
+    title: 'CPT / OPT',
+    description: '경험·직장 후기',
+    href: '/nyc/cpt-opt',
+    postHref: '/nyc/cpt-opt/new',
+    available: false,
+  },
+  {
+    id: 'visa',
+    title: '비자 후기',
+    description: '비자 과정 팁',
+    href: '/nyc/visa',
+    postHref: '/nyc/visa/new',
+    available: false,
+  },
+  {
+    id: 'job-review',
+    title: '취업 후기',
+    description: '면접·직장 경험',
+    href: '/nyc/job-review',
+    postHref: '/nyc/job-review/new',
+    available: false,
+  },
+  {
+    id: 'green-card',
+    title: '영주권 후기',
+    description: '영주권 여정 공유',
+    href: '/nyc/green-card',
+    postHref: '/nyc/green-card/new',
+    available: false,
+  },
+  {
+    id: 'anonymous',
+    title: '익명게시판',
+    description: '익명으로 이야기 나누기',
+    href: '/nyc/anonymous',
+    postHref: '/nyc/anonymous/new',
+    available: false,
+  },
+] as const
+
+export type NycCategoryId = (typeof NYC_CATEGORIES)[number]['id']
+
+/** 하우징·룸메이트 제외, 공통 communityPosts 컬렉션을 쓰는 보드 */
+export const NYC_COMMUNITY_BOARD_IDS = [
+  'events',
+  'food',
+  'marketplace',
+  'cpt-opt',
+  'visa',
+  'job-review',
+  'green-card',
+  'anonymous',
+] as const
+
+export type NycCommunityBoardId = (typeof NYC_COMMUNITY_BOARD_IDS)[number]
+
+export const NYC_COMMUNITY_BOARD_META: Record<
+  NycCommunityBoardId,
+  {
+    writeLabel: string
+    listIntro: string
+    locationLabel: string
+    locationPlaceholder: string
+    detailLabel: string | null
+    detailPlaceholder: string
+    detailInput: 'text' | 'date' | 'number' | null
+    titlePlaceholder: string
+    descriptionPlaceholder: string
+  }
+> = {
+  events: {
+    writeLabel: '이벤트 올리기',
+    listIntro: 'NYC에서 열리는 모임·공연·행사를 공유해 보세요.',
+    locationLabel: '장소',
+    locationPlaceholder: '맨해튼 / 온라인',
+    detailLabel: '일시',
+    detailPlaceholder: '',
+    detailInput: 'date',
+    titlePlaceholder: '한인 네트워킹 나이트',
+    descriptionPlaceholder: '시간, 참가 방법, 한 줄 소개',
+  },
+  food: {
+    writeLabel: '맛집 추천',
+    listIntro: '가본 맛집·카페를 짧게 남겨 주세요.',
+    locationLabel: '동네',
+    locationPlaceholder: '플러싱 / 코리아타운',
+    detailLabel: '한 줄 키워드',
+    detailPlaceholder: '칼국수 · 웨이팅 있음',
+    detailInput: 'text',
+    titlePlaceholder: '플러싱 OO 칼국수',
+    descriptionPlaceholder: '메뉴, 가격대, 팁',
+  },
+  marketplace: {
+    writeLabel: '물품 등록',
+    listIntro: '필요 없는 물건, 필요한 물건 — 이웃과 거래해 보세요.',
+    locationLabel: '거래 지역',
+    locationPlaceholder: '브루클린 / 미팅 가능',
+    detailLabel: '희망 가격 ($)',
+    detailPlaceholder: '0',
+    detailInput: 'number',
+    titlePlaceholder: 'IKEA 책장 나눔/판매',
+    descriptionPlaceholder: '상태, 픽업 가능 여부',
+  },
+  'cpt-opt': {
+    writeLabel: '후기 쓰기',
+    listIntro: 'CPT·OPT 경험과 직장 후기를 나눠 주세요.',
+    locationLabel: '회사/학교 (선택)',
+    locationPlaceholder: '회사명 또는 학교',
+    detailLabel: '유형',
+    detailPlaceholder: 'CPT / OPT / STEM OPT',
+    detailInput: 'text',
+    titlePlaceholder: 'OPT 3개월차 회고',
+    descriptionPlaceholder: '지원 과정, 팁, 주의할 점',
+  },
+  visa: {
+    writeLabel: '후기 쓰기',
+    listIntro: '비자 준비·인터뷰 경험을 공유해 주세요.',
+    locationLabel: '관련 지역 (선택)',
+    locationPlaceholder: 'NY / 대사관 등',
+    detailLabel: '비자 종류',
+    detailPlaceholder: 'F-1 / H-1B / O-1',
+    detailInput: 'text',
+    titlePlaceholder: 'H-1B 청원 후기',
+    descriptionPlaceholder: '타임라인, 서류, 팁',
+  },
+  'job-review': {
+    writeLabel: '후기 쓰기',
+    listIntro: '면접·취업·직장 경험을 나눠 주세요.',
+    locationLabel: '회사/업계 (선택)',
+    locationPlaceholder: '테크 / 금융 등',
+    detailLabel: '역할',
+    detailPlaceholder: '인턴 / 신입 / 이직',
+    detailInput: 'text',
+    titlePlaceholder: '뉴욕 테크 인턴 면접 후기',
+    descriptionPlaceholder: '준비 과정, 질문, 분위기',
+  },
+  'green-card': {
+    writeLabel: '후기 쓰기',
+    listIntro: '영주권 여정을 커뮤니티와 공유해 주세요.',
+    locationLabel: '카테고리 (선택)',
+    locationPlaceholder: 'EB-2 / 결혼 등',
+    detailLabel: '단계',
+    detailPlaceholder: 'I-140 / 인터뷰 등',
+    detailInput: 'text',
+    titlePlaceholder: 'EB-2 NIW 승인 후기',
+    descriptionPlaceholder: '기간, 변호사, 팁',
+  },
+  anonymous: {
+    writeLabel: '익명으로 글쓰기',
+    listIntro: '이름 없이 편하게 나누는 NYC 익명 게시판이에요.',
+    locationLabel: '주제 (선택)',
+    locationPlaceholder: '고민 · 질문 · 일상',
+    detailLabel: null,
+    detailPlaceholder: '',
+    detailInput: null,
+    titlePlaceholder: '오늘 하루 한 줄',
+    descriptionPlaceholder: '부담 없이 남겨 보세요. 작성자는 익명으로 표시돼요.',
+  },
+}
+
+export function getNycCategory(id: string) {
+  return NYC_CATEGORIES.find((c) => c.id === id)
+}
+
+export function isCommunityBoardId(id: string): id is NycCommunityBoardId {
+  return (NYC_COMMUNITY_BOARD_IDS as readonly string[]).includes(id)
+}
+
+export function isAnonymousBoard(id: string): boolean {
+  return id === 'anonymous'
+}
+
+export function isMisaengEmail(email: string | null | undefined): boolean {
+  if (!email) return false
+  return email.toLowerCase().endsWith(MISAENG_EMAIL_DOMAIN)
+}
+
+/** 로고는 추후 교체. 지금은 이니셜 플레이스홀더. handle이 있으면 Instagram 링크. */
+export const NYC_PARTNER_ORGS = [
+  {
+    id: 'nyu-kiso',
+    name: '뉴욕대 한인학생회',
+    shortName: 'NYU',
+    handle: 'nyu_kiso',
+  },
+  {
+    id: 'fit-ksof',
+    name: 'FIT 한인학생회',
+    shortName: 'FIT',
+    handle: 'ksof_fit',
+  },
+  {
+    id: 'columbia-ksa',
+    name: '컬럼비아 한인학생회',
+    shortName: 'CU',
+    handle: null,
+  },
+  {
+    id: 'baruch-ksa',
+    name: '바루크 한인학생회',
+    shortName: 'BC',
+    handle: null,
+  },
+  {
+    id: 'newschool-ksa',
+    name: '뉴스키쿨 한인학생회',
+    shortName: 'TNS',
+    handle: null,
+  },
+  {
+    id: 'parsons-ksa',
+    name: '파슨스 한인학생회',
+    shortName: 'PAR',
+    handle: null,
+  },
+] as const
+
+/** 협력 인플루언서 플랫폼 */
+export const NYC_INFLUENCER_PLATFORMS = [
+  {
+    id: 'instagram',
+    title: '인스타그램',
+    description: 'NYC 라이프·로컬 인스타그램',
+  },
+  {
+    id: 'youtube',
+    title: '유튜버',
+    description: '브이로그·정보 유튜브',
+  },
+  {
+    id: 'tiktok',
+    title: '틱토커',
+    description: '숏폼으로 보는 뉴욕',
+  },
+] as const
+
+export type NycInfluencerPlatformId =
+  (typeof NYC_INFLUENCER_PLATFORMS)[number]['id']
+
+/** 프로필·링크는 추후 교체. handle이 있으면 플랫폼 프로필로 연결. */
+export const NYC_PARTNER_INFLUENCERS = [
+  {
+    id: 'ig-placeholder-1',
+    name: 'NYC Daily',
+    shortName: 'IG',
+    handle: null,
+    platform: 'instagram',
+  },
+  {
+    id: 'ig-placeholder-2',
+    name: '한인 라이프',
+    shortName: 'IG',
+    handle: null,
+    platform: 'instagram',
+  },
+  {
+    id: 'yt-placeholder-1',
+    name: '뉴욕 브이로그',
+    shortName: 'YT',
+    handle: null,
+    platform: 'youtube',
+  },
+  {
+    id: 'yt-placeholder-2',
+    name: '유학생 채널',
+    shortName: 'YT',
+    handle: null,
+    platform: 'youtube',
+  },
+  {
+    id: 'tt-placeholder-1',
+    name: 'NYC Shorts',
+    shortName: 'TT',
+    handle: null,
+    platform: 'tiktok',
+  },
+  {
+    id: 'tt-placeholder-2',
+    name: '맨해튼 클립',
+    shortName: 'TT',
+    handle: null,
+    platform: 'tiktok',
+  },
+] as const satisfies ReadonlyArray<{
+  id: string
+  name: string
+  shortName: string
+  handle: string | null
+  platform: NycInfluencerPlatformId
+}>
+
+export const NYC_PROFESSIONAL_CATEGORIES = [
+  {
+    id: 'real-estate',
+    title: '부동산',
+    description: '임대·매매·브로커 상담',
+  },
+  {
+    id: 'lawyer',
+    title: '변호사',
+    description: '비자·이민·계약 법률',
+  },
+  {
+    id: 'moving',
+    title: '이사업체',
+    description: 'NYC 이사·운반',
+  },
+  {
+    id: 'accountant',
+    title: '회계사',
+    description: '세금·세무·CPA',
+  },
+] as const
+
+export type NycProfessionalCategoryId =
+  (typeof NYC_PROFESSIONAL_CATEGORIES)[number]['id']
+
+/** 실제 파트너 정보로 교체 예정인 플레이스홀더 */
+export const NYC_PROFESSIONALS = [
+  {
+    id: 're-1',
+    categoryId: 'real-estate' as const,
+    name: '예시 부동산',
+    specialty: '맨해튼 · 브루클린 임대',
+    contact: null,
+  },
+  {
+    id: 're-2',
+    categoryId: 'real-estate' as const,
+    name: '예시 브로커',
+    specialty: '학생·직장인 하우징',
+    contact: null,
+  },
+  {
+    id: 'law-1',
+    categoryId: 'lawyer' as const,
+    name: '예시 법률사무소',
+    specialty: '비자 · 이민법',
+    contact: null,
+  },
+  {
+    id: 'law-2',
+    categoryId: 'lawyer' as const,
+    name: '예시 변호사',
+    specialty: '임대차 · 계약',
+    contact: null,
+  },
+  {
+    id: 'mv-1',
+    categoryId: 'moving' as const,
+    name: '예시 이사업체',
+    specialty: '시내 · 근교 이사',
+    contact: null,
+  },
+  {
+    id: 'mv-2',
+    categoryId: 'moving' as const,
+    name: '예시 무빙',
+    specialty: '원룸 · 스튜디오',
+    contact: null,
+  },
+  {
+    id: 'acc-1',
+    categoryId: 'accountant' as const,
+    name: '예시 회계사무소',
+    specialty: '개인 · 프리랜서 세금',
+    contact: null,
+  },
+  {
+    id: 'acc-2',
+    categoryId: 'accountant' as const,
+    name: '예시 CPA',
+    specialty: 'OPT · ITIN · 세금신고',
+    contact: null,
+  },
+] as const
+
+/** 매거진형 에디터 콘텐츠 프리뷰 (게시판과 별개) */
+export const NYC_MAGAZINE_PREVIEWS = [
+  {
+    id: 'mag-1',
+    tag: '맛집',
+    title: '플러싱에서 줄 서는 칼국수집',
+    excerpt: '주말 브런치보다 든든한 한 끼, 현지 한인들이 가는 곳.',
+    image: '/img/banner_1.png',
+  },
+  {
+    id: 'mag-2',
+    tag: '이벤트',
+    title: '이번 주 맨해튼 한인 네트워킹',
+    excerpt: '유학생·주니어가 모이는 가벼운 저녁 모임 소식.',
+    image: '/img/ourservice_banner.png',
+  },
+  {
+    id: 'mag-3',
+    tag: '놀거리',
+    title: '비 오는 날 실내 코스',
+    excerpt: '박물관부터 카페까지, 하루 코스로 묶어봤어요.',
+    image: '/img/main_banner_1.png',
+  },
+  {
+    id: 'mag-4',
+    tag: '동네',
+    title: '아스토리아 한낮 산책',
+    excerpt: '카페 골목부터 공원까지, 주말에 걷기 좋은 루트.',
+    image: '/img/map_2.png',
+  },
+] as const

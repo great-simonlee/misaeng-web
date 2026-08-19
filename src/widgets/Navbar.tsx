@@ -66,7 +66,9 @@ export function Navbar() {
                   onClick={() => setMobileOpen(false)}
                   className={cn(
                     'min-h-[48px] flex items-center px-4 text-sm font-medium text-[var(--foreground)] active:bg-[var(--surface)]',
-                    pathname === href ? 'text-[var(--brand)] font-semibold' : ''
+                    pathname === href || pathname.startsWith(`${href}/`)
+                      ? 'text-[var(--brand)] font-semibold'
+                      : ''
                   )}
                 >
                   {label}
@@ -119,7 +121,7 @@ export function Navbar() {
                 href={href}
                 className={cn(
                   'text-sm font-medium transition-colors',
-                  pathname === href
+                  pathname === href || pathname.startsWith(`${href}/`)
                     ? 'text-[var(--foreground)] font-semibold'
                     : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
                 )}

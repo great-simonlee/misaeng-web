@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMisaeng() {
+      return signedIn()
+        && request.auth.token.email.matches('.*@misaeng[.]com$');
+    }
+
+    function isAuthor(data) {
+      return signedIn() && request.auth.uid == data.authorUid;
+    }
+
+    match /housingPosts/{postId} {
+      allow read: if true;
+      allow create: if isMisaeng()
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorEmail == request.auth.token.email
+        && request.resource.data.status == 'open';
+      allow update, delete: if isAuthor(resource.data) && isMisaeng();
+    }
+
+    match /roommatePosts/{postId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorEmail == request.auth.token.email
+        && request.resource.data.status == 'open';
+      allow update, delete: if isAuthor(resource.data);
+    }
+
+    match /communityPosts/{postId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorEmail == request.auth.token.email
+        && request.resource.data.status == 'open'
+        && request.resource.data.categoryId in [
+          'events',
+          'food',
+          'marketplace',
+          'cpt-opt',
+          'visa',
+          'job-review',
+          'green-card',
+          'anonymous'
+        ];
+      allow update, delete: if isAuthor(resource.data);
+    }
+
+    match /users/{uid} {
+      allow read: if true;
+      allow create, update: if signedIn() && request.auth.uid == uid;
+    }
+  }
+}
