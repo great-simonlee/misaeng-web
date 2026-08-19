@@ -1,5 +1,10 @@
+import { DEFAULT_GOOGLE_CLIENT_ID } from '@lib/constants/googleAuth'
+
 export function getGoogleClientId() {
-  return process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim() || null
+  return (
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim() ||
+    DEFAULT_GOOGLE_CLIENT_ID
+  )
 }
 
 export function isGoogleSignInConfigured() {

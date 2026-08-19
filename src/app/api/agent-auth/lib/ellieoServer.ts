@@ -1,5 +1,10 @@
 import { cookies } from 'next/headers'
 
+import {
+  resolveAppConnectBaseUrl,
+  resolveAppConnectDeviceId,
+} from '@lib/constants/appConnect'
+
 export const ELLIEO_ACCESS_COOKIE = 'ellieo_app_access'
 export const ELLIEO_REFRESH_COOKIE = 'ellieo_app_refresh'
 export const ELLIEO_DEVICE_COOKIE = 'ellieo_app_device'
@@ -8,11 +13,11 @@ const ACCESS_MAX_AGE = 60 * 25
 const REFRESH_MAX_AGE = 60 * 60 * 24 * 30
 
 export function getEllieoBaseUrl() {
-  return (process.env.APP_CONNECT_API_BASE_URL || '').trim().replace(/\/$/, '')
+  return resolveAppConnectBaseUrl()
 }
 
 export function getDefaultDeviceId() {
-  return (process.env.APP_CONNECT_DEVICE_ID || '').trim()
+  return resolveAppConnectDeviceId()
 }
 
 export async function getEllieoAccessToken() {

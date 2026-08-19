@@ -4,7 +4,12 @@ interface AuthConfigBannerProps {
   className?: string
 }
 
+/** 로컬 개발용 — Production(Vercel)에서는 표시하지 않음 */
 export function AuthConfigBanner({ className }: AuthConfigBannerProps) {
+  if (process.env.NODE_ENV === 'production') {
+    return null
+  }
+
   return (
     <div
       className={
@@ -25,7 +30,9 @@ export function AuthConfigBanner({ className }: AuthConfigBannerProps) {
         auth/login/google
       </code>
       로 전달됩니다 (
-      <code className='break-all font-mono text-[11px] sm:text-xs'>.env.example</code>{' '}
+      <code className='break-all font-mono text-[11px] sm:text-xs'>
+        .env.example
+      </code>{' '}
       참고).{' '}
       <Link
         href='/nyc/login'

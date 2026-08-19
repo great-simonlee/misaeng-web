@@ -9,6 +9,7 @@ import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { AuthConfigBanner } from '@widgets/nyc/AuthConfigBanner'
 import { GoogleSignInButton } from '@widgets/nyc/GoogleSignInButton'
+import { isAppConnectConfigured } from '@lib/constants/appConnect'
 import { isGoogleSignInConfigured } from '@lib/google/config'
 
 const inputClass =
@@ -34,8 +35,12 @@ export function NycLoginScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const authReady = useMemo(
+    () => isAppConnectConfigured() && isGoogleSignInConfigured(),
+    [],
+  )
   const canUseGoogle = useMemo(
-    () => configured && isGoogleSignInConfigured(),
+    () => (configured || isAppConnectConfigured()) && isGoogleSignInConfigured(),
     [configured],
   )
 
@@ -181,7 +186,7 @@ export function NycLoginScreen() {
             </div>
           )}
 
-          {!configured && (
+          {!authReady && process.env.NODE_ENV !== 'production' && (
             <div className='mt-5'>
               <AuthConfigBanner />
             </div>
@@ -239,7 +244,7 @@ export function NycLoginScreen() {
 
             <button
               type='submit'
-              disabled={submitting || !configured}
+              disabled={submitting || !isAppConnectConfigured()}
               className='min-h-[48px] w-full rounded-full bg-[linear-gradient(135deg,#ff4c14_0%,#f64310_50%,#df390e_100%)] text-[15px] font-semibold text-white shadow-[0_10px_20px_rgba(246,67,16,0.24)] transition hover:brightness-[1.03] disabled:cursor-not-allowed disabled:opacity-50'
             >
               {submitLabel}
