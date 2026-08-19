@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/opengraph-image',
+        url: '/opengraph-image.png',
         width: 1200,
         height: 630,
         alt: 'Misaeng – Ellieo verified housing platform',
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     title: 'Misaeng – Ellieo | Verified Housing for New York City Students & Professionals',
     description:
       'Official corporate site for Misaeng and Ellieo—next-gen housing platform for New York City. Identity verification, scam prevention, roommate matching. U.S. business expansion.',
-    images: ['/twitter-image'],
+    images: ['/twitter-image.png'],
   },
 }
 

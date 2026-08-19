@@ -6,8 +6,6 @@ import {
 } from '@lib/constants/nyc'
 import { CommunityListScreen } from '@screens/nyc/CommunityListScreen'
 
-export const runtime = 'edge'
-
 interface CommunityBoardPageProps {
   params: Promise<{ board: string }>
 }
