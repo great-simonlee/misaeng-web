@@ -1,7 +1,18 @@
 import { NextResponse } from 'next/server'
 
-import { getEllieoBaseUrl } from '../lib/ellieoServer'
-import { loginOrRegisterWithGoogle } from '../lib/authHelpers'
+import {
+  buildAuthUserFromHints,
+  getAuthErrorMessage,
+  isUpstreamUnavailable,
+  loginOrRegisterWithGoogle,
+} from '../lib/authHelpers'
+import {
+  ellieoUpstreamFetch,
+  extractEllieoTokens,
+  getEllieoBaseUrl,
+  getOrCreateDeviceId,
+  setEllieoSession,
+} from '../lib/ellieoServer'
 
 type GoogleAuthBody = {
   idToken?: string
@@ -11,6 +22,14 @@ type GoogleAuthBody = {
   email?: string | null
   name?: string | null
 }
+
+const ELLIEO_LOGIN_BODIES = (idToken: string) => [
+  { idToken, platform: 'web' },
+  { idToken },
+  { googleIdToken: idToken, platform: 'web' },
+  { googleIdToken: idToken },
+  { token: idToken },
+]
 
 export async function POST(request: Request) {
   try {
@@ -35,37 +54,88 @@ export async function POST(request: Request) {
       )
     }
 
-    const result = await loginOrRegisterWithGoogle(
+    const deviceId = await getOrCreateDeviceId()
+    let lastError = 'Google 로그인에 실패했어요.'
+    let lastStatus = 401
+    let loginData: unknown = null
+    let tokens: ReturnType<typeof extractEllieoTokens> | null = null
+
+    for (const loginBody of ELLIEO_LOGIN_BODIES(idToken)) {
+      const { res, data } = await ellieoUpstreamFetch('auth/login/google', {
+        method: 'POST',
+        body: loginBody,
+        deviceId,
+      })
+
+      if (res.ok) {
+        tokens = extractEllieoTokens(data)
+        loginData = data
+        if (tokens.accessToken) break
+      } else {
+        lastStatus = res.status
+        lastError = getAuthErrorMessage(data, lastError)
+        if (isUpstreamUnavailable(res.status)) {
+          return NextResponse.json({ error: lastError }, { status: 503 })
+        }
+      }
+    }
+
+    if (tokens?.accessToken) {
+      await setEllieoSession({
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        deviceId,
+      })
+
+      const user = buildAuthUserFromHints(
+        { email: body.email, name: body.name },
+        { payload: loginData, accessToken: tokens.accessToken },
+      )
+
+      return NextResponse.json({
+        ok: true,
+        connected: true,
+        registered: false,
+        user,
+      })
+    }
+
+    const registerResult = await loginOrRegisterWithGoogle(
       idToken,
       body.email,
       body.name,
+      { loginOnly: false, skipLoginAttempt: true },
     )
 
-    if (!result.ok) {
-      const status =
-        'status' in result && result.status && result.status >= 500
+    if (registerResult.ok) {
+      return NextResponse.json({
+        ok: true,
+        connected: true,
+        registered: registerResult.registered,
+        user: registerResult.user,
+      })
+    }
+
+    const status =
+      'status' in registerResult &&
+      registerResult.status &&
+      registerResult.status >= 500
+        ? 503
+        : lastStatus >= 500
           ? 503
           : 401
 
-      return NextResponse.json(
-        {
-          error: result.error,
-          ...(status === 401
-            ? {
-                hint: 'Google 계정이 Ellieo에 등록되어 있지 않을 수 있어요. 이메일 회원가입을 먼저 시도해 보세요.',
-              }
-            : {}),
-        },
-        { status },
-      )
-    }
-
-    return NextResponse.json({
-      ok: true,
-      connected: true,
-      registered: result.registered,
-      user: result.user,
-    })
+    return NextResponse.json(
+      {
+        error: registerResult.error || lastError,
+        ...(status === 401
+          ? {
+              hint: 'Ellieo에 등록된 Google 계정이 필요해요.',
+            }
+          : {}),
+      },
+      { status },
+    )
   } catch (error) {
     console.error('Google auth error:', error)
 

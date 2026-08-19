@@ -82,6 +82,14 @@ function mapProfile(uid: string, email: string, raw: Record<string, unknown> | n
   }
 }
 
+function profileFromAuthUser(user: AuthUser): NycUserProfile {
+  return mapProfile(user.uid, user.email, {
+    name: user.displayName,
+    photoURL: user.photoURL,
+    phone: user.phoneNumber,
+  })
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [profile, setProfile] = useState<NycUserProfile | null>(null)
@@ -108,20 +116,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setConfigured(Boolean(data.configured))
-      setUser(data.user ?? null)
 
-      if (data.user) {
-        const rawProfile =
-          data.profile &&
-          typeof data.profile === 'object' &&
-          'data' in data.profile
-            ? (data.profile.data as Record<string, unknown>)
-            : (data.profile as Record<string, unknown> | null | undefined)
+      if (data.connected) {
+        if (data.user) {
+          setUser(data.user)
 
-        setProfile(mapProfile(data.user.uid, data.user.email, rawProfile ?? null))
-      } else {
-        setProfile(null)
+          const rawProfile =
+            data.profile &&
+            typeof data.profile === 'object' &&
+            'data' in data.profile
+              ? (data.profile.data as Record<string, unknown>)
+              : (data.profile as Record<string, unknown> | null | undefined)
+
+          setProfile(
+            mapProfile(data.user.uid, data.user.email, rawProfile ?? {
+              name: data.user.displayName,
+              photoURL: data.user.photoURL,
+              phone: data.user.phoneNumber,
+            }),
+          )
+        }
+        return
       }
+
+      setUser(null)
+      setProfile(null)
     } catch {
       setConfigured(true)
       setUser(null)
@@ -158,11 +177,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }),
     })
 
+    const data = (await response.json().catch(() => null)) as
+      | { error?: string; user?: AuthUser | null }
+      | null
+
     if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as
-        | { error?: string }
-        | null
       throw new Error(data?.error || '로그인에 실패했어요')
+    }
+
+    if (data?.user) {
+      setUser(data.user)
+      setProfile(profileFromAuthUser(data.user))
     }
 
     await loadSession()
@@ -182,11 +207,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }),
     })
 
+    const data = (await response.json().catch(() => null)) as
+      | { error?: string; user?: AuthUser | null }
+      | null
+
     if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as
-        | { error?: string }
-        | null
       throw new Error(data?.error || '회원가입에 실패했어요')
+    }
+
+    if (data?.user) {
+      setUser(data.user)
+      setProfile(profileFromAuthUser(data.user))
     }
 
     await loadSession()
@@ -207,11 +238,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }),
       })
 
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string; hint?: string; user?: AuthUser | null }
+        | null
+
       if (!response.ok) {
-        const data = (await response.json().catch(() => null)) as
-          | { error?: string }
-          | null
-        throw new Error(data?.error || 'Google 로그인에 실패했어요')
+        throw new Error(
+          data?.error ||
+            (response.status >= 500
+              ? 'Ellieo 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.'
+              : 'Google 로그인에 실패했어요'),
+        )
+      }
+
+      if (data?.user) {
+        setUser(data.user)
+        setProfile(profileFromAuthUser(data.user))
+      } else if (params.email) {
+        const fallbackUser: AuthUser = {
+          uid: params.email,
+          email: params.email,
+          displayName: params.name ?? null,
+          photoURL: null,
+          phoneNumber: null,
+        }
+        setUser(fallbackUser)
+        setProfile(profileFromAuthUser(fallbackUser))
       }
 
       await loadSession()

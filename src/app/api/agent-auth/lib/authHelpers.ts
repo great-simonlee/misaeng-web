@@ -35,6 +35,49 @@ export function decodeJwtPayload(token: string): Record<string, unknown> | null 
   }
 }
 
+function pickEmailFromRecord(record: Record<string, unknown>): string | null {
+  const candidates = ['email', 'userEmail', 'username', 'loginEmail']
+  for (const key of candidates) {
+    const value = record[key]
+    if (typeof value === 'string' && value.includes('@')) {
+      return value
+    }
+  }
+  return null
+}
+
+export function buildAuthUserFromHints(
+  hints: {
+    email?: string | null
+    name?: string | null
+  },
+  sources: {
+    payload?: unknown
+    accessToken?: string | null
+  } = {},
+) {
+  const fromPayload = sources.payload
+    ? normalizeUserFromPayload(sources.payload)
+    : null
+  if (fromPayload) return fromPayload
+
+  const fromToken = sources.accessToken
+    ? normalizeUserFromAccessToken(sources.accessToken)
+    : null
+  if (fromToken) return fromToken
+
+  const email = hints.email?.trim()
+  if (!email) return null
+
+  return {
+    uid: email,
+    email,
+    displayName: hints.name?.trim() || null,
+    photoURL: null,
+    phoneNumber: null,
+  }
+}
+
 export function normalizeUserFromPayload(payload: unknown) {
   if (!payload || typeof payload !== 'object') return null
 
@@ -54,9 +97,8 @@ export function normalizeUserFromPayload(payload: unknown) {
   const source = nestedUser ?? record
 
   const email =
-    (typeof source.email === 'string' && source.email) ||
-    (typeof source.userEmail === 'string' && source.userEmail) ||
-    (typeof record.email === 'string' && record.email) ||
+    pickEmailFromRecord(source as Record<string, unknown>) ||
+    pickEmailFromRecord(record) ||
     null
 
   if (!email) return null
@@ -93,32 +135,40 @@ export function normalizeUserFromAccessToken(accessToken: string) {
   const payload = decodeJwtPayload(accessToken)
   if (!payload) return null
 
-  const email =
-    (typeof payload.email === 'string' && payload.email) ||
-    (typeof payload.sub === 'string' && payload.sub.includes('@')
-      ? payload.sub
-      : null)
+  const email = pickEmailFromRecord(payload)
 
-  if (!email) return null
+  const uid =
+    (payload.sub != null && String(payload.sub)) ||
+    (payload.userIdx != null && String(payload.userIdx)) ||
+    (payload.id != null && String(payload.id)) ||
+    (payload.userId != null && String(payload.userId)) ||
+    email
+
+  if (!uid) return null
 
   return {
-    uid:
-      (payload.sub != null && String(payload.sub)) ||
-      (payload.userIdx != null && String(payload.userIdx)) ||
-      email,
-    email,
+    uid,
+    email: email || (uid.includes('@') ? uid : `${uid}@ellieo.user`),
     displayName:
       (typeof payload.name === 'string' && payload.name) ||
       (typeof payload.nickname === 'string' && payload.nickname) ||
+      (typeof payload.userName === 'string' && payload.userName) ||
       null,
-    photoURL: null,
-    phoneNumber: null,
+    photoURL:
+      (typeof payload.photoURL === 'string' && payload.photoURL) ||
+      (typeof payload.profileImage === 'string' && payload.profileImage) ||
+      null,
+    phoneNumber:
+      (typeof payload.phone === 'string' && payload.phone) ||
+      (typeof payload.phoneNumber === 'string' && payload.phoneNumber) ||
+      null,
   }
 }
 
 export async function persistAuthSession(
   loginData: unknown,
   deviceId: string,
+  hints?: { email?: string | null; name?: string | null },
 ) {
   const tokens = extractEllieoTokens(loginData)
   if (!tokens.accessToken) {
@@ -133,9 +183,10 @@ export async function persistAuthSession(
 
   return {
     ok: true as const,
-    user:
-      normalizeUserFromPayload(loginData) ??
-      normalizeUserFromAccessToken(tokens.accessToken),
+    user: buildAuthUserFromHints(hints ?? {}, {
+      payload: loginData,
+      accessToken: tokens.accessToken,
+    }),
     profile: loginData,
   }
 }
@@ -160,7 +211,7 @@ export async function loginWithEmail(email: string, password: string) {
       continue
     }
 
-    const session = await persistAuthSession(data, deviceId)
+    const session = await persistAuthSession(data, deviceId, { email })
     if (session.ok) return session
     lastError = session.error
   }
@@ -190,7 +241,10 @@ export async function registerWithEmail(
     if (res.ok) {
       const tokens = extractEllieoTokens(data)
       if (tokens.accessToken) {
-        return persistAuthSession(data, deviceId)
+        return persistAuthSession(data, deviceId, {
+          email,
+          name: displayName,
+        })
       }
       break
     }
@@ -212,14 +266,11 @@ function buildGoogleBodies(
   return [
     { idToken, platform: 'web' },
     { idToken },
-    { credential: idToken, platform: 'web' },
-    { credential: idToken },
     { googleIdToken: idToken, platform: 'web' },
     { googleIdToken: idToken },
     { token: idToken },
     { idToken, email, name, platform: 'web' },
     { googleIdToken: idToken, email, name, platform: 'web' },
-    { credential: idToken, email, name, platform: 'web' },
   ]
 }
 
@@ -248,7 +299,7 @@ export async function loginWithGoogle(
       continue
     }
 
-    const session = await persistAuthSession(data, deviceId)
+    const session = await persistAuthSession(data, deviceId, { email, name })
     if (session.ok) return session
     lastError = session.error
   }
@@ -289,7 +340,7 @@ export async function registerWithGoogle(
       continue
     }
 
-    const session = await persistAuthSession(data, deviceId)
+    const session = await persistAuthSession(data, deviceId, { email, name })
     if (session.ok) return session
   }
 
@@ -307,14 +358,24 @@ export async function loginOrRegisterWithGoogle(
   idToken: string,
   email?: string | null,
   name?: string | null,
+  options?: {
+    loginOnly?: boolean
+    skipLoginAttempt?: boolean
+  },
 ) {
-  const login = await loginWithGoogle(idToken, email, name)
-  if (login.ok) {
-    return { ...login, registered: false }
-  }
+  if (!options?.skipLoginAttempt) {
+    const login = await loginWithGoogle(idToken, email, name)
+    if (login.ok) {
+      return { ...login, registered: false }
+    }
 
-  if ('status' in login && login.status && isUpstreamUnavailable(login.status)) {
-    return login
+    if ('status' in login && login.status && isUpstreamUnavailable(login.status)) {
+      return login
+    }
+
+    if (options?.loginOnly) {
+      return login
+    }
   }
 
   const asAgent = isMisaengEmail(email)

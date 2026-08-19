@@ -1,9 +1,15 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { signInWithPopup } from 'firebase/auth'
+import { useState } from 'react'
+
+import {
+  createEllieoGoogleProvider,
+  getEllieoFirebaseAuth,
+  isEllieoFirebaseConfigured,
+} from '@lib/ellieo/firebaseAuth'
 
 interface GoogleSignInButtonProps {
-  clientId: string
   disabled?: boolean
   onCredential: (credential: {
     idToken: string
@@ -36,187 +42,69 @@ function GoogleLogo() {
   )
 }
 
-async function loadGoogleIdentityScript() {
-  if (window.google?.accounts?.id) return
-
-  await new Promise<void>((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>(
-      'script[data-google-identity="true"]',
-    )
-
-    if (existing) {
-      if (window.google?.accounts?.id) {
-        resolve()
-        return
-      }
-
-      existing.addEventListener('load', () => resolve(), { once: true })
-      existing.addEventListener(
-        'error',
-        () => reject(new Error('Google 스크립트를 불러오지 못했어요.')),
-        { once: true },
-      )
-      return
-    }
-
-    const script = document.createElement('script')
-    script.src = 'https://accounts.google.com/gsi/client'
-    script.async = true
-    script.defer = true
-    script.dataset.googleIdentity = 'true'
-    script.onload = () => resolve()
-    script.onerror = () =>
-      reject(new Error('Google 스크립트를 불러오지 못했어요.'))
-    document.head.appendChild(script)
-  })
-}
-
-let googleIdentityClientId: string | null = null
-
 export function GoogleSignInButton({
-  clientId,
   disabled,
   onCredential,
   onError,
 }: GoogleSignInButtonProps) {
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const googleContainerRef = useRef<HTMLDivElement>(null)
-  const onCredentialRef = useRef(onCredential)
-  const onErrorRef = useRef(onError)
-  const [initialized, setInitialized] = useState(false)
-  const [buttonWidth, setButtonWidth] = useState(320)
+  const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
-    onCredentialRef.current = onCredential
-  }, [onCredential])
+  async function handleClick() {
+    if (disabled || submitting) return
 
-  useEffect(() => {
-    onErrorRef.current = onError
-  }, [onError])
-
-  useEffect(() => {
-    const wrapper = wrapperRef.current
-    if (!wrapper) return
-
-    const updateWidth = () => {
-      const nextWidth = Math.floor(wrapper.getBoundingClientRect().width)
-      if (nextWidth > 0) {
-        setButtonWidth(nextWidth)
-      }
+    if (!isEllieoFirebaseConfigured()) {
+      onError('Firebase Google 로그인 설정이 필요해요.')
+      return
     }
 
-    updateWidth()
+    setSubmitting(true)
+    try {
+      const auth = getEllieoFirebaseAuth()
+      const result = await signInWithPopup(auth, createEllieoGoogleProvider())
+      const idToken = await result.user.getIdToken(true)
 
-    const observer = new ResizeObserver(updateWidth)
-    observer.observe(wrapper)
+      onCredential({
+        idToken,
+        email: result.user.email,
+        name: result.user.displayName,
+      })
+    } catch (error) {
+      const code =
+        error && typeof error === 'object' && 'code' in error
+          ? String(error.code)
+          : ''
 
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (!clientId || disabled) return
-
-    let cancelled = false
-
-    ;(async () => {
-      try {
-        await loadGoogleIdentityScript()
-        if (cancelled) return
-
-        if (googleIdentityClientId !== clientId) {
-          window.google.accounts.id.initialize({
-            client_id: clientId,
-            callback: (response) => {
-              if (!response.credential) {
-                onErrorRef.current('Google 자격 증명을 받지 못했어요.')
-                return
-              }
-
-              let email: string | null = null
-              let name: string | null = null
-
-              try {
-                const payload = JSON.parse(
-                  atob(response.credential.split('.')[1] || ''),
-                ) as { email?: string; name?: string }
-                email = payload.email || null
-                name = payload.name || null
-              } catch {
-                email = null
-                name = null
-              }
-
-              onCredentialRef.current({
-                idToken: response.credential,
-                email,
-                name,
-              })
-            },
-            ux_mode: 'popup',
-            auto_select: false,
-          })
-          googleIdentityClientId = clientId
-        }
-
-        if (!cancelled) setInitialized(true)
-      } catch (error) {
-        if (!cancelled) {
-          setInitialized(false)
-          onErrorRef.current(
-            error instanceof Error
-              ? error.message
-              : 'Google 로그인 버튼을 불러오지 못했어요.',
-          )
-        }
+      if (code === 'auth/popup-closed-by-user') {
+        return
       }
-    })()
 
-    return () => {
-      cancelled = true
+      onError(
+        error instanceof Error
+          ? error.message
+          : 'Google 로그인에 실패했어요.',
+      )
+    } finally {
+      setSubmitting(false)
     }
-  }, [clientId, disabled])
+  }
 
-  useEffect(() => {
-    if (!initialized || disabled || !googleContainerRef.current) return
-
-    googleContainerRef.current.innerHTML = ''
-    window.google.accounts.id.renderButton(googleContainerRef.current, {
-      type: 'standard',
-      theme: 'outline',
-      size: 'large',
-      shape: 'pill',
-      text: 'continue_with',
-      width: buttonWidth,
-    })
-  }, [buttonWidth, disabled, initialized])
-
-  if (!clientId) {
+  if (!isEllieoFirebaseConfigured()) {
     return (
       <p className='rounded-full border border-[#dde2ea] bg-[#f9fafb] px-4 py-3 text-center text-[13px] font-normal text-[#667085]'>
-        Google 로그인 설정이 필요해요.
+        Firebase Google 로그인 설정이 필요해요.
       </p>
     )
   }
 
   return (
-    <div ref={wrapperRef} className='relative w-full'>
-      <div
-        aria-hidden='true'
-        className='pointer-events-none flex min-h-[48px] w-full items-center justify-center gap-3 rounded-full border border-[#dde2ea] bg-white px-4 text-[15px] font-medium text-[#344054]'
-      >
-        <GoogleLogo />
-        {initialized ? 'Google로 계속하기' : 'Google 버튼 불러오는 중…'}
-      </div>
-
-      <div
-        ref={googleContainerRef}
-        aria-label='Google로 계속하기'
-        className={`absolute inset-0 z-10 flex items-center justify-center overflow-hidden ${
-          disabled || !initialized
-            ? 'pointer-events-none opacity-0'
-            : 'opacity-[0.001]'
-        } [&>div]:!h-full [&>div]:!w-full [&>div>div]:!w-full`}
-      />
-    </div>
+    <button
+      type='button'
+      onClick={() => void handleClick()}
+      disabled={disabled || submitting}
+      className='flex min-h-[48px] w-full items-center justify-center gap-3 rounded-full border border-[#dde2ea] bg-white px-4 text-[15px] font-medium text-[#344054] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-50'
+    >
+      <GoogleLogo />
+      {submitting ? 'Google 계정 연결 중…' : 'Google로 계속하기'}
+    </button>
   )
 }

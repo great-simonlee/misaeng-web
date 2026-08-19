@@ -1,19 +1,18 @@
 import { NextResponse } from 'next/server'
 
 import {
-  clearEllieoSession,
+  normalizeUserFromAccessToken,
+  normalizeUserFromPayload,
+} from '../lib/authHelpers'
+import {
   ellieoAuthorizedFetch,
   ellieoUpstreamFetch,
   getEllieoAccessToken,
   getEllieoBaseUrl,
   getEllieoRefreshToken,
   refreshEllieoAccessToken,
+  clearEllieoSession,
 } from '../lib/ellieoServer'
-import {
-  normalizeUserFromAccessToken,
-  normalizeUserFromPayload,
-  isUpstreamUnavailable,
-} from '../lib/authHelpers'
 
 export async function GET() {
   const baseUrl = getEllieoBaseUrl()
@@ -32,7 +31,7 @@ export async function GET() {
     accessToken = (await refreshEllieoAccessToken()) || null
   }
 
-  if (!accessToken && !refreshToken) {
+  if (!accessToken) {
     return NextResponse.json({
       configured: true,
       connected: false,
@@ -44,54 +43,21 @@ export async function GET() {
     method: 'GET',
   })
 
-  if (res.ok) {
-    const user = normalizeUserFromPayload(data)
-    return NextResponse.json({
-      configured: true,
-      connected: true,
-      user,
-      profile: data,
-    })
-  }
+  const user =
+    (res.ok ? normalizeUserFromPayload(data) : null) ??
+    normalizeUserFromAccessToken(accessToken)
 
-  if (accessToken) {
-    const fallbackUser = normalizeUserFromAccessToken(accessToken)
-    if (fallbackUser) {
-      return NextResponse.json({
-        configured: true,
-        connected: true,
-        user: fallbackUser,
-        profile: null,
-      })
-    }
-  }
-
-  if (res.status === 401) {
-    return NextResponse.json({
-      configured: true,
-      connected: false,
-      user: null,
-    })
-  }
-
-  if (isUpstreamUnavailable(res.status)) {
-    return NextResponse.json({
-      configured: true,
-      connected: false,
-      user: null,
-      error: 'Ellieo 서버에 연결할 수 없어요.',
-    })
-  }
-
-  return NextResponse.json(
-    {
-      configured: true,
-      connected: false,
-      user: null,
-      error: '사용자 정보를 불러오지 못했어요.',
-    },
-    { status: 200 },
-  )
+  return NextResponse.json({
+    configured: true,
+    connected: true,
+    user,
+    profile: res.ok ? data : null,
+    ...(res.ok
+      ? {}
+      : user
+        ? { warning: '프로필 정보를 불러오지 못했지만 로그인 상태는 유지됩니다.' }
+        : { warning: '로그인은 되었지만 사용자 정보를 확인하지 못했어요.' }),
+  })
 }
 
 export async function DELETE() {

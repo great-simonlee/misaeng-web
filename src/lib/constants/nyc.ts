@@ -1,5 +1,9 @@
 export const MISAENG_EMAIL_DOMAIN = '@misaeng.com'
 
+/** NYC 네비·푸터·본문 가로 정렬용 컨테이너 */
+export const NYC_PAGE_SHELL_CLASS =
+  'mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'
+
 /** 카카오톡 문의 채널/오픈채팅 URL (미설정 시 문의 버튼에서 안내) */
 export const KAKAO_INQUIRY_URL =
   process.env.NEXT_PUBLIC_KAKAO_INQUIRY_URL?.trim() || ''

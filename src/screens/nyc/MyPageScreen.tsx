@@ -9,6 +9,8 @@ import {
   MAX_NICKNAME_LEN,
   MIN_NICKNAME_LEN,
 } from '@lib/constants/profile'
+import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
+import { cn } from '@lib'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { MBTI_TYPES } from '@lib/constants/mbti'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
@@ -119,7 +121,12 @@ export function MyPageScreen() {
 
   return (
     <div className='flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
-      <div className='mx-auto w-full max-w-5xl flex-1 px-5 pb-14 pt-8 sm:px-6 sm:pb-16 sm:pt-10 lg:max-w-6xl lg:px-8 lg:pb-20 lg:pt-12'>
+      <div
+        className={cn(
+          'flex flex-1 flex-col pb-14 pt-8 sm:pb-16 sm:pt-10 lg:pb-20 lg:pt-12',
+          NYC_PAGE_SHELL_CLASS,
+        )}
+      >
         <div className='mb-6 lg:mb-8'>
           <p className='text-[11px] font-medium tracking-[0.18em] text-[var(--muted)]'>
             ACCOUNT
@@ -130,8 +137,8 @@ export function MyPageScreen() {
         </div>
 
         <div className='grid gap-6 lg:grid-cols-[minmax(260px,300px)_minmax(0,1fr)] lg:items-start lg:gap-8'>
-          {/* 프로필 카드 */}
-          <aside className='overflow-hidden rounded-[1.5rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_rgba(15,23,42,0.05)] ring-1 ring-black/[0.04] lg:sticky lg:top-24'>
+          <div className='flex flex-col gap-2 lg:sticky lg:top-24'>
+            <aside className='overflow-hidden rounded-[1.5rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_rgba(15,23,42,0.05)] ring-1 ring-black/[0.04]'>
             <div className='relative h-20 bg-[linear-gradient(135deg,#1e293b_0%,#0f172a_55%,#F64310_160%)] lg:h-24' />
             <div className='relative px-5 pb-6 pt-0 text-center sm:px-6'>
               <button
@@ -178,15 +185,14 @@ export function MyPageScreen() {
                 </p>
               )}
 
-              <button
-                type='button'
-                onClick={() => void handleLogout()}
-                className='mt-5 inline-flex h-9 items-center rounded-full border border-[#e5e7eb] px-4 text-[13px] font-medium text-[var(--muted-foreground)] touch-manipulation transition hover:border-[var(--foreground)]/20 hover:text-[var(--foreground)]'
-              >
-                로그아웃
-              </button>
             </div>
           </aside>
+
+            <LogoutSection
+              onLogout={() => void handleLogout()}
+              className='hidden lg:block'
+            />
+          </div>
 
           {/* 설정 영역 */}
           <div className='min-w-0 space-y-6 lg:space-y-7'>
@@ -282,6 +288,11 @@ export function MyPageScreen() {
 
             <ProfileVerificationSection profile={profile} />
           </div>
+
+          <LogoutSection
+            onLogout={() => void handleLogout()}
+            className='mt-2 sm:mt-4 lg:hidden'
+          />
         </div>
       </div>
 
@@ -398,6 +409,63 @@ function CameraIcon() {
         d='M4 8.5A1.5 1.5 0 0 1 5.5 7h2.1l1.2-1.6A1.5 1.5 0 0 1 10 4.5h4a1.5 1.5 0 0 1 1.2.9L16.4 7h2.1A1.5 1.5 0 0 1 20 8.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5v-8Z'
       />
       <circle cx='12' cy='12.5' r='3' />
+    </svg>
+  )
+}
+
+function LogoutSection({
+  onLogout,
+  className,
+}: {
+  onLogout: () => void
+  className?: string
+}) {
+  return (
+    <section className={cn(className)}>
+      <button
+        type='button'
+        onClick={onLogout}
+        className='group flex w-full items-center justify-between gap-3 rounded-[1.25rem] bg-white px-4 py-4 text-left shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04] transition hover:bg-[#fafafa] active:scale-[0.995] sm:px-5 sm:py-3.5'
+      >
+        <span className='flex min-w-0 items-center gap-3'>
+          <span className='flex size-10 shrink-0 items-center justify-center rounded-full bg-[#f4f5f7] text-[#64748b] transition group-hover:bg-[#eef0f3] group-hover:text-[#334155] sm:size-9'>
+            <LogoutIcon />
+          </span>
+          <span className='min-w-0'>
+            <span className='block text-[15px] font-semibold tracking-tight text-[var(--foreground)]'>
+              로그아웃
+            </span>
+            <span className='mt-0.5 block text-[13px] leading-snug text-[var(--muted-foreground)]'>
+              이 기기에서 계정 연결을 해제해요
+            </span>
+          </span>
+        </span>
+        <ChevronIcon />
+      </button>
+    </section>
+  )
+}
+
+function LogoutIcon() {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='1.8'
+      className='size-[18px]'
+      aria-hidden
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15'
+      />
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M10.5 12h10.25M18 9.75 21.25 12 18 14.25'
+      />
     </svg>
   )
 }

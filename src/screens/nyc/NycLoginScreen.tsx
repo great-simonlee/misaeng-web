@@ -9,6 +9,7 @@ import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { AuthConfigBanner } from '@widgets/nyc/AuthConfigBanner'
 import { GoogleSignInButton } from '@widgets/nyc/GoogleSignInButton'
+import { isEllieoFirebaseConfigured } from '@lib/ellieo/firebaseAuth'
 
 const inputClass =
   'mt-2 min-h-[48px] w-full rounded-xl border border-[#dde2ea] bg-white px-3.5 text-[15px] font-normal text-[var(--foreground)] outline-none transition placeholder:text-[#98a2b3] focus:border-[#F64310] focus:shadow-[0_0_0_3px_rgba(246,67,16,0.12)]'
@@ -32,10 +33,9 @@ export function NycLoginScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim() || ''
   const canUseGoogle = useMemo(
-    () => configured && Boolean(googleClientId),
-    [configured, googleClientId],
+    () => configured && isEllieoFirebaseConfigured(),
+    [configured],
   )
 
   useEffect(() => {
@@ -255,7 +255,6 @@ export function NycLoginScreen() {
                 </div>
 
                 <GoogleSignInButton
-                  clientId={googleClientId}
                   disabled={submitting || !canUseGoogle}
                   onCredential={(credential) =>
                     void handleGoogleCredential(credential)

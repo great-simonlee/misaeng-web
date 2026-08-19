@@ -11,9 +11,15 @@ export function getEllieoBaseUrl() {
   return (process.env.APP_CONNECT_API_BASE_URL || '').trim().replace(/\/$/, '')
 }
 
+export function getDefaultDeviceId() {
+  return (process.env.APP_CONNECT_DEVICE_ID || '').trim()
+}
+
 export async function getEllieoAccessToken() {
   const jar = await cookies()
-  return jar.get(ELLIEO_ACCESS_COOKIE)?.value?.trim() || null
+  const fromCookie = jar.get(ELLIEO_ACCESS_COOKIE)?.value?.trim()
+  if (fromCookie) return fromCookie
+  return (process.env.APP_CONNECT_API_KEY || '').trim() || null
 }
 
 export async function getEllieoRefreshToken() {
@@ -64,7 +70,7 @@ export async function getOrCreateDeviceId() {
 
   if (!deviceId) {
     deviceId =
-      (process.env.APP_CONNECT_DEVICE_ID || '').trim() ||
+      getDefaultDeviceId() ||
       `erp-${crypto.randomUUID()}`
   }
 

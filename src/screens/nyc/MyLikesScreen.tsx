@@ -8,7 +8,7 @@ import { LoadingState, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { useHousingLikes } from '@hooks/useHousingLikes'
 import { getHousingUnitRent, listMockHousingPosts } from '@lib/constants/housingMock'
-import { NYC_CATEGORIES, type NycCategoryId } from '@lib/constants/nyc'
+import { NYC_CATEGORIES, NYC_PAGE_SHELL_CLASS, type NycCategoryId } from '@lib/constants/nyc'
 import { cn } from '@lib'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
 // import { getHousingPost } from '@lib/firebase/housing'
@@ -151,13 +151,18 @@ export function MyLikesScreen() {
     <div className='relative flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
       {/* 임시: 파이어베이스 배너 비활성화
       {!isFirebaseConfigured() && (
-        <div className='mx-auto w-full max-w-5xl px-5 pt-4 sm:px-6 lg:max-w-6xl lg:px-8'>
+        <div className={cn('pt-4', NYC_PAGE_SHELL_CLASS)}>
           <FirebaseConfigBanner />
         </div>
       )}
       */}
 
-      <div className='mx-auto flex w-full max-w-5xl flex-1 flex-col px-5 pb-14 pt-8 sm:px-6 sm:pb-16 sm:pt-10 lg:max-w-6xl lg:px-8 lg:pb-20 lg:pt-12'>
+      <div
+        className={cn(
+          'flex flex-1 flex-col pb-14 pt-8 sm:pb-16 sm:pt-10 lg:pb-20 lg:pt-12',
+          NYC_PAGE_SHELL_CLASS,
+        )}
+      >
         <div className='flex flex-wrap items-end justify-between gap-4'>
           <div className='min-w-0'>
             <p className='text-[11px] font-medium tracking-[0.18em] text-[var(--muted)]'>
