@@ -2,10 +2,8 @@ import { NextResponse } from 'next/server'
 
 import {
   normalizeUserFromAccessToken,
-  normalizeUserFromPayload,
 } from '../lib/authHelpers'
 import {
-  ellieoAuthorizedFetch,
   ellieoUpstreamFetch,
   getEllieoAccessToken,
   getEllieoBaseUrl,
@@ -13,6 +11,12 @@ import {
   refreshEllieoAccessToken,
   clearEllieoSession,
 } from '../lib/ellieoServer'
+import {
+  getLatestSupabaseAvatarUrl,
+  isSupabaseStorageConfigured,
+} from '@lib/supabase/avatar.server'
+import { getSupabaseAvatarBucket } from '@lib/supabase/server'
+import { getSupabaseProfile } from '@lib/supabase/profile.server'
 
 export async function GET() {
   const baseUrl = getEllieoBaseUrl()
@@ -39,24 +43,39 @@ export async function GET() {
     })
   }
 
-  const { res, data } = await ellieoAuthorizedFetch('user/profile', {
-    method: 'GET',
-  })
+  const user = normalizeUserFromAccessToken(accessToken)
+  if (!user) {
+    return NextResponse.json({
+      configured: true,
+      connected: false,
+      user: null,
+      warning: '로그인은 되었지만 사용자 정보를 확인하지 못했어요.',
+    })
+  }
 
-  const user =
-    (res.ok ? normalizeUserFromPayload(data) : null) ??
-    normalizeUserFromAccessToken(accessToken)
+  let photoURL = user.photoURL ?? null
+  let storedProfile = null
+
+  if (isSupabaseStorageConfigured()) {
+    storedProfile = await getSupabaseProfile(user.uid).catch(() => null)
+
+    const supabasePhoto = await getLatestSupabaseAvatarUrl({
+      uid: user.uid,
+      bucket: getSupabaseAvatarBucket(),
+    }).catch(() => null)
+
+    photoURL =
+      supabasePhoto ?? storedProfile?.photoURL ?? user.photoURL ?? null
+  }
+
+  const enrichedUser = photoURL ? { ...user, photoURL } : user
 
   return NextResponse.json({
     configured: true,
     connected: true,
-    user,
-    profile: res.ok ? data : null,
-    ...(res.ok
-      ? {}
-      : user
-        ? { warning: '프로필 정보를 불러오지 못했지만 로그인 상태는 유지됩니다.' }
-        : { warning: '로그인은 되었지만 사용자 정보를 확인하지 못했어요.' }),
+    user: enrichedUser,
+    profile: storedProfile,
+    ...(photoURL ? { avatarURL: photoURL } : {}),
   })
 }
 

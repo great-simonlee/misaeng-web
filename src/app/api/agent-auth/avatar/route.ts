@@ -1,51 +1,51 @@
 import { NextResponse } from 'next/server'
 
-import { ellieoAuthorizedFetch } from '../lib/ellieoServer'
+import { resolveAuthenticatedUser } from '../lib/authHelpers'
+import { getSupabaseAvatarBucket } from '@lib/supabase/server'
 import {
-  getSupabaseAvatarBucket,
-  getSupabaseServiceClient,
-} from '@lib/supabase/server'
-
-function extractCurrentUser(payload: unknown) {
-  if (!payload || typeof payload !== 'object') return null
-  const data =
-    'data' in payload && payload.data && typeof payload.data === 'object'
-      ? payload.data
-      : payload
-
-  if (!data || typeof data !== 'object') return null
-
-  const email =
-    ('email' in data && typeof data.email === 'string' && data.email) ||
-    ('userEmail' in data && typeof data.userEmail === 'string' && data.userEmail) ||
-    null
-  const uid =
-    ('id' in data && data.id != null && String(data.id)) ||
-    ('uid' in data && data.uid != null && String(data.uid)) ||
-    ('userIdx' in data && data.userIdx != null && String(data.userIdx)) ||
-    email
-
-  if (!email || !uid) return null
-
-  return { uid, email }
-}
+  isSupabaseStorageConfigured,
+  uploadAvatarToSupabase,
+} from '@lib/supabase/avatar.server'
+import { upsertSupabaseProfile } from '@lib/supabase/profile.server'
 
 export async function POST(request: Request) {
   try {
-    const me = await ellieoAuthorizedFetch('user/profile', { method: 'GET' })
-    if (!me.res.ok) {
+    if (!isSupabaseStorageConfigured()) {
       return NextResponse.json(
-        { error: '로그인이 필요해요.' },
-        { status: 401 },
+        {
+          error:
+            'Supabase 스토리지 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+        },
+        { status: 503 },
       )
     }
 
-    const currentUser = extractCurrentUser(me.data)
-    if (!currentUser) {
-      return NextResponse.json(
-        { error: '사용자 정보를 확인할 수 없어요.' },
-        { status: 401 },
-      )
+    const currentUser = await resolveAuthenticatedUser()
+    if (!currentUser?.uid) {
+      return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    }
+
+    const contentType = request.headers.get('content-type') || ''
+
+    if (contentType.includes('application/json')) {
+      const body = (await request.json()) as { photoURL?: string }
+      const photoURL = body.photoURL?.trim()
+      if (!photoURL) {
+        return NextResponse.json(
+          { error: 'photoURL이 필요해요.' },
+          { status: 400 },
+        )
+      }
+
+      await upsertSupabaseProfile(currentUser.uid, {
+        email: currentUser.email,
+        photoURL,
+      }).catch(() => null)
+
+      return NextResponse.json({
+        ok: true,
+        photoURL,
+      })
     }
 
     const formData = await request.formData()
@@ -57,40 +57,21 @@ export async function POST(request: Request) {
       )
     }
 
-    const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg'
-    const filePath = `${currentUser.uid}/${Date.now()}.${ext}`
     const bucket = getSupabaseAvatarBucket()
-    const supabase = getSupabaseServiceClient()
-
-    const uploadResult = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file, {
-        upsert: true,
-        contentType: file.type || 'application/octet-stream',
-      })
-
-    if (uploadResult.error) {
-      return NextResponse.json(
-        { error: `스토리지 업로드 실패: ${uploadResult.error.message}` },
-        { status: 500 },
-      )
-    }
-
-    const publicUrlResult = supabase.storage.from(bucket).getPublicUrl(filePath)
-    const photoURL = publicUrlResult.data.publicUrl
-
-    await ellieoAuthorizedFetch('user/profile', {
-      method: 'PUT',
-      body: {
-        photoURL,
-        profileImage: photoURL,
-      },
+    const photoURL = await uploadAvatarToSupabase({
+      uid: currentUser.uid,
+      file,
+      bucket,
     })
+
+    await upsertSupabaseProfile(currentUser.uid, {
+      email: currentUser.email,
+      photoURL,
+    }).catch(() => null)
 
     return NextResponse.json({
       ok: true,
       photoURL,
-      path: filePath,
     })
   } catch (error) {
     return NextResponse.json(

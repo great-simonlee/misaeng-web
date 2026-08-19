@@ -72,7 +72,7 @@ export function CommunityDetailScreen({
   async function handleClose() {
     if (!post || !user) return
     // 임시: 파이어베이스 마감 비활성화
-    toastError('Firebase가 일시적으로 비활성화되어 있어요')
+    toastError('Supabase 연동 후 이용할 수 있어요')
     /*
     try {
       await closeCommunityPost(post.id)

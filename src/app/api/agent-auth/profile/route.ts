@@ -1,61 +1,113 @@
 import { NextResponse } from 'next/server'
 
-import { ellieoAuthorizedFetch, getEllieoBaseUrl } from '../lib/ellieoServer'
+import { resolveAuthenticatedUser } from '../lib/authHelpers'
+import {
+  isProfileGender,
+  isProfileOccupationType,
+} from '@lib/constants/profile'
+import {
+  getSupabaseProfile,
+  isSupabaseProfileConfigured,
+  upsertSupabaseProfile,
+} from '@lib/supabase/profile.server'
 
 type ProfilePatchBody = {
   nickname?: string
   mbti?: string | null
+  photoURL?: string
+  firstName?: string
+  lastName?: string
+  gender?: string | null
+  occupationType?: string | null
 }
 
-function normalizeError(data: unknown, fallback: string) {
-  if (!data || typeof data !== 'object') return fallback
-  if ('message' in data && typeof data.message === 'string') return data.message
-  if ('error' in data && typeof data.error === 'string') return data.error
-  return fallback
+function asTrimmedString(value: unknown): string {
+  if (typeof value === 'string') return value.trim()
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value)
+  }
+  return ''
 }
 
 export async function PATCH(request: Request) {
-  if (!getEllieoBaseUrl()) {
+  if (!isSupabaseProfileConfigured()) {
     return NextResponse.json(
-      { error: 'APP_CONNECT_API_BASE_URL 환경 변수가 필요해요.' },
+      {
+        error:
+          'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+      },
       { status: 503 },
     )
   }
 
-  const body = (await request.json()) as ProfilePatchBody
+  const user = await resolveAuthenticatedUser()
+  if (!user?.uid) {
+    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+  }
 
-  const patch: Record<string, unknown> = {}
+  const body = (await request.json()) as ProfilePatchBody
+  const patch: Record<string, unknown> = { email: user.email }
+
   if (body.nickname !== undefined) {
-    patch.nickname = body.nickname.trim()
+    patch.nickname = asTrimmedString(body.nickname)
   }
   if (body.mbti !== undefined) {
-    patch.mbti = body.mbti ? body.mbti.trim().toUpperCase() : null
+    const mbti = asTrimmedString(body.mbti).toUpperCase()
+    patch.mbti = mbti || null
+  }
+  if (body.photoURL !== undefined) {
+    const photoURL = asTrimmedString(body.photoURL)
+    if (photoURL) patch.photoURL = photoURL
+  }
+  if (body.firstName !== undefined) {
+    patch.firstName = asTrimmedString(body.firstName)
+  }
+  if (body.lastName !== undefined) {
+    patch.lastName = asTrimmedString(body.lastName)
+  }
+  if (body.gender !== undefined) {
+    const gender = asTrimmedString(body.gender).toLowerCase()
+    if (gender && !isProfileGender(gender)) {
+      return NextResponse.json(
+        { error: '올바른 성별 값을 선택해 주세요.' },
+        { status: 400 },
+      )
+    }
+    patch.gender = gender || null
+  }
+  if (body.occupationType !== undefined) {
+    const occupationType = asTrimmedString(body.occupationType).toLowerCase()
+    if (occupationType && !isProfileOccupationType(occupationType)) {
+      return NextResponse.json(
+        { error: '올바른 직업 유형을 선택해 주세요.' },
+        { status: 400 },
+      )
+    }
+    patch.occupationType = occupationType || null
   }
 
-  const result = await ellieoAuthorizedFetch('user/profile', {
-    method: 'PUT',
-    body: patch,
-  })
-
-  if (!result.res.ok) {
+  try {
+    const profile = await upsertSupabaseProfile(user.uid, patch)
+    return NextResponse.json({ ok: true, profile })
+  } catch (error) {
     return NextResponse.json(
-      { error: normalizeError(result.data, '프로필 저장에 실패했어요.') },
-      { status: result.res.status || 500 },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : '프로필 저장에 실패했어요.',
+      },
+      { status: 500 },
     )
   }
+}
 
-  const me = await ellieoAuthorizedFetch('user/profile', { method: 'GET' })
-  if (!me.res.ok) {
-    return NextResponse.json({ ok: true, profile: null })
+export async function GET() {
+  const user = await resolveAuthenticatedUser()
+  if (!user?.uid) {
+    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
   }
 
-  const profile =
-    me.data && typeof me.data === 'object' && 'data' in me.data
-      ? me.data.data
-      : me.data
-
-  return NextResponse.json({
-    ok: true,
-    profile,
-  })
+  const profile = await getSupabaseProfile(user.uid)
+  return NextResponse.json({ ok: true, profile })
 }

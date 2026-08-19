@@ -31,7 +31,7 @@ export function NycNavbar() {
   const [mounted, setMounted] = useState(false)
   const accountRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
-  const { user, loading, avatarURL, displayName } = useAuth()
+  const { user, loading, avatarURL, displayName, isMisaengUser } = useAuth()
 
   useEffect(() => {
     setTimeout(() => setMounted(true), 0)
@@ -231,6 +231,12 @@ export function NycNavbar() {
               </Link>
             )}
 
+            {!loading && user && isMisaengUser && (
+              <span className='text-[13px] font-semibold tracking-wide text-[#F64310] sm:text-sm'>
+                Agent
+              </span>
+            )}
+
             {/* 모바일: 전체 메뉴 */}
             <button
               type='button'
@@ -239,21 +245,10 @@ export function NycNavbar() {
               aria-expanded={mobileOpen}
               aria-label={mobileOpen ? '메뉴 닫기' : '메뉴 열기'}
             >
-              {mobileOpen ? (
-                <span className='inline-flex size-7 items-center justify-center text-[var(--muted-foreground)]'>
-                  <CloseIcon />
-                </span>
-              ) : (
-                <>
-                  <ProfileAvatar
-                    photoURL={avatarURL}
-                    displayName={displayName}
-                  />
-                  <span className='inline-flex size-7 items-center justify-center text-[var(--muted-foreground)]'>
-                    <MenuIcon />
-                  </span>
-                </>
-              )}
+              <ProfileAvatar photoURL={avatarURL} displayName={displayName} />
+              <span className='inline-flex size-7 items-center justify-center text-[var(--muted-foreground)]'>
+                {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+              </span>
             </button>
 
             {/* 데스크톱: 계정 드롭다운 (마이페이지 / 내가 올린 글 / 좋아요) */}

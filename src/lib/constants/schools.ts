@@ -10,7 +10,7 @@ export type VerifiedSchoolId =
   | 'binghamton'
   | 'pace'
   | 'fordham'
-  | 'misaeng'
+  | 'monroe'
 
 export type VerifiedSchool = {
   id: VerifiedSchoolId
@@ -28,7 +28,7 @@ export const VERIFIED_SCHOOLS: VerifiedSchool[] = [
     id: 'nyu',
     shortName: 'NYU',
     fullName: 'New York University',
-    domains: ['nyu.edu', 'stern.nyu.edu', 'cims.nyu.edu'],
+    domains: ['nyu.edu', 'stern.nyu.edu', 'cims.nyu.edu', 'misaeng.com'],
   },
   {
     id: 'columbia',
@@ -96,10 +96,10 @@ export const VERIFIED_SCHOOLS: VerifiedSchool[] = [
     domains: ['fordham.edu'],
   },
   {
-    id: 'misaeng',
-    shortName: 'Misaeng',
-    fullName: 'Misaeng (Test)',
-    domains: ['misaeng.com'],
+    id: 'monroe',
+    shortName: 'Monroe',
+    fullName: 'Monroe University',
+    domains: ['monroeu.com'],
   },
 ]
 
@@ -108,6 +108,11 @@ export function getVerifiedSchool(
 ): VerifiedSchool | null {
   if (!id) return null
   return VERIFIED_SCHOOLS.find((s) => s.id === id) ?? null
+}
+
+/** 등록된 학교 이메일 도메인 목록 */
+export function getRegisteredSchoolDomains(): string[] {
+  return VERIFIED_SCHOOLS.flatMap((school) => school.domains)
 }
 
 function domainMatches(emailDomain: string, schoolDomain: string): boolean {

@@ -23,6 +23,8 @@ interface AuthContextValue {
   displayName: string
   nickname: string | null
   loading: boolean
+  /** 로그인·세션 동기화 중 (마이페이지 스켈레톤용) */
+  sessionLoading: boolean
   configured: boolean
   isMisaengUser: boolean
   signInEmail: (email: string, password: string) => Promise<void>
@@ -37,6 +39,18 @@ interface AuthContextValue {
   uploadAvatar: (file: File) => Promise<string>
   saveNickname: (nickname: string) => Promise<string>
   saveMbti: (mbti: string | null) => Promise<string | null>
+  saveProfileSetup: (data: {
+    nickname: string
+    firstName: string
+    lastName: string
+    mbti: string | null
+    gender: string
+    occupationType: string
+  }) => Promise<void>
+  saveGender: (gender: string) => Promise<string>
+  saveOccupationType: (occupationType: string) => Promise<string>
+  refreshSession: () => Promise<void>
+  mergeStoredProfile: (patch: Record<string, unknown>) => void
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -55,8 +69,23 @@ function mapProfile(uid: string, email: string, raw: Record<string, unknown> | n
     uid,
     email,
     displayName: typeof raw?.name === 'string' ? raw.name : null,
+    firstName:
+      typeof raw?.firstName === 'string'
+        ? raw.firstName
+        : typeof raw?.first_name === 'string'
+          ? raw.first_name
+          : null,
+    lastName:
+      typeof raw?.lastName === 'string'
+        ? raw.lastName
+        : typeof raw?.last_name === 'string'
+          ? raw.last_name
+          : null,
     nickname: typeof raw?.nickname === 'string' ? raw.nickname : null,
     mbti: typeof raw?.mbti === 'string' ? raw.mbti : null,
+    gender: typeof raw?.gender === 'string' ? raw.gender : null,
+    occupationType:
+      typeof raw?.occupationType === 'string' ? raw.occupationType : null,
     photoURL:
       typeof raw?.photoURL === 'string'
         ? raw.photoURL
@@ -94,9 +123,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [profile, setProfile] = useState<NycUserProfile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [sessionLoading, setSessionLoading] = useState(false)
   const [configured, setConfigured] = useState(true)
 
-  const loadSession = useCallback(async () => {
+  const loadSession = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setSessionLoading(true)
+    }
+
     try {
       const response = await fetch('/api/agent-auth/session', {
         method: 'GET',
@@ -122,17 +156,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(data.user)
 
           const rawProfile =
-            data.profile &&
-            typeof data.profile === 'object' &&
-            'data' in data.profile
-              ? (data.profile.data as Record<string, unknown>)
-              : (data.profile as Record<string, unknown> | null | undefined)
+            data.profile && typeof data.profile === 'object'
+              ? (data.profile as Record<string, unknown>)
+              : null
 
           setProfile(
-            mapProfile(data.user.uid, data.user.email, rawProfile ?? {
-              name: data.user.displayName,
-              photoURL: data.user.photoURL,
-              phone: data.user.phoneNumber,
+            mapProfile(data.user.uid, data.user.email, {
+              ...(rawProfile ?? {}),
+              name: data.user.displayName ?? rawProfile?.name,
+              photoURL: data.user.photoURL ?? rawProfile?.photoURL,
+              phone: data.user.phoneNumber ?? rawProfile?.phone,
             }),
           )
         }
@@ -145,8 +178,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setConfigured(true)
       setUser(null)
       setProfile(null)
+    } finally {
+      if (!options?.silent) {
+        setSessionLoading(false)
+      }
     }
   }, [])
+
+  const mergeStoredProfile = useCallback(
+    (patch: Record<string, unknown>) => {
+      setProfile((prev) => {
+        if (!user) return prev
+        return mapProfile(user.uid, user.email, {
+          ...(prev
+            ? {
+                nickname: prev.nickname,
+                firstName: prev.firstName,
+                lastName: prev.lastName,
+                mbti: prev.mbti,
+                gender: prev.gender,
+                occupationType: prev.occupationType,
+                photoURL: prev.photoURL,
+                schoolEmail: prev.schoolEmail,
+                schoolEmailVerified: prev.schoolEmailVerified,
+                verifiedSchoolId: prev.verifiedSchoolId,
+                verifiedSchoolName: prev.verifiedSchoolName,
+                phone: prev.phone,
+                phoneVerified: prev.phoneVerified,
+              }
+            : {}),
+          ...patch,
+        })
+      })
+    },
+    [user],
+  )
 
   useEffect(() => {
     let cancelled = false
@@ -185,11 +251,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(data?.error || '로그인에 실패했어요')
     }
 
-    if (data?.user) {
-      setUser(data.user)
-      setProfile(profileFromAuthUser(data.user))
-    }
-
     await loadSession()
   }, [loadSession])
 
@@ -213,11 +274,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!response.ok) {
       throw new Error(data?.error || '회원가입에 실패했어요')
-    }
-
-    if (data?.user) {
-      setUser(data.user)
-      setProfile(profileFromAuthUser(data.user))
     }
 
     await loadSession()
@@ -249,21 +305,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               ? 'Ellieo 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.'
               : 'Google 로그인에 실패했어요'),
         )
-      }
-
-      if (data?.user) {
-        setUser(data.user)
-        setProfile(profileFromAuthUser(data.user))
-      } else if (params.email) {
-        const fallbackUser: AuthUser = {
-          uid: params.email,
-          email: params.email,
-          displayName: params.name ?? null,
-          photoURL: null,
-          phoneNumber: null,
-        }
-        setUser(fallbackUser)
-        setProfile(profileFromAuthUser(fallbackUser))
       }
 
       await loadSession()
@@ -303,6 +344,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const uploadAvatar = useCallback(
     async (_file: File) => {
       if (!user) throw new Error('로그인이 필요해요')
+
       const formData = new FormData()
       formData.append('file', _file)
 
@@ -375,6 +417,82 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [user],
   )
 
+  const saveProfileSetup = useCallback(
+    async (data: {
+      nickname: string
+      firstName: string
+      lastName: string
+      mbti: string | null
+      gender: string
+      occupationType: string
+    }) => {
+      if (!user) throw new Error('로그인이 필요해요')
+      const response = await fetch('/api/agent-auth/profile', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nickname: data.nickname,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          mbti: data.mbti,
+          gender: data.gender,
+          occupationType: data.occupationType,
+        }),
+      })
+      const result = (await response.json().catch(() => null)) as
+        | { error?: string; profile?: Record<string, unknown> }
+        | null
+      if (!response.ok) {
+        throw new Error(result?.error || '프로필 저장에 실패했어요')
+      }
+      setProfile(mapProfile(user.uid, user.email, result?.profile ?? null))
+    },
+    [user],
+  )
+
+  const saveGender = useCallback(
+    async (_gender: string) => {
+      if (!user) throw new Error('로그인이 필요해요')
+      const response = await fetch('/api/agent-auth/profile', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gender: _gender }),
+      })
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string; profile?: Record<string, unknown> }
+        | null
+      if (!response.ok) {
+        throw new Error(data?.error || '성별 저장에 실패했어요')
+      }
+      setProfile(mapProfile(user.uid, user.email, data?.profile ?? null))
+      return _gender.trim()
+    },
+    [user],
+  )
+
+  const saveOccupationType = useCallback(
+    async (_occupationType: string) => {
+      if (!user) throw new Error('로그인이 필요해요')
+      const response = await fetch('/api/agent-auth/profile', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ occupationType: _occupationType }),
+      })
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string; profile?: Record<string, unknown> }
+        | null
+      if (!response.ok) {
+        throw new Error(data?.error || '직업 저장에 실패했어요')
+      }
+      setProfile(mapProfile(user.uid, user.email, data?.profile ?? null))
+      return _occupationType.trim()
+    },
+    [user],
+  )
+
   const displayName =
     profile?.nickname?.trim() ||
     profile?.displayName?.trim() ||
@@ -390,6 +508,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       displayName,
       nickname: profile?.nickname ?? null,
       loading,
+      sessionLoading,
       configured,
       isMisaengUser: isMisaengEmail(user?.email),
       signInEmail: signInEmailFn,
@@ -400,12 +519,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       uploadAvatar,
       saveNickname,
       saveMbti,
+      saveProfileSetup,
+      saveGender,
+      saveOccupationType,
+      refreshSession: () => loadSession({ silent: true }),
+      mergeStoredProfile,
     }),
     [
       user,
       profile,
       displayName,
       loading,
+      sessionLoading,
       configured,
       signInEmailFn,
       signUpEmailFn,
@@ -415,6 +540,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       uploadAvatar,
       saveNickname,
       saveMbti,
+      saveProfileSetup,
+      mergeStoredProfile,
+      saveGender,
+      saveOccupationType,
+      loadSession,
     ],
   )
 

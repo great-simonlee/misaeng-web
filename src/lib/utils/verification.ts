@@ -1,4 +1,6 @@
-/** 미국 학교(.edu) 이메일인지 판별합니다. */
+import { getRegisteredSchoolDomains } from '@lib/constants/schools'
+
+/** 미국 학교(.edu) 또는 등록된 학교 도메인 이메일인지 판별합니다. */
 export function isSchoolEmail(email: string): boolean {
   const normalized = email.trim().toLowerCase()
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) return false
@@ -8,19 +10,14 @@ export function isSchoolEmail(email: string): boolean {
 
   if (domain.endsWith('.edu') || domain.includes('.edu.')) return true
 
-  // .edu가 아니어도 등록된 협력·테스트 도메인 허용
-  const allowlist = [
-    'misaeng.com',
-    'baruchmail.cuny.edu',
-    'baruch.cuny.edu',
-    'hunter.cuny.edu',
-    'qc.cuny.edu',
-    'brooklyn.cuny.edu',
-    'ccny.cuny.edu',
-  ]
-  return allowlist.some(
+  const registered = getRegisteredSchoolDomains()
+  return registered.some(
     (d) => domain === d || domain.endsWith(`.${d}`),
   )
+}
+
+export function isValidEmailFormat(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim().toLowerCase())
 }
 
 /** 미국(+1) / 한국(+82) 번호를 E.164로 정규화합니다. */
@@ -36,7 +33,6 @@ export function normalizePhoneE164(input: string): string {
 
   const digits = raw.replace(/\D/g, '')
 
-  // 한국 010...
   if (digits.startsWith('010') && digits.length === 11) {
     return `+82${digits.slice(1)}`
   }
@@ -44,7 +40,6 @@ export function normalizePhoneE164(input: string): string {
     return `+${digits}`
   }
 
-  // 미국 10자리 / 1+10자리
   if (digits.length === 10) return `+1${digits}`
   if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`
 

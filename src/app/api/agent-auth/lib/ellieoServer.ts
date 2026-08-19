@@ -276,3 +276,55 @@ export async function ellieoAuthorizedFetch(
 
   return result
 }
+
+export async function ellieoAuthorizedMultipartFetch(
+  path: string,
+  formData: FormData,
+  options: {
+    method?: string
+    retryOn401?: boolean
+  } = {},
+) {
+  const baseUrl = getEllieoBaseUrl()
+  if (!baseUrl) {
+    throw new Error('APP_CONNECT_API_BASE_URL is not configured')
+  }
+
+  const method = (options.method || 'PUT').toUpperCase()
+  const cleanPath = path.replace(/^\/+/, '')
+  const url = `${baseUrl}/${cleanPath}`
+  const deviceId = await getOrCreateDeviceId()
+
+  const doFetch = async () => {
+    const headers = await buildHeaders({
+      includeJsonBody: false,
+      deviceId,
+    })
+
+    const response = await fetch(url, {
+      method,
+      headers,
+      body: formData,
+    })
+
+    const text = await response.text()
+    let data: unknown = null
+    try {
+      data = text ? JSON.parse(text) : null
+    } catch {
+      data = text ? { raw: text } : null
+    }
+
+    return { res: response, data }
+  }
+
+  let result = await doFetch()
+  if (result.res.status === 401 && options.retryOn401 !== false) {
+    const refreshed = await refreshEllieoAccessToken()
+    if (refreshed) {
+      result = await doFetch()
+    }
+  }
+
+  return result
+}

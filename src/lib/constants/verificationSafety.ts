@@ -1,6 +1,6 @@
 /**
  * 인증(SMS/이메일) 비용·남용 방지 상수.
- * 프론트 가드는 우회 가능하므로, 운영에서는 Firebase 쿼터·테스트 번호·Cloud Functions를 함께 쓰세요.
+ * 프론트 가드는 우회 가능하므로, 운영에서는 Supabase RLS·Edge Function 등을 함께 쓰세요.
  */
 
 export function isPhoneSmsEnabled(): boolean {

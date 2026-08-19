@@ -13,6 +13,10 @@ type BottomSheetProps = {
   footer?: ReactNode
   /** 시트 본문 최대 높이 (기본: 70dvh) */
   maxHeightClassName?: string
+  /** 중첩 시트 등 z-index 조정 (기본: z-[10001]) */
+  overlayClassName?: string
+  /** 본문 스크롤 비활성화 (컴팩트 시트용) */
+  scrollable?: boolean
   className?: string
 }
 
@@ -24,6 +28,8 @@ export function BottomSheet({
   children,
   footer,
   maxHeightClassName = 'max-h-[min(70dvh,560px)]',
+  overlayClassName = 'z-[10001]',
+  scrollable = true,
   className,
 }: BottomSheetProps) {
   useEffect(() => {
@@ -46,7 +52,10 @@ export function BottomSheet({
 
   return (
     <div
-      className='fixed inset-0 z-[10001] flex items-end justify-center sm:items-center'
+      className={cn(
+        'fixed inset-0 flex items-end justify-center sm:items-center',
+        overlayClassName,
+      )}
       role='dialog'
       aria-modal='true'
       aria-label={title}
@@ -70,14 +79,14 @@ export function BottomSheet({
             className='h-1 w-10 rounded-full bg-[#e2e5ea]'
             aria-hidden
           />
-          <div className='flex w-full items-center justify-between gap-3 px-5 pb-2 pt-3'>
-            <h3 className='text-[15px] font-semibold tracking-tight text-[var(--foreground)]'>
+          <div className='flex w-full items-center justify-between gap-3 px-5 pb-3 pt-3'>
+            <h3 className='min-w-0 flex-1 text-[15px] font-semibold leading-tight tracking-tight text-[var(--foreground)]'>
               {title}
             </h3>
             <button
               type='button'
               onClick={onClose}
-              className='text-[13px] font-medium text-[var(--muted)] touch-manipulation transition hover:text-[var(--foreground)]'
+              className='shrink-0 px-1 py-1 text-[13px] font-medium leading-none text-[var(--muted)] touch-manipulation transition hover:text-[var(--foreground)]'
             >
               닫기
             </button>
@@ -85,7 +94,8 @@ export function BottomSheet({
         </div>
         <div
           className={cn(
-            'min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-2',
+            'min-h-0 flex-1 overflow-x-hidden overscroll-contain px-2',
+            scrollable ? 'overflow-y-auto' : 'overflow-y-hidden',
             footer
               ? 'pb-3'
               : 'pb-[max(1.25rem,env(safe-area-inset-bottom))]',

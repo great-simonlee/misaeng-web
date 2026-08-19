@@ -35,7 +35,7 @@ export function HousingNewScreen() {
     setSubmitting(true)
     try {
       // 임시: 파이어베이스 하우징 등록 비활성화
-      throw new Error('Firebase가 일시적으로 비활성화되어 있어요')
+      throw new Error('Supabase 연동 후 이용할 수 있어요')
       /*
       const id = await createHousingPost(
         {

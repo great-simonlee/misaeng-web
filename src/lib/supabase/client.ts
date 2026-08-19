@@ -17,3 +17,10 @@ export function getSupabaseBrowserClient() {
   browserClient = createClient(url, anonKey)
   return browserClient
 }
+
+export function isSupabaseConfigured() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim(),
+  )
+}

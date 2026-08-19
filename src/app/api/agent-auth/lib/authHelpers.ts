@@ -3,7 +3,10 @@ import { isMisaengEmail } from '@lib/constants/nyc'
 import {
   ellieoUpstreamFetch,
   extractEllieoTokens,
+  getEllieoAccessToken,
+  getEllieoRefreshToken,
   getOrCreateDeviceId,
+  refreshEllieoAccessToken,
   setEllieoSession,
 } from './ellieoServer'
 
@@ -385,4 +388,18 @@ export async function loginOrRegisterWithGoogle(
   }
 
   return register
+}
+
+/** Ellieo 로그인 세션(액세스 토큰)만으로 현재 사용자 확인 — 프로필 API 호출 없음 */
+export async function resolveAuthenticatedUser() {
+  let accessToken = await getEllieoAccessToken()
+  const refreshToken = await getEllieoRefreshToken()
+
+  if (!accessToken && refreshToken) {
+    accessToken = (await refreshEllieoAccessToken()) || null
+  }
+
+  if (!accessToken) return null
+
+  return normalizeUserFromAccessToken(accessToken)
 }

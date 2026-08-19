@@ -9,7 +9,7 @@ import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { AuthConfigBanner } from '@widgets/nyc/AuthConfigBanner'
 import { GoogleSignInButton } from '@widgets/nyc/GoogleSignInButton'
-import { isEllieoFirebaseConfigured } from '@lib/ellieo/firebaseAuth'
+import { isGoogleSignInConfigured } from '@lib/google/config'
 
 const inputClass =
   'mt-2 min-h-[48px] w-full rounded-xl border border-[#dde2ea] bg-white px-3.5 text-[15px] font-normal text-[var(--foreground)] outline-none transition placeholder:text-[#98a2b3] focus:border-[#F64310] focus:shadow-[0_0_0_3px_rgba(246,67,16,0.12)]'
@@ -18,6 +18,7 @@ export function NycLoginScreen() {
   const {
     user,
     loading,
+    sessionLoading,
     configured,
     signInEmail,
     signUpEmail,
@@ -34,15 +35,15 @@ export function NycLoginScreen() {
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const canUseGoogle = useMemo(
-    () => configured && isEllieoFirebaseConfigured(),
+    () => configured && isGoogleSignInConfigured(),
     [configured],
   )
 
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && !sessionLoading && user) {
       router.replace(next)
     }
-  }, [loading, user, router, next])
+  }, [loading, sessionLoading, user, router, next])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()

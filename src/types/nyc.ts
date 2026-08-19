@@ -216,10 +216,14 @@ export interface NycUserProfile {
   email: string
   /** Google 등 계정 표시 이름 (참고용) */
   displayName: string | null
+  firstName: string | null
+  lastName: string | null
   /** 커뮤니티에서 쓰는 닉네임 */
   nickname: string | null
   /** MBTI (예: ENFP) */
   mbti: string | null
+  gender: string | null
+  occupationType: string | null
   /** 미생에 직접 등록한 프로필 사진 (Google 사진과 별개) */
   photoURL: string | null
   roommatePostId: string | null

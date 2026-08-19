@@ -16,11 +16,15 @@ export function AuthConfigBanner({ className }: AuthConfigBannerProps) {
       <code className='break-all font-mono text-[11px] sm:text-xs'>
         APP_CONNECT_API_BASE_URL
       </code>
-      과 Ellieo Firebase용{' '}
+      과 Google Identity Services용{' '}
       <code className='break-all font-mono text-[11px] sm:text-xs'>
-        NEXT_PUBLIC_FIREBASE_*
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID
       </code>
-      를 환경 변수에 넣어 주세요 (
+      를 환경 변수에 넣어 주세요. Google idToken은 Ellieo{' '}
+      <code className='break-all font-mono text-[11px] sm:text-xs'>
+        auth/login/google
+      </code>
+      로 전달됩니다 (
       <code className='break-all font-mono text-[11px] sm:text-xs'>.env.example</code>{' '}
       참고).{' '}
       <Link
