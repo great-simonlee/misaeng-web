@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/great-simonlee/misaeng-web/compare/v0.0.2...v0.0.3) (2026-08-20)
+
+
+### 버그 수정
+
+* update Vercel deployment workflow to include production alias URL ([39a23c6](https://github.com/great-simonlee/misaeng-web/commit/39a23c65621e10ef5a1413ac7fcce7ebf29cdc21))
+
 ## [0.0.2](https://github.com/great-simonlee/misaeng-web/compare/v0.0.1...v0.0.2) (2026-08-20)
 
 ## 0.0.1 (2026-08-20)
