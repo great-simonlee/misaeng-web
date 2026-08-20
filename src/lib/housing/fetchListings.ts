@@ -34,18 +34,6 @@ export async function fetchHousingListing(
   }
 }
 
-/** Mock listings first, then ERP/Misaeng listings. */
-export function mergeMockAndLiveHousingListings(
-  mockListings: HousingListing[],
-  liveListings: HousingListing[],
-): HousingListing[] {
-  const mockIds = new Set(mockListings.map((listing) => listing.id))
-  return [
-    ...mockListings,
-    ...liveListings.filter((listing) => !mockIds.has(listing.id)),
-  ]
-}
-
 export function shouldUnoptimizeHousingImage(src: string) {
   return !src.includes('images.unsplash.com')
 }

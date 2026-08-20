@@ -47,8 +47,10 @@ export interface HousingProperty {
   partWall?: 'Full wall' | 'Regular wall' | 'Curtain only' | null
   amenityFee?: {
     type: 'optional' | 'mandatory'
-    amount: number
+    /** null = unknown, 0 = free, greater than 0 = paid */
+    amount: number | null
     period: 'monthly' | 'yearly'
+    per?: 'person' | 'unit'
   } | null
   incomeRequirements?: {
     personalIncome?: string

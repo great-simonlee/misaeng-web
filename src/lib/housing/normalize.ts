@@ -29,6 +29,14 @@ function asNumber(value: unknown, fallback = 0) {
   return Number.isFinite(n) ? n : fallback
 }
 
+/** null = unknown, 0 = free, greater than 0 = paid */
+function asAmenityAmount(value: unknown): number | null {
+  if (value == null || value === '') return null
+  const n = asNumber(value, Number.NaN)
+  if (!Number.isFinite(n) || n < 0) return null
+  return n
+}
+
 function normalizePromotions(value: unknown): HousingListing['unit']['promotions'] {
   const list = Array.isArray(value) ? value : value && typeof value === 'object' ? [value] : []
   return list
@@ -130,14 +138,19 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
         partWall === 'Curtain only'
           ? partWall
           : null,
-      amenityFee:
-        amenityFeeRaw && asNumber(amenityFeeRaw.amount, 0) > 0
-          ? {
-              type: amenityFeeRaw.type === 'mandatory' ? 'mandatory' : 'optional',
-              amount: asNumber(amenityFeeRaw.amount, 0),
-              period: amenityFeeRaw.period === 'yearly' ? 'yearly' : 'monthly',
-            }
-          : null,
+      amenityFee: amenityFeeRaw
+        ? {
+            type: amenityFeeRaw.type === 'mandatory' ? 'mandatory' : 'optional',
+            amount: asAmenityAmount(amenityFeeRaw.amount),
+            period: amenityFeeRaw.period === 'yearly' ? 'yearly' : 'monthly',
+            per: amenityFeeRaw.per === 'person' ? 'person' : 'unit',
+          }
+        : {
+            type: 'optional',
+            amount: null,
+            period: 'monthly',
+            per: 'unit',
+          },
       incomeRequirements: incomeRaw
         ? {
             personalIncome: String(incomeRaw.personalIncome || '').trim() || undefined,

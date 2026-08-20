@@ -343,16 +343,23 @@ const AMENITY_STRING_TO_PERK: Record<string, HousingPerkId> = {
   rooftop: 'rooftop',
   pool: 'pool',
   'swimming pool': 'pool',
+  'indoor pool': 'pool',
+  'outdoor pool': 'pool',
   'mail room': 'mail-room',
   'package storage': 'package-storage',
+  'storage space': 'package-storage',
   sauna: 'sauna',
   'bbq grill': 'bbq-grill',
+  'bbq grills': 'bbq-grill',
   barbecue: 'bbq-grill',
-  dishwasher: 'washer-dryer',
+  washer: 'washer-dryer',
+  dryer: 'washer-dryer',
   'in-unit washer': 'washer-dryer',
   'laundry room': 'washer-dryer',
   terrace: 'terrace',
-  'resident lounge': 'work-study',
+  sundeck: 'terrace',
+  'working space': 'work-study',
+  'business meeting room': 'work-study',
   'business center': 'work-study',
 }
 
@@ -367,6 +374,12 @@ export function mapAmenityStringToPerkId(value: string): HousingPerkId | null {
 export function listingHasNoGuarantor(listing: HousingListing): boolean {
   const guarantor = listing.property.incomeRequirements?.personalGuarantor
   return guarantor === '0' || guarantor === 'none'
+}
+
+/** Full wall / Regular wall = 플렉스 벽 가능. Curtain only 는 제외 */
+export function listingHasFlexWall(listing: HousingListing): boolean {
+  const wall = listing.property.partWall
+  return wall === 'Full wall' || wall === 'Regular wall'
 }
 
 export function getListingDerivedPerks(listing: HousingListing): HousingPerkId[] {
@@ -387,7 +400,7 @@ export function getListingDerivedPerks(listing: HousingListing): HousingPerkId[]
     if (perk) perks.add(perk)
   }
 
-  if (listing.property.partWall === 'Full wall') perks.add('wall-ok')
+  if (listingHasFlexWall(listing)) perks.add('wall-ok')
 
   return Array.from(perks)
 }
@@ -397,8 +410,10 @@ export function housingMatchesPerk(
   perk: HousingPerkId,
 ): boolean {
   if (perk === 'no-guarantor') {
-    const guarantor = listing.property.incomeRequirements?.personalGuarantor
-    return guarantor === '0' || guarantor === 'none'
+    return listingHasNoGuarantor(listing)
+  }
+  if (perk === 'wall-ok') {
+    return listingHasFlexWall(listing)
   }
   return getListingDerivedPerks(listing).includes(perk)
 }
@@ -459,25 +474,43 @@ export function formatListingBedBath(listing: HousingListing): string {
 
 export function formatPropertyAmenityFee(
   property: HousingProperty,
-): string | null {
+): string {
   const fee = property.amenityFee
-  if (!fee || !Number.isFinite(fee.amount) || fee.amount <= 0) return null
-  const period = fee.period === 'yearly' ? '년' : '월'
-  const prefix = fee.type === 'mandatory' ? '필수' : '선택'
-  return `${prefix} $${fee.amount.toLocaleString()}/${period}`
+  const amount = fee?.amount
+  if (amount == null || !Number.isFinite(amount) || amount < 0) {
+    return '아직 모름'
+  }
+  if (amount === 0) return '무료'
+  const period = fee?.period === 'yearly' ? '년' : '월'
+  const prefix = fee?.type === 'mandatory' ? '필수' : '옵션'
+  const per = fee?.per === 'person' ? '인당' : '유닛당'
+  return `${prefix} · ${per} $${amount.toLocaleString()}/${period}`
+}
+
+export function formatHousingPartWall(
+  partWall: HousingProperty['partWall'] | string | null | undefined,
+): string | null {
+  const raw = String(partWall || '').trim()
+  if (!raw) return null
+  const labels: Record<string, string> = {
+    'Full wall': '풀 월',
+    'Regular wall': '레귤러 월',
+    'Curtain only': '커튼만',
+  }
+  return labels[raw] || raw
 }
 
 export function formatPropertyIncomeRequirements(
   property: HousingProperty,
-): string | null {
+): string {
   const income = property.incomeRequirements
-  if (!income) return null
   const parts: string[] = []
-  if (income.personalIncome) {
+  if (income?.personalIncome) {
     parts.push(`개인 ${income.personalIncome}x`)
   }
-  if (income.personalGuarantor) {
+  if (income?.personalGuarantor) {
     parts.push(`게런터 ${income.personalGuarantor}x`)
   }
-  return parts.length > 0 ? parts.join(' · ') : null
+  parts.push('보증 회사 가능')
+  return parts.join(' · ')
 }

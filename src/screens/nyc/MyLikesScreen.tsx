@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { LoadingState, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { useHousingLikes } from '@hooks/useHousingLikes'
-import { getHousingUnitRent, getListingArea, getListingDisplayAddress, getListingUnitNet, listMockHousingPosts } from '@lib/constants/housingMock'
+import { getHousingUnitRent, getListingArea, getListingDisplayAddress, getListingUnitNet } from '@lib/constants/housingMock'
 import { NYC_CATEGORIES, NYC_PAGE_SHELL_CLASS, type NycCategoryId } from '@lib/constants/nyc'
 import { cn } from '@lib'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
@@ -96,14 +96,11 @@ export function MyLikesScreen() {
   }, [user, likedKey])
 
   const items = useMemo(() => {
-    const mockMap = new Map(
-      listMockHousingPosts().map((post) => [post.id, post] as const),
-    )
     const remoteMap = new Map(
       remotePosts.map((post) => [post.id, post] as const),
     )
     return likedIds
-      .map((id) => mockMap.get(id) ?? remoteMap.get(id) ?? null)
+      .map((id) => remoteMap.get(id) ?? null)
       .filter(
         (post): post is HousingPost => post != null && post.status === 'open',
       )

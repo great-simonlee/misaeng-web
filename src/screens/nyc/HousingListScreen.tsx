@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { BottomSheet, RangeSlider } from '@components'
+import { BottomSheet, RangeSlider, Skeleton } from '@components'
 import {
   formatHousingPriceFilterLabel,
   getHousingPriceBounds,
@@ -25,10 +25,9 @@ import {
   HOUSING_ROOM_TYPES,
   HOUSING_UNIT_TYPES,
   isHousingPriceFilterActive,
-  listMockHousingPosts,
   type HousingListingKind,
 } from '@lib/constants/housingMock'
-import { fetchHousingListings, mergeMockAndLiveHousingListings } from '@lib/housing/fetchListings'
+import { fetchHousingListings } from '@lib/housing/fetchListings'
 import { cn } from '@lib'
 import type {
   HousingListing,
@@ -37,6 +36,7 @@ import type {
   HousingUnitType,
 } from '@/types/nyc'
 import { HousingPostCard } from '@widgets/nyc/HousingPostCard'
+import { HousingPostCardSkeletonGrid } from '@widgets/nyc/HousingPostCardSkeleton'
 
 type UnitTypeFilter = 'all' | HousingUnitType
 type RoomTypeFilter = 'all' | HousingRoomType
@@ -65,7 +65,8 @@ export function HousingListScreen() {
     getHousingPriceBounds('unit').max,
   )
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [livePosts, setLivePosts] = useState<HousingListing[]>([])
+  const [posts, setPosts] = useState<HousingListing[]>([])
+  const [loading, setLoading] = useState(true)
 
   const [draftListingKind, setDraftListingKind] =
     useState<ListingKindFilter>('all')
@@ -140,19 +141,16 @@ export function HousingListScreen() {
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
     void fetchHousingListings().then((listings) => {
-      if (!cancelled) setLivePosts(listings)
+      if (cancelled) return
+      setPosts(listings)
+      setLoading(false)
     })
     return () => {
       cancelled = true
     }
   }, [])
-
-  const mockPosts = useMemo(() => listMockHousingPosts(), [])
-  const posts = useMemo(
-    () => mergeMockAndLiveHousingListings(mockPosts, livePosts),
-    [livePosts, mockPosts],
-  )
 
   const filteredPosts = useMemo(() => {
     return posts.filter((listing) => {
@@ -322,10 +320,6 @@ export function HousingListScreen() {
     )
   }
 
-  function toggleQuickListingKind(kind: HousingListingKind) {
-    applyListingKind(listingKind === kind ? 'all' : kind, 'applied')
-  }
-
   function toggleQuickPrice(min: number, max: number) {
     if (listingKind === 'all') return
     const bounds = getHousingPriceBounds(listingKind)
@@ -440,14 +434,6 @@ export function HousingListScreen() {
                 role='listbox'
                 aria-label='빠른 필터'
               >
-                {HOUSING_LISTING_KINDS.map((kind) => (
-                  <QuickChip
-                    key={kind.id}
-                    label={kind.label}
-                    active={listingKind === kind.id}
-                    onClick={() => toggleQuickListingKind(kind.id)}
-                  />
-                ))}
                 {pricePresets.map((preset) => (
                   <QuickChip
                     key={preset.id}
@@ -513,7 +499,12 @@ export function HousingListScreen() {
       </header>
 
       <section className='mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 sm:pb-14 lg:px-8 lg:pb-16'>
-        {filteredPosts.length === 0 ? (
+        {loading ? (
+          <>
+            <Skeleton className='mb-3 h-3.5 w-36 sm:mb-3.5' />
+            <HousingPostCardSkeletonGrid />
+          </>
+        ) : filteredPosts.length === 0 ? (
           <div className='rounded-2xl bg-white px-6 py-14 text-center ring-1 ring-black/[0.04]'>
             <p className='text-[15px] font-semibold text-[var(--foreground)]'>
               조건에 맞는 매물이 없어요
