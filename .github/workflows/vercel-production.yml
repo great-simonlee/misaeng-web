@@ -58,7 +58,7 @@ jobs:
       - name: Deploy Production to Vercel
         id: deploy
         run: |
-          deployment_url="$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})"
+          deployment_url="$(vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})"
           echo "deployment_url=$deployment_url" >> "$GITHUB_OUTPUT"
 
           alias_url=""
