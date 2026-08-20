@@ -28,7 +28,6 @@ import {
   formatPhoneDisplay,
   isSchoolEmail,
   isValidEmailFormat,
-  normalizePhoneE164,
 } from '@lib/utils/verification'
 import type { NycUserProfile } from '@/types/nyc'
 
@@ -727,7 +726,6 @@ function SchoolEmailVerifyModal({
 
 function PhoneVerifyModal({
   onClose,
-  onVerified,
   onError,
 }: {
   onClose: () => void
@@ -735,9 +733,9 @@ function PhoneVerifyModal({
   onError: (msg: string) => void
 }) {
   const { user } = useAuth()
-  const [step, setStep] = useState<'phone' | 'code'>('phone')
+  const [step] = useState<'phone' | 'code'>('phone')
   const [phone, setPhone] = useState('')
-  const [e164, setE164] = useState('')
+  const [e164] = useState('')
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
   const [cooldown, setCooldown] = useState(0)

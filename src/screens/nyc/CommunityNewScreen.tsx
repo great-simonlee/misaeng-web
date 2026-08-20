@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useState } from 'react'
 
@@ -9,7 +8,6 @@ import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import {
   NYC_COMMUNITY_BOARD_META,
-  isAnonymousBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
@@ -27,9 +25,8 @@ export function CommunityNewScreen({
   title,
 }: CommunityNewScreenProps) {
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
-  const { user, loading, configured, profile } = useAuth()
-  const { success, error: toastError } = useToast()
-  const router = useRouter()
+  const { user, loading } = useAuth()
+  const { error: toastError } = useToast()
   const [submitting, setSubmitting] = useState(false)
 
   const [postTitle, setPostTitle] = useState('')

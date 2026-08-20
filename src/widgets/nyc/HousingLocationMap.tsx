@@ -12,7 +12,10 @@ export function HousingLocationMap({
   const query = [address, neighborhood, 'New York, NY']
     .filter(Boolean)
     .join(', ')
+
   const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=15&output=embed`
+
+  const externalHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
 
   return (
     <section
@@ -32,7 +35,7 @@ export function HousingLocationMap({
           </p>
         </div>
         <a
-          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`}
+          href={externalHref}
           target='_blank'
           rel='noopener noreferrer'
           className='shrink-0 text-[12px] font-semibold text-[#F64310] underline-offset-2 touch-manipulation hover:underline'

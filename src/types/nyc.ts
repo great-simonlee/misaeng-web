@@ -10,11 +10,80 @@ export type HousingUnitType =
   | '3b2b'
   | '4-plus'
 
-/** 룸(침실) 타입 — 유닛과 독립 */
+/** ERP ROOM_TYPES와 정렬된 룸 타입 */
 export type HousingRoomType =
   | 'master-w-bath'
+  | 'master-wo-bath'
   | 'regular-bedroom'
   | 'flexroom'
+  | 'entire'
+  | 'studio'
+
+/** ERP unit.promotions[] 항목 */
+export type HousingUnitPromotion = {
+  hasOP?: boolean
+  opMonths?: number
+  opBasis?: 'gross' | 'net'
+  opOrFree?: boolean
+  opOrFreeFreeMonth?: number
+  freeMonth?: number
+  leaseTerm?: number
+  rentCredit?: number
+}
+
+/** ERP properties 문서 — 공개용 건물 정보 */
+export interface HousingProperty {
+  address: string
+  displayedAddress?: string | null
+  buildingName?: string | null
+  area: string
+  zipcode?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  subway: string[]
+  amenities: string[]
+  appliances: string[]
+  includedUtility?: string[]
+  partWall?: 'Full wall' | 'Regular wall' | 'Curtain only' | null
+  amenityFee?: {
+    type: 'optional' | 'mandatory'
+    amount: number
+    period: 'monthly' | 'yearly'
+  } | null
+  incomeRequirements?: {
+    personalIncome?: string
+    personalGuarantor?: string
+  } | null
+  latestMoveInAllowedDays?: number | null
+}
+
+/** ERP units 문서 — 호수·가격·룸 분할 */
+export interface HousingUnit {
+  unitNumber?: string | null
+  bedrooms: number
+  bathrooms: number
+  /** 그로스 월세 */
+  price: number
+  /** 넷 월세. 그로스와 같으면 생략 */
+  netPrice?: number | null
+  availableDate?: string | null
+  available: boolean
+  rooms: HousingRoom[]
+  promotions: HousingUnitPromotion[]
+  images: string[]
+  youtubeUrl?: string | null
+  listingUrl?: string | null
+  /** 업로드 시 스냅샷 (없으면 beds/baths에서 파생) */
+  unitType?: HousingUnitType | null
+}
+
+/** ERP units.rooms[] 원소 */
+export interface HousingRoom {
+  type: HousingRoomType
+  price: number
+  /** 룸 넷 월세. 그로스와 같으면 생략 */
+  netPrice?: number | null
+}
 
 /** 하우징 혜택/조건 태그 */
 export type HousingPerkId =
@@ -49,8 +118,11 @@ export type HousingRoommateComposition = {
 /** 기다리는 룸메이트의 희망 룸 (복수 선택) */
 export type HousingRoommateRoomPreference =
   | 'master-w-bath'
+  | 'master-wo-bath'
   | 'regular-bedroom'
   | 'flexroom'
+  | 'entire'
+  | 'studio'
   | 'any'
 
 export type HousingRoommateGender = 'male' | 'female'
@@ -74,50 +146,21 @@ export type HousingRoommateWaiting = {
   profiles: HousingRoommateProfile[]
 }
 
-/** 유닛 내 룸(또는 전체 유닛) 옵션 — 가격이 룸 타입별로 다를 수 있음 */
-export interface HousingRoomOption {
+/**
+ * Misaeng 공개 리스팅 — ERP Property + Unit 스냅샷
+ * Supabase 업로드 계약: property + unit + roommateWaiting + sourcePropertyId/sourceUnitId
+ */
+export interface HousingListing {
   id: string
-  /** null이면 유닛 전체 임대 */
-  roomType: HousingRoomType | null
-  rent: number
-  availableFrom: string
-  /** 입주 가능 종료일 (YYYY-MM-DD) */
-  availableTo: string
-  /** @deprecated 유닛 단위 roommateWaiting 사용 — 목록 배지 호환용 */
-  roommateWaiting: boolean
-  /** @deprecated */
-  roommateComposition: HousingRoommateComposition | null
-  /** @deprecated */
-  roommateIntro: string | null
-}
-
-export interface HousingPost {
-  id: string
-  /** 목록/상세 타이틀로 쓰는 스트리트 주소 */
-  title: string
+  property: HousingProperty
+  unit: HousingUnit
   description: string
-  neighborhood: string
-  bedrooms: number
-  /** 유닛 타입 (Studio, 1B1B …) */
-  unitType: HousingUnitType | null
-  /** 전체 유닛 월세 (룸 타입 합산 기준, 등록 시 별도 입력) */
-  unitRent: number
-  /** 룸별 가격·입주·룸메이트 옵션 */
-  roomOptions: HousingRoomOption[]
-  /** 유닛 공통 혜택/어메니티 (룸메이트 대기중은 roomOptions에서 판단) */
-  perks: HousingPerkId[]
-  /** free-credit 매물의 구체 혜택 (x개월 무료 또는 $x,xxx 크레딧) */
-  creditOffer: HousingCreditOffer | null
-  /** 기다리는 룸메이트 (있으면 표시, 룸 옵션 선택과 독립) */
   roommateWaiting: HousingRoommateWaiting | null
   contactEmail: string
-  /** 매물 사진 URL (없으면 빈 배열) */
-  images: string[]
-  /** 유튜브 투어 영상 URL (없으면 null) */
-  youtubeUrl: string | null
+  sourcePropertyId?: string | null
+  sourceUnitId?: string | null
   authorUid: string
   authorEmail: string
-  /** 작성자 학교 인증 배지용 (예: nyu) */
   authorSchoolId: string | null
   authorSchoolName: string | null
   createdAt: number
@@ -125,8 +168,11 @@ export interface HousingPost {
   status: PostStatus
 }
 
-export type HousingPostInput = Omit<
-  HousingPost,
+/** @deprecated HousingListing 사용 */
+export type HousingPost = HousingListing
+
+export type HousingListingInput = Omit<
+  HousingListing,
   | 'id'
   | 'authorUid'
   | 'authorEmail'
@@ -136,6 +182,9 @@ export type HousingPostInput = Omit<
   | 'updatedAt'
   | 'status'
 >
+
+/** @deprecated HousingListingInput 사용 */
+export type HousingPostInput = HousingListingInput
 
 export type RoommateLookingFor = 'room' | 'roommate'
 

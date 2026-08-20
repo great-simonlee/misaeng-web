@@ -1,22 +1,19 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useState } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
-import { inferHousingUnitType } from '@lib/constants/housingMock'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
 // import { createHousingPost } from '@lib/firebase/housing'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
 import { LoadingState } from '@components'
 
 export function HousingNewScreen() {
-  const { user, loading, isMisaengUser, configured, profile } = useAuth()
-  const { success, error: toastError } = useToast()
-  const router = useRouter()
+  const { user, loading, isMisaengUser } = useAuth()
+  const { error: toastError } = useToast()
   const [submitting, setSubmitting] = useState(false)
 
   const [title, setTitle] = useState('')
