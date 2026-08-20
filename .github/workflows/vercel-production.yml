@@ -13,6 +13,7 @@ concurrency:
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  APP_ENV_JSON: ${{ vars.APP_ENV_JSON }}
 
 jobs:
   lint-and-production:
@@ -47,6 +48,9 @@ jobs:
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Load app env from APP_ENV_JSON
+        run: node scripts/export-app-env.mjs production
 
       - name: Build Project Artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}

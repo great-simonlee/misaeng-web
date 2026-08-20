@@ -81,9 +81,9 @@ misaeng_temp_web/
 
 Vercel Git 자동 배포는 끄고, GitHub Actions에서 빌드한 산출물을 배포합니다.
 
-### GitHub Secrets
+### GitHub Secrets / Variables
 
-저장소 **Settings → Secrets and variables → Actions**에 아래 값을 넣습니다.
+**Secrets** (`Settings → Secrets and variables → Actions → Secrets`)
 
 | Secret | 설명 |
 |---|---|
@@ -92,6 +92,23 @@ Vercel Git 자동 배포는 끄고, GitHub Actions에서 빌드한 산출물을 
 | `VERCEL_PROJECT_ID` | Vercel 프로젝트 ID |
 
 ID는 Vercel 대시보드 **Project Settings → General**의 Project ID, **Team Settings → General**의 Team ID에서 확인할 수 있습니다.
+
+**Variables** (`Settings → Secrets and variables → Actions → Variables`)
+
+앱 환경 변수는 `APP_ENV_JSON` 하나에 JSON으로 넣습니다. 형식은 `app-env.example.json`을 참고하세요.
+
+```json
+{
+  "APP_CONNECT_API_BASE_URL": "",
+  "APP_CONNECT_DEVICE_ID": "",
+  "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "",
+  "NEXT_PUBLIC_SUPABASE_URL": "",
+  "NEXT_PUBLIC_SUPABASE_ANON_KEY": "",
+  "SUPABASE_SERVICE_ROLE_KEY": ""
+}
+```
+
+워크플로가 이 JSON을 읽어 `.vercel/.env.*.local`과 러너 환경 변수로 주입한 뒤 `vercel build`합니다.
 
 ### Preview / Production
 
