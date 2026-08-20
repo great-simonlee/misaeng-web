@@ -2,8 +2,8 @@ name: Vercel Preview
 
 on:
   push:
-    branches:
-      - feature/ci_cd
+    branches-ignore:
+      - main
   workflow_dispatch:
 
 concurrency:
