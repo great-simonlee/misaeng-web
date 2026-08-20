@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { LoadingState, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { useHousingLikes } from '@hooks/useHousingLikes'
-import { getHousingUnitRent, getListingArea, getListingDisplayAddress, listMockHousingPosts } from '@lib/constants/housingMock'
+import { getHousingUnitRent, getListingArea, getListingDisplayAddress, getListingUnitNet, listMockHousingPosts } from '@lib/constants/housingMock'
 import { NYC_CATEGORIES, NYC_PAGE_SHELL_CLASS, type NycCategoryId } from '@lib/constants/nyc'
 import { cn } from '@lib'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
@@ -325,11 +325,18 @@ export function MyLikesScreen() {
   )
 }
 
+function formatHousingRentMeta(post: HousingPost): string {
+  const gross = getHousingUnitRent(post)
+  const net = getListingUnitNet(post)
+  if (net != null) return `$${gross.toLocaleString()} / $${net.toLocaleString()}/월`
+  return `$${gross.toLocaleString()}/월`
+}
+
 function mapHousing(post: HousingPost): LikedItem {
   return {
     id: post.id,
     title: getListingDisplayAddress(post),
-    meta: `${getListingArea(post)} · $${getHousingUnitRent(post).toLocaleString()}/월`,
+    meta: `${getListingArea(post)} · ${formatHousingRentMeta(post)}`,
     href: `/nyc/housing/${post.id}`,
     categoryId: 'housing',
     boardLabel: '하우징',

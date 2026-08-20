@@ -28,6 +28,7 @@ import {
   listMockHousingPosts,
   type HousingListingKind,
 } from '@lib/constants/housingMock'
+import { fetchHousingListings, mergeMockAndLiveHousingListings } from '@lib/housing/fetchListings'
 import { cn } from '@lib'
 import type {
   HousingListing,
@@ -64,6 +65,7 @@ export function HousingListScreen() {
     getHousingPriceBounds('unit').max,
   )
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [livePosts, setLivePosts] = useState<HousingListing[]>([])
 
   const [draftListingKind, setDraftListingKind] =
     useState<ListingKindFilter>('all')
@@ -136,7 +138,21 @@ export function HousingListScreen() {
     }
   }, [])
 
-  const posts = useMemo(() => listMockHousingPosts(), [])
+  useEffect(() => {
+    let cancelled = false
+    void fetchHousingListings().then((listings) => {
+      if (!cancelled) setLivePosts(listings)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const mockPosts = useMemo(() => listMockHousingPosts(), [])
+  const posts = useMemo(
+    () => mergeMockAndLiveHousingListings(mockPosts, livePosts),
+    [livePosts, mockPosts],
+  )
 
   const filteredPosts = useMemo(() => {
     return posts.filter((listing) => {

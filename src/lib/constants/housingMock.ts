@@ -4,10 +4,12 @@ import {
   formatListingBedBath,
   getListingArea,
   getListingCreditOffer,
+  getListingCreditOffers,
   getListingDerivedPerks,
   getListingDisplayAddress,
-  getListingPrimaryPromotion,
   getListingUnitRent,
+  getListingUnitNet,
+  getHousingRoomNet,
   getListingUnitType,
   getListingAvailableDate,
   getPricedRooms,
@@ -51,11 +53,14 @@ export {
   getHousingRoomTypeLabel,
   getListingArea,
   getListingCreditOffer,
+  getListingCreditOffers,
   getListingDerivedPerks,
   getListingDisplayAddress,
   getListingImages,
   getListingStreetAddress,
   getListingUnitRent,
+  getListingUnitNet,
+  getHousingRoomNet,
   getListingUnitType,
   getListingAvailableDate,
   getListingYoutubeUrl,
@@ -750,13 +755,13 @@ export function getListingCardBadges(listing: HousingListing) {
   const badges: { key: string; label: string }[] = derived
     .filter((perk) => HOUSING_CARD_BADGE_PERKS.includes(perk))
     .map((perk) => ({ key: perk, label: getHousingPerkLabel(perk) }))
-  const credit = getListingCreditOffer(listing)
-  if (credit) {
+  const creditOffers = getListingCreditOffers(listing)
+  creditOffers.forEach((credit, index) => {
     badges.push({
-      key: 'credit-offer',
+      key: `credit-offer-${index}`,
       label: formatHousingCreditOfferLabel(credit),
     })
-  }
+  })
   return badges
 }
 
@@ -786,13 +791,7 @@ export function shouldShowListingRoomRows(listing: HousingListing): boolean {
 }
 
 export function formatListingPromotionSummary(listing: HousingListing): string[] {
-  const labels: string[] = []
-  const promo = getListingPrimaryPromotion(listing)
-  if (promo?.hasOP) {
-    const months = promo.opMonths ?? 1
-    labels.push(`OP ${months}개월`)
-  }
-  const credit = getListingCreditOffer(listing)
-  if (credit) labels.push(formatHousingCreditOfferLabel(credit))
-  return labels
+  return getListingCreditOffers(listing).map((credit) =>
+    formatHousingCreditOfferLabel(credit),
+  )
 }

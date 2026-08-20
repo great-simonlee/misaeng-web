@@ -17,14 +17,30 @@ export function usePagedGallery(count: number, resetKey?: string) {
   const ref = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(0)
   const indexRef = useRef(0)
-  const startRef = useRef<{
-    x: number
-    y: number
-    index: number
-    axis?: 'x' | 'y'
-  } | null>(null)
   const swipingRef = useRef(false)
-  const restoreTimerRef = useRef<number>(0)
+  const scrollIdleTimerRef = useRef<number>(0)
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null)
+
+  const syncIndexFromScroll = useCallback(() => {
+    const el = ref.current
+    if (!el || count <= 0) return
+    const width = el.clientWidth
+    if (width <= 0) return
+    const next = Math.round(el.scrollLeft / width)
+    const clamped = Math.min(Math.max(next, 0), count - 1)
+    if (clamped !== indexRef.current) {
+      indexRef.current = clamped
+      setIndex(clamped)
+    }
+  }, [count])
+
+  const markScrolling = useCallback(() => {
+    swipingRef.current = true
+    window.clearTimeout(scrollIdleTimerRef.current)
+    scrollIdleTimerRef.current = window.setTimeout(() => {
+      swipingRef.current = false
+    }, 150)
+  }, [])
 
   const goTo = useCallback(
     (next: number, options: PagedGalleryGoToOptions = {}) => {
@@ -39,94 +55,39 @@ export function usePagedGallery(count: number, resetKey?: string) {
       setIndex(clamped)
       indexRef.current = clamped
       if (!el || count <= 0) return
-      window.clearTimeout(restoreTimerRef.current)
-      el.style.scrollSnapType = 'none'
       el.scrollTo({
         left: clamped * el.clientWidth,
         behavior: options.behavior ?? 'smooth',
       })
-      restoreTimerRef.current = window.setTimeout(() => {
-        el.style.scrollSnapType = ''
-      }, 360)
     },
     [count],
   )
 
   function onPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (count <= 1) return
-    if (event.pointerType === 'mouse' && event.button !== 0) return
-    startRef.current = {
-      x: event.clientX,
-      y: event.clientY,
-      index: indexRef.current,
-    }
-    swipingRef.current = false
-  }
-
-  function onPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    const start = startRef.current
-    const el = ref.current
-    if (!start || !el || count <= 1) return
-
-    const dx = event.clientX - start.x
-    const dy = event.clientY - start.y
-
-    if (!start.axis) {
-      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return
-      start.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
-      if (start.axis === 'x') {
-        swipingRef.current = true
-        el.style.scrollSnapType = 'none'
-        event.currentTarget.setPointerCapture(event.pointerId)
-      } else {
-        startRef.current = null
-      }
-      return
-    }
-
-    if (start.axis !== 'x') return
-
-    const width = el.clientWidth
-    if (width <= 0) return
-    const raw = start.index * width - dx
-    const min = Math.max(0, start.index - 1) * width
-    const max = Math.min(count - 1, start.index + 1) * width
-    el.scrollLeft = Math.min(Math.max(raw, min), max)
-  }
-
-  function settle(clientX: number) {
-    const start = startRef.current
-    const el = ref.current
-    startRef.current = null
-    if (!start || start.axis !== 'x' || !el) return
-    const dx = clientX - start.x
-    const threshold = Math.max(36, el.clientWidth * 0.12)
-    if (dx <= -threshold) goTo(start.index + 1)
-    else if (dx >= threshold) goTo(start.index - 1)
-    else goTo(start.index)
+    pointerStartRef.current = { x: event.clientX, y: event.clientY }
   }
 
   function onPointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!startRef.current) return
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId)
+    const start = pointerStartRef.current
+    pointerStartRef.current = null
+    if (!start) return
+    const dx = Math.abs(event.clientX - start.x)
+    const dy = Math.abs(event.clientY - start.y)
+    if (dx > 8 && dx > dy) {
+      markScrolling()
     }
-    settle(event.clientX)
   }
 
-  function onPointerCancel(event: ReactPointerEvent<HTMLDivElement>) {
-    const start = startRef.current
-    startRef.current = null
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId)
-    }
-    if (start?.axis === 'x') goTo(start.index)
+  function onPointerCancel() {
+    pointerStartRef.current = null
   }
 
   const [prevResetKey, setPrevResetKey] = useState(resetKey)
   if (resetKey !== prevResetKey) {
     setPrevResetKey(resetKey)
     setIndex(0)
+    indexRef.current = 0
   }
 
   useEffect(() => {
@@ -135,8 +96,38 @@ export function usePagedGallery(count: number, resetKey?: string) {
 
   useEffect(() => {
     const el = ref.current
-    if (el) el.scrollTo({ left: 0 })
+    if (!el) return
+    el.scrollTo({ left: 0 })
+    indexRef.current = 0
+    setIndex(0)
   }, [resetKey])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el || count <= 1) return
+
+    function onScroll() {
+      markScrolling()
+      syncIndexFromScroll()
+    }
+
+    function onScrollEnd() {
+      syncIndexFromScroll()
+      window.clearTimeout(scrollIdleTimerRef.current)
+      scrollIdleTimerRef.current = window.setTimeout(() => {
+        swipingRef.current = false
+      }, 80)
+    }
+
+    el.addEventListener('scroll', onScroll, { passive: true })
+    el.addEventListener('scrollend', onScrollEnd)
+
+    return () => {
+      el.removeEventListener('scroll', onScroll)
+      el.removeEventListener('scrollend', onScrollEnd)
+      window.clearTimeout(scrollIdleTimerRef.current)
+    }
+  }, [count, markScrolling, syncIndexFromScroll])
 
   useEffect(() => {
     function align() {
@@ -149,7 +140,7 @@ export function usePagedGallery(count: number, resetKey?: string) {
   }, [])
 
   useEffect(() => {
-    return () => window.clearTimeout(restoreTimerRef.current)
+    return () => window.clearTimeout(scrollIdleTimerRef.current)
   }, [])
 
   return {
@@ -159,7 +150,6 @@ export function usePagedGallery(count: number, resetKey?: string) {
     swipingRef,
     pointerHandlers: {
       onPointerDown,
-      onPointerMove,
       onPointerUp,
       onPointerCancel,
     },

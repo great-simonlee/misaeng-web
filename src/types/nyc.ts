@@ -64,6 +64,8 @@ export interface HousingUnit {
   bathrooms: number
   /** 그로스 월세 */
   price: number
+  /** 넷 월세. 그로스와 같으면 생략 */
+  netPrice?: number | null
   availableDate?: string | null
   available: boolean
   rooms: HousingRoom[]
@@ -79,6 +81,8 @@ export interface HousingUnit {
 export interface HousingRoom {
   type: HousingRoomType
   price: number
+  /** 룸 넷 월세. 그로스와 같으면 생략 */
+  netPrice?: number | null
 }
 
 /** 하우징 혜택/조건 태그 */

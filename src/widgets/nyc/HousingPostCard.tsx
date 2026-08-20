@@ -10,20 +10,22 @@ import { usePagedGallery } from '@hooks/usePagedGallery'
 import {
   formatHousingAvailableDate,
   formatListingBedBath,
-  getHousingListingTypeLabel,
   getHousingPerkLabel,
   getHousingRoomLabel,
+  getHousingRoomNet,
   getHousingUnitRent,
   getListingArea,
   getListingCardBadges,
   getListingDisplayAddress,
   getListingImages,
   getListingAvailableDate,
+  getListingUnitNet,
   getPricedRooms,
   getRoomSelectionKey,
   shouldShowListingRoomRows,
   sortHousingRooms,
 } from '@lib/constants/housingMock'
+import { shouldUnoptimizeHousingImage } from '@lib/housing/fetchListings'
 import type {
   HousingListing,
   HousingPerkId,
@@ -44,8 +46,8 @@ export function HousingPostCard({
   const images = getListingImages(listing)
   const displayAddress = getListingDisplayAddress(listing)
   const area = getListingArea(listing)
-  const listingTypeLabel = getHousingListingTypeLabel(listing)
   const unitRent = getHousingUnitRent(listing)
+  const unitNet = getListingUnitNet(listing)
   const availableDate = getListingAvailableDate(listing)
   const roomRows = sortHousingRooms(getPricedRooms(listing))
   const showOptionRows = shouldShowListingRoomRows(listing)
@@ -71,7 +73,7 @@ export function HousingPostCard({
           <div
             ref={galleryRef}
             {...pointerHandlers}
-            className='flex h-full touch-pan-y snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain overscroll-y-none select-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+            className='flex h-full snap-x snap-proximity overflow-x-auto overflow-y-hidden overscroll-x-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
           >
             {images.map((src, index) => (
               <Link
@@ -83,7 +85,7 @@ export function HousingPostCard({
                     swipingRef.current = false
                   }
                 }}
-                className='relative h-full w-full min-w-full shrink-0 overflow-hidden snap-start snap-always'
+                className='relative h-full w-full min-w-full shrink-0 overflow-hidden snap-start'
                 aria-label={`${displayAddress} 사진 ${index + 1}`}
               >
                 <Image
@@ -91,6 +93,7 @@ export function HousingPostCard({
                   alt=''
                   fill
                   draggable={false}
+                  unoptimized={shouldUnoptimizeHousingImage(src)}
                   className='object-cover transition-transform duration-500 ease-out will-change-transform group-hover:scale-[1.05]'
                   sizes='(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw'
                   priority={index === 0}
@@ -165,15 +168,20 @@ export function HousingPostCard({
               </h3>
               <SchoolBadge schoolId={listing.authorSchoolId} />
             </div>
-            <p className='shrink-0 text-right text-[15px] font-semibold leading-snug tabular-nums tracking-tight text-[var(--foreground)] sm:text-[13px]'>
-              ${unitRent.toLocaleString()}
-              <span className='font-medium text-[var(--muted)]'>/월</span>
-            </p>
+            <div className='shrink-0 text-right'>
+              <p className='text-[15px] font-semibold leading-snug tabular-nums tracking-tight text-[var(--foreground)] sm:text-[13px]'>
+                ${unitRent.toLocaleString()}
+                <span className='font-medium text-[var(--muted)]'>/월</span>
+              </p>
+              {unitNet != null ? (
+                <p className='text-[12px] font-medium tabular-nums text-[var(--muted)] sm:text-[11px]'>
+                  ${unitNet.toLocaleString()}
+                </p>
+              ) : null}
+            </div>
           </div>
           <p className='truncate text-[13px] text-[var(--muted-foreground)] sm:text-[12px]'>
             {area}
-            <span className='mx-1 text-[#d0d4db]'>·</span>
-            {listingTypeLabel}
             <span className='mx-1 text-[#d0d4db]'>·</span>
             {formatListingBedBath(listing)}
             <span className='mx-1 text-[#d0d4db]'>·</span>
@@ -187,6 +195,7 @@ export function HousingPostCard({
               <RoomOptionRow
                 key={getRoomSelectionKey(room, index)}
                 room={room}
+                net={getHousingRoomNet(listing, room)}
                 roomKey={getRoomSelectionKey(room, index)}
                 highlighted={
                   highlightRoomType !== 'all' && room.type === highlightRoomType
@@ -203,11 +212,12 @@ export function HousingPostCard({
 
 function RoomOptionRow({
   room,
-  roomKey,
+  net,
   highlighted,
   href,
 }: {
   room: HousingRoom
+  net: number | null
   roomKey: string
   highlighted: boolean
   href: string
@@ -227,7 +237,14 @@ function RoomOptionRow({
         </span>
         <span className='text-[13px] font-semibold tabular-nums text-[var(--foreground)] sm:text-[12px]'>
           ${room.price.toLocaleString()}
-          <span className='font-medium text-[var(--muted)]'>/월</span>
+          {net != null ? (
+            <span className='font-medium text-[var(--muted)]'>
+              {' '}
+              / ${net.toLocaleString()}
+            </span>
+          ) : (
+            <span className='font-medium text-[var(--muted)]'>/월</span>
+          )}
         </span>
       </Link>
     </li>

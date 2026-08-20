@@ -1,0 +1,166 @@
+import type { HousingListing, HousingRoomType } from '@/types/nyc'
+import { normalizeErpRoomType } from './listing'
+
+const ROOM_TYPES = new Set([
+  'master-w-bath',
+  'master-wo-bath',
+  'regular-bedroom',
+  'flexroom',
+  'entire',
+  'studio',
+])
+
+const UNIT_TYPES = new Set([
+  'studio',
+  '1b1b',
+  '2b1b',
+  '2b2b',
+  '3b1b',
+  '3b2b',
+  '4-plus',
+])
+
+function asNumber(value: unknown, fallback = 0) {
+  const n = Number(value)
+  return Number.isFinite(n) ? n : fallback
+}
+
+function asStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .map((item) => String(item ?? '').trim())
+    .filter(Boolean)
+}
+
+export function normalizeHousingListing(raw: unknown): HousingListing | null {
+  if (!raw || typeof raw !== 'object') return null
+  const data = raw as Record<string, unknown>
+  const propertyRaw =
+    data.property && typeof data.property === 'object'
+      ? (data.property as Record<string, unknown>)
+      : null
+  const unitRaw =
+    data.unit && typeof data.unit === 'object'
+      ? (data.unit as Record<string, unknown>)
+      : null
+  const id = String(data.id || '').trim()
+  if (!id || !propertyRaw || !unitRaw) return null
+
+  const rooms = Array.isArray(unitRaw.rooms)
+    ? unitRaw.rooms.flatMap((item) => {
+        if (!item || typeof item !== 'object') return []
+        const room = item as Record<string, unknown>
+        const rawType = String(room.type || room.name || room.label || '').trim()
+        const type = (ROOM_TYPES.has(rawType)
+          ? rawType
+          : normalizeErpRoomType(rawType)) as HousingRoomType | null
+        const price = asNumber(room.price ?? room.rent ?? room.amount, 0)
+        if (!type || !ROOM_TYPES.has(type) || price <= 0) return []
+        const netPriceRaw = asNumber(room.netPrice, 0)
+        const netPrice =
+          netPriceRaw > 0 && Math.round(netPriceRaw) !== Math.round(price)
+            ? Math.round(netPriceRaw)
+            : null
+        return netPrice != null ? [{ type, price, netPrice }] : [{ type, price }]
+      })
+    : []
+
+  const unitType = String(unitRaw.unitType || '').trim()
+  const partWall = String(propertyRaw.partWall || '').trim()
+  const amenityFeeRaw =
+    propertyRaw.amenityFee && typeof propertyRaw.amenityFee === 'object'
+      ? (propertyRaw.amenityFee as Record<string, unknown>)
+      : null
+  const incomeRaw =
+    propertyRaw.incomeRequirements &&
+    typeof propertyRaw.incomeRequirements === 'object'
+      ? (propertyRaw.incomeRequirements as Record<string, unknown>)
+      : null
+
+  const status = data.status === 'closed' ? 'closed' : 'open'
+
+  return {
+    id,
+    property: {
+      address: String(propertyRaw.address || '').trim(),
+      displayedAddress: String(propertyRaw.displayedAddress || '').trim() || null,
+      buildingName: String(propertyRaw.buildingName || '').trim() || null,
+      area: String(propertyRaw.area || '').trim() || 'New York',
+      zipcode: String(propertyRaw.zipcode || '').trim() || null,
+      latitude:
+        propertyRaw.latitude == null ? null : asNumber(propertyRaw.latitude, 0),
+      longitude:
+        propertyRaw.longitude == null ? null : asNumber(propertyRaw.longitude, 0),
+      subway: asStringArray(propertyRaw.subway),
+      amenities: asStringArray(propertyRaw.amenities),
+      appliances: asStringArray(propertyRaw.appliances),
+      includedUtility: asStringArray(propertyRaw.includedUtility),
+      partWall:
+        partWall === 'Full wall' ||
+        partWall === 'Regular wall' ||
+        partWall === 'Curtain only'
+          ? partWall
+          : null,
+      amenityFee:
+        amenityFeeRaw && asNumber(amenityFeeRaw.amount, 0) > 0
+          ? {
+              type: amenityFeeRaw.type === 'mandatory' ? 'mandatory' : 'optional',
+              amount: asNumber(amenityFeeRaw.amount, 0),
+              period: amenityFeeRaw.period === 'yearly' ? 'yearly' : 'monthly',
+            }
+          : null,
+      incomeRequirements: incomeRaw
+        ? {
+            personalIncome: String(incomeRaw.personalIncome || '').trim() || undefined,
+            personalGuarantor:
+              String(incomeRaw.personalGuarantor || '').trim() || undefined,
+          }
+        : null,
+      latestMoveInAllowedDays:
+        propertyRaw.latestMoveInAllowedDays == null
+          ? null
+          : asNumber(propertyRaw.latestMoveInAllowedDays, 0),
+    },
+    unit: {
+      unitNumber: String(unitRaw.unitNumber || '').trim() || null,
+      bedrooms: asNumber(unitRaw.bedrooms, 0),
+      bathrooms: asNumber(unitRaw.bathrooms, 1),
+      price: asNumber(unitRaw.price, 0),
+      netPrice: (() => {
+        const net = asNumber(unitRaw.netPrice, 0)
+        const gross = asNumber(unitRaw.price, 0)
+        return net > 0 && Math.round(net) !== Math.round(gross) ? Math.round(net) : null
+      })(),
+      availableDate: String(unitRaw.availableDate || '').trim() || null,
+      available: unitRaw.available !== false,
+      rooms,
+      promotions: Array.isArray(unitRaw.promotions)
+        ? unitRaw.promotions.filter(
+            (item): item is HousingListing['unit']['promotions'][number] =>
+              Boolean(item) && typeof item === 'object',
+          )
+        : [],
+      images: asStringArray(unitRaw.images),
+      youtubeUrl: String(unitRaw.youtubeUrl || '').trim() || null,
+      listingUrl: String(unitRaw.listingUrl || '').trim() || null,
+      unitType: UNIT_TYPES.has(unitType)
+        ? (unitType as HousingListing['unit']['unitType'])
+        : null,
+    },
+    description: String(data.description || '').trim(),
+    roommateWaiting:
+      data.roommateWaiting && typeof data.roommateWaiting === 'object'
+        ? (data.roommateWaiting as HousingListing['roommateWaiting'])
+        : null,
+    contactEmail: String(data.contactEmail || '').trim() || 'housing@misaeng.com',
+    sourcePropertyId: String(data.sourcePropertyId || '').trim() || null,
+    sourceUnitId: String(data.sourceUnitId || '').trim() || null,
+    authorUid: String(data.authorUid || '').trim() || 'erp',
+    authorEmail: String(data.authorEmail || '').trim() || 'housing@misaeng.com',
+    authorSchoolId: String(data.authorSchoolId || '').trim() || null,
+    authorSchoolName: String(data.authorSchoolName || '').trim() || null,
+    createdAt: asNumber(data.createdAt, Date.now()),
+    updatedAt: asNumber(data.updatedAt, Date.now()),
+    status,
+  }
+}

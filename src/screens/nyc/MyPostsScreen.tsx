@@ -20,6 +20,7 @@ import {
   getHousingUnitRent,
   getListingArea,
   getListingDisplayAddress,
+  getListingUnitNet,
 } from '@lib/constants/housingMock'
 import type { CommunityPost, HousingPost } from '@/types/nyc'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
@@ -309,11 +310,18 @@ export function MyPostsScreen() {
   )
 }
 
+function formatHousingRentMeta(post: HousingPost): string {
+  const gross = getHousingUnitRent(post)
+  const net = getListingUnitNet(post)
+  if (net != null) return `$${gross.toLocaleString()} / $${net.toLocaleString()}/월`
+  return `$${gross.toLocaleString()}/월`
+}
+
 function mapHousing(posts: HousingPost[]): MyPostItem[] {
   return posts.map((post) => ({
     id: post.id,
     title: getListingDisplayAddress(post),
-    meta: `${getListingArea(post)} · $${getHousingUnitRent(post).toLocaleString()}/월`,
+    meta: `${getListingArea(post)} · ${formatHousingRentMeta(post)}`,
     href: `/nyc/housing/${post.id}`,
     categoryId: 'housing',
     boardLabel: '하우징',

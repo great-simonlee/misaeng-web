@@ -1,35 +1,21 @@
 interface HousingLocationMapProps {
   address: string
   neighborhood: string
-  latitude?: number | null
-  longitude?: number | null
   className?: string
 }
 
 export function HousingLocationMap({
   address,
   neighborhood,
-  latitude,
-  longitude,
   className,
 }: HousingLocationMapProps) {
-  const hasCoords =
-    typeof latitude === 'number' &&
-    typeof longitude === 'number' &&
-    Number.isFinite(latitude) &&
-    Number.isFinite(longitude)
-
   const query = [address, neighborhood, 'New York, NY']
     .filter(Boolean)
     .join(', ')
 
-  const mapSrc = hasCoords
-    ? `https://maps.google.com/maps?q=${latitude},${longitude}&z=15&output=embed`
-    : `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=15&output=embed`
+  const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=15&output=embed`
 
-  const externalHref = hasCoords
-    ? `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
-    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+  const externalHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
 
   return (
     <section

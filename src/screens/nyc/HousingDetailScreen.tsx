@@ -10,23 +10,19 @@ import { useAuth } from '@hooks/useAuth'
 import { useToast } from '@hooks/useToast'
 import {
   formatHousingAvailableDate,
-  formatHousingCreditOfferLabel,
   formatListingBedBath,
-  formatListingPromotionSummary,
   formatPropertyAmenityFee,
   formatPropertyIncomeRequirements,
   findListingRoomByKey,
   getHousingRoomLabel,
-  getHousingUnitTypeLabel,
+  getHousingRoomNet,
   getListingAmenityPerks,
   getListingArea,
-  getListingBenefitPerks,
-  getListingCreditOffer,
+  getListingCardBadges,
   getListingDisplayAddress,
   getListingImages,
-  getListingStreetAddress,
+  getListingUnitNet,
   getListingUnitRent,
-  getListingUnitType,
   getListingAvailableDate,
   getListingYoutubeUrl,
   getMockHousingListing,
@@ -35,6 +31,7 @@ import {
   shouldShowListingRoomRows,
   sortHousingRooms,
 } from '@lib/constants/housingMock'
+import { fetchHousingListing, shouldUnoptimizeHousingImage } from '@lib/housing/fetchListings'
 import { KAKAO_INQUIRY_URL } from '@lib/constants/nyc'
 import { cn } from '@lib'
 import type { HousingListing, HousingRoom } from '@/types/nyc'
@@ -42,7 +39,7 @@ import { EmptyState } from '@widgets/nyc/EmptyState'
 import { PerkBadge } from '@widgets/nyc/HousingPostCard'
 import { HousingLocationMap } from '@widgets/nyc/HousingLocationMap'
 import { HousingRoommateIntro } from '@widgets/nyc/HousingRoommateIntro'
-import { SchoolBadge } from '@components'
+import { LoadingState, SchoolBadge } from '@components'
 
 interface HousingDetailScreenProps {
   postId: string
@@ -53,7 +50,13 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   const { success, error: toastError } = useToast()
   const searchParams = useSearchParams()
   const roomParam = searchParams.get('room')
-  const listing = useMemo(() => getMockHousingListing(postId) ?? null, [postId])
+  const mockListing = useMemo(
+    () => getMockHousingListing(postId) ?? null,
+    [postId],
+  )
+  const [liveListing, setLiveListing] = useState<HousingListing | null>(null)
+  const [loadingLive, setLoadingLive] = useState(!postId.startsWith('mock-'))
+  const listing = liveListing ?? mockListing
   const [userRoomKey, setUserRoomKey] = useState<{
     postId: string
     roomParam: string | null
@@ -68,6 +71,27 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   } = usePagedGallery(images.length, postId)
   const thumbScrollRef = useRef<HTMLDivElement>(null)
   const [thumbEdge, setThumbEdge] = useState({ left: false, right: false })
+
+  useEffect(() => {
+    let cancelled = false
+    if (postId.startsWith('mock-')) {
+      setLiveListing(null)
+      setLoadingLive(false)
+      return
+    }
+    setLoadingLive(true)
+    void fetchHousingListing(postId)
+      .then((next) => {
+        if (cancelled) return
+        setLiveListing(next)
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingLive(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [postId])
 
   function updateThumbScrollHint() {
     const el = thumbScrollRef.current
@@ -183,6 +207,10 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     }
   }
 
+  if (loadingLive && !listing) {
+    return <LoadingState fullPage />
+  }
+
   if (!listing || listing.status === 'closed') {
     return (
       <div className='mx-auto max-w-3xl px-4 py-12'>
@@ -199,19 +227,13 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   const isAuthor =
     user?.uid === listing.authorUid && !listing.id.startsWith('mock-')
   const displayAddress = getListingDisplayAddress(listing)
-  const streetAddress = getListingStreetAddress(listing)
   const area = getListingArea(listing)
   const unitRent = getListingUnitRent(listing)
-  const unitType = getListingUnitType(listing)
-  const unitTypeLabel = unitType ? getHousingUnitTypeLabel(unitType) : '미정'
+  const unitNet = getListingUnitNet(listing)
   const availableDate = getListingAvailableDate(listing)
   const youtubeUrl = getListingYoutubeUrl(listing)
-  const benefitPerks = getListingBenefitPerks(listing)
   const amenityPerks = getListingAmenityPerks(listing)
-  const creditOffer = getListingCreditOffer(listing)
-  const promotionLabels = formatListingPromotionSummary(listing)
-  const hasBenefits =
-    benefitPerks.length > 0 || Boolean(creditOffer) || promotionLabels.length > 0
+  const benefitBadges = getListingCardBadges(listing)
   const hasAmenities = amenityPerks.length > 0
   const showRoomRows = shouldShowListingRoomRows(listing)
   const mailSubject = encodeURIComponent(`[Misaeng Housing] ${displayAddress}`)
@@ -236,12 +258,12 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                 <div
                   ref={galleryScrollRef}
                   {...galleryPointerHandlers}
-                  className='flex h-full touch-pan-y snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain overscroll-y-none select-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+                  className='flex h-full snap-x snap-proximity overflow-x-auto overflow-y-hidden overscroll-x-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
                 >
                   {images.map((src, index) => (
                     <div
                       key={`${src}-${index}`}
-                      className='relative h-full w-full min-w-full shrink-0 snap-start snap-always'
+                      className='relative h-full w-full min-w-full shrink-0 snap-start'
                     >
                       <Image
                         src={src}
@@ -249,6 +271,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                         fill
                         priority={index === 0}
                         draggable={false}
+                        unoptimized={shouldUnoptimizeHousingImage(src)}
                         className='object-cover'
                         sizes='(max-width: 1024px) 100vw, 55vw'
                       />
@@ -332,6 +355,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                               src={src}
                               alt=''
                               fill
+                              unoptimized={shouldUnoptimizeHousingImage(src)}
                               className='object-cover'
                               sizes='96px'
                             />
@@ -384,10 +408,8 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               )}
               <HousingPropertySection listing={listing} />
               <HousingLocationMap
-                address={streetAddress}
+                address={displayAddress}
                 neighborhood={area}
-                latitude={property.latitude}
-                longitude={property.longitude}
               />
             </div>
           </div>
@@ -402,32 +424,31 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               ) : null}
             </div>
 
-            {unit.unitNumber ? (
-              <p className='mt-1 text-[13px] font-medium text-[var(--muted)]'>
-                Unit {unit.unitNumber}
-              </p>
-            ) : null}
-
             <p className='mt-3 text-[1.35rem] font-semibold tracking-tight text-[#F64310]'>
               ${unitRent.toLocaleString()}
               <span className='text-base font-medium text-[#F64310]/75'>
                 /월
               </span>
+              {unitNet != null ? (
+                <span className='ml-2 text-[15px] font-medium tabular-nums text-[var(--muted)]'>
+                  / ${unitNet.toLocaleString()}
+                </span>
+              ) : null}
               <span className='ml-2 text-[13px] font-medium text-[var(--muted)]'>
-                · 그로스 · {formatListingBedBath(listing)}
+                · {formatListingBedBath(listing)}
               </span>
             </p>
 
-            {promotionLabels.length > 0 && (
-              <div className='mt-2 flex flex-wrap gap-1.5'>
-                {promotionLabels.map((label) => (
-                  <span
-                    key={label}
-                    className='inline-flex rounded-full bg-[#fff5f2] px-2.5 py-1 text-[12px] font-semibold text-[#F64310]'
-                  >
-                    {label}
-                  </span>
-                ))}
+            {benefitBadges.length > 0 && (
+              <div className='mt-4'>
+                <p className='text-[12px] font-semibold text-[var(--muted)]'>
+                  혜택
+                </p>
+                <div className='mt-2 flex flex-wrap gap-1.5'>
+                  {benefitBadges.map((badge) => (
+                    <PerkBadge key={badge.key} label={badge.label} />
+                  ))}
+                </div>
               </div>
             )}
 
@@ -440,6 +461,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                   {roomRows.map((room, index) => {
                     const roomKey = getRoomSelectionKey(room, index)
                     const active = roomKey === resolvedRoomKey
+                    const roomNet = getHousingRoomNet(listing, room)
                     return (
                       <button
                         key={roomKey}
@@ -462,11 +484,16 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                             입주 {formatHousingAvailableDate(availableDate) || '미정'}
                           </span>
                         </span>
-                        <span className='text-[14px] font-semibold tabular-nums text-[var(--foreground)]'>
+                        <span className='text-right text-[14px] font-semibold tabular-nums text-[var(--foreground)]'>
                           ${room.price.toLocaleString()}
                           <span className='font-medium text-[var(--muted)]'>
                             /월
                           </span>
+                          {roomNet != null ? (
+                            <span className='mt-0.5 block text-[12px] font-medium text-[var(--muted)]'>
+                              ${roomNet.toLocaleString()}
+                            </span>
+                          ) : null}
                         </span>
                       </button>
                     )
@@ -481,46 +508,28 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               </div>
             )}
 
-            {(hasBenefits || hasAmenities) && (
-              <div className='mt-4 space-y-3.5'>
-                {hasBenefits && (
-                  <div>
-                    <p className='text-[12px] font-semibold text-[var(--muted)]'>
-                      혜택
-                    </p>
-                    <div className='mt-2 flex flex-wrap gap-1.5'>
-                      {benefitPerks.map((perk) => (
-                        <PerkBadge key={perk} perk={perk} />
-                      ))}
-                      {creditOffer && (
-                        <PerkBadge
-                          label={formatHousingCreditOfferLabel(creditOffer)}
-                        />
-                      )}
-                    </div>
-                  </div>
-                )}
-                {hasAmenities && (
-                  <div>
-                    <p className='text-[12px] font-semibold text-[var(--muted)]'>
-                      어메니티
-                    </p>
-                    <div className='mt-2 flex flex-wrap gap-1.5'>
-                      {amenityPerks.map((perk) => (
-                        <PerkBadge key={perk} perk={perk} />
-                      ))}
-                    </div>
-                  </div>
-                )}
+            {hasAmenities && (
+              <div className='mt-4'>
+                <p className='text-[12px] font-semibold text-[var(--muted)]'>
+                  어메니티
+                </p>
+                <div className='mt-2 flex flex-wrap gap-1.5'>
+                  {amenityPerks.map((perk) => (
+                    <PerkBadge key={perk} perk={perk} />
+                  ))}
+                </div>
               </div>
             )}
 
             <dl className='mt-5 grid grid-cols-2 gap-3 text-sm'>
               <DetailStat label='지역' value={area} />
-              <DetailStat label='유닛 타입' value={unitTypeLabel} />
               <DetailStat
                 label='유닛 전체'
-                value={`$${unitRent.toLocaleString()}/월`}
+                value={
+                  unitNet != null
+                    ? `$${unitRent.toLocaleString()} / $${unitNet.toLocaleString()}/월`
+                    : `$${unitRent.toLocaleString()}/월`
+                }
               />
               <DetailStat
                 label='룸 타입'
@@ -548,10 +557,8 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             <div className='mt-5 lg:hidden'>
               <HousingPropertySection listing={listing} className='mb-4' />
               <HousingLocationMap
-                address={streetAddress}
+                address={displayAddress}
                 neighborhood={area}
-                latitude={property.latitude}
-                longitude={property.longitude}
               />
             </div>
 

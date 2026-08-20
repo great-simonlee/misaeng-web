@@ -31,9 +31,48 @@ export const HOUSING_ROOM_TYPE_ORDER: HousingRoomType[] = [
   'flexroom',
 ]
 
+const ERP_ROOM_TYPE_ENUM: Record<string, HousingRoomType> = {
+  MASTER_WITH_BATH: 'master-w-bath',
+  MASTER_WITHOUT_BATH: 'master-wo-bath',
+  MASTER_W_BATH: 'master-w-bath',
+  MASTER_WO_BATH: 'master-wo-bath',
+  REGULAR: 'regular-bedroom',
+  REGULAR_BEDROOM: 'regular-bedroom',
+  FLEX: 'flexroom',
+  FLEXROOM: 'flexroom',
+  STUDIO: 'studio',
+  ENTIRE: 'entire',
+  ENTIRE_UNIT: 'entire',
+}
+
+const ERP_ROOM_TYPE_INDEX: Record<string, HousingRoomType> = {
+  '0': 'master-w-bath',
+  '1': 'master-w-bath',
+  '2': 'master-wo-bath',
+  '3': 'regular-bedroom',
+  '4': 'flexroom',
+  '5': 'studio',
+}
+
 export function normalizeErpRoomType(label: string): HousingRoomType | null {
-  const key = label.trim().toLowerCase().replace(/\s+/g, ' ')
-  return ERP_ROOM_TYPE_ALIASES[key] ?? null
+  const raw = label.trim()
+  if (!raw) return null
+  if (ERP_ROOM_TYPE_ENUM[raw] || ERP_ROOM_TYPE_ENUM[raw.toUpperCase().replace(/\s+/g, '_')]) {
+    return (
+      ERP_ROOM_TYPE_ENUM[raw] ||
+      ERP_ROOM_TYPE_ENUM[raw.toUpperCase().replace(/\s+/g, '_')]
+    )
+  }
+  if (ERP_ROOM_TYPE_INDEX[raw]) return ERP_ROOM_TYPE_INDEX[raw]
+  const key = raw.toLowerCase().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim()
+  if (ERP_ROOM_TYPE_ALIASES[key]) return ERP_ROOM_TYPE_ALIASES[key]
+  if (/\bflex\b/.test(key)) return 'flexroom'
+  if (key.includes('master') && /(without|w\/o|\bwo\b)/.test(key)) return 'master-wo-bath'
+  if (key.includes('master')) return 'master-w-bath'
+  if (key.includes('regular')) return 'regular-bedroom'
+  if (key.includes('studio')) return 'studio'
+  if (key.includes('entire')) return 'entire'
+  return null
 }
 
 export function parsePropertyAddress(address: string) {
@@ -44,11 +83,19 @@ export function parsePropertyAddress(address: string) {
   }
 }
 
+function streetBeforeFirstComma(address: string): string {
+  const beforeComma = address.split(',')[0]?.trim()
+  return beforeComma || address.trim()
+}
+
 export function getListingDisplayAddress(listing: HousingListing): string {
   const { property } = listing
-  if (property.displayedAddress?.trim()) return property.displayedAddress.trim()
+  if (property.displayedAddress?.trim()) {
+    return streetBeforeFirstComma(property.displayedAddress)
+  }
   const { street, buildingName } = parsePropertyAddress(property.address)
-  return buildingName ? `${street} · ${buildingName}` : street
+  const streetTitle = streetBeforeFirstComma(street)
+  return buildingName ? `${streetTitle} · ${buildingName}` : streetTitle
 }
 
 export function getListingStreetAddress(listing: HousingListing): string {
@@ -103,6 +150,102 @@ export function getPricedRooms(listing: HousingListing): HousingRoom[] {
   return listing.unit.rooms.filter((room) => room.price > 0)
 }
 
+function asFiniteNumber(value: unknown): number | null {
+  if (value == null || value === '') return null
+  const n = typeof value === 'number' ? value : Number(String(value).replace(/[^0-9.-]/g, ''))
+  return Number.isFinite(n) ? n : null
+}
+
+/** Count rooms that have a positive price. */
+export function countPricedRooms(rooms: HousingRoom[]): number {
+  return rooms.filter((room) => {
+    const n = asFiniteNumber(room.price)
+    return n != null && n > 0
+  }).length
+}
+
+/**
+ * Monthly net effective rent from gross + promotion.
+ * Free months: $4,000 × 11 / 12 = $3,667 (1 month free on a 12-month lease).
+ * Rent credit on a room: split equally across priced rooms.
+ * Unit-level (omit roomCount): the full rent credit applies to the unit.
+ * Either/or OP-or-free offers do not produce a net (returns null).
+ */
+export function calculateNetMonthlyPrice(
+  grossPrice: number | null | undefined,
+  promotion: HousingUnitPromotion | null | undefined,
+  { roomCount = null }: { roomCount?: number | null } = {},
+): number | null {
+  const gross = asFiniteNumber(grossPrice)
+  if (gross == null || gross <= 0 || !promotion || typeof promotion !== 'object') {
+    return null
+  }
+  if (promotion.opOrFree) return null
+
+  const freeMonth = asFiniteNumber(promotion.freeMonth) || 0
+  const rentCredit = asFiniteNumber(promotion.rentCredit) || 0
+  if (freeMonth <= 0 && rentCredit <= 0) return null
+
+  let leaseTerm = asFiniteNumber(promotion.leaseTerm)
+  if (leaseTerm == null || leaseTerm <= 0) leaseTerm = 12
+
+  let totalAmount = gross * leaseTerm
+  if (freeMonth > 0) totalAmount -= gross * freeMonth
+  if (rentCredit > 0) {
+    const n = asFiniteNumber(roomCount)
+    const creditToApply = n != null && n > 0 ? rentCredit / n : rentCredit
+    totalAmount -= creditToApply
+  }
+
+  const net = totalAmount / leaseTerm
+  if (!Number.isFinite(net)) return null
+  const rounded = Math.round(net)
+  if (rounded === Math.round(gross)) return null
+  return rounded
+}
+
+export function calculateLowestNetMonthlyPrice(
+  grossPrice: number | null | undefined,
+  promotions: HousingUnitPromotion[] | null | undefined,
+  opts: { roomCount?: number | null } = {},
+): number | null {
+  if (!Array.isArray(promotions) || promotions.length === 0) return null
+  let lowest: number | null = null
+  for (const promo of promotions) {
+    const net = calculateNetMonthlyPrice(grossPrice, promo, opts)
+    if (net != null && (lowest == null || net < lowest)) lowest = net
+  }
+  return lowest
+}
+
+function storedNetIfDifferent(
+  stored: number | null | undefined,
+  gross: number,
+): number | null {
+  const net = asFiniteNumber(stored)
+  if (net == null || net <= 0) return null
+  if (Math.round(net) === Math.round(gross)) return null
+  return Math.round(net)
+}
+
+export function getListingUnitNet(listing: HousingListing): number | null {
+  const gross = getListingUnitRent(listing)
+  const stored = storedNetIfDifferent(listing.unit.netPrice, gross)
+  if (stored != null) return stored
+  return calculateLowestNetMonthlyPrice(gross, listing.unit.promotions)
+}
+
+export function getHousingRoomNet(
+  listing: HousingListing,
+  room: HousingRoom,
+): number | null {
+  const stored = storedNetIfDifferent(room.netPrice, room.price)
+  if (stored != null) return stored
+  return calculateLowestNetMonthlyPrice(room.price, listing.unit.promotions, {
+    roomCount: countPricedRooms(getPricedRooms(listing)),
+  })
+}
+
 export function getListingPrimaryPromotion(
   listing: HousingListing,
 ): HousingUnitPromotion | null {
@@ -116,18 +259,24 @@ export function listingHasOP(listing: HousingListing): boolean {
 export function getListingCreditOffer(
   listing: HousingListing,
 ): HousingCreditOffer | null {
+  return getListingCreditOffers(listing)[0] ?? null
+}
+
+export function getListingCreditOffers(
+  listing: HousingListing,
+): HousingCreditOffer[] {
+  const offers: HousingCreditOffer[] = []
   for (const promo of listing.unit.promotions) {
     const freeMonth = Number(promo.freeMonth ?? 0)
-    const leaseTerm = Number(promo.leaseTerm ?? 0)
-    if (freeMonth > 0 && leaseTerm > 0 && !promo.opOrFree) {
-      return { kind: 'months-free', months: freeMonth }
+    if (freeMonth > 0 && !promo.opOrFree) {
+      offers.push({ kind: 'months-free', months: freeMonth })
     }
     const rentCredit = Number(promo.rentCredit ?? 0)
     if (rentCredit > 0) {
-      return { kind: 'dollar-credit', amount: rentCredit }
+      offers.push({ kind: 'dollar-credit', amount: rentCredit })
     }
   }
-  return null
+  return offers
 }
 
 export function getListingAvailableDate(listing: HousingListing): string {
@@ -213,9 +362,15 @@ function normalizeAmenityKey(value: string) {
   return value.trim().toLowerCase()
 }
 
+export function listingHasNoGuarantor(listing: HousingListing): boolean {
+  const guarantor = listing.property.incomeRequirements?.personalGuarantor
+  return guarantor === '0' || guarantor === 'none'
+}
+
 export function getListingDerivedPerks(listing: HousingListing): HousingPerkId[] {
   const perks = new Set<HousingPerkId>()
   if (listingHasOP(listing)) perks.add('no-broker-fee')
+  if (listingHasNoGuarantor(listing)) perks.add('no-guarantor')
   if (getListingCreditOffer(listing)) perks.add('free-credit')
   if (housingHasRoommateWaiting(listing)) perks.add('roommate-waiting')
 
