@@ -23,11 +23,12 @@ import {
   getListingCardBadges,
   getListingUtilityLabels,
   getListingDisplayAddress,
-  getListingImages,
   getListingUnitNet,
   getListingUnitRent,
   getListingAvailableDate,
   getListingYoutubeUrl,
+  getListingGalleryImages,
+  getListingLayoutImageIndex,
   getPricedRooms,
   getRoomSelectionKey,
   shouldShowListingRoomRows,
@@ -63,7 +64,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     roomParam: string | null
     roomKey: string
   } | null>(null)
-  const images = listing ? getListingImages(listing) : []
+  const images = listing ? getListingGalleryImages(listing) : []
   const {
     ref: galleryScrollRef,
     index: activeImage,
@@ -213,6 +214,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   const unitNet = getListingUnitNet(listing)
   const availableDate = getListingAvailableDate(listing)
   const youtubeUrl = getListingYoutubeUrl(listing)
+  const layoutIndex = getListingLayoutImageIndex(listing)
   const amenityLabels = getListingAmenityLabels(listing)
   const utilityLabels = getListingUtilityLabels(listing)
   const applianceLabels = getListingApplianceLabels(listing)
@@ -239,12 +241,12 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                 <div
                   ref={galleryScrollRef}
                   {...galleryPointerHandlers}
-                  className='flex h-full snap-x snap-proximity overflow-x-auto overflow-y-hidden overscroll-x-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+                  className='flex h-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
                 >
                   {images.map((src, index) => (
                     <div
                       key={`${src}-${index}`}
-                      className='relative h-full w-full min-w-full shrink-0 snap-start'
+                      className='relative h-full w-full min-w-full shrink-0 snap-start snap-always'
                     >
                       <Image
                         src={src}
@@ -286,7 +288,22 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                 </>
               )}
 
-              <div className='absolute bottom-3 right-3 z-10 flex items-center gap-1.5 sm:bottom-4 sm:right-4'>
+              <div className='absolute bottom-3 right-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center justify-end gap-1.5 sm:bottom-4 sm:right-4'>
+                {layoutIndex != null ? (
+                  <button
+                    type='button'
+                    onClick={() => goToGallery(layoutIndex)}
+                    className={cn(
+                      'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium touch-manipulation transition',
+                      activeImage === layoutIndex
+                        ? 'bg-white text-[var(--foreground)]'
+                        : 'bg-black/55 text-white hover:bg-black/70',
+                    )}
+                  >
+                    <LayoutPlanIcon className='size-3 shrink-0' />
+                    레이아웃
+                  </button>
+                ) : null}
                 {youtubeUrl ? (
                   <a
                     href={youtubeUrl}
@@ -698,6 +715,22 @@ function YoutubePlayIcon({ className }: { className?: string }) {
   return (
     <svg viewBox='0 0 24 24' fill='currentColor' className={className} aria-hidden>
       <path d='M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.2 3.5-6.2 3.5z' />
+    </svg>
+  )
+}
+
+function LayoutPlanIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='1.8'
+      className={className}
+      aria-hidden
+    >
+      <rect x='3.5' y='3.5' width='17' height='17' rx='1.5' />
+      <path strokeLinecap='round' d='M3.5 10.5h17M10.5 10.5v10' />
     </svg>
   )
 }

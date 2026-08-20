@@ -103,26 +103,52 @@ export function usePagedGallery(count: number, resetKey?: string) {
     const el = ref.current
     if (!el || count <= 1) return
 
-    function onScroll() {
-      markScrolling()
-      syncIndexFromScroll()
-    }
-
     function onScrollEnd() {
-      syncIndexFromScroll()
+      const node = ref.current
+      if (node) {
+        const width = node.clientWidth
+        if (width > 0) {
+          const next = Math.round(node.scrollLeft / width)
+          const clamped = Math.min(Math.max(next, 0), count - 1)
+          const target = clamped * width
+          if (Math.abs(node.scrollLeft - target) > 1) {
+            node.scrollTo({ left: target, behavior: 'smooth' })
+          }
+          if (clamped !== indexRef.current) {
+            indexRef.current = clamped
+            setIndex(clamped)
+          }
+        } else {
+          syncIndexFromScroll()
+        }
+      } else {
+        syncIndexFromScroll()
+      }
       window.clearTimeout(scrollIdleTimerRef.current)
       scrollIdleTimerRef.current = window.setTimeout(() => {
         swipingRef.current = false
       }, 80)
     }
 
-    el.addEventListener('scroll', onScroll, { passive: true })
+    // scrollend 미지원 브라우저용 폴백
+    let scrollEndFallback = 0
+    function onScrollFallback() {
+      markScrolling()
+      syncIndexFromScroll()
+      window.clearTimeout(scrollEndFallback)
+      scrollEndFallback = window.setTimeout(() => {
+        onScrollEnd()
+      }, 120)
+    }
+
+    el.addEventListener('scroll', onScrollFallback, { passive: true })
     el.addEventListener('scrollend', onScrollEnd)
 
     return () => {
-      el.removeEventListener('scroll', onScroll)
+      el.removeEventListener('scroll', onScrollFallback)
       el.removeEventListener('scrollend', onScrollEnd)
       window.clearTimeout(scrollIdleTimerRef.current)
+      window.clearTimeout(scrollEndFallback)
     }
   }, [count, markScrolling, syncIndexFromScroll])
 

@@ -73,7 +73,7 @@ export function HousingPostCard({
           <div
             ref={galleryRef}
             {...pointerHandlers}
-            className='flex h-full snap-x snap-proximity overflow-x-auto overflow-y-hidden overscroll-x-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+            className='flex h-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
           >
             {images.map((src, index) => (
               <Link
@@ -85,7 +85,7 @@ export function HousingPostCard({
                     swipingRef.current = false
                   }
                 }}
-                className='relative h-full w-full min-w-full shrink-0 overflow-hidden snap-start'
+                className='relative h-full w-full min-w-full shrink-0 overflow-hidden snap-start snap-always'
                 aria-label={`${displayAddress} 사진 ${index + 1}`}
               >
                 <Image

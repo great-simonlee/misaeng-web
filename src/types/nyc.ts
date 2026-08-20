@@ -73,6 +73,10 @@ export interface HousingUnit {
   rooms: HousingRoom[]
   promotions: HousingUnitPromotion[]
   images: string[]
+  /** ERP에서 업로드한 유닛 전체 레이아웃 (없으면 null) */
+  layoutImage?: string | null
+  /** 룸 타입별 레이아웃 이미지 URL */
+  roomLayouts?: Partial<Record<HousingRoomType, string>>
   youtubeUrl?: string | null
   listingUrl?: string | null
   /** 업로드 시 스냅샷 (없으면 beds/baths에서 파생) */

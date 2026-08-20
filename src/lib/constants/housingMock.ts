@@ -41,6 +41,8 @@ export {
   getListingUnitType,
   getListingAvailableDate,
   getListingYoutubeUrl,
+  getListingGalleryImages,
+  getListingLayoutImageIndex,
   getPricedRooms,
   getRoomSelectionKey,
   housingHasRoommateWaiting,

@@ -178,6 +178,21 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
       rooms,
       promotions: normalizePromotions(unitRaw.promotions),
       images: asStringArray(unitRaw.images),
+      layoutImage: String(unitRaw.layoutImage || '').trim() || null,
+      roomLayouts: (() => {
+        const raw = unitRaw.roomLayouts
+        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {}
+        const out: Partial<Record<HousingRoomType, string>> = {}
+        for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+          const type = (ROOM_TYPES.has(key)
+            ? key
+            : normalizeErpRoomType(key)) as HousingRoomType | null
+          const url = String(value || '').trim()
+          if (!type || !ROOM_TYPES.has(type) || !url) continue
+          out[type] = url
+        }
+        return out
+      })(),
       youtubeUrl: String(unitRaw.youtubeUrl || '').trim() || null,
       listingUrl: String(unitRaw.listingUrl || '').trim() || null,
       unitType: UNIT_TYPES.has(unitType)

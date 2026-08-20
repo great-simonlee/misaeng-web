@@ -113,6 +113,50 @@ export function getListingYoutubeUrl(listing: HousingListing): string | null {
   return listing.unit.youtubeUrl ?? null
 }
 
+export function getListingLayoutImage(listing: HousingListing): string | null {
+  const url = String(listing.unit.layoutImage || '').trim()
+  return url || null
+}
+
+/** 상세 갤러리: 사진 → 유닛 레이아웃 → 룸 레이아웃 */
+export function getListingGalleryImages(listing: HousingListing): string[] {
+  const photos = getListingImages(listing)
+  const layout = getListingLayoutImage(listing)
+  const roomLayoutEntries = Object.entries(listing.unit.roomLayouts || {})
+    .map(([type, url]) => ({
+      type: type as HousingRoomType,
+      url: String(url || '').trim(),
+    }))
+    .filter((item) => item.url)
+  const order = new Map(
+    HOUSING_ROOM_TYPE_ORDER.map((type, index) => [type, index]),
+  )
+  roomLayoutEntries.sort(
+    (a, b) => (order.get(a.type) ?? 99) - (order.get(b.type) ?? 99),
+  )
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const src of [
+    ...photos,
+    ...(layout ? [layout] : []),
+    ...roomLayoutEntries.map((item) => item.url),
+  ]) {
+    const key = src.trim()
+    if (!key || seen.has(key)) continue
+    seen.add(key)
+    out.push(key)
+  }
+  return out
+}
+
+/** 유닛 레이아웃이 갤러리에서 위치한 인덱스. 없으면 null */
+export function getListingLayoutImageIndex(listing: HousingListing): number | null {
+  const layout = getListingLayoutImage(listing)
+  if (!layout) return null
+  const index = getListingGalleryImages(listing).indexOf(layout)
+  return index >= 0 ? index : null
+}
+
 export function getListingUnitType(listing: HousingListing): HousingUnitType | null {
   if (listing.unit.unitType) return listing.unit.unitType
   return inferHousingUnitType(listing.unit.bedrooms, listing.unit.bathrooms)
