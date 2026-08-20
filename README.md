@@ -100,7 +100,9 @@ ID는 Vercel 대시보드 **Project Settings → General**의 Project ID, **Team
 | 워크플로 | `.github/workflows/vercel-preview.yml` | `.github/workflows/vercel-production.yml` |
 | 트리거 | `feature/ci_cd` push | `release/vX.Y.Z` push (`release/v1.0.0` 형식) |
 | 환경 | Vercel Preview 환경 변수 | Vercel Production 환경 변수 |
-| URL | 임시 Preview URL | 프로덕션 도메인 |
+| URL | 임시 Preview URL | 프로덕션 alias (도메인) |
+
+`--prod` 배포가 만든 **고유 URL**(`*.vercel.app` 해시 주소)은 Deployment Protection 때문에 Vercel 로그인이 필요합니다. 일반 사용자는 프로젝트에 연결된 **production alias**(예: `프로젝트명.vercel.app` 또는 커스텀 도메인)로 접속합니다.
 
 `main`에 푸시해도 프로덕션은 배포되지 않습니다.
 

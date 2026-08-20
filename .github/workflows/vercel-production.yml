@@ -20,7 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     if: startsWith(github.ref, 'refs/heads/release/v')
-    environment: production
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
     permissions:
       contents: read
 
@@ -52,10 +54,44 @@ jobs:
       - name: Deploy Production to Vercel
         id: deploy
         run: |
-          url="$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})"
-          echo "url=$url" >> "$GITHUB_OUTPUT"
-          echo "### Production URL" >> "$GITHUB_STEP_SUMMARY"
-          echo "$url" >> "$GITHUB_STEP_SUMMARY"
+          deployment_url="$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})"
+          echo "deployment_url=$deployment_url" >> "$GITHUB_OUTPUT"
 
-      - name: Print Production URL
+          alias_url=""
+          for _ in 1 2 3 4 5 6; do
+            inspect_json="$(vercel inspect "$deployment_url" --json --token=${{ secrets.VERCEL_TOKEN }})"
+            alias_url="$(printf '%s' "$inspect_json" | node -e '
+              let raw = ""
+              process.stdin.on("data", (chunk) => { raw += chunk })
+              process.stdin.on("end", () => {
+                const data = JSON.parse(raw)
+                const deploymentHost = String(data.url || "")
+                  .replace(/^https?:\/\//, "")
+                const aliases = (data.aliases || []).map((item) =>
+                  String(item).replace(/^https?:\/\//, "")
+                )
+                const custom = aliases.find((host) => !host.endsWith(".vercel.app"))
+                const stable = aliases.find((host) => host !== deploymentHost)
+                const host = custom || stable || aliases[0] || ""
+                process.stdout.write(host ? "https://" + host : "")
+              })
+            ')"
+            if [ -n "$alias_url" ]; then
+              break
+            fi
+            sleep 3
+          done
+
+          public_url="${alias_url:-$deployment_url}"
+          echo "url=$public_url" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Production Alias"
+            echo "$public_url"
+            echo
+            echo "배포 고유 URL은 Deployment Protection 때문에 로그인이 필요합니다. 일반 사용자는 위 alias로 접속하세요."
+            echo
+            echo "Deployment URL: $deployment_url"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Print Production Alias
         run: echo "${{ steps.deploy.outputs.url }}"
