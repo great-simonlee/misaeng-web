@@ -121,7 +121,8 @@ npm run release -- --release-as 1.0.0     # 버전을 직접 지정
 1. `package.json` 버전 bump, `CHANGELOG.md` 갱신
 2. `chore(release): vX.Y.Z` 커밋과 `vX.Y.Z` 태그 생성
 3. `release/vX.Y.Z` 브랜치를 origin에 푸시 (`--follow-tags`)
-4. Production 워크플로가 해당 브랜치를 배포
+4. 원래 작업 브랜치로 다시 체크아웃
+5. Production 워크플로가 해당 브랜치를 배포
 
 ## Supabase + AppConnect 설정
 
