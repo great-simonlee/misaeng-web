@@ -769,12 +769,8 @@ function ProfileImage({
   photoURL: string | null
   displayName: string
 }) {
-  const [failed, setFailed] = useState(false)
-  const show = Boolean(photoURL) && !failed
-
-  useEffect(() => {
-    setFailed(false)
-  }, [photoURL])
+  const [failedSrc, setFailedSrc] = useState<string | null>(null)
+  const show = Boolean(photoURL) && failedSrc !== photoURL
 
   return (
     <span className='relative inline-flex size-[5.5rem] shrink-0 overflow-hidden rounded-full bg-[#e8eaee] ring-4 ring-white shadow-[0_8px_24px_rgba(15,23,42,0.08)] lg:size-[6.25rem]'>
@@ -784,7 +780,7 @@ function ProfileImage({
           src={photoURL!}
           alt={`${displayName} 프로필`}
           className='size-full object-cover'
-          onError={() => setFailed(true)}
+          onError={() => setFailedSrc(photoURL)}
           referrerPolicy='no-referrer'
         />
       ) : (

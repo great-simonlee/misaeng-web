@@ -1,10 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
-import { getErrorMessage, useToast } from '@hooks/useToast'
 import {
   NYC_COMMUNITY_BOARD_META,
   type NycCommunityBoardId,
@@ -28,16 +27,14 @@ export function CommunityListScreen({
 }: CommunityListScreenProps) {
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const { user, loading: authLoading } = useAuth()
-  const { error: toastError } = useToast()
-  const [posts, setPosts] = useState<CommunityPost[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [posts] = useState<CommunityPost[]>([])
+  const [loading] = useState(false)
+  const [error] = useState<string | null>(null)
   // const configured = isFirebaseConfigured()
 
+  // 임시: 파이어베이스 커뮤니티 목록 조회 비활성화
+  /*
   useEffect(() => {
-    // 임시: 파이어베이스 커뮤니티 목록 조회 비활성화
-    setLoading(false)
-    /*
     if (!configured) {
       setLoading(false)
       return
@@ -60,8 +57,8 @@ export function CommunityListScreen({
     return () => {
       cancelled = true
     }
-    */
   }, [boardId])
+  */
 
   const newPath = `/nyc/${boardId}/new`
   const postHref = user ? newPath : `/nyc/login?next=${encodeURIComponent(newPath)}`

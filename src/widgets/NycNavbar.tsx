@@ -32,15 +32,16 @@ export function NycNavbar() {
   const accountRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const { user, loading, avatarURL, displayName, isMisaengUser } = useAuth()
+  const [navPath, setNavPath] = useState(pathname)
+  if (pathname !== navPath) {
+    setNavPath(pathname)
+    setMobileOpen(false)
+    setAccountOpen(false)
+  }
 
   useEffect(() => {
     setTimeout(() => setMounted(true), 0)
   }, [])
-
-  useEffect(() => {
-    setMobileOpen(false)
-    setAccountOpen(false)
-  }, [pathname])
 
   useEffect(() => {
     if (!mobileOpen) return
@@ -344,12 +345,8 @@ function ProfileAvatar({
   photoURL?: string | null
   displayName?: string | null
 }) {
-  const [imgFailed, setImgFailed] = useState(false)
-  const showPhoto = Boolean(photoURL) && !imgFailed
-
-  useEffect(() => {
-    setImgFailed(false)
-  }, [photoURL])
+  const [failedSrc, setFailedSrc] = useState<string | null>(null)
+  const showPhoto = Boolean(photoURL) && failedSrc !== photoURL
 
   return (
     <span className='relative inline-flex size-7 shrink-0 overflow-hidden rounded-full bg-[#f1f5f9]'>
@@ -361,7 +358,7 @@ function ProfileAvatar({
           width={28}
           height={28}
           className='size-full object-cover'
-          onError={() => setImgFailed(true)}
+          onError={() => setFailedSrc(photoURL ?? null)}
           referrerPolicy='no-referrer'
         />
       ) : (

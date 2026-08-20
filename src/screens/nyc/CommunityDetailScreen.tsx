@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
-import { getErrorMessage, useToast } from '@hooks/useToast'
+import { useToast } from '@hooks/useToast'
 import {
   NYC_COMMUNITY_BOARD_META,
   isAnonymousBoard,
@@ -30,20 +30,18 @@ interface CommunityDetailScreenProps {
 export function CommunityDetailScreen({
   boardId,
   title,
-  postId,
 }: CommunityDetailScreenProps) {
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const { user } = useAuth()
-  const { success, error: toastError } = useToast()
-  const [post, setPost] = useState<CommunityPost | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { error: toastError } = useToast()
+  const [post] = useState<CommunityPost | null>(null)
+  const [loading] = useState(false)
+  const [error] = useState<string | null>(null)
   // const configured = isFirebaseConfigured()
 
+  // 임시: 파이어베이스 커뮤니티 상세 조회 비활성화
+  /*
   useEffect(() => {
-    // 임시: 파이어베이스 커뮤니티 상세 조회 비활성화
-    setLoading(false)
-    /*
     if (!configured) {
       setLoading(false)
       return
@@ -66,8 +64,8 @@ export function CommunityDetailScreen({
     return () => {
       cancelled = true
     }
-    */
   }, [postId])
+  */
 
   async function handleClose() {
     if (!post || !user) return

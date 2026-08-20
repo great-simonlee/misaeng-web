@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { usePagedGallery } from '@hooks/usePagedGallery'
 import { useAuth } from '@hooks/useAuth'
-import { getErrorMessage, useToast } from '@hooks/useToast'
+import { useToast } from '@hooks/useToast'
 import {
   formatHousingCreditOfferLabel,
   formatHousingAvailableRange,
@@ -22,7 +22,7 @@ import { KAKAO_INQUIRY_URL } from '@lib/constants/nyc'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
 // import { closeHousingPost, getHousingPost } from '@lib/firebase/housing'
 import { cn } from '@lib'
-import type { HousingPost, HousingRoomOption } from '@/types/nyc'
+import type { HousingRoomOption } from '@/types/nyc'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import {
   PerkBadge,
@@ -30,7 +30,7 @@ import {
 } from '@widgets/nyc/HousingPostCard'
 import { HousingLocationMap } from '@widgets/nyc/HousingLocationMap'
 import { HousingRoommateIntro } from '@widgets/nyc/HousingRoommateIntro'
-import { LoadingState, SchoolBadge } from '@components'
+import { SchoolBadge } from '@components'
 
 interface HousingDetailScreenProps {
   postId: string
@@ -41,10 +41,12 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   const { success, error: toastError } = useToast()
   const searchParams = useSearchParams()
   const roomParam = searchParams.get('room')
-  const [post, setPost] = useState<HousingPost | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null)
+  const post = useMemo(() => getMockHousingPost(postId) ?? null, [postId])
+  const [userOption, setUserOption] = useState<{
+    postId: string
+    roomParam: string | null
+    optionId: string
+  } | null>(null)
   const {
     ref: galleryScrollRef,
     index: activeImage,
@@ -78,32 +80,17 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     goToGallery(index, { wrap: true })
   }
 
-  useEffect(() => {
-    setLoading(true)
-    setError(null)
-
-    const mock = getMockHousingPost(postId)
-    if (mock) {
-      setPost(mock)
-      setLoading(false)
-      return
-    }
-
-    // 임시: 파이어베이스 하우징 상세 조회 비활성화
-    setPost(null)
-    setLoading(false)
-  }, [postId])
-
   const roomOptions = useMemo(
     () => (post ? sortHousingRoomOptions(post.roomOptions) : []),
     [post],
   )
 
-  useEffect(() => {
-    if (!post) return
-    const fromQuery = roomOptions.find((option) => option.id === roomParam)
-    setSelectedOptionId(fromQuery?.id ?? roomOptions[0]?.id ?? null)
-  }, [post, roomParam, roomOptions])
+  const resolvedOptionId =
+    userOption?.postId === postId && userOption.roomParam === roomParam
+      ? userOption.optionId
+      : (roomOptions.find((option) => option.id === roomParam)?.id ??
+        roomOptions[0]?.id ??
+        null)
 
   useEffect(() => {
     updateThumbScrollHint()
@@ -142,13 +129,13 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   }, [activeImage])
 
   const selectedOption: HousingRoomOption | null = useMemo(() => {
-    if (!selectedOptionId) return roomOptions[0] ?? null
+    if (!resolvedOptionId) return roomOptions[0] ?? null
     return (
-      roomOptions.find((option) => option.id === selectedOptionId) ??
+      roomOptions.find((option) => option.id === resolvedOptionId) ??
       roomOptions[0] ??
       null
     )
-  }, [roomOptions, selectedOptionId])
+  }, [roomOptions, resolvedOptionId])
 
   async function handleClose() {
     if (!post || !user || post.id.startsWith('mock-')) return
@@ -183,18 +170,12 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     }
   }
 
-  if (loading) {
-    return <LoadingState fullPage />
-  }
-
-  if (error || !post || post.status === 'closed') {
+  if (!post || post.status === 'closed') {
     return (
       <div className='mx-auto max-w-3xl px-4 py-12'>
         <EmptyState
           title='게시글을 찾을 수 없습니다'
-          description={
-            error ?? '마감되었거나 삭제된 하우징 글일 수 있습니다.'
-          }
+          description='마감되었거나 삭제된 하우징 글일 수 있습니다.'
           actionHref='/nyc/housing'
           actionLabel='하우징 목록으로'
         />
@@ -423,7 +404,13 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                       <button
                         key={option.id}
                         type='button'
-                        onClick={() => setSelectedOptionId(option.id)}
+                        onClick={() =>
+                          setUserOption({
+                            postId,
+                            roomParam,
+                            optionId: option.id,
+                          })
+                        }
                         className={cn(
                           'flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-left touch-manipulation transition ring-1',
                           active

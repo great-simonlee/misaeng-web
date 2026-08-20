@@ -6,7 +6,6 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { LoadingState, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
-import { getErrorMessage, useToast } from '@hooks/useToast'
 import {
   getNycCategory,
   NYC_CATEGORIES,
@@ -39,11 +38,10 @@ type MyPostItem = {
 type CategoryFilter = 'all' | NycCategoryId
 
 export function MyPostsScreen() {
-  const { user, loading, configured } = useAuth()
-  const { error: toastError } = useToast()
+  const { user, loading } = useAuth()
   const router = useRouter()
-  const [posts, setPosts] = useState<MyPostItem[]>([])
-  const [loadingPosts, setLoadingPosts] = useState(true)
+  const [posts] = useState<MyPostItem[]>([])
+  const [loadingPosts] = useState(false)
   const [category, setCategory] = useState<CategoryFilter>('all')
 
   useEffect(() => {
@@ -53,10 +51,9 @@ export function MyPostsScreen() {
     }
   }, [user, loading, router])
 
+  // 임시: 파이어베이스 내 글 조회 비활성화
+  /*
   useEffect(() => {
-    // 임시: 파이어베이스 내 글 조회 비활성화
-    setLoadingPosts(false)
-    /*
     if (!user || !configured || !isFirebaseConfigured()) {
       setLoadingPosts(false)
       return
@@ -83,8 +80,8 @@ export function MyPostsScreen() {
     return () => {
       cancelled = true
     }
-    */
   }, [user, configured, toastError])
+  */
 
   const counts = useMemo(() => {
     const map = Object.fromEntries(

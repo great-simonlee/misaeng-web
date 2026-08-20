@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import { useMemo, useSyncExternalStore } from 'react'
 
 import {
   getLikedHousingIds,
-  isHousingLiked,
   subscribeHousingLikes,
   toggleHousingLike,
 } from '@lib/utils/housingLikes'
@@ -36,18 +35,12 @@ export function useHousingLikes() {
 }
 
 export function useHousingLike(postId: string) {
-  const [liked, setLiked] = useState(false)
+  const { isLiked, toggleLike } = useHousingLikes()
 
-  useEffect(() => {
-    setLiked(isHousingLiked(postId))
-    return subscribeHousingLikes(() => {
-      setLiked(isHousingLiked(postId))
-    })
-  }, [postId])
-
-  function toggle() {
-    setLiked(toggleHousingLike(postId))
+  return {
+    liked: isLiked(postId),
+    toggle: () => {
+      toggleLike(postId)
+    },
   }
-
-  return { liked, toggle }
 }

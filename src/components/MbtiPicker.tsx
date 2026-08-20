@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import { BottomSheet } from './BottomSheet'
 import {
@@ -53,13 +53,9 @@ export function MbtiPicker({
   const composedGroup = composed ? getMbtiGroupLabel(composed) : null
   const displayLabel = hasValue ? formatMbtiDisplay(selected) : '선택해 주세요'
 
-  useEffect(() => {
-    if (!open) return
-    setDraft(parseMbtiDimensions(value))
-  }, [open, value])
-
   function handleOpen() {
     if (disabled) return
+    setDraft(parseMbtiDimensions(value))
     setOpen(true)
   }
 

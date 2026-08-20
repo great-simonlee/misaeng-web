@@ -26,8 +26,6 @@ export function usePagedGallery(count: number, resetKey?: string) {
   const swipingRef = useRef(false)
   const restoreTimerRef = useRef<number>(0)
 
-  indexRef.current = index
-
   const goTo = useCallback(
     (next: number, options: PagedGalleryGoToOptions = {}) => {
       const el = ref.current
@@ -125,9 +123,17 @@ export function usePagedGallery(count: number, resetKey?: string) {
     if (start?.axis === 'x') goTo(start.index)
   }
 
-  useEffect(() => {
+  const [prevResetKey, setPrevResetKey] = useState(resetKey)
+  if (resetKey !== prevResetKey) {
+    setPrevResetKey(resetKey)
     setIndex(0)
-    indexRef.current = 0
+  }
+
+  useEffect(() => {
+    indexRef.current = index
+  }, [index])
+
+  useEffect(() => {
     const el = ref.current
     if (el) el.scrollTo({ left: 0 })
   }, [resetKey])
