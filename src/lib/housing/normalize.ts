@@ -21,8 +21,37 @@ const UNIT_TYPES = new Set([
 ])
 
 function asNumber(value: unknown, fallback = 0) {
-  const n = Number(value)
+  if (value == null || value === '') return fallback
+  const n =
+    typeof value === 'number'
+      ? value
+      : Number(String(value).replace(/[^0-9.-]/g, ''))
   return Number.isFinite(n) ? n : fallback
+}
+
+function normalizePromotions(value: unknown): HousingListing['unit']['promotions'] {
+  const list = Array.isArray(value) ? value : value && typeof value === 'object' ? [value] : []
+  return list
+    .filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object')
+    .map((item) => {
+      const freeMonth = asNumber(item.freeMonth, 0)
+      const rentCredit = asNumber(item.rentCredit, 0)
+      const leaseTerm = asNumber(item.leaseTerm, 0)
+      const opMonths = asNumber(item.opMonths, 0)
+      return {
+        hasOP: Boolean(item.hasOP),
+        opMonths: opMonths > 0 ? opMonths : undefined,
+        opBasis: item.opBasis === 'net' ? 'net' as const : item.opBasis === 'gross' ? 'gross' as const : undefined,
+        opOrFree: Boolean(item.opOrFree) || undefined,
+        opOrFreeFreeMonth:
+          asNumber(item.opOrFreeFreeMonth, 0) > 0
+            ? asNumber(item.opOrFreeFreeMonth, 0)
+            : undefined,
+        freeMonth: freeMonth > 0 ? freeMonth : undefined,
+        leaseTerm: leaseTerm > 0 ? leaseTerm : undefined,
+        rentCredit: rentCredit > 0 ? rentCredit : undefined,
+      }
+    })
 }
 
 function asStringArray(value: unknown): string[] {
@@ -134,12 +163,7 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
       availableDate: String(unitRaw.availableDate || '').trim() || null,
       available: unitRaw.available !== false,
       rooms,
-      promotions: Array.isArray(unitRaw.promotions)
-        ? unitRaw.promotions.filter(
-            (item): item is HousingListing['unit']['promotions'][number] =>
-              Boolean(item) && typeof item === 'object',
-          )
-        : [],
+      promotions: normalizePromotions(unitRaw.promotions),
       images: asStringArray(unitRaw.images),
       youtubeUrl: String(unitRaw.youtubeUrl || '').trim() || null,
       listingUrl: String(unitRaw.listingUrl || '').trim() || null,

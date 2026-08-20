@@ -50,13 +50,21 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   const { success, error: toastError } = useToast()
   const searchParams = useSearchParams()
   const roomParam = searchParams.get('room')
+  const isMockId = postId.startsWith('mock-')
   const mockListing = useMemo(
     () => getMockHousingListing(postId) ?? null,
     [postId],
   )
-  const [liveListing, setLiveListing] = useState<HousingListing | null>(null)
-  const [loadingLive, setLoadingLive] = useState(!postId.startsWith('mock-'))
-  const listing = liveListing ?? mockListing
+  const [fetched, setFetched] = useState<{
+    id: string
+    listing: HousingListing | null
+  } | null>(null)
+  const listing = isMockId
+    ? mockListing
+    : fetched?.id === postId
+      ? fetched.listing
+      : null
+  const loadingLive = !isMockId && fetched?.id !== postId
   const [userRoomKey, setUserRoomKey] = useState<{
     postId: string
     roomParam: string | null
@@ -73,25 +81,16 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   const [thumbEdge, setThumbEdge] = useState({ left: false, right: false })
 
   useEffect(() => {
+    if (isMockId) return
     let cancelled = false
-    if (postId.startsWith('mock-')) {
-      setLiveListing(null)
-      setLoadingLive(false)
-      return
-    }
-    setLoadingLive(true)
-    void fetchHousingListing(postId)
-      .then((next) => {
-        if (cancelled) return
-        setLiveListing(next)
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingLive(false)
-      })
+    void fetchHousingListing(postId).then((next) => {
+      if (cancelled) return
+      setFetched({ id: postId, listing: next })
+    })
     return () => {
       cancelled = true
     }
-  }, [postId])
+  }, [isMockId, postId])
 
   function updateThumbScrollHint() {
     const el = thumbScrollRef.current
@@ -238,7 +237,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   const showRoomRows = shouldShowListingRoomRows(listing)
   const mailSubject = encodeURIComponent(`[Misaeng Housing] ${displayAddress}`)
   const mailHref = `mailto:${listing.contactEmail}?subject=${mailSubject}`
-  const { property, unit } = listing
+  const { unit } = listing
 
   return (
     <div className='flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_48%,#ffffff_100%)]'>

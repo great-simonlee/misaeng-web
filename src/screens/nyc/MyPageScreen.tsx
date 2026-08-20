@@ -80,7 +80,6 @@ export function MyPageScreen() {
     sessionLoading,
     logout,
     isMisaengUser,
-    configured,
     avatarURL,
     displayName,
     nickname,

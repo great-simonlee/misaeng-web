@@ -37,7 +37,7 @@ export function MyLikesScreen() {
   const router = useRouter()
   const { likedIds } = useHousingLikes()
   const [remotePosts, setRemotePosts] = useState<HousingPost[]>([])
-  const [loadingRemote, setLoadingRemote] = useState(false)
+  const [loadingRemote] = useState(false)
   const [category, setCategory] = useState<CategoryFilter>('all')
   const likedKey = likedIds.join('|')
 

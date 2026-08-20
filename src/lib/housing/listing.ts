@@ -5,10 +5,8 @@ import type {
   HousingProperty,
   HousingRoom,
   HousingRoomType,
-  HousingUnit,
   HousingUnitPromotion,
   HousingUnitType,
-  HousingRoommateWaiting,
 } from '@/types/nyc'
 
 /** ERP 룸 타입 라벨 → 내부 enum */
@@ -267,11 +265,11 @@ export function getListingCreditOffers(
 ): HousingCreditOffer[] {
   const offers: HousingCreditOffer[] = []
   for (const promo of listing.unit.promotions) {
-    const freeMonth = Number(promo.freeMonth ?? 0)
+    const freeMonth = asFiniteNumber(promo.freeMonth) ?? 0
     if (freeMonth > 0 && !promo.opOrFree) {
       offers.push({ kind: 'months-free', months: freeMonth })
     }
-    const rentCredit = Number(promo.rentCredit ?? 0)
+    const rentCredit = asFiniteNumber(promo.rentCredit) ?? 0
     if (rentCredit > 0) {
       offers.push({ kind: 'dollar-credit', amount: rentCredit })
     }

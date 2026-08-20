@@ -111,13 +111,6 @@ function mapProfile(uid: string, email: string, raw: Record<string, unknown> | n
   }
 }
 
-function profileFromAuthUser(user: AuthUser): NycUserProfile {
-  return mapProfile(user.uid, user.email, {
-    name: user.displayName,
-    photoURL: user.photoURL,
-    phone: user.phoneNumber,
-  })
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)

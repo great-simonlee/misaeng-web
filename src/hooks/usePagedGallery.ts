@@ -87,7 +87,6 @@ export function usePagedGallery(count: number, resetKey?: string) {
   if (resetKey !== prevResetKey) {
     setPrevResetKey(resetKey)
     setIndex(0)
-    indexRef.current = 0
   }
 
   useEffect(() => {
@@ -98,8 +97,6 @@ export function usePagedGallery(count: number, resetKey?: string) {
     const el = ref.current
     if (!el) return
     el.scrollTo({ left: 0 })
-    indexRef.current = 0
-    setIndex(0)
   }, [resetKey])
 
   useEffect(() => {

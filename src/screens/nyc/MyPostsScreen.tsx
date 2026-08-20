@@ -345,3 +345,5 @@ function mapCommunity(posts: CommunityPost[]): MyPostItem[] {
     }
   })
 }
+
+export { mapHousing, mapCommunity }
