@@ -5,13 +5,10 @@ import {
   getListingUnitRent,
   getListingUnitType,
   getPricedRooms,
-  inferHousingUnitType,
-  mapAmenityStringToPerkId,
 } from '@lib/housing/listing'
 import type {
   HousingListing,
   HousingPerkId,
-  HousingRoom,
   HousingRoomType,
   HousingRoommateAffiliation,
   HousingRoommateComposition,

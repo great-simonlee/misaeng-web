@@ -141,7 +141,6 @@ export function HousingListScreen() {
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
     void fetchHousingListings().then((listings) => {
       if (cancelled) return
       setPosts(listings)
