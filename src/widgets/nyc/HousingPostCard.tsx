@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { type MouseEvent } from 'react'
 
-import { SchoolBadge } from '@components'
+import { HousingPricePair, SchoolBadge } from '@components'
 import { useHousingLike } from '@hooks/useHousingLikes'
 import { usePagedGallery } from '@hooks/usePagedGallery'
 import {
@@ -161,24 +161,19 @@ export function HousingPostCard({
           href={`/nyc/housing/${listing.id}`}
           className='flex flex-col gap-1 touch-manipulation sm:gap-0.5'
         >
-          <div className='flex min-w-0 items-center gap-2'>
+          <div className='flex min-h-[2rem] min-w-0 items-center gap-2 sm:min-h-[1.75rem]'>
             <div className='flex min-w-0 flex-1 items-center gap-1.5'>
               <h3 className='min-w-0 flex-1 truncate text-[15px] font-semibold leading-snug tracking-tight text-[var(--foreground)] sm:text-[13px]'>
                 {displayAddress}
               </h3>
               <SchoolBadge schoolId={listing.authorSchoolId} />
             </div>
-            <div className='shrink-0 text-right'>
-              <p className='text-[15px] font-semibold leading-snug tabular-nums tracking-tight text-[var(--foreground)] sm:text-[13px]'>
-                ${unitRent.toLocaleString()}
-                <span className='font-medium text-[var(--muted)]'>/월</span>
-              </p>
-              {unitNet != null ? (
-                <p className='text-[12px] font-medium tabular-nums text-[var(--muted)] sm:text-[11px]'>
-                  ${unitNet.toLocaleString()}
-                </p>
-              ) : null}
-            </div>
+            <HousingPricePair
+              gross={unitRent}
+              net={unitNet}
+              size='md'
+              className='shrink-0'
+            />
           </div>
           <p className='truncate text-[13px] text-[var(--muted-foreground)] sm:text-[12px]'>
             {area}
@@ -235,17 +230,12 @@ function RoomOptionRow({
         <span className='min-w-0 truncate text-[13px] font-medium text-[var(--foreground)] sm:text-[12px]'>
           {getHousingRoomLabel(room)}
         </span>
-        <span className='text-[13px] font-semibold tabular-nums text-[var(--foreground)] sm:text-[12px]'>
-          ${room.price.toLocaleString()}
-          {net != null ? (
-            <span className='font-medium text-[var(--muted)]'>
-              {' '}
-              / ${net.toLocaleString()}
-            </span>
-          ) : (
-            <span className='font-medium text-[var(--muted)]'>/월</span>
-          )}
-        </span>
+        <HousingPricePair
+          gross={room.price}
+          net={net}
+          size='sm'
+          className='shrink-0'
+        />
       </Link>
     </li>
   )

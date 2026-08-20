@@ -6,6 +6,7 @@ import {
   getListingUnitType,
   getPricedRooms,
   inferHousingUnitType,
+  mapAmenityStringToPerkId,
 } from '@lib/housing/listing'
 import type {
   HousingListing,
@@ -54,6 +55,7 @@ export {
   housingMatchesRoomType,
   inferHousingUnitType,
   listingHasOP,
+  mapAmenityStringToPerkId,
   sortHousingRooms,
 } from '@lib/housing/listing'
 
@@ -132,6 +134,84 @@ export const HOUSING_PERKS: {
   { id: 'work-study', label: '업무 및 공부 공간' },
   { id: 'sauna', label: '사우나' },
 ]
+
+export const HOUSING_UTILITY_LABELS: Record<string, string> = {
+  heat: '난방',
+  'hot water': '온수',
+  gas: '가스',
+  electricity: '전기',
+  water: '수도',
+  sewer: '하수',
+}
+
+export function formatHousingUtilityLabel(value: string): string {
+  return HOUSING_UTILITY_LABELS[value.trim().toLowerCase()] ?? value.trim()
+}
+
+export const HOUSING_AMENITY_LABELS: Record<string, string> = {
+  '24-hour attended lobby': '24h 도어맨',
+  'concierge service': '컨시어지',
+  elevator: '엘리베이터',
+  'fitness center': '헬스장',
+  'mail room': '메일룸',
+  'laundry room': '세탁실',
+  'resident lounge': '라운지',
+  'rooftop outdoor space': '옥상실외공간',
+  'rooftop lounge': '옥상 라운지',
+  'pet friendly': '반려동물가능',
+  'garage parking': '주차장',
+  sauna: '사우나',
+  pool: '수영장',
+  'swimming pool': '수영장',
+  'indoor pool': '실내수영장',
+  'outdoor pool': '실외수영장',
+  'working space': '공부/업무 공간',
+  'business meeting room': '미팅룸',
+  'pilates studio': '필라테스',
+  'yoga studio': '요가룸',
+  'recovery room': '회복실',
+  'indoor basketball court': '실내 농구장',
+  'indoor pickleball court': '실내 피클볼',
+  'indoor golf simulator': '스크린 골프',
+  'bowling alley': '볼링장',
+  'poker room': '포커룸',
+  'billiards room': '당구장',
+  'arcade room': '게임룸',
+  'ping pong table': '탁구대',
+  'tennis courts': '테니스 코트',
+  'bbq grills': 'BBQ 그릴',
+  'bbq grill': 'BBQ 그릴',
+  sundeck: '실외 공간',
+  'dog run': '강아지 산책',
+  "children's playroom": '놀이방',
+  'media room': '영화관',
+  garden: '정원',
+  'bike room': '자전거 보관',
+  'storage space': '창고',
+  'valet service': '주차 서비스',
+  'live-in super': '수리공',
+  'wheelchair access': '휠체어 가능',
+  'indoor squash court': '실내 스쿼시',
+}
+
+export function formatHousingAmenityLabel(value: string): string | null {
+  return HOUSING_AMENITY_LABELS[value.trim().toLowerCase()] ?? null
+}
+
+export const HOUSING_APPLIANCE_LABELS: Record<string, string> = {
+  dishwasher: '식기세척기',
+  microwave: '전자레인지',
+  oven: '오븐',
+  refrigerator: '냉장고',
+  washer: '세탁기',
+  dryer: '건조기',
+  'air conditioning': '에어컨',
+  'in-unit washer': '세탁기',
+}
+
+export function formatHousingApplianceLabel(value: string): string {
+  return HOUSING_APPLIANCE_LABELS[value.trim().toLowerCase()] ?? value.trim()
+}
 
 export const HOUSING_BENEFIT_PERKS: HousingPerkId[] = [
   'roommate-waiting',
@@ -760,6 +840,26 @@ export function getListingAmenityPerks(listing: HousingListing): HousingPerkId[]
   return getListingDerivedPerks(listing).filter((perk) =>
     HOUSING_AMENITY_PERKS.includes(perk),
   )
+}
+
+export function getListingAmenityLabels(listing: HousingListing): string[] {
+  const labels: string[] = []
+  const seen = new Set<string>()
+
+  function add(label: string) {
+    const trimmed = label.trim()
+    if (!trimmed) return
+    const key = trimmed.toLowerCase()
+    if (seen.has(key)) return
+    seen.add(key)
+    labels.push(trimmed)
+  }
+
+  for (const item of listing.property.amenities) {
+    const label = formatHousingAmenityLabel(item)
+    if (label) add(label)
+  }
+  return labels
 }
 
 export function shouldShowListingRoomRows(listing: HousingListing): boolean {

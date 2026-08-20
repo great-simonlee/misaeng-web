@@ -360,6 +360,10 @@ function normalizeAmenityKey(value: string) {
   return value.trim().toLowerCase()
 }
 
+export function mapAmenityStringToPerkId(value: string): HousingPerkId | null {
+  return AMENITY_STRING_TO_PERK[normalizeAmenityKey(value)] ?? null
+}
+
 export function listingHasNoGuarantor(listing: HousingListing): boolean {
   const guarantor = listing.property.incomeRequirements?.personalGuarantor
   return guarantor === '0' || guarantor === 'none'

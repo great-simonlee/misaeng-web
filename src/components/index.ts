@@ -10,6 +10,7 @@ export {
 } from './LoadingSpinner'
 export { Skeleton, SkeletonCircle } from './Skeleton'
 export { SchoolBadge } from './SchoolBadge'
+export { HousingPricePair } from './HousingPricePair'
 export { BottomSheet } from './BottomSheet'
 export { MbtiPicker } from './MbtiPicker'
 export {
