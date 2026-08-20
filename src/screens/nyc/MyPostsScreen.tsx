@@ -16,7 +16,11 @@ import { cn } from '@lib'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
 // import { listCommunityPostsByAuthor } from '@lib/firebase/community'
 // import { listHousingPostsByAuthor } from '@lib/firebase/housing'
-import { getHousingUnitRent } from '@lib/constants/housingMock'
+import {
+  getHousingUnitRent,
+  getListingArea,
+  getListingDisplayAddress,
+} from '@lib/constants/housingMock'
 import type { CommunityPost, HousingPost } from '@/types/nyc'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
 import {
@@ -308,8 +312,8 @@ export function MyPostsScreen() {
 function mapHousing(posts: HousingPost[]): MyPostItem[] {
   return posts.map((post) => ({
     id: post.id,
-    title: post.title,
-    meta: `${post.neighborhood} · $${getHousingUnitRent(post).toLocaleString()}/월`,
+    title: getListingDisplayAddress(post),
+    meta: `${getListingArea(post)} · $${getHousingUnitRent(post).toLocaleString()}/월`,
     href: `/nyc/housing/${post.id}`,
     categoryId: 'housing',
     boardLabel: '하우징',

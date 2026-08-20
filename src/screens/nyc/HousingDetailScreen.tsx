@@ -9,25 +9,37 @@ import { usePagedGallery } from '@hooks/usePagedGallery'
 import { useAuth } from '@hooks/useAuth'
 import { useToast } from '@hooks/useToast'
 import {
+  formatHousingAvailableDate,
   formatHousingCreditOfferLabel,
-  formatHousingAvailableRange,
-  getHousingRoomOptionLabel,
+  formatListingBedBath,
+  formatListingPromotionSummary,
+  formatPropertyAmenityFee,
+  formatPropertyIncomeRequirements,
+  findListingRoomByKey,
+  getHousingRoomLabel,
   getHousingUnitTypeLabel,
-  getMockHousingPost,
-  HOUSING_AMENITY_PERKS,
-  HOUSING_BENEFIT_PERKS,
-  sortHousingRoomOptions,
+  getListingAmenityPerks,
+  getListingArea,
+  getListingBenefitPerks,
+  getListingCreditOffer,
+  getListingDisplayAddress,
+  getListingImages,
+  getListingStreetAddress,
+  getListingUnitRent,
+  getListingUnitType,
+  getListingAvailableDate,
+  getListingYoutubeUrl,
+  getMockHousingListing,
+  getPricedRooms,
+  getRoomSelectionKey,
+  shouldShowListingRoomRows,
+  sortHousingRooms,
 } from '@lib/constants/housingMock'
 import { KAKAO_INQUIRY_URL } from '@lib/constants/nyc'
-// import { isFirebaseConfigured } from '@lib/firebase/client'
-// import { closeHousingPost, getHousingPost } from '@lib/firebase/housing'
 import { cn } from '@lib'
-import type { HousingRoomOption } from '@/types/nyc'
+import type { HousingListing, HousingRoom } from '@/types/nyc'
 import { EmptyState } from '@widgets/nyc/EmptyState'
-import {
-  PerkBadge,
-  RoommateCompositionBadge,
-} from '@widgets/nyc/HousingPostCard'
+import { PerkBadge } from '@widgets/nyc/HousingPostCard'
 import { HousingLocationMap } from '@widgets/nyc/HousingLocationMap'
 import { HousingRoommateIntro } from '@widgets/nyc/HousingRoommateIntro'
 import { SchoolBadge } from '@components'
@@ -41,21 +53,21 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   const { success, error: toastError } = useToast()
   const searchParams = useSearchParams()
   const roomParam = searchParams.get('room')
-  const post = useMemo(() => getMockHousingPost(postId) ?? null, [postId])
-  const [userOption, setUserOption] = useState<{
+  const listing = useMemo(() => getMockHousingListing(postId) ?? null, [postId])
+  const [userRoomKey, setUserRoomKey] = useState<{
     postId: string
     roomParam: string | null
-    optionId: string
+    roomKey: string
   } | null>(null)
+  const images = listing ? getListingImages(listing) : []
   const {
     ref: galleryScrollRef,
     index: activeImage,
     goTo: goToGallery,
     pointerHandlers: galleryPointerHandlers,
-  } = usePagedGallery(post?.images.length ?? 0, postId)
+  } = usePagedGallery(images.length, postId)
   const thumbScrollRef = useRef<HTMLDivElement>(null)
   const [thumbEdge, setThumbEdge] = useState({ left: false, right: false })
-  // const configured = isFirebaseConfigured()
 
   function updateThumbScrollHint() {
     const el = thumbScrollRef.current
@@ -80,17 +92,27 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     goToGallery(index, { wrap: true })
   }
 
-  const roomOptions = useMemo(
-    () => (post ? sortHousingRoomOptions(post.roomOptions) : []),
-    [post],
-  )
+  const roomRows = useMemo(() => {
+    if (!listing) return []
+    return sortHousingRooms(getPricedRooms(listing))
+  }, [listing])
 
-  const resolvedOptionId =
-    userOption?.postId === postId && userOption.roomParam === roomParam
-      ? userOption.optionId
-      : (roomOptions.find((option) => option.id === roomParam)?.id ??
-        roomOptions[0]?.id ??
-        null)
+  const resolvedRoomKey = useMemo(() => {
+    if (
+      userRoomKey?.postId === postId &&
+      userRoomKey.roomParam === roomParam
+    ) {
+      return userRoomKey.roomKey
+    }
+    if (!listing) return null
+    const fromQuery = findListingRoomByKey(listing, roomParam)
+    if (fromQuery) {
+      const index = roomRows.findIndex((room) => room === fromQuery)
+      return getRoomSelectionKey(fromQuery, index >= 0 ? index : 0)
+    }
+    const first = roomRows[0]
+    return first ? getRoomSelectionKey(first, 0) : null
+  }, [listing, postId, roomParam, roomRows, userRoomKey])
 
   useEffect(() => {
     updateThumbScrollHint()
@@ -103,7 +125,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
       ro.disconnect()
       window.removeEventListener('resize', updateThumbScrollHint)
     }
-  }, [post?.id, post?.images.length])
+  }, [listing?.id, images.length])
 
   useEffect(() => {
     const el = thumbScrollRef.current
@@ -128,28 +150,19 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     updateThumbScrollHint()
   }, [activeImage])
 
-  const selectedOption: HousingRoomOption | null = useMemo(() => {
-    if (!resolvedOptionId) return roomOptions[0] ?? null
-    return (
-      roomOptions.find((option) => option.id === resolvedOptionId) ??
-      roomOptions[0] ??
-      null
-    )
-  }, [roomOptions, resolvedOptionId])
+  const selectedRoom: HousingRoom | null = useMemo(() => {
+    if (!listing) return null
+    if (resolvedRoomKey) {
+      return (
+        findListingRoomByKey(listing, resolvedRoomKey) ?? roomRows[0] ?? null
+      )
+    }
+    return roomRows[0] ?? null
+  }, [listing, roomRows, resolvedRoomKey])
 
   async function handleClose() {
-    if (!post || !user || post.id.startsWith('mock-')) return
-    // 임시: 파이어베이스 마감 비활성화
+    if (!listing || !user || listing.id.startsWith('mock-')) return
     toastError('Supabase 연동 후 이용할 수 있어요')
-    /*
-    try {
-      await closeHousingPost(post.id)
-      setPost({ ...post, status: 'closed' })
-      success('게시글을 마감했어요')
-    } catch (err) {
-      toastError(getErrorMessage(err, '마감에 실패했어요'))
-    }
-    */
   }
 
   function handleKakaoInquiry() {
@@ -170,7 +183,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     }
   }
 
-  if (!post || post.status === 'closed') {
+  if (!listing || listing.status === 'closed') {
     return (
       <div className='mx-auto max-w-3xl px-4 py-12'>
         <EmptyState
@@ -183,24 +196,27 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     )
   }
 
-  const isAuthor = user?.uid === post.authorUid && !post.id.startsWith('mock-')
-  const images = post.images
-  const unitTypeLabel = post.unitType
-    ? getHousingUnitTypeLabel(post.unitType)
-    : '미정'
-  const benefitPerks = post.perks.filter(
-    (perk) =>
-      HOUSING_BENEFIT_PERKS.includes(perk) &&
-      perk !== 'free-credit' &&
-      perk !== 'roommate-waiting',
-  )
-  const amenityPerks = post.perks.filter((perk) =>
-    HOUSING_AMENITY_PERKS.includes(perk),
-  )
-  const hasBenefits = benefitPerks.length > 0 || Boolean(post.creditOffer)
+  const isAuthor =
+    user?.uid === listing.authorUid && !listing.id.startsWith('mock-')
+  const displayAddress = getListingDisplayAddress(listing)
+  const streetAddress = getListingStreetAddress(listing)
+  const area = getListingArea(listing)
+  const unitRent = getListingUnitRent(listing)
+  const unitType = getListingUnitType(listing)
+  const unitTypeLabel = unitType ? getHousingUnitTypeLabel(unitType) : '미정'
+  const availableDate = getListingAvailableDate(listing)
+  const youtubeUrl = getListingYoutubeUrl(listing)
+  const benefitPerks = getListingBenefitPerks(listing)
+  const amenityPerks = getListingAmenityPerks(listing)
+  const creditOffer = getListingCreditOffer(listing)
+  const promotionLabels = formatListingPromotionSummary(listing)
+  const hasBenefits =
+    benefitPerks.length > 0 || Boolean(creditOffer) || promotionLabels.length > 0
   const hasAmenities = amenityPerks.length > 0
-  const mailSubject = encodeURIComponent(`[Misaeng Housing] ${post.title}`)
-  const mailHref = `mailto:${post.contactEmail}?subject=${mailSubject}`
+  const showRoomRows = shouldShowListingRoomRows(listing)
+  const mailSubject = encodeURIComponent(`[Misaeng Housing] ${displayAddress}`)
+  const mailHref = `mailto:${listing.contactEmail}?subject=${mailSubject}`
+  const { property, unit } = listing
 
   return (
     <div className='flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_48%,#ffffff_100%)]'>
@@ -210,7 +226,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             하우징
           </Link>
           {' / '}
-          {post.neighborhood}
+          {area}
         </p>
 
         <div className='mt-4 grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-10'>
@@ -267,9 +283,9 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               )}
 
               <div className='absolute bottom-3 right-3 z-10 flex items-center gap-1.5 sm:bottom-4 sm:right-4'>
-                {post.youtubeUrl ? (
+                {youtubeUrl ? (
                   <a
-                    href={post.youtubeUrl}
+                    href={youtubeUrl}
                     target='_blank'
                     rel='noopener noreferrer'
                     className='inline-flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-medium text-white touch-manipulation transition hover:bg-black/70'
@@ -362,54 +378,74 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               </div>
             )}
 
-            {/* 데스크톱: 사진 아래 룸메이트 소개 + 지도 */}
             <div className='mt-6 hidden space-y-4 lg:block'>
-              {post.roommateWaiting && (
-                <HousingRoommateIntro roommate={post.roommateWaiting} />
+              {listing.roommateWaiting && (
+                <HousingRoommateIntro roommate={listing.roommateWaiting} />
               )}
+              <HousingPropertySection listing={listing} />
               <HousingLocationMap
-                address={post.title}
-                neighborhood={post.neighborhood}
+                address={streetAddress}
+                neighborhood={area}
+                latitude={property.latitude}
+                longitude={property.longitude}
               />
             </div>
           </div>
 
           <div className='min-w-0 lg:pt-1'>
             <div className='flex flex-wrap items-center gap-2'>
-              <h1 className='min-w-0 truncate text-[1.5rem] font-bold leading-snug tracking-tight text-[var(--foreground)] sm:text-[1.85rem]'>
-                {post.title}
+              <h1 className='min-w-0 text-[1.5rem] font-bold leading-snug tracking-tight text-[var(--foreground)] sm:text-[1.85rem]'>
+                {displayAddress}
               </h1>
-              <SchoolBadge schoolId={post.authorSchoolId} />
+              {listing.authorSchoolId ? (
+                <SchoolBadge schoolId={listing.authorSchoolId} />
+              ) : null}
             </div>
 
+            {unit.unitNumber ? (
+              <p className='mt-1 text-[13px] font-medium text-[var(--muted)]'>
+                Unit {unit.unitNumber}
+              </p>
+            ) : null}
+
             <p className='mt-3 text-[1.35rem] font-semibold tracking-tight text-[#F64310]'>
-              ${post.unitRent.toLocaleString()}
+              ${unitRent.toLocaleString()}
               <span className='text-base font-medium text-[#F64310]/75'>
                 /월
               </span>
               <span className='ml-2 text-[13px] font-medium text-[var(--muted)]'>
-                · 유닛 전체
+                · 그로스 · {formatListingBedBath(listing)}
               </span>
             </p>
 
-            {roomOptions.length > 1 && (
+            {promotionLabels.length > 0 && (
+              <div className='mt-2 flex flex-wrap gap-1.5'>
+                {promotionLabels.map((label) => (
+                  <span
+                    key={label}
+                    className='inline-flex rounded-full bg-[#fff5f2] px-2.5 py-1 text-[12px] font-semibold text-[#F64310]'
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {showRoomRows && (
               <div className='mt-4'>
                 <p className='text-[12px] font-semibold text-[var(--muted)]'>
                   룸 옵션
                 </p>
                 <div className='mt-2 space-y-1.5'>
-                  {roomOptions.map((option) => {
-                    const active = option.id === selectedOption?.id
+                  {roomRows.map((room, index) => {
+                    const roomKey = getRoomSelectionKey(room, index)
+                    const active = roomKey === resolvedRoomKey
                     return (
                       <button
-                        key={option.id}
+                        key={roomKey}
                         type='button'
                         onClick={() =>
-                          setUserOption({
-                            postId,
-                            roomParam,
-                            optionId: option.id,
-                          })
+                          setUserRoomKey({ postId, roomParam, roomKey })
                         }
                         className={cn(
                           'flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-left touch-manipulation transition ring-1',
@@ -420,29 +456,16 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                       >
                         <span className='min-w-0'>
                           <span className='block text-[14px] font-semibold text-[var(--foreground)]'>
-                            {getHousingRoomOptionLabel(option)}
+                            {getHousingRoomLabel(room)}
                           </span>
                           <span className='mt-0.5 block text-[12px] text-[var(--muted)]'>
-                            입주{' '}
-                            {formatHousingAvailableRange(
-                              option.availableFrom,
-                              option.availableTo,
-                            ) || '미정'}
+                            입주 {formatHousingAvailableDate(availableDate) || '미정'}
                           </span>
                         </span>
-                        <span className='flex shrink-0 flex-col items-end gap-1'>
-                          {option.roommateWaiting &&
-                            option.roommateComposition && (
-                              <RoommateCompositionBadge
-                                composition={option.roommateComposition}
-                                compact
-                              />
-                            )}
-                          <span className='text-[14px] font-semibold tabular-nums text-[var(--foreground)]'>
-                            ${option.rent.toLocaleString()}
-                            <span className='font-medium text-[var(--muted)]'>
-                              /월
-                            </span>
+                        <span className='text-[14px] font-semibold tabular-nums text-[var(--foreground)]'>
+                          ${room.price.toLocaleString()}
+                          <span className='font-medium text-[var(--muted)]'>
+                            /월
                           </span>
                         </span>
                       </button>
@@ -452,9 +475,9 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               </div>
             )}
 
-            {post.roommateWaiting && (
+            {listing.roommateWaiting && (
               <div className='mt-4 lg:hidden'>
-                <HousingRoommateIntro roommate={post.roommateWaiting} />
+                <HousingRoommateIntro roommate={listing.roommateWaiting} />
               </div>
             )}
 
@@ -469,11 +492,9 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                       {benefitPerks.map((perk) => (
                         <PerkBadge key={perk} perk={perk} />
                       ))}
-                      {post.creditOffer && (
+                      {creditOffer && (
                         <PerkBadge
-                          label={formatHousingCreditOfferLabel(
-                            post.creditOffer,
-                          )}
+                          label={formatHousingCreditOfferLabel(creditOffer)}
                         />
                       )}
                     </div>
@@ -495,32 +516,24 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             )}
 
             <dl className='mt-5 grid grid-cols-2 gap-3 text-sm'>
-              <DetailStat label='지역' value={post.neighborhood} />
+              <DetailStat label='지역' value={area} />
               <DetailStat label='유닛 타입' value={unitTypeLabel} />
               <DetailStat
                 label='유닛 전체'
-                value={`$${post.unitRent.toLocaleString()}/월`}
+                value={`$${unitRent.toLocaleString()}/월`}
               />
               <DetailStat
                 label='룸 타입'
-                value={
-                  selectedOption
-                    ? getHousingRoomOptionLabel(selectedOption)
-                    : '미정'
-                }
+                value={selectedRoom ? getHousingRoomLabel(selectedRoom) : '미정'}
               />
               <DetailStat
                 label='입주 가능일'
-                value={
-                  selectedOption
-                    ? formatHousingAvailableRange(
-                        selectedOption.availableFrom,
-                        selectedOption.availableTo,
-                      ) || '미정'
-                    : '미정'
-                }
+                value={formatHousingAvailableDate(availableDate) || '미정'}
               />
-              <DetailStat label='상태' value='모집 중' />
+              <DetailStat
+                label='상태'
+                value={unit.available ? '모집 중' : '마감'}
+              />
             </dl>
 
             <div className='mt-6 space-y-3 rounded-2xl bg-white p-5 ring-1 ring-black/[0.05]'>
@@ -528,14 +541,17 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                 상세 설명
               </p>
               <p className='whitespace-pre-wrap text-[15px] leading-relaxed text-[var(--muted-foreground)]'>
-                {post.description}
+                {listing.description}
               </p>
             </div>
 
             <div className='mt-5 lg:hidden'>
+              <HousingPropertySection listing={listing} className='mb-4' />
               <HousingLocationMap
-                address={post.title}
-                neighborhood={post.neighborhood}
+                address={streetAddress}
+                neighborhood={area}
+                latitude={property.latitude}
+                longitude={property.longitude}
               />
             </div>
 
@@ -574,6 +590,97 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
           </div>
         </div>
       </article>
+    </div>
+  )
+}
+
+function HousingPropertySection({
+  listing,
+  className,
+}: {
+  listing: HousingListing
+  className?: string
+}) {
+  const { property } = listing
+  const amenityFeeLabel = formatPropertyAmenityFee(property)
+  const incomeLabel = formatPropertyIncomeRequirements(property)
+  const utilities = property.includedUtility ?? []
+  const hasContent =
+    property.subway.length > 0 ||
+    property.amenities.length > 0 ||
+    property.appliances.length > 0 ||
+    utilities.length > 0 ||
+    property.partWall ||
+    amenityFeeLabel ||
+    incomeLabel
+
+  if (!hasContent) return null
+
+  return (
+    <section
+      className={cn(
+        'rounded-2xl bg-white px-4 py-4 ring-1 ring-black/[0.05] sm:px-5 sm:py-5',
+        className,
+      )}
+    >
+      <h2 className='text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
+        건물 정보
+      </h2>
+
+      <dl className='mt-3 space-y-2.5 text-[13px]'>
+        {property.zipcode ? (
+          <PropertyRow label='우편번호' value={property.zipcode} />
+        ) : null}
+        {property.partWall ? (
+          <PropertyRow label='벽 옵션' value={property.partWall} />
+        ) : null}
+        {amenityFeeLabel ? (
+          <PropertyRow label='어메니티 Fee' value={amenityFeeLabel} />
+        ) : null}
+        {incomeLabel ? (
+          <PropertyRow label='소득 요건' value={incomeLabel} />
+        ) : null}
+        {utilities.length > 0 ? (
+          <PropertyRow label='포함 유틸' value={utilities.join(' · ')} />
+        ) : null}
+      </dl>
+
+      {property.subway.length > 0 && (
+        <PropertyList title='지하철' items={property.subway} />
+      )}
+      {property.amenities.length > 0 && (
+        <PropertyList title='건물 어메니티' items={property.amenities} />
+      )}
+      {property.appliances.length > 0 && (
+        <PropertyList title='가전/유닛' items={property.appliances} />
+      )}
+    </section>
+  )
+}
+
+function PropertyRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className='flex gap-3'>
+      <dt className='w-24 shrink-0 text-[var(--muted)]'>{label}</dt>
+      <dd className='min-w-0 font-medium text-[var(--foreground)]'>{value}</dd>
+    </div>
+  )
+}
+
+function PropertyList({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className='mt-4'>
+      <p className='text-[12px] font-semibold text-[var(--muted)]'>{title}</p>
+      <ul className='mt-2 flex flex-wrap gap-1.5'>
+        {items.map((item) => (
+          <li
+            key={item}
+            className='rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[12px] font-medium text-[var(--foreground)]'
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

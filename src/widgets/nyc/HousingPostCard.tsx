@@ -8,61 +8,55 @@ import { SchoolBadge } from '@components'
 import { useHousingLike } from '@hooks/useHousingLikes'
 import { usePagedGallery } from '@hooks/usePagedGallery'
 import {
-  formatHousingCreditOfferLabel,
-  formatHousingAvailableRange,
-  getHousingEarliestAvailableOption,
+  formatHousingAvailableDate,
+  formatListingBedBath,
   getHousingListingTypeLabel,
-  getHousingUnitRent,
   getHousingPerkLabel,
-  getHousingRoomOptionLabel,
-  HOUSING_CARD_BADGE_PERKS,
-  sortHousingRoomOptions,
+  getHousingRoomLabel,
+  getHousingUnitRent,
+  getListingArea,
+  getListingCardBadges,
+  getListingDisplayAddress,
+  getListingImages,
+  getListingAvailableDate,
+  getPricedRooms,
+  getRoomSelectionKey,
+  shouldShowListingRoomRows,
+  sortHousingRooms,
 } from '@lib/constants/housingMock'
 import type {
+  HousingListing,
   HousingPerkId,
-  HousingPost,
+  HousingRoom,
   HousingRoommateComposition,
-  HousingRoomOption,
 } from '@/types/nyc'
 
 interface HousingPostCardProps {
-  post: HousingPost
+  listing: HousingListing
   /** 룸 타입 필터 시 해당 옵션 강조 */
   highlightRoomType?: string | 'all'
 }
 
 export function HousingPostCard({
-  post,
+  listing,
   highlightRoomType = 'all',
 }: HousingPostCardProps) {
-  const images = post.images
-  const listingTypeLabel = getHousingListingTypeLabel(post)
-  const unitRent = getHousingUnitRent(post)
-  const earliestOption = getHousingEarliestAvailableOption(post)
-  const roomOptions = sortHousingRoomOptions(post.roomOptions)
-  const showOptionRows =
-    roomOptions.length > 1 ||
-    roomOptions.some((option) => option.roomType != null)
-  const badgeLabels = [
-    ...post.perks
-      .filter((perk) => HOUSING_CARD_BADGE_PERKS.includes(perk))
-      .map((perk) => ({ key: perk, label: getHousingPerkLabel(perk) })),
-    ...(post.creditOffer
-      ? [
-          {
-            key: 'credit-offer',
-            label: formatHousingCreditOfferLabel(post.creditOffer),
-          },
-        ]
-      : []),
-  ]
-  const { liked, toggle } = useHousingLike(post.id)
+  const images = getListingImages(listing)
+  const displayAddress = getListingDisplayAddress(listing)
+  const area = getListingArea(listing)
+  const listingTypeLabel = getHousingListingTypeLabel(listing)
+  const unitRent = getHousingUnitRent(listing)
+  const availableDate = getListingAvailableDate(listing)
+  const roomRows = sortHousingRooms(getPricedRooms(listing))
+  const showOptionRows = shouldShowListingRoomRows(listing)
+  const badgeLabels = getListingCardBadges(listing)
+  const { liked, toggle } = useHousingLike(listing.id)
   const {
     ref: galleryRef,
     index: activeIndex,
     swipingRef,
     pointerHandlers,
-  } = usePagedGallery(images.length, post.id)
+  } = usePagedGallery(images.length, listing.id)
 
   function handleToggleLike(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault()
@@ -81,8 +75,8 @@ export function HousingPostCard({
           >
             {images.map((src, index) => (
               <Link
-                key={`${post.id}-${src}-${index}`}
-                href={`/nyc/housing/${post.id}`}
+                key={`${listing.id}-${src}-${index}`}
+                href={`/nyc/housing/${listing.id}`}
                 onClick={(event) => {
                   if (swipingRef.current) {
                     event.preventDefault()
@@ -90,7 +84,7 @@ export function HousingPostCard({
                   }
                 }}
                 className='relative h-full w-full min-w-full shrink-0 overflow-hidden snap-start snap-always'
-                aria-label={`${post.title} 사진 ${index + 1}`}
+                aria-label={`${displayAddress} 사진 ${index + 1}`}
               >
                 <Image
                   src={src}
@@ -132,7 +126,6 @@ export function HousingPostCard({
             aria-pressed={liked}
             className='relative shrink-0 touch-manipulation transition hover:scale-110 active:scale-95'
           >
-            {/* 탭 영역만 확대 — 아이콘 가장자리는 좌측 배지와 동일 inset 유지 */}
             <span className='absolute -inset-2' aria-hidden />
             <HeartIcon
               filled={liked}
@@ -162,15 +155,15 @@ export function HousingPostCard({
 
       <div className='flex flex-1 flex-col px-3.5 py-3.5 sm:px-3 sm:py-2.5'>
         <Link
-          href={`/nyc/housing/${post.id}`}
+          href={`/nyc/housing/${listing.id}`}
           className='flex flex-col gap-1 touch-manipulation sm:gap-0.5'
         >
           <div className='flex min-w-0 items-center gap-2'>
             <div className='flex min-w-0 flex-1 items-center gap-1.5'>
               <h3 className='min-w-0 flex-1 truncate text-[15px] font-semibold leading-snug tracking-tight text-[var(--foreground)] sm:text-[13px]'>
-                {post.title}
+                {displayAddress}
               </h3>
-              <SchoolBadge schoolId={post.authorSchoolId} />
+              <SchoolBadge schoolId={listing.authorSchoolId} />
             </div>
             <p className='shrink-0 text-right text-[15px] font-semibold leading-snug tabular-nums tracking-tight text-[var(--foreground)] sm:text-[13px]'>
               ${unitRent.toLocaleString()}
@@ -178,31 +171,27 @@ export function HousingPostCard({
             </p>
           </div>
           <p className='truncate text-[13px] text-[var(--muted-foreground)] sm:text-[12px]'>
-            {post.neighborhood}
+            {area}
             <span className='mx-1 text-[#d0d4db]'>·</span>
             {listingTypeLabel}
             <span className='mx-1 text-[#d0d4db]'>·</span>
-            입주{' '}
-            {(earliestOption &&
-              formatHousingAvailableRange(
-                earliestOption.availableFrom,
-                earliestOption.availableTo,
-              )) ||
-              '미정'}
+            {formatListingBedBath(listing)}
+            <span className='mx-1 text-[#d0d4db]'>·</span>
+            입주 {formatHousingAvailableDate(availableDate) || '미정'}
           </p>
         </Link>
 
         {showOptionRows && (
           <ul className='mt-2.5 space-y-1 border-t border-[#f0f1f3] pt-2.5 sm:mt-2 sm:pt-2'>
-            {roomOptions.map((option) => (
+            {roomRows.map((room, index) => (
               <RoomOptionRow
-                key={option.id}
-                option={option}
+                key={getRoomSelectionKey(room, index)}
+                room={room}
+                roomKey={getRoomSelectionKey(room, index)}
                 highlighted={
-                  highlightRoomType !== 'all' &&
-                  option.roomType === highlightRoomType
+                  highlightRoomType !== 'all' && room.type === highlightRoomType
                 }
-                href={`/nyc/housing/${post.id}?room=${option.id}`}
+                href={`/nyc/housing/${listing.id}?room=${getRoomSelectionKey(room, index)}`}
               />
             ))}
           </ul>
@@ -213,11 +202,13 @@ export function HousingPostCard({
 }
 
 function RoomOptionRow({
-  option,
+  room,
+  roomKey,
   highlighted,
   href,
 }: {
-  option: HousingRoomOption
+  room: HousingRoom
+  roomKey: string
   highlighted: boolean
   href: string
 }) {
@@ -232,19 +223,11 @@ function RoomOptionRow({
         }`}
       >
         <span className='min-w-0 truncate text-[13px] font-medium text-[var(--foreground)] sm:text-[12px]'>
-          {getHousingRoomOptionLabel(option)}
+          {getHousingRoomLabel(room)}
         </span>
-        <span className='flex shrink-0 items-center gap-2'>
-          {option.roommateWaiting && option.roommateComposition && (
-            <RoommateCompositionBadge
-              composition={option.roommateComposition}
-              compact
-            />
-          )}
-          <span className='text-[13px] font-semibold tabular-nums text-[var(--foreground)] sm:text-[12px]'>
-            ${option.rent.toLocaleString()}
-            <span className='font-medium text-[var(--muted)]'>/월</span>
-          </span>
+        <span className='text-[13px] font-semibold tabular-nums text-[var(--foreground)] sm:text-[12px]'>
+          ${room.price.toLocaleString()}
+          <span className='font-medium text-[var(--muted)]'>/월</span>
         </span>
       </Link>
     </li>

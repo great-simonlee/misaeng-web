@@ -1,17 +1,74 @@
+import {
+  formatHousingCreditOfferLabel,
+  formatHousingDateShort,
+  formatListingBedBath,
+  getListingArea,
+  getListingCreditOffer,
+  getListingDerivedPerks,
+  getListingDisplayAddress,
+  getListingPrimaryPromotion,
+  getListingUnitRent,
+  getListingUnitType,
+  getListingAvailableDate,
+  getPricedRooms,
+  getRoomSelectionKey,
+  housingHasRoommateWaiting,
+  housingMatchesPerk,
+  housingMatchesPrice,
+  housingMatchesRoomType,
+  inferHousingUnitType,
+  listingHasOP,
+  sortHousingRooms,
+} from '@lib/housing/listing'
 import type {
   HousingCreditOffer,
+  HousingListing,
   HousingPerkId,
   HousingPost,
+  HousingProperty,
+  HousingRoom,
+  HousingRoomType,
   HousingRoommateAffiliation,
   HousingRoommateComposition,
   HousingRoommateGender,
   HousingRoommateProfile,
   HousingRoommateRoomPreference,
   HousingRoommateWaiting,
-  HousingRoomOption,
-  HousingRoomType,
+  HousingUnit,
+  HousingUnitPromotion,
   HousingUnitType,
 } from '@/types/nyc'
+
+export {
+  formatHousingCreditOfferLabel,
+  formatHousingDateShort,
+  formatHousingAvailableDate,
+  formatListingBedBath,
+  formatPropertyAmenityFee,
+  formatPropertyIncomeRequirements,
+  findListingRoomByKey,
+  getHousingRoomLabel,
+  getHousingRoomTypeLabel,
+  getListingArea,
+  getListingCreditOffer,
+  getListingDerivedPerks,
+  getListingDisplayAddress,
+  getListingImages,
+  getListingStreetAddress,
+  getListingUnitRent,
+  getListingUnitType,
+  getListingAvailableDate,
+  getListingYoutubeUrl,
+  getPricedRooms,
+  getRoomSelectionKey,
+  housingHasRoommateWaiting,
+  housingMatchesPerk,
+  housingMatchesPrice,
+  housingMatchesRoomType,
+  inferHousingUnitType,
+  listingHasOP,
+  sortHousingRooms,
+} from '@lib/housing/listing'
 
 export const HOUSING_UNIT_TYPES: {
   id: HousingUnitType
@@ -26,17 +83,18 @@ export const HOUSING_UNIT_TYPES: {
   { id: '4-plus', label: '4+ Bedrooms' },
 ]
 
-/** 룸(침실) 타입 — 유닛 타입과 완전 독립 */
 export const HOUSING_ROOM_TYPES: {
   id: HousingRoomType
   label: string
 }[] = [
   { id: 'master-w-bath', label: 'Master w/ Bath' },
+  { id: 'master-wo-bath', label: 'Master w/o Bath' },
   { id: 'regular-bedroom', label: 'Regular' },
-  { id: 'flexroom', label: 'Flexroom' },
+  { id: 'flexroom', label: 'Flex' },
+  { id: 'entire', label: '유닛 전체' },
+  { id: 'studio', label: 'Studio' },
 ]
 
-/** NYC 지역 필터 (표시 순서) */
 export const HOUSING_NEIGHBORHOODS = [
   'Manhattan',
   'Upper West Side',
@@ -88,7 +146,6 @@ export const HOUSING_PERKS: {
   { id: 'sauna', label: '사우나' },
 ]
 
-/** 필터 시트 · 혜택 */
 export const HOUSING_BENEFIT_PERKS: HousingPerkId[] = [
   'roommate-waiting',
   'no-broker-fee',
@@ -96,18 +153,15 @@ export const HOUSING_BENEFIT_PERKS: HousingPerkId[] = [
   'free-credit',
 ]
 
-/** 필터 시트 · 어메니티 */
 export const HOUSING_AMENITY_PERKS: HousingPerkId[] = HOUSING_PERKS.map(
-  (p) => p.id,
+  (perk) => perk.id,
 ).filter((id) => !HOUSING_BENEFIT_PERKS.includes(id))
 
-/** 목록 카드 사진 위에 노출하는 혜택 배지 (무료 크레딧은 creditOffer로 별도 표시) */
 export const HOUSING_CARD_BADGE_PERKS: HousingPerkId[] = [
   'no-broker-fee',
   'no-guarantor',
 ]
 
-/** 월세 필터 — 전체 유닛 vs 개인 방 */
 export type HousingListingKind = 'unit' | 'room'
 
 export const HOUSING_LISTING_KINDS: {
@@ -151,12 +205,9 @@ export function getHousingPricePresets(kind: HousingListingKind) {
   return kind === 'unit' ? HOUSING_UNIT_PRICE_PRESETS : HOUSING_ROOM_PRICE_PRESETS
 }
 
-const UNIT_TYPE_IDS = new Set<string>(HOUSING_UNIT_TYPES.map((t) => t.id))
-const ROOM_TYPE_IDS = new Set<string>(HOUSING_ROOM_TYPES.map((t) => t.id))
-const PERK_IDS = new Set<string>(HOUSING_PERKS.map((t) => t.id))
-
-/** 레거시 perk → free-credit 로 통합 */
-const LEGACY_FREE_CREDIT_PERKS = new Set(['one-month-free', 'credit-1500'])
+const UNIT_TYPE_IDS = new Set<string>(HOUSING_UNIT_TYPES.map((item) => item.id))
+const ROOM_TYPE_IDS = new Set<string>(HOUSING_ROOM_TYPES.map((item) => item.id))
+const PERK_IDS = new Set<string>(HOUSING_PERKS.map((item) => item.id))
 
 export function isHousingUnitType(value: string): value is HousingUnitType {
   return UNIT_TYPE_IDS.has(value)
@@ -176,45 +227,18 @@ export function getHousingUnitTypeLabel(unitType: HousingUnitType): string {
   )
 }
 
-export function getHousingRoomTypeLabel(roomType: HousingRoomType): string {
-  return (
-    HOUSING_ROOM_TYPES.find((item) => item.id === roomType)?.label ?? roomType
-  )
-}
-
-export function getHousingRoomOptionLabel(option: HousingRoomOption): string {
-  if (option.roomType) return getHousingRoomTypeLabel(option.roomType)
-  return '유닛 전체'
-}
-
-export function getHousingListingTypeLabel(post: {
-  unitType: HousingUnitType | null
-}): string {
-  if (post.unitType) return getHousingUnitTypeLabel(post.unitType)
-  return '타입 미정'
+export function getHousingListingTypeLabel(listing: HousingListing): string {
+  const unitType = getListingUnitType(listing)
+  return unitType ? getHousingUnitTypeLabel(unitType) : '타입 미정'
 }
 
 export function getHousingPerkLabel(perkId: HousingPerkId): string {
   return HOUSING_PERKS.find((item) => item.id === perkId)?.label ?? perkId
 }
 
-export function getHousingMinRent(post: HousingPost): number {
-  if (post.roomOptions.length === 0) return 0
-  return Math.min(...post.roomOptions.map((option) => option.rent))
-}
-
-/** 룸 옵션 월세 합산 (레거시·검증용) */
-export function getHousingRoomRentSum(post: HousingPost): number {
-  if (post.roomOptions.length === 0) return 0
-  return post.roomOptions.reduce((sum, option) => sum + option.rent, 0)
-}
-
-/** 카드에 표시하는 전체 유닛 월세 */
-export function getHousingUnitRent(post: HousingPost): number {
-  if (Number.isFinite(post.unitRent) && post.unitRent > 0) {
-    return post.unitRent
-  }
-  return getHousingRoomRentSum(post)
+/** @deprecated getListingUnitRent 사용 */
+export function getHousingUnitRent(listing: HousingListing): number {
+  return getListingUnitRent(listing)
 }
 
 export function isHousingPriceFilterActive(
@@ -225,26 +249,6 @@ export function isHousingPriceFilterActive(
   if (kind === 'all') return false
   const bounds = getHousingPriceBounds(kind)
   return min > bounds.min || max < bounds.max
-}
-
-export function housingMatchesPrice(
-  post: HousingPost,
-  kind: HousingListingKind | 'all',
-  min: number,
-  max: number,
-  roomType?: HousingRoomType | 'all',
-): boolean {
-  if (!isHousingPriceFilterActive(kind, min, max)) return true
-  if (kind === 'unit') {
-    const rent = getHousingUnitRent(post)
-    return rent >= min && rent <= max
-  }
-  const options =
-    roomType && roomType !== 'all'
-      ? post.roomOptions.filter((option) => option.roomType === roomType)
-      : post.roomOptions
-  if (options.length === 0) return false
-  return options.some((option) => option.rent >= min && option.rent <= max)
 }
 
 export function formatHousingPriceFilterLabel(
@@ -271,63 +275,12 @@ export function getHousingPricePresetId(
   return preset?.id ?? null
 }
 
-export function getHousingEarliestAvailable(post: HousingPost): string {
-  const dates = post.roomOptions
-    .map((option) => option.availableFrom)
-    .filter(Boolean)
-    .sort()
-  return dates[0] ?? ''
-}
-
-/** 가장 빠른 입주 시작일을 가진 룸 옵션 */
-export function getHousingEarliestAvailableOption(
-  post: HousingPost,
-): HousingRoomOption | null {
-  if (post.roomOptions.length === 0) return null
-  return [...post.roomOptions].sort((a, b) =>
-    a.availableFrom.localeCompare(b.availableFrom),
-  )[0] ?? null
-}
-
-/** YYYY-MM-DD → M/D (앞에 0 없음) */
-export function formatHousingDateShort(value: string): string {
-  const trimmed = value.trim()
-  if (!trimmed) return ''
-  const match = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/)
-  if (match) return `${Number(match[2])}/${Number(match[3])}`
-  return trimmed
-}
-
-/** 입주 기간 표시 — 예: 9/28 ~ 10/27 */
-export function formatHousingAvailableRange(
-  from: string,
-  to?: string | null,
-): string {
-  const start = formatHousingDateShort(from)
-  if (!start) return ''
-  const end = formatHousingDateShort(to ?? '')
-  if (!end) return start
-  return `${start} ~ ${end}`
-}
-
-/** @deprecated formatHousingAvailableRange 사용 권장 */
-export function formatHousingAvailableFrom(value: string): string {
-  return formatHousingDateShort(value)
-}
-
-export function housingHasRoommateWaiting(post: HousingPost): boolean {
-  return (
-    (post.roommateWaiting?.profiles.length ?? 0) > 0 ||
-    post.perks.includes('roommate-waiting') ||
-    post.roomOptions.some((option) => option.roommateWaiting)
-  )
-}
-
 export const HOUSING_ROOMMATE_ROOM_PREFERENCES: {
   id: HousingRoommateRoomPreference
   label: string
 }[] = [
   { id: 'master-w-bath', label: '마스터 희망' },
+  { id: 'master-wo-bath', label: '마스터(공용욕실) 희망' },
   { id: 'regular-bedroom', label: '레귤러 희망' },
   { id: 'flexroom', label: '플렉스 희망' },
   { id: 'any', label: '모두 가능' },
@@ -337,25 +290,7 @@ export function getHousingRoommateRoomPreferenceLabel(
   id: HousingRoommateRoomPreference,
 ): string {
   return (
-    HOUSING_ROOMMATE_ROOM_PREFERENCES.find((item) => item.id === id)?.label ??
-    id
-  )
-}
-
-export function parseHousingRoommateRoomPreferences(
-  value: unknown,
-): HousingRoommateRoomPreference[] {
-  if (!Array.isArray(value)) return []
-  const allowed = new Set(
-    HOUSING_ROOMMATE_ROOM_PREFERENCES.map((item) => item.id),
-  )
-  const seen = new Set<HousingRoommateRoomPreference>()
-  for (const item of value) {
-    const id = String(item) as HousingRoommateRoomPreference
-    if (allowed.has(id)) seen.add(id)
-  }
-  return HOUSING_ROOMMATE_ROOM_PREFERENCES.map((item) => item.id).filter(
-    (id) => seen.has(id),
+    HOUSING_ROOMMATE_ROOM_PREFERENCES.find((item) => item.id === id)?.label ?? id
   )
 }
 
@@ -369,176 +304,11 @@ export function getHousingRoommateComposition(
   }
 }
 
-export function parseHousingRoommateAffiliation(
-  value: unknown,
-): HousingRoommateAffiliation {
-  if (value && typeof value === 'object') {
-    const raw = value as Record<string, unknown>
-    if (raw.kind === 'student') {
-      const school = String(raw.school ?? '').trim()
-      if (school) return { kind: 'student', school }
-    }
-    if (raw.kind === 'professional') return { kind: 'professional' }
-  }
-  return { kind: 'professional' }
-}
-
 export function getHousingRoommateAffiliationLabel(
   affiliation: HousingRoommateAffiliation,
 ): string {
   if (affiliation.kind === 'student') return affiliation.school
   return '직장인'
-}
-
-export function parseHousingRoommateWaiting(
-  value: unknown,
-  fallbackOptions?: HousingRoomOption[],
-): HousingRoommateWaiting | null {
-  if (value && typeof value === 'object') {
-    const raw = value as Record<string, unknown>
-
-    // 신규: profiles[]
-    if (Array.isArray(raw.profiles)) {
-      const profiles: HousingRoommateProfile[] = []
-      raw.profiles.forEach((item, index) => {
-        if (!item || typeof item !== 'object') return
-        const row = item as Record<string, unknown>
-        const genderRaw = String(row.gender ?? '')
-        const gender: HousingRoommateGender | null =
-          genderRaw === 'male' || genderRaw === 'female' ? genderRaw : null
-        if (!gender) return
-        const preferredRoomTypes = parseHousingRoommateRoomPreferences(
-          row.preferredRoomTypes,
-        )
-        profiles.push({
-          id: String(row.id ?? `roommate-${index}`),
-          gender,
-          affiliation: parseHousingRoommateAffiliation(row.affiliation),
-          preferredRoomTypes:
-            preferredRoomTypes.length > 0 ? preferredRoomTypes : ['any'],
-          intro:
-            typeof row.intro === 'string' && row.intro.trim()
-              ? row.intro.trim()
-              : '',
-        })
-      })
-      if (profiles.length > 0) return { profiles }
-    }
-
-    // 레거시: composition + intro 단일 블록 → 프로필로 분해
-    const composition = parseHousingRoommateComposition(raw.composition)
-    const preferredRoomTypes = parseHousingRoommateRoomPreferences(
-      raw.preferredRoomTypes,
-    )
-    const intro =
-      typeof raw.intro === 'string' && raw.intro.trim() ? raw.intro.trim() : ''
-    if (composition && (composition.male > 0 || composition.female > 0)) {
-      const profiles: HousingRoommateProfile[] = []
-      for (let i = 0; i < composition.male; i += 1) {
-        profiles.push({
-          id: `legacy-male-${i}`,
-          gender: 'male',
-          affiliation: { kind: 'professional' },
-          preferredRoomTypes:
-            preferredRoomTypes.length > 0 ? preferredRoomTypes : ['any'],
-          intro: i === 0 ? intro : '',
-        })
-      }
-      for (let i = 0; i < composition.female; i += 1) {
-        profiles.push({
-          id: `legacy-female-${i}`,
-          gender: 'female',
-          affiliation: { kind: 'professional' },
-          preferredRoomTypes:
-            preferredRoomTypes.length > 0 ? preferredRoomTypes : ['any'],
-          intro: composition.male === 0 && i === 0 ? intro : '',
-        })
-      }
-      if (profiles.length > 0) return { profiles }
-    }
-  }
-
-  // 레거시: roomOptions 기반
-  if (!fallbackOptions?.length) return null
-  const waiting = fallbackOptions.filter((option) => option.roommateWaiting)
-  if (waiting.length === 0) return null
-
-  const profiles: HousingRoommateProfile[] = []
-  waiting.forEach((option, optionIndex) => {
-    const composition = option.roommateComposition ?? { male: 0, female: 0 }
-    const pref: HousingRoommateRoomPreference[] =
-      option.roomType === 'master-w-bath'
-        ? ['master-w-bath']
-        : option.roomType === 'regular-bedroom'
-          ? ['regular-bedroom']
-          : option.roomType === 'flexroom'
-            ? ['flexroom']
-            : ['any']
-    const intro = option.roommateIntro?.trim() ?? ''
-    for (let i = 0; i < composition.male; i += 1) {
-      profiles.push({
-        id: `${option.id}-male-${i}`,
-        gender: 'male',
-        affiliation: { kind: 'professional' },
-        preferredRoomTypes: pref,
-        intro: i === 0 ? intro : '',
-      })
-    }
-    for (let i = 0; i < composition.female; i += 1) {
-      profiles.push({
-        id: `${option.id}-female-${i}`,
-        gender: 'female',
-        affiliation: { kind: 'professional' },
-        preferredRoomTypes: pref,
-        intro: composition.male === 0 && i === 0 ? intro : '',
-      })
-    }
-    if (composition.male === 0 && composition.female === 0) {
-      profiles.push({
-        id: `${option.id}-unknown-${optionIndex}`,
-        gender: 'male',
-        affiliation: { kind: 'professional' },
-        preferredRoomTypes: pref,
-        intro,
-      })
-    }
-  })
-
-  return profiles.length > 0 ? { profiles } : null
-}
-
-export function housingMatchesRoomType(
-  post: HousingPost,
-  roomType: HousingRoomType,
-): boolean {
-  return post.roomOptions.some((option) => option.roomType === roomType)
-}
-
-export function housingMatchesPerk(
-  post: HousingPost,
-  perk: HousingPerkId,
-): boolean {
-  if (perk === 'roommate-waiting') return housingHasRoommateWaiting(post)
-  return post.perks.includes(perk)
-}
-
-export function sortHousingRoomOptions(
-  options: HousingRoomOption[],
-): HousingRoomOption[] {
-  const order = new Map(HOUSING_ROOM_TYPES.map((item, index) => [item.id, index]))
-  return [...options].sort((a, b) => {
-    const ai = a.roomType == null ? -1 : (order.get(a.roomType) ?? 99)
-    const bi = b.roomType == null ? -1 : (order.get(b.roomType) ?? 99)
-    if (ai !== bi) return ai - bi
-    return a.rent - b.rent
-  })
-}
-
-export function formatHousingCreditOfferLabel(
-  offer: HousingCreditOffer,
-): string {
-  if (offer.kind === 'months-free') return `${offer.months}개월 무료`
-  return `$${offer.amount.toLocaleString()} 크레딧`
 }
 
 export function formatHousingRoommateCompositionLabel(
@@ -550,139 +320,8 @@ export function formatHousingRoommateCompositionLabel(
   return parts.join(' ')
 }
 
-export function parseHousingRoommateComposition(
-  value: unknown,
-): HousingRoommateComposition | null {
-  if (!value || typeof value !== 'object') return null
-  const raw = value as Record<string, unknown>
-  const male = Number(raw.male ?? 0)
-  const female = Number(raw.female ?? 0)
-  if (
-    !Number.isFinite(male) ||
-    !Number.isFinite(female) ||
-    male < 0 ||
-    female < 0 ||
-    (male === 0 && female === 0)
-  ) {
-    return null
-  }
-  return { male, female }
-}
-
-export function parseHousingCreditOffer(
-  value: unknown,
-): HousingCreditOffer | null {
-  if (!value || typeof value !== 'object') return null
-  const raw = value as Record<string, unknown>
-  const kind = String(raw.kind ?? '')
-  if (kind === 'months-free') {
-    const months = Number(raw.months)
-    if (Number.isFinite(months) && months > 0) {
-      return { kind: 'months-free', months }
-    }
-  }
-  if (kind === 'dollar-credit') {
-    const amount = Number(raw.amount)
-    if (Number.isFinite(amount) && amount > 0) {
-      return { kind: 'dollar-credit', amount }
-    }
-  }
-  return null
-}
-
-export function parseHousingPerks(value: unknown): HousingPerkId[] {
-  if (!Array.isArray(value)) return []
-  const seen = new Set<HousingPerkId>()
-  for (const item of value) {
-    const id = String(item)
-    if (isHousingPerkId(id)) seen.add(id)
-    else if (LEGACY_FREE_CREDIT_PERKS.has(id)) seen.add('free-credit')
-  }
-  return HOUSING_PERKS.map((p) => p.id).filter((id) => seen.has(id))
-}
-
-export function parseHousingRoomOptions(
-  value: unknown,
-  legacy?: {
-    rent?: number
-    roomType?: string
-    availableFrom?: string
-    roommateComposition?: unknown
-    perks?: HousingPerkId[]
-  },
-): HousingRoomOption[] {
-  if (Array.isArray(value) && value.length > 0) {
-    const options: HousingRoomOption[] = []
-    value.forEach((item, index) => {
-      if (!item || typeof item !== 'object') return
-      const raw = item as Record<string, unknown>
-      const roomRaw = String(raw.roomType ?? '')
-      const roomType = isHousingRoomType(roomRaw) ? roomRaw : null
-      const rent = Number(raw.rent ?? 0)
-      if (!Number.isFinite(rent) || rent < 0) return
-      const roommateWaiting = Boolean(raw.roommateWaiting)
-      const introRaw = raw.roommateIntro
-      const roommateIntro =
-        roommateWaiting && typeof introRaw === 'string' && introRaw.trim()
-          ? introRaw.trim()
-          : null
-      options.push({
-        id: String(raw.id ?? `option-${index}`),
-        roomType,
-        rent,
-        availableFrom: String(raw.availableFrom ?? ''),
-        availableTo: String(raw.availableTo ?? ''),
-        roommateWaiting,
-        roommateComposition: parseHousingRoommateComposition(
-          raw.roommateComposition,
-        ),
-        roommateIntro,
-      })
-    })
-    if (options.length > 0) return sortHousingRoomOptions(options)
-  }
-
-  // 레거시 단일 rent/roomType
-  const rent = Number(legacy?.rent ?? 0)
-  const roomRaw = String(legacy?.roomType ?? '')
-  const roomType = isHousingRoomType(roomRaw) ? roomRaw : null
-  const waiting = Boolean(legacy?.perks?.includes('roommate-waiting'))
-  return [
-    {
-      id: 'legacy-option',
-      roomType,
-      rent: Number.isFinite(rent) ? rent : 0,
-      availableFrom: String(legacy?.availableFrom ?? ''),
-      availableTo: '',
-      roommateWaiting: waiting,
-      roommateComposition: parseHousingRoommateComposition(
-        legacy?.roommateComposition,
-      ),
-      roommateIntro: null,
-    },
-  ]
-}
-
-/** bedrooms 숫자에서 대략적인 유닛 타입 추론 */
-export function inferHousingUnitType(bedrooms: number): HousingUnitType {
-  if (bedrooms <= 0) return 'studio'
-  if (bedrooms === 1) return '1b1b'
-  if (bedrooms === 2) return '2b1b'
-  if (bedrooms === 3) return '3b1b'
-  return '4-plus'
-}
-
-/** @deprecated inferHousingUnitType 사용 */
-export function inferHousingRoomType(bedrooms: number): HousingUnitType {
-  return inferHousingUnitType(bedrooms)
-}
-
-const now = Date.now()
-
-/** 매물 사진 최대 장수 */
 export const HOUSING_MAX_IMAGES = 14
 
-/** UI 테스트용 인테리어 사진 풀 */
 export const MOCK_HOUSING_IMAGES: string[] = [
   'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80',
   'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80',
@@ -698,17 +337,8 @@ export const MOCK_HOUSING_IMAGES: string[] = [
   'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&q=80',
   'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80',
   'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80',
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80',
-  'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1200&q=80',
-  'https://images.unsplash.com/photo-1600047509807-ba8f99d2cd00?w=1200&q=80',
-  'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80',
-  'https://images.unsplash.com/photo-1600573472591-ee6981cf4216?w=1200&q=80',
-  'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1200&q=80',
-  'https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=1200&q=80',
-  'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1200&q=80',
 ]
 
-/** 매물별 서로 다른 장수·구성 (하이드레이션 안정용 결정적 선택) */
 export function pickMockHousingImages(seed: number): string[] {
   const pool = MOCK_HOUSING_IMAGES
   const counts = [3, 7, 1, 5, 14, 2, 9, 4, 11, 6]
@@ -717,7 +347,6 @@ export function pickMockHousingImages(seed: number): string[] {
     Math.max(1, counts[seed % counts.length] ?? 3),
   )
 
-  // 시드 기반 셔플 후 앞에서 count장
   const order = pool.map((_, index) => index)
   let state = (seed + 1) * 2654435761
   for (let i = order.length - 1; i > 0; i -= 1) {
@@ -731,50 +360,118 @@ export function pickMockHousingImages(seed: number): string[] {
   return order.slice(0, count).map((index) => pool[index]!)
 }
 
-/** UI 개발용 하우징 mock 매물 (유닛 + 룸 옵션) */
-export const MOCK_HOUSING_POSTS: HousingPost[] = [
-  {
+const now = Date.now()
+
+type MockListingSeed = {
+  id: string
+  address: string
+  area: string
+  zipcode?: string
+  latitude?: number
+  longitude?: number
+  subway?: string[]
+  amenities?: string[]
+  appliances?: string[]
+  includedUtility?: string[]
+  partWall?: HousingProperty['partWall']
+  amenityFee?: HousingProperty['amenityFee']
+  incomeRequirements?: HousingProperty['incomeRequirements']
+  unitNumber?: string
+  bedrooms: number
+  bathrooms: number
+  price: number
+  availableDate?: string
+  rooms: HousingRoom[]
+  promotions?: HousingUnitPromotion[]
+  description: string
+  roommateWaiting?: HousingRoommateWaiting | null
+  youtubeUrl?: string | null
+  imageSeed: number
+  hoursAgo: number
+}
+
+function buildMockListing(seed: MockListingSeed): HousingListing {
+  const parts = seed.address.split('|').map((part) => part.trim())
+  const street = parts[0] ?? seed.address
+  const buildingName = parts[1] ?? null
+  const property: HousingProperty = {
+    address: seed.address,
+    displayedAddress: buildingName ? `${street} · ${buildingName}` : street,
+    buildingName,
+    area: seed.area,
+    zipcode: seed.zipcode ?? null,
+    latitude: seed.latitude ?? null,
+    longitude: seed.longitude ?? null,
+    subway: seed.subway ?? [],
+    amenities: seed.amenities ?? [],
+    appliances: seed.appliances ?? [],
+    includedUtility: seed.includedUtility ?? [],
+    partWall: seed.partWall ?? null,
+    amenityFee: seed.amenityFee ?? null,
+    incomeRequirements: seed.incomeRequirements ?? null,
+  }
+
+  const unit: HousingUnit = {
+    unitNumber: seed.unitNumber ?? null,
+    bedrooms: seed.bedrooms,
+    bathrooms: seed.bathrooms,
+    price: seed.price,
+    availableDate: seed.availableDate ?? null,
+    available: true,
+    rooms: seed.rooms,
+    promotions: seed.promotions ?? [],
+    images: pickMockHousingImages(seed.imageSeed),
+    youtubeUrl: seed.youtubeUrl ?? null,
+    unitType: inferHousingUnitType(seed.bedrooms, seed.bathrooms),
+  }
+
+  const timestamp = now - seed.hoursAgo * 60 * 60 * 1000
+
+  return {
+    id: seed.id,
+    property,
+    unit,
+    description: seed.description,
+    roommateWaiting: seed.roommateWaiting ?? null,
+    contactEmail: 'housing@misaeng.com',
+    sourcePropertyId: `mock-property-${seed.id}`,
+    sourceUnitId: `mock-unit-${seed.id}`,
+    authorUid: 'mock-misaeng',
+    authorEmail: 'housing@misaeng.com',
+    authorSchoolId: null,
+    authorSchoolName: null,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    status: 'open',
+  }
+}
+
+export const MOCK_HOUSING_LISTINGS: HousingListing[] = [
+  buildMockListing({
     id: 'mock-housing-1',
-    title: '2950 Broadway',
+    address: '2950 Broadway | Pre-War Co-op',
+    area: 'Morningside Heights',
+    zipcode: '10027',
+    latitude: 40.8075,
+    longitude: -73.9626,
+    subway: ['🚇 1 min walk to 116 St-Columbia Univ (1)'],
+    amenities: ['Fitness Center', 'Package Storage', 'Resident Lounge'],
+    appliances: ['Dishwasher', 'Refrigerator'],
+    includedUtility: ['Heat', 'Hot Water'],
+    partWall: 'Full wall',
+    incomeRequirements: { personalIncome: '40', personalGuarantor: '0' },
+    unitNumber: '4B',
+    bedrooms: 2,
+    bathrooms: 1,
+    price: 3400,
+    availableDate: '2026-09-28',
+    rooms: [
+      { type: 'master-w-bath', price: 1850 },
+      { type: 'regular-bedroom', price: 1550 },
+    ],
+    promotions: [{ hasOP: true, freeMonth: 1, leaseTerm: 12 }],
     description:
       'Morningside Heights 캠퍼스 도보 8분. 마스터·레귤러 룸 옵션. 세탁기·건조기 건물 내 구비.',
-    neighborhood: 'Morningside Heights',
-    bedrooms: 2,
-    unitType: '2b1b',
-    unitRent: 3400,
-    roomOptions: [
-      {
-        id: 'm1-master',
-        roomType: 'master-w-bath',
-        rent: 1850,
-        availableFrom: '2026-09-28',
-        availableTo: '2026-10-27',
-        roommateWaiting: true,
-        roommateComposition: { male: 1, female: 0 },
-        roommateIntro:
-          '마스터 룸을 쓰고 있는 직장인이에요. 주중엔 재택이 많고, 조용히 지내는 편입니다.',
-      },
-      {
-        id: 'm1-regular',
-        roomType: 'regular-bedroom',
-        rent: 1550,
-        availableFrom: '2026-09-28',
-        availableTo: '2026-10-27',
-        roommateWaiting: true,
-        roommateComposition: { male: 0, female: 1 },
-        roommateIntro:
-          '레귤러 룸 쪽 여학생이에요. 주중엔 캠퍼스, 주말엔 가끔 브런치 나가요. 반려동물은 없어요.',
-      },
-    ],
-    perks: [
-      'no-broker-fee',
-      'no-guarantor',
-      'free-credit',
-      'washer-dryer',
-      'work-study',
-      'package-storage',
-    ],
-    creditOffer: { kind: 'months-free', months: 1 },
     roommateWaiting: {
       profiles: [
         {
@@ -791,100 +488,55 @@ export const MOCK_HOUSING_POSTS: HousingPost[] = [
           affiliation: { kind: 'student', school: 'NYU' },
           preferredRoomTypes: ['regular-bedroom'],
           intro:
-            '레귤러 룸 쪽 여학생이에요. 주중엔 캠퍼스, 주말엔 가끔 브런치 나가요. 반려동물은 없어요.',
+            '레귤러 룸 쪽 여학생이에요. 주중엔 캠퍼스, 주말엔 가끔 브런치 나가요.',
         },
       ],
     },
-    contactEmail: 'housing@misaeng.com',
-    images: pickMockHousingImages(0),
-    /** 실제 매물 투어 영상 URL로 교체 */
     youtubeUrl: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
-    authorUid: 'mock-misaeng',
-    authorEmail: 'housing@misaeng.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: now - 1000 * 60 * 60 * 5,
-    updatedAt: now - 1000 * 60 * 60 * 5,
-    status: 'open',
-  },
-  {
+    imageSeed: 0,
+    hoursAgo: 5,
+  }),
+  buildMockListing({
     id: 'mock-housing-2',
-    title: '31-15 Ditmars Blvd',
+    address: '31-15 Ditmars Blvd | Astoria Towers',
+    area: 'Astoria',
+    zipcode: '11105',
+    subway: ['🚇 6 min walk to Ditmars Blvd (N/W)'],
+    amenities: ['Fitness Center'],
+    appliances: ['Dishwasher', 'Microwave'],
+    bedrooms: 2,
+    bathrooms: 1,
+    price: 2600,
+    availableDate: '2026-08-20',
+    rooms: [
+      { type: 'regular-bedroom', price: 1400 },
+      { type: 'flexroom', price: 1200 },
+    ],
+    promotions: [{ hasOP: true }],
     description:
       'Queens Astoria 중심. N/W 역 도보 6분. 레귤러·플렉스 옵션. 가구 일부 포함.',
-    neighborhood: 'Astoria',
-    bedrooms: 2,
-    unitType: '2b1b',
-    unitRent: 2600,
-    roomOptions: [
-      {
-        id: 'm2-regular',
-        roomType: 'regular-bedroom',
-        rent: 1400,
-        availableFrom: '2026-08-20',
-        availableTo: '2026-09-18',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-      {
-        id: 'm2-flex',
-        roomType: 'flexroom',
-        rent: 1200,
-        availableFrom: '2026-08-20',
-        availableTo: '2026-09-18',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-    ],
-    perks: ['no-broker-fee', 'gym'],
-    creditOffer: null,
-    roommateWaiting: null,
-    contactEmail: 'housing@misaeng.com',
-    images: pickMockHousingImages(1),
-    youtubeUrl: null,
-    authorUid: 'mock-misaeng',
-    authorEmail: 'housing@misaeng.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: now - 1000 * 60 * 60 * 20,
-    updatedAt: now - 1000 * 60 * 60 * 20,
-    status: 'open',
-  },
-  {
+    imageSeed: 1,
+    hoursAgo: 20,
+  }),
+  buildMockListing({
     id: 'mock-housing-3',
-    title: '188 Avenue A',
+    address: '188 Avenue A',
+    area: 'East Village',
+    zipcode: '10009',
+    subway: ['🚇 4 min walk to 1st Ave (L)'],
+    amenities: ['Rooftop Outdoor Space', 'Terrace'],
+    partWall: 'Full wall',
+    bedrooms: 1,
+    bathrooms: 1,
+    price: 2700,
+    availableDate: '2026-09-15',
+    rooms: [
+      { type: 'regular-bedroom', price: 1450 },
+      { type: 'flexroom', price: 1250 },
+    ],
+    promotions: [{ rentCredit: 1500, leaseTerm: 12 }],
     description:
       'L 라인 인근, 주방 리모델링 완료. Regular / Flexroom 가격이 다릅니다.',
-    neighborhood: 'East Village',
-    bedrooms: 1,
-    unitType: '1b1b',
-    unitRent: 2700,
-    roomOptions: [
-      {
-        id: 'm3-regular',
-        roomType: 'regular-bedroom',
-        rent: 1450,
-        availableFrom: '2026-09-15',
-        availableTo: '2026-10-14',
-        roommateWaiting: true,
-        roommateComposition: { male: 1, female: 0 },
-        roommateIntro: 'East Village에서 일하는 직장인입니다. 저녁 늦게 들어오는 편이라 낮 시간대는 조용해요.',
-      },
-      {
-        id: 'm3-flex',
-        roomType: 'flexroom',
-        rent: 1250,
-        availableFrom: '2026-09-15',
-        availableTo: '2026-10-14',
-        roommateWaiting: true,
-        roommateComposition: { male: 2, female: 0 },
-        roommateIntro: '룸메 두 명과 이미 살고 있어요. 모두 남성·비흡연이고, 공용 공간 정리 규칙을 지켜요.',
-      },
-    ],
-    perks: ['no-guarantor', 'free-credit', 'terrace', 'wall-ok'],
-    creditOffer: { kind: 'dollar-credit', amount: 1500 },
     roommateWaiting: {
       profiles: [
         {
@@ -897,146 +549,67 @@ export const MOCK_HOUSING_POSTS: HousingPost[] = [
         },
       ],
     },
-    contactEmail: 'housing@misaeng.com',
-    images: pickMockHousingImages(2),
-    youtubeUrl: null,
-    authorUid: 'mock-misaeng',
-    authorEmail: 'housing@misaeng.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: now - 1000 * 60 * 60 * 36,
-    updatedAt: now - 1000 * 60 * 60 * 36,
-    status: 'open',
-  },
-  {
+    imageSeed: 2,
+    hoursAgo: 36,
+  }),
+  buildMockListing({
     id: 'mock-housing-4',
-    title: '75 Pierrepont St',
+    address: '75 Pierrepont St | Brooklyn Heights',
+    area: 'Brooklyn Heights',
+    zipcode: '11201',
+    amenities: ['Fitness Center', 'Laundry Room'],
+    appliances: ['Dishwasher', 'In-Unit Washer'],
+    bedrooms: 0,
+    bathrooms: 1,
+    price: 2800,
+    availableDate: '2026-10-01',
+    rooms: [{ type: 'studio', price: 2800 }],
+    promotions: [{ hasOP: true, freeMonth: 2, leaseTerm: 14 }],
+    incomeRequirements: { personalIncome: '40', personalGuarantor: '0' },
     description:
       '프로메나드 인근 스튜디오. 맨해튼 스카이라인 전망, 엘리베이터·세탁실 완비.',
-    neighborhood: 'Brooklyn Heights',
-    bedrooms: 0,
-    unitType: 'studio',
-    unitRent: 2800,
-    roomOptions: [
-      {
-        id: 'm4-unit',
-        roomType: null,
-        rent: 2800,
-        availableFrom: '2026-10-01',
-        availableTo: '2026-10-30',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-    ],
-    perks: [
-      'no-broker-fee',
-      'no-guarantor',
-      'free-credit',
-      'washer-dryer',
-      'gym',
-    ],
-    creditOffer: { kind: 'months-free', months: 2 },
-    roommateWaiting: null,
-    contactEmail: 'housing@misaeng.com',
-    images: pickMockHousingImages(3),
-    youtubeUrl: null,
-    authorUid: 'mock-misaeng',
-    authorEmail: 'housing@misaeng.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: now - 1000 * 60 * 60 * 48,
-    updatedAt: now - 1000 * 60 * 60 * 48,
-    status: 'open',
-  },
-  {
+    imageSeed: 3,
+    hoursAgo: 48,
+  }),
+  buildMockListing({
     id: 'mock-housing-5',
-    title: '11 W 19th St',
+    address: '11 W 19th St | Flatiron House',
+    area: 'Flatiron',
+    zipcode: '10011',
+    amenities: ['Fitness Center', 'Swimming Pool'],
+    bedrooms: 1,
+    bathrooms: 1,
+    price: 5400,
+    availableDate: '2026-08-25',
+    rooms: [
+      { type: 'regular-bedroom', price: 2950 },
+      { type: 'flexroom', price: 2450 },
+    ],
+    promotions: [{ hasOP: true }],
     description:
       'Flatiron 근처 1베드. Regular / Flex 선택 가능. 와이파이·청소 서비스 포함.',
-    neighborhood: 'Flatiron',
-    bedrooms: 1,
-    unitType: '1b1b',
-    unitRent: 5400,
-    roomOptions: [
-      {
-        id: 'm5-regular',
-        roomType: 'regular-bedroom',
-        rent: 2950,
-        availableFrom: '2026-08-25',
-        availableTo: '2026-09-23',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-      {
-        id: 'm5-flex',
-        roomType: 'flexroom',
-        rent: 2450,
-        availableFrom: '2026-08-25',
-        availableTo: '2026-09-23',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-    ],
-    perks: ['no-broker-fee', 'pool', 'gym'],
-    creditOffer: null,
-    roommateWaiting: null,
-    contactEmail: 'housing@misaeng.com',
-    images: pickMockHousingImages(4),
-    youtubeUrl: null,
-    authorUid: 'mock-misaeng',
-    authorEmail: 'housing@misaeng.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: now - 1000 * 60 * 60 * 72,
-    updatedAt: now - 1000 * 60 * 60 * 72,
-    status: 'open',
-  },
-  {
+    imageSeed: 4,
+    hoursAgo: 72,
+  }),
+  buildMockListing({
     id: 'mock-housing-6',
-    title: '250 N 10th St',
+    address: '250 N 10th St | Williamsburg Lofts',
+    area: 'Williamsburg',
+    zipcode: '11211',
+    subway: ['🚇 5 min walk to Bedford Ave (L)'],
+    amenities: ['Rooftop Outdoor Space', 'BBQ Grill', 'Laundry Room'],
+    appliances: ['Dishwasher'],
+    bedrooms: 2,
+    bathrooms: 1,
+    price: 5400,
+    availableDate: '2026-09-10',
+    rooms: [
+      { type: 'master-w-bath', price: 2100 },
+      { type: 'regular-bedroom', price: 1800 },
+      { type: 'flexroom', price: 1500 },
+    ],
     description:
       'Bedford L 역 도보 5분. Master / Regular / Flex 룸별 가격. 루프탑 BBQ·공용 라운지.',
-    neighborhood: 'Williamsburg',
-    bedrooms: 2,
-    unitType: '2b1b',
-    unitRent: 5400,
-    roomOptions: [
-      {
-        id: 'm6-master',
-        roomType: 'master-w-bath',
-        rent: 2100,
-        availableFrom: '2026-09-10',
-        availableTo: '2026-10-09',
-        roommateWaiting: true,
-        roommateComposition: { male: 1, female: 1 },
-        roommateIntro: 'Williamsburg 직장인입니다. 루프탑·BBQ는 가끔 친구 초대해요. 주중엔 재택이 많아요.',
-      },
-      {
-        id: 'm6-regular',
-        roomType: 'regular-bedroom',
-        rent: 1800,
-        availableFrom: '2026-09-10',
-        availableTo: '2026-10-09',
-        roommateWaiting: true,
-        roommateComposition: { male: 1, female: 2 },
-        roommateIntro: '디자인 전공 학생이에요. 주말 외출이 많고, 조용한 룸메를 찾고 있어요.',
-      },
-      {
-        id: 'm6-flex',
-        roomType: 'flexroom',
-        rent: 1500,
-        availableFrom: '2026-09-20',
-        availableTo: '2026-10-19',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-    ],
-    perks: ['washer-dryer', 'terrace', 'rooftop', 'bbq-grill'],
-    creditOffer: null,
     roommateWaiting: {
       profiles: [
         {
@@ -1045,7 +618,7 @@ export const MOCK_HOUSING_POSTS: HousingPost[] = [
           affiliation: { kind: 'professional' },
           preferredRoomTypes: ['master-w-bath'],
           intro:
-            'Williamsburg 직장인입니다. 루프탑·BBQ는 가끔 친구 초대해요. 주중엔 재택이 많아요.',
+            'Williamsburg 직장인입니다. 루프탑·BBQ는 가끔 친구 초대해요.',
         },
         {
           id: 'm6-rm-female',
@@ -1057,228 +630,169 @@ export const MOCK_HOUSING_POSTS: HousingPost[] = [
         },
       ],
     },
-    contactEmail: 'housing@misaeng.com',
-    images: pickMockHousingImages(5),
-    youtubeUrl: null,
-    authorUid: 'mock-misaeng',
-    authorEmail: 'housing@misaeng.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: now - 1000 * 60 * 60 * 96,
-    updatedAt: now - 1000 * 60 * 60 * 96,
-    status: 'open',
-  },
-  {
+    imageSeed: 5,
+    hoursAgo: 96,
+  }),
+  buildMockListing({
     id: 'mock-housing-7',
-    title: '245 W 75th St',
+    address: '245 W 75th St | The Regent',
+    area: 'Upper West Side',
+    zipcode: '10023',
+    amenities: [
+      '24-hour Attended Lobby',
+      'Fitness Center',
+      'Swimming Pool',
+      'Mail Room',
+      'Sauna',
+    ],
+    incomeRequirements: { personalIncome: '40', personalGuarantor: '0' },
+    bedrooms: 2,
+    bathrooms: 2,
+    price: 6250,
+    availableDate: '2026-09-01',
+    rooms: [
+      { type: 'master-w-bath', price: 2400 },
+      { type: 'regular-bedroom', price: 2100 },
+      { type: 'flexroom', price: 1750 },
+    ],
+    promotions: [{ hasOP: true, rentCredit: 2000, leaseTerm: 12 }],
     description:
       'Central Park 인근 2베드 2배스. Master / Regular / Flex 각각 다른 월세.',
-    neighborhood: 'Upper West Side',
-    bedrooms: 2,
-    unitType: '2b2b',
-    unitRent: 6250,
-    roomOptions: [
-      {
-        id: 'm7-master',
-        roomType: 'master-w-bath',
-        rent: 2400,
-        availableFrom: '2026-09-01',
-        availableTo: '2026-09-30',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-      {
-        id: 'm7-regular',
-        roomType: 'regular-bedroom',
-        rent: 2100,
-        availableFrom: '2026-09-01',
-        availableTo: '2026-09-30',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-      {
-        id: 'm7-flex',
-        roomType: 'flexroom',
-        rent: 1750,
-        availableFrom: '2026-09-15',
-        availableTo: '2026-10-14',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-    ],
-    perks: [
-      'no-broker-fee',
-      'no-guarantor',
-      'free-credit',
-      'gym',
-      'pool',
-      'doorman-24h',
-      'mail-room',
-      'sauna',
-    ],
-    creditOffer: { kind: 'dollar-credit', amount: 2000 },
-    roommateWaiting: null,
-    contactEmail: 'housing@misaeng.com',
-    images: pickMockHousingImages(6),
-    youtubeUrl: null,
-    authorUid: 'mock-misaeng',
-    authorEmail: 'housing@misaeng.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: now - 1000 * 60 * 60 * 110,
-    updatedAt: now - 1000 * 60 * 60 * 110,
-    status: 'open',
-  },
-  {
+    imageSeed: 6,
+    hoursAgo: 110,
+  }),
+  buildMockListing({
     id: 'mock-housing-8',
-    title: '27-28 Thomson Ave',
-    description:
-      '7·E·M 환승 편리. Master / Regular 쉐어에 적합한 구조.',
-    neighborhood: 'Long Island City',
+    address: '27-28 Thomson Ave | City View',
+    area: 'Long Island City',
+    zipcode: '11101',
+    subway: ['🚇 3 min walk to Court Sq (7/E/M)'],
+    appliances: ['Dishwasher', 'In-Unit Washer'],
+    incomeRequirements: { personalIncome: '40', personalGuarantor: '80' },
     bedrooms: 3,
-    unitType: '3b1b',
-    unitRent: 3150,
-    roomOptions: [
-      {
-        id: 'm8-master',
-        roomType: 'master-w-bath',
-        rent: 1700,
-        availableFrom: '2026-10-01',
-        availableTo: '2026-10-30',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-      {
-        id: 'm8-regular',
-        roomType: 'regular-bedroom',
-        rent: 1450,
-        availableFrom: '2026-10-01',
-        availableTo: '2026-10-30',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
+    bathrooms: 1,
+    price: 3150,
+    availableDate: '2026-10-01',
+    rooms: [
+      { type: 'master-w-bath', price: 1700 },
+      { type: 'regular-bedroom', price: 1450 },
     ],
-    perks: ['no-guarantor', 'washer-dryer'],
-    creditOffer: null,
-    roommateWaiting: null,
-    contactEmail: 'housing@misaeng.com',
-    images: pickMockHousingImages(7),
-    youtubeUrl: null,
-    authorUid: 'mock-misaeng',
-    authorEmail: 'housing@misaeng.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: now - 1000 * 60 * 60 * 130,
-    updatedAt: now - 1000 * 60 * 60 * 130,
-    status: 'open',
-  },
-  {
+    description: '7·E·M 환승 편리. Master / Regular 쉐어에 적합한 구조.',
+    imageSeed: 7,
+    hoursAgo: 130,
+  }),
+  buildMockListing({
     id: 'mock-housing-9',
-    title: '222 Berkeley Pl',
+    address: '222 Berkeley Pl | Park Slope Classic',
+    area: 'Park Slope',
+    zipcode: '11217',
+    amenities: ['Fitness Center', 'Terrace'],
+    bedrooms: 3,
+    bathrooms: 2,
+    price: 5050,
+    availableDate: '2026-09-20',
+    rooms: [
+      { type: 'master-w-bath', price: 1950 },
+      { type: 'regular-bedroom', price: 1700 },
+      { type: 'flexroom', price: 1400 },
+    ],
+    promotions: [{ hasOP: true }],
     description:
       'Prospect Park 도보권. Master / Regular / Flex. 조용한 주거 지역.',
-    neighborhood: 'Park Slope',
-    bedrooms: 3,
-    unitType: '3b2b',
-    unitRent: 5050,
-    roomOptions: [
-      {
-        id: 'm9-master',
-        roomType: 'master-w-bath',
-        rent: 1950,
-        availableFrom: '2026-09-20',
-        availableTo: '2026-10-19',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-      {
-        id: 'm9-regular',
-        roomType: 'regular-bedroom',
-        rent: 1700,
-        availableFrom: '2026-09-20',
-        availableTo: '2026-10-19',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-      {
-        id: 'm9-flex',
-        roomType: 'flexroom',
-        rent: 1400,
-        availableFrom: '2026-10-01',
-        availableTo: '2026-10-30',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-    ],
-    perks: ['no-broker-fee', 'terrace', 'gym'],
-    creditOffer: null,
-    roommateWaiting: null,
-    contactEmail: 'housing@misaeng.com',
-    images: pickMockHousingImages(8),
-    youtubeUrl: null,
-    authorUid: 'mock-misaeng',
-    authorEmail: 'housing@misaeng.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: now - 1000 * 60 * 60 * 150,
-    updatedAt: now - 1000 * 60 * 60 * 150,
-    status: 'open',
-  },
-  {
+    imageSeed: 8,
+    hoursAgo: 150,
+  }),
+  buildMockListing({
     id: 'mock-housing-10',
-    title: '301 W 118th St',
+    address: '301 W 118th St | Harlem Heritage',
+    area: 'Harlem',
+    zipcode: '10026',
+    subway: ['🚇 2 min walk to 116 St (2/3/B/C)'],
+    amenities: ['Fitness Center', 'Swimming Pool'],
+    appliances: ['Dishwasher'],
+    incomeRequirements: { personalIncome: '40', personalGuarantor: '0' },
+    bedrooms: 4,
+    bathrooms: 2,
+    price: 5200,
+    availableDate: '2026-11-01',
+    rooms: [{ type: 'entire', price: 5200 }],
+    promotions: [{ hasOP: true, freeMonth: 1, leaseTerm: 12 }],
     description:
       '침실 4개 이상 대형 유닛. 그룹 쉐어·가족 거주 가능. 2·3·B·C 라인 접근성 좋음.',
-    neighborhood: 'Harlem',
-    bedrooms: 4,
-    unitType: '4-plus',
-    unitRent: 5200,
-    roomOptions: [
-      {
-        id: 'm10-unit',
-        roomType: null,
-        rent: 5200,
-        availableFrom: '2026-11-01',
-        availableTo: '2026-11-30',
-        roommateWaiting: false,
-        roommateComposition: null,
-        roommateIntro: null,
-      },
-    ],
-    perks: [
-      'no-broker-fee',
-      'no-guarantor',
-      'free-credit',
-      'washer-dryer',
-      'pool',
-    ],
-    creditOffer: { kind: 'months-free', months: 1 },
-    roommateWaiting: null,
-    contactEmail: 'housing@misaeng.com',
-    images: pickMockHousingImages(9),
-    youtubeUrl: null,
-    authorUid: 'mock-misaeng',
-    authorEmail: 'housing@misaeng.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: now - 1000 * 60 * 60 * 170,
-    updatedAt: now - 1000 * 60 * 60 * 170,
-    status: 'open',
-  },
+    imageSeed: 9,
+    hoursAgo: 170,
+  }),
 ]
 
-export function listMockHousingPosts(): HousingPost[] {
-  return MOCK_HOUSING_POSTS.filter((post) => post.status === 'open')
+/** @deprecated MOCK_HOUSING_LISTINGS 사용 */
+export const MOCK_HOUSING_POSTS: HousingPost[] = MOCK_HOUSING_LISTINGS
+
+export function listMockHousingListings(): HousingListing[] {
+  return MOCK_HOUSING_LISTINGS.filter((listing) => listing.status === 'open')
 }
 
-export function getMockHousingPost(id: string): HousingPost | null {
-  return MOCK_HOUSING_POSTS.find((post) => post.id === id) ?? null
+/** @deprecated listMockHousingListings 사용 */
+export function listMockHousingPosts(): HousingListing[] {
+  return listMockHousingListings()
+}
+
+export function getMockHousingListing(id: string): HousingListing | null {
+  return MOCK_HOUSING_LISTINGS.find((listing) => listing.id === id) ?? null
+}
+
+/** @deprecated getMockHousingListing 사용 */
+export function getMockHousingPost(id: string): HousingListing | null {
+  return getMockHousingListing(id)
+}
+
+export function getListingCardBadges(listing: HousingListing) {
+  const derived = getListingDerivedPerks(listing)
+  const badges: { key: string; label: string }[] = derived
+    .filter((perk) => HOUSING_CARD_BADGE_PERKS.includes(perk))
+    .map((perk) => ({ key: perk, label: getHousingPerkLabel(perk) }))
+  const credit = getListingCreditOffer(listing)
+  if (credit) {
+    badges.push({
+      key: 'credit-offer',
+      label: formatHousingCreditOfferLabel(credit),
+    })
+  }
+  return badges
+}
+
+export function getListingBenefitPerks(listing: HousingListing): HousingPerkId[] {
+  return getListingDerivedPerks(listing).filter(
+    (perk) =>
+      HOUSING_BENEFIT_PERKS.includes(perk) &&
+      perk !== 'free-credit' &&
+      perk !== 'roommate-waiting',
+  )
+}
+
+export function getListingAmenityPerks(listing: HousingListing): HousingPerkId[] {
+  return getListingDerivedPerks(listing).filter((perk) =>
+    HOUSING_AMENITY_PERKS.includes(perk),
+  )
+}
+
+export function shouldShowListingRoomRows(listing: HousingListing): boolean {
+  const rooms = getPricedRooms(listing)
+  return (
+    rooms.length > 1 ||
+    (rooms.length === 1 &&
+      rooms[0]?.type !== 'entire' &&
+      rooms[0]?.type !== 'studio')
+  )
+}
+
+export function formatListingPromotionSummary(listing: HousingListing): string[] {
+  const labels: string[] = []
+  const promo = getListingPrimaryPromotion(listing)
+  if (promo?.hasOP) {
+    const months = promo.opMonths ?? 1
+    labels.push(`OP ${months}개월`)
+  }
+  const credit = getListingCreditOffer(listing)
+  if (credit) labels.push(formatHousingCreditOfferLabel(credit))
+  return labels
 }

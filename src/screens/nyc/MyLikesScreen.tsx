@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { LoadingState, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { useHousingLikes } from '@hooks/useHousingLikes'
-import { getHousingUnitRent, listMockHousingPosts } from '@lib/constants/housingMock'
+import { getHousingUnitRent, getListingArea, getListingDisplayAddress, listMockHousingPosts } from '@lib/constants/housingMock'
 import { NYC_CATEGORIES, NYC_PAGE_SHELL_CLASS, type NycCategoryId } from '@lib/constants/nyc'
 import { cn } from '@lib'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
@@ -328,8 +328,8 @@ export function MyLikesScreen() {
 function mapHousing(post: HousingPost): LikedItem {
   return {
     id: post.id,
-    title: post.title,
-    meta: `${post.neighborhood} · $${getHousingUnitRent(post).toLocaleString()}/월`,
+    title: getListingDisplayAddress(post),
+    meta: `${getListingArea(post)} · $${getHousingUnitRent(post).toLocaleString()}/월`,
     href: `/nyc/housing/${post.id}`,
     categoryId: 'housing',
     boardLabel: '하우징',

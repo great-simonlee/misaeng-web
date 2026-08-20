@@ -11,6 +11,8 @@ import {
   getHousingPricePresets,
   getHousingRoomTypeLabel,
   getHousingUnitTypeLabel,
+  getListingArea,
+  getListingUnitType,
   housingMatchesPerk,
   housingMatchesPrice,
   housingMatchesRoomType,
@@ -28,6 +30,7 @@ import {
 } from '@lib/constants/housingMock'
 import { cn } from '@lib'
 import type {
+  HousingListing,
   HousingPerkId,
   HousingRoomType,
   HousingUnitType,
@@ -136,22 +139,22 @@ export function HousingListScreen() {
   const posts = useMemo(() => listMockHousingPosts(), [])
 
   const filteredPosts = useMemo(() => {
-    return posts.filter((post) => {
+    return posts.filter((listing) => {
       const matchUnit =
         listingKind !== 'unit' ||
         unitType === 'all' ||
-        post.unitType === unitType
+        getListingUnitType(listing) === unitType
       const matchRoom =
         listingKind !== 'room' ||
         roomType === 'all' ||
-        housingMatchesRoomType(post, roomType)
+        housingMatchesRoomType(listing, roomType)
       const matchArea =
-        neighborhood === 'all' || post.neighborhood === neighborhood
+        neighborhood === 'all' || getListingArea(listing) === neighborhood
       const matchPerks =
         perks.length === 0 ||
-        perks.every((perk) => housingMatchesPerk(post, perk))
+        perks.every((perk) => housingMatchesPerk(listing, perk))
       const matchPrice = housingMatchesPrice(
-        post,
+        listing,
         listingKind,
         priceMin,
         priceMax,
@@ -192,8 +195,9 @@ export function HousingListScreen() {
   const neighborhoodOptions = useMemo(() => {
     const counts: Record<string, number> = {}
     for (const area of HOUSING_NEIGHBORHOODS) counts[area] = 0
-    for (const post of posts) {
-      counts[post.neighborhood] = (counts[post.neighborhood] ?? 0) + 1
+    for (const listing of posts) {
+      counts[getListingArea(listing)] =
+        (counts[getListingArea(listing)] ?? 0) + 1
     }
     const withPosts = HOUSING_NEIGHBORHOODS.filter((area) => counts[area] > 0)
     const withoutPosts = HOUSING_NEIGHBORHOODS.filter(
@@ -321,22 +325,23 @@ export function HousingListScreen() {
   }
 
   const draftResultCount = useMemo(() => {
-    return posts.filter((post) => {
+    return posts.filter((listing) => {
       const matchUnit =
         draftListingKind !== 'unit' ||
         draftUnitType === 'all' ||
-        post.unitType === draftUnitType
+        getListingUnitType(listing) === draftUnitType
       const matchRoom =
         draftListingKind !== 'room' ||
         draftRoomType === 'all' ||
-        housingMatchesRoomType(post, draftRoomType)
+        housingMatchesRoomType(listing, draftRoomType)
       const matchArea =
-        draftNeighborhood === 'all' || post.neighborhood === draftNeighborhood
+        draftNeighborhood === 'all' ||
+        getListingArea(listing) === draftNeighborhood
       const matchPerks =
         draftPerks.length === 0 ||
-        draftPerks.every((perk) => housingMatchesPerk(post, perk))
+        draftPerks.every((perk) => housingMatchesPerk(listing, perk))
       const matchPrice = housingMatchesPrice(
-        post,
+        listing,
         draftListingKind,
         draftPriceMin,
         draftPriceMax,
@@ -514,10 +519,10 @@ export function HousingListScreen() {
               {summaryLabel}
             </p>
             <div className='grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 lg:gap-3.5'>
-              {filteredPosts.map((post) => (
+              {filteredPosts.map((listing) => (
                 <HousingPostCard
-                  key={post.id}
-                  post={post}
+                  key={listing.id}
+                  listing={listing}
                   highlightRoomType={
                     listingKind === 'room' ? roomType : 'all'
                   }
