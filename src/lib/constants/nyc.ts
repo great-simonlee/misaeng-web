@@ -6,7 +6,8 @@ export const NYC_PAGE_SHELL_CLASS =
 
 /** 카카오톡 문의 채널/오픈채팅 URL (미설정 시 문의 버튼에서 안내) */
 export const KAKAO_INQUIRY_URL =
-  process.env.NEXT_PUBLIC_KAKAO_INQUIRY_URL?.trim() || ''
+  process.env.NEXT_PUBLIC_KAKAO_INQUIRY_URL?.trim() ||
+  'https://open.kakao.com/o/sRI0tPJi'
 
 export const NYC_CATEGORIES = [
   {
