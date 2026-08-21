@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.5](https://github.com/great-simonlee/misaeng-web/compare/v0.0.4...v0.0.5) (2026-08-21)
+
+
+### 문서
+
+* enhance README with additional SSH and app environment variable details for Vercel deployment ([8bc6564](https://github.com/great-simonlee/misaeng-web/commit/8bc6564d73f32889763134975d00aace0a88492c))
+* update README and GitHub Actions to clarify SSH variable usage and switch to secrets for sensitive information ([1ba7d79](https://github.com/great-simonlee/misaeng-web/commit/1ba7d79643a49f779bad7b7c614d10f92dbba42d))
+
 ## 0.0.4 (2026-08-20)
 
 
