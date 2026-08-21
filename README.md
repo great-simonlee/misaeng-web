@@ -90,7 +90,10 @@ Vercel Git 자동 배포는 끄고, GitHub Actions에서 빌드한 산출물을 
 | `VERCEL_TOKEN` | [Vercel 토큰](https://vercel.com/account/tokens) |
 | `VERCEL_ORG_ID` | Vercel 팀(또는 계정) ID |
 | `VERCEL_PROJECT_ID` | Vercel 프로젝트 ID |
-| `BASTION_SSH_KEY` | 배스천/EC2 SSH PEM 전체 (`AWS SSH whoami` 워크플로) |
+| `BASTION_SSH_KEY` | 배스천/EC2 SSH PEM 전체 |
+| `BASTION_HOST` | 배스천 공인 IP |
+| `APP_HOST` | 내부 EC2 사설 IP |
+| `SSH_USER` | SSH 유저 (예: `ec2-user`) |
 
 ID는 Vercel 대시보드 **Project Settings → General**의 Project ID, **Team Settings → General**의 Team ID에서 확인할 수 있습니다.
 
@@ -99,9 +102,6 @@ ID는 Vercel 대시보드 **Project Settings → General**의 Project ID, **Team
 | Variable | 설명 |
 |---|---|
 | `APP_ENV_JSON` | 앱 환경 변수 JSON (`app-env.example.json` 형식) |
-| `BASTION_HOST` | 배스천 공인 IP |
-| `APP_HOST` | 내부 EC2 사설 IP |
-| `SSH_USER` | SSH 유저 (예: `ec2-user`) |
 
 앱 환경 변수는 `APP_ENV_JSON` 하나에 JSON으로 넣습니다. 형식은 `app-env.example.json`을 참고하세요.
 

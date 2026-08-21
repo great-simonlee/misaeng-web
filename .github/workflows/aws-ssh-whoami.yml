@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      BASTION_HOST: ${{ vars.BASTION_HOST }}
-      APP_HOST: ${{ vars.APP_HOST }}
-      SSH_USER: ${{ vars.SSH_USER }}
+      BASTION_HOST: ${{ secrets.BASTION_HOST }}
+      APP_HOST: ${{ secrets.APP_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
 
     steps:
       - name: Setup SSH config
@@ -26,7 +26,7 @@ jobs:
             exit 1
           fi
           if [ -z "$BASTION_HOST" ] || [ -z "$APP_HOST" ] || [ -z "$SSH_USER" ]; then
-            echo "GitHub Variables BASTION_HOST, APP_HOST, SSH_USER를 설정해 주세요."
+            echo "GitHub Secrets BASTION_HOST, APP_HOST, SSH_USER를 설정해 주세요."
             exit 1
           fi
           mkdir -p ~/.ssh
