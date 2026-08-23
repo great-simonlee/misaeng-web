@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { toPublicHousingListing } from '@lib/housing/publicListing'
 import { getStoredHousingListing } from '@lib/supabase/housing.server'
 
 export const runtime = 'nodejs'
@@ -16,7 +17,7 @@ export async function GET(_request: Request, { params }: HousingDetailRouteProps
     if (!listing || listing.status === 'closed') {
       return NextResponse.json({ listing: null }, { status: 404 })
     }
-    return NextResponse.json({ listing })
+    return NextResponse.json({ listing: toPublicHousingListing(listing) })
   } catch (error) {
     console.error('Housing detail error:', error)
     return NextResponse.json(

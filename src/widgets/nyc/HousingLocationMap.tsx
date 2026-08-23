@@ -1,21 +1,18 @@
 interface HousingLocationMapProps {
+  listingId: string
   address: string
   neighborhood: string
   className?: string
 }
 
 export function HousingLocationMap({
+  listingId,
   address,
   neighborhood,
   className,
 }: HousingLocationMapProps) {
-  const query = [address, neighborhood, 'New York, NY']
-    .filter(Boolean)
-    .join(', ')
-
-  const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=15&output=embed`
-
-  const externalHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+  const mapSrc = `/api/housing/${encodeURIComponent(listingId)}/map`
+  const externalHref = `/api/housing/${encodeURIComponent(listingId)}/map?open=1`
 
   return (
     <section

@@ -1,5 +1,8 @@
 export const MISAENG_EMAIL_DOMAIN = '@misaeng.com'
 
+export const MISAENG_NY_INSTAGRAM_HANDLE = 'misaeng.ny'
+export const MISAENG_NY_INSTAGRAM_URL = `https://instagram.com/${MISAENG_NY_INSTAGRAM_HANDLE}`
+
 /** NYC 네비·푸터·본문 가로 정렬용 컨테이너 */
 export const NYC_PAGE_SHELL_CLASS =
   'mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'
@@ -221,43 +224,35 @@ export function isMisaengEmail(email: string | null | undefined): boolean {
   return email.toLowerCase().endsWith(MISAENG_EMAIL_DOMAIN)
 }
 
-/** 로고는 추후 교체. 지금은 이니셜 플레이스홀더. handle이 있으면 Instagram 링크. */
+/** handle이 있으면 Instagram 링크. logoSrc가 있으면 학교 로고 표시. */
 export const NYC_PARTNER_ORGS = [
   {
     id: 'nyu-kiso',
     name: '뉴욕대 한인학생회',
     shortName: 'NYU',
     handle: 'nyu_kiso',
+    logoSrc: '/img/school/kiso.png',
   },
   {
     id: 'fit-ksof',
     name: 'FIT 한인학생회',
     shortName: 'FIT',
     handle: 'ksof_fit',
-  },
-  {
-    id: 'columbia-ksa',
-    name: '컬럼비아 한인학생회',
-    shortName: 'CU',
-    handle: null,
+    logoSrc: '/img/school/fit.png',
   },
   {
     id: 'baruch-ksa',
     name: '바루크 한인학생회',
     shortName: 'BC',
-    handle: null,
-  },
-  {
-    id: 'newschool-ksa',
-    name: '뉴스키쿨 한인학생회',
-    shortName: 'TNS',
-    handle: null,
+    handle: 'ksabaruch',
+    logoSrc: '/img/school/baruch.png',
   },
   {
     id: 'parsons-ksa',
     name: '파슨스 한인학생회',
     shortName: 'PAR',
-    handle: null,
+    handle: 'parsons.kisp',
+    logoSrc: '/img/school/parsons.png',
   },
 ] as const
 
@@ -283,46 +278,46 @@ export const NYC_INFLUENCER_PLATFORMS = [
 export type NycInfluencerPlatformId =
   (typeof NYC_INFLUENCER_PLATFORMS)[number]['id']
 
-/** 프로필·링크는 추후 교체. handle이 있으면 플랫폼 프로필로 연결. */
+/** 협력 인플루언서 확정 전 모집 안내. handle이 있으면 플랫폼 프로필로 연결. */
 export const NYC_PARTNER_INFLUENCERS = [
   {
-    id: 'ig-placeholder-1',
-    name: 'NYC Daily',
+    id: 'ig-recruiting-1',
+    name: '협력 인플루언서를 찾습니다!',
     shortName: 'IG',
     handle: null,
     platform: 'instagram',
   },
   {
-    id: 'ig-placeholder-2',
-    name: '한인 라이프',
+    id: 'ig-recruiting-2',
+    name: '현재 협력 인플루언서 찾는 중',
     shortName: 'IG',
     handle: null,
     platform: 'instagram',
   },
   {
-    id: 'yt-placeholder-1',
-    name: '뉴욕 브이로그',
+    id: 'yt-recruiting-1',
+    name: '협력 인플루언서를 찾습니다!',
     shortName: 'YT',
     handle: null,
     platform: 'youtube',
   },
   {
-    id: 'yt-placeholder-2',
-    name: '유학생 채널',
+    id: 'yt-recruiting-2',
+    name: '현재 협력 인플루언서 찾는 중',
     shortName: 'YT',
     handle: null,
     platform: 'youtube',
   },
   {
-    id: 'tt-placeholder-1',
-    name: 'NYC Shorts',
+    id: 'tt-recruiting-1',
+    name: '협력 인플루언서를 찾습니다!',
     shortName: 'TT',
     handle: null,
     platform: 'tiktok',
   },
   {
-    id: 'tt-placeholder-2',
-    name: '맨해튼 클립',
+    id: 'tt-recruiting-2',
+    name: '현재 협력 인플루언서 찾는 중',
     shortName: 'TT',
     handle: null,
     platform: 'tiktok',

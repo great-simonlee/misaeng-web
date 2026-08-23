@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 
+import { MisaengNyInstagramDmCallout } from '@widgets/nyc/MisaengNyInstagramDmCallout'
+
 export function InfluencersScreen() {
   return (
     <div className='min-h-screen bg-[linear-gradient(180deg,#f6f7f9_0%,#ffffff_42%,#ffffff_100%)]'>
@@ -13,19 +15,26 @@ export function InfluencersScreen() {
           인플루언서 콘텐츠
         </h1>
         <p className='mt-2 text-[14px] leading-relaxed text-[var(--muted-foreground)]'>
-          협력 인플루언서가 올린 콘텐츠를 한곳에서 모아 볼 예정이에요.
+          현재 협력 인플루언서를 찾고 있어요. 인스타그램 · 유튜브 · 틱톡
+          크리에이터와 함께할 예정이에요.
         </p>
 
         <div className='mt-8 rounded-[1.25rem] bg-white px-6 py-10 text-center shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>
           <p className='text-[15px] font-semibold tracking-tight text-[var(--foreground)]'>
-            곧 공개됩니다
+            협력 인플루언서를 찾습니다!
           </p>
           <p className='mt-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-            인스타그램 · 유튜브 · 틱톡 콘텐츠가 여기에 모여요.
+            현재 협력 인플루언서 찾는 중이에요. 곧 이곳에서 콘텐츠를 모아 볼 수
+            있어요.
           </p>
+        </div>
+
+        <MisaengNyInstagramDmCallout message='협력 인플루언서 문의는 인스타그램' />
+
+        <div className='mt-8 text-center'>
           <Link
             href='/nyc'
-            className='mt-5 inline-flex h-10 items-center rounded-full bg-[var(--foreground)] px-5 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--navy-light)]'
+            className='text-[13px] font-medium text-[var(--muted)] touch-manipulation transition hover:text-[var(--foreground)]'
           >
             커뮤니티 홈으로
           </Link>

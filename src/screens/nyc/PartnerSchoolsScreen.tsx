@@ -3,6 +3,8 @@
 import Link from 'next/link'
 
 import { NYC_PARTNER_ORGS } from '@lib/constants/nyc'
+import { MisaengNyInstagramDmCallout } from '@widgets/nyc/MisaengNyInstagramDmCallout'
+import { PartnerSchoolLogo } from '@widgets/nyc/PartnerSchoolLogo'
 
 export function PartnerSchoolsScreen() {
   return (
@@ -22,9 +24,11 @@ export function PartnerSchoolsScreen() {
           {NYC_PARTNER_ORGS.map((org, index) => {
             const row = (
               <div className='flex items-center gap-3 px-5 py-4'>
-                <span className='flex size-10 shrink-0 items-center justify-center rounded-full bg-[#f4f5f7] text-[11px] font-bold text-[var(--foreground)]'>
-                  {org.shortName}
-                </span>
+                <PartnerSchoolLogo
+                  shortName={org.shortName}
+                  logoSrc={org.logoSrc}
+                  size='md'
+                />
                 <div className='min-w-0 flex-1'>
                   <p className='truncate text-[15px] font-medium tracking-tight text-[var(--foreground)]'>
                     {org.name}
@@ -61,6 +65,8 @@ export function PartnerSchoolsScreen() {
             )
           })}
         </ul>
+
+        <MisaengNyInstagramDmCallout message='파트너 학생회 문의는 인스타그램' />
 
         <div className='mt-8 text-center'>
           <Link

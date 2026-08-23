@@ -29,6 +29,50 @@ function asNumber(value: unknown, fallback = 0) {
   return Number.isFinite(n) ? n : fallback
 }
 
+function asCoordinate(value: unknown): number | null {
+  if (value == null || value === '') return null
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  if (typeof value === 'string') {
+    const n = Number(value.trim().replace(/[^0-9.+-]/g, ''))
+    return Number.isFinite(n) ? n : null
+  }
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    return asCoordinate(record.latitude ?? record.lat ?? record.longitude ?? record.lng)
+  }
+  return null
+}
+
+function readCoordinates(propertyRaw: Record<string, unknown>): {
+  latitude: number | null
+  longitude: number | null
+} {
+  const nested =
+    propertyRaw.location && typeof propertyRaw.location === 'object'
+      ? (propertyRaw.location as Record<string, unknown>)
+      : propertyRaw.geo && typeof propertyRaw.geo === 'object'
+        ? (propertyRaw.geo as Record<string, unknown>)
+        : propertyRaw.coordinates && typeof propertyRaw.coordinates === 'object'
+          ? (propertyRaw.coordinates as Record<string, unknown>)
+          : null
+  const latitude =
+    asCoordinate(propertyRaw.latitude ?? propertyRaw.lat) ??
+    (nested ? asCoordinate(nested.latitude ?? nested.lat) : null)
+  const longitude =
+    asCoordinate(propertyRaw.longitude ?? propertyRaw.lng ?? propertyRaw.lon) ??
+    (nested ? asCoordinate(nested.longitude ?? nested.lng ?? nested.lon) : null)
+  if (
+    latitude == null ||
+    longitude == null ||
+    (latitude === 0 && longitude === 0) ||
+    Math.abs(latitude) > 90 ||
+    Math.abs(longitude) > 180
+  ) {
+    return { latitude: null, longitude: null }
+  }
+  return { latitude, longitude }
+}
+
 /** null = unknown, 0 = free, greater than 0 = paid */
 function asAmenityAmount(value: unknown): number | null {
   if (value == null || value === '') return null
@@ -124,10 +168,7 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
       buildingName: String(propertyRaw.buildingName || '').trim() || null,
       area: String(propertyRaw.area || '').trim() || 'New York',
       zipcode: String(propertyRaw.zipcode || '').trim() || null,
-      latitude:
-        propertyRaw.latitude == null ? null : asNumber(propertyRaw.latitude, 0),
-      longitude:
-        propertyRaw.longitude == null ? null : asNumber(propertyRaw.longitude, 0),
+      ...readCoordinates(propertyRaw),
       subway: asStringArray(propertyRaw.subway),
       amenities: asStringArray(propertyRaw.amenities),
       appliances: asStringArray(propertyRaw.appliances),

@@ -117,7 +117,7 @@ export function NycLoginScreen() {
       : '로그인'
   const description = isResetMode
     ? '가입한 이메일을 입력하면 비밀번호 재설정 링크를 보내드려요.'
-    : '유학생 · 직장인을 위한 New York City 정보 공유 공간이에요.'
+    : null
 
   const submitLabel = submitting
     ? '잠시만 기다려 주세요…'
@@ -145,7 +145,13 @@ export function NycLoginScreen() {
               {title}
             </h1>
             <p className='mt-2 text-[14px] font-normal leading-[1.55] text-[#667085]'>
-              {description}
+              {description ?? (
+                <>
+                  유학생 · 직장인을 위한
+                  <br />
+                  New York City 정보 공유 공간이에요.
+                </>
+              )}
             </p>
           </header>
 

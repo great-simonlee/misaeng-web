@@ -406,6 +406,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               )}
               <HousingPropertySection listing={listing} />
               <HousingLocationMap
+                listingId={listing.id}
                 address={displayAddress}
                 neighborhood={area}
               />
@@ -548,6 +549,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
 
             <div className='mt-5 lg:hidden'>
               <HousingLocationMap
+                listingId={listing.id}
                 address={displayAddress}
                 neighborhood={area}
               />

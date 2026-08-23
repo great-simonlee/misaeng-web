@@ -91,9 +91,10 @@ export function getListingDisplayAddress(listing: HousingListing): string {
   if (property.displayedAddress?.trim()) {
     return streetBeforeFirstComma(property.displayedAddress)
   }
-  const { street, buildingName } = parsePropertyAddress(property.address)
-  const streetTitle = streetBeforeFirstComma(street)
-  return buildingName ? `${streetTitle} · ${buildingName}` : streetTitle
+  if (property.buildingName?.trim()) {
+    return property.buildingName.trim()
+  }
+  return property.area?.trim() || 'New York'
 }
 
 export function getListingStreetAddress(listing: HousingListing): string {
