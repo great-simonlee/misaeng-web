@@ -5,6 +5,7 @@ import {
   normalizeWaitMinutes,
 } from '@lib/community/food'
 import { isCommunityBoardId } from '@lib/constants/nyc'
+import { getSupabaseProfile } from '@lib/supabase/profile.server'
 
 const DEFAULT_BUCKET = 'housing'
 const FALLBACK_BUCKET = 'avatars'
@@ -94,6 +95,10 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
     detail: String(data.detail || '').trim(),
     authorUid: String(data.authorUid || '').trim(),
     authorEmail: String(data.authorEmail || '').trim(),
+    authorNickname:
+      typeof data.authorNickname === 'string' && data.authorNickname.trim()
+        ? data.authorNickname.trim()
+        : null,
     authorSchoolId:
       typeof data.authorSchoolId === 'string' ? data.authorSchoolId : null,
     authorSchoolName:
@@ -221,6 +226,24 @@ export async function listStoredCommunityPostsByAuthor(
   return posts.filter((post) => post.authorUid === uid)
 }
 
+async function enrichCommunityPostAuthor(
+  post: CommunityPost,
+): Promise<CommunityPost> {
+  if (post.authorNickname?.trim()) return post
+
+  const profile = await getSupabaseProfile(post.authorUid)
+  const nickname = profile?.nickname?.trim()
+  if (!nickname) return post
+
+  const enriched = { ...post, authorNickname: nickname }
+  try {
+    await saveStoredCommunityPost(enriched)
+  } catch {
+    // 표시만 보강, 저장 실패 시에도 닉네임은 반환
+  }
+  return enriched
+}
+
 export async function getStoredCommunityPost(
   id: string,
 ): Promise<CommunityPost | null> {
@@ -228,7 +251,9 @@ export async function getStoredCommunityPost(
   const postId = String(id || '').trim()
   if (!postId) return null
   const bucket = await resolveBucket()
-  return fetchPostJson(bucket, objectPath(postId))
+  const post = await fetchPostJson(bucket, objectPath(postId))
+  if (!post) return null
+  return enrichCommunityPostAuthor(post)
 }
 
 export async function saveStoredCommunityPost(

@@ -276,18 +276,11 @@ export function MyPostsScreen() {
                               {post.boardLabel}
                             </span>
                           )}
-                          {post.status === 'closed' && (
-                            <span className='rounded-full bg-[#f1f2f4] px-2 py-0.5 text-[10px] font-semibold text-[var(--muted)]'>
-                              마감
-                            </span>
-                          )}
                         </div>
                         <div
                           className={cn(
                             'flex flex-wrap items-center gap-1.5',
-                            category === 'all' || post.status === 'closed'
-                              ? 'mt-1'
-                              : undefined,
+                            category === 'all' ? 'mt-1' : undefined,
                           )}
                         >
                           <p className='truncate text-[15px] font-semibold tracking-tight text-[var(--foreground)] lg:text-base'>
@@ -302,7 +295,7 @@ export function MyPostsScreen() {
 
                       {post.canManage ? (
                         <div className='flex shrink-0 items-center gap-1.5 pt-0.5'>
-                          {post.editHref && post.status === 'open' ? (
+                          {post.editHref ? (
                             <Link
                               href={post.editHref}
                               className='inline-flex h-8 items-center rounded-full bg-[#f3f4f6] px-3 text-[12px] font-semibold text-[var(--foreground)] touch-manipulation transition hover:bg-[#e8eaee]'

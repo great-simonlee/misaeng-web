@@ -24,9 +24,11 @@ function post(
     | 'longitude'
     | 'authorUid'
     | 'authorEmail'
+    | 'authorNickname'
   > & {
     authorUid?: string
     authorEmail?: string
+    authorNickname?: string | null
     updatedAt?: number
     viewCount?: number
     beenThereCount?: number
@@ -46,6 +48,7 @@ function post(
     ...partial,
     authorUid: partial.authorUid ?? `mock-author-${partial.id}`,
     authorEmail: partial.authorEmail ?? `mock-${partial.id}@example.com`,
+    authorNickname: partial.authorNickname ?? null,
     thumbnailUrl: partial.thumbnailUrl ?? null,
     partySize: partial.partySize ?? null,
     totalSpend: partial.totalSpend ?? null,
@@ -85,6 +88,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     detail: '한식',
     authorUid: 'mock-user-1',
     authorEmail: 'foodlover@nyu.edu',
+    authorNickname: '플러싱러버',
     authorSchoolId: 'nyu',
     authorSchoolName: 'New York University',
     createdAt: NOW - 3 * HOUR,

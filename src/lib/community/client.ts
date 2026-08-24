@@ -71,6 +71,7 @@ export async function createCommunityPostRequest(input: {
   detail: string
   authorSchoolId: string | null
   authorSchoolName: string | null
+  authorNickname?: string | null
   thumbnailUrl?: string | null
   partySize?: number | null
   totalSpend?: number | null
@@ -156,24 +157,4 @@ export async function deleteCommunityPostRequest(id: string): Promise<void> {
   if (!res.ok || !data?.ok) {
     throw new Error(data?.error || '삭제에 실패했어요')
   }
-}
-
-export async function closeCommunityPostRequest(
-  id: string,
-): Promise<CommunityPost> {
-  if (id.startsWith('mock-')) {
-    throw new Error('예시 글은 마감할 수 없어요')
-  }
-  const res = await fetch(`/api/community/${encodeURIComponent(id)}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status: 'closed' }),
-  })
-  const data = (await res.json().catch(() => null)) as
-    | { post?: CommunityPost; error?: string }
-    | null
-  if (!res.ok || !data?.post) {
-    throw new Error(data?.error || '마감에 실패했어요')
-  }
-  return data.post
 }

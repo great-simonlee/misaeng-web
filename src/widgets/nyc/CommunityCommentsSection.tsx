@@ -139,60 +139,62 @@ export function CommunityCommentsSection({
   }
 
   return (
-    <BoardSurface as='section' className='mt-5 p-5 sm:mt-6 sm:p-6'>
-      <div className='flex items-baseline justify-between gap-3'>
-        <h2 className='text-[16px] font-semibold tracking-tight text-[var(--foreground)]'>
-          댓글
-        </h2>
-        <span className='text-[12px] font-medium text-[var(--muted)]'>
-          {totalCount}개
-        </span>
+    <BoardSurface as='section' className='mt-5 overflow-hidden sm:mt-6'>
+      <div className='border-b border-black/[0.04] bg-gradient-to-b from-white to-[#fafbfc] px-5 py-5 sm:px-6'>
+        <div className='flex items-baseline justify-between gap-3'>
+          <h2 className='text-[16px] font-semibold tracking-tight text-[var(--foreground)]'>
+            댓글
+          </h2>
+          <span className='rounded-full bg-white px-2.5 py-0.5 text-[12px] font-semibold tabular-nums text-[var(--muted)] ring-1 ring-black/[0.06]'>
+            {totalCount}
+          </span>
+        </div>
+
+        {!authLoading && !user ? (
+          <div className='mt-4 rounded-2xl bg-white px-4 py-3.5 text-[13px] text-[var(--muted-foreground)] ring-1 ring-black/[0.06]'>
+            댓글을 쓰려면{' '}
+            <Link
+              href={loginHref}
+              className='font-semibold text-[var(--brand)] underline-offset-2 hover:underline'
+            >
+              로그인
+            </Link>
+            이 필요해요.
+          </div>
+        ) : authLoading ? (
+          <p className='mt-4 text-[13px] text-[var(--muted)]'>
+            로그인 상태를 확인하는 중이에요…
+          </p>
+        ) : (
+          <form
+            className='mt-4'
+            onSubmit={(e) => {
+              e.preventDefault()
+              void submitComment(draft, null)
+            }}
+          >
+            <textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              rows={3}
+              maxLength={2000}
+              placeholder='댓글을 남겨 보세요'
+              className='w-full resize-none rounded-2xl border-0 bg-white px-4 py-3.5 text-[14px] leading-relaxed shadow-sm ring-1 ring-black/[0.06] outline-none transition placeholder:text-[var(--muted)] focus:ring-2 focus:ring-[var(--brand)]/20'
+            />
+            <div className='mt-2.5 flex justify-end'>
+              <button
+                type='submit'
+                disabled={submitting || !draft.trim()}
+                className='inline-flex h-10 items-center rounded-full bg-[var(--foreground)] px-5 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--navy-light)] disabled:opacity-40'
+              >
+                {submitting ? '등록 중…' : '댓글 등록'}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
 
-      {!authLoading && !user ? (
-        <div className='mt-4 rounded-xl bg-[#f4f5f7] px-4 py-3 text-[13px] text-[var(--muted-foreground)]'>
-          댓글을 쓰려면{' '}
-          <Link
-            href={loginHref}
-            className='font-semibold text-[var(--brand)] underline-offset-2 hover:underline'
-          >
-            로그인
-          </Link>
-          이 필요해요.
-        </div>
-      ) : authLoading ? (
-        <p className='mt-4 text-[13px] text-[var(--muted)]'>
-          로그인 상태를 확인하는 중이에요…
-        </p>
-      ) : (
-        <form
-          className='mt-4'
-          onSubmit={(e) => {
-            e.preventDefault()
-            void submitComment(draft, null)
-          }}
-        >
-          <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            rows={3}
-            maxLength={2000}
-            placeholder='댓글을 남겨 보세요'
-            className='w-full resize-none rounded-xl border border-black/[0.07] bg-[#fafbfc] px-3.5 py-3 text-[14px] leading-relaxed outline-none transition placeholder:text-[var(--muted)] focus:border-black/20 focus:bg-white'
-          />
-          <div className='mt-2 flex justify-end'>
-            <button
-              type='submit'
-              disabled={submitting || !draft.trim()}
-              className='inline-flex h-10 items-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-50'
-            >
-              {submitting ? '등록 중…' : '댓글 등록'}
-            </button>
-          </div>
-        </form>
-      )}
-
-      <div className='mt-5 space-y-4 border-t border-black/[0.04] pt-5'>
+      <div className='space-y-4 px-5 py-5 sm:px-6'>
         {loading && (
           <p className='py-6 text-center text-[13px] text-[var(--muted)]'>
             댓글을 불러오는 중이에요…

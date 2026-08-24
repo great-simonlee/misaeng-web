@@ -1,6 +1,7 @@
 import type { CommunityComment } from '@/types/nyc'
 import {
   buildCommentThreads,
+  countOpenComments,
   listMockCommunityComments,
 } from '@lib/constants/communityCommentsMock'
 import {
@@ -10,6 +11,13 @@ import {
 } from '@lib/community/comments.local'
 
 export { buildCommentThreads }
+
+export async function fetchCommunityCommentCount(
+  postId: string,
+): Promise<number> {
+  const comments = await fetchCommunityComments(postId)
+  return countOpenComments(comments)
+}
 
 export async function fetchCommunityComments(
   postId: string,

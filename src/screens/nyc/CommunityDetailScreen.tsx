@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -8,7 +7,6 @@ import { LoadingState, PullToRefresh, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import {
-  closeCommunityPostRequest,
   deleteCommunityPostRequest,
   fetchCommunityPost,
 } from '@lib/community/client'
@@ -39,8 +37,7 @@ import {
 } from '@widgets/nyc/BoardPageShell'
 import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 import { CommunityCommentsSection } from '@widgets/nyc/CommunityCommentsSection'
-import { CommunityEngagementBar } from '@widgets/nyc/CommunityEngagementBar'
-import { CopyLinkButton } from '@widgets/nyc/CopyLinkButton'
+import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 
 interface CommunityDetailScreenProps {
@@ -112,17 +109,6 @@ export function CommunityDetailScreen({
     await loadPost({ silent: true })
   }, [loadPost])
 
-  async function handleClose() {
-    if (!post || !user) return
-    try {
-      const next = await closeCommunityPostRequest(post.id)
-      setPost(next)
-      success('게시글을 마감했어요')
-    } catch (err) {
-      toastError(getErrorMessage(err, '마감에 실패했어요'))
-    }
-  }
-
   async function handleDelete() {
     if (!post || !user) return
     const ok = window.confirm(
@@ -159,7 +145,7 @@ export function CommunityDetailScreen({
         <BoardPageShell width='narrow' className='py-12'>
           <EmptyState
             title='게시글을 찾을 수 없습니다'
-            description={error ?? '마감되었거나 삭제된 글일 수 있습니다.'}
+            description={error ?? '삭제된 글일 수 있습니다.'}
             actionHref={`/nyc/${boardId}`}
             actionLabel={`${title} 목록으로`}
           />
@@ -354,58 +340,15 @@ export function CommunityDetailScreen({
               <CommunityRichBody html={bodyHtml} />
             </div>
 
-            <div className='flex flex-col gap-4 border-t border-black/[0.04] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8'>
-              <p className='text-[13px] text-[var(--muted)]'>
-                {anonymous ? (
-                  '익명 작성'
-                ) : (
-                  <>
-                    작성자{' '}
-                    <a
-                      href={`mailto:${post.authorEmail}`}
-                      className='font-medium text-[var(--foreground)] underline-offset-2 hover:underline'
-                    >
-                      {post.authorEmail}
-                    </a>
-                  </>
-                )}
-              </p>
-              <CopyLinkButton />
-            </div>
-
-            <div className='border-t border-black/[0.04] px-5 py-4 sm:px-8'>
-              <CommunityEngagementBar
-                postId={post.id}
-                boardId={boardId}
-                loginNext={`/nyc/${boardId}/${post.id}`}
-              />
-            </div>
+            <CommunityPostFooter
+              post={post}
+              boardId={boardId}
+              anonymous={anonymous}
+              isAuthor={isAuthor}
+              loginNext={`/nyc/${boardId}/${post.id}`}
+              onDelete={() => void handleDelete()}
+            />
           </BoardSurface>
-
-          {isAuthor && (
-            <div className='mt-4 flex flex-wrap gap-2'>
-              <Link
-                href={`/nyc/${boardId}/${post.id}/edit`}
-                className='inline-flex h-11 items-center justify-center rounded-full bg-[var(--foreground)] px-5 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--navy-light)]'
-              >
-                수정
-              </Link>
-              <button
-                type='button'
-                onClick={() => void handleClose()}
-                className='inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-5 text-[13px] font-medium text-[var(--muted-foreground)] touch-manipulation transition hover:border-black/20'
-              >
-                게시 마감
-              </button>
-              <button
-                type='button'
-                onClick={() => void handleDelete()}
-                className='inline-flex h-11 items-center justify-center rounded-full border border-red-200 bg-white px-5 text-[13px] font-medium text-red-600 touch-manipulation transition hover:bg-red-50'
-              >
-                삭제
-              </button>
-            </div>
-          )}
 
           <CommunityCommentsSection
             postId={post.id}

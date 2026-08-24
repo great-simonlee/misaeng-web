@@ -43,7 +43,7 @@ export const NYC_CATEGORIES = [
     description: '생활용품 사고팔기',
     href: '/nyc/marketplace',
     postHref: '/nyc/marketplace/new',
-    available: true,
+    available: false,
   },
   {
     id: 'cpt-opt',
@@ -51,7 +51,7 @@ export const NYC_CATEGORIES = [
     description: '경험·직장 후기',
     href: '/nyc/cpt-opt',
     postHref: '/nyc/cpt-opt/new',
-    available: true,
+    available: false,
   },
   {
     id: 'visa',
@@ -102,6 +102,18 @@ export const NYC_COMMUNITY_BOARD_IDS = [
 ] as const
 
 export type NycCommunityBoardId = (typeof NYC_COMMUNITY_BOARD_IDS)[number]
+
+/** 목록·글쓰기 UI 대신 준비 중 안내를 보여줄 보드 */
+export const NYC_WIP_COMMUNITY_BOARD_IDS = ['marketplace', 'cpt-opt'] as const
+
+export type NycWipCommunityBoardId =
+  (typeof NYC_WIP_COMMUNITY_BOARD_IDS)[number]
+
+export function isCommunityBoardWip(
+  id: string,
+): id is NycWipCommunityBoardId {
+  return (NYC_WIP_COMMUNITY_BOARD_IDS as readonly string[]).includes(id)
+}
 
 export const NYC_COMMUNITY_BOARD_META: Record<
   NycCommunityBoardId,

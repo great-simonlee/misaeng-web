@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
@@ -21,6 +21,7 @@ type CommunityEngagementBarProps = {
   boardId: string
   loginNext?: string
   className?: string
+  layout?: 'default' | 'cards'
 }
 
 export function CommunityEngagementBar({
@@ -28,6 +29,7 @@ export function CommunityEngagementBar({
   boardId,
   loginNext,
   className,
+  layout = 'default',
 }: CommunityEngagementBarProps) {
   const { user, loading: authLoading } = useAuth()
   const { error: toastError, success } = useToast()
@@ -139,98 +141,152 @@ export function CommunityEngagementBar({
 
   return (
     <>
-      <div
-        className={cn(
-          'flex flex-wrap items-center gap-2',
-          className,
-        )}
-      >
-        {!authLoading && !user ? (
-          <Link
-            href={loginHref}
-            className='inline-flex h-10 items-center gap-1.5 rounded-full border border-black/[0.08] bg-white px-3.5 text-[13px] font-medium text-[var(--muted-foreground)] touch-manipulation hover:border-black/15'
-          >
-            추천하려면 로그인
-          </Link>
-        ) : (
-          <button
-            type='button'
-            onClick={() => void handleRecommend()}
-            disabled={busy || authLoading}
-            aria-pressed={recommendedByMe}
+      {layout === 'cards' ? (
+        <div className={cn('space-y-2.5', className)}>
+          <div
             className={cn(
-              'inline-flex h-10 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-semibold touch-manipulation transition disabled:opacity-50',
-              recommendedByMe
-                ? 'border-[var(--brand)]/35 bg-[var(--brand-light)] text-[var(--brand)]'
-                : 'border-black/[0.07] bg-[#fafbfc] text-[var(--foreground)] hover:border-black/15 hover:bg-white',
+              'grid gap-2.5',
+              isFood ? 'grid-cols-2' : 'grid-cols-1',
             )}
           >
-            <RecommendIcon filled={recommendedByMe} />
-            추천
-            <span
-              className={cn(
-                'tabular-nums',
-                recommendedByMe ? 'text-[var(--brand)]' : 'text-[var(--muted)]',
-              )}
-            >
-              {count}
-            </span>
-          </button>
-        )}
-
-        {isFood &&
-          (!authLoading && !user ? (
+            <EngagementCard
+              active={recommendedByMe}
+              activeTone='brand'
+              disabled={busy || authLoading}
+              onClick={() => void handleRecommend()}
+              loginHref={loginHref}
+              needsLogin={!authLoading && !user}
+              icon={<RecommendIcon filled={recommendedByMe} />}
+              label='추천'
+              count={count}
+              countUnit=''
+            />
+            {isFood ? (
+              <EngagementCard
+                active={beenThereByMe}
+                activeTone='emerald'
+                disabled={beenThereBusy || authLoading}
+                onClick={() => void handleBeenThere()}
+                loginHref={loginHref}
+                needsLogin={!authLoading && !user}
+                icon={<BeenThereIcon filled={beenThereByMe} />}
+                label='가봤어요'
+                count={beenThereCount}
+                countUnit='명'
+              />
+            ) : null}
+          </div>
+          {!authLoading && !user ? (
             <Link
               href={loginHref}
-              className='inline-flex h-10 items-center gap-1.5 rounded-full border border-black/[0.08] bg-white px-3.5 text-[13px] font-medium text-[var(--muted-foreground)] touch-manipulation hover:border-black/15'
+              className='flex h-9 w-full items-center justify-center text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
             >
-              <BeenThereIcon filled={false} />
-              나도 가봤어요
+              신고하려면 로그인
             </Link>
           ) : (
             <button
               type='button'
-              onClick={() => void handleBeenThere()}
-              disabled={beenThereBusy || authLoading}
-              aria-pressed={beenThereByMe}
+              onClick={() => setReportOpen(true)}
+              disabled={authLoading}
+              className='flex h-9 w-full items-center justify-center text-[12px] font-medium text-[var(--muted)] touch-manipulation transition hover:text-red-500 disabled:opacity-50'
+            >
+              신고하기
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className={cn('flex flex-wrap items-center gap-2', className)}>
+          {!authLoading && !user ? (
+            <Link
+              href={loginHref}
+              className='inline-flex h-10 items-center gap-1.5 rounded-full border border-black/[0.08] bg-white px-3.5 text-[13px] font-medium text-[var(--muted-foreground)] touch-manipulation hover:border-black/15'
+            >
+              추천하려면 로그인
+            </Link>
+          ) : (
+            <button
+              type='button'
+              onClick={() => void handleRecommend()}
+              disabled={busy || authLoading}
+              aria-pressed={recommendedByMe}
               className={cn(
                 'inline-flex h-10 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-semibold touch-manipulation transition disabled:opacity-50',
-                beenThereByMe
-                  ? 'border-emerald-500/35 bg-emerald-500/[0.08] text-emerald-700'
-                  : 'border-black/[0.08] bg-white text-[var(--foreground)] hover:border-black/15',
+                recommendedByMe
+                  ? 'border-[var(--brand)]/35 bg-[var(--brand-light)] text-[var(--brand)]'
+                  : 'border-black/[0.07] bg-[#fafbfc] text-[var(--foreground)] hover:border-black/15 hover:bg-white',
               )}
             >
-              <BeenThereIcon filled={beenThereByMe} />
-              나도 가봤어요
+              <RecommendIcon filled={recommendedByMe} />
+              추천
               <span
                 className={cn(
                   'tabular-nums',
-                  beenThereByMe ? 'text-emerald-700' : 'text-[var(--muted)]',
+                  recommendedByMe
+                    ? 'text-[var(--brand)]'
+                    : 'text-[var(--muted)]',
                 )}
               >
-                {beenThereCount}
+                {count}
               </span>
             </button>
-          ))}
+          )}
 
-        {!authLoading && !user ? (
-          <Link
-            href={loginHref}
-            className='inline-flex h-10 items-center rounded-full px-3 text-[13px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
-          >
-            신고
-          </Link>
-        ) : (
-          <button
-            type='button'
-            onClick={() => setReportOpen(true)}
-            disabled={authLoading}
-            className='inline-flex h-10 items-center rounded-full px-3 text-[13px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600 disabled:opacity-50'
-          >
-            신고
-          </button>
-        )}
-      </div>
+          {isFood &&
+            (!authLoading && !user ? (
+              <Link
+                href={loginHref}
+                className='inline-flex h-10 items-center gap-1.5 rounded-full border border-black/[0.08] bg-white px-3.5 text-[13px] font-medium text-[var(--muted-foreground)] touch-manipulation hover:border-black/15'
+              >
+                <BeenThereIcon filled={false} />
+                나도 가봤어요
+              </Link>
+            ) : (
+              <button
+                type='button'
+                onClick={() => void handleBeenThere()}
+                disabled={beenThereBusy || authLoading}
+                aria-pressed={beenThereByMe}
+                className={cn(
+                  'inline-flex h-10 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-semibold touch-manipulation transition disabled:opacity-50',
+                  beenThereByMe
+                    ? 'border-emerald-500/35 bg-emerald-500/[0.08] text-emerald-700'
+                    : 'border-black/[0.08] bg-white text-[var(--foreground)] hover:border-black/15',
+                )}
+              >
+                <BeenThereIcon filled={beenThereByMe} />
+                나도 가봤어요
+                <span
+                  className={cn(
+                    'tabular-nums',
+                    beenThereByMe
+                      ? 'text-emerald-700'
+                      : 'text-[var(--muted)]',
+                  )}
+                >
+                  {beenThereCount}
+                </span>
+              </button>
+            ))}
+
+          {!authLoading && !user ? (
+            <Link
+              href={loginHref}
+              className='inline-flex h-10 items-center rounded-full px-3 text-[13px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
+            >
+              신고
+            </Link>
+          ) : (
+            <button
+              type='button'
+              onClick={() => setReportOpen(true)}
+              disabled={authLoading}
+              className='inline-flex h-10 items-center rounded-full px-3 text-[13px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600 disabled:opacity-50'
+            >
+              신고
+            </button>
+          )}
+        </div>
+      )}
 
       <CommunityReportSheet
         open={reportOpen}
@@ -240,6 +296,25 @@ export function CommunityEngagementBar({
         onSubmit={handleReportSubmit}
       />
     </>
+  )
+}
+
+function RecommendIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg
+      width='16'
+      height='16'
+      viewBox='0 0 24 24'
+      fill={filled ? 'currentColor' : 'none'}
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      aria-hidden
+    >
+      <path d='M7 10v12' />
+      <path d='M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z' />
+    </svg>
   )
 }
 
@@ -262,21 +337,92 @@ function BeenThereIcon({ filled }: { filled: boolean }) {
   )
 }
 
-function RecommendIcon({ filled }: { filled: boolean }) {
+type EngagementCardProps = {
+  active: boolean
+  activeTone: 'brand' | 'emerald'
+  disabled?: boolean
+  onClick: () => void
+  loginHref: string
+  needsLogin: boolean
+  icon: ReactNode
+  label: string
+  count: number
+  countUnit?: string
+}
+
+function EngagementCard({
+  active,
+  activeTone,
+  disabled,
+  onClick,
+  loginHref,
+  needsLogin,
+  icon,
+  label,
+  count,
+  countUnit = '명',
+}: EngagementCardProps) {
+  const activeStyles =
+    activeTone === 'brand'
+      ? 'bg-[var(--brand-light)] ring-[var(--brand)]/25 text-[var(--brand)]'
+      : 'bg-emerald-500/[0.08] ring-emerald-500/25 text-emerald-700'
+
+  const content = (
+    <>
+      <span
+        className={cn(
+          'flex h-9 w-9 items-center justify-center rounded-xl bg-white/80 shadow-sm',
+          active &&
+            (activeTone === 'brand'
+              ? 'text-[var(--brand)]'
+              : 'text-emerald-600'),
+        )}
+      >
+        {icon}
+      </span>
+      <span className='mt-2 text-[13px] font-semibold'>{label}</span>
+      <span
+        className={cn(
+          'mt-0.5 text-[12px] tabular-nums',
+          active
+            ? activeTone === 'brand'
+              ? 'text-[var(--brand)]/80'
+              : 'text-emerald-600/80'
+            : 'text-[var(--muted)]',
+        )}
+      >
+        {count.toLocaleString('en-US')}
+        {countUnit}
+      </span>
+    </>
+  )
+
+  const baseClass =
+    'flex flex-col items-center justify-center rounded-2xl bg-white px-3 py-4 ring-1 ring-black/[0.06] touch-manipulation transition active:scale-[0.98] disabled:opacity-50'
+
+  if (needsLogin) {
+    return (
+      <Link
+        href={loginHref}
+        className={cn(baseClass, 'hover:bg-[#fafbfc]')}
+      >
+        {content}
+      </Link>
+    )
+  }
+
   return (
-    <svg
-      width='16'
-      height='16'
-      viewBox='0 0 24 24'
-      fill={filled ? 'currentColor' : 'none'}
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      aria-hidden
+    <button
+      type='button'
+      onClick={onClick}
+      disabled={disabled}
+      aria-pressed={active}
+      className={cn(
+        baseClass,
+        active ? activeStyles : 'hover:bg-[#fafbfc]',
+      )}
     >
-      <path d='M7 10v12' />
-      <path d='M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z' />
-    </svg>
+      {content}
+    </button>
   )
 }

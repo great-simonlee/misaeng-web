@@ -17,6 +17,7 @@ import {
   listStoredCommunityPostsByAuthor,
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
+import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import type { CommunityPost, FoodCategoryId, FoodMenuItem } from '@/types/nyc'
 
 export const runtime = 'nodejs'
@@ -65,6 +66,7 @@ type CreateBody = {
   detail?: string
   authorSchoolId?: string | null
   authorSchoolName?: string | null
+  authorNickname?: string | null
   thumbnailUrl?: string | null
   partySize?: number | null
   totalSpend?: number | null
@@ -182,6 +184,14 @@ export async function POST(request: Request) {
     }
   }
 
+  const profile = await getSupabaseProfile(user.uid)
+  const authorNickname =
+    profile?.nickname?.trim() ||
+    (typeof body?.authorNickname === 'string'
+      ? body.authorNickname.trim()
+      : '') ||
+    null
+
   const post: CommunityPost = {
     id,
     categoryId,
@@ -192,6 +202,7 @@ export async function POST(request: Request) {
     detail: String(body?.detail || '').trim(),
     authorUid: user.uid,
     authorEmail: user.email,
+    authorNickname,
     authorSchoolId:
       typeof body?.authorSchoolId === 'string' ? body.authorSchoolId : null,
     authorSchoolName:

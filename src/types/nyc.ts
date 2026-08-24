@@ -257,6 +257,8 @@ export interface CommunityPost {
   detail: string
   authorUid: string
   authorEmail: string
+  /** 프로필 닉네임 (작성 시점 스냅샷) */
+  authorNickname: string | null
   authorSchoolId: string | null
   authorSchoolName: string | null
   createdAt: number

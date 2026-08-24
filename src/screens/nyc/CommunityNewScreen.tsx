@@ -260,6 +260,10 @@ export function CommunityNewScreen({
         toastError('어떤 음식인지 선택해 주세요')
         return
       }
+      if (!postTitle.trim()) {
+        toastError('음식점 이름을 입력해 주세요')
+        return
+      }
       partySizeNum = parseFoodInt(
         partySize,
         FOOD_PARTY_MIN,
@@ -300,7 +304,7 @@ export function CommunityNewScreen({
         thumb = menuItems[0].imageUrl
       }
 
-      titleValue = selectedPlace.name.trim()
+      titleValue = postTitle.trim()
       locationValue =
         selectedPlace.address?.trim() || selectedPlace.name.trim()
       detailValue = getFoodCuisineLabel(foodCuisine) || ''
@@ -333,6 +337,7 @@ export function CommunityNewScreen({
         : await createCommunityPostRequest({
             categoryId: boardId,
             ...payload,
+            authorNickname: profile?.nickname?.trim() || null,
             authorSchoolId: isAnonymousBoard(boardId)
               ? null
               : (profile?.verifiedSchoolId ?? null),
@@ -389,10 +394,28 @@ export function CommunityNewScreen({
               value={selectedPlace}
               onChange={(place) => {
                 setSelectedPlace(place)
-                setPostTitle(place?.name?.trim() || '')
+                if (place?.name?.trim()) {
+                  setPostTitle((prev) => prev.trim() || place.name.trim())
+                }
               }}
               className='mt-3'
             />
+          </section>
+
+          <section className='mt-6'>
+            <Field label='음식점 이름' required>
+              <input
+                required
+                value={postTitle}
+                onChange={(e) => setPostTitle(e.target.value)}
+                className={inputClass}
+                placeholder={meta.titlePlaceholder}
+                maxLength={80}
+              />
+            </Field>
+            <p className='mt-1.5 text-[12px] text-[var(--muted)]'>
+              목록·상세 페이지에 표시되는 이름이에요
+            </p>
           </section>
 
           <section className='mt-8'>
@@ -640,6 +663,7 @@ export function CommunityNewScreen({
               type='submit'
               disabled={
                 submitting ||
+                !postTitle.trim() ||
                 !selectedPlace?.placeId ||
                 selectedPlace.latitude == null ||
                 selectedPlace.longitude == null ||
@@ -652,15 +676,17 @@ export function CommunityNewScreen({
                 ? isEdit
                   ? '저장 중…'
                   : '등록 중…'
-                : !selectedPlace
-                  ? '장소를 선택해 주세요'
-                  : !foodCategory
-                    ? '카테고리를 선택해 주세요'
-                    : !foodCuisine
-                      ? '음식을 선택해 주세요'
-                      : isEdit
-                        ? '수정 완료'
-                        : '올리기'}
+                : !postTitle.trim()
+                  ? '음식점 이름을 입력해 주세요'
+                  : !selectedPlace
+                    ? '장소를 선택해 주세요'
+                    : !foodCategory
+                      ? '카테고리를 선택해 주세요'
+                      : !foodCuisine
+                        ? '음식을 선택해 주세요'
+                        : isEdit
+                          ? '수정 완료'
+                          : '올리기'}
             </button>
           </div>
         </form>

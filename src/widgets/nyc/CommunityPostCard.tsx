@@ -21,6 +21,8 @@ import { cn } from '@lib'
 import type { CommunityPost } from '@/types/nyc'
 import { BoardSurface } from '@widgets/nyc/BoardPageShell'
 import { FoodCategoryBadge } from '@widgets/nyc/FoodCategoryBadge'
+import { FoodCardCommentStat } from '@widgets/nyc/FoodCardCommentStat'
+import { FoodCardRecommendStat } from '@widgets/nyc/FoodCardRecommendStat'
 
 interface CommunityPostCardProps {
   post: CommunityPost
@@ -133,20 +135,22 @@ function FoodListingCard({
             {post.description}
           </p>
 
-          <div className='mt-3.5 flex items-center gap-4 border-t border-black/[0.04] pt-3 text-[12px] font-medium text-[var(--muted)]'>
+          <div className='mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-black/[0.04] pt-3 text-[12px] font-medium text-[var(--muted)]'>
             <span className='inline-flex items-center gap-1.5'>
               <EyeIcon className='size-3.5' />
               <span className='tabular-nums'>
                 {formatCommunityCount(post.viewCount)}
               </span>
             </span>
+            <FoodCardRecommendStat postId={post.id} />
+            <FoodCardCommentStat postId={post.id} />
             <span className='inline-flex items-center gap-1.5'>
               <PinIcon className='size-3.5' />
               <span>
-                가봤어요{' '}
                 <span className='tabular-nums'>
                   {formatCommunityCount(post.beenThereCount)}
                 </span>
+                명이 가봤어요
               </span>
             </span>
           </div>

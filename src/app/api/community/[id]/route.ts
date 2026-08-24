@@ -26,7 +26,6 @@ interface RouteContext {
 }
 
 type UpdateBody = {
-  status?: string
   title?: string
   contentHtml?: string
   location?: string
@@ -88,27 +87,6 @@ export async function PATCH(request: Request, context: RouteContext) {
   const body = (await request.json().catch(() => null)) as UpdateBody | null
   if (!body) {
     return NextResponse.json({ error: '잘못된 요청이에요.' }, { status: 400 })
-  }
-
-  // 마감만
-  if (body.status === 'closed' && Object.keys(body).length === 1) {
-    try {
-      const saved = await saveStoredCommunityPost({
-        ...existing,
-        status: 'closed',
-        updatedAt: Date.now(),
-      })
-      return NextResponse.json({ post: saved })
-    } catch (error) {
-      console.error('Community close error:', error)
-      return NextResponse.json(
-        {
-          error:
-            error instanceof Error ? error.message : '마감에 실패했어요.',
-        },
-        { status: 500 },
-      )
-    }
   }
 
   // 내용 수정
