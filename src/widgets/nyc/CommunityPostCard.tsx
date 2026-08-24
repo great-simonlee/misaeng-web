@@ -1,9 +1,11 @@
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 
 import { SchoolBadge } from '@components'
 import {
   formatFoodPartySpend,
   formatFoodWait,
+  getFoodCategory,
   resolveCommunityThumbnail,
 } from '@lib/community/food'
 import {
@@ -42,8 +44,22 @@ function FoodListingCard({
 }) {
   const anonymous = isAnonymousBoard(boardId)
   const thumbnail = resolveCommunityThumbnail(post)
+  const foodCategory = getFoodCategory(post.foodCategory)
   const foodSpend = formatFoodPartySpend(post.partySize, post.totalSpend)
   const foodWait = formatFoodWait(post.waitMinutes)
+  const metaChips = [
+    anonymous ? (
+      <FoodOverlayChip key='anon'>익명</FoodOverlayChip>
+    ) : null,
+    foodSpend ? (
+      <FoodOverlayChip key='spend' className='tabular-nums'>
+        {foodSpend}
+      </FoodOverlayChip>
+    ) : null,
+    foodWait ? (
+      <FoodOverlayChip key='wait'>{foodWait}</FoodOverlayChip>
+    ) : null,
+  ].filter(Boolean)
 
   return (
     <BoardSurface
@@ -67,39 +83,27 @@ function FoodListingCard({
               사진 없음
             </div>
           )}
-          <div
-            className='pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 via-black/10 to-transparent'
-            aria-hidden
-          />
-          <div className='absolute inset-x-0 top-0 flex flex-wrap items-start gap-1.5 p-4'>
-            <FoodCategoryBadge categoryId={post.foodCategory} />
-            {anonymous ? (
-              <span className='rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold leading-none text-[var(--muted-foreground)] shadow-sm backdrop-blur-sm'>
-                익명
-              </span>
-            ) : post.authorSchoolId ? (
-              <span className='inline-flex items-center rounded-full bg-white/95 px-2 py-1 shadow-sm backdrop-blur-sm'>
-                <SchoolBadge
-                  schoolId={post.authorSchoolId}
-                  className='bg-transparent px-0.5 text-[10px] leading-none'
-                />
-              </span>
-            ) : null}
-          </div>
-          {(foodSpend || foodWait) && (
-            <div className='absolute inset-x-0 bottom-0 flex flex-wrap items-center gap-1.5 p-4'>
-              {foodSpend ? (
-                <span className='inline-flex items-center rounded-full bg-white/95 px-3 py-1.5 text-[12px] font-semibold tabular-nums tracking-tight text-[var(--foreground)] shadow-[0_2px_10px_rgba(15,23,42,0.14)] backdrop-blur-sm sm:text-[13px]'>
-                  {foodSpend}
-                </span>
-              ) : null}
-              {foodWait ? (
-                <span className='inline-flex items-center rounded-full bg-black/50 px-2.5 py-1.5 text-[11px] font-semibold text-white backdrop-blur-sm sm:text-[12px]'>
-                  {foodWait}
-                </span>
-              ) : null}
+          {foodCategory ? (
+            <div className='absolute left-2.5 top-2.5'>
+              <FoodCategoryBadge
+                categoryId={foodCategory.id}
+                size='sm'
+                variant='solid'
+                className='shadow-[0_2px_8px_rgba(15,23,42,0.12)]'
+              />
             </div>
-          )}
+          ) : null}
+          {metaChips.length > 0 ? (
+            <>
+              <div
+                className='pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/45 to-transparent'
+                aria-hidden
+              />
+              <div className='absolute inset-x-0 bottom-0 flex flex-wrap items-center gap-1 p-2.5'>
+                {metaChips}
+              </div>
+            </>
+          ) : null}
         </div>
 
         <div className='flex flex-1 flex-col px-4 pb-4 pt-3.5 sm:px-5 sm:pb-5 sm:pt-4'>
@@ -229,6 +233,25 @@ function TextListingCard({
         </div>
       </Link>
     </BoardSurface>
+  )
+}
+
+function FoodOverlayChip({
+  children,
+  className,
+}: {
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <span
+      className={cn(
+        'inline-flex h-6 max-w-full shrink-0 items-center gap-1 rounded-full bg-black/40 px-2 text-[10px] font-semibold leading-none text-white backdrop-blur-[6px]',
+        className,
+      )}
+    >
+      {children}
+    </span>
   )
 }
 

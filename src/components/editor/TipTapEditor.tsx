@@ -42,6 +42,7 @@ export function TipTapEditor({
     extensions: [
       StarterKit.configure({
         heading: { levels: [2, 3] },
+        link: false,
       }),
       Placeholder.configure({ placeholder }),
       Link.configure({

@@ -150,7 +150,7 @@ export function CommunityListScreen({
   title,
 }: CommunityListScreenProps) {
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const { error: toastError } = useToast()
   const [posts, setPosts] = useState<CommunityPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -247,9 +247,9 @@ export function CommunityListScreen({
   }
 
   const newPath = `/nyc/${boardId}/new`
-  const postHref = user
-    ? newPath
-    : `/nyc/login?next=${encodeURIComponent(newPath)}`
+  const loginNext = `/nyc/login?next=${encodeURIComponent(newPath)}`
+  const canWrite = Boolean(user)
+  const postHref = canWrite ? newPath : loginNext
 
   const listSection = (
     <section className='pb-14 pt-4 sm:pb-16 sm:pt-5'>
@@ -275,13 +275,27 @@ export function CommunityListScreen({
           }
           description={
             posts.length === 0
-              ? '첫 글을 올려 커뮤니티를 시작해 보세요.'
+              ? canWrite
+                ? '첫 글을 올려 커뮤니티를 시작해 보세요.'
+                : '로그인 후 글을 올릴 수 있어요.'
               : isFoodBoard
                 ? '다른 카테고리를 선택해 보세요.'
                 : '필터를 바꿔 다시 찾아 보세요.'
           }
-          actionHref={posts.length === 0 ? postHref : undefined}
-          actionLabel={posts.length === 0 ? meta.writeLabel : undefined}
+          actionHref={
+            posts.length === 0
+              ? canWrite
+                ? newPath
+                : loginNext
+              : undefined
+          }
+          actionLabel={
+            posts.length === 0
+              ? canWrite
+                ? meta.writeLabel
+                : '로그인'
+              : undefined
+          }
         />
       )}
 
@@ -319,6 +333,7 @@ export function CommunityListScreen({
         intro={meta.listIntro}
         writeHref={postHref}
         writeLabel={meta.writeLabel}
+        showWrite={!authLoading && canWrite}
         showFilter={!isFoodBoard}
         onFilterClick={isFoodBoard ? undefined : openFilters}
         filterCount={isFoodBoard ? 0 : activeFilterCount}
