@@ -16,18 +16,11 @@ import {
   formatCommunityRelativeTime,
 } from '@lib/constants/communityMock'
 import {
-  formatFoodPartySpend,
-  formatFoodWait,
-  formatUsd,
-  resolveCommunityThumbnail,
-} from '@lib/community/food'
-import {
   NYC_COMMUNITY_BOARD_META,
   isAnonymousBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import type { CommunityPost } from '@/types/nyc'
-import { FoodCategoryBadge } from '@widgets/nyc/FoodCategoryBadge'
 import {
   BoardBackLink,
   BoardMetaChip,
@@ -38,6 +31,7 @@ import {
 import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 import { CommunityCommentsSection } from '@widgets/nyc/CommunityCommentsSection'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
+import { FoodDetailContent } from '@widgets/nyc/FoodDetailContent'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 
 interface CommunityDetailScreenProps {
@@ -159,196 +153,94 @@ export function CommunityDetailScreen({
   const isFood = boardId === 'food'
   const bodyHtml = post.contentHtml || `<p>${post.description}</p>`
   const tone = boardToneForId(boardId)
-  const foodSpend = formatFoodPartySpend(post.partySize, post.totalSpend)
-  const foodWait = isFood ? formatFoodWait(post.waitMinutes) : null
-  const thumbnail = isFood ? resolveCommunityThumbnail(post) : null
-  const menuItems = isFood ? post.menuItems || [] : []
   const metaBits = [
     post.location && {
       label: meta.locationLabel,
       value: post.location,
     },
-    !isFood &&
-      post.detail &&
+    post.detail &&
       meta.detailLabel && {
         label: meta.detailLabel,
         value:
           boardId === 'marketplace' ? `$${post.detail}` : post.detail,
       },
-    isFood && post.detail
-      ? { label: meta.detailLabel || '음식', value: post.detail }
-      : null,
   ].filter(Boolean) as { label: string; value: string }[]
 
   return (
     <PullToRefresh onRefresh={refreshPost}>
       <BoardPageShell width='narrow'>
-        <div className='pb-16 pt-5 sm:pb-20 sm:pt-7'>
-          <BoardBackLink
-            href={`/nyc/${boardId}`}
-            label={`${title} 목록`}
-            className='mb-4'
-          />
-
-          <BoardSurface as='article' className='overflow-hidden'>
-            {thumbnail ? (
-              <div className='relative aspect-[16/10] overflow-hidden bg-[#e8eaee] sm:aspect-[2/1]'>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={thumbnail}
-                  alt=''
-                  className='h-full w-full object-cover'
-                />
-              </div>
-            ) : null}
-
-            <div className='border-b border-black/[0.04] bg-gradient-to-b from-white to-[#fafbfc] px-5 py-5 sm:px-8 sm:py-7'>
-              <div className='flex flex-wrap items-center gap-2'>
-                <BoardMetaChip tone={tone}>{title}</BoardMetaChip>
-                {isFood ? (
-                  <FoodCategoryBadge
-                    categoryId={post.foodCategory}
-                    variant='soft'
-                    size='md'
-                  />
-                ) : null}
-                {anonymous ? (
-                  <BoardMetaChip>익명</BoardMetaChip>
-                ) : (
-                  <SchoolBadge schoolId={post.authorSchoolId} />
-                )}
-                <span className='text-[12px] text-[var(--muted)]'>
-                  {formatCommunityRelativeTime(post.createdAt)}
-                </span>
-                <span className='text-[12px] text-[var(--muted)]'>
-                  조회 {formatCommunityCount(post.viewCount)}
-                </span>
-              </div>
-
-              <h1 className='mt-3.5 text-[1.55rem] font-semibold leading-[1.25] tracking-[-0.035em] text-[var(--foreground)] sm:text-[1.9rem]'>
-                {post.title}
-              </h1>
-
-              {isFood && (foodSpend || foodWait) ? (
-                <div className='mt-3 flex flex-wrap items-center gap-2'>
-                  {foodSpend ? (
-                    <p className='inline-flex items-center rounded-full bg-[var(--brand-light)] px-3.5 py-1.5 text-[14px] font-semibold text-[var(--brand)]'>
-                      {foodSpend}
-                    </p>
-                  ) : null}
-                  {foodWait ? (
-                    <p className='inline-flex items-center rounded-full bg-[#f4f5f7] px-3.5 py-1.5 text-[13px] font-semibold text-[var(--foreground)]'>
-                      {foodWait}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {metaBits.length > 0 && (
-                <div className='mt-4 grid gap-2 sm:grid-cols-2'>
-                  {metaBits.map((item) => (
-                    <div
-                      key={`${item.label}-${item.value}`}
-                      className='rounded-xl bg-white/80 px-3.5 py-2.5 ring-1 ring-black/[0.04]'
-                    >
-                      <p className='text-[11px] font-medium text-[var(--muted)]'>
-                        {item.label}
-                      </p>
-                      <p className='mt-0.5 text-[14px] font-semibold text-[var(--foreground)]'>
-                        {item.value}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {isFood &&
-                (post.partySize ||
-                  post.totalSpend != null ||
-                  post.waitMinutes != null) && (
-                  <div className='mt-4 flex flex-wrap gap-4 rounded-xl bg-white px-4 py-3 ring-1 ring-black/[0.04]'>
-                    {post.partySize ? (
-                      <div>
-                        <p className='text-[11px] text-[var(--muted)]'>인원</p>
-                        <p className='text-[15px] font-semibold tabular-nums'>
-                          {post.partySize}인
-                        </p>
-                      </div>
-                    ) : null}
-                    {post.totalSpend != null ? (
-                      <div>
-                        <p className='text-[11px] text-[var(--muted)]'>
-                          총 금액
-                        </p>
-                        <p className='text-[15px] font-semibold tabular-nums'>
-                          ${formatUsd(post.totalSpend)}
-                        </p>
-                      </div>
-                    ) : null}
-                    {post.waitMinutes != null ? (
-                      <div>
-                        <p className='text-[11px] text-[var(--muted)]'>
-                          웨이팅
-                        </p>
-                        <p className='text-[15px] font-semibold tabular-nums'>
-                          {post.waitMinutes === 0
-                            ? '없음'
-                            : `${post.waitMinutes}분`}
-                        </p>
-                      </div>
-                    ) : null}
-                  </div>
-                )}
-            </div>
-
-            {menuItems.length > 0 && (
-              <div className='border-b border-black/[0.04] px-5 py-6 sm:px-8'>
-                <h2 className='text-[14px] font-semibold tracking-tight text-[var(--foreground)]'>
-                  메뉴 후기
-                </h2>
-                <ul className='mt-4 space-y-4'>
-                  {menuItems.map((item) => (
-                    <li
-                      key={item.id}
-                      className='flex gap-3.5 sm:gap-4'
-                    >
-                      <div className='h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-[#e8eaee] sm:h-28 sm:w-28'>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.imageUrl}
-                          alt=''
-                          className='h-full w-full object-cover'
-                        />
-                      </div>
-                      <div className='min-w-0 flex-1 py-0.5'>
-                        <p className='text-[14px] font-medium leading-relaxed text-[var(--foreground)] sm:text-[15px]'>
-                          {item.caption || '메뉴 한 줄 평이 없어요'}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className='px-5 py-6 sm:px-8 sm:py-8'>
-              {isFood ? (
-                <h2 className='mb-4 text-[14px] font-semibold tracking-tight text-[var(--foreground)]'>
-                  자세한 후기
-                </h2>
-              ) : null}
-              <CommunityRichBody html={bodyHtml} />
-            </div>
-
-            <CommunityPostFooter
+        <div className={isFood ? 'pb-16 sm:pb-20' : 'pb-16 pt-5 sm:pb-20 sm:pt-7'}>
+          {isFood ? (
+            <FoodDetailContent
               post={post}
               boardId={boardId}
-              anonymous={anonymous}
+              boardTitle={title}
               isAuthor={isAuthor}
-              loginNext={`/nyc/${boardId}/${post.id}`}
               onDelete={() => void handleDelete()}
             />
-          </BoardSurface>
+          ) : (
+            <>
+              <BoardBackLink
+                href={`/nyc/${boardId}`}
+                label={`${title} 목록`}
+                className='mb-4'
+              />
+
+              <BoardSurface as='article' className='overflow-hidden'>
+                <div className='border-b border-black/[0.04] bg-gradient-to-b from-white to-[#fafbfc] px-5 py-5 sm:px-8 sm:py-7'>
+                  <div className='flex flex-wrap items-center gap-2'>
+                    <BoardMetaChip tone={tone}>{title}</BoardMetaChip>
+                    {anonymous ? (
+                      <BoardMetaChip>익명</BoardMetaChip>
+                    ) : (
+                      <SchoolBadge schoolId={post.authorSchoolId} />
+                    )}
+                    <span className='text-[12px] text-[var(--muted)]'>
+                      {formatCommunityRelativeTime(post.createdAt)}
+                    </span>
+                    <span className='text-[12px] text-[var(--muted)]'>
+                      조회 {formatCommunityCount(post.viewCount)}
+                    </span>
+                  </div>
+
+                  <h1 className='mt-3.5 text-[1.55rem] font-semibold leading-[1.25] tracking-[-0.035em] text-[var(--foreground)] sm:text-[1.9rem]'>
+                    {post.title}
+                  </h1>
+
+                  {metaBits.length > 0 && (
+                    <div className='mt-4 grid gap-2 sm:grid-cols-2'>
+                      {metaBits.map((item) => (
+                        <div
+                          key={`${item.label}-${item.value}`}
+                          className='rounded-xl bg-white/80 px-3.5 py-2.5 ring-1 ring-black/[0.04]'
+                        >
+                          <p className='text-[11px] font-medium text-[var(--muted)]'>
+                            {item.label}
+                          </p>
+                          <p className='mt-0.5 text-[14px] font-semibold text-[var(--foreground)]'>
+                            {item.value}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className='px-5 py-6 sm:px-8 sm:py-8'>
+                  <CommunityRichBody html={bodyHtml} />
+                </div>
+
+                <CommunityPostFooter
+                  post={post}
+                  boardId={boardId}
+                  anonymous={anonymous}
+                  isAuthor={isAuthor}
+                  loginNext={`/nyc/${boardId}/${post.id}`}
+                  onDelete={() => void handleDelete()}
+                />
+              </BoardSurface>
+            </>
+          )}
 
           <CommunityCommentsSection
             postId={post.id}

@@ -17,7 +17,6 @@ import { countOpenComments } from '@lib/constants/communityCommentsMock'
 import { cn } from '@lib'
 import type { CommunityComment, CommunityReportReason } from '@/types/nyc'
 import { CommunityReportSheet } from '@widgets/nyc/CommunityReportSheet'
-import { BoardSurface } from '@widgets/nyc/BoardPageShell'
 
 type CommunityCommentsSectionProps = {
   postId: string
@@ -87,6 +86,9 @@ export function CommunityCommentsSection({
         authorNickname: anonymousBoard
           ? null
           : (profile?.nickname ?? null),
+        authorPhotoURL: anonymousBoard
+          ? null
+          : (profile?.photoURL ?? null),
         authorSchoolId: anonymousBoard
           ? null
           : (profile?.verifiedSchoolId ?? null),
@@ -139,19 +141,19 @@ export function CommunityCommentsSection({
   }
 
   return (
-    <BoardSurface as='section' className='mt-5 overflow-hidden sm:mt-6'>
-      <div className='border-b border-black/[0.04] bg-gradient-to-b from-white to-[#fafbfc] px-5 py-5 sm:px-6'>
-        <div className='flex items-baseline justify-between gap-3'>
+    <section className='mt-6 overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.05] sm:mt-7'>
+      <div className='px-5 py-5 sm:px-6'>
+        <div className='flex items-center justify-between gap-3'>
           <h2 className='text-[16px] font-semibold tracking-tight text-[var(--foreground)]'>
             댓글
           </h2>
-          <span className='rounded-full bg-white px-2.5 py-0.5 text-[12px] font-semibold tabular-nums text-[var(--muted)] ring-1 ring-black/[0.06]'>
+          <span className='rounded-full bg-[#f4f5f7] px-2.5 py-0.5 text-[12px] font-semibold tabular-nums text-[var(--muted)]'>
             {totalCount}
           </span>
         </div>
 
         {!authLoading && !user ? (
-          <div className='mt-4 rounded-2xl bg-white px-4 py-3.5 text-[13px] text-[var(--muted-foreground)] ring-1 ring-black/[0.06]'>
+          <div className='mt-4 rounded-xl bg-[#f7f8fa] px-4 py-3.5 text-[13px] text-[var(--muted-foreground)]'>
             댓글을 쓰려면{' '}
             <Link
               href={loginHref}
@@ -179,13 +181,13 @@ export function CommunityCommentsSection({
               rows={3}
               maxLength={2000}
               placeholder='댓글을 남겨 보세요'
-              className='w-full resize-none rounded-2xl border-0 bg-white px-4 py-3.5 text-[14px] leading-relaxed shadow-sm ring-1 ring-black/[0.06] outline-none transition placeholder:text-[var(--muted)] focus:ring-2 focus:ring-[var(--brand)]/20'
+              className='w-full resize-none rounded-xl border-0 bg-[#f7f8fa] px-4 py-3.5 text-[14px] leading-relaxed outline-none transition placeholder:text-[var(--muted)] focus:bg-white focus:ring-2 focus:ring-[var(--brand)]/15'
             />
             <div className='mt-2.5 flex justify-end'>
               <button
                 type='submit'
                 disabled={submitting || !draft.trim()}
-                className='inline-flex h-10 items-center rounded-full bg-[var(--foreground)] px-5 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--navy-light)] disabled:opacity-40'
+                className='inline-flex h-9 items-center rounded-full bg-[var(--foreground)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--navy-light)] disabled:opacity-40'
               >
                 {submitting ? '등록 중…' : '댓글 등록'}
               </button>
@@ -194,22 +196,28 @@ export function CommunityCommentsSection({
         )}
       </div>
 
-      <div className='space-y-4 px-5 py-5 sm:px-6'>
+      <div className='border-t border-black/[0.05] px-5 py-2 sm:px-6'>
         {loading && (
-          <p className='py-6 text-center text-[13px] text-[var(--muted)]'>
+          <p className='py-8 text-center text-[13px] text-[var(--muted)]'>
             댓글을 불러오는 중이에요…
           </p>
         )}
 
         {!loading && threads.length === 0 && (
-          <p className='py-6 text-center text-[13px] text-[var(--muted)]'>
+          <p className='py-8 text-center text-[13px] text-[var(--muted)]'>
             아직 댓글이 없어요. 첫 댓글을 남겨 보세요.
           </p>
         )}
 
         {!loading &&
-          threads.map((thread) => (
-            <div key={thread.id} className='space-y-3'>
+          threads.map((thread, index) => (
+            <div
+              key={thread.id}
+              className={cn(
+                'py-4',
+                index !== threads.length - 1 && 'border-b border-black/[0.05]',
+              )}
+            >
               <CommentItem
                 comment={thread}
                 anonymousBoard={anonymousBoard}
@@ -227,7 +235,7 @@ export function CommunityCommentsSection({
               />
 
               {thread.replies.length > 0 && (
-                <div className='space-y-3 border-l-2 border-[var(--brand)]/20 pl-4 sm:ml-3'>
+                <div className='mt-4 ml-3 space-y-4 border-l-2 border-[var(--brand)]/25 pl-5 sm:ml-5 sm:pl-6'>
                   {thread.replies.map((reply) => (
                     <CommentItem
                       key={reply.id}
@@ -244,7 +252,7 @@ export function CommunityCommentsSection({
 
               {replyToId === thread.id && user && (
                 <form
-                  className='sm:ml-3'
+                  className='mt-4 ml-3 border-l-2 border-[var(--brand)]/25 pl-5 sm:ml-5 sm:pl-6'
                   onSubmit={(e) => {
                     e.preventDefault()
                     void submitComment(replyDraft, thread.id)
@@ -256,7 +264,7 @@ export function CommunityCommentsSection({
                     rows={2}
                     maxLength={2000}
                     placeholder='답글을 입력하세요'
-                    className='w-full resize-none rounded-xl border border-black/[0.07] bg-[#fafbfc] px-3 py-2.5 text-[13px] outline-none focus:border-black/20 focus:bg-white'
+                    className='w-full resize-none rounded-xl border-0 bg-[#f7f8fa] px-3.5 py-2.5 text-[13px] outline-none focus:bg-white focus:ring-2 focus:ring-[var(--brand)]/15'
                     autoFocus
                   />
                   <div className='mt-2 flex justify-end gap-2'>
@@ -266,14 +274,14 @@ export function CommunityCommentsSection({
                         setReplyToId(null)
                         setReplyDraft('')
                       }}
-                      className='h-9 rounded-full px-3 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
+                      className='h-8 rounded-full px-3 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
                     >
                       취소
                     </button>
                     <button
                       type='submit'
                       disabled={submitting || !replyDraft.trim()}
-                      className='h-9 rounded-full bg-[var(--foreground)] px-3.5 text-[12px] font-semibold text-white touch-manipulation disabled:opacity-50'
+                      className='h-8 rounded-full bg-[var(--foreground)] px-3.5 text-[12px] font-semibold text-white touch-manipulation disabled:opacity-50'
                     >
                       답글 등록
                     </button>
@@ -291,7 +299,7 @@ export function CommunityCommentsSection({
         submitting={reporting}
         onSubmit={handleReportSubmit}
       />
-    </BoardSurface>
+    </section>
   )
 }
 
@@ -317,46 +325,94 @@ function CommentItem({
     : comment.authorNickname?.trim() ||
       comment.authorEmail.split('@')[0] ||
       '회원'
+  const initial = displayName.charAt(0).toUpperCase()
+  const photoURL = anonymousBoard
+    ? null
+    : comment.authorPhotoURL?.trim() || null
 
   return (
-    <div className={cn(!isReply && 'rounded-xl bg-[#f4f5f7]/80 p-3.5 sm:p-4')}>
-      <div className='flex flex-wrap items-center gap-2'>
-        <span className='text-[13px] font-semibold text-[var(--foreground)]'>
-          {displayName}
-        </span>
-        {!anonymousBoard && <SchoolBadge schoolId={comment.authorSchoolId} />}
-        <time className='text-[11px] text-[var(--muted)]'>
-          {formatCommunityRelativeTime(comment.createdAt)}
-        </time>
-      </div>
-      <p className='mt-1.5 whitespace-pre-wrap text-[14px] leading-relaxed text-[var(--foreground)]'>
-        {comment.body}
-      </p>
-      <div className='mt-2 flex flex-wrap items-center gap-3'>
-        {onReply && (
+    <div className='flex gap-3'>
+      {photoURL ? (
+        <div
+          className={cn(
+            'shrink-0 overflow-hidden rounded-full bg-[#e8eaee]',
+            isReply ? 'h-8 w-8' : 'h-9 w-9',
+          )}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={photoURL}
+            alt=''
+            className='h-full w-full object-cover'
+          />
+        </div>
+      ) : (
+        <div
+          className={cn(
+            'flex shrink-0 items-center justify-center rounded-full font-bold',
+            isReply
+              ? 'h-8 w-8 text-[12px] bg-[#eef0f3] text-[var(--muted)]'
+              : 'h-9 w-9 text-[13px] bg-[var(--brand-light)] text-[var(--brand)]',
+          )}
+        >
+          {initial}
+        </div>
+      )}
+
+      <div className='min-w-0 flex-1'>
+        <div className='flex items-start justify-between gap-3'>
+          <div className='flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1'>
+            <span
+              className={cn(
+                'font-semibold text-[var(--foreground)]',
+                isReply ? 'text-[13px]' : 'text-[14px]',
+              )}
+            >
+              {displayName}
+            </span>
+            {!anonymousBoard && (
+              <SchoolBadge schoolId={comment.authorSchoolId} />
+            )}
+            <time className='text-[11px] text-[var(--muted)]'>
+              {formatCommunityRelativeTime(comment.createdAt)}
+            </time>
+          </div>
+
+          {canReport && onReport ? (
+            <button
+              type='button'
+              onClick={onReport}
+              className='shrink-0 pt-0.5 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
+            >
+              신고
+            </button>
+          ) : loginHref ? (
+            <Link
+              href={loginHref}
+              className='shrink-0 pt-0.5 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
+            >
+              신고
+            </Link>
+          ) : null}
+        </div>
+
+        <p
+          className={cn(
+            'mt-1.5 whitespace-pre-wrap leading-relaxed text-[var(--foreground)]',
+            isReply ? 'text-[13px]' : 'text-[14px]',
+          )}
+        >
+          {comment.body}
+        </p>
+
+        {onReply ? (
           <button
             type='button'
             onClick={onReply}
-            className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--brand)]'
+            className='mt-2 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--brand)]'
           >
             답글 달기
           </button>
-        )}
-        {canReport && onReport ? (
-          <button
-            type='button'
-            onClick={onReport}
-            className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
-          >
-            신고
-          </button>
-        ) : loginHref ? (
-          <Link
-            href={loginHref}
-            className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
-          >
-            신고
-          </Link>
         ) : null}
       </div>
     </div>

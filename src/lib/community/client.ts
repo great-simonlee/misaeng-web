@@ -72,12 +72,14 @@ export async function createCommunityPostRequest(input: {
   authorSchoolId: string | null
   authorSchoolName: string | null
   authorNickname?: string | null
+  authorPhotoURL?: string | null
   thumbnailUrl?: string | null
   partySize?: number | null
   totalSpend?: number | null
   waitMinutes?: number | null
   foodCategory?: CommunityPost['foodCategory']
   menuItems?: CommunityPost['menuItems']
+  galleryPhotos?: CommunityPost['galleryPhotos']
   placeId?: string | null
   placeName?: string | null
   latitude?: number | null
@@ -121,6 +123,7 @@ export async function updateCommunityPostRequest(
     waitMinutes?: number | null
     foodCategory?: CommunityPost['foodCategory']
     menuItems?: CommunityPost['menuItems']
+    galleryPhotos?: CommunityPost['galleryPhotos']
     placeId?: string | null
     placeName?: string | null
     latitude?: number | null

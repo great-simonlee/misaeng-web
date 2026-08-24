@@ -11,6 +11,7 @@ import {
   listStoredCommunityComments,
   saveStoredCommunityComments,
 } from '@lib/supabase/communityComments.server'
+import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import type { CommunityComment } from '@/types/nyc'
 
 export const runtime = 'nodejs'
@@ -26,8 +27,25 @@ export async function GET(_request: Request, context: RouteContext) {
     const stored = isCommunityCommentStorageConfigured()
       ? await listStoredCommunityComments(postId)
       : []
-    const comments =
+    let comments =
       stored.length > 0 ? stored : listMockCommunityComments(postId)
+
+    if (stored.length > 0) {
+      comments = await enrichCommentAuthors(comments)
+      const changed = comments.some(
+        (item, index) =>
+          item.authorPhotoURL !== stored[index]?.authorPhotoURL ||
+          item.authorNickname !== stored[index]?.authorNickname,
+      )
+      if (changed) {
+        try {
+          await saveStoredCommunityComments(postId, comments)
+        } catch {
+          // 표시만 보강
+        }
+      }
+    }
+
     return NextResponse.json({ comments })
   } catch (error) {
     console.error('Community comments list error:', error)
@@ -38,10 +56,51 @@ export async function GET(_request: Request, context: RouteContext) {
   }
 }
 
+async function enrichCommentAuthors(
+  comments: CommunityComment[],
+): Promise<CommunityComment[]> {
+  const needsEnrich = comments.filter(
+    (item) =>
+      item.status === 'open' &&
+      (!item.authorPhotoURL?.trim() || !item.authorNickname?.trim()),
+  )
+  if (needsEnrich.length === 0) return comments
+
+  const uids = [...new Set(needsEnrich.map((item) => item.authorUid))]
+  const profiles = await Promise.all(
+    uids.map(async (uid) => {
+      const profile = await getSupabaseProfile(uid)
+      return [uid, profile] as const
+    }),
+  )
+  const byUid = new Map(profiles)
+
+  return comments.map((item) => {
+    const profile = byUid.get(item.authorUid)
+    if (!profile) return item
+    const nickname =
+      item.authorNickname?.trim() ||
+      (typeof profile.nickname === 'string' ? profile.nickname.trim() : '') ||
+      null
+    const photoURL =
+      item.authorPhotoURL?.trim() ||
+      (typeof profile.photoURL === 'string' ? profile.photoURL.trim() : '') ||
+      null
+    if (
+      nickname === item.authorNickname &&
+      photoURL === item.authorPhotoURL
+    ) {
+      return item
+    }
+    return { ...item, authorNickname: nickname, authorPhotoURL: photoURL }
+  })
+}
+
 type CreateBody = {
   body?: string
   parentId?: string | null
   authorNickname?: string | null
+  authorPhotoURL?: string | null
   authorSchoolId?: string | null
 }
 
@@ -104,6 +163,20 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   const now = Date.now()
+  const profile = await getSupabaseProfile(user.uid)
+  const authorNickname =
+    (typeof profile?.nickname === 'string' && profile.nickname.trim()) ||
+    (typeof payload?.authorNickname === 'string'
+      ? payload.authorNickname.trim() || null
+      : null) ||
+    null
+  const authorPhotoURL =
+    (typeof profile?.photoURL === 'string' && profile.photoURL.trim()) ||
+    (typeof payload?.authorPhotoURL === 'string'
+      ? payload.authorPhotoURL.trim() || null
+      : null) ||
+    null
+
   const comment: CommunityComment = {
     id: `cmt_${now.toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
     postId,
@@ -111,10 +184,8 @@ export async function POST(request: Request, context: RouteContext) {
     body,
     authorUid: user.uid,
     authorEmail: user.email,
-    authorNickname:
-      typeof payload?.authorNickname === 'string'
-        ? payload.authorNickname.trim() || null
-        : null,
+    authorNickname,
+    authorPhotoURL,
     authorSchoolId:
       typeof payload?.authorSchoolId === 'string'
         ? payload.authorSchoolId

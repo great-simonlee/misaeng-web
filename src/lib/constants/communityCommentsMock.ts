@@ -7,12 +7,14 @@ const NOW = Date.now()
 const HOUR = 60 * 60 * 1000
 
 function comment(
-  partial: Omit<CommunityComment, 'status' | 'updatedAt'> & {
+  partial: Omit<CommunityComment, 'status' | 'updatedAt' | 'authorPhotoURL'> & {
     updatedAt?: number
+    authorPhotoURL?: string | null
   },
 ): CommunityComment {
   return {
     ...partial,
+    authorPhotoURL: partial.authorPhotoURL ?? null,
     updatedAt: partial.updatedAt ?? partial.createdAt,
     status: 'open',
   }

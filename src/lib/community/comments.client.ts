@@ -53,6 +53,7 @@ export async function createCommunityCommentRequest(input: {
   authorUid: string
   authorEmail: string
   authorNickname?: string | null
+  authorPhotoURL?: string | null
   authorSchoolId?: string | null
 }): Promise<CommunityComment> {
   const body = input.body.trim()
@@ -71,6 +72,7 @@ export async function createCommunityCommentRequest(input: {
           body,
           parentId: input.parentId ?? null,
           authorNickname: input.authorNickname ?? null,
+          authorPhotoURL: input.authorPhotoURL ?? null,
           authorSchoolId: input.authorSchoolId ?? null,
         }),
       },
@@ -108,6 +110,7 @@ function createLocalComment(
     authorUid: string
     authorEmail: string
     authorNickname?: string | null
+    authorPhotoURL?: string | null
     authorSchoolId?: string | null
   },
   body: string,
@@ -138,6 +141,7 @@ function createLocalComment(
     authorUid: input.authorUid,
     authorEmail: input.authorEmail,
     authorNickname: input.authorNickname?.trim() || null,
+    authorPhotoURL: input.authorPhotoURL?.trim() || null,
     authorSchoolId: input.authorSchoolId ?? null,
     createdAt: now,
     updatedAt: now,

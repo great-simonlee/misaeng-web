@@ -18,6 +18,7 @@ function post(
     | 'waitMinutes'
     | 'foodCategory'
     | 'menuItems'
+    | 'galleryPhotos'
     | 'placeId'
     | 'placeName'
     | 'latitude'
@@ -25,10 +26,12 @@ function post(
     | 'authorUid'
     | 'authorEmail'
     | 'authorNickname'
+    | 'authorPhotoURL'
   > & {
     authorUid?: string
     authorEmail?: string
     authorNickname?: string | null
+    authorPhotoURL?: string | null
     updatedAt?: number
     viewCount?: number
     beenThereCount?: number
@@ -38,6 +41,7 @@ function post(
     waitMinutes?: number | null
     foodCategory?: CommunityPost['foodCategory']
     menuItems?: CommunityPost['menuItems']
+    galleryPhotos?: CommunityPost['galleryPhotos']
     placeId?: string | null
     placeName?: string | null
     latitude?: number | null
@@ -49,12 +53,14 @@ function post(
     authorUid: partial.authorUid ?? `mock-author-${partial.id}`,
     authorEmail: partial.authorEmail ?? `mock-${partial.id}@example.com`,
     authorNickname: partial.authorNickname ?? null,
+    authorPhotoURL: partial.authorPhotoURL ?? null,
     thumbnailUrl: partial.thumbnailUrl ?? null,
     partySize: partial.partySize ?? null,
     totalSpend: partial.totalSpend ?? null,
     waitMinutes: partial.waitMinutes ?? null,
     foodCategory: partial.foodCategory ?? null,
     menuItems: partial.menuItems ?? [],
+    galleryPhotos: partial.galleryPhotos ?? [],
     placeId: partial.placeId ?? null,
     placeName: partial.placeName ?? null,
     latitude: partial.latitude ?? null,

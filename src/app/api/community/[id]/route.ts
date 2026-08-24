@@ -4,6 +4,7 @@ import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import {
   COMMUNITY_BODY_MAX,
   isFoodCategoryId,
+  normalizeFoodGalleryPhotos,
   normalizeFoodMenuItems,
   normalizePartySize,
   normalizeTotalSpend,
@@ -16,7 +17,7 @@ import {
   isCommunityStorageConfigured,
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
-import type { FoodCategoryId, FoodMenuItem } from '@/types/nyc'
+import type { FoodCategoryId, FoodGalleryPhoto, FoodMenuItem } from '@/types/nyc'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -36,6 +37,7 @@ type UpdateBody = {
   waitMinutes?: number | null
   foodCategory?: FoodCategoryId | null
   menuItems?: FoodMenuItem[] | null
+  galleryPhotos?: FoodGalleryPhoto[] | null
   placeId?: string | null
   placeName?: string | null
   latitude?: number | null
@@ -113,6 +115,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   const isFood = existing.categoryId === 'food'
   const menuItems = isFood
     ? normalizeFoodMenuItems(body.menuItems ?? existing.menuItems)
+    : []
+  const galleryPhotos = isFood
+    ? normalizeFoodGalleryPhotos(body.galleryPhotos ?? existing.galleryPhotos)
     : []
   const partySize = isFood
     ? normalizePartySize(body.partySize ?? existing.partySize)
@@ -208,6 +213,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     waitMinutes: isFood ? waitMinutes : null,
     foodCategory,
     menuItems,
+    galleryPhotos,
     placeId: isFood ? placeId : null,
     placeName: isFood ? placeName : null,
     latitude: isFood ? latitude : null,

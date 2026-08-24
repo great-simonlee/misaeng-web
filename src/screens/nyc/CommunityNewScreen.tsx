@@ -21,6 +21,7 @@ import {
   COMMUNITY_BODY_MAX,
   FOOD_CATEGORIES,
   FOOD_CUISINES,
+  FOOD_GALLERY_MAX,
   FOOD_PARTY_MAX,
   FOOD_PARTY_MIN,
   FOOD_SPEND_MAX,
@@ -41,6 +42,7 @@ import {
 } from '@lib/constants/nyc'
 import { cn } from '@lib'
 import type {
+  CommunityPost,
   FoodCategoryId,
   FoodMenuItem,
   PlaceSearchResult,
@@ -66,10 +68,20 @@ type MenuDraft = {
   caption: string
 }
 
+type GalleryDraft = {
+  key: string
+  imageUrl: string
+  caption: string
+}
+
 const FOOD_MENU_MAX = 8
 
 function createMenuKey() {
   return `menu_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`
+}
+
+function createGalleryKey() {
+  return `gallery_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`
 }
 
 export function CommunityNewScreen({
@@ -106,6 +118,7 @@ export function CommunityNewScreen({
   const [menuDrafts, setMenuDrafts] = useState<MenuDraft[]>([
     { key: 'menu_1', imageUrl: '', caption: '' },
   ])
+  const [galleryDrafts, setGalleryDrafts] = useState<GalleryDraft[]>([])
   const captionRefs = useRef<Record<string, HTMLTextAreaElement | null>>({})
   const pendingFocusKeyRef = useRef<string | null>(null)
 
@@ -164,6 +177,15 @@ export function CommunityNewScreen({
             })),
           )
         }
+        if (post.galleryPhotos?.length) {
+          setGalleryDrafts(
+            post.galleryPhotos.map((item, index) => ({
+              key: item.id || `gallery_${index + 1}`,
+              imageUrl: item.imageUrl,
+              caption: item.caption,
+            })),
+          )
+        }
       } catch (err) {
         if (!cancelled) {
           toastError(getErrorMessage(err, '글을 불러오지 못했어요'))
@@ -211,6 +233,27 @@ export function CommunityNewScreen({
     setMenuDrafts((prev) => [...prev, { key, imageUrl: '', caption: '' }])
   }
 
+  function updateGalleryRow(key: string, patch: Partial<GalleryDraft>) {
+    setGalleryDrafts((prev) =>
+      prev.map((item) => (item.key === key ? { ...item, ...patch } : item)),
+    )
+  }
+
+  function removeGalleryRow(key: string) {
+    setGalleryDrafts((prev) => prev.filter((item) => item.key !== key))
+  }
+
+  function requestAddGallery() {
+    if (galleryDrafts.length >= FOOD_GALLERY_MAX) {
+      toastError(`분위기 사진은 최대 ${FOOD_GALLERY_MAX}장까지 등록할 수 있어요`)
+      return
+    }
+    setGalleryDrafts((prev) => [
+      ...prev,
+      { key: createGalleryKey(), imageUrl: '', caption: '' },
+    ])
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!user?.email) {
@@ -235,6 +278,7 @@ export function CommunityNewScreen({
     let totalSpendNum: number | null = null
     let waitMinutesNum: number | null = null
     let menuItems: FoodMenuItem[] = []
+    let galleryPhotos: CommunityPost['galleryPhotos'] = []
     let thumb = thumbnailUrl.trim() || null
     let locationValue = location.trim()
     let titleValue = postTitle.trim()
@@ -300,6 +344,14 @@ export function CommunityNewScreen({
           caption: item.caption.trim(),
         }))
 
+      galleryPhotos = galleryDrafts
+        .filter((item) => item.imageUrl.trim())
+        .map((item, index) => ({
+          id: `gallery_${index + 1}`,
+          imageUrl: item.imageUrl.trim(),
+          caption: item.caption.trim(),
+        }))
+
       if (!thumb && menuItems[0]?.imageUrl) {
         thumb = menuItems[0].imageUrl
       }
@@ -326,6 +378,7 @@ export function CommunityNewScreen({
         waitMinutes: isFood ? waitMinutesNum : null,
         foodCategory: isFood ? foodCategory : null,
         menuItems: isFood ? menuItems : [],
+        galleryPhotos: isFood ? galleryPhotos : [],
         placeId: isFood ? selectedPlace?.placeId ?? null : null,
         placeName: isFood ? selectedPlace?.name ?? null : null,
         latitude: isFood ? selectedPlace?.latitude ?? null : null,
@@ -338,6 +391,7 @@ export function CommunityNewScreen({
             categoryId: boardId,
             ...payload,
             authorNickname: profile?.nickname?.trim() || null,
+            authorPhotoURL: profile?.photoURL?.trim() || null,
             authorSchoolId: isAnonymousBoard(boardId)
               ? null
               : (profile?.verifiedSchoolId ?? null),
@@ -534,6 +588,81 @@ export function CommunityNewScreen({
               emptyHint='맛있는 한 컷을 올려 주세요'
               aspectClassName='aspect-[4/3]'
             />
+          </section>
+
+          <section className='mt-8'>
+            <div className='flex items-end justify-between gap-3'>
+              <div>
+                <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
+                  가게 내부 · 분위기
+                </h2>
+                <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
+                  인테리어, 좌석, 분위기 사진을 추가해 보세요
+                </p>
+              </div>
+              <p className='shrink-0 pb-0.5 text-[12px] font-medium tabular-nums text-[var(--muted)]'>
+                {galleryDrafts.length}/{FOOD_GALLERY_MAX}
+              </p>
+            </div>
+
+            <div className='mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3'>
+              {galleryDrafts.map((item, index) => (
+                <div
+                  key={item.key}
+                  className='rounded-2xl bg-white p-2.5 ring-1 ring-black/[0.06]'
+                >
+                  <div className='mb-2 flex items-center justify-between gap-2'>
+                    <p className='text-[11px] font-semibold text-[var(--muted)]'>
+                      사진 {index + 1}
+                    </p>
+                    <button
+                      type='button'
+                      onClick={() => removeGalleryRow(item.key)}
+                      className='text-[11px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
+                    >
+                      삭제
+                    </button>
+                  </div>
+                  <PhotoUploadZone
+                    compact
+                    className='min-w-0'
+                    src={item.imageUrl || null}
+                    onUploaded={(url) =>
+                      updateGalleryRow(item.key, { imageUrl: url })
+                    }
+                    onRemove={() => updateGalleryRow(item.key, { imageUrl: '' })}
+                    emptyLabel='사진'
+                    emptyHint=''
+                    aspectClassName='aspect-[4/5]'
+                  />
+                  <input
+                    type='text'
+                    value={item.caption}
+                    onChange={(e) =>
+                      updateGalleryRow(item.key, { caption: e.target.value })
+                    }
+                    maxLength={40}
+                    placeholder='예: 2층 좌석, 카운터'
+                    className='mt-2 w-full rounded-xl border-0 bg-[#f8f9fb] px-3 py-2 text-[12px] outline-none ring-1 ring-black/[0.05] placeholder:text-[var(--muted)] focus:ring-[var(--brand)]/25'
+                  />
+                </div>
+              ))}
+
+              {galleryDrafts.length < FOOD_GALLERY_MAX ? (
+                <button
+                  type='button'
+                  onClick={requestAddGallery}
+                  className='flex min-h-[10.5rem] flex-col items-center justify-center rounded-2xl border border-dashed border-black/[0.12] bg-[#fafbfc] px-3 text-center touch-manipulation transition hover:border-black/20 hover:bg-white'
+                >
+                  <span className='text-[24px] leading-none text-[var(--muted)]'>
+                    +
+                  </span>
+                  <span className='mt-2 text-[12px] font-semibold text-[var(--foreground)]'>
+                    분위기 사진 추가
+                  </span>
+                </button>
+              ) : null}
+            </div>
           </section>
 
           <section className='mt-8'>

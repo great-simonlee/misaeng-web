@@ -259,6 +259,8 @@ export interface CommunityPost {
   authorEmail: string
   /** 프로필 닉네임 (작성 시점 스냅샷) */
   authorNickname: string | null
+  /** 프로필 사진 URL (작성 시점 스냅샷) */
+  authorPhotoURL: string | null
   authorSchoolId: string | null
   authorSchoolName: string | null
   createdAt: number
@@ -280,6 +282,8 @@ export interface CommunityPost {
   foodCategory: FoodCategoryId | null
   /** 맛집: 메뉴 사진 + 한 줄 평 */
   menuItems: FoodMenuItem[]
+  /** 맛집: 가게 내부·분위기 등 추가 사진 */
+  galleryPhotos: FoodGalleryPhoto[]
   /** 맛집: Google/지도 place id */
   placeId: string | null
   /** 맛집: 지도에서 고른 상호명 */
@@ -295,6 +299,13 @@ export type FoodCategoryId = 'restaurant' | 'value' | 'vibe' | 'study'
 
 /** 맛집 메뉴 한 줄 (사진 + 짧은 후기) */
 export interface FoodMenuItem {
+  id: string
+  imageUrl: string
+  caption: string
+}
+
+/** 맛집: 가게 내부·분위기 등 추가 사진 */
+export interface FoodGalleryPhoto {
   id: string
   imageUrl: string
   caption: string
@@ -321,6 +332,7 @@ export interface CommunityComment {
   authorUid: string
   authorEmail: string
   authorNickname: string | null
+  authorPhotoURL: string | null
   authorSchoolId: string | null
   createdAt: number
   updatedAt: number
@@ -332,6 +344,7 @@ export type CommunityCommentInput = {
   parentId?: string | null
   body: string
   authorNickname?: string | null
+  authorPhotoURL?: string | null
   authorSchoolId?: string | null
 }
 

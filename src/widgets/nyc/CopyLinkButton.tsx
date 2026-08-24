@@ -7,7 +7,7 @@ import { cn } from '@lib'
 
 type CopyLinkButtonProps = {
   url?: string
-  variant?: 'default' | 'icon' | 'ghost'
+  variant?: 'default' | 'icon' | 'ghost' | 'pill'
   className?: string
 }
 
@@ -47,6 +47,23 @@ export function CopyLinkButton({
         )}
       >
         {copied ? <CheckIcon /> : <LinkIcon />}
+      </button>
+    )
+  }
+
+  if (variant === 'pill') {
+    return (
+      <button
+        type='button'
+        onClick={handleCopy}
+        className={cn(
+          'inline-flex h-9 items-center gap-1.5 rounded-full bg-[#f4f5f7] px-3 text-[13px] font-medium text-[var(--foreground)] touch-manipulation transition hover:bg-[#eceef1] active:scale-[0.98]',
+          copied && 'text-emerald-600',
+          className,
+        )}
+      >
+        {copied ? <CheckIcon /> : <LinkIcon />}
+        {copied ? '복사됨' : '공유'}
       </button>
     )
   }

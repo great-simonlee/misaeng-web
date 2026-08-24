@@ -1,4 +1,4 @@
-import type { FoodCategoryId, FoodMenuItem } from '@/types/nyc'
+import type { FoodCategoryId, FoodMenuItem, FoodGalleryPhoto, CommunityPost } from '@/types/nyc'
 
 export type FoodCategoryMeta = {
   id: FoodCategoryId
@@ -159,6 +159,13 @@ export const FOOD_SPEND_MIN = 0
 export const FOOD_SPEND_MAX = 9999
 export const FOOD_WAIT_MIN = 0
 export const FOOD_WAIT_MAX = 300
+export const FOOD_GALLERY_MAX = 6
+
+export type FoodCarouselSlide = {
+  id: string
+  imageUrl: string
+  label: string
+}
 
 /** 맛집·커뮤니티 본문 플레인 텍스트 최대 글자 수 */
 export const COMMUNITY_BODY_MAX = 2000
@@ -259,6 +266,66 @@ export function normalizeFoodMenuItems(raw: unknown): FoodMenuItem[] {
       }
     })
     .filter((item): item is FoodMenuItem => Boolean(item))
+}
+
+export function normalizeFoodGalleryPhotos(raw: unknown): FoodGalleryPhoto[] {
+  if (!Array.isArray(raw)) return []
+  return raw
+    .map((item, index) => {
+      if (!item || typeof item !== 'object') return null
+      const data = item as Record<string, unknown>
+      const imageUrl = String(data.imageUrl || '').trim()
+      if (!imageUrl) return null
+      return {
+        id:
+          String(data.id || '').trim() ||
+          `gallery_${index}_${Math.random().toString(36).slice(2, 7)}`,
+        imageUrl,
+        caption: String(data.caption || '').trim(),
+      }
+    })
+    .filter((item): item is FoodGalleryPhoto => Boolean(item))
+}
+
+/** 상세 상단 캐러셀: 대표 → 메뉴 → 분위기 순, URL 중복 제거 */
+export function buildFoodDetailCarouselSlides(
+  post: Pick<
+    CommunityPost,
+    'thumbnailUrl' | 'menuItems' | 'galleryPhotos'
+  >,
+): FoodCarouselSlide[] {
+  const slides: FoodCarouselSlide[] = []
+  const thumb = post.thumbnailUrl?.trim()
+  if (thumb) {
+    slides.push({ id: 'thumbnail', imageUrl: thumb, label: '대표' })
+  }
+
+  for (const item of post.menuItems || []) {
+    const imageUrl = item.imageUrl?.trim()
+    if (!imageUrl) continue
+    slides.push({
+      id: `menu-${item.id}`,
+      imageUrl,
+      label: item.caption?.trim() || '메뉴',
+    })
+  }
+
+  for (const photo of post.galleryPhotos || []) {
+    const imageUrl = photo.imageUrl?.trim()
+    if (!imageUrl) continue
+    slides.push({
+      id: `gallery-${photo.id}`,
+      imageUrl,
+      label: photo.caption?.trim() || '분위기',
+    })
+  }
+
+  const seen = new Set<string>()
+  return slides.filter((slide) => {
+    if (seen.has(slide.imageUrl)) return false
+    seen.add(slide.imageUrl)
+    return true
+  })
 }
 
 export function resolveCommunityThumbnail(post: {

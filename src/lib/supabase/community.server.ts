@@ -1,6 +1,7 @@
 import type { CommunityPost } from '@/types/nyc'
 import {
   normalizeFoodCategory,
+  normalizeFoodGalleryPhotos,
   normalizeFoodMenuItems,
   normalizeWaitMinutes,
 } from '@lib/community/food'
@@ -99,6 +100,10 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       typeof data.authorNickname === 'string' && data.authorNickname.trim()
         ? data.authorNickname.trim()
         : null,
+    authorPhotoURL:
+      typeof data.authorPhotoURL === 'string' && data.authorPhotoURL.trim()
+        ? data.authorPhotoURL.trim()
+        : null,
     authorSchoolId:
       typeof data.authorSchoolId === 'string' ? data.authorSchoolId : null,
     authorSchoolName:
@@ -123,6 +128,7 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
     waitMinutes: normalizeWaitMinutes(data.waitMinutes),
     foodCategory: normalizeFoodCategory(data.foodCategory),
     menuItems: normalizeFoodMenuItems(data.menuItems),
+    galleryPhotos: normalizeFoodGalleryPhotos(data.galleryPhotos),
     placeId:
       typeof data.placeId === 'string' && data.placeId.trim()
         ? data.placeId.trim()
@@ -229,17 +235,32 @@ export async function listStoredCommunityPostsByAuthor(
 async function enrichCommunityPostAuthor(
   post: CommunityPost,
 ): Promise<CommunityPost> {
-  if (post.authorNickname?.trim()) return post
+  const needsNickname = !post.authorNickname?.trim()
+  const needsPhoto = !post.authorPhotoURL?.trim()
+  if (!needsNickname && !needsPhoto) return post
 
   const profile = await getSupabaseProfile(post.authorUid)
-  const nickname = profile?.nickname?.trim()
-  if (!nickname) return post
+  const nickname = profile?.nickname?.trim() || null
+  const photoURL =
+    (typeof profile?.photoURL === 'string' && profile.photoURL.trim()) ||
+    null
 
-  const enriched = { ...post, authorNickname: nickname }
+  if (
+    (!needsNickname || !nickname) &&
+    (!needsPhoto || !photoURL)
+  ) {
+    return post
+  }
+
+  const enriched: CommunityPost = {
+    ...post,
+    authorNickname: post.authorNickname?.trim() || nickname,
+    authorPhotoURL: post.authorPhotoURL?.trim() || photoURL,
+  }
   try {
     await saveStoredCommunityPost(enriched)
   } catch {
-    // 표시만 보강, 저장 실패 시에도 닉네임은 반환
+    // 표시만 보강
   }
   return enriched
 }

@@ -5,6 +5,7 @@ import { isCommunityBoardId } from '@lib/constants/nyc'
 import {
   COMMUNITY_BODY_MAX,
   isFoodCategoryId,
+  normalizeFoodGalleryPhotos,
   normalizeFoodMenuItems,
   normalizePartySize,
   normalizeTotalSpend,
@@ -18,7 +19,7 @@ import {
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
-import type { CommunityPost, FoodCategoryId, FoodMenuItem } from '@/types/nyc'
+import type { CommunityPost, FoodCategoryId, FoodGalleryPhoto, FoodMenuItem } from '@/types/nyc'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -67,12 +68,14 @@ type CreateBody = {
   authorSchoolId?: string | null
   authorSchoolName?: string | null
   authorNickname?: string | null
+  authorPhotoURL?: string | null
   thumbnailUrl?: string | null
   partySize?: number | null
   totalSpend?: number | null
   waitMinutes?: number | null
   foodCategory?: FoodCategoryId | null
   menuItems?: FoodMenuItem[] | null
+  galleryPhotos?: FoodGalleryPhoto[] | null
   placeId?: string | null
   placeName?: string | null
   latitude?: number | null
@@ -125,6 +128,9 @@ export async function POST(request: Request) {
   const id = `c_${now.toString(36)}_${Math.random().toString(36).slice(2, 8)}`
   const isFood = categoryId === 'food'
   const menuItems = isFood ? normalizeFoodMenuItems(body?.menuItems) : []
+  const galleryPhotos = isFood
+    ? normalizeFoodGalleryPhotos(body?.galleryPhotos)
+    : []
   const partySize = isFood ? normalizePartySize(body?.partySize) : null
   const totalSpend = isFood ? normalizeTotalSpend(body?.totalSpend) : null
   const waitMinutes = isFood ? normalizeWaitMinutes(body?.waitMinutes) : null
@@ -191,6 +197,10 @@ export async function POST(request: Request) {
       ? body.authorNickname.trim()
       : '') ||
     null
+  const authorPhotoURL =
+    (typeof profile?.photoURL === 'string' && profile.photoURL.trim()) ||
+    (typeof body?.authorPhotoURL === 'string' && body.authorPhotoURL.trim()) ||
+    null
 
   const post: CommunityPost = {
     id,
@@ -203,6 +213,7 @@ export async function POST(request: Request) {
     authorUid: user.uid,
     authorEmail: user.email,
     authorNickname,
+    authorPhotoURL,
     authorSchoolId:
       typeof body?.authorSchoolId === 'string' ? body.authorSchoolId : null,
     authorSchoolName:
@@ -220,6 +231,7 @@ export async function POST(request: Request) {
     waitMinutes: isFood ? waitMinutes : null,
     foodCategory: isFood ? body!.foodCategory! : null,
     menuItems,
+    galleryPhotos,
     placeId: isFood ? placeId : null,
     placeName: isFood ? placeName : null,
     latitude: isFood ? latitude : null,

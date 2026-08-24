@@ -86,6 +86,10 @@ function normalizeComment(raw: unknown): CommunityComment | null {
     authorEmail: String(data.authorEmail || '').trim(),
     authorNickname:
       typeof data.authorNickname === 'string' ? data.authorNickname : null,
+    authorPhotoURL:
+      typeof data.authorPhotoURL === 'string' && data.authorPhotoURL.trim()
+        ? data.authorPhotoURL.trim()
+        : null,
     authorSchoolId:
       typeof data.authorSchoolId === 'string' ? data.authorSchoolId : null,
     createdAt: Number(data.createdAt) || Date.now(),
