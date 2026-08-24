@@ -398,9 +398,11 @@ const AMENITY_STRING_TO_PERK: Record<string, HousingPerkId> = {
   'bbq grills': 'bbq-grill',
   barbecue: 'bbq-grill',
   washer: 'washer-dryer',
-  dryer: 'washer-dryer',
   'in-unit washer': 'washer-dryer',
-  'laundry room': 'washer-dryer',
+  'in-unit washer / dryer': 'washer-dryer',
+  'in-unit washer/dryer': 'washer-dryer',
+  'washer / dryer': 'washer-dryer',
+  'washer/dryer': 'washer-dryer',
   terrace: 'terrace',
   sundeck: 'terrace',
   'working space': 'work-study',
@@ -412,8 +414,28 @@ function normalizeAmenityKey(value: string) {
   return value.trim().toLowerCase()
 }
 
+/** 세탁기 기준 매칭 (식기세척기 제외). 건조기만 있는 매물은 제외 */
+export function listingHasWasher(listing: HousingListing): boolean {
+  const strings = [
+    ...listing.property.amenities,
+    ...listing.property.appliances,
+  ]
+  return strings.some((item) => {
+    const key = normalizeAmenityKey(item)
+    if (!key.includes('washer')) return false
+    if (key.includes('dishwasher')) return false
+    return true
+  })
+}
+
 export function mapAmenityStringToPerkId(value: string): HousingPerkId | null {
-  return AMENITY_STRING_TO_PERK[normalizeAmenityKey(value)] ?? null
+  const key = normalizeAmenityKey(value)
+  const exact = AMENITY_STRING_TO_PERK[key]
+  if (exact) return exact
+  if (key.includes('washer') && !key.includes('dishwasher')) {
+    return 'washer-dryer'
+  }
+  return null
 }
 
 export function listingHasNoGuarantor(listing: HousingListing): boolean {
@@ -423,8 +445,8 @@ export function listingHasNoGuarantor(listing: HousingListing): boolean {
 
 /** Full wall / Regular wall = 플렉스 벽 가능. Curtain only 는 제외 */
 export function listingHasFlexWall(listing: HousingListing): boolean {
-  const wall = listing.property.partWall
-  return wall === 'Full wall' || wall === 'Regular wall'
+  const walls = listing.property.partWall ?? []
+  return walls.includes('Full wall') || walls.includes('Regular wall')
 }
 
 export function getListingDerivedPerks(listing: HousingListing): HousingPerkId[] {
@@ -440,11 +462,11 @@ export function getListingDerivedPerks(listing: HousingListing): HousingPerkId[]
     ...(listing.property.includedUtility ?? []),
   ]
   for (const item of strings) {
-    const key = normalizeAmenityKey(item)
-    const perk = AMENITY_STRING_TO_PERK[key]
+    const perk = mapAmenityStringToPerkId(item)
     if (perk) perks.add(perk)
   }
 
+  if (listingHasWasher(listing)) perks.add('washer-dryer')
   if (listingHasFlexWall(listing)) perks.add('wall-ok')
 
   return Array.from(perks)
@@ -459,6 +481,9 @@ export function housingMatchesPerk(
   }
   if (perk === 'wall-ok') {
     return listingHasFlexWall(listing)
+  }
+  if (perk === 'washer-dryer') {
+    return listingHasWasher(listing)
   }
   return getListingDerivedPerks(listing).includes(perk)
 }
@@ -533,16 +558,25 @@ export function formatPropertyAmenityFee(
 }
 
 export function formatHousingPartWall(
-  partWall: HousingProperty['partWall'] | string | null | undefined,
+  partWall: HousingProperty['partWall'] | string | string[] | null | undefined,
 ): string | null {
-  const raw = String(partWall || '').trim()
-  if (!raw) return null
+  const items = Array.isArray(partWall)
+    ? partWall
+    : String(partWall || '')
+        .split(/[,/|·]/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+  if (items.length === 0) return null
   const labels: Record<string, string> = {
     'Full wall': '풀 월',
     'Regular wall': '레귤러 월',
     'Curtain only': '커튼만',
+    Curtain: '커튼만',
   }
-  return labels[raw] || raw
+  const formatted = items
+    .map((item) => labels[item] || item)
+    .filter(Boolean)
+  return formatted.length > 0 ? formatted.join(' · ') : null
 }
 
 export function formatPropertyIncomeRequirements(

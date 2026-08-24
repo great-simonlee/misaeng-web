@@ -31,6 +31,12 @@ export type HousingUnitPromotion = {
   rentCredit?: number
 }
 
+/** ERP partWall 옵션 (Curtain only = ERP 'Curtain' 별칭) */
+export type HousingPartWall =
+  | 'Full wall'
+  | 'Regular wall'
+  | 'Curtain only'
+
 /** ERP properties 문서 — 공개용 건물 정보 */
 export interface HousingProperty {
   address: string
@@ -44,7 +50,8 @@ export interface HousingProperty {
   amenities: string[]
   appliances: string[]
   includedUtility?: string[]
-  partWall?: 'Full wall' | 'Regular wall' | 'Curtain only' | null
+  /** 복수 선택 가능. Full/Regular = 플렉스 벽 가능 */
+  partWall?: HousingPartWall[] | null
   amenityFee?: {
     type: 'optional' | 'mandatory'
     /** null = unknown, 0 = free, greater than 0 = paid */
@@ -242,7 +249,10 @@ export interface CommunityPost {
   id: string
   categoryId: CommunityBoardId
   title: string
+  /** 목록 카드용 플레인 텍스트 요약 */
   description: string
+  /** TipTap HTML 본문 */
+  contentHtml: string
   location: string
   detail: string
   authorUid: string
@@ -252,6 +262,79 @@ export interface CommunityPost {
   createdAt: number
   updatedAt: number
   status: PostStatus
+  /** 상세 조회 수 */
+  viewCount: number
+  /** 맛집 보드: 나도 가봤어요 수 */
+  beenThereCount: number
+  /** 목록 썸네일 (맛집 등) */
+  thumbnailUrl: string | null
+  /** 맛집: 방문 인원 */
+  partySize: number | null
+  /** 맛집: 총 지출(USD) */
+  totalSpend: number | null
+  /** 맛집: 웨이팅 시간(분). 0 = 없음 */
+  waitMinutes: number | null
+  /** 맛집: 맛집 | 가성비 | 느좋 | 카공 */
+  foodCategory: FoodCategoryId | null
+  /** 맛집: 메뉴 사진 + 한 줄 평 */
+  menuItems: FoodMenuItem[]
+  /** 맛집: Google/지도 place id */
+  placeId: string | null
+  /** 맛집: 지도에서 고른 상호명 */
+  placeName: string | null
+  /** 맛집: 위도 */
+  latitude: number | null
+  /** 맛집: 경도 */
+  longitude: number | null
+}
+
+/** 맛집 보드 카테고리 */
+export type FoodCategoryId = 'restaurant' | 'value' | 'vibe' | 'study'
+
+/** 맛집 메뉴 한 줄 (사진 + 짧은 후기) */
+export interface FoodMenuItem {
+  id: string
+  imageUrl: string
+  caption: string
+}
+
+/** 지도 장소 검색 결과 */
+export interface PlaceSearchResult {
+  placeId: string
+  name: string
+  address: string
+  latitude: number | null
+  longitude: number | null
+}
+
+/** 댓글/대댓글 — parentId가 있으면 대댓글(1단만 허용) */
+export type CommunityCommentStatus = 'open' | 'deleted'
+
+export interface CommunityComment {
+  id: string
+  postId: string
+  /** null = 댓글, string = 해당 댓글에 대한 대댓글 */
+  parentId: string | null
+  body: string
+  authorUid: string
+  authorEmail: string
+  authorNickname: string | null
+  authorSchoolId: string | null
+  createdAt: number
+  updatedAt: number
+  status: CommunityCommentStatus
+}
+
+export type CommunityCommentInput = {
+  postId: string
+  parentId?: string | null
+  body: string
+  authorNickname?: string | null
+  authorSchoolId?: string | null
+}
+
+export type CommunityCommentThread = CommunityComment & {
+  replies: CommunityComment[]
 }
 
 export type CommunityPostInput = Omit<
@@ -264,7 +347,94 @@ export type CommunityPostInput = Omit<
   | 'createdAt'
   | 'updatedAt'
   | 'status'
+  | 'viewCount'
+  | 'beenThereCount'
 >
+
+/** 추천·신고 대상 (게시글 / 댓글) — ellieo-erp 모더레이션과 공유 */
+export type CommunityEngagementTargetType = 'post' | 'comment'
+
+/** 게시글·댓글 추천(업보트) */
+export interface CommunityRecommend {
+  id: string
+  targetType: CommunityEngagementTargetType
+  targetId: string
+  postId: string
+  boardId: string
+  authorUid: string
+  createdAt: number
+}
+
+export type CommunityRecommendSummary = {
+  count: number
+  recommendedByMe: boolean
+}
+
+/** 맛집: 나도 가봤어요 */
+export interface CommunityBeenThere {
+  id: string
+  postId: string
+  boardId: string
+  authorUid: string
+  createdAt: number
+}
+
+export type CommunityBeenThereSummary = {
+  count: number
+  beenThereByMe: boolean
+}
+
+/**
+ * 신고 사유 — ERP 관리 화면에서도 동일 코드 사용
+ * spam | abuse | inappropriate | misinformation | privacy | other
+ */
+export type CommunityReportReason =
+  | 'spam'
+  | 'abuse'
+  | 'inappropriate'
+  | 'misinformation'
+  | 'privacy'
+  | 'other'
+
+/**
+ * 신고 처리 상태 — 웹은 주로 open 생성, ERP에서 이후 상태 전환
+ * open → reviewed → resolved | dismissed
+ */
+export type CommunityReportStatus =
+  | 'open'
+  | 'reviewed'
+  | 'resolved'
+  | 'dismissed'
+
+export interface CommunityReport {
+  id: string
+  targetType: CommunityEngagementTargetType
+  targetId: string
+  postId: string
+  boardId: string
+  reason: CommunityReportReason
+  detail: string | null
+  reporterUid: string
+  reporterEmail: string
+  status: CommunityReportStatus
+  createdAt: number
+  updatedAt: number
+  /** ERP 모더레이터 처리 시각 */
+  reviewedAt: number | null
+  /** ERP 담당자 uid/이메일 */
+  reviewedBy: string | null
+  /** ERP 조치 메모 */
+  resolutionNote: string | null
+}
+
+export type CommunityReportInput = {
+  targetType: CommunityEngagementTargetType
+  targetId: string
+  postId: string
+  boardId: string
+  reason: CommunityReportReason
+  detail?: string | null
+}
 
 export interface NycUserProfile {
   uid: string

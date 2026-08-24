@@ -1,5 +1,42 @@
-import type { HousingListing, HousingRoomType } from '@/types/nyc'
+import type {
+  HousingListing,
+  HousingPartWall,
+  HousingRoomType,
+} from '@/types/nyc'
 import { normalizeErpRoomType } from './listing'
+
+const PART_WALL_OPTIONS: HousingPartWall[] = [
+  'Full wall',
+  'Regular wall',
+  'Curtain only',
+]
+
+const PART_WALL_ALIASES: Record<string, HousingPartWall> = {
+  'full wall': 'Full wall',
+  'regular wall': 'Regular wall',
+  'curtain only': 'Curtain only',
+  curtain: 'Curtain only',
+}
+
+/** ERP: string | string[] | "Full wall · Regular wall" → canonical 배열 */
+function normalizePartWalls(value: unknown): HousingPartWall[] | null {
+  const items = Array.isArray(value)
+    ? value
+    : String(value ?? '')
+        .split(/[,/|·]/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+  const seen = new Set<HousingPartWall>()
+  for (const item of items) {
+    const key = String(item ?? '')
+      .trim()
+      .toLowerCase()
+    const label = PART_WALL_ALIASES[key]
+    if (label) seen.add(label)
+  }
+  const walls = PART_WALL_OPTIONS.filter((option) => seen.has(option))
+  return walls.length > 0 ? walls : null
+}
 
 const ROOM_TYPES = new Set([
   'master-w-bath',
@@ -147,7 +184,6 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
     : []
 
   const unitType = String(unitRaw.unitType || '').trim()
-  const partWall = String(propertyRaw.partWall || '').trim()
   const amenityFeeRaw =
     propertyRaw.amenityFee && typeof propertyRaw.amenityFee === 'object'
       ? (propertyRaw.amenityFee as Record<string, unknown>)
@@ -173,12 +209,7 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
       amenities: asStringArray(propertyRaw.amenities),
       appliances: asStringArray(propertyRaw.appliances),
       includedUtility: asStringArray(propertyRaw.includedUtility),
-      partWall:
-        partWall === 'Full wall' ||
-        partWall === 'Regular wall' ||
-        partWall === 'Curtain only'
-          ? partWall
-          : null,
+      partWall: normalizePartWalls(propertyRaw.partWall),
       amenityFee: amenityFeeRaw
         ? {
             type: amenityFeeRaw.type === 'mandatory' ? 'mandatory' : 'optional',

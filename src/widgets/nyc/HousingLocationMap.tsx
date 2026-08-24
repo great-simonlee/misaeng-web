@@ -1,3 +1,6 @@
+import { cn } from '@lib'
+import { BoardSurface } from '@widgets/nyc/BoardPageShell'
+
 interface HousingLocationMapProps {
   listingId: string
   address: string
@@ -15,19 +18,19 @@ export function HousingLocationMap({
   const externalHref = `/api/housing/${encodeURIComponent(listingId)}/map?open=1`
 
   return (
-    <section
-      className={
-        className ??
-        'overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.05]'
-      }
+    <BoardSurface
+      as='section'
+      className={cn('overflow-hidden', className)}
     >
       <div className='flex items-start justify-between gap-3 px-4 pt-4 sm:px-5 sm:pt-5'>
         <div className='min-w-0'>
-          <p className='text-[12px] font-semibold text-[var(--muted)]'>위치</p>
+          <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
+            위치
+          </p>
           <p className='mt-1 truncate text-[14px] font-semibold text-[var(--foreground)]'>
             {address}
           </p>
-          <p className='mt-0.5 text-[12px] text-[var(--muted-foreground)]'>
+          <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
             {neighborhood}, New York
           </p>
         </div>
@@ -35,12 +38,12 @@ export function HousingLocationMap({
           href={externalHref}
           target='_blank'
           rel='noopener noreferrer'
-          className='shrink-0 text-[12px] font-semibold text-[#F64310] underline-offset-2 touch-manipulation hover:underline'
+          className='shrink-0 text-[12px] font-semibold text-[var(--brand)] underline-offset-2 touch-manipulation hover:underline'
         >
           지도 앱에서 보기
         </a>
       </div>
-      <div className='relative mt-3 aspect-[16/10] overflow-hidden bg-[#eef0f3] sm:aspect-[16/9]'>
+      <div className='relative mt-3 aspect-[16/10] overflow-hidden bg-[#e8eaee] sm:aspect-[16/9]'>
         <iframe
           title={`${address} 위치 지도`}
           src={mapSrc}
@@ -50,6 +53,6 @@ export function HousingLocationMap({
           allowFullScreen
         />
       </div>
-    </section>
+    </BoardSurface>
   )
 }

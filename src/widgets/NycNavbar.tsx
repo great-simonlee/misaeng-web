@@ -11,6 +11,9 @@ import { cn } from '@lib'
 
 const NYC_NAV_LINKS = [
   { href: '/nyc/housing', label: '하우징' },
+  { href: '/nyc/food', label: '맛집' },
+  { href: '/nyc/marketplace', label: '중고거래' },
+  { href: '/nyc/cpt-opt', label: 'CPT/OPT' },
 ] as const
 
 const ACCOUNT_LINKS = [

@@ -6,6 +6,7 @@ import {
 import { cn } from '@lib'
 import type { HousingRoommateWaiting } from '@/types/nyc'
 import { RoommateCompositionBadge } from '@widgets/nyc/HousingPostCard'
+import { BoardSurface } from '@widgets/nyc/BoardPageShell'
 
 interface HousingRoommateIntroProps {
   roommate: HousingRoommateWaiting
@@ -22,11 +23,9 @@ export function HousingRoommateIntro({
   const composition = getHousingRoommateComposition(roommate)
 
   return (
-    <section
-      className={cn(
-        'rounded-2xl bg-white px-4 py-4 ring-1 ring-black/[0.05] sm:px-5 sm:py-5',
-        className,
-      )}
+    <BoardSurface
+      as='section'
+      className={cn('px-4 py-4 sm:px-5 sm:py-5', className)}
     >
       <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
         <h2 className='text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
@@ -84,6 +83,6 @@ export function HousingRoommateIntro({
           )
         })}
       </ul>
-    </section>
+    </BoardSurface>
   )
 }

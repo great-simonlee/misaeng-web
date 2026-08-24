@@ -12,7 +12,7 @@ export function HousingPostCardSkeleton({
   return (
     <article
       className={cn(
-        'flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.05] sm:rounded-xl',
+        'flex flex-col overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_28px_rgba(15,23,42,0.045)] ring-1 ring-black/[0.03]',
         className,
       )}
       aria-hidden

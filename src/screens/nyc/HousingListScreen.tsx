@@ -1,9 +1,8 @@
 'use client'
 
-import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { BottomSheet, RangeSlider, Skeleton } from '@components'
+import { BottomSheet, PullToRefresh, RangeSlider, Skeleton } from '@components'
 import {
   formatHousingPriceFilterLabel,
   getHousingPriceBounds,
@@ -37,6 +36,8 @@ import type {
 } from '@/types/nyc'
 import { HousingPostCard } from '@widgets/nyc/HousingPostCard'
 import { HousingPostCardSkeletonGrid } from '@widgets/nyc/HousingPostCardSkeleton'
+import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
+import { EmptyState } from '@widgets/nyc/EmptyState'
 
 type UnitTypeFilter = 'all' | HousingUnitType
 type RoomTypeFilter = 'all' | HousingRoomType
@@ -149,6 +150,12 @@ export function HousingListScreen() {
     return () => {
       cancelled = true
     }
+  }, [])
+
+  const refreshListings = useCallback(async () => {
+    const listings = await fetchHousingListings()
+    setPosts(listings)
+    setLoading(false)
   }, [])
 
   const filteredPosts = useMemo(() => {
@@ -389,17 +396,17 @@ export function HousingListScreen() {
   )
 
   return (
-    <div className='flex flex-1 flex-col bg-[#f7f8fa]'>
-      <header className='mx-auto w-full max-w-7xl px-4 pb-3 pt-6 sm:px-6 sm:pb-4 sm:pt-8 lg:px-8 lg:pt-9'>
-        <h1 className='sr-only'>하우징</h1>
-        <p className='text-[11px] font-medium tracking-[0.16em] text-[var(--muted)] sm:text-[10px] sm:tracking-[0.2em]'>
-          <Link href='/nyc' className='hover:text-[#F64310]'>
-            NYC
-          </Link>{' '}
-          / 하우징
+    <PullToRefresh onRefresh={refreshListings} className='flex flex-1 flex-col'>
+    <BoardPageShell width='wide' className='flex flex-1 flex-col'>
+      <header className='pt-5 sm:pt-8 lg:pt-10'>
+        <h1 className='text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]'>
+          하우징
+        </h1>
+        <p className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>
+          Misaeng이 엄선한 NYC 매물 · 유닛과 개인 방을 한곳에서 찾아보세요.
         </p>
 
-        {/* Airbnb-style filter bar */}
+        {/* 필터 + 빠른 태그 (예전 디자인) */}
         <div className='mt-4 flex items-center gap-2 sm:mt-5 sm:gap-2.5'>
           <button
             type='button'
@@ -420,7 +427,10 @@ export function HousingListScreen() {
             )}
           </button>
 
-          <span className='hidden h-6 w-px shrink-0 bg-[#dddddd] sm:block' aria-hidden />
+          <span
+            className='hidden h-6 w-px shrink-0 bg-[#dddddd] sm:block'
+            aria-hidden
+          />
 
           <div className='relative min-w-0 flex-1'>
             <div
@@ -456,11 +466,11 @@ export function HousingListScreen() {
               <div className='pointer-events-none absolute inset-y-0 left-0 z-10 flex w-14 items-center'>
                 <div
                   aria-hidden
-                  className='absolute inset-y-0 left-0 w-8 bg-[#f7f8fa]'
+                  className='absolute inset-y-0 left-0 w-8 bg-[#f8f8f9]'
                 />
                 <div
                   aria-hidden
-                  className='absolute inset-y-0 left-7 right-0 bg-gradient-to-r from-[#f7f8fa] to-transparent'
+                  className='absolute inset-y-0 left-7 right-0 bg-gradient-to-r from-[#f8f8f9] to-transparent'
                 />
                 <button
                   type='button'
@@ -477,11 +487,11 @@ export function HousingListScreen() {
               <div className='pointer-events-none absolute inset-y-0 right-0 z-10 flex w-14 items-center justify-end'>
                 <div
                   aria-hidden
-                  className='absolute inset-y-0 right-0 w-8 bg-[#f7f8fa]'
+                  className='absolute inset-y-0 right-0 w-8 bg-[#f8f8f9]'
                 />
                 <div
                   aria-hidden
-                  className='absolute inset-y-0 right-7 left-0 bg-gradient-to-l from-[#f7f8fa] to-transparent'
+                  className='absolute inset-y-0 right-7 left-0 bg-gradient-to-l from-[#f8f8f9] to-transparent'
                 />
                 <button
                   type='button'
@@ -497,34 +507,25 @@ export function HousingListScreen() {
         </div>
       </header>
 
-      <section className='mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 sm:pb-14 lg:px-8 lg:pb-16'>
+      <section className='flex-1 pb-14 pt-4 sm:pb-16 sm:pt-5'>
         {loading ? (
           <>
-            <Skeleton className='mb-3 h-3.5 w-36 sm:mb-3.5' />
+            <Skeleton className='mb-3.5 h-3.5 w-36' />
             <HousingPostCardSkeletonGrid />
           </>
         ) : filteredPosts.length === 0 ? (
-          <div className='rounded-2xl bg-white px-6 py-14 text-center ring-1 ring-black/[0.04]'>
-            <p className='text-[15px] font-semibold text-[var(--foreground)]'>
-              조건에 맞는 매물이 없어요
-            </p>
-            <p className='mt-1.5 text-[14px] text-[var(--muted-foreground)] sm:text-[13px]'>
-              필터를 바꿔 다시 검색해 보세요.
-            </p>
-            <button
-              type='button'
-              onClick={clearAllFilters}
-              className='mt-5 inline-flex h-10 items-center rounded-full bg-[var(--foreground)] px-5 text-[14px] font-semibold text-white touch-manipulation sm:text-[13px]'
-            >
-              필터 초기화
-            </button>
-          </div>
+          <EmptyState
+            title='조건에 맞는 매물이 없어요'
+            description='필터를 바꿔 다시 검색해 보세요.'
+            actionLabel='필터 초기화'
+            onAction={clearAllFilters}
+          />
         ) : (
           <>
-            <p className='mb-3 text-[13px] text-[var(--muted)] sm:mb-3.5 sm:text-[12px]'>
+            <p className='mb-3.5 text-[12px] font-medium text-[var(--muted)] sm:mb-4 sm:text-[13px]'>
               {summaryLabel}
             </p>
-            <div className='grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 lg:gap-3.5'>
+            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5'>
               {filteredPosts.map((listing) => (
                 <HousingPostCard
                   key={listing.id}
@@ -564,7 +565,7 @@ export function HousingListScreen() {
             <button
               type='button'
               onClick={applyFilters}
-              className='inline-flex h-11 min-w-[140px] items-center justify-center rounded-lg bg-[var(--foreground)] px-5 text-[14px] font-semibold text-white touch-manipulation hover:bg-[var(--navy-light)]'
+              className='inline-flex h-11 min-w-[140px] items-center justify-center rounded-full bg-[var(--foreground)] px-5 text-[14px] font-semibold text-white touch-manipulation hover:bg-[var(--navy-light)]'
             >
               매물 {draftResultCount}개 보기
             </button>
@@ -593,7 +594,7 @@ export function HousingListScreen() {
                         'rounded-2xl border px-3.5 py-3 text-left touch-manipulation transition',
                         active
                           ? 'border-[var(--foreground)] bg-white'
-                          : 'border-[#dddddd] bg-white hover:border-[#b0b0b0]',
+                          : 'border-black/[0.08] bg-white hover:border-black/15',
                       )}
                     >
                       <span className='block text-[13px] font-semibold text-[var(--foreground)]'>
@@ -812,7 +813,8 @@ export function HousingListScreen() {
             </section>
           </div>
       </BottomSheet>
-    </div>
+    </BoardPageShell>
+    </PullToRefresh>
   )
 }
 
@@ -860,7 +862,7 @@ function SheetChip({
         'inline-flex max-w-full items-center rounded-full border px-3 py-2 text-left text-[12px] font-medium leading-snug touch-manipulation transition',
         active
           ? 'border-[var(--foreground)] bg-white text-[var(--foreground)]'
-          : 'border-[#dddddd] bg-white text-[var(--foreground)] hover:border-[#b0b0b0]',
+          : 'border-black/[0.08] bg-white text-[var(--foreground)] hover:border-black/15',
       )}
     >
       {label}

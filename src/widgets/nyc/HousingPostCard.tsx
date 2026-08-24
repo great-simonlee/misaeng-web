@@ -67,8 +67,8 @@ export function HousingPostCard({
   }
 
   return (
-    <article className='group flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.05] transition hover:ring-black/[0.1] sm:rounded-xl'>
-      <div className='relative aspect-[4/3] overflow-hidden bg-[#eef0f3] sm:aspect-[3/2]'>
+    <article className='group flex flex-col overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_28px_rgba(15,23,42,0.045)] ring-1 ring-black/[0.03] transition hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgba(15,23,42,0.05),0_16px_36px_rgba(15,23,42,0.07)]'>
+      <div className='relative aspect-[4/3] overflow-hidden bg-[#e8eaee] sm:aspect-[3/2]'>
         {images.length > 0 ? (
           <div
             ref={galleryRef}
@@ -156,14 +156,14 @@ export function HousingPostCard({
         )}
       </div>
 
-      <div className='flex flex-1 flex-col px-3.5 py-3.5 sm:px-3 sm:py-2.5'>
+      <div className='flex flex-1 flex-col px-3.5 py-3.5 sm:px-3.5 sm:py-3'>
         <Link
           href={`/nyc/housing/${listing.id}`}
-          className='flex flex-col gap-1 touch-manipulation sm:gap-0.5'
+          className='flex flex-col gap-1 touch-manipulation sm:gap-1'
         >
           <div className='flex min-h-[2rem] min-w-0 items-center gap-2 sm:min-h-[1.75rem]'>
             <div className='flex min-w-0 flex-1 items-center gap-1.5'>
-              <h3 className='min-w-0 flex-1 truncate text-[15px] font-semibold leading-snug tracking-tight text-[var(--foreground)] sm:text-[13px]'>
+              <h3 className='min-w-0 flex-1 truncate text-[15px] font-semibold leading-snug tracking-tight text-[var(--foreground)] sm:text-[14px]'>
                 {displayAddress}
               </h3>
               <SchoolBadge schoolId={listing.authorSchoolId} />
@@ -175,7 +175,7 @@ export function HousingPostCard({
               className='shrink-0'
             />
           </div>
-          <p className='truncate text-[13px] text-[var(--muted-foreground)] sm:text-[12px]'>
+          <p className='truncate text-[12px] text-[var(--muted)] sm:text-[12px]'>
             {area}
             <span className='mx-1 text-[#d0d4db]'>·</span>
             {formatListingBedBath(listing)}
@@ -185,7 +185,7 @@ export function HousingPostCard({
         </Link>
 
         {showOptionRows && (
-          <ul className='mt-2.5 space-y-1 border-t border-[#f0f1f3] pt-2.5 sm:mt-2 sm:pt-2'>
+          <ul className='mt-2.5 space-y-1 border-t border-black/[0.04] pt-2.5'>
             {roomRows.map((room, index) => (
               <RoomOptionRow
                 key={getRoomSelectionKey(room, index)}
