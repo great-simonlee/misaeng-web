@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.18](https://github.com/great-simonlee/misaeng-web/compare/v0.0.17...v0.0.18) (2026-08-24)
+
+
+### 버그 수정
+
+* 커뮤니티 mock 타입 오류 및 내 글 화면 타입 수정 ([8d84f81](https://github.com/great-simonlee/misaeng-web/commit/8d84f8128a51dfaabe30bfaa7048f585beebdbc8))
+
 ## [0.0.17](https://github.com/great-simonlee/misaeng-web/compare/v0.0.16...v0.0.17) (2026-08-24)
 
 ## [0.0.16](https://github.com/great-simonlee/misaeng-web/compare/v0.0.15...v0.0.16) (2026-08-24)
