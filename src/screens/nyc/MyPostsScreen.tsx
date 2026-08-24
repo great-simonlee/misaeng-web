@@ -26,8 +26,14 @@ import {
 } from '@widgets/nyc/AccountCategoryNav'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 
-const MY_POSTS_COMMUNITY_CATEGORIES = NYC_CATEGORIES.filter((category) =>
-  (NYC_COMMUNITY_BOARD_IDS as readonly string[]).includes(category.id),
+type MyPostsCommunityCategory = Extract<
+  (typeof NYC_CATEGORIES)[number],
+  { id: NycCommunityBoardId }
+>
+
+const MY_POSTS_COMMUNITY_CATEGORIES = NYC_CATEGORIES.filter(
+  (category): category is MyPostsCommunityCategory =>
+    (NYC_COMMUNITY_BOARD_IDS as readonly string[]).includes(category.id),
 )
 
 type MyPostItem = {

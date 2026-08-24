@@ -22,7 +22,11 @@ function post(
     | 'placeName'
     | 'latitude'
     | 'longitude'
+    | 'authorUid'
+    | 'authorEmail'
   > & {
+    authorUid?: string
+    authorEmail?: string
     updatedAt?: number
     viewCount?: number
     beenThereCount?: number
@@ -40,6 +44,8 @@ function post(
 ): CommunityPost {
   return {
     ...partial,
+    authorUid: partial.authorUid ?? `mock-author-${partial.id}`,
+    authorEmail: partial.authorEmail ?? `mock-${partial.id}@example.com`,
     thumbnailUrl: partial.thumbnailUrl ?? null,
     partySize: partial.partySize ?? null,
     totalSpend: partial.totalSpend ?? null,
@@ -175,6 +181,8 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     `,
     location: '브루클린',
     detail: '브런치',
+    authorUid: 'mock-user-3',
+    authorEmail: 'brunch@newschool.edu',
     authorSchoolId: null,
     authorSchoolName: null,
     createdAt: NOW - 2 * DAY,
