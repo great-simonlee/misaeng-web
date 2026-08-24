@@ -55,7 +55,6 @@ export function ImageUploadButton({
         ref={inputRef}
         type='file'
         accept='image/*'
-        capture='environment'
         className='hidden'
         onChange={(e) => void handleFiles(e.target.files)}
       />
@@ -222,7 +221,7 @@ export function PhotoUploadZone({
                   …
                 </span>
               ) : (
-                <CameraIcon
+                <PhotoIcon
                   className={cn(compact ? 'size-4' : 'size-5', 'opacity-80')}
                 />
               )}
@@ -247,7 +246,6 @@ export function PhotoUploadZone({
         ref={inputRef}
         type='file'
         accept='image/*'
-        capture='environment'
         className='hidden'
         onChange={(e) => void handleFiles(e.target.files)}
       />
@@ -258,7 +256,7 @@ export function PhotoUploadZone({
   )
 }
 
-function CameraIcon({ className }: { className?: string }) {
+function PhotoIcon({ className }: { className?: string }) {
   return (
     <svg
       viewBox='0 0 24 24'
@@ -268,12 +266,9 @@ function CameraIcon({ className }: { className?: string }) {
       className={className}
       aria-hidden
     >
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        d='M4 8.5A2.5 2.5 0 0 1 6.5 6h1.2l1.1-1.6A1.5 1.5 0 0 1 10 3.8h4a1.5 1.5 0 0 1 1.2.6L16.3 6h1.2A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-8Z'
-      />
-      <circle cx='12' cy='12.5' r='3.2' />
+      <rect x='4' y='5' width='16' height='14' rx='2' />
+      <path strokeLinecap='round' d='M8.5 11.5 11 14l2.5-2.5L16 14' />
+      <circle cx='9' cy='9.5' r='1' fill='currentColor' stroke='none' />
     </svg>
   )
 }

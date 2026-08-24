@@ -10,7 +10,7 @@ import {
   PhotoUploadZone,
   TipTapEditor,
 } from '@components'
-import { useAuth } from '@hooks/useAuth'
+import { useRequireAuth } from '@hooks/useRequireAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import {
   createCommunityPostRequest,
@@ -78,12 +78,16 @@ export function CommunityNewScreen({
   editPostId,
 }: CommunityNewScreenProps) {
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
-  const { user, profile, loading } = useAuth()
+  const isEdit = Boolean(editPostId)
+  const loginNext = editPostId
+    ? `/nyc/${boardId}/${editPostId}/edit`
+    : `/nyc/${boardId}/new`
+  const { user, profile, loading, isAuthenticated } =
+    useRequireAuth(loginNext)
   const { error: toastError, success } = useToast()
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [loadingEdit, setLoadingEdit] = useState(Boolean(editPostId))
-  const isEdit = Boolean(editPostId)
   const isFood = boardId === 'food'
 
   const [postTitle, setPostTitle] = useState('')
@@ -209,7 +213,11 @@ export function CommunityNewScreen({
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!user?.email) return
+    if (!user?.email) {
+      toastError('로그인이 필요해요')
+      router.replace(`/nyc/login?next=${encodeURIComponent(loginNext)}`)
+      return
+    }
 
     const plain = htmlToPlainText(contentHtml)
     if (!plain) {
@@ -341,35 +349,17 @@ export function CommunityNewScreen({
     }
   }
 
-  if (loading || loadingEdit) {
+  if (loading || loadingEdit || !isAuthenticated || !user) {
     return (
       <BoardPageShell width='narrow'>
-        <LoadingState fullPage />
-      </BoardPageShell>
-    )
-  }
-
-  if (!user) {
-    return (
-      <BoardPageShell width='narrow'>
-        <div className='mx-auto flex min-h-[70vh] max-w-md flex-col items-center justify-center px-4 text-center'>
-          <h1 className='text-2xl font-semibold tracking-tight'>
-            로그인이 필요해요
-          </h1>
-          <p className='mt-2 text-[14px] text-[var(--muted-foreground)]'>
-            로그인 후 {title} 글을 올릴 수 있어요.
-          </p>
-          <Link
-            href={`/nyc/login?next=${encodeURIComponent(
-              isEdit && editPostId
-                ? `/nyc/${boardId}/${editPostId}/edit`
-                : `/nyc/${boardId}/new`,
-            )}`}
-            className='mt-6 inline-flex h-11 items-center rounded-full bg-[var(--brand)] px-5 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)]'
-          >
-            로그인
-          </Link>
-        </div>
+        <LoadingState
+          fullPage
+          label={
+            !loading && !isAuthenticated
+              ? '로그인 페이지로 이동 중…'
+              : undefined
+          }
+        />
       </BoardPageShell>
     )
   }

@@ -33,6 +33,11 @@ export function NycNavbar() {
   const [accountOpen, setAccountOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const accountRef = useRef<HTMLDivElement>(null)
+  const accountButtonRef = useRef<HTMLButtonElement>(null)
+  const [accountMenuStyle, setAccountMenuStyle] = useState<{
+    top: number
+    right: number
+  } | null>(null)
   const pathname = usePathname()
   const { user, loading, avatarURL, displayName, isMisaengUser } = useAuth()
   const [navPath, setNavPath] = useState(pathname)
@@ -58,12 +63,27 @@ export function NycNavbar() {
   useEffect(() => {
     if (!accountOpen) return
 
+    function updateAccountMenuPosition() {
+      const button = accountButtonRef.current
+      if (!button) return
+      const rect = button.getBoundingClientRect()
+      setAccountMenuStyle({
+        top: rect.bottom + 8,
+        right: Math.max(8, window.innerWidth - rect.right),
+      })
+    }
+
+    updateAccountMenuPosition()
+    window.addEventListener('resize', updateAccountMenuPosition)
+    window.addEventListener('scroll', updateAccountMenuPosition, true)
+
     function onPointerDown(e: MouseEvent | TouchEvent) {
-      const el = accountRef.current
-      if (!el) return
-      if (e.target instanceof Node && !el.contains(e.target)) {
-        setAccountOpen(false)
-      }
+      const root = accountRef.current
+      const menu = document.getElementById('nyc-account-menu')
+      const target = e.target
+      if (!(target instanceof Node)) return
+      if (root?.contains(target) || menu?.contains(target)) return
+      setAccountOpen(false)
     }
 
     function onKey(e: KeyboardEvent) {
@@ -74,10 +94,17 @@ export function NycNavbar() {
     document.addEventListener('touchstart', onPointerDown)
     window.addEventListener('keydown', onKey)
     return () => {
+      window.removeEventListener('resize', updateAccountMenuPosition)
+      window.removeEventListener('scroll', updateAccountMenuPosition, true)
       document.removeEventListener('mousedown', onPointerDown)
       document.removeEventListener('touchstart', onPointerDown)
       window.removeEventListener('keydown', onKey)
     }
+  }, [accountOpen])
+
+  useEffect(() => {
+    if (accountOpen) return
+    setTimeout(() => setAccountMenuStyle(null), 0)
   }, [accountOpen])
 
   function isActive(href: string) {
@@ -87,6 +114,44 @@ export function NycNavbar() {
   function isAccountActive(href: string, match: 'exact' | 'prefix') {
     return match === 'exact' ? pathname === href : isActive(href)
   }
+
+  const accountMenuOverlay =
+    mounted &&
+    typeof document !== 'undefined' &&
+    accountOpen &&
+    accountMenuStyle &&
+    createPortal(
+      <div
+        id='nyc-account-menu'
+        role='menu'
+        aria-label='계정 메뉴'
+        style={{
+          position: 'fixed',
+          top: accountMenuStyle.top,
+          right: accountMenuStyle.right,
+          zIndex: 10001,
+        }}
+        className='hidden min-w-[12.5rem] rounded-xl border border-[var(--border)] bg-white py-1 shadow-[0_8px_30px_rgba(15,23,42,0.12)] md:block'
+      >
+        {ACCOUNT_LINKS.map(({ href, label, match }) => (
+          <Link
+            key={href}
+            href={href}
+            role='menuitem'
+            onClick={() => setAccountOpen(false)}
+            className={cn(
+              'flex h-10 items-center whitespace-nowrap px-3.5 text-sm font-medium transition hover:bg-[var(--surface)]',
+              isAccountActive(href, match)
+                ? 'bg-[#F64310]/[0.08] font-semibold text-[#F64310]'
+                : 'text-[var(--foreground)]',
+            )}
+          >
+            {label}
+          </Link>
+        ))}
+      </div>,
+      document.body,
+    )
 
   const mobileMenuOverlay =
     mounted &&
@@ -178,7 +243,7 @@ export function NycNavbar() {
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-[10000] border-b border-[var(--border)] md:sticky md:z-50',
+          'fixed top-0 left-0 right-0 z-[10000] overflow-visible border-b border-[var(--border)] md:sticky md:z-50',
           mobileOpen
             ? 'bg-[var(--background)] md:bg-[var(--background)]/95 md:backdrop-blur md:supports-[backdrop-filter]:bg-[var(--background)]/80'
             : 'bg-[var(--background)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--background)]/80',
@@ -263,6 +328,7 @@ export function NycNavbar() {
                 {/* 데스크톱: 계정 드롭다운 (마이페이지 / 내가 올린 글 / 좋아요) */}
                 <div ref={accountRef} className='relative hidden md:block'>
                 <button
+                  ref={accountButtonRef}
                   type='button'
                   onClick={() => setAccountOpen((o) => !o)}
                   className='inline-flex h-9 shrink-0 cursor-pointer items-center gap-0.5 rounded-full border border-[var(--border)] bg-white p-0.5 touch-manipulation transition hover:bg-[var(--surface)]'
@@ -278,31 +344,6 @@ export function NycNavbar() {
                     {accountOpen ? <CloseIcon /> : <MenuIcon />}
                   </span>
                 </button>
-
-                {accountOpen && (
-                  <div
-                    role='menu'
-                    aria-label='계정 메뉴'
-                    className='absolute right-0 top-[calc(100%+0.5rem)] z-50 w-44 overflow-hidden rounded-xl border border-[var(--border)] bg-white py-1 shadow-[0_8px_30px_rgba(15,23,42,0.12)]'
-                  >
-                    {ACCOUNT_LINKS.map(({ href, label, match }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        role='menuitem'
-                        onClick={() => setAccountOpen(false)}
-                        className={cn(
-                          'flex h-10 items-center px-3.5 text-sm font-medium transition hover:bg-[var(--surface)]',
-                          isAccountActive(href, match)
-                            ? 'bg-[#F64310]/[0.08] font-semibold text-[#F64310]'
-                            : 'text-[var(--foreground)]',
-                        )}
-                      >
-                        {label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
                 </div>
               </>
             )}
@@ -310,6 +351,7 @@ export function NycNavbar() {
         </div>
       </header>
 
+      {accountMenuOverlay}
       {mobileMenuOverlay}
     </>
   )

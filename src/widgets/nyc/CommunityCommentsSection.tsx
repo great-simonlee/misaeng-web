@@ -160,6 +160,10 @@ export function CommunityCommentsSection({
           </Link>
           이 필요해요.
         </div>
+      ) : authLoading ? (
+        <p className='mt-4 text-[13px] text-[var(--muted)]'>
+          로그인 상태를 확인하는 중이에요…
+        </p>
       ) : (
         <form
           className='mt-4'
@@ -209,10 +213,14 @@ export function CommunityCommentsSection({
                 anonymousBoard={anonymousBoard}
                 canReport={Boolean(user)}
                 loginHref={loginHref}
-                onReply={() => {
-                  setReplyToId(thread.id)
-                  setReplyDraft('')
-                }}
+                onReply={
+                  user
+                    ? () => {
+                        setReplyToId(thread.id)
+                        setReplyDraft('')
+                      }
+                    : undefined
+                }
                 onReport={() => setReportTargetId(thread.id)}
               />
 

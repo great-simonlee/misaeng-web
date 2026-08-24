@@ -4,7 +4,7 @@ import Link from 'next/link'
 import type { FormEvent } from 'react'
 import { useState } from 'react'
 
-import { useAuth } from '@hooks/useAuth'
+import { useRequireAuth } from '@hooks/useRequireAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
 // import { createHousingPost } from '@lib/firebase/housing'
@@ -12,7 +12,9 @@ import { getErrorMessage, useToast } from '@hooks/useToast'
 import { LoadingState } from '@components'
 
 export function HousingNewScreen() {
-  const { user, loading, isMisaengUser } = useAuth()
+  const { user, loading, isAuthenticated, isMisaengUser } = useRequireAuth(
+    '/nyc/housing/new',
+  )
   const { error: toastError } = useToast()
   const [submitting, setSubmitting] = useState(false)
 
@@ -28,7 +30,10 @@ export function HousingNewScreen() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!user?.email) return
+    if (!user?.email) {
+      toastError('로그인이 필요해요')
+      return
+    }
     setSubmitting(true)
     try {
       // 임시: 파이어베이스 하우징 등록 비활성화
@@ -78,35 +83,14 @@ export function HousingNewScreen() {
     }
   }
 
-  if (loading) {
-    return <LoadingState fullPage />
-  }
-
-  // 임시: 파이어베이스 배너 비활성화
-  /*
-  if (!configured || !isFirebaseConfigured()) {
+  if (loading || !isAuthenticated || !user) {
     return (
-      <div className='mx-auto max-w-2xl px-4 py-12'>
-        <FirebaseConfigBanner />
-      </div>
-    )
-  }
-  */
-
-  if (!user) {
-    return (
-      <div className='mx-auto max-w-2xl px-4 py-12'>
-        <h1 className='text-2xl font-bold'>로그인이 필요합니다</h1>
-        <p className='mt-2 text-sm text-[var(--muted-foreground)]'>
-          하우징은 @misaeng.com 계정으로 로그인한 후에만 등록할 수 있습니다.
-        </p>
-        <Link
-          href='/nyc/login?next=/nyc/housing/new'
-          className='mt-6 inline-flex rounded-full bg-[#F64310] px-5 py-2.5 text-sm font-semibold text-white'
-        >
-          로그인
-        </Link>
-      </div>
+      <LoadingState
+        fullPage
+        label={
+          !loading && !isAuthenticated ? '로그인 페이지로 이동 중…' : undefined
+        }
+      />
     )
   }
 
@@ -123,7 +107,7 @@ export function HousingNewScreen() {
           하우징 매물은{' '}
           <strong className='text-[var(--foreground)]'>@misaeng.com</strong>{' '}
           이메일로만 등록할 수 있습니다. 현재 로그인:{' '}
-          {user.email}
+          {user?.email ?? '알 수 없음'}
         </p>
         <div className='mt-6 flex flex-wrap gap-3'>
           <Link

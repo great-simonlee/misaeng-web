@@ -76,7 +76,11 @@ export async function createCommunityCommentRequest(input: {
       return data.comment
     }
 
-    if (res.status === 503 || input.postId.startsWith('mock-') || res.status === 401) {
+    if (res.status === 401) {
+      throw new Error(data?.error || '로그인이 필요해요.')
+    }
+
+    if (res.status === 503 || input.postId.startsWith('mock-')) {
       return createLocalComment(input, body)
     }
 
