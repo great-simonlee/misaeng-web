@@ -21,6 +21,38 @@ interface GoogleSignInButtonProps {
 const GIS_SCRIPT_SRC = 'https://accounts.google.com/gsi/client'
 
 let gisScriptPromise: Promise<void> | null = null
+let gisInitializedClientId: string | null = null
+let gisInitPromise: Promise<void> | null = null
+
+type GisCredentialHandler = (response: GoogleCredentialResponse) => void
+
+const gisCredentialHandlerRef: { current: GisCredentialHandler | null } = {
+  current: null,
+}
+
+async function ensureGoogleIdentityInitialized(clientId: string) {
+  await loadGoogleIdentityScript()
+  if (!window.google?.accounts?.id) return false
+  if (gisInitializedClientId === clientId) return true
+
+  if (!gisInitPromise) {
+    gisInitPromise = Promise.resolve().then(() => {
+      if (!window.google?.accounts?.id) return
+      if (gisInitializedClientId === clientId) return
+
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: (response) => gisCredentialHandlerRef.current?.(response),
+        ux_mode: 'popup',
+        auto_select: false,
+      })
+      gisInitializedClientId = clientId
+    })
+  }
+
+  await gisInitPromise
+  return gisInitializedClientId === clientId
+}
 
 function loadGoogleIdentityScript() {
   if (typeof window === 'undefined') {
@@ -123,6 +155,10 @@ function GoogleSignInInner({
   )
 
   useEffect(() => {
+    gisCredentialHandlerRef.current = handleCredential
+  }, [handleCredential])
+
+  useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
@@ -146,18 +182,16 @@ function GoogleSignInInner({
     let cancelled = false
     const googleRoot = googleRef.current
 
-    void loadGoogleIdentityScript()
-      .then(() => {
-        if (cancelled || !window.google?.accounts?.id || !googleRoot) {
+    void ensureGoogleIdentityInitialized(clientId)
+      .then((initialized) => {
+        if (
+          cancelled ||
+          !initialized ||
+          !window.google?.accounts?.id ||
+          !googleRoot
+        ) {
           return
         }
-
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: handleCredential,
-          ux_mode: 'popup',
-          auto_select: false,
-        })
 
         googleRoot.innerHTML = ''
         window.google.accounts.id.renderButton(googleRoot, {
@@ -185,7 +219,7 @@ function GoogleSignInInner({
       cancelled = true
       setReady(false)
     }
-  }, [buttonWidth, clientId, handleCredential, onError])
+  }, [buttonWidth, clientId, onError])
 
   const isDisabled = disabled || submitting || !ready
   const label = submitting

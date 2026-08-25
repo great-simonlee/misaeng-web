@@ -1,12 +1,16 @@
 export const MISAENG_EMAIL_DOMAIN = '@misaeng.com'
 
+export const MISAENG_NY_INSTAGRAM_HANDLE = 'misaeng.ny'
+export const MISAENG_NY_INSTAGRAM_URL = `https://instagram.com/${MISAENG_NY_INSTAGRAM_HANDLE}`
+
 /** NYC 네비·푸터·본문 가로 정렬용 컨테이너 */
 export const NYC_PAGE_SHELL_CLASS =
   'mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'
 
 /** 카카오톡 문의 채널/오픈채팅 URL (미설정 시 문의 버튼에서 안내) */
 export const KAKAO_INQUIRY_URL =
-  process.env.NEXT_PUBLIC_KAKAO_INQUIRY_URL?.trim() || ''
+  process.env.NEXT_PUBLIC_KAKAO_INQUIRY_URL?.trim() ||
+  'https://open.kakao.com/o/sRI0tPJi'
 
 export const NYC_CATEGORIES = [
   {
@@ -31,7 +35,7 @@ export const NYC_CATEGORIES = [
     description: '맛집·카페 추천',
     href: '/nyc/food',
     postHref: '/nyc/food/new',
-    available: false,
+    available: true,
   },
   {
     id: 'marketplace',
@@ -99,6 +103,18 @@ export const NYC_COMMUNITY_BOARD_IDS = [
 
 export type NycCommunityBoardId = (typeof NYC_COMMUNITY_BOARD_IDS)[number]
 
+/** 목록·글쓰기 UI 대신 준비 중 안내를 보여줄 보드 */
+export const NYC_WIP_COMMUNITY_BOARD_IDS = ['marketplace', 'cpt-opt'] as const
+
+export type NycWipCommunityBoardId =
+  (typeof NYC_WIP_COMMUNITY_BOARD_IDS)[number]
+
+export function isCommunityBoardWip(
+  id: string,
+): id is NycWipCommunityBoardId {
+  return (NYC_WIP_COMMUNITY_BOARD_IDS as readonly string[]).includes(id)
+}
+
 export const NYC_COMMUNITY_BOARD_META: Record<
   NycCommunityBoardId,
   {
@@ -125,18 +141,18 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     descriptionPlaceholder: '시간, 참가 방법, 한 줄 소개',
   },
   food: {
-    writeLabel: '맛집 추천',
-    listIntro: '가본 맛집·카페를 짧게 남겨 주세요.',
+    writeLabel: '맛집 추천하기',
+    listIntro: '가본 맛집·카페를 남겨 주세요. 사진과 후기를 자유롭게 적어 보세요.',
     locationLabel: '동네',
     locationPlaceholder: '플러싱 / 코리아타운',
-    detailLabel: '한 줄 키워드',
-    detailPlaceholder: '칼국수 · 웨이팅 있음',
-    detailInput: 'text',
-    titlePlaceholder: '플러싱 OO 칼국수',
-    descriptionPlaceholder: '메뉴, 가격대, 팁',
+    detailLabel: '음식',
+    detailPlaceholder: '',
+    detailInput: null,
+    titlePlaceholder: '식당 이름',
+    descriptionPlaceholder: '메뉴, 가격대, 웨이팅, 추천 포인트…',
   },
   marketplace: {
-    writeLabel: '물품 등록',
+    writeLabel: '물품 등록하기',
     listIntro: '필요 없는 물건, 필요한 물건 — 이웃과 거래해 보세요.',
     locationLabel: '거래 지역',
     locationPlaceholder: '브루클린 / 미팅 가능',
@@ -144,10 +160,10 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     detailPlaceholder: '0',
     detailInput: 'number',
     titlePlaceholder: 'IKEA 책장 나눔/판매',
-    descriptionPlaceholder: '상태, 픽업 가능 여부',
+    descriptionPlaceholder: '상태, 픽업 가능 여부, 거래 방식을 적어 주세요.',
   },
   'cpt-opt': {
-    writeLabel: '후기 쓰기',
+    writeLabel: '후기 남기기',
     listIntro: 'CPT·OPT 경험과 직장 후기를 나눠 주세요.',
     locationLabel: '회사/학교 (선택)',
     locationPlaceholder: '회사명 또는 학교',
@@ -155,10 +171,10 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     detailPlaceholder: 'CPT / OPT / STEM OPT',
     detailInput: 'text',
     titlePlaceholder: 'OPT 3개월차 회고',
-    descriptionPlaceholder: '지원 과정, 팁, 주의할 점',
+    descriptionPlaceholder: '지원 과정, 서류, 팁, 주의할 점을 자세히 적어 주세요.',
   },
   visa: {
-    writeLabel: '후기 쓰기',
+    writeLabel: '후기 남기기',
     listIntro: '비자 준비·인터뷰 경험을 공유해 주세요.',
     locationLabel: '관련 지역 (선택)',
     locationPlaceholder: 'NY / 대사관 등',
@@ -169,7 +185,7 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     descriptionPlaceholder: '타임라인, 서류, 팁',
   },
   'job-review': {
-    writeLabel: '후기 쓰기',
+    writeLabel: '후기 남기기',
     listIntro: '면접·취업·직장 경험을 나눠 주세요.',
     locationLabel: '회사/업계 (선택)',
     locationPlaceholder: '테크 / 금융 등',
@@ -180,7 +196,7 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     descriptionPlaceholder: '준비 과정, 질문, 분위기',
   },
   'green-card': {
-    writeLabel: '후기 쓰기',
+    writeLabel: '후기 남기기',
     listIntro: '영주권 여정을 커뮤니티와 공유해 주세요.',
     locationLabel: '카테고리 (선택)',
     locationPlaceholder: 'EB-2 / 결혼 등',
@@ -191,7 +207,7 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     descriptionPlaceholder: '기간, 변호사, 팁',
   },
   anonymous: {
-    writeLabel: '익명으로 글쓰기',
+    writeLabel: '익명으로 글 남기기',
     listIntro: '이름 없이 편하게 나누는 NYC 익명 게시판이에요.',
     locationLabel: '주제 (선택)',
     locationPlaceholder: '고민 · 질문 · 일상',
@@ -220,43 +236,35 @@ export function isMisaengEmail(email: string | null | undefined): boolean {
   return email.toLowerCase().endsWith(MISAENG_EMAIL_DOMAIN)
 }
 
-/** 로고는 추후 교체. 지금은 이니셜 플레이스홀더. handle이 있으면 Instagram 링크. */
+/** handle이 있으면 Instagram 링크. logoSrc가 있으면 학교 로고 표시. */
 export const NYC_PARTNER_ORGS = [
   {
     id: 'nyu-kiso',
     name: '뉴욕대 한인학생회',
     shortName: 'NYU',
     handle: 'nyu_kiso',
+    logoSrc: '/img/school/kiso.png',
   },
   {
     id: 'fit-ksof',
     name: 'FIT 한인학생회',
     shortName: 'FIT',
     handle: 'ksof_fit',
-  },
-  {
-    id: 'columbia-ksa',
-    name: '컬럼비아 한인학생회',
-    shortName: 'CU',
-    handle: null,
+    logoSrc: '/img/school/fit.png',
   },
   {
     id: 'baruch-ksa',
     name: '바루크 한인학생회',
     shortName: 'BC',
-    handle: null,
-  },
-  {
-    id: 'newschool-ksa',
-    name: '뉴스키쿨 한인학생회',
-    shortName: 'TNS',
-    handle: null,
+    handle: 'ksabaruch',
+    logoSrc: '/img/school/baruch.png',
   },
   {
     id: 'parsons-ksa',
     name: '파슨스 한인학생회',
     shortName: 'PAR',
-    handle: null,
+    handle: 'parsons.kisp',
+    logoSrc: '/img/school/parsons.png',
   },
 ] as const
 
@@ -282,46 +290,46 @@ export const NYC_INFLUENCER_PLATFORMS = [
 export type NycInfluencerPlatformId =
   (typeof NYC_INFLUENCER_PLATFORMS)[number]['id']
 
-/** 프로필·링크는 추후 교체. handle이 있으면 플랫폼 프로필로 연결. */
+/** 협력 인플루언서 확정 전 모집 안내. handle이 있으면 플랫폼 프로필로 연결. */
 export const NYC_PARTNER_INFLUENCERS = [
   {
-    id: 'ig-placeholder-1',
-    name: 'NYC Daily',
+    id: 'ig-recruiting-1',
+    name: '협력 인플루언서를 찾습니다!',
     shortName: 'IG',
     handle: null,
     platform: 'instagram',
   },
   {
-    id: 'ig-placeholder-2',
-    name: '한인 라이프',
+    id: 'ig-recruiting-2',
+    name: '현재 협력 인플루언서 찾는 중',
     shortName: 'IG',
     handle: null,
     platform: 'instagram',
   },
   {
-    id: 'yt-placeholder-1',
-    name: '뉴욕 브이로그',
+    id: 'yt-recruiting-1',
+    name: '협력 인플루언서를 찾습니다!',
     shortName: 'YT',
     handle: null,
     platform: 'youtube',
   },
   {
-    id: 'yt-placeholder-2',
-    name: '유학생 채널',
+    id: 'yt-recruiting-2',
+    name: '현재 협력 인플루언서 찾는 중',
     shortName: 'YT',
     handle: null,
     platform: 'youtube',
   },
   {
-    id: 'tt-placeholder-1',
-    name: 'NYC Shorts',
+    id: 'tt-recruiting-1',
+    name: '협력 인플루언서를 찾습니다!',
     shortName: 'TT',
     handle: null,
     platform: 'tiktok',
   },
   {
-    id: 'tt-placeholder-2',
-    name: '맨해튼 클립',
+    id: 'tt-recruiting-2',
+    name: '현재 협력 인플루언서 찾는 중',
     shortName: 'TT',
     handle: null,
     platform: 'tiktok',

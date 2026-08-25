@@ -50,7 +50,7 @@ function InfluencerItem({
           {name}
         </span>
         <span className='mt-0.5 block text-[11px] leading-none text-[var(--muted)]'>
-          {handle ? `@${handle}` : '프로필 준비 중'}
+          {handle ? `@${handle}` : '협력 인플루언서 모집 중'}
         </span>
       </span>
     </>

@@ -1,25 +1,38 @@
 'use client'
 
-import Link from 'next/link'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
 
+import { LoadingState, PullToRefresh, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
-import { useToast } from '@hooks/useToast'
+import { getErrorMessage, useToast } from '@hooks/useToast'
+import {
+  deleteCommunityPostRequest,
+  fetchCommunityPost,
+} from '@lib/community/client'
+import { recordCommunityView } from '@lib/community/engagement.client'
+import {
+  formatCommunityCount,
+  formatCommunityRelativeTime,
+} from '@lib/constants/communityMock'
 import {
   NYC_COMMUNITY_BOARD_META,
   isAnonymousBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
-// import { isFirebaseConfigured } from '@lib/firebase/client'
-// import {
-//   closeCommunityPost,
-//   getCommunityPost,
-// } from '@lib/firebase/community'
 import type { CommunityPost } from '@/types/nyc'
-import { CopyLinkButton } from '@widgets/nyc/CopyLinkButton'
+import {
+  BoardBackLink,
+  BoardMetaChip,
+  BoardPageShell,
+  BoardSurface,
+  boardToneForId,
+} from '@widgets/nyc/BoardPageShell'
+import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
+import { CommunityCommentsSection } from '@widgets/nyc/CommunityCommentsSection'
+import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
+import { FoodDetailContent } from '@widgets/nyc/FoodDetailContent'
 import { EmptyState } from '@widgets/nyc/EmptyState'
-// import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
-import { LoadingState, SchoolBadge } from '@components'
 
 interface CommunityDetailScreenProps {
   boardId: NycCommunityBoardId
@@ -30,71 +43,89 @@ interface CommunityDetailScreenProps {
 export function CommunityDetailScreen({
   boardId,
   title,
+  postId,
 }: CommunityDetailScreenProps) {
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const { user } = useAuth()
-  const { error: toastError } = useToast()
-  const [post] = useState<CommunityPost | null>(null)
-  const [loading] = useState(false)
-  const [error] = useState<string | null>(null)
-  // const configured = isFirebaseConfigured()
+  const { error: toastError, success } = useToast()
+  const router = useRouter()
+  const [post, setPost] = useState<CommunityPost | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // 임시: 파이어베이스 커뮤니티 상세 조회 비활성화
-  /*
-  useEffect(() => {
-    if (!configured) {
-      setLoading(false)
-      return
-    }
-    let cancelled = false
-    ;(async () => {
-      try {
-        const data = await getCommunityPost(postId)
-        if (!cancelled) setPost(data)
-      } catch (err) {
-        if (!cancelled) {
-          const msg = getErrorMessage(err, '글을 불러오지 못했어요')
-          setError(msg)
-          toastError(msg)
-        }
-      } finally {
-        if (!cancelled) setLoading(false)
+  const loadPost = useCallback(
+    async (opts?: { silent?: boolean }) => {
+      if (!opts?.silent) {
+        setLoading(true)
+        setError(null)
       }
-    })()
+      try {
+        const data = await fetchCommunityPost(postId)
+        setPost(data)
+        setError(null)
+      } catch (err) {
+        const msg = getErrorMessage(err, '글을 불러오지 못했어요')
+        setError(msg)
+        if (!opts?.silent) toastError(msg)
+        throw err
+      } finally {
+        setLoading(false)
+      }
+    },
+    [postId, toastError],
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    void loadPost().catch(() => {
+      if (cancelled) return
+    })
     return () => {
       cancelled = true
     }
+  }, [loadPost])
+
+  useEffect(() => {
+    if (!postId) return
+    void recordCommunityView(postId).then((result) => {
+      if (!result) return
+      setPost((current) => {
+        if (!current) return current
+        if ('viewCount' in result) {
+          return { ...current, viewCount: result.viewCount }
+        }
+        return { ...current, viewCount: current.viewCount + 1 }
+      })
+    })
   }, [postId])
-  */
 
-  async function handleClose() {
+  const refreshPost = useCallback(async () => {
+    await loadPost({ silent: true })
+  }, [loadPost])
+
+  async function handleDelete() {
     if (!post || !user) return
-    // 임시: 파이어베이스 마감 비활성화
-    toastError('Supabase 연동 후 이용할 수 있어요')
-    /*
-    try {
-      await closeCommunityPost(post.id)
-      setPost({ ...post, status: 'closed' })
-      success('게시글을 마감했어요')
-    } catch (err) {
-      toastError(getErrorMessage(err, '마감에 실패했어요'))
-    }
-    */
-  }
-
-  // 임시: 파이어베이스 배너 비활성화
-  /*
-  if (!configured) {
-    return (
-      <div className='mx-auto max-w-3xl px-4 py-12'>
-        <FirebaseConfigBanner />
-      </div>
+    const ok = window.confirm(
+      `"${post.title}" 글을 삭제할까요?\n삭제하면 되돌릴 수 없어요.`,
     )
+    if (!ok) return
+    try {
+      await deleteCommunityPostRequest(post.id)
+      success('글을 삭제했어요')
+      router.push('/nyc/me/posts')
+    } catch (err) {
+      toastError(getErrorMessage(err, '삭제에 실패했어요'))
+    }
   }
-  */
 
   if (loading) {
-    return <LoadingState fullPage />
+    return (
+      <PullToRefresh onRefresh={refreshPost}>
+        <BoardPageShell width='narrow'>
+          <LoadingState fullPage label='글을 불러오는 중이에요…' />
+        </BoardPageShell>
+      </PullToRefresh>
+    )
   }
 
   if (
@@ -104,102 +135,121 @@ export function CommunityDetailScreen({
     post.categoryId !== boardId
   ) {
     return (
-      <div className='mx-auto max-w-3xl px-4 py-12'>
-        <EmptyState
-          title='게시글을 찾을 수 없습니다'
-          description={error ?? '마감되었거나 삭제된 글일 수 있습니다.'}
-          actionHref={`/nyc/${boardId}`}
-          actionLabel={`${title} 목록으로`}
-        />
-      </div>
+      <PullToRefresh onRefresh={refreshPost}>
+        <BoardPageShell width='narrow' className='py-12'>
+          <EmptyState
+            title='게시글을 찾을 수 없습니다'
+            description={error ?? '삭제된 글일 수 있습니다.'}
+            actionHref={`/nyc/${boardId}`}
+            actionLabel={`${title} 목록으로`}
+          />
+        </BoardPageShell>
+      </PullToRefresh>
     )
   }
 
-  const isAuthor = user?.uid === post.authorUid
+  const isAuthor = user?.uid === post.authorUid && !post.id.startsWith('mock-')
   const anonymous = isAnonymousBoard(boardId)
+  const isFood = boardId === 'food'
+  const bodyHtml = post.contentHtml || `<p>${post.description}</p>`
+  const tone = boardToneForId(boardId)
+  const metaBits = [
+    post.location && {
+      label: meta.locationLabel,
+      value: post.location,
+    },
+    post.detail &&
+      meta.detailLabel && {
+        label: meta.detailLabel,
+        value:
+          boardId === 'marketplace' ? `$${post.detail}` : post.detail,
+      },
+  ].filter(Boolean) as { label: string; value: string }[]
 
   return (
-    <div className='min-h-screen bg-[var(--background)]'>
-      <article className='mx-auto max-w-3xl px-4 py-7 sm:px-6 sm:py-12'>
-        <p className='text-[10px] font-semibold tracking-[0.28em] text-[var(--muted)]'>
-          <Link href={`/nyc/${boardId}`} className='hover:text-[#F64310]'>
-            {title}
-          </Link>
-        </p>
-        <div className='mt-3 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
-          <div className='min-w-0'>
-            <div className='flex flex-wrap items-center gap-2'>
-              <h1 className='text-[1.5rem] font-bold leading-snug tracking-tight text-[var(--foreground)] sm:text-4xl'>
-                {post.title}
-              </h1>
-              {anonymous ? (
-                <span className='rounded-full bg-[var(--foreground)]/6 px-1.5 py-0.5 text-[9px] font-semibold tracking-wide text-[var(--muted)]'>
-                  익명
-                </span>
-              ) : (
-                <SchoolBadge schoolId={post.authorSchoolId} />
-              )}
-            </div>
-            {(post.location || post.detail) && (
-              <p className='mt-2 text-[15px] font-semibold leading-snug text-[var(--foreground)] sm:text-base'>
-                {[post.location, post.detail].filter(Boolean).join(' · ')}
-              </p>
-            )}
-          </div>
-          <div className='w-full shrink-0 sm:w-auto'>
-            <CopyLinkButton />
-          </div>
-        </div>
+    <PullToRefresh onRefresh={refreshPost}>
+      <BoardPageShell width='narrow'>
+        <div className={isFood ? 'pb-16 sm:pb-20' : 'pb-16 pt-5 sm:pb-20 sm:pt-7'}>
+          {isFood ? (
+            <FoodDetailContent
+              post={post}
+              boardId={boardId}
+              boardTitle={title}
+              isAuthor={isAuthor}
+              onDelete={() => void handleDelete()}
+            />
+          ) : (
+            <>
+              <BoardBackLink
+                href={`/nyc/${boardId}`}
+                label={`${title} 목록`}
+                className='mb-4'
+              />
 
-        <div className='mt-6 space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:mt-8 sm:p-6'>
-          <p className='whitespace-pre-wrap text-[15px] leading-relaxed text-[var(--muted-foreground)] sm:text-sm'>
-            {post.description}
-          </p>
-          <dl className='grid grid-cols-1 gap-4 border-t border-[var(--border)] pt-4 text-sm sm:grid-cols-2 sm:gap-3'>
-            {post.location && (
-              <div>
-                <dt className='text-[var(--muted)]'>{meta.locationLabel}</dt>
-                <dd className='mt-0.5 font-medium text-[var(--foreground)]'>
-                  {post.location}
-                </dd>
-              </div>
-            )}
-            {post.detail && meta.detailLabel && (
-              <div>
-                <dt className='text-[var(--muted)]'>{meta.detailLabel}</dt>
-                <dd className='mt-0.5 font-medium text-[var(--foreground)]'>
-                  {post.detail}
-                </dd>
-              </div>
-            )}
-            <div>
-              <dt className='text-[var(--muted)]'>작성자</dt>
-              <dd className='mt-0.5 break-all font-medium text-[var(--foreground)]'>
-                {anonymous ? (
-                  '익명'
-                ) : (
-                  <a
-                    href={`mailto:${post.authorEmail}`}
-                    className='inline-flex min-h-[44px] items-center text-[#F64310] underline-offset-2 touch-manipulation hover:underline'
-                  >
-                    {post.authorEmail}
-                  </a>
-                )}
-              </dd>
-            </div>
-          </dl>
-        </div>
+              <BoardSurface as='article' className='overflow-hidden'>
+                <div className='border-b border-black/[0.04] bg-gradient-to-b from-white to-[#fafbfc] px-5 py-5 sm:px-8 sm:py-7'>
+                  <div className='flex flex-wrap items-center gap-2'>
+                    <BoardMetaChip tone={tone}>{title}</BoardMetaChip>
+                    {anonymous ? (
+                      <BoardMetaChip>익명</BoardMetaChip>
+                    ) : (
+                      <SchoolBadge schoolId={post.authorSchoolId} />
+                    )}
+                    <span className='text-[12px] text-[var(--muted)]'>
+                      {formatCommunityRelativeTime(post.createdAt)}
+                    </span>
+                    <span className='text-[12px] text-[var(--muted)]'>
+                      조회 {formatCommunityCount(post.viewCount)}
+                    </span>
+                  </div>
 
-        {isAuthor && (
-          <button
-            type='button'
-            onClick={() => void handleClose()}
-            className='mt-6 inline-flex min-h-[48px] w-full items-center justify-center rounded-full border border-[var(--border)] px-4 text-sm font-semibold text-[var(--muted-foreground)] touch-manipulation hover:border-red-300 hover:text-red-600 sm:w-auto'
-          >
-            게시 마감
-          </button>
-        )}
-      </article>
-    </div>
+                  <h1 className='mt-3.5 text-[1.55rem] font-semibold leading-[1.25] tracking-[-0.035em] text-[var(--foreground)] sm:text-[1.9rem]'>
+                    {post.title}
+                  </h1>
+
+                  {metaBits.length > 0 && (
+                    <div className='mt-4 grid gap-2 sm:grid-cols-2'>
+                      {metaBits.map((item) => (
+                        <div
+                          key={`${item.label}-${item.value}`}
+                          className='rounded-xl bg-white/80 px-3.5 py-2.5 ring-1 ring-black/[0.04]'
+                        >
+                          <p className='text-[11px] font-medium text-[var(--muted)]'>
+                            {item.label}
+                          </p>
+                          <p className='mt-0.5 text-[14px] font-semibold text-[var(--foreground)]'>
+                            {item.value}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className='px-5 py-6 sm:px-8 sm:py-8'>
+                  <CommunityRichBody html={bodyHtml} />
+                </div>
+
+                <CommunityPostFooter
+                  post={post}
+                  boardId={boardId}
+                  anonymous={anonymous}
+                  isAuthor={isAuthor}
+                  loginNext={`/nyc/${boardId}/${post.id}`}
+                  onDelete={() => void handleDelete()}
+                />
+              </BoardSurface>
+            </>
+          )}
+
+          <CommunityCommentsSection
+            postId={post.id}
+            boardId={boardId}
+            anonymousBoard={anonymous}
+            loginNext={`/nyc/${boardId}/${post.id}`}
+          />
+        </div>
+      </BoardPageShell>
+    </PullToRefresh>
   )
 }

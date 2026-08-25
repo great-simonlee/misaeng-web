@@ -1,8 +1,56 @@
 # Changelog
 
-## [0.0.6](https://github.com/great-simonlee/misaeng-web/compare/v0.0.4...v0.0.6) (2026-08-20)
+## [0.0.18](https://github.com/great-simonlee/misaeng-web/compare/v0.0.17...v0.0.18) (2026-08-24)
 
-## [0.0.5](https://github.com/great-simonlee/misaeng-web/compare/v0.0.4...v0.0.5) (2026-08-20)
+
+### 버그 수정
+
+* 커뮤니티 mock 타입 오류 및 내 글 화면 타입 수정 ([8d84f81](https://github.com/great-simonlee/misaeng-web/commit/8d84f8128a51dfaabe30bfaa7048f585beebdbc8))
+
+## [0.0.17](https://github.com/great-simonlee/misaeng-web/compare/v0.0.16...v0.0.17) (2026-08-24)
+
+## [0.0.16](https://github.com/great-simonlee/misaeng-web/compare/v0.0.15...v0.0.16) (2026-08-24)
+
+## [0.0.15](https://github.com/great-simonlee/misaeng-web/compare/v0.0.14...v0.0.15) (2026-08-24)
+
+## [0.0.14](https://github.com/great-simonlee/misaeng-web/compare/v0.0.13...v0.0.14) (2026-08-24)
+
+## [0.0.13](https://github.com/great-simonlee/misaeng-web/compare/v0.0.12...v0.0.13) (2026-08-23)
+
+## [0.0.12](https://github.com/great-simonlee/misaeng-web/compare/v0.0.11...v0.0.12) (2026-08-23)
+
+## [0.0.11](https://github.com/great-simonlee/misaeng-web/compare/v0.0.10...v0.0.11) (2026-08-22)
+
+## [0.0.10](https://github.com/great-simonlee/misaeng-web/compare/v0.0.9...v0.0.10) (2026-08-21)
+
+## [0.0.9](https://github.com/great-simonlee/misaeng-web/compare/v0.0.4...v0.0.9) (2026-08-21)
+
+
+### 버그 수정
+
+* 하우징 카카오톡 문의 오픈채팅 링크 연결 ([c2f6817](https://github.com/great-simonlee/misaeng-web/commit/c2f68171cf877f2558254397e23a7c9b8a446245))
+
+
+### 문서
+
+* enhance README with additional SSH and app environment variable details for Vercel deployment ([8bc6564](https://github.com/great-simonlee/misaeng-web/commit/8bc6564d73f32889763134975d00aace0a88492c))
+* update README and GitHub Actions to clarify SSH variable usage and switch to secrets for sensitive information ([1ba7d79](https://github.com/great-simonlee/misaeng-web/commit/1ba7d79643a49f779bad7b7c614d10f92dbba42d))
+
+## [0.0.8](https://github.com/great-simonlee/misaeng-web/compare/v0.0.4...v0.0.8) (2026-08-21)
+
+
+### 문서
+
+* enhance README with additional SSH and app environment variable details for Vercel deployment ([8bc6564](https://github.com/great-simonlee/misaeng-web/commit/8bc6564d73f32889763134975d00aace0a88492c))
+* update README and GitHub Actions to clarify SSH variable usage and switch to secrets for sensitive information ([1ba7d79](https://github.com/great-simonlee/misaeng-web/commit/1ba7d79643a49f779bad7b7c614d10f92dbba42d))
+
+## [0.0.5](https://github.com/great-simonlee/misaeng-web/compare/v0.0.4...v0.0.5) (2026-08-21)
+
+
+### 문서
+
+* enhance README with additional SSH and app environment variable details for Vercel deployment ([8bc6564](https://github.com/great-simonlee/misaeng-web/commit/8bc6564d73f32889763134975d00aace0a88492c))
+* update README and GitHub Actions to clarify SSH variable usage and switch to secrets for sensitive information ([1ba7d79](https://github.com/great-simonlee/misaeng-web/commit/1ba7d79643a49f779bad7b7c614d10f92dbba42d))
 
 ## 0.0.4 (2026-08-20)
 

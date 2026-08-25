@@ -2,30 +2,22 @@ import Link from 'next/link'
 
 import { MarqueeRow } from '@components'
 import { NYC_PARTNER_ORGS } from '@lib/constants/nyc'
-
-function PartnerMark({ shortName }: { shortName: string }) {
-  return (
-    <span
-      className='flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--background)] text-[10px] font-bold tracking-tight text-[var(--foreground)]'
-      aria-hidden
-    >
-      {shortName}
-    </span>
-  )
-}
+import { PartnerSchoolLogo } from '@widgets/nyc/PartnerSchoolLogo'
 
 function PartnerItem({
   name,
   shortName,
   handle,
+  logoSrc,
 }: {
   name: string
   shortName: string
   handle: string | null
+  logoSrc?: string | null
 }) {
   const content = (
     <>
-      <PartnerMark shortName={shortName} />
+      <PartnerSchoolLogo shortName={shortName} logoSrc={logoSrc} />
       <span className='min-w-0 pr-0.5'>
         <span className='block text-xs font-semibold leading-tight text-[var(--foreground)]'>
           {name}
@@ -77,6 +69,7 @@ export function PartnerSchoolsMarquee() {
             name={org.name}
             shortName={org.shortName}
             handle={org.handle}
+            logoSrc={org.logoSrc}
           />
         ))}
       </MarqueeRow>

@@ -1,9 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { usePagedGallery } from '@hooks/usePagedGallery'
 import { useAuth } from '@hooks/useAuth'
@@ -42,7 +41,12 @@ import { EmptyState } from '@widgets/nyc/EmptyState'
 import { PerkBadge } from '@widgets/nyc/HousingPostCard'
 import { HousingLocationMap } from '@widgets/nyc/HousingLocationMap'
 import { HousingRoommateIntro } from '@widgets/nyc/HousingRoommateIntro'
-import { HousingPricePair, LoadingState, SchoolBadge } from '@components'
+import {
+  BoardBackLink,
+  BoardPageShell,
+  BoardSurface,
+} from '@widgets/nyc/BoardPageShell'
+import { HousingPricePair, LoadingState, PullToRefresh, SchoolBadge } from '@components'
 
 interface HousingDetailScreenProps {
   postId: string
@@ -83,6 +87,11 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     return () => {
       cancelled = true
     }
+  }, [postId])
+
+  const refreshListing = useCallback(async () => {
+    const next = await fetchHousingListing(postId)
+    setFetched({ id: postId, listing: next })
   }, [postId])
 
   function updateThumbScrollHint() {
@@ -195,14 +204,16 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
 
   if (!listing || listing.status === 'closed') {
     return (
-      <div className='mx-auto max-w-3xl px-4 py-12'>
-        <EmptyState
-          title='게시글을 찾을 수 없습니다'
-          description='마감되었거나 삭제된 하우징 글일 수 있습니다.'
-          actionHref='/nyc/housing'
-          actionLabel='하우징 목록으로'
-        />
-      </div>
+      <PullToRefresh onRefresh={refreshListing}>
+        <BoardPageShell width='narrow' className='py-12'>
+          <EmptyState
+            title='게시글을 찾을 수 없습니다'
+            description='마감되었거나 삭제된 하우징 글일 수 있습니다.'
+            actionHref='/nyc/housing'
+            actionLabel='하우징 목록으로'
+          />
+        </BoardPageShell>
+      </PullToRefresh>
     )
   }
 
@@ -224,19 +235,18 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   const mailHref = `mailto:${listing.contactEmail}?subject=${mailSubject}`
 
   return (
-    <div className='flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_48%,#ffffff_100%)]'>
-      <article className='mx-auto w-full max-w-7xl px-4 pt-7 pb-14 sm:px-6 sm:py-10 lg:px-8 lg:py-12'>
-        <p className='text-[10px] font-semibold tracking-[0.28em] text-[var(--muted)]'>
-          <Link href='/nyc/housing' className='hover:text-[#F64310]'>
-            하우징
-          </Link>
-          {' / '}
-          {area}
-        </p>
+    <PullToRefresh onRefresh={refreshListing}>
+    <BoardPageShell width='wide'>
+      <article className='pb-16 pt-5 sm:pb-20 sm:pt-7'>
+        <BoardBackLink
+          href='/nyc/housing'
+          label='하우징 목록'
+          className='mb-5'
+        />
 
-        <div className='mt-4 grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-10'>
+        <div className='grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-10'>
           <div className='min-w-0'>
-            <div className='relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#eef0f3] ring-1 ring-black/[0.04] sm:aspect-[16/11]'>
+            <div className='relative aspect-[4/3] overflow-hidden rounded-[1.25rem] bg-[#e8eaee] shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_28px_rgba(15,23,42,0.045)] ring-1 ring-black/[0.03] sm:aspect-[16/11]'>
               {images.length > 0 ? (
                 <div
                   ref={galleryScrollRef}
@@ -342,7 +352,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                           className={cn(
                             'relative h-16 w-20 shrink-0 rounded-xl border-2 p-0.5 touch-manipulation transition sm:h-[4.5rem] sm:w-24',
                             active
-                              ? 'border-[#F64310]'
+                              ? 'border-[var(--brand)]'
                               : 'border-transparent opacity-80 hover:opacity-100',
                           )}
                           aria-label={`사진 ${index + 1}`}
@@ -368,7 +378,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                   <div className='pointer-events-none absolute inset-y-[-2px] left-0 z-10 flex w-[4.25rem] items-center'>
                     <div
                       aria-hidden
-                      className='absolute inset-0 bg-gradient-to-r from-[#f4f5f7] from-[12%] via-[#f4f5f7]/80 via-[48%] to-transparent'
+                      className='absolute inset-0 bg-gradient-to-r from-[#f8f8f9] from-[12%] via-[#f8f8f9]/80 via-[48%] to-transparent'
                     />
                     <button
                       type='button'
@@ -385,7 +395,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                   <div className='pointer-events-none absolute inset-y-[-2px] right-0 z-10 flex w-[4.25rem] items-center justify-end'>
                     <div
                       aria-hidden
-                      className='absolute inset-0 bg-gradient-to-l from-[#f4f5f7] from-[12%] via-[#f4f5f7]/80 via-[48%] to-transparent'
+                      className='absolute inset-0 bg-gradient-to-l from-[#f8f8f9] from-[12%] via-[#f8f8f9]/80 via-[48%] to-transparent'
                     />
                     <button
                       type='button'
@@ -406,15 +416,17 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               )}
               <HousingPropertySection listing={listing} />
               <HousingLocationMap
+                listingId={listing.id}
                 address={displayAddress}
                 neighborhood={area}
               />
             </div>
           </div>
 
-          <div className='min-w-0 lg:pt-1'>
+          <div className='min-w-0 lg:pt-0'>
+            <BoardSurface className='overflow-hidden p-5 sm:p-6'>
             <div className='flex flex-wrap items-center gap-2'>
-              <h1 className='min-w-0 text-[1.5rem] font-bold leading-snug tracking-tight text-[var(--foreground)] sm:text-[1.85rem]'>
+              <h1 className='min-w-0 text-[1.45rem] font-semibold leading-snug tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.75rem]'>
                 {displayAddress}
               </h1>
               {listing.authorSchoolId ? (
@@ -440,8 +452,8 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             </div>
 
             {benefitBadges.length > 0 && (
-              <div className='mt-4'>
-                <p className='text-[12px] font-semibold text-[var(--muted)]'>
+              <div className='mt-5'>
+                <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
                   혜택
                 </p>
                 <div className='mt-2 flex flex-wrap gap-1.5'>
@@ -453,8 +465,8 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             )}
 
             {showRoomRows && (
-              <div className='mt-4'>
-                <p className='text-[12px] font-semibold text-[var(--muted)]'>
+              <div className='mt-5'>
+                <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
                   룸 옵션
                 </p>
                 <div className='mt-2 space-y-1.5'>
@@ -472,8 +484,8 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                         className={cn(
                           'flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-3 text-left touch-manipulation transition ring-1',
                           active
-                            ? 'bg-white ring-[var(--foreground)]'
-                            : 'bg-white/70 ring-black/[0.04] hover:ring-black/[0.08]',
+                            ? 'bg-[#f8f9fb] ring-[var(--foreground)]'
+                            : 'bg-[#fafbfc] ring-black/[0.04] hover:ring-black/[0.08]',
                         )}
                       >
                         <span className='min-w-0 truncate text-[14px] font-semibold text-[var(--foreground)]'>
@@ -493,14 +505,14 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             )}
 
             {listing.roommateWaiting && (
-              <div className='mt-4 lg:hidden'>
+              <div className='mt-5 lg:hidden'>
                 <HousingRoommateIntro roommate={listing.roommateWaiting} />
               </div>
             )}
 
             {amenityLabels.length > 0 && (
-              <div className='mt-4'>
-                <p className='text-[12px] font-semibold text-[var(--muted)]'>
+              <div className='mt-5'>
+                <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
                   어메니티
                 </p>
                 <div className='mt-2 flex flex-wrap gap-1.5'>
@@ -512,8 +524,8 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             )}
 
             {utilityLabels.length > 0 && (
-              <div className='mt-4'>
-                <p className='text-[12px] font-semibold text-[var(--muted)]'>
+              <div className='mt-5'>
+                <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
                   유틸리티
                 </p>
                 <div className='mt-2 flex flex-wrap gap-1.5'>
@@ -525,8 +537,8 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             )}
 
             {applianceLabels.length > 0 && (
-              <div className='mt-4'>
-                <p className='text-[12px] font-semibold text-[var(--muted)]'>
+              <div className='mt-5'>
+                <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
                   가전제품
                 </p>
                 <div className='mt-2 flex flex-wrap gap-1.5'>
@@ -539,38 +551,27 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
 
             <HousingDescriptionSection
               description={listing.description}
-              className='mt-4 lg:my-8'
+              className='mt-5'
             />
 
-            <div className='mt-6 lg:hidden'>
-              <HousingPropertySection listing={listing} />
-            </div>
-
-            <div className='mt-5 lg:hidden'>
-              <HousingLocationMap
-                address={displayAddress}
-                neighborhood={area}
-              />
-            </div>
-
-            <div className='mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-stretch'>
+            <div className='mt-6 flex flex-col gap-2.5 border-t border-black/[0.04] pt-5 sm:flex-row sm:items-stretch'>
               <a
                 href={mailHref}
-                className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-[#F64310]/35 bg-[#F64310]/08 px-5 text-sm font-semibold text-[#c9360d] touch-manipulation transition hover:border-[#F64310]/50 hover:bg-[#F64310]/12'
+                className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full bg-[var(--brand)] px-5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(246,67,16,0.22)] touch-manipulation transition hover:bg-[var(--brand-hover)]'
               >
                 이메일 문의
               </a>
               <button
                 type='button'
                 onClick={handleKakaoInquiry}
-                className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-[#E8D84A] bg-[#FEE500]/85 px-5 text-sm font-semibold text-[#191919] touch-manipulation transition hover:bg-[#FEE500]'
+                className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-[#E8D84A] bg-[#FEE500] px-5 text-sm font-semibold text-[#191919] touch-manipulation transition hover:brightness-95'
               >
                 카카오톡 문의
               </button>
               <button
                 type='button'
                 onClick={() => void handleShare()}
-                className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-[var(--border)] bg-white px-5 text-sm font-semibold text-[var(--foreground)] touch-manipulation transition hover:border-black/20 hover:bg-[#f7f8fa]'
+                className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-black/[0.08] bg-[#fafbfc] px-5 text-sm font-semibold text-[var(--foreground)] touch-manipulation transition hover:bg-white'
               >
                 공유하기
               </button>
@@ -580,15 +581,26 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               <button
                 type='button'
                 onClick={() => void handleClose()}
-                className='mt-4 inline-flex min-h-[48px] w-full items-center justify-center rounded-full border border-[var(--border)] px-4 text-sm font-semibold text-[var(--muted-foreground)] touch-manipulation hover:border-red-300 hover:text-red-600 sm:w-auto'
+                className='mt-3 inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-black/10 px-4 text-sm font-medium text-[var(--muted-foreground)] touch-manipulation hover:border-red-300 hover:text-red-600 sm:w-auto'
               >
                 게시 마감
               </button>
             )}
+            </BoardSurface>
+
+            <div className='mt-5 space-y-4 lg:hidden'>
+              <HousingPropertySection listing={listing} />
+              <HousingLocationMap
+                listingId={listing.id}
+                address={displayAddress}
+                neighborhood={area}
+              />
+            </div>
           </div>
         </div>
       </article>
-    </div>
+    </BoardPageShell>
+    </PullToRefresh>
   )
 }
 
@@ -602,13 +614,8 @@ function HousingDescriptionSection({
   if (!description.trim()) return null
 
   return (
-    <div
-      className={cn(
-        'space-y-3 rounded-2xl bg-white p-5 ring-1 ring-black/[0.05]',
-        className,
-      )}
-    >
-      <p className='text-[11px] font-medium tracking-[0.14em] text-[var(--muted)]'>
+    <div className={cn('space-y-2', className)}>
+      <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
         상세 설명
       </p>
       <p className='whitespace-pre-wrap text-[15px] leading-relaxed text-[var(--muted-foreground)]'>
@@ -639,11 +646,9 @@ function HousingPropertySection({
   if (!hasContent) return null
 
   return (
-    <section
-      className={cn(
-        'rounded-2xl bg-white px-4 py-4 ring-1 ring-black/[0.05] sm:px-5 sm:py-5',
-        className,
-      )}
+    <BoardSurface
+      as='section'
+      className={cn('px-4 py-4 sm:px-5 sm:py-5', className)}
     >
       <h2 className='text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
         건물 정보
@@ -665,7 +670,7 @@ function HousingPropertySection({
       {property.subway.length > 0 && (
         <PropertyList title='지하철' items={property.subway} />
       )}
-    </section>
+    </BoardSurface>
   )
 }
 

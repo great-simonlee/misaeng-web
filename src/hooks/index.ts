@@ -1,4 +1,5 @@
 export { useAuth, AuthProvider } from './useAuth'
+export { useRequireAuth } from './useRequireAuth'
 export {
   ToastProvider,
   useToast,

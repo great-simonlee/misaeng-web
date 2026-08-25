@@ -1,5 +1,42 @@
-import type { HousingListing, HousingRoomType } from '@/types/nyc'
+import type {
+  HousingListing,
+  HousingPartWall,
+  HousingRoomType,
+} from '@/types/nyc'
 import { normalizeErpRoomType } from './listing'
+
+const PART_WALL_OPTIONS: HousingPartWall[] = [
+  'Full wall',
+  'Regular wall',
+  'Curtain only',
+]
+
+const PART_WALL_ALIASES: Record<string, HousingPartWall> = {
+  'full wall': 'Full wall',
+  'regular wall': 'Regular wall',
+  'curtain only': 'Curtain only',
+  curtain: 'Curtain only',
+}
+
+/** ERP: string | string[] | "Full wall · Regular wall" → canonical 배열 */
+function normalizePartWalls(value: unknown): HousingPartWall[] | null {
+  const items = Array.isArray(value)
+    ? value
+    : String(value ?? '')
+        .split(/[,/|·]/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+  const seen = new Set<HousingPartWall>()
+  for (const item of items) {
+    const key = String(item ?? '')
+      .trim()
+      .toLowerCase()
+    const label = PART_WALL_ALIASES[key]
+    if (label) seen.add(label)
+  }
+  const walls = PART_WALL_OPTIONS.filter((option) => seen.has(option))
+  return walls.length > 0 ? walls : null
+}
 
 const ROOM_TYPES = new Set([
   'master-w-bath',
@@ -27,6 +64,50 @@ function asNumber(value: unknown, fallback = 0) {
       ? value
       : Number(String(value).replace(/[^0-9.-]/g, ''))
   return Number.isFinite(n) ? n : fallback
+}
+
+function asCoordinate(value: unknown): number | null {
+  if (value == null || value === '') return null
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  if (typeof value === 'string') {
+    const n = Number(value.trim().replace(/[^0-9.+-]/g, ''))
+    return Number.isFinite(n) ? n : null
+  }
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    return asCoordinate(record.latitude ?? record.lat ?? record.longitude ?? record.lng)
+  }
+  return null
+}
+
+function readCoordinates(propertyRaw: Record<string, unknown>): {
+  latitude: number | null
+  longitude: number | null
+} {
+  const nested =
+    propertyRaw.location && typeof propertyRaw.location === 'object'
+      ? (propertyRaw.location as Record<string, unknown>)
+      : propertyRaw.geo && typeof propertyRaw.geo === 'object'
+        ? (propertyRaw.geo as Record<string, unknown>)
+        : propertyRaw.coordinates && typeof propertyRaw.coordinates === 'object'
+          ? (propertyRaw.coordinates as Record<string, unknown>)
+          : null
+  const latitude =
+    asCoordinate(propertyRaw.latitude ?? propertyRaw.lat) ??
+    (nested ? asCoordinate(nested.latitude ?? nested.lat) : null)
+  const longitude =
+    asCoordinate(propertyRaw.longitude ?? propertyRaw.lng ?? propertyRaw.lon) ??
+    (nested ? asCoordinate(nested.longitude ?? nested.lng ?? nested.lon) : null)
+  if (
+    latitude == null ||
+    longitude == null ||
+    (latitude === 0 && longitude === 0) ||
+    Math.abs(latitude) > 90 ||
+    Math.abs(longitude) > 180
+  ) {
+    return { latitude: null, longitude: null }
+  }
+  return { latitude, longitude }
 }
 
 /** null = unknown, 0 = free, greater than 0 = paid */
@@ -103,7 +184,6 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
     : []
 
   const unitType = String(unitRaw.unitType || '').trim()
-  const partWall = String(propertyRaw.partWall || '').trim()
   const amenityFeeRaw =
     propertyRaw.amenityFee && typeof propertyRaw.amenityFee === 'object'
       ? (propertyRaw.amenityFee as Record<string, unknown>)
@@ -124,20 +204,12 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
       buildingName: String(propertyRaw.buildingName || '').trim() || null,
       area: String(propertyRaw.area || '').trim() || 'New York',
       zipcode: String(propertyRaw.zipcode || '').trim() || null,
-      latitude:
-        propertyRaw.latitude == null ? null : asNumber(propertyRaw.latitude, 0),
-      longitude:
-        propertyRaw.longitude == null ? null : asNumber(propertyRaw.longitude, 0),
+      ...readCoordinates(propertyRaw),
       subway: asStringArray(propertyRaw.subway),
       amenities: asStringArray(propertyRaw.amenities),
       appliances: asStringArray(propertyRaw.appliances),
       includedUtility: asStringArray(propertyRaw.includedUtility),
-      partWall:
-        partWall === 'Full wall' ||
-        partWall === 'Regular wall' ||
-        partWall === 'Curtain only'
-          ? partWall
-          : null,
+      partWall: normalizePartWalls(propertyRaw.partWall),
       amenityFee: amenityFeeRaw
         ? {
             type: amenityFeeRaw.type === 'mandatory' ? 'mandatory' : 'optional',

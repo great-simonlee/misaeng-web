@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation'
 import {
   getNycCategory,
   isCommunityBoardId,
+  isCommunityBoardWip,
 } from '@lib/constants/nyc'
+import { CommunityBoardWipScreen } from '@screens/nyc/CommunityBoardWipScreen'
 import { CommunityDetailScreen } from '@screens/nyc/CommunityDetailScreen'
 
 interface CommunityDetailPageProps {
@@ -17,6 +19,10 @@ export default async function CommunityDetailPage({
   if (!isCommunityBoardId(board)) notFound()
   const category = getNycCategory(board)
   if (!category) notFound()
+
+  if (isCommunityBoardWip(board)) {
+    return <CommunityBoardWipScreen boardId={board} title={category.title} />
+  }
 
   return (
     <CommunityDetailScreen

@@ -2,52 +2,63 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { LoadingState, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
+import { getErrorMessage, useToast } from '@hooks/useToast'
+import {
+  deleteCommunityPostRequest,
+  fetchMyCommunityPosts,
+} from '@lib/community/client'
 import {
   getNycCategory,
   NYC_CATEGORIES,
+  NYC_COMMUNITY_BOARD_IDS,
   NYC_PAGE_SHELL_CLASS,
-  type NycCategoryId,
+  type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { cn } from '@lib'
-// import { isFirebaseConfigured } from '@lib/firebase/client'
-// import { listCommunityPostsByAuthor } from '@lib/firebase/community'
-// import { listHousingPostsByAuthor } from '@lib/firebase/housing'
-import {
-  getHousingUnitRent,
-  getListingArea,
-  getListingDisplayAddress,
-  getListingUnitNet,
-} from '@lib/constants/housingMock'
-import type { CommunityPost, HousingPost } from '@/types/nyc'
-// import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
+import type { CommunityPost } from '@/types/nyc'
 import {
   AccountCategoryChip,
   AccountCategorySideItem,
 } from '@widgets/nyc/AccountCategoryNav'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 
+type MyPostsCommunityCategory = Extract<
+  (typeof NYC_CATEGORIES)[number],
+  { id: NycCommunityBoardId }
+>
+
+const MY_POSTS_COMMUNITY_CATEGORIES = NYC_CATEGORIES.filter(
+  (category): category is MyPostsCommunityCategory =>
+    (NYC_COMMUNITY_BOARD_IDS as readonly string[]).includes(category.id),
+)
+
 type MyPostItem = {
   id: string
   title: string
   meta: string
   href: string
-  categoryId: NycCategoryId
+  editHref: string | null
+  categoryId: NycCommunityBoardId
   boardLabel: string
   authorSchoolId: string | null
+  status: 'open' | 'closed'
+  canManage: boolean
 }
 
-type CategoryFilter = 'all' | NycCategoryId
+type CategoryFilter = 'all' | NycCommunityBoardId
 
 export function MyPostsScreen() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const [posts] = useState<MyPostItem[]>([])
-  const [loadingPosts] = useState(false)
+  const { error: toastError, success } = useToast()
+  const [posts, setPosts] = useState<MyPostItem[]>([])
+  const [loadingPosts, setLoadingPosts] = useState(true)
   const [category, setCategory] = useState<CategoryFilter>('all')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (loading) return
@@ -56,42 +67,50 @@ export function MyPostsScreen() {
     }
   }, [user, loading, router])
 
-  // 임시: 파이어베이스 내 글 조회 비활성화
-  /*
-  useEffect(() => {
-    if (!user || !configured || !isFirebaseConfigured()) {
+  const loadPosts = useCallback(async () => {
+    if (!user) {
       setLoadingPosts(false)
       return
     }
-
-    let cancelled = false
-    ;(async () => {
-      try {
-        const [housing, community] = await Promise.all([
-          listHousingPostsByAuthor(user.uid),
-          listCommunityPostsByAuthor(user.uid),
-        ])
-        if (cancelled) return
-        setPosts([...mapHousing(housing), ...mapCommunity(community)])
-      } catch (err) {
-        if (!cancelled) {
-          toastError(getErrorMessage(err, '내 글을 불러오지 못했어요'))
-        }
-      } finally {
-        if (!cancelled) setLoadingPosts(false)
-      }
-    })()
-
-    return () => {
-      cancelled = true
+    setLoadingPosts(true)
+    try {
+      const community = await fetchMyCommunityPosts()
+      setPosts(mapCommunity(community))
+    } catch (err) {
+      toastError(getErrorMessage(err, '내 글을 불러오지 못했어요'))
+      setPosts([])
+    } finally {
+      setLoadingPosts(false)
     }
-  }, [user, configured, toastError])
-  */
+  }, [user, toastError])
+
+  useEffect(() => {
+    if (loading || !user) return
+    void loadPosts()
+  }, [loading, user, loadPosts])
+
+  async function handleDelete(post: MyPostItem) {
+    if (!post.canManage) return
+    const ok = window.confirm(
+      `"${post.title}" 글을 삭제할까요?\n삭제하면 되돌릴 수 없어요.`,
+    )
+    if (!ok) return
+    setDeletingId(post.id)
+    try {
+      await deleteCommunityPostRequest(post.id)
+      setPosts((prev) => prev.filter((item) => item.id !== post.id))
+      success('글을 삭제했어요')
+    } catch (err) {
+      toastError(getErrorMessage(err, '삭제에 실패했어요'))
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   const counts = useMemo(() => {
     const map = Object.fromEntries(
-      NYC_CATEGORIES.map((c) => [c.id, 0]),
-    ) as Record<NycCategoryId, number>
+      MY_POSTS_COMMUNITY_CATEGORIES.map((category) => [category.id, 0]),
+    ) as Record<NycCommunityBoardId, number>
     for (const post of posts) {
       map[post.categoryId] = (map[post.categoryId] ?? 0) + 1
     }
@@ -104,12 +123,12 @@ export function MyPostsScreen() {
   }, [posts, category])
 
   const sortedBoards = useMemo(() => {
-    return [...NYC_CATEGORIES].sort((a, b) => {
+    return [...MY_POSTS_COMMUNITY_CATEGORIES].sort((a, b) => {
       const diff = counts[b.id] - counts[a.id]
       if (diff !== 0) return diff
       return (
-        NYC_CATEGORIES.findIndex((c) => c.id === a.id) -
-        NYC_CATEGORIES.findIndex((c) => c.id === b.id)
+        MY_POSTS_COMMUNITY_CATEGORIES.findIndex((c) => c.id === a.id) -
+        MY_POSTS_COMMUNITY_CATEGORIES.findIndex((c) => c.id === b.id)
       )
     })
   }, [counts])
@@ -117,7 +136,7 @@ export function MyPostsScreen() {
   const selectedBoard =
     category === 'all'
       ? null
-      : NYC_CATEGORIES.find((c) => c.id === category) ?? null
+      : MY_POSTS_COMMUNITY_CATEGORIES.find((c) => c.id === category) ?? null
 
   if (loading) {
     return <LoadingState fullPage />
@@ -126,17 +145,6 @@ export function MyPostsScreen() {
   if (!user) {
     return <LoadingState fullPage label='로그인 페이지로 이동 중…' />
   }
-
-  // 임시: 파이어베이스 배너 비활성화
-  /*
-  if (!configured || !isFirebaseConfigured()) {
-    return (
-      <div className='mx-auto max-w-lg px-4 py-12'>
-        <FirebaseConfigBanner />
-      </div>
-    )
-  }
-  */
 
   return (
     <div className='relative flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
@@ -155,7 +163,7 @@ export function MyPostsScreen() {
               내가 올린 글
             </h1>
             <p className='mt-1.5 text-[14px] text-[var(--muted-foreground)]'>
-              카테고리별로 내가 쓴 글을 모아 볼 수 있어요
+              커뮤니티 게시판 글을 카테고리별로 모아 보고, 수정·삭제할 수 있어요
             </p>
           </div>
           <span className='rounded-full bg-white px-3 py-1.5 text-[13px] tabular-nums text-[var(--muted)] ring-1 ring-black/[0.06]'>
@@ -168,7 +176,6 @@ export function MyPostsScreen() {
         </div>
 
         <div className='mt-8 grid flex-1 gap-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-stretch lg:gap-8'>
-          {/* 데스크톱 카테고리 사이드 */}
           <aside className='hidden lg:block'>
             <div className='sticky top-24 overflow-hidden rounded-[1.25rem] bg-white p-2 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>
               <p className='px-3 pb-2 pt-2.5 text-[11px] font-medium tracking-[0.14em] text-[var(--muted)]'>
@@ -195,7 +202,6 @@ export function MyPostsScreen() {
           </aside>
 
           <div className='flex min-h-0 min-w-0 flex-1 flex-col'>
-            {/* 모바일·태블릿 칩 */}
             {!loadingPosts && (
               <div className='mb-5 shrink-0 lg:hidden'>
                 <ChipScrollRow
@@ -252,53 +258,62 @@ export function MyPostsScreen() {
             ) : (
               <ul className='overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>
                 {filteredPosts.map((post, index) => (
-                  <li key={`${post.href}-${post.id}`}>
-                    <Link
-                      href={post.href}
-                      className={cn(
-                        'block px-5 py-4 touch-manipulation transition hover:bg-[#f8f9fb] active:bg-[#f4f5f7] lg:px-6 lg:py-5',
-                        index !== filteredPosts.length - 1 &&
-                          'border-b border-[#f0f1f3]',
-                      )}
-                    >
-                      <div className='flex items-start justify-between gap-4'>
-                        <div className='min-w-0 flex-1'>
+                  <li
+                    key={`${post.href}-${post.id}`}
+                    className={cn(
+                      index !== filteredPosts.length - 1 &&
+                        'border-b border-[#f0f1f3]',
+                    )}
+                  >
+                    <div className='flex items-start gap-3 px-5 py-4 lg:gap-4 lg:px-6 lg:py-5'>
+                      <Link
+                        href={post.href}
+                        className='min-w-0 flex-1 touch-manipulation transition hover:opacity-80'
+                      >
+                        <div className='flex flex-wrap items-center gap-1.5'>
                           {category === 'all' && (
-                            <p className='text-[11px] font-medium tracking-wide text-[var(--brand)]'>
+                            <span className='text-[11px] font-medium tracking-wide text-[var(--brand)]'>
                               {post.boardLabel}
-                            </p>
+                            </span>
                           )}
-                          <div
-                            className={cn(
-                              'flex flex-wrap items-center gap-1.5',
-                              category === 'all' ? 'mt-1' : undefined,
-                            )}
-                          >
-                            <p className='truncate text-[15px] font-semibold tracking-tight text-[var(--foreground)] lg:text-base'>
-                              {post.title}
-                            </p>
-                            <SchoolBadge schoolId={post.authorSchoolId} />
-                          </div>
-                          <p className='mt-0.5 truncate text-[12px] text-[var(--muted)] lg:text-[13px]'>
-                            {post.meta}
-                          </p>
                         </div>
-                        <svg
-                          viewBox='0 0 24 24'
-                          fill='none'
-                          stroke='currentColor'
-                          strokeWidth='2'
-                          className='mt-1 hidden size-4 shrink-0 text-[#c4c9d1] lg:block'
-                          aria-hidden
+                        <div
+                          className={cn(
+                            'flex flex-wrap items-center gap-1.5',
+                            category === 'all' ? 'mt-1' : undefined,
+                          )}
                         >
-                          <path
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            d='m9 6 6 6-6 6'
-                          />
-                        </svg>
-                      </div>
-                    </Link>
+                          <p className='truncate text-[15px] font-semibold tracking-tight text-[var(--foreground)] lg:text-base'>
+                            {post.title}
+                          </p>
+                          <SchoolBadge schoolId={post.authorSchoolId} />
+                        </div>
+                        <p className='mt-0.5 truncate text-[12px] text-[var(--muted)] lg:text-[13px]'>
+                          {post.meta}
+                        </p>
+                      </Link>
+
+                      {post.canManage ? (
+                        <div className='flex shrink-0 items-center gap-1.5 pt-0.5'>
+                          {post.editHref ? (
+                            <Link
+                              href={post.editHref}
+                              className='inline-flex h-8 items-center rounded-full bg-[#f3f4f6] px-3 text-[12px] font-semibold text-[var(--foreground)] touch-manipulation transition hover:bg-[#e8eaee]'
+                            >
+                              수정
+                            </Link>
+                          ) : null}
+                          <button
+                            type='button'
+                            disabled={deletingId === post.id}
+                            onClick={() => void handleDelete(post)}
+                            className='inline-flex h-8 items-center rounded-full px-3 text-[12px] font-semibold text-red-600 touch-manipulation transition hover:bg-red-50 disabled:opacity-50'
+                          >
+                            {deletingId === post.id ? '삭제 중…' : '삭제'}
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -310,40 +325,25 @@ export function MyPostsScreen() {
   )
 }
 
-function formatHousingRentMeta(post: HousingPost): string {
-  const gross = getHousingUnitRent(post)
-  const net = getListingUnitNet(post)
-  if (net != null) return `$${gross.toLocaleString()} / $${net.toLocaleString()}/월`
-  return `$${gross.toLocaleString()}/월`
-}
-
-function mapHousing(posts: HousingPost[]): MyPostItem[] {
-  return posts.map((post) => ({
-    id: post.id,
-    title: getListingDisplayAddress(post),
-    meta: `${getListingArea(post)} · ${formatHousingRentMeta(post)}`,
-    href: `/nyc/housing/${post.id}`,
-    categoryId: 'housing',
-    boardLabel: '하우징',
-    authorSchoolId: post.authorSchoolId,
-  }))
-}
-
 function mapCommunity(posts: CommunityPost[]): MyPostItem[] {
   return posts.map((post) => {
     const category = getNycCategory(post.categoryId)
-    const categoryId = (category?.id ?? post.categoryId) as NycCategoryId
+    const categoryId = (category?.id ?? post.categoryId) as NycCommunityBoardId
+    const isMock = post.id.startsWith('mock-')
     return {
       id: post.id,
       title: post.title,
       meta:
         [post.location, post.detail].filter(Boolean).join(' · ') || '상세 보기',
       href: `/nyc/${post.categoryId}/${post.id}`,
+      editHref: isMock
+        ? null
+        : `/nyc/${post.categoryId}/${post.id}/edit`,
       categoryId,
       boardLabel: category?.title ?? post.categoryId,
       authorSchoolId: post.authorSchoolId,
+      status: post.status === 'closed' ? 'closed' : 'open',
+      canManage: !isMock,
     }
   })
 }
-
-export { mapHousing, mapCommunity }
