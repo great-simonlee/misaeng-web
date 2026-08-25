@@ -10,8 +10,10 @@ import {
 } from '@lib/constants/communityMock'
 import {
   buildFoodDetailCarouselSlides,
+  formatFoodMenuDisplay,
   formatUsd,
   getFoodCuisineLabel,
+  getFoodMenuName,
 } from '@lib/community/food'
 import { resolveFoodPlacePoint } from '@lib/community/foodMap'
 import { isAnonymousBoard, type NycCommunityBoardId } from '@lib/constants/nyc'
@@ -67,7 +69,7 @@ export function FoodDetailContent({
         .map((item) => ({
           id: item.id,
           imageUrl: item.imageUrl,
-          caption: item.caption,
+          caption: formatFoodMenuDisplay(item),
         })),
     [menuItems],
   )
@@ -199,39 +201,59 @@ export function FoodDetailContent({
           <section className='mt-8'>
             <SectionLabel>메뉴</SectionLabel>
             <ul className='mt-4 divide-y divide-black/[0.06]'>
-              {menuItems.map((item, index) => {
+              {menuItems.map((item) => {
                 const lightboxIndex = menuLightboxItems.findIndex(
                   (entry) => entry.id === item.id,
                 )
+                const canOpen =
+                  Boolean(item.imageUrl?.trim()) && lightboxIndex >= 0
+
+                function openThis() {
+                  if (!canOpen) return
+                  openMenuLightbox(lightboxIndex)
+                }
+
                 return (
-                  <li
-                    key={item.id}
-                    className='flex gap-4 py-4 first:pt-0 last:pb-0'
-                  >
-                    {item.imageUrl?.trim() ? (
+                  <li key={item.id} className='py-4 first:pt-0 last:pb-0'>
+                    {canOpen ? (
                       <button
                         type='button'
-                        onClick={() =>
-                          openMenuLightbox(
-                            lightboxIndex >= 0 ? lightboxIndex : index,
-                          )
-                        }
-                        className='h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[#e8eaee] touch-manipulation transition hover:opacity-90 sm:h-24 sm:w-24'
+                        onClick={openThis}
+                        className='flex w-full gap-4 text-left touch-manipulation transition hover:opacity-90'
                         aria-label='메뉴 사진 크게 보기'
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={item.imageUrl}
                           alt=''
-                          className='h-full w-full object-cover'
+                          className='h-20 w-20 shrink-0 rounded-xl bg-[#e8eaee] object-cover sm:h-24 sm:w-24'
                         />
+                        <span className='min-w-0 flex-1 self-center'>
+                          <span className='block text-[14px] font-semibold text-[var(--foreground)] sm:text-[15px]'>
+                            {getFoodMenuName(item, '메뉴')}
+                          </span>
+                          {item.caption?.trim() ? (
+                            <span className='mt-0.5 block text-[13px] leading-[1.5] text-[var(--muted-foreground)] sm:text-[14px]'>
+                              {item.caption.trim()}
+                            </span>
+                          ) : null}
+                        </span>
                       </button>
                     ) : (
-                      <div className='h-20 w-20 shrink-0 rounded-xl bg-[#e8eaee] sm:h-24 sm:w-24' />
+                      <div className='flex gap-4'>
+                        <div className='h-20 w-20 shrink-0 rounded-xl bg-[#e8eaee] sm:h-24 sm:w-24' />
+                        <div className='min-w-0 flex-1 self-center'>
+                          <p className='text-[14px] font-semibold text-[var(--foreground)] sm:text-[15px]'>
+                            {getFoodMenuName(item, '메뉴')}
+                          </p>
+                          {item.caption?.trim() ? (
+                            <p className='mt-0.5 text-[13px] leading-[1.5] text-[var(--muted-foreground)] sm:text-[14px]'>
+                              {item.caption.trim()}
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
                     )}
-                    <p className='min-w-0 flex-1 self-center text-[14px] leading-[1.55] text-[var(--foreground)] sm:text-[15px]'>
-                      {item.caption || '한 줄 평이 없어요'}
-                    </p>
                   </li>
                 )
               })}

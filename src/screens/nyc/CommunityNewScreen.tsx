@@ -23,6 +23,8 @@ import {
   FOOD_CUISINES,
   FOOD_GALLERY_MAX,
   FOOD_MENU_MAX,
+  FOOD_MENU_NAME_MAX,
+  FOOD_MENU_CAPTION_MAX,
   FOOD_PARTY_MAX,
   FOOD_PARTY_MIN,
   FOOD_SPEND_MAX,
@@ -69,6 +71,7 @@ interface CommunityNewScreenProps {
 type MenuDraft = {
   key: string
   imageUrl: string
+  name: string
   caption: string
 }
 
@@ -133,6 +136,7 @@ export function CommunityNewScreen({
   const [galleryPendingCount, setGalleryPendingCount] = useState(0)
   const [menuPendingCount, setMenuPendingCount] = useState(0)
   const captionRefs = useRef<Record<string, HTMLTextAreaElement | null>>({})
+  const nameRefs = useRef<Record<string, HTMLInputElement | null>>({})
   const pendingFocusKeyRef = useRef<string | null>(null)
   const menuFileInputRef = useRef<HTMLInputElement>(null)
   const galleryFileInputRef = useRef<HTMLInputElement>(null)
@@ -197,6 +201,7 @@ export function CommunityNewScreen({
             post.menuItems.map((item, index) => ({
               key: item.id || `menu_${index + 1}`,
               imageUrl: item.imageUrl,
+              name: item.name || '',
               caption: item.caption,
             })),
           )
@@ -230,7 +235,7 @@ export function CommunityNewScreen({
     const card = document.getElementById(`menu-card-${key}`)
     card?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     window.setTimeout(() => {
-      captionRefs.current[key]?.focus()
+      nameRefs.current[key]?.focus()
     }, 280)
   }, [menuDrafts])
 
@@ -301,6 +306,7 @@ export function CommunityNewScreen({
         const draft: MenuDraft = {
           key: createPhotoKey('menu'),
           imageUrl: url,
+          name: '',
           caption: '',
         }
         if (!didSetFocus) {
@@ -482,20 +488,27 @@ export function CommunityNewScreen({
 
       const incompleteMenu = menuDrafts.find((item) => {
         const hasImage = Boolean(item.imageUrl.trim())
+        const hasName = Boolean(item.name.trim())
         const hasCaption = Boolean(item.caption.trim())
-        return hasImage !== hasCaption
+        return hasImage && (!hasName || !hasCaption)
       })
       if (incompleteMenu) {
-        toastError('메뉴는 사진과 한 줄 평을 모두 입력해야 등록할 수 있어요')
+        toastError('메뉴는 사진·메뉴 이름·한 줄 평을 모두 입력해야 등록할 수 있어요')
         return
       }
 
       menuItems = menuDrafts
-        .filter((item) => item.imageUrl.trim() && item.caption.trim())
+        .filter(
+          (item) =>
+            item.imageUrl.trim() &&
+            item.name.trim() &&
+            item.caption.trim(),
+        )
         .map((item, index) => ({
           id: `menu_${index + 1}`,
           imageUrl: item.imageUrl.trim(),
-          caption: item.caption.trim(),
+          name: item.name.trim().slice(0, FOOD_MENU_NAME_MAX),
+          caption: item.caption.trim().slice(0, FOOD_MENU_CAPTION_MAX),
         }))
 
       galleryPhotos = galleryDrafts
@@ -854,7 +867,7 @@ export function CommunityNewScreen({
                   메뉴 사진
                 </h2>
                 <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
-                  사진을 여러 장 선택한 뒤, 각 메뉴에 한 줄 평을 남겨 주세요
+                  사진마다 메뉴 이름과 한 줄 평을 따로 적어 주세요
                 </p>
               </div>
               <p className='shrink-0 pb-0.5 text-[12px] font-medium tabular-nums text-[var(--muted)]'>
@@ -886,7 +899,7 @@ export function CommunityNewScreen({
                     메뉴 사진 여러 장 선택
                   </span>
                   <span className='mt-0.5 block text-[11px] text-[var(--muted)]'>
-                    최대 {FOOD_MENU_MAX}장 · 사진과 한 줄 평이 모두 필요해요
+                    최대 {FOOD_MENU_MAX}장 · 사진·이름·한 줄 평이 모두 필요해요
                   </span>
                 </span>
               </button>
@@ -894,70 +907,114 @@ export function CommunityNewScreen({
 
             {menuDrafts.length > 0 || menuPendingCount > 0 ? (
               <div className='mt-3 space-y-2.5'>
-                {menuDrafts.map((item, index) => (
-                  <div
-                    key={item.key}
-                    id={`menu-card-${item.key}`}
-                    className='rounded-2xl bg-white p-3 ring-1 ring-black/[0.06]'
-                  >
-                    <div className='mb-2.5 flex items-center justify-between gap-2'>
-                      <p className='text-[12px] font-semibold text-[var(--muted)]'>
-                        메뉴 {index + 1}
-                      </p>
-                      <button
-                        type='button'
-                        onClick={() => removeMenuRow(item.key)}
-                        className='text-[11px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
-                      >
-                        삭제
-                      </button>
-                    </div>
-
-                    <div className='grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]'>
-                      <PhotoUploadZone
-                        compact
-                        className='min-w-0'
-                        src={item.imageUrl || null}
-                        onUploaded={(url) =>
-                          updateMenuRow(item.key, { imageUrl: url })
-                        }
-                        emptyLabel='사진'
-                        emptyHint=''
-                        aspectClassName='aspect-square'
-                      />
-                      <div className='relative flex min-h-0 min-w-0 flex-col'>
-                        <textarea
-                          ref={(el) => {
-                            captionRefs.current[item.key] = el
-                          }}
-                          value={item.caption}
-                          onChange={(e) =>
-                            updateMenuRow(item.key, {
-                              caption: e.target.value,
-                            })
-                          }
-                          maxLength={120}
-                          placeholder='한 줄 평 (필수)'
-                          className={cn(
-                            'h-[6.5rem] w-full resize-none rounded-xl bg-[#f8f8f9] px-3 py-2.5 pb-6 text-[13px] leading-relaxed outline-none ring-1 transition placeholder:text-[var(--muted)] sm:h-[7.5rem] sm:text-[14px]',
-                            item.imageUrl && !item.caption.trim()
-                              ? 'ring-red-300 focus:ring-red-400'
-                              : 'ring-black/[0.05] focus:ring-[var(--brand)]/35',
-                          )}
-                          aria-label={`메뉴 ${index + 1} 한 줄 평`}
-                        />
-                        <span className='pointer-events-none absolute bottom-2 right-2.5 text-[10px] tabular-nums text-[var(--muted)]'>
-                          {item.caption.length}/120
-                        </span>
+                {menuDrafts.map((item, index) => {
+                  const missingName =
+                    Boolean(item.imageUrl) && !item.name.trim()
+                  const missingCaption =
+                    Boolean(item.imageUrl) && !item.caption.trim()
+                  return (
+                    <div
+                      key={item.key}
+                      id={`menu-card-${item.key}`}
+                      className='rounded-2xl bg-white p-3 ring-1 ring-black/[0.06]'
+                    >
+                      <div className='mb-2.5 flex items-center justify-between gap-2'>
+                        <p className='text-[12px] font-semibold text-[var(--muted)]'>
+                          메뉴 {index + 1}
+                        </p>
+                        <button
+                          type='button'
+                          onClick={() => removeMenuRow(item.key)}
+                          className='text-[11px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
+                        >
+                          삭제
+                        </button>
                       </div>
+
+                      <div className='grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]'>
+                        <PhotoUploadZone
+                          compact
+                          className='min-w-0'
+                          src={item.imageUrl || null}
+                          onUploaded={(url) =>
+                            updateMenuRow(item.key, { imageUrl: url })
+                          }
+                          emptyLabel='사진'
+                          emptyHint=''
+                          aspectClassName='aspect-square'
+                        />
+                        <div className='flex min-h-0 min-w-0 flex-col gap-2'>
+                          <div className='relative'>
+                            <input
+                              ref={(el) => {
+                                nameRefs.current[item.key] = el
+                              }}
+                              type='text'
+                              value={item.name}
+                              onChange={(e) =>
+                                updateMenuRow(item.key, {
+                                  name: e.target.value.slice(
+                                    0,
+                                    FOOD_MENU_NAME_MAX,
+                                  ),
+                                })
+                              }
+                              maxLength={FOOD_MENU_NAME_MAX}
+                              placeholder='메뉴 이름 (필수)'
+                              className={cn(
+                                'w-full rounded-xl bg-[#f8f8f9] px-3 py-2.5 pr-12 text-[13px] font-semibold outline-none ring-1 transition placeholder:font-normal placeholder:text-[var(--muted)] sm:text-[14px]',
+                                missingName
+                                  ? 'ring-red-300 focus:ring-red-400'
+                                  : 'ring-black/[0.05] focus:ring-[var(--brand)]/35',
+                              )}
+                              aria-label={`메뉴 ${index + 1} 이름`}
+                            />
+                            <span className='pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] tabular-nums text-[var(--muted)]'>
+                              {item.name.length}/{FOOD_MENU_NAME_MAX}
+                            </span>
+                          </div>
+                          <div className='relative min-h-0 flex-1'>
+                            <textarea
+                              ref={(el) => {
+                                captionRefs.current[item.key] = el
+                              }}
+                              value={item.caption}
+                              onChange={(e) =>
+                                updateMenuRow(item.key, {
+                                  caption: e.target.value.slice(
+                                    0,
+                                    FOOD_MENU_CAPTION_MAX,
+                                  ),
+                                })
+                              }
+                              maxLength={FOOD_MENU_CAPTION_MAX}
+                              placeholder='한 줄 평 (필수)'
+                              className={cn(
+                                'h-[4.75rem] w-full resize-none rounded-xl bg-[#f8f8f9] px-3 py-2.5 pb-6 text-[13px] leading-relaxed outline-none ring-1 transition placeholder:text-[var(--muted)] sm:h-[5.25rem] sm:text-[14px]',
+                                missingCaption
+                                  ? 'ring-red-300 focus:ring-red-400'
+                                  : 'ring-black/[0.05] focus:ring-[var(--brand)]/35',
+                              )}
+                              aria-label={`메뉴 ${index + 1} 한 줄 평`}
+                            />
+                            <span className='pointer-events-none absolute bottom-2 right-2.5 text-[10px] tabular-nums text-[var(--muted)]'>
+                              {item.caption.length}/{FOOD_MENU_CAPTION_MAX}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      {missingName || missingCaption ? (
+                        <p className='mt-2 text-[11px] font-medium text-red-600'>
+                          {missingName && missingCaption
+                            ? '메뉴 이름과 한 줄 평을 입력해 주세요'
+                            : missingName
+                              ? '메뉴 이름을 입력해 주세요'
+                              : '한 줄 평을 입력해 주세요'}
+                        </p>
+                      ) : null}
                     </div>
-                    {item.imageUrl && !item.caption.trim() ? (
-                      <p className='mt-2 text-[11px] font-medium text-red-600'>
-                        한 줄 평을 입력해 주세요
-                      </p>
-                    ) : null}
-                  </div>
-                ))}
+                  )
+                })}
 
                 {Array.from({ length: menuPendingCount }, (_, index) => (
                   <div

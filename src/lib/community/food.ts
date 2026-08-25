@@ -161,6 +161,8 @@ export const FOOD_WAIT_MIN = 0
 export const FOOD_WAIT_MAX = 300
 export const FOOD_GALLERY_MAX = 4
 export const FOOD_MENU_MAX = 8
+export const FOOD_MENU_NAME_MAX = 20
+export const FOOD_MENU_CAPTION_MAX = 120
 
 export type FoodCarouselSlide = {
   id: string
@@ -258,15 +260,36 @@ export function normalizeFoodMenuItems(raw: unknown): FoodMenuItem[] {
       const data = item as Record<string, unknown>
       const imageUrl = String(data.imageUrl || '').trim()
       if (!imageUrl) return null
+      const name = String(data.name || '').trim()
+      const caption = String(data.caption || '').trim()
       return {
         id:
           String(data.id || '').trim() ||
           `menu_${index}_${Math.random().toString(36).slice(2, 7)}`,
         imageUrl,
-        caption: String(data.caption || '').trim(),
+        name,
+        caption,
       }
     })
     .filter((item): item is FoodMenuItem => Boolean(item))
+}
+
+/** 상세·라이트박스용 메뉴 표시 문구 */
+export function formatFoodMenuDisplay(
+  item: Pick<FoodMenuItem, 'name' | 'caption'>,
+): string {
+  const name = item.name?.trim() || ''
+  const caption = item.caption?.trim() || ''
+  if (name && caption) return `${name} — ${caption}`
+  return name || caption || ''
+}
+
+/** 메뉴 이름 (없으면 캡션·기본값) */
+export function getFoodMenuName(
+  item: Pick<FoodMenuItem, 'name' | 'caption'>,
+  fallback = '메뉴',
+): string {
+  return item.name?.trim() || item.caption?.trim() || fallback
 }
 
 export function normalizeFoodGalleryPhotos(raw: unknown): FoodGalleryPhoto[] {
@@ -307,7 +330,7 @@ export function buildFoodDetailCarouselSlides(
     slides.push({
       id: `menu-${item.id}`,
       imageUrl,
-      label: item.caption?.trim() || '메뉴',
+      label: getFoodMenuName(item),
     })
   }
 

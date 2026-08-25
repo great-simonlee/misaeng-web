@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -39,8 +40,20 @@ import { cn } from '@lib'
 import type { HousingListing } from '@/types/nyc'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { PerkBadge } from '@widgets/nyc/HousingPostCard'
-import { HousingLocationMap } from '@widgets/nyc/HousingLocationMap'
 import { HousingRoommateIntro } from '@widgets/nyc/HousingRoommateIntro'
+
+const HousingLocationMap = dynamic(
+  () =>
+    import('@widgets/nyc/HousingLocationMap').then(
+      (mod) => mod.HousingLocationMap,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className='aspect-[16/10] animate-pulse rounded-[1.25rem] bg-[#e8eaee] sm:aspect-[16/9]' />
+    ),
+  },
+)
 import {
   BoardBackLink,
   BoardPageShell,

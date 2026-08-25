@@ -115,13 +115,15 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         id: 'm1',
         imageUrl:
           'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&q=80',
-        caption: '칼국수 — 육수 깔끔, 면발 쫄깃',
+        name: '칼국수',
+        caption: '육수 깔끔, 면발 쫄깃',
       },
       {
         id: 'm2',
         imageUrl:
           'https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=800&q=80',
-        caption: '김치전 — 바삭하고 기름 적당',
+        name: '김치전',
+        caption: '바삭하고 기름 적당',
       },
     ],
   }),
@@ -167,13 +169,15 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         id: 'm3',
         imageUrl:
           'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80',
-        caption: '아메리카노 — 산미 적고 무난',
+        name: '아메리카노',
+        caption: '산미 적고 무난',
       },
       {
         id: 'm4',
         imageUrl:
           'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800&q=80',
-        caption: '에그 샌드위치 — 포만감 좋음',
+        name: '에그 샌드위치',
+        caption: '포만감 좋음',
       },
     ],
   }),
@@ -213,7 +217,8 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         id: 'm5',
         imageUrl:
           'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=80',
-        caption: '팬케이크 — 달콤하고 폭신',
+        name: '팬케이크',
+        caption: '달콤하고 폭신',
       },
     ],
   }),
@@ -251,7 +256,8 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         id: 'm6',
         imageUrl:
           'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800&q=80',
-        caption: '김밥 세트 — 양 많고 저렴',
+        name: '김밥 세트',
+        caption: '양 많고 저렴',
       },
     ],
   }),
@@ -424,7 +430,8 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         id: 'm7',
         imageUrl:
           'https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=800&q=80',
-        caption: '돌솥비빔밥 — 밥알 고소',
+        name: '돌솥비빔밥',
+        caption: '밥알 고소',
       },
     ],
   }),

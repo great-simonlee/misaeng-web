@@ -280,7 +280,7 @@ export interface CommunityPost {
   waitMinutes: number | null
   /** 맛집: 맛집 | 가성비 | 느좋 | 카공 */
   foodCategory: FoodCategoryId | null
-  /** 맛집: 메뉴 사진 + 한 줄 평 */
+  /** 맛집: 메뉴 사진 + 이름 + 한 줄 평 */
   menuItems: FoodMenuItem[]
   /** 맛집: 가게 내부·분위기 등 추가 사진 */
   galleryPhotos: FoodGalleryPhoto[]
@@ -297,10 +297,13 @@ export interface CommunityPost {
 /** 맛집 보드 카테고리 */
 export type FoodCategoryId = 'restaurant' | 'value' | 'vibe' | 'study'
 
-/** 맛집 메뉴 한 줄 (사진 + 짧은 후기) */
+/** 맛집 메뉴 (사진 + 메뉴명 + 한 줄 평) */
 export interface FoodMenuItem {
   id: string
   imageUrl: string
+  /** 메뉴 이름 (예: 돼지곰탕) */
+  name: string
+  /** 한 줄 평 */
   caption: string
 }
 
