@@ -251,7 +251,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                 <div
                   ref={galleryScrollRef}
                   {...galleryPointerHandlers}
-                  className='flex h-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+                  className='flex h-full touch-pan-x snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain overscroll-y-none [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
                 >
                   {images.map((src, index) => (
                     <div

@@ -33,6 +33,26 @@ function getScrollTop() {
   )
 }
 
+/** 캐러셀 등 가로 스크롤 영역 — PTR이 제스처를 가로채지 않음 */
+function isInsideHorizontalScrollable(target: EventTarget | null) {
+  let node = target instanceof Element ? target : null
+  while (node && node !== document.documentElement) {
+    if (node instanceof HTMLElement) {
+      const { overflowX } = getComputedStyle(node)
+      if (
+        (overflowX === 'auto' ||
+          overflowX === 'scroll' ||
+          overflowX === 'overlay') &&
+        node.scrollWidth > node.clientWidth + 1
+      ) {
+        return true
+      }
+    }
+    node = node.parentElement
+  }
+  return false
+}
+
 export function PullToRefresh({
   onRefresh,
   children,
@@ -43,7 +63,10 @@ export function PullToRefresh({
   const [pull, setPull] = useState(0)
   const [refreshing, setRefreshing] = useState(false)
   const pullRef = useRef(0)
+  const startXRef = useRef<number | null>(null)
   const startYRef = useRef<number | null>(null)
+  const axisLockRef = useRef<'x' | 'y' | null>(null)
+  const ignoreGestureRef = useRef(false)
   const pullingRef = useRef(false)
   const refreshingRef = useRef(false)
   const onRefreshRef = useRef(onRefresh)
@@ -73,7 +96,10 @@ export function PullToRefresh({
       refreshingRef.current = false
       setRefreshing(false)
       setPullBoth(0)
+      startXRef.current = null
       startYRef.current = null
+      axisLockRef.current = null
+      ignoreGestureRef.current = false
       pullingRef.current = false
     }
   }, [setPullBoth])
@@ -82,13 +108,34 @@ export function PullToRefresh({
     const el = rootRef.current
     if (!el) return
 
+    function resetGesture() {
+      startXRef.current = null
+      startYRef.current = null
+      axisLockRef.current = null
+      ignoreGestureRef.current = false
+      pullingRef.current = false
+    }
+
     function onTouchStart(e: TouchEvent) {
       if (disabledRef.current || refreshingRef.current) return
       if (getScrollTop() > 2) {
-        startYRef.current = null
+        resetGesture()
         return
       }
-      startYRef.current = e.touches[0]?.clientY ?? null
+      // 캐러셀 위에서의 터치는 PTR이 개입하지 않음
+      if (isInsideHorizontalScrollable(e.target)) {
+        ignoreGestureRef.current = true
+        startXRef.current = null
+        startYRef.current = null
+        axisLockRef.current = null
+        pullingRef.current = false
+        return
+      }
+      ignoreGestureRef.current = false
+      const touch = e.touches[0]
+      startXRef.current = touch?.clientX ?? null
+      startYRef.current = touch?.clientY ?? null
+      axisLockRef.current = null
       pullingRef.current = false
     }
 
@@ -96,27 +143,52 @@ export function PullToRefresh({
       if (
         disabledRef.current ||
         refreshingRef.current ||
-        startYRef.current == null
+        ignoreGestureRef.current ||
+        startYRef.current == null ||
+        startXRef.current == null
       ) {
         return
       }
       if (getScrollTop() > 2) {
-        startYRef.current = null
+        resetGesture()
+        setPullBoth(0)
+        return
+      }
+
+      const touch = e.touches[0]
+      if (!touch) return
+      const dx = touch.clientX - startXRef.current
+      const dy = touch.clientY - startYRef.current
+      const adx = Math.abs(dx)
+      const ady = Math.abs(dy)
+
+      // 축이 확정되기 전에는 pull/preventDefault 하지 않음 (맨 위 캐러셀 스와이프 보호)
+      if (axisLockRef.current == null) {
+        if (adx > 6 && adx >= ady) {
+          axisLockRef.current = 'x'
+        } else if (ady > 10 && ady > adx * 1.15) {
+          axisLockRef.current = 'y'
+        } else if (adx > 12 || ady > 12) {
+          axisLockRef.current = adx >= ady ? 'x' : 'y'
+        } else {
+          return
+        }
+      }
+
+      if (axisLockRef.current === 'x') {
         setPullBoth(0)
         pullingRef.current = false
         return
       }
 
-      const currentY = e.touches[0]?.clientY ?? startYRef.current
-      const delta = currentY - startYRef.current
-      if (delta <= 0) {
+      if (dy <= 0) {
         setPullBoth(0)
         pullingRef.current = false
         return
       }
 
       pullingRef.current = true
-      const next = Math.min(PULL_MAX, delta * 0.42)
+      const next = Math.min(PULL_MAX, dy * 0.42)
       setPullBoth(next)
       if (next > 8 && e.cancelable) {
         e.preventDefault()
@@ -126,9 +198,11 @@ export function PullToRefresh({
     function onTouchEnd() {
       if (disabledRef.current || refreshingRef.current) return
       const shouldRefresh =
-        pullingRef.current && pullRef.current >= PULL_THRESHOLD
-      startYRef.current = null
-      pullingRef.current = false
+        !ignoreGestureRef.current &&
+        pullingRef.current &&
+        axisLockRef.current === 'y' &&
+        pullRef.current >= PULL_THRESHOLD
+      resetGesture()
       if (shouldRefresh) {
         void finishRefresh()
         return

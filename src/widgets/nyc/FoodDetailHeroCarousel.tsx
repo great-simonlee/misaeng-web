@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRef } from 'react'
+import { useMemo } from 'react'
 
 import { usePagedGallery } from '@hooks/usePagedGallery'
 import { cn } from '@lib'
@@ -12,8 +12,6 @@ type FoodDetailHeroCarouselProps = {
   backHref: string
   backLabel?: string
   className?: string
-  /** 사진 탭(드래그 아님) 시 확대 보기 */
-  onSlideOpen?: (index: number) => void
 }
 
 export function FoodDetailHeroCarousel({
@@ -21,16 +19,27 @@ export function FoodDetailHeroCarousel({
   backHref,
   backLabel = '목록',
   className,
-  onSlideOpen,
 }: FoodDetailHeroCarouselProps) {
   const count = slides.length
   const {
     ref: scrollRef,
     index: activeIndex,
     goTo,
+    looping,
     pointerHandlers,
-  } = usePagedGallery(count)
-  const tapStartRef = useRef<{ x: number; y: number } | null>(null)
+  } = usePagedGallery(count, undefined, { loop: true })
+
+  // [마지막 클론, ...원본, 첫 클론] — 끝에서 더 넘기면 처음으로 이어짐
+  const trackSlides = useMemo(() => {
+    if (count <= 1) return slides
+    const first = slides[0]
+    const last = slides[count - 1]
+    return [
+      { ...last, id: `${last.id}__clone-prev` },
+      ...slides,
+      { ...first, id: `${first.id}__clone-next` },
+    ]
+  }, [slides, count])
 
   if (count === 0) {
     return (
@@ -46,46 +55,42 @@ export function FoodDetailHeroCarousel({
   }
 
   return (
-    <div className={cn('relative overflow-hidden', className)}>
+    <div className={cn('relative', className)}>
       <div
         ref={scrollRef}
         {...pointerHandlers}
-        onPointerDown={(e) => {
-          pointerHandlers.onPointerDown?.(e)
-          tapStartRef.current = { x: e.clientX, y: e.clientY }
-        }}
-        onPointerUp={(e) => {
-          pointerHandlers.onPointerUp?.(e)
-          const start = tapStartRef.current
-          tapStartRef.current = null
-          if (!start || !onSlideOpen) return
-          const dx = Math.abs(e.clientX - start.x)
-          const dy = Math.abs(e.clientY - start.y)
-          if (dx < 8 && dy < 8) onSlideOpen(activeIndex)
-        }}
-        onPointerCancel={() => {
-          pointerHandlers.onPointerCancel?.()
-          tapStartRef.current = null
-        }}
-        className='flex aspect-[4/3] cursor-zoom-in snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+        className={cn(
+          'flex aspect-[4/3] w-full touch-pan-x snap-x snap-mandatory overflow-x-auto overflow-y-hidden',
+          'overscroll-x-contain overscroll-y-none',
+          '[-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden',
+        )}
         aria-roledescription='carousel'
         aria-label='맛집 사진'
       >
-        {slides.map((slide, index) => (
-          <div
-            key={slide.id}
-            className='relative h-full w-full min-w-full shrink-0 snap-start snap-always bg-[#e8eaee]'
-            aria-hidden={index !== activeIndex}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={slide.imageUrl}
-              alt={slide.label || ''}
-              draggable={false}
-              className='pointer-events-none h-full w-full select-none object-cover'
-            />
-          </div>
-        ))}
+        {trackSlides.map((slide, trackIndex) => {
+          const logicalIndex = looping
+            ? trackIndex === 0
+              ? count - 1
+              : trackIndex === trackSlides.length - 1
+                ? 0
+                : trackIndex - 1
+            : trackIndex
+          return (
+            <div
+              key={slide.id}
+              className='relative aspect-[4/3] w-full min-w-full max-w-full shrink-0 grow-0 basis-full snap-start snap-always bg-[#e8eaee]'
+              aria-hidden={logicalIndex !== activeIndex}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={slide.imageUrl}
+                alt={slide.label || ''}
+                draggable={false}
+                className='pointer-events-none h-full w-full select-none object-cover'
+              />
+            </div>
+          )
+        })}
       </div>
 
       <div className='pointer-events-none absolute inset-x-0 top-0 z-[1] h-20 bg-gradient-to-b from-black/40 to-transparent' />
@@ -96,21 +101,21 @@ export function FoodDetailHeroCarousel({
           <button
             type='button'
             aria-label='이전 사진'
-            onClick={() => goTo(activeIndex - 1)}
-            className='absolute left-3 top-1/2 z-10 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/95 text-[var(--foreground)] shadow-md touch-manipulation transition hover:bg-white sm:left-4 sm:size-10'
+            onClick={() => goTo(activeIndex - 1, { wrap: true })}
+            className='absolute left-3 top-1/2 z-10 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/95 text-[var(--foreground)] shadow-md touch-manipulation transition hover:bg-white sm:inline-flex sm:left-4'
           >
-            <ChevronIcon className='size-4 rotate-180 sm:size-[1.1rem]' />
+            <ChevronIcon className='size-[1.1rem] rotate-180' />
           </button>
           <button
             type='button'
             aria-label='다음 사진'
-            onClick={() => goTo(activeIndex + 1)}
-            className='absolute right-3 top-1/2 z-10 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/95 text-[var(--foreground)] shadow-md touch-manipulation transition hover:bg-white sm:right-4 sm:size-10'
+            onClick={() => goTo(activeIndex + 1, { wrap: true })}
+            className='absolute right-3 top-1/2 z-10 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/95 text-[var(--foreground)] shadow-md touch-manipulation transition hover:bg-white sm:inline-flex sm:right-4'
           >
-            <ChevronIcon className='size-4 sm:size-[1.1rem]' />
+            <ChevronIcon className='size-[1.1rem]' />
           </button>
 
-          <div className='absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/40 px-2 py-1.5 backdrop-blur-sm sm:bottom-4'>
+          <div className='pointer-events-none absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1.5 backdrop-blur-sm sm:bottom-4'>
             {slides.map((slide, index) => (
               <button
                 key={slide.id}
@@ -119,7 +124,7 @@ export function FoodDetailHeroCarousel({
                 aria-current={index === activeIndex}
                 onClick={() => goTo(index)}
                 className={cn(
-                  'h-1.5 rounded-full touch-manipulation transition-all',
+                  'pointer-events-auto h-1.5 rounded-full touch-manipulation transition-all',
                   index === activeIndex
                     ? 'w-4 bg-white'
                     : 'w-1.5 bg-white/50 hover:bg-white/80',

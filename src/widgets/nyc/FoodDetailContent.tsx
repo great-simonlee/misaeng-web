@@ -84,16 +84,6 @@ export function FoodDetailContent({
     [galleryPhotos],
   )
 
-  const carouselLightboxItems = useMemo<PhotoLightboxItem[]>(
-    () =>
-      slides.map((slide) => ({
-        id: slide.id,
-        imageUrl: slide.imageUrl,
-        caption: slide.label,
-      })),
-    [slides],
-  )
-
   const partySize =
     post.partySize != null && post.partySize > 0 ? post.partySize : null
   const totalSpend =
@@ -128,14 +118,6 @@ export function FoodDetailContent({
     })
   }
 
-  function openCarouselLightbox(index: number) {
-    if (carouselLightboxItems.length === 0) return
-    setLightbox({
-      items: carouselLightboxItems,
-      index,
-    })
-  }
-
   return (
     <article>
       <div className='-mx-4 sm:mx-0 sm:overflow-hidden sm:rounded-[1.25rem]'>
@@ -143,7 +125,6 @@ export function FoodDetailContent({
           slides={slides}
           backHref={`/nyc/${boardId}`}
           backLabel={`${boardTitle} 목록`}
-          onSlideOpen={openCarouselLightbox}
         />
       </div>
 
