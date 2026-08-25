@@ -37,6 +37,7 @@ import {
 } from '@lib/community/food'
 import { htmlToPlainText } from '@lib/community/html'
 import { uploadCommunityImageFile } from '@lib/community/upload.client'
+import { IMAGE_LIBRARY_ACCEPT } from '@lib/constants/imageUpload'
 import {
   NYC_COMMUNITY_BOARD_META,
   isAnonymousBoard,
@@ -74,15 +75,23 @@ type MenuDraft = {
 type GalleryDraft = {
   key: string
   imageUrl: string
-  caption: string
 }
 
-function createMenuKey() {
-  return `menu_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`
+let photoKeySeq = 0
+
+function createPhotoKey(prefix: 'menu' | 'gallery') {
+  photoKeySeq += 1
+  return `${prefix}_${Date.now().toString(36)}_${photoKeySeq}`
 }
 
-function createGalleryKey() {
-  return `gallery_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`
+function isLikelyImageFile(file: File) {
+  if (file.type.startsWith('image/')) return true
+  // HEIC 등 일부 환경에서 type이 비어 있음
+  return /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(file.name)
+}
+
+function pickImageFiles(files: FileList, remaining: number) {
+  return Array.from(files).filter(isLikelyImageFile).slice(0, remaining)
 }
 
 export function CommunityNewScreen({
@@ -119,9 +128,23 @@ export function CommunityNewScreen({
   const [menuDrafts, setMenuDrafts] = useState<MenuDraft[]>([])
   const [galleryDrafts, setGalleryDrafts] = useState<GalleryDraft[]>([])
   const [menuUploading, setMenuUploading] = useState(false)
+  const [galleryUploading, setGalleryUploading] = useState(false)
+  /** 업로드 진행 중 보이는 플레이스홀더 개수 */
+  const [galleryPendingCount, setGalleryPendingCount] = useState(0)
+  const [menuPendingCount, setMenuPendingCount] = useState(0)
   const captionRefs = useRef<Record<string, HTMLTextAreaElement | null>>({})
   const pendingFocusKeyRef = useRef<string | null>(null)
   const menuFileInputRef = useRef<HTMLInputElement>(null)
+  const galleryFileInputRef = useRef<HTMLInputElement>(null)
+  const menuDraftsRef = useRef(menuDrafts)
+  const galleryDraftsRef = useRef(galleryDrafts)
+  menuDraftsRef.current = menuDrafts
+  galleryDraftsRef.current = galleryDrafts
+
+  const galleryRemaining = FOOD_GALLERY_MAX - galleryDrafts.length
+  const menuRemaining = FOOD_MENU_MAX - menuDrafts.length
+  const canAddGallery = galleryRemaining > 0 && !galleryUploading
+  const canAddMenu = menuRemaining > 0 && !menuUploading
 
   useEffect(() => {
     if (!editPostId || !user?.uid) return
@@ -183,7 +206,6 @@ export function CommunityNewScreen({
             post.galleryPhotos.map((item, index) => ({
               key: item.id || `gallery_${index + 1}`,
               imageUrl: item.imageUrl,
-              caption: item.caption,
             })),
           )
         }
@@ -222,61 +244,158 @@ export function CommunityNewScreen({
     setMenuDrafts((prev) => prev.filter((item) => item.key !== key))
   }
 
+  function resetMenuFileInput() {
+    if (menuFileInputRef.current) menuFileInputRef.current.value = ''
+  }
+
+  function resetGalleryFileInput() {
+    if (galleryFileInputRef.current) galleryFileInputRef.current.value = ''
+  }
+
+  function openMenuPicker() {
+    if (!canAddMenu) return
+    resetMenuFileInput()
+    menuFileInputRef.current?.click()
+  }
+
+  function openGalleryPicker() {
+    if (!canAddGallery) return
+    resetGalleryFileInput()
+    galleryFileInputRef.current?.click()
+  }
+
   async function handleMenuFilesSelected(files: FileList | null) {
-    if (!files?.length) return
-    const remaining = FOOD_MENU_MAX - menuDrafts.length
-    if (remaining <= 0) {
-      toastError(`메뉴는 최대 ${FOOD_MENU_MAX}개까지 등록할 수 있어요`)
+    if (!files?.length || menuUploading) {
+      resetMenuFileInput()
       return
     }
 
-    const selected = Array.from(files).slice(0, remaining)
+    const remaining = FOOD_MENU_MAX - menuDraftsRef.current.length
+    if (remaining <= 0) {
+      toastError(`메뉴는 최대 ${FOOD_MENU_MAX}개까지 등록할 수 있어요`)
+      resetMenuFileInput()
+      return
+    }
+
+    const selected = pickImageFiles(files, remaining)
+    if (selected.length === 0) {
+      toastError('이미지 파일만 선택할 수 있어요')
+      resetMenuFileInput()
+      return
+    }
     if (files.length > remaining) {
-      toastError(`메뉴는 최대 ${FOOD_MENU_MAX}개까지예요. ${remaining}장만 추가했어요`)
+      toastError(
+        `메뉴는 최대 ${FOOD_MENU_MAX}개까지예요. ${selected.length}장만 추가합니다`,
+      )
     }
 
     setMenuUploading(true)
-    try {
-      const uploaded: MenuDraft[] = []
-      for (const file of selected) {
+    setMenuPendingCount(selected.length)
+    let successCount = 0
+    let failCount = 0
+    let didSetFocus = false
+
+    for (const file of selected) {
+      try {
         const url = await uploadCommunityImageFile(file)
-        uploaded.push({
-          key: createMenuKey(),
+        const draft: MenuDraft = {
+          key: createPhotoKey('menu'),
           imageUrl: url,
           caption: '',
+        }
+        if (!didSetFocus) {
+          pendingFocusKeyRef.current = draft.key
+          didSetFocus = true
+        }
+        setMenuDrafts((prev) => {
+          if (prev.length >= FOOD_MENU_MAX) return prev
+          return [...prev, draft]
         })
+        successCount += 1
+      } catch {
+        failCount += 1
+      } finally {
+        setMenuPendingCount((count) => Math.max(0, count - 1))
       }
-      if (uploaded.length > 0) {
-        pendingFocusKeyRef.current = uploaded[0].key
-        setMenuDrafts((prev) => [...prev, ...uploaded])
-      }
-    } catch (err) {
-      toastError(getErrorMessage(err, '메뉴 사진 업로드에 실패했어요'))
-    } finally {
-      setMenuUploading(false)
-      if (menuFileInputRef.current) menuFileInputRef.current.value = ''
     }
-  }
 
-  function updateGalleryRow(key: string, patch: Partial<GalleryDraft>) {
-    setGalleryDrafts((prev) =>
-      prev.map((item) => (item.key === key ? { ...item, ...patch } : item)),
-    )
+    if (failCount > 0) {
+      toastError(
+        successCount > 0
+          ? `${successCount}장은 추가됐고, ${failCount}장은 실패했어요`
+          : '메뉴 사진 업로드에 실패했어요',
+      )
+    }
+
+    setMenuUploading(false)
+    setMenuPendingCount(0)
+    resetMenuFileInput()
   }
 
   function removeGalleryRow(key: string) {
     setGalleryDrafts((prev) => prev.filter((item) => item.key !== key))
   }
 
-  function requestAddGallery() {
-    if (galleryDrafts.length >= FOOD_GALLERY_MAX) {
-      toastError(`분위기 사진은 최대 ${FOOD_GALLERY_MAX}장까지 등록할 수 있어요`)
+  async function handleGalleryFilesSelected(files: FileList | null) {
+    if (!files?.length || galleryUploading) {
+      resetGalleryFileInput()
       return
     }
-    setGalleryDrafts((prev) => [
-      ...prev,
-      { key: createGalleryKey(), imageUrl: '', caption: '' },
-    ])
+
+    const remaining = FOOD_GALLERY_MAX - galleryDraftsRef.current.length
+    if (remaining <= 0) {
+      toastError(`분위기 사진은 최대 ${FOOD_GALLERY_MAX}장까지 등록할 수 있어요`)
+      resetGalleryFileInput()
+      return
+    }
+
+    const selected = pickImageFiles(files, remaining)
+    if (selected.length === 0) {
+      toastError('이미지 파일만 선택할 수 있어요')
+      resetGalleryFileInput()
+      return
+    }
+    if (files.length > remaining) {
+      toastError(
+        `분위기 사진은 최대 ${FOOD_GALLERY_MAX}장까지예요. ${selected.length}장만 추가합니다`,
+      )
+    }
+
+    setGalleryUploading(true)
+    setGalleryPendingCount(selected.length)
+    let successCount = 0
+    let failCount = 0
+
+    for (const file of selected) {
+      try {
+        const url = await uploadCommunityImageFile(file)
+        const draft: GalleryDraft = {
+          key: createPhotoKey('gallery'),
+          imageUrl: url,
+        }
+        setGalleryDrafts((prev) => {
+          if (prev.length >= FOOD_GALLERY_MAX) return prev
+          return [...prev, draft]
+        })
+        successCount += 1
+      } catch {
+        failCount += 1
+      } finally {
+        setGalleryPendingCount((count) => Math.max(0, count - 1))
+      }
+    }
+
+    if (failCount > 0) {
+      toastError(
+        successCount > 0
+          ? `${successCount}장은 추가됐고, ${failCount}장은 실패했어요`
+          : '분위기 사진 업로드에 실패했어요',
+      )
+    }
+
+    setGalleryUploading(false)
+    setGalleryPendingCount(0)
+    resetGalleryFileInput()
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -385,7 +504,7 @@ export function CommunityNewScreen({
         .map((item, index) => ({
           id: `gallery_${index + 1}`,
           imageUrl: item.imageUrl.trim(),
-          caption: item.caption.trim(),
+          caption: '',
         }))
 
       if (!thumb && menuItems[0]?.imageUrl) {
@@ -640,54 +759,92 @@ export function CommunityNewScreen({
               </p>
             </div>
 
-            <div className='mt-3 grid grid-cols-4 gap-2'>
-              {galleryDrafts.map((item, index) => (
-                <div
-                  key={item.key}
-                  className='min-w-0 rounded-xl bg-white p-1.5 ring-1 ring-black/[0.06]'
-                >
-                  <div className='relative'>
-                    <PhotoUploadZone
-                      compact
-                      className='min-w-0'
-                      src={item.imageUrl || null}
-                      onUploaded={(url) =>
-                        updateGalleryRow(item.key, { imageUrl: url })
-                      }
-                      onRemove={() => removeGalleryRow(item.key)}
-                      emptyLabel={`${index + 1}`}
-                      emptyHint=''
-                      aspectClassName='aspect-square'
-                    />
-                  </div>
-                  <input
-                    type='text'
-                    value={item.caption}
-                    onChange={(e) =>
-                      updateGalleryRow(item.key, { caption: e.target.value })
-                    }
-                    maxLength={24}
-                    placeholder='설명'
-                    className='mt-1.5 w-full rounded-lg border-0 bg-[#f8f9fb] px-1.5 py-1 text-[10px] outline-none ring-1 ring-black/[0.05] placeholder:text-[var(--muted)] focus:ring-[var(--brand)]/25'
-                  />
-                </div>
-              ))}
+            <input
+              ref={galleryFileInputRef}
+              type='file'
+              accept={IMAGE_LIBRARY_ACCEPT}
+              multiple
+              className='hidden'
+              onChange={(e) => void handleGalleryFilesSelected(e.target.files)}
+            />
 
-              {galleryDrafts.length < FOOD_GALLERY_MAX ? (
-                <button
-                  type='button'
-                  onClick={requestAddGallery}
-                  className='flex aspect-square flex-col items-center justify-center rounded-xl border border-dashed border-black/[0.12] bg-[#fafbfc] px-1 text-center touch-manipulation transition hover:border-black/20 hover:bg-white'
-                >
-                  <span className='text-[18px] leading-none text-[var(--muted)]'>
-                    +
+            {galleryDrafts.length === 0 && galleryPendingCount === 0 ? (
+              <button
+                type='button'
+                disabled={!canAddGallery}
+                onClick={openGalleryPicker}
+                className='mt-3 flex w-full items-center gap-3 rounded-2xl bg-white px-3.5 py-3.5 text-left ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-[#fff8f5] hover:ring-[var(--brand)]/30 disabled:opacity-60'
+              >
+                <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#fff1ed] text-[var(--brand)]'>
+                  <PlusIcon className='size-3.5' />
+                </span>
+                <span className='min-w-0 flex-1'>
+                  <span className='block text-[13px] font-semibold text-[var(--foreground)]'>
+                    분위기 사진 선택
                   </span>
-                  <span className='mt-1 text-[10px] font-semibold text-[var(--muted-foreground)]'>
-                    추가
+                  <span className='mt-0.5 block text-[11px] text-[var(--muted)]'>
+                    갤러리에서 최대 {FOOD_GALLERY_MAX}장까지 한 번에 고를 수 있어요
                   </span>
-                </button>
-              ) : null}
-            </div>
+                </span>
+              </button>
+            ) : (
+              <div className='mt-3 grid grid-cols-4 gap-2'>
+                {galleryDrafts.map((item) => (
+                  <div
+                    key={item.key}
+                    className='relative aspect-square overflow-hidden rounded-xl bg-[#e8eaee] ring-1 ring-black/[0.06]'
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.imageUrl}
+                      alt=''
+                      className='h-full w-full object-cover'
+                    />
+                    <button
+                      type='button'
+                      onClick={() => removeGalleryRow(item.key)}
+                      className='absolute right-1 top-1 inline-flex h-6 items-center rounded-full bg-black/55 px-2 text-[10px] font-semibold text-white touch-manipulation backdrop-blur-sm'
+                    >
+                      삭제
+                    </button>
+                  </div>
+                ))}
+
+                {Array.from({ length: galleryPendingCount }, (_, index) => (
+                  <div
+                    key={`gallery-pending-${index}`}
+                    className='flex aspect-square items-center justify-center rounded-xl bg-[#f3f4f6] ring-1 ring-dashed ring-black/[0.1]'
+                    aria-hidden
+                  >
+                    <span className='text-[11px] font-medium text-[var(--muted)]'>
+                      …
+                    </span>
+                  </div>
+                ))}
+
+                {galleryDrafts.length + galleryPendingCount <
+                FOOD_GALLERY_MAX ? (
+                  <button
+                    type='button'
+                    disabled={!canAddGallery}
+                    onClick={openGalleryPicker}
+                    className='flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-white text-[var(--brand)] ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-[#fff8f5] hover:ring-[var(--brand)]/30 disabled:opacity-60'
+                    aria-label={`분위기 사진 ${galleryRemaining}장 더 추가`}
+                  >
+                    <PlusIcon className='size-4' />
+                    <span className='text-[10px] font-semibold tabular-nums text-[var(--muted)]'>
+                      {galleryRemaining}장 더
+                    </span>
+                  </button>
+                ) : null}
+              </div>
+            )}
+
+            {galleryUploading ? (
+              <p className='mt-2 text-[11px] font-medium text-[var(--muted)]'>
+                업로드 중…
+              </p>
+            ) : null}
           </section>
 
           <section className='mt-8'>
@@ -708,17 +865,17 @@ export function CommunityNewScreen({
             <input
               ref={menuFileInputRef}
               type='file'
-              accept='image/*'
+              accept={IMAGE_LIBRARY_ACCEPT}
               multiple
               className='hidden'
               onChange={(e) => void handleMenuFilesSelected(e.target.files)}
             />
 
-            {menuDrafts.length < FOOD_MENU_MAX ? (
+            {menuDrafts.length === 0 && menuPendingCount === 0 ? (
               <button
                 type='button'
-                disabled={menuUploading}
-                onClick={() => menuFileInputRef.current?.click()}
+                disabled={!canAddMenu}
+                onClick={openMenuPicker}
                 className='mt-3 flex w-full items-center gap-3 rounded-2xl bg-white px-3.5 py-3.5 text-left ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-[#fff8f5] hover:ring-[var(--brand)]/30 disabled:opacity-60'
               >
                 <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#fff1ed] text-[var(--brand)]'>
@@ -726,20 +883,16 @@ export function CommunityNewScreen({
                 </span>
                 <span className='min-w-0 flex-1'>
                   <span className='block text-[13px] font-semibold text-[var(--foreground)]'>
-                    {menuUploading ? '업로드 중…' : '메뉴 사진 여러 장 선택'}
+                    메뉴 사진 여러 장 선택
                   </span>
                   <span className='mt-0.5 block text-[11px] text-[var(--muted)]'>
                     최대 {FOOD_MENU_MAX}장 · 사진과 한 줄 평이 모두 필요해요
                   </span>
                 </span>
               </button>
-            ) : (
-              <p className='mt-3 rounded-2xl bg-[#f3f4f6] px-4 py-2.5 text-center text-[12px] font-medium text-[var(--muted)]'>
-                메뉴는 최대 {FOOD_MENU_MAX}개까지 등록할 수 있어요
-              </p>
-            )}
+            ) : null}
 
-            {menuDrafts.length > 0 ? (
+            {menuDrafts.length > 0 || menuPendingCount > 0 ? (
               <div className='mt-3 space-y-2.5'>
                 {menuDrafts.map((item, index) => (
                   <div
@@ -768,7 +921,6 @@ export function CommunityNewScreen({
                         onUploaded={(url) =>
                           updateMenuRow(item.key, { imageUrl: url })
                         }
-                        onRemove={() => removeMenuRow(item.key)}
                         emptyLabel='사진'
                         emptyHint=''
                         aspectClassName='aspect-square'
@@ -806,6 +958,36 @@ export function CommunityNewScreen({
                     ) : null}
                   </div>
                 ))}
+
+                {Array.from({ length: menuPendingCount }, (_, index) => (
+                  <div
+                    key={`menu-pending-${index}`}
+                    className='flex h-[7.5rem] items-center justify-center rounded-2xl bg-[#f3f4f6] ring-1 ring-dashed ring-black/[0.1]'
+                    aria-hidden
+                  >
+                    <span className='text-[12px] font-medium text-[var(--muted)]'>
+                      업로드 중…
+                    </span>
+                  </div>
+                ))}
+
+                {menuDrafts.length + menuPendingCount < FOOD_MENU_MAX ? (
+                  <button
+                    type='button'
+                    disabled={!canAddMenu}
+                    onClick={openMenuPicker}
+                    className='flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-3.5 py-3 text-[13px] font-semibold text-[var(--foreground)] ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-[#fff8f5] hover:ring-[var(--brand)]/30 disabled:opacity-60'
+                  >
+                    <PlusIcon className='size-3.5 text-[var(--brand)]' />
+                    {menuUploading
+                      ? '업로드 중…'
+                      : `메뉴 사진 ${menuRemaining}장 더 추가`}
+                  </button>
+                ) : (
+                  <p className='rounded-2xl bg-[#f3f4f6] px-4 py-2.5 text-center text-[12px] font-medium text-[var(--muted)]'>
+                    메뉴는 최대 {FOOD_MENU_MAX}개까지 등록할 수 있어요
+                  </p>
+                )}
               </div>
             ) : null}
           </section>

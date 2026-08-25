@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 
 import { uploadCommunityImageFile } from '@lib/community/upload.client'
+import { IMAGE_LIBRARY_ACCEPT } from '@lib/constants/imageUpload'
 import { cn } from '@lib'
 
 type ImageUploadButtonProps = {
@@ -54,7 +55,7 @@ export function ImageUploadButton({
       <input
         ref={inputRef}
         type='file'
-        accept='image/*'
+        accept={IMAGE_LIBRARY_ACCEPT}
         className='hidden'
         onChange={(e) => void handleFiles(e.target.files)}
       />
@@ -245,7 +246,7 @@ export function PhotoUploadZone({
       <input
         ref={inputRef}
         type='file'
-        accept='image/*'
+        accept={IMAGE_LIBRARY_ACCEPT}
         className='hidden'
         onChange={(e) => void handleFiles(e.target.files)}
       />
