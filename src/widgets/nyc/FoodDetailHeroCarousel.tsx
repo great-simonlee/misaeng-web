@@ -63,8 +63,8 @@ export function FoodDetailHeroCarousel({
           const dy = Math.abs(e.clientY - start.y)
           if (dx < 8 && dy < 8) onSlideOpen(activeIndex)
         }}
-        onPointerCancel={(e) => {
-          pointerHandlers.onPointerCancel?.(e)
+        onPointerCancel={() => {
+          pointerHandlers.onPointerCancel?.()
           tapStartRef.current = null
         }}
         className='flex aspect-[4/3] cursor-zoom-in snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
