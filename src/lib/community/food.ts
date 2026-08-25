@@ -159,7 +159,8 @@ export const FOOD_SPEND_MIN = 0
 export const FOOD_SPEND_MAX = 9999
 export const FOOD_WAIT_MIN = 0
 export const FOOD_WAIT_MAX = 300
-export const FOOD_GALLERY_MAX = 6
+export const FOOD_GALLERY_MAX = 4
+export const FOOD_MENU_MAX = 8
 
 export type FoodCarouselSlide = {
   id: string

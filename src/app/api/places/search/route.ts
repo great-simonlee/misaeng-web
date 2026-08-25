@@ -1,17 +1,20 @@
 import { NextResponse } from 'next/server'
 
-import { searchPlaces } from '@lib/community/places.server'
+import { searchAddresses, searchPlaces } from '@lib/community/places.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   try {
-    const q = new URL(request.url).searchParams.get('q')?.trim() || ''
+    const { searchParams } = new URL(request.url)
+    const q = searchParams.get('q')?.trim() || ''
+    const mode = searchParams.get('mode')?.trim() || 'place'
     if (q.length < 2) {
       return NextResponse.json({ results: [] })
     }
-    const results = await searchPlaces(q)
+    const results =
+      mode === 'address' ? await searchAddresses(q) : await searchPlaces(q)
     return NextResponse.json({ results })
   } catch (error) {
     console.error('Places search error:', error)

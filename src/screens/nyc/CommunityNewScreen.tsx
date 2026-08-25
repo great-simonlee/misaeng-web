@@ -22,6 +22,7 @@ import {
   FOOD_CATEGORIES,
   FOOD_CUISINES,
   FOOD_GALLERY_MAX,
+  FOOD_MENU_MAX,
   FOOD_PARTY_MAX,
   FOOD_PARTY_MIN,
   FOOD_SPEND_MAX,
@@ -35,6 +36,7 @@ import {
   type FoodCuisineId,
 } from '@lib/community/food'
 import { htmlToPlainText } from '@lib/community/html'
+import { uploadCommunityImageFile } from '@lib/community/upload.client'
 import {
   NYC_COMMUNITY_BOARD_META,
   isAnonymousBoard,
@@ -54,6 +56,7 @@ import {
 } from '@widgets/nyc/BoardPageShell'
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { PlaceSearchField } from '@widgets/nyc/PlaceSearchField'
+import { RestaurantNameField } from '@widgets/nyc/RestaurantNameField'
 
 interface CommunityNewScreenProps {
   boardId: NycCommunityBoardId
@@ -73,8 +76,6 @@ type GalleryDraft = {
   imageUrl: string
   caption: string
 }
-
-const FOOD_MENU_MAX = 8
 
 function createMenuKey() {
   return `menu_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`
@@ -115,12 +116,12 @@ export function CommunityNewScreen({
   const [partySize, setPartySize] = useState('2')
   const [totalSpend, setTotalSpend] = useState('')
   const [waitMinutes, setWaitMinutes] = useState('')
-  const [menuDrafts, setMenuDrafts] = useState<MenuDraft[]>([
-    { key: 'menu_1', imageUrl: '', caption: '' },
-  ])
+  const [menuDrafts, setMenuDrafts] = useState<MenuDraft[]>([])
   const [galleryDrafts, setGalleryDrafts] = useState<GalleryDraft[]>([])
+  const [menuUploading, setMenuUploading] = useState(false)
   const captionRefs = useRef<Record<string, HTMLTextAreaElement | null>>({})
   const pendingFocusKeyRef = useRef<string | null>(null)
+  const menuFileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!editPostId || !user?.uid) return
@@ -159,11 +160,11 @@ export function CommunityNewScreen({
         setWaitMinutes(
           post.waitMinutes != null ? String(post.waitMinutes) : '',
         )
-        if (post.placeId && post.placeName) {
+        if (post.placeId && (post.location || post.placeName)) {
           setSelectedPlace({
             placeId: post.placeId,
-            name: post.placeName,
-            address: post.location || post.placeName,
+            name: post.location?.split(',')[0]?.trim() || post.placeName || '',
+            address: post.location || post.placeName || '',
             latitude: post.latitude,
             longitude: post.longitude,
           })
@@ -218,19 +219,43 @@ export function CommunityNewScreen({
   }
 
   function removeMenuRow(key: string) {
-    setMenuDrafts((prev) =>
-      prev.length <= 1 ? prev : prev.filter((item) => item.key !== key),
-    )
+    setMenuDrafts((prev) => prev.filter((item) => item.key !== key))
   }
 
-  function requestAddMenu() {
-    if (menuDrafts.length >= FOOD_MENU_MAX) {
+  async function handleMenuFilesSelected(files: FileList | null) {
+    if (!files?.length) return
+    const remaining = FOOD_MENU_MAX - menuDrafts.length
+    if (remaining <= 0) {
       toastError(`메뉴는 최대 ${FOOD_MENU_MAX}개까지 등록할 수 있어요`)
       return
     }
-    const key = createMenuKey()
-    pendingFocusKeyRef.current = key
-    setMenuDrafts((prev) => [...prev, { key, imageUrl: '', caption: '' }])
+
+    const selected = Array.from(files).slice(0, remaining)
+    if (files.length > remaining) {
+      toastError(`메뉴는 최대 ${FOOD_MENU_MAX}개까지예요. ${remaining}장만 추가했어요`)
+    }
+
+    setMenuUploading(true)
+    try {
+      const uploaded: MenuDraft[] = []
+      for (const file of selected) {
+        const url = await uploadCommunityImageFile(file)
+        uploaded.push({
+          key: createMenuKey(),
+          imageUrl: url,
+          caption: '',
+        })
+      }
+      if (uploaded.length > 0) {
+        pendingFocusKeyRef.current = uploaded[0].key
+        setMenuDrafts((prev) => [...prev, ...uploaded])
+      }
+    } catch (err) {
+      toastError(getErrorMessage(err, '메뉴 사진 업로드에 실패했어요'))
+    } finally {
+      setMenuUploading(false)
+      if (menuFileInputRef.current) menuFileInputRef.current.value = ''
+    }
   }
 
   function updateGalleryRow(key: string, patch: Partial<GalleryDraft>) {
@@ -285,15 +310,15 @@ export function CommunityNewScreen({
     let detailValue = detail.trim()
 
     if (isFood) {
-      if (!selectedPlace?.name) {
-        toastError('지도에서 식당을 검색해 선택해 주세요')
+      if (!selectedPlace) {
+        toastError('지도에서 주소를 검색해 선택해 주세요')
         return
       }
       if (
         selectedPlace.latitude == null ||
         selectedPlace.longitude == null
       ) {
-        toastError('선택한 장소의 좌표를 확인하지 못했어요')
+        toastError('선택한 주소의 좌표를 확인하지 못했어요')
         return
       }
       if (!foodCategory) {
@@ -336,8 +361,18 @@ export function CommunityNewScreen({
         return
       }
 
+      const incompleteMenu = menuDrafts.find((item) => {
+        const hasImage = Boolean(item.imageUrl.trim())
+        const hasCaption = Boolean(item.caption.trim())
+        return hasImage !== hasCaption
+      })
+      if (incompleteMenu) {
+        toastError('메뉴는 사진과 한 줄 평을 모두 입력해야 등록할 수 있어요')
+        return
+      }
+
       menuItems = menuDrafts
-        .filter((item) => item.imageUrl.trim())
+        .filter((item) => item.imageUrl.trim() && item.caption.trim())
         .map((item, index) => ({
           id: `menu_${index + 1}`,
           imageUrl: item.imageUrl.trim(),
@@ -346,6 +381,7 @@ export function CommunityNewScreen({
 
       galleryPhotos = galleryDrafts
         .filter((item) => item.imageUrl.trim())
+        .slice(0, FOOD_GALLERY_MAX)
         .map((item, index) => ({
           id: `gallery_${index + 1}`,
           imageUrl: item.imageUrl.trim(),
@@ -380,7 +416,7 @@ export function CommunityNewScreen({
         menuItems: isFood ? menuItems : [],
         galleryPhotos: isFood ? galleryPhotos : [],
         placeId: isFood ? selectedPlace?.placeId ?? null : null,
-        placeName: isFood ? selectedPlace?.name ?? null : null,
+        placeName: isFood ? titleValue : null,
         latitude: isFood ? selectedPlace?.latitude ?? null : null,
         longitude: isFood ? selectedPlace?.longitude ?? null : null,
       }
@@ -444,13 +480,14 @@ export function CommunityNewScreen({
             <h2 className='text-[1.25rem] font-semibold tracking-[-0.03em] text-[var(--foreground)]'>
               어디서 먹었어요?
             </h2>
+            <p className='mt-1 text-[13px] text-[var(--muted)]'>
+              정확한 주소를 선택하면 위치가 저장돼요
+            </p>
             <PlaceSearchField
+              mode='address'
               value={selectedPlace}
               onChange={(place) => {
                 setSelectedPlace(place)
-                if (place?.name?.trim()) {
-                  setPostTitle((prev) => prev.trim() || place.name.trim())
-                }
               }}
               className='mt-3'
             />
@@ -458,18 +495,16 @@ export function CommunityNewScreen({
 
           <section className='mt-6'>
             <Field label='음식점 이름' required>
-              <input
-                required
+              <RestaurantNameField
                 value={postTitle}
-                onChange={(e) => setPostTitle(e.target.value)}
-                className={inputClass}
+                onChange={setPostTitle}
+                latitude={selectedPlace?.latitude ?? null}
+                longitude={selectedPlace?.longitude ?? null}
+                placeId={selectedPlace?.placeId ?? null}
+                inputClassName={inputClass}
                 placeholder={meta.titlePlaceholder}
-                maxLength={80}
               />
             </Field>
-            <p className='mt-1.5 text-[12px] text-[var(--muted)]'>
-              목록·상세 페이지에 표시되는 이름이에요
-            </p>
           </section>
 
           <section className='mt-8'>
@@ -597,7 +632,7 @@ export function CommunityNewScreen({
                   가게 내부 · 분위기
                 </h2>
                 <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
-                  인테리어, 좌석, 분위기 사진을 추가해 보세요
+                  인테리어, 좌석, 분위기 사진 · 최대 {FOOD_GALLERY_MAX}장
                 </p>
               </div>
               <p className='shrink-0 pb-0.5 text-[12px] font-medium tabular-nums text-[var(--muted)]'>
@@ -605,45 +640,35 @@ export function CommunityNewScreen({
               </p>
             </div>
 
-            <div className='mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3'>
+            <div className='mt-3 grid grid-cols-4 gap-2'>
               {galleryDrafts.map((item, index) => (
                 <div
                   key={item.key}
-                  className='rounded-2xl bg-white p-2.5 ring-1 ring-black/[0.06]'
+                  className='min-w-0 rounded-xl bg-white p-1.5 ring-1 ring-black/[0.06]'
                 >
-                  <div className='mb-2 flex items-center justify-between gap-2'>
-                    <p className='text-[11px] font-semibold text-[var(--muted)]'>
-                      사진 {index + 1}
-                    </p>
-                    <button
-                      type='button'
-                      onClick={() => removeGalleryRow(item.key)}
-                      className='text-[11px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
-                    >
-                      삭제
-                    </button>
+                  <div className='relative'>
+                    <PhotoUploadZone
+                      compact
+                      className='min-w-0'
+                      src={item.imageUrl || null}
+                      onUploaded={(url) =>
+                        updateGalleryRow(item.key, { imageUrl: url })
+                      }
+                      onRemove={() => removeGalleryRow(item.key)}
+                      emptyLabel={`${index + 1}`}
+                      emptyHint=''
+                      aspectClassName='aspect-square'
+                    />
                   </div>
-                  <PhotoUploadZone
-                    compact
-                    className='min-w-0'
-                    src={item.imageUrl || null}
-                    onUploaded={(url) =>
-                      updateGalleryRow(item.key, { imageUrl: url })
-                    }
-                    onRemove={() => updateGalleryRow(item.key, { imageUrl: '' })}
-                    emptyLabel='사진'
-                    emptyHint=''
-                    aspectClassName='aspect-[4/5]'
-                  />
                   <input
                     type='text'
                     value={item.caption}
                     onChange={(e) =>
                       updateGalleryRow(item.key, { caption: e.target.value })
                     }
-                    maxLength={40}
-                    placeholder='예: 2층 좌석, 카운터'
-                    className='mt-2 w-full rounded-xl border-0 bg-[#f8f9fb] px-3 py-2 text-[12px] outline-none ring-1 ring-black/[0.05] placeholder:text-[var(--muted)] focus:ring-[var(--brand)]/25'
+                    maxLength={24}
+                    placeholder='설명'
+                    className='mt-1.5 w-full rounded-lg border-0 bg-[#f8f9fb] px-1.5 py-1 text-[10px] outline-none ring-1 ring-black/[0.05] placeholder:text-[var(--muted)] focus:ring-[var(--brand)]/25'
                   />
                 </div>
               ))}
@@ -652,13 +677,13 @@ export function CommunityNewScreen({
                 <button
                   type='button'
                   onClick={requestAddGallery}
-                  className='flex min-h-[10.5rem] flex-col items-center justify-center rounded-2xl border border-dashed border-black/[0.12] bg-[#fafbfc] px-3 text-center touch-manipulation transition hover:border-black/20 hover:bg-white'
+                  className='flex aspect-square flex-col items-center justify-center rounded-xl border border-dashed border-black/[0.12] bg-[#fafbfc] px-1 text-center touch-manipulation transition hover:border-black/20 hover:bg-white'
                 >
-                  <span className='text-[24px] leading-none text-[var(--muted)]'>
+                  <span className='text-[18px] leading-none text-[var(--muted)]'>
                     +
                   </span>
-                  <span className='mt-2 text-[12px] font-semibold text-[var(--foreground)]'>
-                    분위기 사진 추가
+                  <span className='mt-1 text-[10px] font-semibold text-[var(--muted-foreground)]'>
+                    추가
                   </span>
                 </button>
               ) : null}
@@ -672,7 +697,7 @@ export function CommunityNewScreen({
                   메뉴 사진
                 </h2>
                 <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
-                  메뉴마다 한 줄 평을 남기고, 사진은 선택해 올려 주세요
+                  사진을 여러 장 선택한 뒤, 각 메뉴에 한 줄 평을 남겨 주세요
                 </p>
               </div>
               <p className='shrink-0 pb-0.5 text-[12px] font-medium tabular-nums text-[var(--muted)]'>
@@ -680,18 +705,52 @@ export function CommunityNewScreen({
               </p>
             </div>
 
-            <div className='mt-3 space-y-2.5'>
-              {menuDrafts.map((item, index) => (
-                <div
-                  key={item.key}
-                  id={`menu-card-${item.key}`}
-                  className='rounded-2xl bg-white p-3 ring-1 ring-black/[0.06]'
-                >
-                  <div className='mb-2.5 flex items-center justify-between gap-2'>
-                    <p className='text-[12px] font-semibold text-[var(--muted)]'>
-                      메뉴 {index + 1}
-                    </p>
-                    {menuDrafts.length > 1 ? (
+            <input
+              ref={menuFileInputRef}
+              type='file'
+              accept='image/*'
+              multiple
+              className='hidden'
+              onChange={(e) => void handleMenuFilesSelected(e.target.files)}
+            />
+
+            {menuDrafts.length < FOOD_MENU_MAX ? (
+              <button
+                type='button'
+                disabled={menuUploading}
+                onClick={() => menuFileInputRef.current?.click()}
+                className='mt-3 flex w-full items-center gap-3 rounded-2xl bg-white px-3.5 py-3.5 text-left ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-[#fff8f5] hover:ring-[var(--brand)]/30 disabled:opacity-60'
+              >
+                <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#fff1ed] text-[var(--brand)]'>
+                  <PlusIcon className='size-3.5' />
+                </span>
+                <span className='min-w-0 flex-1'>
+                  <span className='block text-[13px] font-semibold text-[var(--foreground)]'>
+                    {menuUploading ? '업로드 중…' : '메뉴 사진 여러 장 선택'}
+                  </span>
+                  <span className='mt-0.5 block text-[11px] text-[var(--muted)]'>
+                    최대 {FOOD_MENU_MAX}장 · 사진과 한 줄 평이 모두 필요해요
+                  </span>
+                </span>
+              </button>
+            ) : (
+              <p className='mt-3 rounded-2xl bg-[#f3f4f6] px-4 py-2.5 text-center text-[12px] font-medium text-[var(--muted)]'>
+                메뉴는 최대 {FOOD_MENU_MAX}개까지 등록할 수 있어요
+              </p>
+            )}
+
+            {menuDrafts.length > 0 ? (
+              <div className='mt-3 space-y-2.5'>
+                {menuDrafts.map((item, index) => (
+                  <div
+                    key={item.key}
+                    id={`menu-card-${item.key}`}
+                    className='rounded-2xl bg-white p-3 ring-1 ring-black/[0.06]'
+                  >
+                    <div className='mb-2.5 flex items-center justify-between gap-2'>
+                      <p className='text-[12px] font-semibold text-[var(--muted)]'>
+                        메뉴 {index + 1}
+                      </p>
                       <button
                         type='button'
                         onClick={() => removeMenuRow(item.key)}
@@ -699,72 +758,56 @@ export function CommunityNewScreen({
                       >
                         삭제
                       </button>
+                    </div>
+
+                    <div className='grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]'>
+                      <PhotoUploadZone
+                        compact
+                        className='min-w-0'
+                        src={item.imageUrl || null}
+                        onUploaded={(url) =>
+                          updateMenuRow(item.key, { imageUrl: url })
+                        }
+                        onRemove={() => removeMenuRow(item.key)}
+                        emptyLabel='사진'
+                        emptyHint=''
+                        aspectClassName='aspect-square'
+                      />
+                      <div className='relative flex min-h-0 min-w-0 flex-col'>
+                        <textarea
+                          ref={(el) => {
+                            captionRefs.current[item.key] = el
+                          }}
+                          value={item.caption}
+                          onChange={(e) =>
+                            updateMenuRow(item.key, {
+                              caption: e.target.value,
+                            })
+                          }
+                          maxLength={120}
+                          placeholder='한 줄 평 (필수)'
+                          className={cn(
+                            'h-[6.5rem] w-full resize-none rounded-xl bg-[#f8f8f9] px-3 py-2.5 pb-6 text-[13px] leading-relaxed outline-none ring-1 transition placeholder:text-[var(--muted)] sm:h-[7.5rem] sm:text-[14px]',
+                            item.imageUrl && !item.caption.trim()
+                              ? 'ring-red-300 focus:ring-red-400'
+                              : 'ring-black/[0.05] focus:ring-[var(--brand)]/35',
+                          )}
+                          aria-label={`메뉴 ${index + 1} 한 줄 평`}
+                        />
+                        <span className='pointer-events-none absolute bottom-2 right-2.5 text-[10px] tabular-nums text-[var(--muted)]'>
+                          {item.caption.length}/120
+                        </span>
+                      </div>
+                    </div>
+                    {item.imageUrl && !item.caption.trim() ? (
+                      <p className='mt-2 text-[11px] font-medium text-red-600'>
+                        한 줄 평을 입력해 주세요
+                      </p>
                     ) : null}
                   </div>
-
-                  <div className='grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]'>
-                    <PhotoUploadZone
-                      compact
-                      className='min-w-0'
-                      src={item.imageUrl || null}
-                      onUploaded={(url) =>
-                        updateMenuRow(item.key, { imageUrl: url })
-                      }
-                      onRemove={() =>
-                        updateMenuRow(item.key, { imageUrl: '' })
-                      }
-                      emptyLabel='사진'
-                      emptyHint=''
-                      aspectClassName='aspect-square'
-                    />
-                    <div className='relative flex min-h-0 min-w-0 flex-col'>
-                      <textarea
-                        ref={(el) => {
-                          captionRefs.current[item.key] = el
-                        }}
-                        value={item.caption}
-                        onChange={(e) =>
-                          updateMenuRow(item.key, {
-                            caption: e.target.value,
-                          })
-                        }
-                        maxLength={120}
-                        placeholder='한 줄 평 (예: 칼국수 — 육수 깔끔)'
-                        className='h-[6.5rem] w-full resize-none rounded-xl bg-[#f8f8f9] px-3 py-2.5 pb-6 text-[13px] leading-relaxed outline-none ring-1 ring-black/[0.05] transition placeholder:text-[var(--muted)] focus:ring-[var(--brand)]/35 sm:h-[7.5rem] sm:text-[14px]'
-                        aria-label={`메뉴 ${index + 1} 한 줄 평`}
-                      />
-                      <span className='pointer-events-none absolute bottom-2 right-2.5 text-[10px] tabular-nums text-[var(--muted)]'>
-                        {item.caption.length}/120
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {menuDrafts.length < FOOD_MENU_MAX ? (
-                <button
-                  type='button'
-                  onClick={requestAddMenu}
-                  className='group flex w-full items-center gap-3 rounded-2xl bg-white px-3.5 py-3 text-left ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-[#fff8f5] hover:ring-[var(--brand)]/30 active:scale-[0.995]'
-                >
-                  <span className='inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#fff1ed] text-[var(--brand)]'>
-                    <PlusIcon className='size-3.5' />
-                  </span>
-                  <span className='min-w-0 flex-1'>
-                    <span className='block text-[13px] font-semibold text-[var(--foreground)]'>
-                      다음 메뉴 추가
-                    </span>
-                    <span className='mt-0.5 block text-[11px] text-[var(--muted)]'>
-                      사진 없이도 추가할 수 있어요
-                    </span>
-                  </span>
-                </button>
-              ) : (
-                <p className='rounded-2xl bg-[#f3f4f6] px-4 py-2.5 text-center text-[12px] font-medium text-[var(--muted)]'>
-                  메뉴는 최대 {FOOD_MENU_MAX}개까지 등록할 수 있어요
-                </p>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : null}
           </section>
 
           <section className='mt-8'>
@@ -808,14 +851,17 @@ export function CommunityNewScreen({
                 : !postTitle.trim()
                   ? '음식점 이름을 입력해 주세요'
                   : !selectedPlace
-                    ? '장소를 선택해 주세요'
-                    : !foodCategory
-                      ? '카테고리를 선택해 주세요'
-                      : !foodCuisine
-                        ? '음식을 선택해 주세요'
-                        : isEdit
-                          ? '수정 완료'
-                          : '올리기'}
+                    ? '주소를 선택해 주세요'
+                    : selectedPlace.latitude == null ||
+                        selectedPlace.longitude == null
+                      ? '주소 좌표를 확인 중이에요'
+                      : !foodCategory
+                        ? '카테고리를 선택해 주세요'
+                        : !foodCuisine
+                          ? '음식을 선택해 주세요'
+                          : isEdit
+                            ? '수정 완료'
+                            : '올리기'}
             </button>
           </div>
         </form>

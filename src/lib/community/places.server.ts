@@ -3,7 +3,8 @@ import type { PlaceSearchResult } from '@/types/nyc'
 const NYC_BIAS = {
   lat: 40.758,
   lng: -73.9855,
-  radiusMeters: 35000,
+  /** 브롱스·퀸즈·브루클린·스테이튼 아일랜드까지 커버 */
+  radiusMeters: 45000,
 }
 
 function getGoogleMapsApiKey() {
@@ -18,7 +19,7 @@ export function isGoogleMapsConfigured() {
   return Boolean(getGoogleMapsApiKey())
 }
 
-/** 식당·주소 자동완성 */
+/** 식당·주소 자동완성 (Text Search + Autocomplete 병합) */
 export async function searchPlaces(query: string): Promise<PlaceSearchResult[]> {
   const q = query.trim()
   if (q.length < 2) return []
@@ -26,6 +27,20 @@ export async function searchPlaces(query: string): Promise<PlaceSearchResult[]> 
   const key = getGoogleMapsApiKey()
   if (key) {
     return searchGooglePlaces(q, key)
+  }
+  return searchNominatim(q)
+}
+
+/** 주소만 검색 — 정확한 주소 + 위경도용 */
+export async function searchAddresses(
+  query: string,
+): Promise<PlaceSearchResult[]> {
+  const q = query.trim()
+  if (q.length < 2) return []
+
+  const key = getGoogleMapsApiKey()
+  if (key) {
+    return searchGoogleAddresses(q, key)
   }
   return searchNominatim(q)
 }
@@ -46,9 +61,186 @@ export async function getPlaceDetails(
   return null
 }
 
+/** NYC 맥락이 없으면 쿼리에 New York을 붙여 매칭률을 높임 */
+function withNycContext(query: string) {
+  const lower = query.toLowerCase()
+  if (
+    /\b(ny|nyc|new york|manhattan|brooklyn|queens|bronx|staten)\b/i.test(
+      lower,
+    )
+  ) {
+    return query
+  }
+  return `${query} New York`
+}
+
 async function searchGooglePlaces(
   query: string,
   key: string,
+): Promise<PlaceSearchResult[]> {
+  const contextualQuery = withNycContext(query)
+
+  const [textResults, autocompleteResults] = await Promise.all([
+    searchGoogleText(contextualQuery, key).catch(() => [] as PlaceSearchResult[]),
+    searchGoogleAutocomplete(query, key, null).catch(
+      () => [] as PlaceSearchResult[],
+    ),
+  ])
+
+  // Text Search를 우선 (상호명 매칭이 더 강하고 좌표 포함)
+  return mergePlaceResults(textResults, autocompleteResults).slice(0, 10)
+}
+
+/** 주소 전용: Autocomplete(address) + Geocoding으로 좌표까지 확보 */
+async function searchGoogleAddresses(
+  query: string,
+  key: string,
+): Promise<PlaceSearchResult[]> {
+  const contextualQuery = withNycContext(query)
+
+  const [autocompleteResults, geocodeResults] = await Promise.all([
+    searchGoogleAutocomplete(query, key, 'address').catch(
+      () => [] as PlaceSearchResult[],
+    ),
+    searchGoogleGeocode(contextualQuery, key).catch(
+      () => [] as PlaceSearchResult[],
+    ),
+  ])
+
+  // Geocode 결과를 우선 (주소 + 좌표가 바로 있음)
+  return mergePlaceResults(geocodeResults, autocompleteResults).slice(0, 8)
+}
+
+async function searchGoogleGeocode(
+  query: string,
+  key: string,
+): Promise<PlaceSearchResult[]> {
+  const url = new URL('https://maps.googleapis.com/maps/api/geocode/json')
+  url.searchParams.set('address', query)
+  url.searchParams.set('key', key)
+  url.searchParams.set('language', 'ko')
+  url.searchParams.set('region', 'us')
+  url.searchParams.set(
+    'bounds',
+    `${NYC_BIAS.lat - 0.35},${NYC_BIAS.lng - 0.45}|${NYC_BIAS.lat + 0.35},${NYC_BIAS.lng + 0.45}`,
+  )
+
+  const res = await fetch(url.toString(), { cache: 'no-store' })
+  if (!res.ok) throw new Error('주소 검색에 실패했어요')
+  const data = (await res.json()) as {
+    status?: string
+    error_message?: string
+    results?: Array<{
+      place_id?: string
+      formatted_address?: string
+      geometry?: { location?: { lat?: number; lng?: number } }
+      address_components?: Array<{
+        long_name?: string
+        short_name?: string
+        types?: string[]
+      }>
+    }>
+  }
+  if (data.status && data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+    throw new Error(data.error_message || `Geocoding 오류: ${data.status}`)
+  }
+
+  return (data.results || [])
+    .map((item) => {
+      const placeId = String(item.place_id || '').trim()
+      const address = String(item.formatted_address || '').trim()
+      if (!placeId || !address) return null
+      const lat = Number(item.geometry?.location?.lat)
+      const lng = Number(item.geometry?.location?.lng)
+      const street = item.address_components?.find((c) =>
+        c.types?.includes('route'),
+      )?.long_name
+      const number = item.address_components?.find((c) =>
+        c.types?.includes('street_number'),
+      )?.long_name
+      const name =
+        [number, street].filter(Boolean).join(' ').trim() ||
+        address.split(',')[0]?.trim() ||
+        '주소'
+      return {
+        placeId,
+        name,
+        address,
+        latitude: Number.isFinite(lat) ? lat : null,
+        longitude: Number.isFinite(lng) ? lng : null,
+      } satisfies PlaceSearchResult
+    })
+    .filter((item): item is PlaceSearchResult => Boolean(item))
+}
+
+function mergePlaceResults(
+  primary: PlaceSearchResult[],
+  secondary: PlaceSearchResult[],
+): PlaceSearchResult[] {
+  const seen = new Set<string>()
+  const merged: PlaceSearchResult[] = []
+  for (const item of [...primary, ...secondary]) {
+    const id = item.placeId.trim()
+    if (!id || seen.has(id)) continue
+    seen.add(id)
+    merged.push(item)
+  }
+  return merged
+}
+
+/** 상호명·키워드 검색에 강한 Text Search */
+async function searchGoogleText(
+  query: string,
+  key: string,
+): Promise<PlaceSearchResult[]> {
+  const url = new URL(
+    'https://maps.googleapis.com/maps/api/place/textsearch/json',
+  )
+  url.searchParams.set('query', query)
+  url.searchParams.set('key', key)
+  url.searchParams.set('language', 'ko')
+  url.searchParams.set('region', 'us')
+  url.searchParams.set('location', `${NYC_BIAS.lat},${NYC_BIAS.lng}`)
+  url.searchParams.set('radius', String(NYC_BIAS.radiusMeters))
+
+  const res = await fetch(url.toString(), { cache: 'no-store' })
+  if (!res.ok) throw new Error('장소 검색에 실패했어요')
+  const data = (await res.json()) as {
+    status?: string
+    error_message?: string
+    results?: Array<{
+      place_id?: string
+      name?: string
+      formatted_address?: string
+      geometry?: { location?: { lat?: number; lng?: number } }
+    }>
+  }
+  if (data.status && data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+    throw new Error(data.error_message || `Places 오류: ${data.status}`)
+  }
+
+  return (data.results || [])
+    .map((item) => {
+      const placeId = String(item.place_id || '').trim()
+      if (!placeId) return null
+      const lat = Number(item.geometry?.location?.lat)
+      const lng = Number(item.geometry?.location?.lng)
+      return {
+        placeId,
+        name: String(item.name || '').trim() || '장소',
+        address: String(item.formatted_address || '').trim(),
+        latitude: Number.isFinite(lat) ? lat : null,
+        longitude: Number.isFinite(lng) ? lng : null,
+      } satisfies PlaceSearchResult
+    })
+    .filter((item): item is PlaceSearchResult => Boolean(item))
+}
+
+/** 타이핑 자동완성 */
+async function searchGoogleAutocomplete(
+  query: string,
+  key: string,
+  types: 'address' | null,
 ): Promise<PlaceSearchResult[]> {
   const url = new URL(
     'https://maps.googleapis.com/maps/api/place/autocomplete/json',
@@ -59,6 +251,9 @@ async function searchGooglePlaces(
   url.searchParams.set('components', 'country:us')
   url.searchParams.set('location', `${NYC_BIAS.lat},${NYC_BIAS.lng}`)
   url.searchParams.set('radius', String(NYC_BIAS.radiusMeters))
+  if (types) {
+    url.searchParams.set('types', types)
+  }
 
   const res = await fetch(url.toString(), { cache: 'no-store' })
   if (!res.ok) throw new Error('장소 검색에 실패했어요')
@@ -77,7 +272,7 @@ async function searchGooglePlaces(
   if (data.status && data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
     throw new Error(data.error_message || `Places 오류: ${data.status}`)
   }
-  return (data.predictions || []).slice(0, 6).map((item) => ({
+  return (data.predictions || []).map((item) => ({
     placeId: item.place_id,
     name: item.structured_formatting?.main_text || item.description,
     address:
@@ -129,14 +324,35 @@ async function detailsGooglePlace(
 }
 
 async function searchNominatim(query: string): Promise<PlaceSearchResult[]> {
+  const contextualQuery = withNycContext(query)
+
+  // 1차: NYC viewbox 선호 (강제 제한 X)
+  const preferred = await fetchNominatim(contextualQuery, {
+    viewbox: true,
+    bounded: false,
+  })
+  if (preferred.length > 0) return preferred
+
+  // 2차: viewbox 없이 재시도
+  return fetchNominatim(contextualQuery, { viewbox: false, bounded: false })
+}
+
+async function fetchNominatim(
+  query: string,
+  opts: { viewbox: boolean; bounded: boolean },
+): Promise<PlaceSearchResult[]> {
   const url = new URL('https://nominatim.openstreetmap.org/search')
-  url.searchParams.set('q', `${query}, New York`)
+  url.searchParams.set('q', query)
   url.searchParams.set('format', 'jsonv2')
   url.searchParams.set('addressdetails', '1')
-  url.searchParams.set('limit', '6')
+  url.searchParams.set('limit', '10')
   url.searchParams.set('countrycodes', 'us')
-  url.searchParams.set('viewbox', '-74.3,40.9,-73.7,40.5')
-  url.searchParams.set('bounded', '1')
+  if (opts.viewbox) {
+    url.searchParams.set('viewbox', '-74.35,40.95,-73.65,40.45')
+  }
+  if (opts.bounded) {
+    url.searchParams.set('bounded', '1')
+  }
 
   const res = await fetch(url.toString(), {
     cache: 'no-store',

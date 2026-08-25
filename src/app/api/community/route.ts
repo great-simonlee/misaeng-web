@@ -184,7 +184,7 @@ export async function POST(request: Request) {
     }
     if (latitude == null || longitude == null || !placeName) {
       return NextResponse.json(
-        { error: '지도에서 식당을 검색해 선택해 주세요.' },
+        { error: '주소와 음식점 이름을 확인해 주세요.' },
         { status: 400 },
       )
     }

@@ -9,12 +9,15 @@ type PlaceSearchFieldProps = {
   value: PlaceSearchResult | null
   onChange: (place: PlaceSearchResult | null) => void
   className?: string
+  /** address: 주소·좌표만 / place: 상호·장소 통합 검색 */
+  mode?: 'address' | 'place'
 }
 
 export function PlaceSearchField({
   value,
   onChange,
   className,
+  mode = 'place',
 }: PlaceSearchFieldProps) {
   const listId = useId()
   const [query, setQuery] = useState('')
@@ -68,7 +71,7 @@ export function PlaceSearchField({
       void (async () => {
         try {
           const res = await fetch(
-            `/api/places/search?q=${encodeURIComponent(q)}`,
+            `/api/places/search?q=${encodeURIComponent(q)}&mode=${mode}`,
             { cache: 'no-store', signal: controller.signal },
           )
           if (requestId !== requestIdRef.current) return
@@ -101,12 +104,12 @@ export function PlaceSearchField({
           }
         }
       })()
-    }, 320)
+    }, 220)
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [query])
+  }, [query, mode])
 
   useEffect(() => {
     return () => {
@@ -182,11 +185,21 @@ export function PlaceSearchField({
           <div className='flex items-center gap-3 px-4 py-3.5'>
             <div className='min-w-0 flex-1'>
               <p className='truncate text-[15px] font-semibold tracking-tight text-[var(--foreground)]'>
-                {value.name}
+                {mode === 'address'
+                  ? value.address || value.name
+                  : value.name}
               </p>
-              <p className='mt-0.5 truncate text-[12px] text-[var(--muted)]'>
-                {value.address}
-              </p>
+              {mode === 'address' ? (
+                value.name && value.name !== value.address ? (
+                  <p className='mt-0.5 truncate text-[12px] text-[var(--muted)]'>
+                    {value.name}
+                  </p>
+                ) : null
+              ) : (
+                <p className='mt-0.5 truncate text-[12px] text-[var(--muted)]'>
+                  {value.address}
+                </p>
+              )}
             </div>
             <button
               type='button'
@@ -213,7 +226,11 @@ export function PlaceSearchField({
               onFocus={() => {
                 if (results.length > 0) setOpen(true)
               }}
-              placeholder='식당 이름 또는 주소 검색'
+              placeholder={
+                mode === 'address'
+                  ? '예: 53 W 53rd St, New York'
+                  : '예: Halal Guys, 플러싱 칼국수, West 53rd St'
+              }
               className='h-11 w-full rounded-xl border-0 bg-white py-2.5 pl-10 pr-3.5 text-[15px] outline-none ring-1 ring-black/[0.08] transition placeholder:text-[var(--muted)] focus:ring-black/20'
               autoComplete='off'
               autoCorrect='off'
@@ -245,10 +262,16 @@ export function PlaceSearchField({
                     className='flex w-full flex-col px-3.5 py-2.5 text-left touch-manipulation transition hover:bg-[#f8f9fb] active:bg-[#f3f4f6]'
                   >
                     <span className='truncate text-[14px] font-medium text-[var(--foreground)]'>
-                      {item.name}
+                      {mode === 'address'
+                        ? item.address || item.name
+                        : item.name}
                     </span>
                     <span className='mt-0.5 truncate text-[12px] text-[var(--muted)]'>
-                      {item.address}
+                      {mode === 'address'
+                        ? item.name !== item.address
+                          ? item.name
+                          : '정확한 주소로 선택해 주세요'
+                        : item.address}
                     </span>
                   </button>
                 </li>
@@ -261,11 +284,13 @@ export function PlaceSearchField({
           results.length === 0 &&
           !error ? (
             <p className='mt-2 text-[12px] text-[var(--muted)]'>
-              검색 결과가 없어요. 다른 키워드로 찾아 주세요.
+              검색 결과가 없어요. 영어 주소나 거리명을 더 자세히 넣어 보세요.
             </p>
           ) : null}
           <p className='mt-2 text-[12px] text-[var(--muted)]'>
-            목록에서 장소를 선택해야 글을 올릴 수 있어요.
+            {mode === 'address'
+              ? '주소를 선택하면 위치가 저장돼요.'
+              : '목록에서 장소를 선택해야 글을 올릴 수 있어요.'}
           </p>
         </>
       )}
