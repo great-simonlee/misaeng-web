@@ -15,7 +15,12 @@ import { BottomSheet, LoadingState, PullToRefresh } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { fetchCommunityPosts } from '@lib/community/client'
-import { FOOD_CATEGORIES } from '@lib/community/food'
+import {
+  FOOD_CATEGORIES,
+  FOOD_CUISINES,
+  normalizeFoodCuisine,
+  type FoodCuisineId,
+} from '@lib/community/food'
 import {
   NYC_COMMUNITY_BOARD_META,
   type NycCommunityBoardId,
@@ -25,6 +30,7 @@ import { cn } from '@lib'
 import type { CommunityPost, FoodCategoryId } from '@/types/nyc'
 import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
+import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CommunityPostCard } from '@widgets/nyc/CommunityPostCard'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
@@ -54,9 +60,13 @@ interface CommunityListScreenProps {
 function FoodCategoryStickyBar({
   foodCategory,
   setFoodCategory,
+  foodCuisine,
+  setFoodCuisine,
 }: {
   foodCategory: FoodCategoryId | 'all'
   setFoodCategory: Dispatch<SetStateAction<FoodCategoryId | 'all'>>
+  foodCuisine: FoodCuisineId | 'all'
+  setFoodCuisine: Dispatch<SetStateAction<FoodCuisineId | 'all'>>
 }) {
   const sentinelRef = useRef<HTMLDivElement>(null)
   const barRef = useRef<HTMLDivElement>(null)
@@ -111,17 +121,18 @@ function FoodCategoryStickyBar({
   }, [])
 
   const chips = (
-    <div className='overflow-x-auto overflow-y-hidden scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
-      <div
-        className='flex w-max items-center gap-2'
-        role='listbox'
-        aria-label='맛집 카테고리'
+    <div className='space-y-2'>
+      <ChipScrollRow
+        ariaLabel='맛집 분위기'
+        edgeColor='#f8f8f9'
+        leading={
+          <BoardQuickChip
+            label='전체'
+            active={foodCategory === 'all'}
+            onClick={() => setFoodCategory('all')}
+          />
+        }
       >
-        <BoardQuickChip
-          label='전체'
-          active={foodCategory === 'all'}
-          onClick={() => setFoodCategory('all')}
-        />
         {FOOD_CATEGORIES.map((cat) => (
           <BoardQuickChip
             key={cat.id}
@@ -133,7 +144,27 @@ function FoodCategoryStickyBar({
             }
           />
         ))}
-      </div>
+      </ChipScrollRow>
+      <ChipScrollRow
+        ariaLabel='음식 종류'
+        edgeColor='#f8f8f9'
+        leading={
+          <BoardQuickChip
+            label='음식 전체'
+            active={foodCuisine === 'all'}
+            onClick={() => setFoodCuisine('all')}
+          />
+        }
+      >
+        {FOOD_CUISINES.map((cuisine) => (
+          <BoardQuickChip
+            key={cuisine.id}
+            label={cuisine.label}
+            active={foodCuisine === cuisine.id}
+            onClick={() => setFoodCuisine(cuisine.id)}
+          />
+        ))}
+      </ChipScrollRow>
     </div>
   )
 
@@ -178,10 +209,38 @@ export function CommunityListScreen({
   const [foodCategory, setFoodCategory] = useState<FoodCategoryId | 'all'>(
     'all',
   )
+  const [foodCuisine, setFoodCuisine] = useState<FoodCuisineId | 'all'>('all')
   const [draftQuery, setDraftQuery] = useState('')
   const [draftSort, setDraftSort] = useState<SortOption>('newest')
   const [viewMode, setViewMode] = useState<FoodViewMode>('list')
   const isFoodBoard = boardId === 'food'
+  /** 푸터가 보이면 플로팅 버튼 숨김 (푸터 위로 올리지 않음) */
+  const [mapFabHidden, setMapFabHidden] = useState(false)
+
+  useEffect(() => {
+    if (!isFoodBoard) {
+      setMapFabHidden(false)
+      return
+    }
+
+    const footer = document.querySelector('footer')
+    if (!footer) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setMapFabHidden(entry.isIntersecting)
+      },
+      {
+        root: null,
+        // 푸터가 살짝만 들어와도 버튼이 겹치기 전에 숨김
+        rootMargin: '0px 0px -48px 0px',
+        threshold: 0,
+      },
+    )
+    observer.observe(footer)
+    return () => observer.disconnect()
+  }, [isFoodBoard])
+
 
   const loadPosts = useCallback(
     async (opts?: { silent?: boolean }) => {
@@ -225,6 +284,11 @@ export function CommunityListScreen({
     if (isFoodBoard && foodCategory !== 'all') {
       next = next.filter((post) => post.foodCategory === foodCategory)
     }
+    if (isFoodBoard && foodCuisine !== 'all') {
+      next = next.filter(
+        (post) => normalizeFoodCuisine(post.detail) === foodCuisine,
+      )
+    }
     if (!isFoodBoard && q) {
       next = next.filter((post) => {
         const haystack = [
@@ -241,7 +305,7 @@ export function CommunityListScreen({
     return [...next].sort((a, b) =>
       sort === 'newest' ? b.createdAt - a.createdAt : a.createdAt - b.createdAt,
     )
-  }, [posts, query, sort, foodCategory, isFoodBoard])
+  }, [posts, query, sort, foodCategory, foodCuisine, isFoodBoard])
 
   /** 지도: 실데이터 + 복수 후기 목데이터(같은 placeId)를 합쳐 핀 데모 */
   const mapPosts = useMemo(() => {
@@ -254,8 +318,13 @@ export function CommunityListScreen({
     if (foodCategory !== 'all') {
       merged = merged.filter((post) => post.foodCategory === foodCategory)
     }
+    if (foodCuisine !== 'all') {
+      merged = merged.filter(
+        (post) => normalizeFoodCuisine(post.detail) === foodCuisine,
+      )
+    }
     return merged.sort((a, b) => b.createdAt - a.createdAt)
-  }, [filteredPosts, foodCategory, isFoodBoard])
+  }, [filteredPosts, foodCategory, foodCuisine, isFoodBoard])
 
   const activeFilterCount =
     (query.trim() ? 1 : 0) + (sort !== 'newest' ? 1 : 0)
@@ -309,8 +378,8 @@ export function CommunityListScreen({
               ? canWrite
                 ? '첫 글을 올려 커뮤니티를 시작해 보세요.'
                 : '로그인 후 글을 올릴 수 있어요.'
-              : isFoodBoard
-                ? '다른 카테고리를 선택해 보세요.'
+                : isFoodBoard
+                ? '다른 분위기·음식 종류를 선택해 보세요.'
                 : '필터를 바꿔 다시 찾아 보세요.'
           }
           actionHref={
@@ -374,6 +443,8 @@ export function CommunityListScreen({
         <FoodCategoryStickyBar
           foodCategory={foodCategory}
           setFoodCategory={setFoodCategory}
+          foodCuisine={foodCuisine}
+          setFoodCuisine={setFoodCuisine}
         />
       ) : null}
 
@@ -403,13 +474,23 @@ export function CommunityListScreen({
       )}
 
       {isFoodBoard ? (
-        <div className='pointer-events-none fixed inset-x-0 bottom-0 z-[95] flex justify-center pb-[max(1.25rem,env(safe-area-inset-bottom))]'>
+        <div
+          className={cn(
+            'pointer-events-none fixed inset-x-0 bottom-0 z-[95] flex justify-center pb-[max(1.25rem,env(safe-area-inset-bottom))] transition duration-200 ease-out',
+            mapFabHidden
+              ? 'translate-y-3 opacity-0'
+              : 'translate-y-0 opacity-100',
+          )}
+          aria-hidden={mapFabHidden}
+        >
           <button
             type='button'
+            tabIndex={mapFabHidden ? -1 : 0}
+            disabled={mapFabHidden}
             onClick={() =>
               setViewMode((mode) => (mode === 'list' ? 'map' : 'list'))
             }
-            className='pointer-events-auto inline-flex h-12 items-center gap-2 rounded-full bg-white px-5 text-[14px] font-semibold text-[var(--foreground)] shadow-[0_4px_6px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.14)] ring-1 ring-black/[0.06] touch-manipulation transition hover:bg-[#fafbfc] active:scale-[0.98]'
+            className='pointer-events-auto inline-flex h-12 items-center gap-2 rounded-full bg-white px-5 text-[14px] font-semibold text-[var(--foreground)] shadow-[0_4px_6px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.14)] ring-1 ring-black/[0.06] touch-manipulation transition hover:bg-[#fafbfc] active:scale-[0.98] disabled:pointer-events-none'
             aria-label={viewMode === 'list' ? '지도로 보기' : '리스트로 보기'}
           >
             {viewMode === 'list' ? (

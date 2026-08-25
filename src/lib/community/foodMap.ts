@@ -14,13 +14,46 @@ export type FoodMapPin = {
   posts: CommunityPost[]
 }
 
-function hasValidCoords(post: CommunityPost) {
+function hasValidCoords(post: Pick<CommunityPost, 'latitude' | 'longitude'>) {
   const { latitude: lat, longitude: lng } = post
   if (lat == null || lng == null) return false
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false
   if (lat === 0 && lng === 0) return false
   if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return false
   return true
+}
+
+export function hasFoodMapCoords(
+  post: Pick<CommunityPost, 'latitude' | 'longitude'>,
+) {
+  return hasValidCoords(post)
+}
+
+export type FoodPlacePoint = {
+  name: string
+  address: string
+  latitude: number
+  longitude: number
+}
+
+/** 상세 페이지용 단일 식당 좌표 */
+export function resolveFoodPlacePoint(
+  post: Pick<
+    CommunityPost,
+    'latitude' | 'longitude' | 'placeName' | 'title' | 'location'
+  >,
+): FoodPlacePoint | null {
+  if (!hasValidCoords(post)) return null
+  return {
+    name:
+      post.placeName?.trim() ||
+      post.title?.trim() ||
+      post.location?.trim() ||
+      '맛집',
+    address: post.location?.trim() || '',
+    latitude: post.latitude as number,
+    longitude: post.longitude as number,
+  }
 }
 
 function pinKey(post: CommunityPost) {

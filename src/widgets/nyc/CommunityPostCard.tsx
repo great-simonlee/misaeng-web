@@ -6,6 +6,8 @@ import {
   formatFoodPartySpend,
   formatFoodWait,
   getFoodCategory,
+  getFoodCuisineLabel,
+  normalizeFoodCuisine,
   resolveCommunityThumbnail,
 } from '@lib/community/food'
 import {
@@ -47,9 +49,13 @@ function FoodListingCard({
   const anonymous = isAnonymousBoard(boardId)
   const thumbnail = resolveCommunityThumbnail(post)
   const foodCategory = getFoodCategory(post.foodCategory)
+  const cuisineLabel = getFoodCuisineLabel(normalizeFoodCuisine(post.detail))
   const foodSpend = formatFoodPartySpend(post.partySize, post.totalSpend)
   const foodWait = formatFoodWait(post.waitMinutes)
   const metaChips = [
+    cuisineLabel ? (
+      <FoodOverlayChip key='cuisine'>{cuisineLabel}</FoodOverlayChip>
+    ) : null,
     anonymous ? (
       <FoodOverlayChip key='anon'>익명</FoodOverlayChip>
     ) : null,
@@ -122,12 +128,6 @@ function FoodListingCard({
             <p className='mt-1.5 flex items-center gap-1 text-[13px] font-medium text-[var(--muted-foreground)]'>
               <LocationIcon className='size-3.5 shrink-0 opacity-70' />
               <span className='truncate'>{post.location}</span>
-              {post.detail ? (
-                <>
-                  <span className='text-black/15'>·</span>
-                  <span className='truncate'>{post.detail}</span>
-                </>
-              ) : null}
             </p>
           ) : null}
 

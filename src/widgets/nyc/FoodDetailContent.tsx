@@ -1,6 +1,9 @@
 'use client'
 
-import { SchoolBadge } from '@components'
+import dynamic from 'next/dynamic'
+import { useMemo, useState } from 'react'
+
+import { PhotoLightbox, SchoolBadge, type PhotoLightboxItem } from '@components'
 import {
   formatCommunityCount,
   formatCommunityRelativeTime,
@@ -8,7 +11,9 @@ import {
 import {
   buildFoodDetailCarouselSlides,
   formatUsd,
+  getFoodCuisineLabel,
 } from '@lib/community/food'
+import { resolveFoodPlacePoint } from '@lib/community/foodMap'
 import { isAnonymousBoard, type NycCommunityBoardId } from '@lib/constants/nyc'
 import type { CommunityPost } from '@/types/nyc'
 import { FoodCategoryBadge } from '@widgets/nyc/FoodCategoryBadge'
@@ -16,12 +21,29 @@ import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
 import { FoodDetailHeroCarousel } from '@widgets/nyc/FoodDetailHeroCarousel'
 
+const FoodPlaceMap = dynamic(
+  () =>
+    import('@widgets/nyc/FoodPlaceMap').then((mod) => mod.FoodPlaceMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className='h-48 animate-pulse rounded-2xl bg-[#e8eaee] sm:h-56' />
+    ),
+  },
+)
+
 type FoodDetailContentProps = {
   post: CommunityPost
   boardId: NycCommunityBoardId
   boardTitle: string
   isAuthor: boolean
   onDelete: () => void
+}
+
+type LightboxState = {
+  items: PhotoLightboxItem[]
+  index: number
+  eyebrow?: string
 }
 
 export function FoodDetailContent({
@@ -35,6 +57,42 @@ export function FoodDetailContent({
   const slides = buildFoodDetailCarouselSlides(post)
   const bodyHtml = post.contentHtml || `<p>${post.description}</p>`
   const menuItems = post.menuItems || []
+  const galleryPhotos = post.galleryPhotos || []
+  const [lightbox, setLightbox] = useState<LightboxState | null>(null)
+
+  const menuLightboxItems = useMemo<PhotoLightboxItem[]>(
+    () =>
+      menuItems
+        .filter((item) => item.imageUrl?.trim())
+        .map((item) => ({
+          id: item.id,
+          imageUrl: item.imageUrl,
+          caption: item.caption,
+        })),
+    [menuItems],
+  )
+
+  const galleryLightboxItems = useMemo<PhotoLightboxItem[]>(
+    () =>
+      galleryPhotos
+        .filter((item) => item.imageUrl?.trim())
+        .map((item) => ({
+          id: item.id,
+          imageUrl: item.imageUrl,
+          caption: item.caption,
+        })),
+    [galleryPhotos],
+  )
+
+  const carouselLightboxItems = useMemo<PhotoLightboxItem[]>(
+    () =>
+      slides.map((slide) => ({
+        id: slide.id,
+        imageUrl: slide.imageUrl,
+        caption: slide.label,
+      })),
+    [slides],
+  )
 
   const partySize =
     post.partySize != null && post.partySize > 0 ? post.partySize : null
@@ -48,28 +106,59 @@ export function FoodDetailContent({
       : null
 
   const shortAddress = shortenAddress(post.location)
-  const locationLine = [shortAddress, post.detail].filter(Boolean).join(' · ')
+  const cuisineLabel = getFoodCuisineLabel(post.detail)
+  const locationLine = shortAddress
+  const placePoint = useMemo(() => resolveFoodPlacePoint(post), [post])
+
+  function openMenuLightbox(index: number) {
+    if (menuLightboxItems.length === 0) return
+    setLightbox({
+      items: menuLightboxItems,
+      index,
+      eyebrow: '메뉴',
+    })
+  }
+
+  function openGalleryLightbox(index: number) {
+    if (galleryLightboxItems.length === 0) return
+    setLightbox({
+      items: galleryLightboxItems,
+      index,
+      eyebrow: '가게 내부',
+    })
+  }
+
+  function openCarouselLightbox(index: number) {
+    if (carouselLightboxItems.length === 0) return
+    setLightbox({
+      items: carouselLightboxItems,
+      index,
+    })
+  }
 
   return (
     <article>
-      {/* 히어로 */}
       <div className='-mx-4 sm:mx-0 sm:overflow-hidden sm:rounded-[1.25rem]'>
         <FoodDetailHeroCarousel
           slides={slides}
           backHref={`/nyc/${boardId}`}
           backLabel={`${boardTitle} 목록`}
+          onSlideOpen={openCarouselLightbox}
         />
       </div>
 
-      {/* 본문 */}
       <div className='mt-5 px-1 sm:mt-7 sm:px-0'>
-        {/* 메타 */}
         <div className='flex flex-wrap items-center gap-2'>
           <FoodCategoryBadge
             categoryId={post.foodCategory}
             variant='soft'
             size='md'
           />
+          {cuisineLabel ? (
+            <span className='inline-flex items-center rounded-full bg-[#f1f2f4] px-2.5 py-1 text-[12px] font-semibold text-[var(--muted-foreground)]'>
+              {cuisineLabel}
+            </span>
+          ) : null}
           {!anonymous ? <SchoolBadge schoolId={post.authorSchoolId} /> : null}
         </div>
 
@@ -90,7 +179,6 @@ export function FoodDetailContent({
           </p>
         ) : null}
 
-        {/* 방문 정보 */}
         {(partySize || totalSpend != null || waitMinutes != null) && (
           <div className='mt-5 grid grid-cols-3 overflow-hidden rounded-2xl bg-[#f4f5f7]'>
             <MetricCell
@@ -117,31 +205,83 @@ export function FoodDetailContent({
           </div>
         )}
 
-        {/* 메뉴 */}
+        {placePoint ? (
+          <section className='mt-8'>
+            <SectionLabel>위치</SectionLabel>
+            <div className='mt-4'>
+              <FoodPlaceMap place={placePoint} />
+            </div>
+          </section>
+        ) : null}
+
         {menuItems.length > 0 ? (
           <section className='mt-8'>
             <SectionLabel>메뉴</SectionLabel>
             <ul className='mt-4 divide-y divide-black/[0.06]'>
-              {menuItems.map((item) => (
-                <li key={item.id} className='flex gap-4 py-4 first:pt-0 last:pb-0'>
-                  <div className='h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[#e8eaee] sm:h-24 sm:w-24'>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.imageUrl}
-                      alt=''
-                      className='h-full w-full object-cover'
-                    />
-                  </div>
-                  <p className='min-w-0 flex-1 self-center text-[14px] leading-[1.55] text-[var(--foreground)] sm:text-[15px]'>
-                    {item.caption || '한 줄 평이 없어요'}
-                  </p>
-                </li>
-              ))}
+              {menuItems.map((item, index) => {
+                const lightboxIndex = menuLightboxItems.findIndex(
+                  (entry) => entry.id === item.id,
+                )
+                return (
+                  <li
+                    key={item.id}
+                    className='flex gap-4 py-4 first:pt-0 last:pb-0'
+                  >
+                    {item.imageUrl?.trim() ? (
+                      <button
+                        type='button'
+                        onClick={() =>
+                          openMenuLightbox(
+                            lightboxIndex >= 0 ? lightboxIndex : index,
+                          )
+                        }
+                        className='h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[#e8eaee] touch-manipulation transition hover:opacity-90 sm:h-24 sm:w-24'
+                        aria-label='메뉴 사진 크게 보기'
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={item.imageUrl}
+                          alt=''
+                          className='h-full w-full object-cover'
+                        />
+                      </button>
+                    ) : (
+                      <div className='h-20 w-20 shrink-0 rounded-xl bg-[#e8eaee] sm:h-24 sm:w-24' />
+                    )}
+                    <p className='min-w-0 flex-1 self-center text-[14px] leading-[1.55] text-[var(--foreground)] sm:text-[15px]'>
+                      {item.caption || '한 줄 평이 없어요'}
+                    </p>
+                  </li>
+                )
+              })}
             </ul>
           </section>
         ) : null}
 
-        {/* 후기 */}
+        {galleryLightboxItems.length > 0 ? (
+          <section className='mt-8'>
+            <SectionLabel>가게 내부 · 분위기</SectionLabel>
+            <div className='mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5'>
+              {galleryLightboxItems.map((item, index) => (
+                <button
+                  key={item.id}
+                  type='button'
+                  onClick={() => openGalleryLightbox(index)}
+                  className='aspect-square overflow-hidden rounded-xl bg-[#e8eaee] touch-manipulation transition hover:opacity-90'
+                  aria-label='분위기 사진 크게 보기'
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.imageUrl}
+                    alt=''
+                    className='h-full w-full object-cover'
+                  />
+                </button>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         <section className='mt-8'>
           <SectionLabel>후기</SectionLabel>
           <CommunityRichBody
@@ -151,7 +291,6 @@ export function FoodDetailContent({
         </section>
       </div>
 
-      {/* 작성자 · 반응 */}
       <div className='mt-8'>
         <CommunityPostFooter
           post={post}
@@ -162,6 +301,17 @@ export function FoodDetailContent({
           onDelete={onDelete}
         />
       </div>
+
+      <PhotoLightbox
+        open={Boolean(lightbox)}
+        items={lightbox?.items ?? []}
+        index={lightbox?.index ?? 0}
+        eyebrow={lightbox?.eyebrow}
+        onClose={() => setLightbox(null)}
+        onIndexChange={(next) =>
+          setLightbox((prev) => (prev ? { ...prev, index: next } : prev))
+        }
+      />
     </article>
   )
 }

@@ -169,8 +169,13 @@ export function CommunityDetailScreen({
   return (
     <PullToRefresh onRefresh={refreshPost}>
       <BoardPageShell width='narrow'>
-        <div className={isFood ? 'pb-16 sm:pb-20' : 'pb-16 pt-5 sm:pb-20 sm:pt-7'}>
-          {isFood ? (
+        <div
+          className={
+            isFood
+              ? 'pb-16 pt-0 sm:pb-20 sm:pt-6 lg:pt-8'
+              : 'pb-16 pt-5 sm:pb-20 sm:pt-7'
+          }
+        >          {isFood ? (
             <FoodDetailContent
               post={post}
               boardId={boardId}
