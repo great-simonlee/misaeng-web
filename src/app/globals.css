@@ -296,6 +296,12 @@ body {
   pointer-events: none;
 }
 
+/* Leaflet DivIcon 기본 흰 박스 제거 (맛집 지도 핀) */
+.leaflet-div-icon.food-map-pin {
+  background: transparent;
+  border: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .misaeng-spinner-orbit,
   .misaeng-ptr-orbit {

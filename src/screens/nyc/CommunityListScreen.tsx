@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import {
   useCallback,
   useEffect,
@@ -19,6 +20,7 @@ import {
   NYC_COMMUNITY_BOARD_META,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
+import { listMockCommunityPosts } from '@lib/constants/communityMock'
 import { cn } from '@lib'
 import type { CommunityPost, FoodCategoryId } from '@/types/nyc'
 import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
@@ -27,7 +29,21 @@ import { CommunityPostCard } from '@widgets/nyc/CommunityPostCard'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 
+const FoodPostsMap = dynamic(
+  () =>
+    import('@widgets/nyc/FoodPostsMap').then((mod) => mod.FoodPostsMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className='flex h-full items-center justify-center bg-[#e8eaee]'>
+        <LoadingState label='지도를 불러오는 중…' />
+      </div>
+    ),
+  },
+)
+
 type SortOption = 'newest' | 'oldest'
+type FoodViewMode = 'list' | 'map'
 
 interface CommunityListScreenProps {
   boardId: NycCommunityBoardId
@@ -164,6 +180,7 @@ export function CommunityListScreen({
   )
   const [draftQuery, setDraftQuery] = useState('')
   const [draftSort, setDraftSort] = useState<SortOption>('newest')
+  const [viewMode, setViewMode] = useState<FoodViewMode>('list')
   const isFoodBoard = boardId === 'food'
 
   const loadPosts = useCallback(
@@ -226,6 +243,20 @@ export function CommunityListScreen({
     )
   }, [posts, query, sort, foodCategory, isFoodBoard])
 
+  /** 지도: 실데이터 + 복수 후기 목데이터(같은 placeId)를 합쳐 핀 데모 */
+  const mapPosts = useMemo(() => {
+    if (!isFoodBoard) return filteredPosts
+    const mocks = listMockCommunityPosts('food')
+    const byId = new Map<string, CommunityPost>()
+    for (const post of mocks) byId.set(post.id, post)
+    for (const post of filteredPosts) byId.set(post.id, post)
+    let merged = Array.from(byId.values())
+    if (foodCategory !== 'all') {
+      merged = merged.filter((post) => post.foodCategory === foodCategory)
+    }
+    return merged.sort((a, b) => b.createdAt - a.createdAt)
+  }, [filteredPosts, foodCategory, isFoodBoard])
+
   const activeFilterCount =
     (query.trim() ? 1 : 0) + (sort !== 'newest' ? 1 : 0)
 
@@ -252,7 +283,7 @@ export function CommunityListScreen({
   const postHref = canWrite ? newPath : loginNext
 
   const listSection = (
-    <section className='pb-14 pt-4 sm:pb-16 sm:pt-5'>
+    <section className={cn('pt-4 sm:pt-5', isFoodBoard ? 'pb-20 sm:pb-24' : 'pb-14 sm:pb-16')}>
       {loading && (
         <LoadingState className='py-20' label='글을 불러오는 중이에요…' />
       )}
@@ -346,7 +377,55 @@ export function CommunityListScreen({
         />
       ) : null}
 
-      <PullToRefresh onRefresh={refreshPosts}>{listSection}</PullToRefresh>
+      {isFoodBoard && viewMode === 'map' ? (
+        <section className='relative mt-3 pb-[5.5rem]'>
+          {loading ? (
+            <div className='flex h-[min(70vh,calc(100dvh-14rem))] items-center justify-center rounded-2xl bg-[#e8eaee]'>
+              <LoadingState label='글을 불러오는 중이에요…' />
+            </div>
+          ) : error ? (
+            <EmptyState
+              title='목록을 불러오지 못했어요'
+              description={error}
+              actionHref={`/nyc/${boardId}`}
+              actionLabel='다시 시도'
+            />
+          ) : (
+            <FoodPostsMap
+              posts={mapPosts}
+              boardId={boardId}
+              className='h-[min(72vh,calc(100dvh-13rem))] rounded-2xl ring-1 ring-black/[0.05]'
+            />
+          )}
+        </section>
+      ) : (
+        <PullToRefresh onRefresh={refreshPosts}>{listSection}</PullToRefresh>
+      )}
+
+      {isFoodBoard ? (
+        <div className='pointer-events-none fixed inset-x-0 bottom-0 z-[95] flex justify-center pb-[max(1.25rem,env(safe-area-inset-bottom))]'>
+          <button
+            type='button'
+            onClick={() =>
+              setViewMode((mode) => (mode === 'list' ? 'map' : 'list'))
+            }
+            className='pointer-events-auto inline-flex h-12 items-center gap-2 rounded-full bg-white px-5 text-[14px] font-semibold text-[var(--foreground)] shadow-[0_4px_6px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.14)] ring-1 ring-black/[0.06] touch-manipulation transition hover:bg-[#fafbfc] active:scale-[0.98]'
+            aria-label={viewMode === 'list' ? '지도로 보기' : '리스트로 보기'}
+          >
+            {viewMode === 'list' ? (
+              <>
+                <MapIcon className='size-4 text-[var(--brand)]' />
+                지도
+              </>
+            ) : (
+              <>
+                <ListIcon className='size-4 text-[var(--brand)]' />
+                리스트
+              </>
+            )}
+          </button>
+        </div>
+      ) : null}
 
       {!isFoodBoard ? (
         <BottomSheet
@@ -419,5 +498,45 @@ export function CommunityListScreen({
         </BottomSheet>
       ) : null}
     </BoardPageShell>
+  )
+}
+
+function MapIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='1.9'
+      className={className}
+      aria-hidden
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M9 4.5 3.75 6.75v12.75L9 17.25l6 2.25 5.25-2.25V4.5L15 6.75 9 4.5Z'
+      />
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M9 4.5v12.75M15 6.75v12.75'
+      />
+    </svg>
+  )
+}
+
+function ListIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='1.9'
+      className={className}
+      aria-hidden
+    >
+      <path strokeLinecap='round' d='M8 7h12M8 12h12M8 17h12' />
+      <path strokeLinecap='round' d='M4 7h.01M4 12h.01M4 17h.01' />
+    </svg>
   )
 }
