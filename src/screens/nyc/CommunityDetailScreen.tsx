@@ -32,6 +32,7 @@ import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 import { CommunityCommentsSection } from '@widgets/nyc/CommunityCommentsSection'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
 import { FoodDetailContent } from '@widgets/nyc/FoodDetailContent'
+import { CptOptDetailContent } from '@widgets/nyc/CptOptDetailContent'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 
 interface CommunityDetailScreenProps {
@@ -151,6 +152,7 @@ export function CommunityDetailScreen({
   const isAuthor = user?.uid === post.authorUid && !post.id.startsWith('mock-')
   const anonymous = isAnonymousBoard(boardId)
   const isFood = boardId === 'food'
+  const isCptOpt = boardId === 'cpt-opt'
   const bodyHtml = post.contentHtml || `<p>${post.description}</p>`
   const tone = boardToneForId(boardId)
   const metaBits = [
@@ -171,12 +173,27 @@ export function CommunityDetailScreen({
       <BoardPageShell width='narrow'>
         <div
           className={
-            isFood
+            isFood || isCptOpt
               ? 'pb-16 pt-0 sm:pb-20 sm:pt-6 lg:pt-8'
               : 'pb-16 pt-5 sm:pb-20 sm:pt-7'
           }
-        >          {isFood ? (
+        >
+          <BoardBackLink
+            href={`/nyc/${boardId}`}
+            label={`${title} 목록`}
+            className={isFood || isCptOpt ? 'mb-4 px-1 sm:px-0' : 'mb-4'}
+          />
+
+          {isFood ? (
             <FoodDetailContent
+              post={post}
+              boardId={boardId}
+              boardTitle={title}
+              isAuthor={isAuthor}
+              onDelete={() => void handleDelete()}
+            />
+          ) : isCptOpt ? (
+            <CptOptDetailContent
               post={post}
               boardId={boardId}
               boardTitle={title}
@@ -185,12 +202,6 @@ export function CommunityDetailScreen({
             />
           ) : (
             <>
-              <BoardBackLink
-                href={`/nyc/${boardId}`}
-                label={`${title} 목록`}
-                className='mb-4'
-              />
-
               <BoardSurface as='article' className='overflow-hidden'>
                 <div className='border-b border-black/[0.04] bg-gradient-to-b from-white to-[#fafbfc] px-5 py-5 sm:px-8 sm:py-7'>
                   <div className='flex flex-wrap items-center gap-2'>

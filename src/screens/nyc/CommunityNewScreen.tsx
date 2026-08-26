@@ -60,6 +60,7 @@ import {
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { PlaceSearchField } from '@widgets/nyc/PlaceSearchField'
 import { RestaurantNameField } from '@widgets/nyc/RestaurantNameField'
+import { CptOptWriteScreen } from '@screens/nyc/CptOptWriteScreen'
 
 interface CommunityNewScreenProps {
   boardId: NycCommunityBoardId
@@ -102,6 +103,10 @@ export function CommunityNewScreen({
   title,
   editPostId,
 }: CommunityNewScreenProps) {
+  if (boardId === 'cpt-opt') {
+    return <CptOptWriteScreen title={title} editPostId={editPostId} />
+  }
+
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const isEdit = Boolean(editPostId)
   const loginNext = editPostId
@@ -122,7 +127,6 @@ export function CommunityNewScreen({
   const [selectedPlace, setSelectedPlace] = useState<PlaceSearchResult | null>(
     null,
   )
-  const [thumbnailUrl, setThumbnailUrl] = useState('')
   const [foodCategory, setFoodCategory] = useState<FoodCategoryId | null>(null)
   const [foodCuisine, setFoodCuisine] = useState<FoodCuisineId | null>(null)
   const [partySize, setPartySize] = useState('2')
@@ -175,7 +179,6 @@ export function CommunityNewScreen({
         setContentHtml(post.contentHtml)
         setLocation(post.location)
         setDetail(post.detail)
-        setThumbnailUrl(post.thumbnailUrl || '')
         setFoodCategory(post.foodCategory)
         setFoodCuisine(normalizeFoodCuisine(post.detail))
         setPartySize(
@@ -429,7 +432,7 @@ export function CommunityNewScreen({
     let waitMinutesNum: number | null = null
     let menuItems: FoodMenuItem[] = []
     let galleryPhotos: CommunityPost['galleryPhotos'] = []
-    let thumb = thumbnailUrl.trim() || null
+    let thumb: string | null = null
     let locationValue = location.trim()
     let titleValue = postTitle.trim()
     let detailValue = detail.trim()
@@ -520,9 +523,8 @@ export function CommunityNewScreen({
           caption: '',
         }))
 
-      if (!thumb && menuItems[0]?.imageUrl) {
-        thumb = menuItems[0].imageUrl
-      }
+      // 대표 사진은 첫 번째 메뉴 사진을 자동 사용
+      thumb = menuItems[0]?.imageUrl?.trim() || null
 
       titleValue = postTitle.trim()
       locationValue =
@@ -739,28 +741,6 @@ export function CommunityNewScreen({
             <div className='flex items-end justify-between gap-3'>
               <div>
                 <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                  대표 사진
-                </h2>
-                <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
-                  목록 카드에 크게 보여요
-                </p>
-              </div>
-            </div>
-            <PhotoUploadZone
-              className='mt-3 w-full sm:max-w-[18rem]'
-              src={thumbnailUrl || null}
-              onUploaded={setThumbnailUrl}
-              onRemove={() => setThumbnailUrl('')}
-              emptyLabel='대표 사진 추가'
-              emptyHint='맛있는 한 컷을 올려 주세요'
-              aspectClassName='aspect-[4/3]'
-            />
-          </section>
-
-          <section className='mt-8'>
-            <div className='flex items-end justify-between gap-3'>
-              <div>
-                <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
                   가게 내부 · 분위기
                 </h2>
                 <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
@@ -875,6 +855,15 @@ export function CommunityNewScreen({
               </p>
             </div>
 
+            <div className='mt-3 rounded-xl bg-[#fff8f5] px-3.5 py-2.5 ring-1 ring-[var(--brand)]/15'>
+              <p className='text-[12px] font-semibold text-[var(--brand)]'>
+                첫 번째 메뉴 사진이 대표 사진으로 등록돼요
+              </p>
+              <p className='mt-0.5 text-[11px] leading-relaxed text-[var(--muted)]'>
+                목록 카드와 상세 상단에 첫 번째 메뉴 사진이 크게 보여요.
+              </p>
+            </div>
+
             <input
               ref={menuFileInputRef}
               type='file'
@@ -899,7 +888,7 @@ export function CommunityNewScreen({
                     메뉴 사진 여러 장 선택
                   </span>
                   <span className='mt-0.5 block text-[11px] text-[var(--muted)]'>
-                    최대 {FOOD_MENU_MAX}장 · 사진·이름·한 줄 평이 모두 필요해요
+                    최대 {FOOD_MENU_MAX}장 · 첫 장이 대표 사진 · 이름·한 줄 평 필수
                   </span>
                 </span>
               </button>
@@ -908,6 +897,7 @@ export function CommunityNewScreen({
             {menuDrafts.length > 0 || menuPendingCount > 0 ? (
               <div className='mt-3 space-y-2.5'>
                 {menuDrafts.map((item, index) => {
+                  const isCover = index === 0
                   const missingName =
                     Boolean(item.imageUrl) && !item.name.trim()
                   const missingCaption =
@@ -916,12 +906,23 @@ export function CommunityNewScreen({
                     <div
                       key={item.key}
                       id={`menu-card-${item.key}`}
-                      className='rounded-2xl bg-white p-3 ring-1 ring-black/[0.06]'
+                      className={
+                        isCover
+                          ? 'rounded-2xl bg-white p-3 ring-1 ring-[var(--brand)]/25'
+                          : 'rounded-2xl bg-white p-3 ring-1 ring-black/[0.06]'
+                      }
                     >
                       <div className='mb-2.5 flex items-center justify-between gap-2'>
-                        <p className='text-[12px] font-semibold text-[var(--muted)]'>
-                          메뉴 {index + 1}
-                        </p>
+                        <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
+                          <p className='text-[12px] font-semibold text-[var(--muted)]'>
+                            메뉴 {index + 1}
+                          </p>
+                          {isCover ? (
+                            <span className='inline-flex rounded-full bg-[#fff8f5] px-2 py-0.5 text-[10px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
+                              대표 사진
+                            </span>
+                          ) : null}
+                        </div>
                         <button
                           type='button'
                           onClick={() => removeMenuRow(item.key)}
@@ -932,17 +933,24 @@ export function CommunityNewScreen({
                       </div>
 
                       <div className='grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]'>
-                        <PhotoUploadZone
-                          compact
-                          className='min-w-0'
-                          src={item.imageUrl || null}
-                          onUploaded={(url) =>
-                            updateMenuRow(item.key, { imageUrl: url })
-                          }
-                          emptyLabel='사진'
-                          emptyHint=''
-                          aspectClassName='aspect-square'
-                        />
+                        <div className='relative min-w-0'>
+                          <PhotoUploadZone
+                            compact
+                            className='min-w-0'
+                            src={item.imageUrl || null}
+                            onUploaded={(url) =>
+                              updateMenuRow(item.key, { imageUrl: url })
+                            }
+                            emptyLabel='사진'
+                            emptyHint=''
+                            aspectClassName='aspect-square'
+                          />
+                          {isCover && item.imageUrl ? (
+                            <span className='pointer-events-none absolute left-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[9px] font-semibold text-white backdrop-blur-sm'>
+                              대표
+                            </span>
+                          ) : null}
+                        </div>
                         <div className='flex min-h-0 min-w-0 flex-col gap-2'>
                           <div className='relative'>
                             <input

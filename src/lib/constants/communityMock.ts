@@ -2,7 +2,8 @@ import type { CommunityPost } from '@/types/nyc'
 import type { NycCommunityBoardId } from '@lib/constants/nyc'
 
 const NOW = Date.now()
-const HOUR = 60 * 60 * 1000
+const MINUTE = 60 * 1000
+const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 
 function post(
@@ -23,6 +24,9 @@ function post(
     | 'placeName'
     | 'latitude'
     | 'longitude'
+    | 'cptOptType'
+    | 'cptOptTimeline'
+    | 'cptOptTips'
     | 'authorUid'
     | 'authorEmail'
     | 'authorNickname'
@@ -46,6 +50,9 @@ function post(
     placeName?: string | null
     latitude?: number | null
     longitude?: number | null
+    cptOptType?: CommunityPost['cptOptType']
+    cptOptTimeline?: CommunityPost['cptOptTimeline']
+    cptOptTips?: CommunityPost['cptOptTips']
   },
 ): CommunityPost {
   return {
@@ -65,6 +72,9 @@ function post(
     placeName: partial.placeName ?? null,
     latitude: partial.latitude ?? null,
     longitude: partial.longitude ?? null,
+    cptOptType: partial.cptOptType ?? null,
+    cptOptTimeline: partial.cptOptTimeline ?? [],
+    cptOptTips: partial.cptOptTips ?? null,
     viewCount: partial.viewCount ?? 0,
     beenThereCount: partial.beenThereCount ?? 0,
     updatedAt: partial.updatedAt ?? partial.createdAt,
@@ -682,11 +692,38 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     `,
     location: 'NYU',
     detail: 'CPT',
+    cptOptType: 'cpt',
+    cptOptTips:
+      '회사 시작일보다 최소 2–3주 전에 학교에 서류를 넣으세요. 학교마다 포털/양식이 달라 ISS 체크리스트를 먼저 확인하는 게 좋아요.',
+    cptOptTimeline: [
+      {
+        id: 't1',
+        date: '2025-01-10',
+        prepared: '오퍼레터, CPT 신청서 초안',
+        submitted: '',
+        resultReceived: '',
+      },
+      {
+        id: 't2',
+        date: '2025-01-18',
+        prepared: '어드바이저 서명',
+        submitted: 'ISS 포털 업로드',
+        resultReceived: '',
+      },
+      {
+        id: 't3',
+        date: '2025-01-28',
+        prepared: '',
+        submitted: '',
+        resultReceived: '새 I-20 PDF 이메일 수령',
+      },
+    ],
     authorUid: 'mock-user-7',
     authorEmail: 'cpt@nyu.edu',
     authorSchoolId: 'nyu',
     authorSchoolName: 'New York University',
     createdAt: NOW - 8 * HOUR,
+    updatedAt: NOW - 25 * MINUTE,
   }),
   post({
     id: 'mock-cpt-2',
@@ -706,6 +743,25 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     `,
     location: '테크 스타트업',
     detail: 'OPT',
+    cptOptType: 'opt',
+    cptOptTips:
+      '카드 오기 전에도 네트워킹·포트폴리오 정리는 미리 시작하세요. USCIS 계정에서 case status를 주기적으로 확인하면 마음이 편해요.',
+    cptOptTimeline: [
+      {
+        id: 't4',
+        date: '2024-11-05',
+        prepared: 'I-765, 사진, 수수료',
+        submitted: 'USCIS 온라인 제출',
+        resultReceived: '',
+      },
+      {
+        id: 't5',
+        date: '2025-02-14',
+        prepared: '',
+        submitted: '',
+        resultReceived: 'EAD 카드 우편 수령',
+      },
+    ],
     authorUid: 'mock-user-8',
     authorEmail: 'opt@columbia.edu',
     authorSchoolId: null,
@@ -730,6 +786,25 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     `,
     location: '핀테크',
     detail: 'STEM OPT',
+    cptOptType: 'stem-opt',
+    cptOptTips:
+      'Validation report 마감일을 캘린더에 3번 알림 걸어두세요. 회사 주소·직함 변경 시 즉시 SEVP 포털 업데이트가 필요합니다.',
+    cptOptTimeline: [
+      {
+        id: 't6',
+        date: '2024-06-01',
+        prepared: 'I-983, 회사 정보',
+        submitted: 'STEM OPT 연장 신청',
+        resultReceived: '',
+      },
+      {
+        id: 't7',
+        date: '2024-08-20',
+        prepared: '',
+        submitted: '',
+        resultReceived: 'I-797 승인 통지',
+      },
+    ],
     authorUid: 'mock-user-9',
     authorEmail: 'stem@baruch.edu',
     authorSchoolId: null,
@@ -741,9 +816,16 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
 export function listMockCommunityPosts(
   boardId?: NycCommunityBoardId,
 ): CommunityPost[] {
-  return COMMUNITY_MOCK_POSTS.filter(
+  const items = COMMUNITY_MOCK_POSTS.filter(
     (item) => !boardId || item.categoryId === boardId,
-  ).sort((a, b) => b.createdAt - a.createdAt)
+  )
+  if (boardId === 'cpt-opt') {
+    return items.sort(
+      (a, b) =>
+        b.updatedAt - a.updatedAt || b.createdAt - a.createdAt,
+    )
+  }
+  return items.sort((a, b) => b.createdAt - a.createdAt)
 }
 
 export function getMockCommunityPost(id: string): CommunityPost | null {

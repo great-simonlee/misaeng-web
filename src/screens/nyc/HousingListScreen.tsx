@@ -466,11 +466,11 @@ export function HousingListScreen() {
               <div className='pointer-events-none absolute inset-y-0 left-0 z-10 flex w-14 items-center'>
                 <div
                   aria-hidden
-                  className='absolute inset-y-0 left-0 w-8 bg-[#f8f8f9]'
+                  className='absolute inset-y-0 left-0 w-8 bg-white'
                 />
                 <div
                   aria-hidden
-                  className='absolute inset-y-0 left-7 right-0 bg-gradient-to-r from-[#f8f8f9] to-transparent'
+                  className='absolute inset-y-0 left-7 right-0 bg-gradient-to-r from-white to-transparent'
                 />
                 <button
                   type='button'
@@ -487,11 +487,11 @@ export function HousingListScreen() {
               <div className='pointer-events-none absolute inset-y-0 right-0 z-10 flex w-14 items-center justify-end'>
                 <div
                   aria-hidden
-                  className='absolute inset-y-0 right-0 w-8 bg-[#f8f8f9]'
+                  className='absolute inset-y-0 right-0 w-8 bg-white'
                 />
                 <div
                   aria-hidden
-                  className='absolute inset-y-0 right-7 left-0 bg-gradient-to-l from-[#f8f8f9] to-transparent'
+                  className='absolute inset-y-0 right-7 left-0 bg-gradient-to-l from-white to-transparent'
                 />
                 <button
                   type='button'

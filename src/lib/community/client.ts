@@ -23,6 +23,9 @@ function withLocalCounts(post: CommunityPost): CommunityPost {
     placeName: post.placeName ?? null,
     latitude: post.latitude ?? null,
     longitude: post.longitude ?? null,
+    cptOptType: post.cptOptType ?? null,
+    cptOptTimeline: Array.isArray(post.cptOptTimeline) ? post.cptOptTimeline : [],
+    cptOptTips: post.cptOptTips ?? null,
   }
 }
 
@@ -84,6 +87,9 @@ export async function createCommunityPostRequest(input: {
   placeName?: string | null
   latitude?: number | null
   longitude?: number | null
+  cptOptType?: CommunityPost['cptOptType']
+  cptOptTimeline?: CommunityPost['cptOptTimeline']
+  cptOptTips?: CommunityPost['cptOptTips']
 }): Promise<CommunityPost> {
   const res = await fetch('/api/community', {
     method: 'POST',
@@ -128,6 +134,9 @@ export async function updateCommunityPostRequest(
     placeName?: string | null
     latitude?: number | null
     longitude?: number | null
+    cptOptType?: CommunityPost['cptOptType']
+    cptOptTimeline?: CommunityPost['cptOptTimeline']
+    cptOptTips?: CommunityPost['cptOptTips']
   },
 ): Promise<CommunityPost> {
   if (id.startsWith('mock-')) {

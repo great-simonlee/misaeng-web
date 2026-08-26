@@ -28,7 +28,7 @@ const ALLOWED_TYPES = new Set([
   'image/heif',
 ])
 
-const MAX_BYTES = 8 * 1024 * 1024
+const MAX_BYTES = 5 * 1024 * 1024
 
 export async function uploadCommunityImageToSupabase(args: {
   uid: string
@@ -47,7 +47,7 @@ export async function uploadCommunityImageToSupabase(args: {
     throw new Error('JPG, PNG, WEBP, GIF 이미지만 올릴 수 있어요.')
   }
   if (args.file.size > MAX_BYTES) {
-    throw new Error('이미지는 8MB 이하로 올려 주세요.')
+    throw new Error('이미지는 5MB 이하로 올려 주세요.')
   }
 
   const extFromName = args.file.name.includes('.')

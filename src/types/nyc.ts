@@ -292,6 +292,28 @@ export interface CommunityPost {
   latitude: number | null
   /** 맛집: 경도 */
   longitude: number | null
+  /** CPT/OPT: 신청 유형 */
+  cptOptType: CptOptTypeId | null
+  /** CPT/OPT: 날짜별 준비·제출·결과 타임라인 */
+  cptOptTimeline: CptOptTimelineEntry[]
+  /** CPT/OPT: 조심해야 할 점 */
+  cptOptTips: string | null
+}
+
+/** CPT / OPT / STEM OPT */
+export type CptOptTypeId = 'cpt' | 'opt' | 'stem-opt'
+
+/** CPT·OPT 진행 단계 (날짜별) */
+export interface CptOptTimelineEntry {
+  id: string
+  /** YYYY-MM-DD 또는 자유 입력 */
+  date: string
+  /** 준비한 것 */
+  prepared: string
+  /** 제출한 것 */
+  submitted: string
+  /** 결과 수령 */
+  resultReceived: string
 }
 
 /** 맛집 보드 카테고리 */

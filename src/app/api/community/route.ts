@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../agent-auth/lib/authHelpers'
+import {
+  normalizeCptOptTimeline,
+  normalizeCptOptTips,
+  normalizeCptOptType,
+  getCptOptTypeLabel,
+  isCptOptTypeId,
+} from '@lib/community/cptOpt'
 import { isCommunityBoardId } from '@lib/constants/nyc'
 import {
   COMMUNITY_BODY_MAX,
@@ -19,7 +26,14 @@ import {
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
-import type { CommunityPost, FoodCategoryId, FoodGalleryPhoto, FoodMenuItem } from '@/types/nyc'
+import type {
+  CommunityPost,
+  CptOptTimelineEntry,
+  CptOptTypeId,
+  FoodCategoryId,
+  FoodGalleryPhoto,
+  FoodMenuItem,
+} from '@/types/nyc'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -80,6 +94,9 @@ type CreateBody = {
   placeName?: string | null
   latitude?: number | null
   longitude?: number | null
+  cptOptType?: CptOptTypeId | null
+  cptOptTimeline?: CptOptTimelineEntry[] | null
+  cptOptTips?: string | null
 }
 
 export async function POST(request: Request) {
@@ -127,6 +144,7 @@ export async function POST(request: Request) {
   const now = Date.now()
   const id = `c_${now.toString(36)}_${Math.random().toString(36).slice(2, 8)}`
   const isFood = categoryId === 'food'
+  const isCptOpt = categoryId === 'cpt-opt'
   const menuItems = isFood ? normalizeFoodMenuItems(body?.menuItems) : []
   const galleryPhotos = isFood
     ? normalizeFoodGalleryPhotos(body?.galleryPhotos)
@@ -156,6 +174,16 @@ export async function POST(request: Request) {
     isFood && Number.isFinite(longitudeRaw) && Math.abs(longitudeRaw) <= 180
       ? longitudeRaw
       : null
+
+  const cptOptType = isCptOpt
+    ? isCptOptTypeId(body?.cptOptType)
+      ? body!.cptOptType!
+      : normalizeCptOptType(body?.cptOptType, body?.detail)
+    : null
+  const cptOptTimeline = isCptOpt
+    ? normalizeCptOptTimeline(body?.cptOptTimeline)
+    : []
+  const cptOptTips = isCptOpt ? normalizeCptOptTips(body?.cptOptTips) : null
 
   if (isFood) {
     if (partySize == null) {
@@ -190,6 +218,21 @@ export async function POST(request: Request) {
     }
   }
 
+  if (isCptOpt) {
+    if (!cptOptType) {
+      return NextResponse.json(
+        { error: 'CPT / OPT / STEM OPT 유형을 선택해 주세요.' },
+        { status: 400 },
+      )
+    }
+    if (cptOptTimeline.length === 0) {
+      return NextResponse.json(
+        { error: '타임라인을 최소 1단계 이상 입력해 주세요.' },
+        { status: 400 },
+      )
+    }
+  }
+
   const profile = await getSupabaseProfile(user.uid)
   const authorNickname =
     profile?.nickname?.trim() ||
@@ -209,7 +252,9 @@ export async function POST(request: Request) {
     contentHtml,
     description: htmlToPlainText(contentHtml).slice(0, 240),
     location: String(body?.location || '').trim() || (placeName ?? ''),
-    detail: String(body?.detail || '').trim(),
+    detail: isCptOpt
+      ? getCptOptTypeLabel(cptOptType)
+      : String(body?.detail || '').trim(),
     authorUid: user.uid,
     authorEmail: user.email,
     authorNickname,
@@ -236,6 +281,9 @@ export async function POST(request: Request) {
     placeName: isFood ? placeName : null,
     latitude: isFood ? latitude : null,
     longitude: isFood ? longitude : null,
+    cptOptType: isCptOpt ? cptOptType : null,
+    cptOptTimeline: isCptOpt ? cptOptTimeline : [],
+    cptOptTips: isCptOpt ? cptOptTips || null : null,
   }
 
   try {

@@ -17,9 +17,7 @@ export function BoardPageShell({
   className,
 }: BoardPageShellProps) {
   return (
-    <div
-      className={cn('relative min-h-screen bg-[#f8f8f9]', className)}
-    >
+    <div className={cn('relative min-h-screen bg-white', className)}>
       <div
         className={cn(
           'relative mx-auto w-full',
@@ -49,7 +47,7 @@ export function BoardSurface({
   return (
     <Tag
       className={cn(
-        'rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_28px_rgba(15,23,42,0.045)] ring-1 ring-black/[0.03]',
+        'rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.05),0_12px_32px_rgba(15,23,42,0.07)] ring-1 ring-black/[0.05]',
         className,
       )}
     >

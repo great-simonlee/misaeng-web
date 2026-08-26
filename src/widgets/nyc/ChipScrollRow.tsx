@@ -19,7 +19,7 @@ export function ChipScrollRow({
   leading,
   ariaLabel,
   className,
-  edgeColor = '#f8f8f9',
+  edgeColor = '#ffffff',
 }: ChipScrollRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [edge, setEdge] = useState({ left: false, right: false })

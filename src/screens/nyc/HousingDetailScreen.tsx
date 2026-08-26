@@ -391,7 +391,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                   <div className='pointer-events-none absolute inset-y-[-2px] left-0 z-10 flex w-[4.25rem] items-center'>
                     <div
                       aria-hidden
-                      className='absolute inset-0 bg-gradient-to-r from-[#f8f8f9] from-[12%] via-[#f8f8f9]/80 via-[48%] to-transparent'
+                      className='absolute inset-0 bg-gradient-to-r from-white from-[12%] via-white/80 via-[48%] to-transparent'
                     />
                     <button
                       type='button'
@@ -408,7 +408,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                   <div className='pointer-events-none absolute inset-y-[-2px] right-0 z-10 flex w-[4.25rem] items-center justify-end'>
                     <div
                       aria-hidden
-                      className='absolute inset-0 bg-gradient-to-l from-[#f8f8f9] from-[12%] via-[#f8f8f9]/80 via-[48%] to-transparent'
+                      className='absolute inset-0 bg-gradient-to-l from-white from-[12%] via-white/80 via-[48%] to-transparent'
                     />
                     <button
                       type='button'

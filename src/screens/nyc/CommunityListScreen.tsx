@@ -16,6 +16,12 @@ import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { fetchCommunityPosts } from '@lib/community/client'
 import {
+  CPT_OPT_TYPES,
+  getCptOptListTimestamp,
+  normalizeCptOptType,
+  type CptOptTypeId,
+} from '@lib/community/cptOpt'
+import {
   FOOD_CATEGORIES,
   FOOD_CUISINES,
   normalizeFoodCuisine,
@@ -124,7 +130,7 @@ function FoodCategoryStickyBar({
     <div className='space-y-2'>
       <ChipScrollRow
         ariaLabel='맛집 분위기'
-        edgeColor='#f8f8f9'
+        edgeColor='#ffffff'
         leading={
           <BoardQuickChip
             label='전체'
@@ -147,7 +153,7 @@ function FoodCategoryStickyBar({
       </ChipScrollRow>
       <ChipScrollRow
         ariaLabel='음식 종류'
-        edgeColor='#f8f8f9'
+        edgeColor='#ffffff'
         leading={
           <BoardQuickChip
             label='음식 전체'
@@ -175,7 +181,7 @@ function FoodCategoryStickyBar({
       <div
         ref={barRef}
         className={cn(
-          'z-[90] border-b border-black/[0.04] bg-[#f8f8f9]/95 backdrop-blur-md supports-[backdrop-filter]:bg-[#f8f8f9]/85',
+          'z-[90] border-b border-black/[0.04] bg-white/95 backdrop-blur-md supports-[backdrop-filter]:bg-white/85',
           stuck
             ? 'fixed inset-x-0 top-14 py-2.5 sm:top-16'
             : 'relative -mx-4 mt-2 px-4 py-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8',
@@ -214,6 +220,8 @@ export function CommunityListScreen({
   const [draftSort, setDraftSort] = useState<SortOption>('newest')
   const [viewMode, setViewMode] = useState<FoodViewMode>('list')
   const isFoodBoard = boardId === 'food'
+  const isCptOptBoard = boardId === 'cpt-opt'
+  const [cptOptType, setCptOptType] = useState<CptOptTypeId | 'all'>('all')
   /** 푸터가 보이면 플로팅 버튼 숨김 (푸터 위로 올리지 않음) */
   const [mapFabHidden, setMapFabHidden] = useState(false)
 
@@ -289,6 +297,12 @@ export function CommunityListScreen({
         (post) => normalizeFoodCuisine(post.detail) === foodCuisine,
       )
     }
+    if (isCptOptBoard && cptOptType !== 'all') {
+      next = next.filter(
+        (post) =>
+          normalizeCptOptType(post.cptOptType, post.detail) === cptOptType,
+      )
+    }
     if (!isFoodBoard && q) {
       next = next.filter((post) => {
         const haystack = [
@@ -296,16 +310,32 @@ export function CommunityListScreen({
           post.description,
           post.location,
           post.detail,
+          ...(isCptOptBoard
+            ? [
+                post.cptOptTips,
+                ...(post.cptOptTimeline ?? []).flatMap((entry) => [
+                  entry.prepared,
+                  entry.submitted,
+                  entry.resultReceived,
+                ]),
+              ]
+            : []),
         ]
           .join(' ')
           .toLowerCase()
         return haystack.includes(q)
       })
     }
+    const getSortTime = (post: CommunityPost) =>
+      isCptOptBoard
+        ? getCptOptListTimestamp(post)
+        : post.createdAt
     return [...next].sort((a, b) =>
-      sort === 'newest' ? b.createdAt - a.createdAt : a.createdAt - b.createdAt,
+      sort === 'newest'
+        ? getSortTime(b) - getSortTime(a)
+        : getSortTime(a) - getSortTime(b),
     )
-  }, [posts, query, sort, foodCategory, foodCuisine, isFoodBoard])
+  }, [posts, query, sort, foodCategory, foodCuisine, cptOptType, isFoodBoard, isCptOptBoard])
 
   /** 지도: 실데이터 + 복수 후기 목데이터(같은 placeId)를 합쳐 핀 데모 */
   const mapPosts = useMemo(() => {
@@ -380,6 +410,8 @@ export function CommunityListScreen({
                 : '로그인 후 글을 올릴 수 있어요.'
                 : isFoodBoard
                 ? '다른 분위기·음식 종류를 선택해 보세요.'
+                : isCptOptBoard
+                  ? '다른 유형(CPT/OPT/STEM OPT)을 선택해 보세요.'
                 : '필터를 바꿔 다시 찾아 보세요.'
           }
           actionHref={
@@ -446,6 +478,31 @@ export function CommunityListScreen({
           foodCuisine={foodCuisine}
           setFoodCuisine={setFoodCuisine}
         />
+      ) : null}
+
+      {isCptOptBoard ? (
+        <div className='mt-2 pb-1'>
+          <ChipScrollRow
+            ariaLabel='CPT OPT 유형'
+            edgeColor='#ffffff'
+            leading={
+              <BoardQuickChip
+                label='전체'
+                active={cptOptType === 'all'}
+                onClick={() => setCptOptType('all')}
+              />
+            }
+          >
+            {CPT_OPT_TYPES.map((item) => (
+              <BoardQuickChip
+                key={item.id}
+                label={item.label}
+                active={cptOptType === item.id}
+                onClick={() => setCptOptType(item.id)}
+              />
+            ))}
+          </ChipScrollRow>
+        </div>
       ) : null}
 
       {isFoodBoard && viewMode === 'map' ? (
@@ -551,10 +608,15 @@ export function CommunityListScreen({
               </h4>
               <div className='mt-2 grid grid-cols-2 gap-2'>
                 {(
-                  [
-                    { id: 'newest', label: '최신순' },
-                    { id: 'oldest', label: '오래된순' },
-                  ] as const
+                  isCptOptBoard
+                    ? ([
+                        { id: 'newest', label: '최근 업데이트순' },
+                        { id: 'oldest', label: '오래된 업데이트순' },
+                      ] as const)
+                    : ([
+                        { id: 'newest', label: '최신순' },
+                        { id: 'oldest', label: '오래된순' },
+                      ] as const)
                 ).map((option) => {
                   const active = draftSort === option.id
                   return (

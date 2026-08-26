@@ -1,7 +1,11 @@
-/** 커뮤니티 이미지 업로드 (기기 파일 → Supabase public URL) */
+import { compressImageForUpload } from '@lib/utils/compressImage'
+
+/** 커뮤니티 이미지 업로드 (기기 파일 → 압축 → Supabase public URL) */
 export async function uploadCommunityImageFile(file: File): Promise<string> {
+  const optimized = await compressImageForUpload(file)
+
   const form = new FormData()
-  form.append('file', file)
+  form.append('file', optimized)
 
   const res = await fetch('/api/community/upload', {
     method: 'POST',

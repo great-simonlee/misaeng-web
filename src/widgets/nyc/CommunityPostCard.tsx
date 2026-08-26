@@ -15,6 +15,10 @@ import {
   formatCommunityRelativeTime,
 } from '@lib/constants/communityMock'
 import {
+  getCptOptTimelineDateRange,
+  hasCptOptPostUpdate,
+} from '@lib/community/cptOpt'
+import {
   NYC_COMMUNITY_BOARD_META,
   isAnonymousBoard,
   type NycCommunityBoardId,
@@ -22,6 +26,8 @@ import {
 import { cn } from '@lib'
 import type { CommunityPost } from '@/types/nyc'
 import { BoardSurface } from '@widgets/nyc/BoardPageShell'
+import { CptOptActivityMeta } from '@widgets/nyc/CptOptActivityMeta'
+import { CptOptTypeBadge } from '@widgets/nyc/CptOptTypeBadge'
 import { FoodCategoryBadge } from '@widgets/nyc/FoodCategoryBadge'
 import { FoodCardCommentStat } from '@widgets/nyc/FoodCardCommentStat'
 import { FoodCardRecommendStat } from '@widgets/nyc/FoodCardRecommendStat'
@@ -34,6 +40,9 @@ interface CommunityPostCardProps {
 export function CommunityPostCard({ post, boardId }: CommunityPostCardProps) {
   if (boardId === 'food') {
     return <FoodListingCard post={post} boardId={boardId} />
+  }
+  if (boardId === 'cpt-opt') {
+    return <CptOptListingCard post={post} boardId={boardId} />
   }
   return <TextListingCard post={post} boardId={boardId} />
 }
@@ -160,7 +169,87 @@ function FoodListingCard({
   )
 }
 
-/** 중고·CPT 등: 텍스트 중심 카드 */
+/** CPT/OPT: 타임라인 요약 카드 */
+function CptOptListingCard({
+  post,
+  boardId,
+}: {
+  post: CommunityPost
+  boardId: NycCommunityBoardId
+}) {
+  const stepCount = post.cptOptTimeline?.length ?? 0
+  const dateRange = getCptOptTimelineDateRange(post.cptOptTimeline)
+  const metaLine = [post.location].filter(Boolean).join(' · ')
+  const wasUpdated = hasCptOptPostUpdate(post)
+
+  return (
+    <BoardSurface
+      as='article'
+      className='group overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_20px_40px_rgba(15,23,42,0.08)]'
+    >
+      <Link
+        href={`/nyc/${boardId}/${post.id}`}
+        className='block touch-manipulation px-4 py-4 sm:px-5 sm:py-5'
+      >
+        <div className='flex items-start justify-between gap-3'>
+          <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
+            <CptOptTypeBadge type={post.cptOptType} />
+            {wasUpdated ? (
+              <span className='inline-flex rounded-full bg-[#fff8f5] px-2 py-0.5 text-[10px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
+                업데이트됨
+              </span>
+            ) : null}
+            <SchoolBadge schoolId={post.authorSchoolId} />
+            {metaLine ? (
+              <span className='truncate text-[12px] font-medium text-[var(--muted)]'>
+                {metaLine}
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        <div className='mt-2'>
+          <CptOptActivityMeta
+            createdAt={post.createdAt}
+            updatedAt={post.updatedAt}
+            compact
+          />
+        </div>
+
+        <h3 className='mt-2.5 text-[16px] font-semibold leading-snug tracking-[-0.025em] text-[var(--foreground)] sm:text-[17px]'>
+          <span className='line-clamp-2'>{post.title}</span>
+        </h3>
+
+        <p className='mt-2 line-clamp-2 text-[13px] leading-relaxed text-[var(--muted)] sm:text-[14px]'>
+          {post.cptOptTips?.trim() || post.description}
+        </p>
+
+        <div className='mt-3.5 flex items-center justify-between gap-3 border-t border-black/[0.04] pt-3 text-[12px] font-medium text-[var(--muted)]'>
+          <span className='inline-flex items-center gap-1.5'>
+            <EyeIcon className='size-3.5' />
+            <span className='tabular-nums'>
+              {formatCommunityCount(post.viewCount)}
+            </span>
+          </span>
+          <span className='text-right text-[11px] leading-snug'>
+            {stepCount > 0 ? (
+              <>
+                타임라인 {stepCount}단계
+                {dateRange ? (
+                  <span className='block text-[10px] font-normal text-[var(--muted)]'>
+                    {dateRange}
+                  </span>
+                ) : null}
+              </>
+            ) : null}
+          </span>
+        </div>
+      </Link>
+    </BoardSurface>
+  )
+}
+
+/** 중고·기타: 텍스트 중심 카드 */
 function TextListingCard({
   post,
   boardId,

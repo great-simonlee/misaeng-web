@@ -47,11 +47,11 @@ export const NYC_CATEGORIES = [
   },
   {
     id: 'cpt-opt',
-    title: 'CPT / OPT',
+    title: 'OPT/CPT 후기',
     description: '경험·직장 후기',
     href: '/nyc/cpt-opt',
     postHref: '/nyc/cpt-opt/new',
-    available: false,
+    available: true,
   },
   {
     id: 'visa',
@@ -104,7 +104,7 @@ export const NYC_COMMUNITY_BOARD_IDS = [
 export type NycCommunityBoardId = (typeof NYC_COMMUNITY_BOARD_IDS)[number]
 
 /** 목록·글쓰기 UI 대신 준비 중 안내를 보여줄 보드 */
-export const NYC_WIP_COMMUNITY_BOARD_IDS = ['marketplace', 'cpt-opt'] as const
+export const NYC_WIP_COMMUNITY_BOARD_IDS = ['marketplace'] as const
 
 export type NycWipCommunityBoardId =
   (typeof NYC_WIP_COMMUNITY_BOARD_IDS)[number]
@@ -163,15 +163,17 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     descriptionPlaceholder: '상태, 픽업 가능 여부, 거래 방식을 적어 주세요.',
   },
   'cpt-opt': {
-    writeLabel: '후기 남기기',
-    listIntro: 'CPT·OPT 경험과 직장 후기를 나눠 주세요.',
-    locationLabel: '회사/학교 (선택)',
-    locationPlaceholder: '회사명 또는 학교',
+    writeLabel: '후기 올리기',
+    listIntro:
+      'CPT·OPT 준비 과정, 제출·결과 일정, 조심할 점을 날짜별로 공유해 보세요.',
+    locationLabel: '학교 / 회사 (선택)',
+    locationPlaceholder: '예: NYU, 테크 스타트업',
     detailLabel: '유형',
-    detailPlaceholder: 'CPT / OPT / STEM OPT',
-    detailInput: 'text',
-    titlePlaceholder: 'OPT 3개월차 회고',
-    descriptionPlaceholder: '지원 과정, 서류, 팁, 주의할 점을 자세히 적어 주세요.',
+    detailPlaceholder: '',
+    detailInput: null,
+    titlePlaceholder: 'OPT 카드 수령까지 — 내 타임라인',
+    descriptionPlaceholder:
+      '전체 경험, 학교·USCIS 소통, 기타 참고할 내용을 자유롭게 적어 주세요.',
   },
   visa: {
     writeLabel: '후기 남기기',

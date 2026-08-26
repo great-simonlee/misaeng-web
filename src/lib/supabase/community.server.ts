@@ -5,6 +5,11 @@ import {
   normalizeFoodMenuItems,
   normalizeWaitMinutes,
 } from '@lib/community/food'
+import {
+  normalizeCptOptTimeline,
+  normalizeCptOptTips,
+  normalizeCptOptType,
+} from '@lib/community/cptOpt'
 import { isCommunityBoardId } from '@lib/constants/nyc'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 
@@ -144,6 +149,15 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
     longitude: (() => {
       const n = Number(data.longitude)
       return Number.isFinite(n) && Math.abs(n) <= 180 ? n : null
+    })(),
+    cptOptType: normalizeCptOptType(
+      data.cptOptType,
+      String(data.detail || '').trim(),
+    ),
+    cptOptTimeline: normalizeCptOptTimeline(data.cptOptTimeline),
+    cptOptTips: (() => {
+      const tips = normalizeCptOptTips(data.cptOptTips)
+      return tips || null
     })(),
   }
 }

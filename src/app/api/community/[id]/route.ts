@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import {
+  normalizeCptOptTimeline,
+  normalizeCptOptTips,
+  normalizeCptOptType,
+  getCptOptTypeLabel,
+  isCptOptTypeId,
+} from '@lib/community/cptOpt'
+import {
   COMMUNITY_BODY_MAX,
   isFoodCategoryId,
   normalizeFoodGalleryPhotos,
@@ -17,7 +24,13 @@ import {
   isCommunityStorageConfigured,
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
-import type { FoodCategoryId, FoodGalleryPhoto, FoodMenuItem } from '@/types/nyc'
+import type {
+  CptOptTimelineEntry,
+  CptOptTypeId,
+  FoodCategoryId,
+  FoodGalleryPhoto,
+  FoodMenuItem,
+} from '@/types/nyc'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -42,6 +55,9 @@ type UpdateBody = {
   placeName?: string | null
   latitude?: number | null
   longitude?: number | null
+  cptOptType?: CptOptTypeId | null
+  cptOptTimeline?: CptOptTimelineEntry[] | null
+  cptOptTips?: string | null
 }
 
 export async function GET(_request: Request, context: RouteContext) {
@@ -113,6 +129,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const isFood = existing.categoryId === 'food'
+  const isCptOpt = existing.categoryId === 'cpt-opt'
   const menuItems = isFood
     ? normalizeFoodMenuItems(body.menuItems ?? existing.menuItems)
     : []
@@ -166,6 +183,21 @@ export async function PATCH(request: Request, context: RouteContext) {
       : existing.foodCategory
     : null
 
+  const cptOptType = isCptOpt
+    ? isCptOptTypeId(body.cptOptType)
+      ? body.cptOptType!
+      : normalizeCptOptType(
+          body.cptOptType ?? existing.cptOptType,
+          body.detail ?? existing.detail,
+        )
+    : null
+  const cptOptTimeline = isCptOpt
+    ? normalizeCptOptTimeline(body.cptOptTimeline ?? existing.cptOptTimeline)
+    : []
+  const cptOptTips = isCptOpt
+    ? normalizeCptOptTips(body.cptOptTips ?? existing.cptOptTips)
+    : null
+
   if (isFood) {
     if (partySize == null) {
       return NextResponse.json(
@@ -199,13 +231,30 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
   }
 
+  if (isCptOpt) {
+    if (!cptOptType) {
+      return NextResponse.json(
+        { error: 'CPT / OPT / STEM OPT 유형을 선택해 주세요.' },
+        { status: 400 },
+      )
+    }
+    if (cptOptTimeline.length === 0) {
+      return NextResponse.json(
+        { error: '타임라인을 최소 1단계 이상 입력해 주세요.' },
+        { status: 400 },
+      )
+    }
+  }
+
   const next = {
     ...existing,
     title,
     contentHtml,
     description: htmlToPlainText(contentHtml).slice(0, 240),
     location: String(body.location ?? existing.location).trim() || (placeName ?? ''),
-    detail: String(body.detail ?? existing.detail).trim(),
+    detail: isCptOpt
+      ? getCptOptTypeLabel(cptOptType)
+      : String(body.detail ?? existing.detail).trim(),
     updatedAt: Date.now(),
     thumbnailUrl: isFood ? thumbnailUrl : null,
     partySize: isFood ? partySize : null,
@@ -218,6 +267,9 @@ export async function PATCH(request: Request, context: RouteContext) {
     placeName: isFood ? placeName : null,
     latitude: isFood ? latitude : null,
     longitude: isFood ? longitude : null,
+    cptOptType: isCptOpt ? cptOptType : null,
+    cptOptTimeline: isCptOpt ? cptOptTimeline : [],
+    cptOptTips: isCptOpt ? cptOptTips || null : null,
   }
 
   try {

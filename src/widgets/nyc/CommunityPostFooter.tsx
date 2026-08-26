@@ -15,6 +15,7 @@ type CommunityPostFooterProps = {
   anonymous?: boolean
   isAuthor?: boolean
   loginNext: string
+  editLabel?: string
   onDelete?: () => void
 }
 
@@ -24,6 +25,7 @@ export function CommunityPostFooter({
   anonymous = false,
   isAuthor = false,
   loginNext,
+  editLabel = '수정',
   onDelete,
 }: CommunityPostFooterProps) {
   const authorName = anonymous
@@ -53,7 +55,7 @@ export function CommunityPostFooter({
               href={`/nyc/${boardId}/${post.id}/edit`}
               className='font-medium text-[var(--muted-foreground)] touch-manipulation hover:text-[var(--foreground)]'
             >
-              수정
+              {editLabel}
             </Link>
             <span className='text-black/10' aria-hidden>
               ·
