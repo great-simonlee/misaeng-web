@@ -6,12 +6,53 @@ const MINUTE = 60 * 1000
 const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 
+/** OPT·비자·영주권·취업 후기 목데이터 표시용 접두어 */
+export const MOCK_COMMUNITY_POST_PREFIX = '[테스트 데이터]'
+
+export function isMockCommunityPostId(id: string): boolean {
+  return id.startsWith('mock-')
+}
+
+function isTimelineBoardMockPost(partial: {
+  id: string
+  categoryId: string
+}): boolean {
+  return (
+    isMockCommunityPostId(partial.id) &&
+    (partial.categoryId === 'status' ||
+      partial.categoryId === 'job-review' ||
+      partial.categoryId === 'anonymous')
+  )
+}
+
+function withMockCommunityPrefix(
+  text: string | null | undefined,
+  enabled: boolean,
+): string {
+  if (!enabled || !text?.trim()) return text ?? ''
+  const trimmed = text.trim()
+  if (trimmed.startsWith(MOCK_COMMUNITY_POST_PREFIX)) return trimmed
+  return `${MOCK_COMMUNITY_POST_PREFIX} ${trimmed}`
+}
+
+function withMockCommunityHtmlPrefix(
+  html: string | undefined,
+  enabled: boolean,
+): string | undefined {
+  if (!enabled || !html?.trim()) return html
+  const trimmed = html.trim()
+  if (trimmed.includes(MOCK_COMMUNITY_POST_PREFIX)) return trimmed
+  return `<p><strong>${MOCK_COMMUNITY_POST_PREFIX}</strong></p>\n${trimmed}`
+}
+
 function post(
   partial: Omit<
     CommunityPost,
     | 'status'
     | 'updatedAt'
     | 'viewCount'
+    | 'recommendCount'
+    | 'commentCount'
     | 'beenThereCount'
     | 'thumbnailUrl'
     | 'partySize'
@@ -27,6 +68,10 @@ function post(
     | 'cptOptType'
     | 'cptOptTimeline'
     | 'cptOptTips'
+    | 'jobReviewType'
+    | 'jobReviewTimeline'
+    | 'jobReviewTips'
+    | 'jobReviewIndustry'
     | 'authorUid'
     | 'authorEmail'
     | 'authorNickname'
@@ -38,6 +83,8 @@ function post(
     authorPhotoURL?: string | null
     updatedAt?: number
     viewCount?: number
+    recommendCount?: number
+    commentCount?: number
     beenThereCount?: number
     thumbnailUrl?: string | null
     partySize?: number | null
@@ -53,10 +100,21 @@ function post(
     cptOptType?: CommunityPost['cptOptType']
     cptOptTimeline?: CommunityPost['cptOptTimeline']
     cptOptTips?: CommunityPost['cptOptTips']
+    jobReviewType?: CommunityPost['jobReviewType']
+    jobReviewTimeline?: CommunityPost['jobReviewTimeline']
+    jobReviewTips?: CommunityPost['jobReviewTips']
+    jobReviewIndustry?: CommunityPost['jobReviewIndustry']
   },
 ): CommunityPost {
+  const mockTimelineBoard = isTimelineBoardMockPost(partial)
+
   return {
     ...partial,
+    title: withMockCommunityPrefix(partial.title, mockTimelineBoard),
+    description: withMockCommunityPrefix(partial.description, mockTimelineBoard),
+    contentHtml:
+      withMockCommunityHtmlPrefix(partial.contentHtml, mockTimelineBoard) ??
+      partial.contentHtml,
     authorUid: partial.authorUid ?? `mock-author-${partial.id}`,
     authorEmail: partial.authorEmail ?? `mock-${partial.id}@example.com`,
     authorNickname: partial.authorNickname ?? null,
@@ -74,8 +132,18 @@ function post(
     longitude: partial.longitude ?? null,
     cptOptType: partial.cptOptType ?? null,
     cptOptTimeline: partial.cptOptTimeline ?? [],
-    cptOptTips: partial.cptOptTips ?? null,
+    cptOptTips: partial.cptOptTips
+      ? withMockCommunityPrefix(partial.cptOptTips, mockTimelineBoard)
+      : null,
+    jobReviewType: partial.jobReviewType ?? null,
+    jobReviewTimeline: partial.jobReviewTimeline ?? [],
+    jobReviewTips: partial.jobReviewTips
+      ? withMockCommunityPrefix(partial.jobReviewTips, mockTimelineBoard)
+      : null,
+    jobReviewIndustry: partial.jobReviewIndustry ?? null,
     viewCount: partial.viewCount ?? 0,
+    recommendCount: partial.recommendCount ?? 0,
+    commentCount: partial.commentCount ?? 0,
     beenThereCount: partial.beenThereCount ?? 0,
     updatedAt: partial.updatedAt ?? partial.createdAt,
     status: 'open',
@@ -674,7 +742,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
   }),
   post({
     id: 'mock-cpt-1',
-    categoryId: 'cpt-opt',
+    categoryId: 'status',
     title: 'CPT 신청 타임라인 — 내가 겪은 순서',
     description:
       '학교 ISS / 회사 offer / I-20 순서만 정리해도 훨씬 수월해졌어요.',
@@ -702,13 +770,15 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         prepared: '오퍼레터, CPT 신청서 초안',
         submitted: '',
         resultReceived: '',
+        nextStep: '어드바이저 서명 받고 ISS에 제출',
       },
       {
         id: 't2',
         date: '2025-01-18',
         prepared: '어드바이저 서명',
-        submitted: 'ISS 포털 업로드',
+        submitted: 'ISS 포털에 PDF 업로드',
         resultReceived: '',
+        nextStep: '새 I-20 이메일 수령 대기',
       },
       {
         id: 't3',
@@ -716,6 +786,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         prepared: '',
         submitted: '',
         resultReceived: '새 I-20 PDF 이메일 수령',
+        nextStep: '서명 후 근무 시작일 맞추기',
       },
     ],
     authorUid: 'mock-user-7',
@@ -727,7 +798,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
   }),
   post({
     id: 'mock-cpt-2',
-    categoryId: 'cpt-opt',
+    categoryId: 'status',
     title: 'OPT 카드 수령까지 — 대기 팁',
     description:
       'EAD 카드 기다리는 동안 이력서/네트워킹을 미리 해두면 좋아요.',
@@ -753,6 +824,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         prepared: 'I-765, 사진, 수수료',
         submitted: 'USCIS 온라인 제출',
         resultReceived: '',
+        nextStep: '케이스 상태 주기적으로 확인',
       },
       {
         id: 't5',
@@ -760,6 +832,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         prepared: '',
         submitted: '',
         resultReceived: 'EAD 카드 우편 수령',
+        nextStep: '근무 시작·STEM 연장 요건 확인',
       },
     ],
     authorUid: 'mock-user-8',
@@ -770,7 +843,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
   }),
   post({
     id: 'mock-cpt-3',
-    categoryId: 'cpt-opt',
+    categoryId: 'status',
     title: 'STEM OPT — 보고서 일정 메모',
     description:
       '6/12/18개월 보고 일정을 캘린더에 미리 넣어두세요. 놓치면 골치 아픕니다.',
@@ -796,6 +869,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         prepared: 'I-983, 회사 정보',
         submitted: 'STEM OPT 연장 신청',
         resultReceived: '',
+        nextStep: '승인 통지·validation report 일정 확인',
       },
       {
         id: 't7',
@@ -803,6 +877,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         prepared: '',
         submitted: '',
         resultReceived: 'I-797 승인 통지',
+        nextStep: '6·12·18개월 보고 알림 설정',
       },
     ],
     authorUid: 'mock-user-9',
@@ -810,6 +885,151 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     authorSchoolId: null,
     authorSchoolName: null,
     createdAt: NOW - 4 * DAY,
+  }),
+  post({
+    id: 'mock-job-1',
+    categoryId: 'job-review',
+    title: 'Google SWE Intern — 3라운드 면접 후기',
+    description:
+      'Handshake로 지원 → OA → Phone → Virtual onsite. 총 3주 걸렸어요.',
+    contentHtml: `
+      <p>2024 Summer SWE Intern 전형 후기입니다.</p>
+      <ul>
+        <li>OA는 LC medium 2문제, 90분</li>
+        <li>Phone은 resume deep dive + behavioral</li>
+        <li>Onsite는 coding 2 + Googleyness 1</li>
+      </ul>
+      <p>Referral 없이 Handshake cold apply로 시작했어요.</p>
+    `,
+    location: 'Google',
+    detail: '인턴',
+    jobReviewType: 'intern',
+    jobReviewIndustry: '테크',
+    jobReviewTips:
+      'OA 전에 LC medium 타이머 연습 2주 추천. Handshake보다 LinkedIn referral 응답률이 더 좋았다는 후기도 많아요.',
+    jobReviewTimeline: [
+      {
+        id: 'jr1',
+        date: '2024-01-10',
+        stageLabel: '서류 지원',
+        platform: 'Handshake',
+        documentsSubmitted: 'Resume, Transcript',
+        interviewRound: '',
+        stageReviewHtml:
+          '<p>Cold apply로 시작했고, 3일 후 OA 초대 메일을 받았어요.</p>',
+        outcome: 'Pass',
+      },
+      {
+        id: 'jr2',
+        date: '2024-01-15',
+        stageLabel: 'Online Assessment',
+        platform: 'HackerRank',
+        documentsSubmitted: '',
+        interviewRound: 'OA',
+        stageReviewHtml:
+          '<p>LC medium 2문제, 90분 제한이었어요. 타이머 연습이 도움이 됐습니다.</p>',
+        outcome: 'Pass',
+      },
+      {
+        id: 'jr3',
+        date: '2024-01-25',
+        stageLabel: 'Virtual Onsite',
+        platform: 'Google Meet',
+        documentsSubmitted: '',
+        interviewRound: 'Final (3 rounds)',
+        stageReviewHtml:
+          '<p>Coding 2라운드 + Googleyness 1라운드. 카메라 ON, 노트 필기 허용.</p>',
+        outcome: 'Offer',
+      },
+    ],
+    authorUid: 'mock-user-10',
+    authorEmail: 'intern@nyu.edu',
+    authorSchoolId: 'nyu',
+    authorSchoolName: 'NYU',
+    createdAt: NOW - 3 * DAY,
+    updatedAt: NOW - 2 * HOUR,
+  }),
+  post({
+    id: 'mock-job-2',
+    categoryId: 'job-review',
+    title: 'JP Morgan Analyst — Superday 후기',
+    description: 'Campus recruiting, 1차 networking → Superday까지 6주.',
+    contentHtml: `
+      <p>금융 Analyst 신입 전형 후기입니다.</p>
+      <p>Behavioral + Case + Fit interview가 Superday에서 연속으로 진행됐어요.</p>
+    `,
+    location: 'JP Morgan',
+    detail: '신입',
+    jobReviewType: 'new-grad',
+    jobReviewIndustry: '금융',
+    jobReviewTips:
+      'Superday 전날은 질문 리스트만 보고 새로운 걸 외우지 마세요. Why JPM, Why NYC는 꼭 준비.',
+    jobReviewTimeline: [
+      {
+        id: 'jr4',
+        date: '2023-09-01',
+        stageLabel: 'Campus Info Session',
+        platform: '학교 Career Fair',
+        documentsSubmitted: 'Resume',
+        interviewRound: 'Networking',
+        stageReviewHtml:
+          '<p>Recruiter 1:1 후 follow-up email을 같은 날 보냈어요.</p>',
+        outcome: 'Pass',
+      },
+      {
+        id: 'jr5',
+        date: '2023-10-15',
+        stageLabel: 'Superday',
+        platform: 'In-person NYC',
+        documentsSubmitted: '',
+        interviewRound: '4 rounds',
+        stageReviewHtml:
+          '<p>Behavioral, Case, Fit, Senior MD 인터뷰가 하루에 연속으로 진행됐어요.</p>',
+        outcome: 'Offer',
+      },
+    ],
+    authorUid: 'mock-user-11',
+    authorEmail: 'finance@columbia.edu',
+    authorSchoolId: null,
+    authorSchoolName: null,
+    createdAt: NOW - 6 * DAY,
+  }),
+  post({
+    id: 'mock-anon-1',
+    categoryId: 'anonymous',
+    title: 'OPT 없이 남은 기간, 어떻게 보내고 계세요?',
+    description:
+      '졸업 후 카드 오기 전까지 시간이 길어서 불안해요. 비슷한 경험 있으신 분 조언 부탁드려요.',
+    contentHtml: `
+      <p>졸업은 했는데 EAD 카드가 아직 안 와서 마음이 조급합니다.</p>
+      <p>그동안 네트워킹·포트폴리오 정리는 하고 있는데, 합법적으로 할 수 있는 일이 더 있는지 궁금해요.</p>
+    `,
+    location: '고민 · 질문',
+    detail: '',
+    authorUid: 'mock-user-12',
+    authorEmail: 'anon@example.com',
+    authorSchoolId: null,
+    authorSchoolName: null,
+    createdAt: NOW - 5 * HOUR,
+    viewCount: 42,
+  }),
+  post({
+    id: 'mock-anon-2',
+    categoryId: 'anonymous',
+    title: '맨해튼에서 혼밥하기 좋은 곳 추천해 주세요',
+    description: '바에 앉아서 혼자 밥 먹기 편한 곳 있으면 알려주세요.',
+    contentHtml: `
+      <p>퇴근 후 혼자 식사할 때 부담 없는 분위기의 식당을 찾고 있어요.</p>
+      <p>가격대는 $15–25 정도면 좋겠습니다.</p>
+    `,
+    location: '일상',
+    detail: '',
+    authorUid: 'mock-user-13',
+    authorEmail: 'anon2@example.com',
+    authorSchoolId: null,
+    authorSchoolName: null,
+    createdAt: NOW - 1 * DAY,
+    viewCount: 67,
   }),
 ]
 
@@ -819,7 +1039,7 @@ export function listMockCommunityPosts(
   const items = COMMUNITY_MOCK_POSTS.filter(
     (item) => !boardId || item.categoryId === boardId,
   )
-  if (boardId === 'cpt-opt') {
+  if (boardId === 'status' || boardId === 'job-review') {
     return items.sort(
       (a, b) =>
         b.updatedAt - a.updatedAt || b.createdAt - a.createdAt,

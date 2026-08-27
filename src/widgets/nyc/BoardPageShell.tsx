@@ -89,7 +89,7 @@ export function boardToneForId(
 ): BoardMetaChipProps['tone'] {
   if (boardId === 'food') return 'food'
   if (boardId === 'marketplace') return 'market'
-  if (boardId === 'cpt-opt') return 'work'
+  if (boardId === 'status') return 'work'
   return 'neutral'
 }
 

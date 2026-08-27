@@ -41,6 +41,7 @@ import type { HousingListing } from '@/types/nyc'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { PerkBadge } from '@widgets/nyc/HousingPostCard'
 import { HousingRoommateIntro } from '@widgets/nyc/HousingRoommateIntro'
+import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
 
 const HousingLocationMap = dynamic(
   () =>
@@ -289,6 +290,14 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                   등록된 사진이 없어요
                 </div>
               )}
+
+              <div className='absolute right-3 top-3 z-10 sm:right-4 sm:top-4'>
+                <PostLikeButton
+                  kind='housing'
+                  id={listing.id}
+                  variant='overlay'
+                />
+              </div>
 
               {images.length > 1 && (
                 <>

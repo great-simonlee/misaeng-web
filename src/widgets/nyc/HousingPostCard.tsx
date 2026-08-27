@@ -2,10 +2,8 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { type MouseEvent } from 'react'
 
 import { HousingPricePair, SchoolBadge } from '@components'
-import { useHousingLike } from '@hooks/useHousingLikes'
 import { usePagedGallery } from '@hooks/usePagedGallery'
 import {
   formatHousingAvailableDate,
@@ -32,6 +30,7 @@ import type {
   HousingRoom,
   HousingRoommateComposition,
 } from '@/types/nyc'
+import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
 
 interface HousingPostCardProps {
   listing: HousingListing
@@ -52,19 +51,12 @@ export function HousingPostCard({
   const roomRows = sortHousingRooms(getPricedRooms(listing))
   const showOptionRows = shouldShowListingRoomRows(listing)
   const badgeLabels = getListingCardBadges(listing)
-  const { liked, toggle } = useHousingLike(listing.id)
   const {
     ref: galleryRef,
     index: activeIndex,
     swipingRef,
     pointerHandlers,
   } = usePagedGallery(images.length, listing.id)
-
-  function handleToggleLike(event: MouseEvent<HTMLButtonElement>) {
-    event.preventDefault()
-    event.stopPropagation()
-    toggle()
-  }
 
   return (
     <article className='group flex flex-col overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_28px_rgba(15,23,42,0.045)] ring-1 ring-black/[0.03] transition hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgba(15,23,42,0.05),0_16px_36px_rgba(15,23,42,0.07)]'>
@@ -122,19 +114,7 @@ export function HousingPostCard({
               <CardBadge key={badge.key} label={badge.label} size='sm' />
             ))}
           </div>
-          <button
-            type='button'
-            onClick={handleToggleLike}
-            aria-label={liked ? '찜 해제' : '찜하기'}
-            aria-pressed={liked}
-            className='relative shrink-0 touch-manipulation transition hover:scale-110 active:scale-95'
-          >
-            <span className='absolute -inset-2' aria-hidden />
-            <HeartIcon
-              filled={liked}
-              className='relative block size-6 sm:size-[1.35rem]'
-            />
-          </button>
+          <PostLikeButton kind='housing' id={listing.id} variant='overlay' />
         </div>
 
         {images.length > 1 && (
@@ -328,31 +308,6 @@ function FemaleIcon({ className }: { className?: string }) {
     >
       <circle cx='12' cy='9' r='5' />
       <path strokeLinecap='round' d='M12 14v6M9.5 17.5h5' />
-    </svg>
-  )
-}
-
-function HeartIcon({
-  filled,
-  className,
-}: {
-  filled: boolean
-  className?: string
-}) {
-  return (
-    <svg
-      viewBox='0 0 32 32'
-      xmlns='http://www.w3.org/2000/svg'
-      className={className}
-      aria-hidden
-      style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.35))' }}
-    >
-      <path
-        d='m16 28c7-4.73 14-10 14-17a6.98 6.98 0 0 0-7-7c-1.8 0-3.58.68-4.95 2.05L16 8.1l-2.05-2.05a6.98 6.98 0 0 0-9.9 0A6.98 6.98 0 0 0 2 11c0 7 7 12.27 14 17z'
-        fill={filled ? '#F64310' : 'none'}
-        stroke='#fff'
-        strokeWidth='2'
-      />
     </svg>
   )
 }

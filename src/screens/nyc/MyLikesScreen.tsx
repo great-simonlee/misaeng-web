@@ -6,19 +6,33 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { LoadingState, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
-import { useHousingLikes } from '@hooks/useHousingLikes'
-import { getHousingUnitRent, getListingArea, getListingDisplayAddress, getListingUnitNet } from '@lib/constants/housingMock'
-import { NYC_CATEGORIES, NYC_PAGE_SHELL_CLASS, type NycCategoryId } from '@lib/constants/nyc'
+import { usePostLikes } from '@hooks/usePostLikes'
+import { fetchCommunityPost } from '@lib/community/client'
+import { getCptOptTypeLabel } from '@lib/community/cptOpt'
+import { getJobReviewTypeLabel } from '@lib/community/jobReview'
+import {
+  getHousingUnitRent,
+  getListingArea,
+  getListingDisplayAddress,
+  getListingUnitNet,
+} from '@lib/constants/housingMock'
+import {
+  NYC_CATEGORIES,
+  NYC_PAGE_SHELL_CLASS,
+  getNycCategory,
+  resolveMergedCommunityBoardId,
+  type NycCategoryId,
+  type NycCommunityBoardId,
+} from '@lib/constants/nyc'
+import { fetchHousingListing } from '@lib/housing/fetchListings'
 import { cn } from '@lib'
-// import { isFirebaseConfigured } from '@lib/firebase/client'
-// import { getHousingPost } from '@lib/firebase/housing'
-import type { HousingPost } from '@/types/nyc'
+import type { PostLikeEntry } from '@lib/utils/postLikes'
+import type { CommunityPost, HousingPost } from '@/types/nyc'
 import {
   AccountCategoryChip,
   AccountCategorySideItem,
 } from '@widgets/nyc/AccountCategoryNav'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
-// import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
 
 type LikedItem = {
   id: string
@@ -32,14 +46,28 @@ type LikedItem = {
 
 type CategoryFilter = 'all' | NycCategoryId
 
+/** 좋아요 모아보기 대상 카테고리 */
+const LIKEABLE_CATEGORY_IDS: NycCategoryId[] = [
+  'housing',
+  'food',
+  'status',
+  'job-review',
+]
+
 export function MyLikesScreen() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const { likedIds } = useHousingLikes()
-  const [remotePosts, setRemotePosts] = useState<HousingPost[]>([])
-  const [loadingRemote] = useState(false)
+  const { likedEntries } = usePostLikes()
+  const [items, setItems] = useState<LikedItem[]>([])
+  const [loadingRemote, setLoadingRemote] = useState(false)
   const [category, setCategory] = useState<CategoryFilter>('all')
-  const likedKey = likedIds.join('|')
+  const likedKey = useMemo(
+    () =>
+      likedEntries
+        .map((entry) => `${entry.kind}:${entry.id}:${entry.boardId ?? ''}`)
+        .join('|'),
+    [likedEntries],
+  )
 
   useEffect(() => {
     if (loading) return
@@ -49,73 +77,53 @@ export function MyLikesScreen() {
   }, [user, loading, router])
 
   useEffect(() => {
-    function clearRemote() {
-      setRemotePosts((prev) => (prev.length === 0 ? prev : []))
-    }
-
-    // 임시: 파이어베이스 좋아요 글 조회 비활성화
-    clearRemote()
-    /*
-    if (!user || !isFirebaseConfigured()) {
-      clearRemote()
+    if (!user) {
+      setItems([])
       return
     }
 
-    const remoteIds = likedKey
-      ? likedKey.split('|').filter((id) => !id.startsWith('mock-'))
-      : []
-    if (remoteIds.length === 0) {
-      clearRemote()
+    if (likedEntries.length === 0) {
+      setItems([])
+      setLoadingRemote(false)
       return
     }
 
     let cancelled = false
     setLoadingRemote(true)
+
     ;(async () => {
       const results = await Promise.all(
-        remoteIds.map(async (id) => {
-          try {
-            return await getHousingPost(id)
-          } catch {
-            return null
-          }
-        }),
+        likedEntries.map((entry) => resolveLikedItem(entry)),
       )
-      if (!cancelled) {
-        setRemotePosts(
-          results.filter((post): post is HousingPost => post != null),
-        )
-        setLoadingRemote(false)
-      }
+      if (cancelled) return
+      setItems(results.filter((item): item is LikedItem => item != null))
+      setLoadingRemote(false)
     })()
 
     return () => {
       cancelled = true
     }
-    */
+    // likedKey로 직렬화된 변경만 추적
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, likedKey])
 
-  const items = useMemo(() => {
-    const remoteMap = new Map(
-      remotePosts.map((post) => [post.id, post] as const),
-    )
-    return likedIds
-      .map((id) => remoteMap.get(id) ?? null)
-      .filter(
-        (post): post is HousingPost => post != null && post.status === 'open',
-      )
-      .map(mapHousing)
-  }, [likedIds, remotePosts])
+  const likeableCategories = useMemo(
+    () =>
+      NYC_CATEGORIES.filter((board) =>
+        LIKEABLE_CATEGORY_IDS.includes(board.id),
+      ),
+    [],
+  )
 
   const counts = useMemo(() => {
     const map = Object.fromEntries(
-      NYC_CATEGORIES.map((c) => [c.id, 0]),
+      likeableCategories.map((c) => [c.id, 0]),
     ) as Record<NycCategoryId, number>
     for (const item of items) {
       map[item.categoryId] = (map[item.categoryId] ?? 0) + 1
     }
     return map
-  }, [items])
+  }, [items, likeableCategories])
 
   const filteredItems = useMemo(() => {
     if (category === 'all') return items
@@ -123,20 +131,20 @@ export function MyLikesScreen() {
   }, [items, category])
 
   const sortedBoards = useMemo(() => {
-    return [...NYC_CATEGORIES].sort((a, b) => {
+    return [...likeableCategories].sort((a, b) => {
       const diff = counts[b.id] - counts[a.id]
       if (diff !== 0) return diff
       return (
-        NYC_CATEGORIES.findIndex((c) => c.id === a.id) -
-        NYC_CATEGORIES.findIndex((c) => c.id === b.id)
+        likeableCategories.findIndex((c) => c.id === a.id) -
+        likeableCategories.findIndex((c) => c.id === b.id)
       )
     })
-  }, [counts])
+  }, [counts, likeableCategories])
 
   const selectedBoard =
     category === 'all'
       ? null
-      : NYC_CATEGORIES.find((c) => c.id === category) ?? null
+      : likeableCategories.find((c) => c.id === category) ?? null
 
   const loadingItems = loadingRemote && items.length === 0
 
@@ -146,14 +154,6 @@ export function MyLikesScreen() {
 
   return (
     <div className='relative flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
-      {/* 임시: 파이어베이스 배너 비활성화
-      {!isFirebaseConfigured() && (
-        <div className={cn('pt-4', NYC_PAGE_SHELL_CLASS)}>
-          <FirebaseConfigBanner />
-        </div>
-      )}
-      */}
-
       <div
         className={cn(
           'flex flex-1 flex-col pb-14 pt-8 sm:pb-16 sm:pt-10 lg:pb-20 lg:pt-12',
@@ -169,7 +169,7 @@ export function MyLikesScreen() {
               내가 좋아요 누른 글
             </h1>
             <p className='mt-1.5 text-[14px] text-[var(--muted-foreground)]'>
-              카테고리별로 찜해 둔 글을 모아 볼 수 있어요
+              하우징 · 맛집 · OPT/비자에서 찜해 둔 글을 모아 볼 수 있어요
             </p>
           </div>
           <span className='rounded-full bg-white px-3 py-1.5 text-[13px] tabular-nums text-[var(--muted)] ring-1 ring-black/[0.06]'>
@@ -322,10 +322,25 @@ export function MyLikesScreen() {
   )
 }
 
+async function resolveLikedItem(
+  entry: PostLikeEntry,
+): Promise<LikedItem | null> {
+  if (entry.kind === 'housing') {
+    const listing = await fetchHousingListing(entry.id)
+    if (!listing || listing.status !== 'open') return null
+    return mapHousing(listing)
+  }
+
+  const post = await fetchCommunityPost(entry.id)
+  if (!post || post.status === 'closed') return null
+  return mapCommunity(post, entry.boardId)
+}
+
 function formatHousingRentMeta(post: HousingPost): string {
   const gross = getHousingUnitRent(post)
   const net = getListingUnitNet(post)
-  if (net != null) return `$${gross.toLocaleString()} / $${net.toLocaleString()}/월`
+  if (net != null)
+    return `$${gross.toLocaleString()} / $${net.toLocaleString()}/월`
   return `$${gross.toLocaleString()}/월`
 }
 
@@ -337,6 +352,44 @@ function mapHousing(post: HousingPost): LikedItem {
     href: `/nyc/housing/${post.id}`,
     categoryId: 'housing',
     boardLabel: '하우징',
+    authorSchoolId: post.authorSchoolId,
+  }
+}
+
+function mapCommunity(
+  post: CommunityPost,
+  preferredBoardId?: string,
+): LikedItem | null {
+  const rawBoardId = preferredBoardId || post.categoryId
+  const mergedId = resolveMergedCommunityBoardId(rawBoardId) ?? rawBoardId
+  const category = getNycCategory(mergedId)
+  const categoryId = (category?.id ?? mergedId) as NycCategoryId
+
+  if (!LIKEABLE_CATEGORY_IDS.includes(categoryId)) return null
+
+  const boardId = (category?.id ?? mergedId) as NycCommunityBoardId
+  const typeLabel =
+    boardId === 'status'
+      ? getCptOptTypeLabel(post.cptOptType)
+      : boardId === 'job-review'
+        ? getJobReviewTypeLabel(post.jobReviewType)
+        : null
+  const meta =
+    [
+      typeLabel,
+      post.location,
+      boardId === 'job-review' ? post.jobReviewIndustry : post.detail,
+    ]
+      .filter(Boolean)
+      .join(' · ') || '상세 보기'
+
+  return {
+    id: post.id,
+    title: post.title,
+    meta,
+    href: `/nyc/${boardId}/${post.id}`,
+    categoryId,
+    boardLabel: category?.title ?? boardId,
     authorSchoolId: post.authorSchoolId,
   }
 }

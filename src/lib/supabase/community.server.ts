@@ -1,4 +1,3 @@
-import type { CommunityPost } from '@/types/nyc'
 import {
   normalizeFoodCategory,
   normalizeFoodGalleryPhotos,
@@ -10,8 +9,16 @@ import {
   normalizeCptOptTips,
   normalizeCptOptType,
 } from '@lib/community/cptOpt'
-import { isCommunityBoardId } from '@lib/constants/nyc'
+import {
+  normalizeJobReviewTimeline,
+  normalizeJobReviewTips,
+  normalizeJobReviewType,
+} from '@lib/community/jobReview'
+import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
+import type { CommunityPost } from '@/types/nyc'
+import { listStoredCommunityComments } from '@lib/supabase/communityComments.server'
+import { listStoredRecommends } from '@lib/supabase/communityEngagement.server'
 
 const DEFAULT_BUCKET = 'housing'
 const FALLBACK_BUCKET = 'avatars'
@@ -117,6 +124,8 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
     updatedAt: Number(data.updatedAt) || Date.now(),
     status: data.status === 'closed' ? 'closed' : 'open',
     viewCount: Math.max(0, Math.floor(Number(data.viewCount) || 0)),
+    recommendCount: Math.max(0, Math.floor(Number(data.recommendCount) || 0)),
+    commentCount: Math.max(0, Math.floor(Number(data.commentCount) || 0)),
     beenThereCount: Math.max(0, Math.floor(Number(data.beenThereCount) || 0)),
     thumbnailUrl:
       typeof data.thumbnailUrl === 'string' && data.thumbnailUrl.trim()
@@ -159,6 +168,20 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       const tips = normalizeCptOptTips(data.cptOptTips)
       return tips || null
     })(),
+    jobReviewType: normalizeJobReviewType(
+      data.jobReviewType,
+      String(data.detail || '').trim(),
+    ),
+    jobReviewTimeline: normalizeJobReviewTimeline(data.jobReviewTimeline),
+    jobReviewTips: (() => {
+      const tips = normalizeJobReviewTips(data.jobReviewTips)
+      return tips || null
+    })(),
+    jobReviewIndustry:
+      typeof data.jobReviewIndustry === 'string' &&
+      data.jobReviewIndustry.trim()
+        ? data.jobReviewIndustry.trim()
+        : null,
   }
 }
 
@@ -227,13 +250,39 @@ async function listAllStoredCommunityPosts(): Promise<CommunityPost[]> {
   return posts.sort((a, b) => b.updatedAt - a.updatedAt || b.createdAt - a.createdAt)
 }
 
+export async function enrichStoredCommunityPostCounts(
+  post: CommunityPost,
+): Promise<CommunityPost> {
+  const [recommends, comments] = await Promise.all([
+    listStoredRecommends(post.id),
+    listStoredCommunityComments(post.id),
+  ])
+  const recommendCount = recommends.filter(
+    (item) => item.targetType === 'post' && item.targetId === post.id,
+  ).length
+  const commentCount = comments.filter((item) => item.status === 'open').length
+  return { ...post, recommendCount, commentCount }
+}
+
 export async function listStoredCommunityPosts(
   boardId?: string,
 ): Promise<CommunityPost[]> {
   const posts = await listAllStoredCommunityPosts()
-  return posts
+  const filtered = posts
     .filter((post) => post.status === 'open')
-    .filter((post) => !boardId || post.categoryId === boardId)
+    .filter((post) => {
+      if (!boardId) return true
+      if (isStatusCommunityBoard(boardId)) {
+        return isStatusCommunityBoard(post.categoryId)
+      }
+      return post.categoryId === boardId
+    })
+
+  if (boardId === 'food') {
+    return Promise.all(filtered.map(enrichStoredCommunityPostCounts))
+  }
+
+  return filtered
 }
 
 /** 내 글 관리용 — open/closed 모두 포함 */
@@ -249,27 +298,34 @@ export async function listStoredCommunityPostsByAuthor(
 async function enrichCommunityPostAuthor(
   post: CommunityPost,
 ): Promise<CommunityPost> {
-  const needsNickname = !post.authorNickname?.trim()
-  const needsPhoto = !post.authorPhotoURL?.trim()
-  if (!needsNickname && !needsPhoto) return post
+  if (isAnonymousBoard(post.categoryId)) return post
 
   const profile = await getSupabaseProfile(post.authorUid)
-  const nickname = profile?.nickname?.trim() || null
-  const photoURL =
-    (typeof profile?.photoURL === 'string' && profile.photoURL.trim()) ||
-    null
+  const profileNickname = profile?.nickname?.trim() || null
+  const profilePhoto =
+    typeof profile?.photoURL === 'string' && profile.photoURL.trim()
+      ? profile.photoURL.trim()
+      : null
+
+  const storedNickname = post.authorNickname?.trim() || null
+  const storedPhoto = post.authorPhotoURL?.trim() || null
+  const safeStoredPhoto =
+    storedPhoto && !storedPhoto.startsWith('blob:') ? storedPhoto : null
+
+  const authorNickname = storedNickname || profileNickname
+  const authorPhotoURL = profilePhoto || safeStoredPhoto
 
   if (
-    (!needsNickname || !nickname) &&
-    (!needsPhoto || !photoURL)
+    authorNickname === storedNickname &&
+    authorPhotoURL === storedPhoto
   ) {
     return post
   }
 
   const enriched: CommunityPost = {
     ...post,
-    authorNickname: post.authorNickname?.trim() || nickname,
-    authorPhotoURL: post.authorPhotoURL?.trim() || photoURL,
+    authorNickname,
+    authorPhotoURL,
   }
   try {
     await saveStoredCommunityPost(enriched)

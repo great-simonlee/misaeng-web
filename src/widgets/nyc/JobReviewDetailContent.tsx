@@ -4,24 +4,24 @@ import Link from 'next/link'
 
 import { cn } from '@lib'
 import {
-  CPT_OPT_TIMELINE_FIELDS,
-  formatCptOptDate,
-  getCptOptTypeStyle,
-  getLatestTimelineEntryId,
-  sortTimelineByDate,
-  summarizeTimelineEntry,
-} from '@lib/community/cptOpt'
+  JOB_REVIEW_TIMELINE_FIELDS,
+  formatJobReviewDate,
+  getJobReviewTypeStyle,
+  getLatestJobReviewTimelineEntryId,
+  sortJobReviewTimelineByDate,
+  summarizeJobReviewTimelineEntry,
+} from '@lib/community/jobReview'
 import { htmlToPlainText } from '@lib/community/html'
 import { formatCommunityCount } from '@lib/constants/communityMock'
 import type { CommunityPost } from '@/types/nyc'
 import { BoardSurface } from '@widgets/nyc/BoardPageShell'
-import { CptOptActivityMeta } from '@widgets/nyc/CptOptActivityMeta'
-import { CptOptTypeBadge } from '@widgets/nyc/CptOptTypeBadge'
+import { JobReviewActivityMeta } from '@widgets/nyc/JobReviewActivityMeta'
+import { JobReviewTypeBadge } from '@widgets/nyc/JobReviewTypeBadge'
 import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
 import type { NycCommunityBoardId } from '@lib/constants/nyc'
 
-type CptOptDetailContentProps = {
+type JobReviewDetailContentProps = {
   post: CommunityPost
   boardId: NycCommunityBoardId
   boardTitle: string
@@ -29,16 +29,16 @@ type CptOptDetailContentProps = {
   onDelete: () => void
 }
 
-export function CptOptDetailContent({
+export function JobReviewDetailContent({
   post,
   boardId,
   isAuthor,
   onDelete,
-}: CptOptDetailContentProps) {
+}: JobReviewDetailContentProps) {
   const tipsHtml = (() => {
     const html = post.contentHtml?.trim() || ''
     if (html && htmlToPlainText(html)) return html
-    const tips = post.cptOptTips?.trim() || ''
+    const tips = post.jobReviewTips?.trim() || ''
     if (!tips) return ''
     return `<p>${tips
       .replaceAll('&', '&amp;')
@@ -46,9 +46,9 @@ export function CptOptDetailContent({
       .replaceAll('>', '&gt;')
       .replaceAll('\n', '<br />')}</p>`
   })()
-  const timeline = sortTimelineByDate(post.cptOptTimeline || [])
-  const typeStyle = getCptOptTypeStyle(post.cptOptType)
-  const latestEntryId = getLatestTimelineEntryId(timeline)
+  const timeline = sortJobReviewTimelineByDate(post.jobReviewTimeline || [])
+  const typeStyle = getJobReviewTypeStyle(post.jobReviewType)
+  const latestEntryId = getLatestJobReviewTimelineEntryId(timeline)
 
   return (
     <article>
@@ -57,10 +57,10 @@ export function CptOptDetailContent({
           <BoardSurface className='flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5'>
             <div>
               <p className='text-[13px] font-semibold text-[var(--foreground)]'>
-                진행 중인 기록이에요
+                진행 중인 채용 기록이에요
               </p>
               <p className='mt-0.5 text-[12px] leading-relaxed text-[var(--muted)]'>
-                새 날짜가 생기면 업데이트 화면에서 기록 한 건만 추가하면
+                새 단계가 생기면 업데이트 화면에서 기록 한 건만 추가하면
                 됩니다. 저장하면 목록 맨 위로 올라갑니다.
               </p>
             </div>
@@ -68,15 +68,15 @@ export function CptOptDetailContent({
               href={`/nyc/${boardId}/${post.id}/edit`}
               className='inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)]'
             >
-              새 기록 추가
+              새 단계 추가
             </Link>
           </BoardSurface>
         </div>
       ) : null}
 
       <div className='mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 px-1 sm:px-0'>
-        <CptOptTypeBadge type={post.cptOptType} />
-        <CptOptActivityMeta
+        <JobReviewTypeBadge type={post.jobReviewType} />
+        <JobReviewActivityMeta
           createdAt={post.createdAt}
           updatedAt={post.updatedAt}
         />
@@ -89,22 +89,29 @@ export function CptOptDetailContent({
         {post.title}
       </h1>
 
-      {post.location?.trim() ? (
-        <p className='mt-3 flex items-center gap-1.5 px-1 text-[14px] font-medium text-[var(--muted-foreground)] sm:px-0'>
-          <BuildingIcon className='size-4 shrink-0 opacity-60' />
-          {post.location.trim()}
+      {(post.location?.trim() || post.jobReviewIndustry?.trim()) ? (
+        <p className='mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 px-1 text-[14px] font-medium text-[var(--muted-foreground)] sm:px-0'>
+          {post.location?.trim() ? (
+            <span className='inline-flex items-center gap-1.5'>
+              <BuildingIcon className='size-4 shrink-0 opacity-60' />
+              {post.location.trim()}
+            </span>
+          ) : null}
+          {post.jobReviewIndustry?.trim() ? (
+            <span className='inline-flex rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[12px] font-semibold text-[var(--muted-foreground)] ring-1 ring-black/8'>
+              {post.jobReviewIndustry.trim()}
+            </span>
+          ) : null}
         </p>
       ) : null}
 
       {timeline.length > 0 ? (
         <section className='mt-8'>
-          <SectionLabel>
-            진행 기록 {timeline.length}건
-          </SectionLabel>
+          <SectionLabel>채용 단계 {timeline.length}건</SectionLabel>
           <ol className='mt-4 space-y-2 px-1 sm:px-0'>
             {timeline.map((entry, index) => {
               const isLatest = entry.id === latestEntryId
-              const summary = summarizeTimelineEntry(entry)
+              const summary = summarizeJobReviewTimelineEntry(entry)
               return (
                 <li key={entry.id}>
                   <div
@@ -129,7 +136,7 @@ export function CptOptDetailContent({
                         <div className='flex flex-wrap items-center gap-2'>
                           <p className='text-[14px] font-semibold text-[var(--foreground)]'>
                             {entry.date
-                              ? formatCptOptDate(entry.date)
+                              ? formatJobReviewDate(entry.date)
                               : '날짜 미입력'}
                           </p>
                           {isLatest ? (
@@ -144,7 +151,7 @@ export function CptOptDetailContent({
                           </p>
                         ) : null}
                         <dl className='mt-3 space-y-2'>
-                          {CPT_OPT_TIMELINE_FIELDS.map((field) => (
+                          {JOB_REVIEW_TIMELINE_FIELDS.map((field) => (
                             <TimelineDetailRow
                               key={field.key}
                               field={field}
@@ -152,6 +159,17 @@ export function CptOptDetailContent({
                             />
                           ))}
                         </dl>
+                        {htmlToPlainText(entry.stageReviewHtml || '') ? (
+                          <div className='mt-4 rounded-xl bg-[#fafbfc] px-3.5 py-3 ring-1 ring-black/[0.05] sm:px-4 sm:py-4'>
+                            <p className='text-[11px] font-semibold text-[var(--muted)]'>
+                              단계 후기
+                            </p>
+                            <CommunityRichBody
+                              html={entry.stageReviewHtml}
+                              className='mt-2 text-[14px] leading-[1.7] text-[var(--foreground)] sm:text-[15px]'
+                            />
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -164,7 +182,7 @@ export function CptOptDetailContent({
 
       {tipsHtml ? (
         <section className='mt-8'>
-          <SectionLabel>조심해야 할 점</SectionLabel>
+          <SectionLabel>다음 지원자에게</SectionLabel>
           <BoardSurface className='mt-4 overflow-hidden'>
             <div className='flex gap-3 bg-[#fffbeb] p-4 sm:p-5'>
               <span
@@ -212,7 +230,7 @@ function TimelineDetailRow({
   field,
   value,
 }: {
-  field: (typeof CPT_OPT_TIMELINE_FIELDS)[number]
+  field: (typeof JOB_REVIEW_TIMELINE_FIELDS)[number]
   value: string
 }) {
   if (!value.trim()) return null

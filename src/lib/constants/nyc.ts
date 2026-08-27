@@ -46,36 +46,20 @@ export const NYC_CATEGORIES = [
     available: false,
   },
   {
-    id: 'cpt-opt',
-    title: 'OPT/CPT 후기',
-    description: '경험·직장 후기',
-    href: '/nyc/cpt-opt',
-    postHref: '/nyc/cpt-opt/new',
+    id: 'status',
+    title: 'OPT · 비자 · 영주권',
+    description: '비자·CPT/OPT·영주권 후기',
+    href: '/nyc/status',
+    postHref: '/nyc/status/new',
     available: true,
-  },
-  {
-    id: 'visa',
-    title: '비자 후기',
-    description: '비자 과정 팁',
-    href: '/nyc/visa',
-    postHref: '/nyc/visa/new',
-    available: false,
   },
   {
     id: 'job-review',
     title: '취업 후기',
-    description: '면접·직장 경험',
+    description: '면접·취업·직장 경험',
     href: '/nyc/job-review',
     postHref: '/nyc/job-review/new',
-    available: false,
-  },
-  {
-    id: 'green-card',
-    title: '영주권 후기',
-    description: '영주권 여정 공유',
-    href: '/nyc/green-card',
-    postHref: '/nyc/green-card/new',
-    available: false,
+    available: true,
   },
   {
     id: 'anonymous',
@@ -83,7 +67,7 @@ export const NYC_CATEGORIES = [
     description: '익명으로 이야기 나누기',
     href: '/nyc/anonymous',
     postHref: '/nyc/anonymous/new',
-    available: false,
+    available: true,
   },
 ] as const
 
@@ -94,6 +78,7 @@ export const NYC_COMMUNITY_BOARD_IDS = [
   'events',
   'food',
   'marketplace',
+  'status',
   'cpt-opt',
   'visa',
   'job-review',
@@ -102,6 +87,15 @@ export const NYC_COMMUNITY_BOARD_IDS = [
 ] as const
 
 export type NycCommunityBoardId = (typeof NYC_COMMUNITY_BOARD_IDS)[number]
+
+/** 레거시 보드 → 통합 게시판(/nyc/status)으로 리다이렉트 */
+export const NYC_COMMUNITY_BOARD_REDIRECTS: Partial<
+  Record<NycCommunityBoardId, string>
+> = {
+  'cpt-opt': '/nyc/status',
+  visa: '/nyc/status',
+  'green-card': '/nyc/status',
+}
 
 /** 목록·글쓰기 UI 대신 준비 중 안내를 보여줄 보드 */
 export const NYC_WIP_COMMUNITY_BOARD_IDS = ['marketplace'] as const
@@ -162,18 +156,31 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     titlePlaceholder: 'IKEA 책장 나눔/판매',
     descriptionPlaceholder: '상태, 픽업 가능 여부, 거래 방식을 적어 주세요.',
   },
-  'cpt-opt': {
+  status: {
     writeLabel: '후기 올리기',
     listIntro:
-      'CPT·OPT 준비 과정, 제출·결과 일정, 조심할 점을 날짜별로 공유해 보세요.',
-    locationLabel: '학교 / 회사 (선택)',
-    locationPlaceholder: '예: NYU, 테크 스타트업',
+      '날짜별로 뭘 준비·제출했는지, 결과는 어떻게 받았는지, 다음 스텝은 뭔지를 남겨 보세요.',
+    locationLabel: '학교 / 회사 / 관련 기관 (선택)',
+    locationPlaceholder: '예: NYU, 테크 스타트업, 대사관',
     detailLabel: '유형',
     detailPlaceholder: '',
     detailInput: null,
     titlePlaceholder: 'OPT 카드 수령까지 — 내 타임라인',
     descriptionPlaceholder:
-      '전체 경험, 학교·USCIS 소통, 기타 참고할 내용을 자유롭게 적어 주세요.',
+      '다음 사람이 실수하지 않도록 조심해야 할 점을 적어 주세요.',
+  },
+  'cpt-opt': {
+    writeLabel: '후기 올리기',
+    listIntro:
+      '날짜별로 뭘 준비·제출했는지, 결과는 어떻게 받았는지, 다음 스텝은 뭔지를 남겨 보세요.',
+    locationLabel: '학교 / 회사 / 관련 기관 (선택)',
+    locationPlaceholder: '예: NYU, 테크 스타트업, 대사관',
+    detailLabel: '유형',
+    detailPlaceholder: '',
+    detailInput: null,
+    titlePlaceholder: 'OPT 카드 수령까지 — 내 타임라인',
+    descriptionPlaceholder:
+      '다음 사람이 실수하지 않도록 조심해야 할 점을 적어 주세요.',
   },
   visa: {
     writeLabel: '후기 남기기',
@@ -187,15 +194,16 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     descriptionPlaceholder: '타임라인, 서류, 팁',
   },
   'job-review': {
-    writeLabel: '후기 남기기',
-    listIntro: '면접·취업·직장 경험을 나눠 주세요.',
-    locationLabel: '회사/업계 (선택)',
-    locationPlaceholder: '테크 / 금융 등',
-    detailLabel: '역할',
-    detailPlaceholder: '인턴 / 신입 / 이직',
-    detailInput: 'text',
-    titlePlaceholder: '뉴욕 테크 인턴 면접 후기',
-    descriptionPlaceholder: '준비 과정, 질문, 분위기',
+    writeLabel: '후기 올리기',
+    listIntro:
+      '회사·플랫폼·서류·면접 단계별로 어떤 경험이었는지 남겨 보세요.',
+    locationLabel: '회사 (선택)',
+    locationPlaceholder: 'Google, Meta, JP Morgan',
+    detailLabel: '유형',
+    detailPlaceholder: '',
+    detailInput: null,
+    titlePlaceholder: 'Google SWE Intern — 3라운드 면접 후기',
+    descriptionPlaceholder: '다음 지원자에게 꼭 알려주고 싶은 팁',
   },
   'green-card': {
     writeLabel: '후기 남기기',
@@ -229,6 +237,25 @@ export function isCommunityBoardId(id: string): id is NycCommunityBoardId {
   return (NYC_COMMUNITY_BOARD_IDS as readonly string[]).includes(id)
 }
 
+export function getCommunityBoardRedirect(id: string): string | null {
+  if (!isCommunityBoardId(id)) return null
+  return NYC_COMMUNITY_BOARD_REDIRECTS[id] ?? null
+}
+
+/** 레거시 cpt-opt·비자·영주권 보드를 통합 게시판(status)으로 매핑 */
+export function resolveMergedCommunityBoardId(
+  id: string,
+): NycCommunityBoardId | null {
+  if (!isCommunityBoardId(id)) return null
+  if (getCommunityBoardRedirect(id) === '/nyc/status') return 'status'
+  return id
+}
+
+/** 비자·OPT·영주권 통합 게시판 여부 (레거시 id 포함) */
+export function isStatusCommunityBoard(id: string): boolean {
+  return resolveMergedCommunityBoardId(id) === 'status'
+}
+
 export function isAnonymousBoard(id: string): boolean {
   return id === 'anonymous'
 }
@@ -256,7 +283,7 @@ export const NYC_PARTNER_ORGS = [
   },
   {
     id: 'baruch-ksa',
-    name: '바루크 한인학생회',
+    name: '버룩 한인학생회',
     shortName: 'BC',
     handle: 'ksabaruch',
     logoSrc: '/img/school/baruch.png',

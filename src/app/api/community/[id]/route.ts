@@ -9,6 +9,13 @@ import {
   isCptOptTypeId,
 } from '@lib/community/cptOpt'
 import {
+  getJobReviewTypeLabel,
+  isJobReviewTypeId,
+  normalizeJobReviewTimeline,
+  normalizeJobReviewTips,
+  normalizeJobReviewType,
+} from '@lib/community/jobReview'
+import {
   COMMUNITY_BODY_MAX,
   isFoodCategoryId,
   normalizeFoodGalleryPhotos,
@@ -18,6 +25,7 @@ import {
   normalizeWaitMinutes,
 } from '@lib/community/food'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
+import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import {
   deleteStoredCommunityPost,
   getStoredCommunityPost,
@@ -30,6 +38,8 @@ import type {
   FoodCategoryId,
   FoodGalleryPhoto,
   FoodMenuItem,
+  JobReviewTimelineEntry,
+  JobReviewTypeId,
 } from '@/types/nyc'
 
 export const runtime = 'nodejs'
@@ -58,6 +68,10 @@ type UpdateBody = {
   cptOptType?: CptOptTypeId | null
   cptOptTimeline?: CptOptTimelineEntry[] | null
   cptOptTips?: string | null
+  jobReviewType?: JobReviewTypeId | null
+  jobReviewTimeline?: JobReviewTimelineEntry[] | null
+  jobReviewTips?: string | null
+  jobReviewIndustry?: string | null
 }
 
 export async function GET(_request: Request, context: RouteContext) {
@@ -73,7 +87,10 @@ export async function GET(_request: Request, context: RouteContext) {
         return NextResponse.json({ error: 'Not found' }, { status: 404 })
       }
     }
-    return NextResponse.json({ post })
+    const user = await resolveAuthenticatedUser()
+    return NextResponse.json({
+      post: sanitizeAnonymousCommunityPost(post, user?.uid),
+    })
   } catch (error) {
     console.error('Community get error:', error)
     return NextResponse.json({ error: 'Failed to load post.' }, { status: 500 })
@@ -129,7 +146,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const isFood = existing.categoryId === 'food'
-  const isCptOpt = existing.categoryId === 'cpt-opt'
+  const isCptOpt =
+    existing.categoryId === 'status' || existing.categoryId === 'cpt-opt'
+  const isJobReview = existing.categoryId === 'job-review'
   const menuItems = isFood
     ? normalizeFoodMenuItems(body.menuItems ?? existing.menuItems)
     : []
@@ -198,6 +217,27 @@ export async function PATCH(request: Request, context: RouteContext) {
     ? normalizeCptOptTips(body.cptOptTips ?? existing.cptOptTips)
     : null
 
+  const jobReviewType = isJobReview
+    ? isJobReviewTypeId(body.jobReviewType)
+      ? body.jobReviewType!
+      : normalizeJobReviewType(
+          body.jobReviewType ?? existing.jobReviewType,
+          body.detail ?? existing.detail,
+        )
+    : null
+  const jobReviewTimeline = isJobReview
+    ? normalizeJobReviewTimeline(
+        body.jobReviewTimeline ?? existing.jobReviewTimeline,
+      )
+    : []
+  const jobReviewTips = isJobReview
+    ? normalizeJobReviewTips(body.jobReviewTips ?? existing.jobReviewTips)
+    : null
+  const jobReviewIndustry = isJobReview
+    ? String(body.jobReviewIndustry ?? existing.jobReviewIndustry ?? '').trim() ||
+      null
+    : null
+
   if (isFood) {
     if (partySize == null) {
       return NextResponse.json(
@@ -234,7 +274,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (isCptOpt) {
     if (!cptOptType) {
       return NextResponse.json(
-        { error: 'CPT / OPT / STEM OPT 유형을 선택해 주세요.' },
+        { error: 'CPT / OPT / STEM OPT / 비자 / 영주권 유형을 선택해 주세요.' },
         { status: 400 },
       )
     }
@@ -246,15 +286,33 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
   }
 
+  if (isJobReview) {
+    if (!jobReviewType) {
+      return NextResponse.json(
+        { error: '인턴 / 신입 / 경력 / 계약 유형을 선택해 주세요.' },
+        { status: 400 },
+      )
+    }
+    if (jobReviewTimeline.length === 0) {
+      return NextResponse.json(
+        { error: '채용 단계를 최소 1건 이상 입력해 주세요.' },
+        { status: 400 },
+      )
+    }
+  }
+
   const next = {
     ...existing,
+    ...(isCptOpt ? { categoryId: 'status' as const } : {}),
     title,
     contentHtml,
     description: htmlToPlainText(contentHtml).slice(0, 240),
     location: String(body.location ?? existing.location).trim() || (placeName ?? ''),
     detail: isCptOpt
       ? getCptOptTypeLabel(cptOptType)
-      : String(body.detail ?? existing.detail).trim(),
+      : isJobReview
+        ? getJobReviewTypeLabel(jobReviewType)
+        : String(body.detail ?? existing.detail).trim(),
     updatedAt: Date.now(),
     thumbnailUrl: isFood ? thumbnailUrl : null,
     partySize: isFood ? partySize : null,
@@ -270,11 +328,17 @@ export async function PATCH(request: Request, context: RouteContext) {
     cptOptType: isCptOpt ? cptOptType : null,
     cptOptTimeline: isCptOpt ? cptOptTimeline : [],
     cptOptTips: isCptOpt ? cptOptTips || null : null,
+    jobReviewType: isJobReview ? jobReviewType : null,
+    jobReviewTimeline: isJobReview ? jobReviewTimeline : [],
+    jobReviewTips: isJobReview ? jobReviewTips || null : null,
+    jobReviewIndustry: isJobReview ? jobReviewIndustry : null,
   }
 
   try {
     const saved = await saveStoredCommunityPost(next)
-    return NextResponse.json({ post: saved })
+    return NextResponse.json({
+      post: sanitizeAnonymousCommunityPost(saved, user.uid),
+    })
   } catch (error) {
     console.error('Community update error:', error)
     return NextResponse.json(

@@ -2,43 +2,45 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
+import { TipTapEditor } from '@components'
 import { cn } from '@lib'
 import {
-  CPT_OPT_FIELD_MAX,
-  CPT_OPT_QUICK_STEPS,
-  CPT_OPT_TIMELINE_FIELDS,
-  CPT_OPT_TIMELINE_MAX,
-  createEmptyTimelineEntry,
-  formatCptOptDate,
-  getCptOptTimelinePlaceholder,
-  isTimelineEntryComplete,
-  isTimelineEntryFilled,
-  sortTimelineByDate,
-  summarizeTimelineEntry,
-  type CptOptTimelineEntry,
-  type CptOptTimelineFieldKey,
-  type CptOptTypeId,
-} from '@lib/community/cptOpt'
+  JOB_REVIEW_FIELD_MAX,
+  JOB_REVIEW_QUICK_STEPS,
+  JOB_REVIEW_STAGE_REVIEW_MAX,
+  JOB_REVIEW_TIMELINE_FIELDS,
+  JOB_REVIEW_TIMELINE_MAX,
+  createEmptyJobReviewTimelineEntry,
+  formatJobReviewDate,
+  getJobReviewTimelinePlaceholder,
+  isJobReviewTimelineEntryComplete,
+  isJobReviewTimelineEntryFilled,
+  sortJobReviewTimelineByDate,
+  summarizeJobReviewTimelineEntry,
+  type JobReviewTimelineEntry,
+  type JobReviewTimelineFieldKey,
+  type JobReviewTypeId,
+} from '@lib/community/jobReview'
 
 type DraftMode = 'add' | 'edit'
 
-type CptOptTimelineEditorProps = {
-  value: CptOptTimelineEntry[]
-  onChange: (next: CptOptTimelineEntry[]) => void
-  cptOptType?: CptOptTypeId | null
+type JobReviewTimelineEditorProps = {
+  value: JobReviewTimelineEntry[]
+  onChange: (next: JobReviewTimelineEntry[]) => void
+  jobReviewType?: JobReviewTypeId | null
   mode?: 'create' | 'update'
   existingEntryIds?: string[]
   className?: string
 }
 
-export function CptOptTimelineEditor({
+export function JobReviewTimelineEditor({
   value,
   onChange,
-  cptOptType = null,
+  jobReviewType = null,
   mode = 'create',
   existingEntryIds = [],
   className,
-}: CptOptTimelineEditorProps) {
+}: JobReviewTimelineEditorProps) {
   const existingIdSet = useMemo(
     () => new Set(existingEntryIds),
     [existingEntryIds],
@@ -50,7 +52,7 @@ export function CptOptTimelineEditor({
       <CreateTimelineForm
         value={value}
         onChange={onChange}
-        cptOptType={cptOptType}
+        jobReviewType={jobReviewType}
         className={className}
       />
     )
@@ -60,7 +62,7 @@ export function CptOptTimelineEditor({
     <UpdateTimelineForm
       value={value}
       onChange={onChange}
-      cptOptType={cptOptType}
+      jobReviewType={jobReviewType}
       existingIdSet={existingIdSet}
       className={className}
     />
@@ -70,17 +72,17 @@ export function CptOptTimelineEditor({
 function CreateTimelineForm({
   value,
   onChange,
-  cptOptType,
+  jobReviewType,
   className,
 }: {
-  value: CptOptTimelineEntry[]
-  onChange: (next: CptOptTimelineEntry[]) => void
-  cptOptType: CptOptTypeId | null
+  value: JobReviewTimelineEntry[]
+  onChange: (next: JobReviewTimelineEntry[]) => void
+  jobReviewType: JobReviewTypeId | null
   className?: string
 }) {
-  const entry = value[0] ?? createEmptyTimelineEntry()
+  const entry = value[0] ?? createEmptyJobReviewTimelineEntry()
 
-  function updateEntry(patch: Partial<CptOptTimelineEntry>) {
+  function updateEntry(patch: Partial<JobReviewTimelineEntry>) {
     onChange([{ ...entry, ...patch }])
   }
 
@@ -88,16 +90,16 @@ function CreateTimelineForm({
     <div className={cn('space-y-3', className)}>
       <GuideBox
         tone='create'
-        title='신분 서류 시작점만 남겨 주세요'
-        description='날짜를 고른 뒤, 준비·제출·결과·다음 스텝 중 해당하는 항목만 선택해서 적으면 됩니다. 나중에 업데이트로 이어서 추가할 수 있어요.'
+        title='첫 채용 단계만 남겨 주세요'
+        description='날짜를 고른 뒤, 단계·플랫폼·서류·면접·결과 중 해당하는 항목을 선택하고, 아래 에디터에 이 단계 후기를 자유롭게 적어 주세요. 나중에 업데이트로 이어서 추가할 수 있어요.'
       />
       <QuickStepButtons
-        cptOptType={cptOptType}
+        jobReviewType={jobReviewType}
         onApply={(patch) => updateEntry(patch)}
       />
       <SingleEntryForm
         entry={entry}
-        cptOptType={cptOptType}
+        jobReviewType={jobReviewType}
         onChange={updateEntry}
       />
     </div>
@@ -107,43 +109,43 @@ function CreateTimelineForm({
 function UpdateTimelineForm({
   value,
   onChange,
-  cptOptType,
+  jobReviewType,
   existingIdSet,
   className,
 }: {
-  value: CptOptTimelineEntry[]
-  onChange: (next: CptOptTimelineEntry[]) => void
-  cptOptType: CptOptTypeId | null
+  value: JobReviewTimelineEntry[]
+  onChange: (next: JobReviewTimelineEntry[]) => void
+  jobReviewType: JobReviewTypeId | null
   existingIdSet: Set<string>
   className?: string
 }) {
   const savedEntries = useMemo(
     () =>
-      sortTimelineByDate(
+      sortJobReviewTimelineByDate(
         value.filter((entry) => existingIdSet.has(entry.id)),
       ),
     [value, existingIdSet],
   )
 
   const [draftMode, setDraftMode] = useState<DraftMode>('add')
-  const [draft, setDraft] = useState(() => createEmptyTimelineEntry())
-  const [editSnapshot, setEditSnapshot] = useState<CptOptTimelineEntry | null>(
+  const [draft, setDraft] = useState(() => createEmptyJobReviewTimelineEntry())
+  const [editSnapshot, setEditSnapshot] = useState<JobReviewTimelineEntry | null>(
     null,
   )
 
-  const canAddMore = value.length < CPT_OPT_TIMELINE_MAX
+  const canAddMore = value.length < JOB_REVIEW_TIMELINE_MAX
 
-  function syncAddDraft(nextDraft: CptOptTimelineEntry) {
+  function syncAddDraft(nextDraft: JobReviewTimelineEntry) {
     setDraft(nextDraft)
     const withoutDraft = value.filter((entry) => existingIdSet.has(entry.id))
     onChange(
-      isTimelineEntryFilled(nextDraft)
+      isJobReviewTimelineEntryFilled(nextDraft)
         ? [...withoutDraft, nextDraft]
         : withoutDraft,
     )
   }
 
-  function syncEditDraft(nextDraft: CptOptTimelineEntry) {
+  function syncEditDraft(nextDraft: JobReviewTimelineEntry) {
     setDraft(nextDraft)
     onChange(
       value.map((entry) => (entry.id === nextDraft.id ? nextDraft : entry)),
@@ -153,12 +155,12 @@ function UpdateTimelineForm({
   function startAdd() {
     setDraftMode('add')
     setEditSnapshot(null)
-    const empty = createEmptyTimelineEntry()
+    const empty = createEmptyJobReviewTimelineEntry()
     setDraft(empty)
     onChange(savedEntries)
   }
 
-  function startEdit(entry: CptOptTimelineEntry) {
+  function startEdit(entry: JobReviewTimelineEntry) {
     setDraftMode('edit')
     setEditSnapshot(entry)
     setDraft({ ...entry })
@@ -184,7 +186,7 @@ function UpdateTimelineForm({
     onChange(value.filter((entry) => entry.id !== id))
   }
 
-  function handleDraftChange(patch: Partial<CptOptTimelineEntry>) {
+  function handleDraftChange(patch: Partial<JobReviewTimelineEntry>) {
     const nextDraft = { ...draft, ...patch }
     if (draftMode === 'add') syncAddDraft(nextDraft)
     else syncEditDraft(nextDraft)
@@ -199,8 +201,8 @@ function UpdateTimelineForm({
         title={isEditing ? '기존 기록 수정 중' : '이번에 추가할 1건'}
         description={
           isEditing
-            ? '준비·제출·결과 수령·다음 스텝을 고친 뒤, 아래 업데이트 버튼으로 저장해 주세요.'
-            : '새 날짜를 고르고, 준비·제출·결과·다음 스텝 중 필요한 항목만 선택해 적어 주세요.'
+            ? '단계·플랫폼·서류·면접 기록을 고친 뒤, 아래 업데이트 버튼으로 저장해 주세요.'
+            : '새 날짜를 고르고, 단계·플랫폼·서류·면접 중 필요한 항목만 선택해 적어 주세요.'
         }
       />
 
@@ -229,19 +231,19 @@ function UpdateTimelineForm({
 
         {!isEditing && canAddMore ? (
           <QuickStepButtons
-            cptOptType={cptOptType}
+            jobReviewType={jobReviewType}
             onApply={(patch) => handleDraftChange(patch)}
           />
         ) : null}
 
         <SingleEntryForm
           entry={draft}
-          cptOptType={cptOptType}
+          jobReviewType={jobReviewType}
           highlight
           onChange={handleDraftChange}
         />
 
-        {!isEditing && isTimelineEntryFilled(draft) ? (
+        {!isEditing && isJobReviewTimelineEntryFilled(draft) ? (
           <button
             type='button'
             onClick={startAdd}
@@ -268,7 +270,7 @@ function UpdateTimelineForm({
                 active={isActiveEdit}
                 onEdit={() => startEdit(entry)}
                 onRemove={
-                  savedEntries.length > 1 || isTimelineEntryFilled(draft)
+                  savedEntries.length > 1 || isJobReviewTimelineEntryFilled(draft)
                     ? () => removeSaved(entry.id)
                     : undefined
                 }
@@ -288,13 +290,13 @@ function SavedEntryRow({
   onEdit,
   onRemove,
 }: {
-  entry: CptOptTimelineEntry
+  entry: JobReviewTimelineEntry
   index: number
   active: boolean
   onEdit: () => void
   onRemove?: () => void
 }) {
-  const summary = summarizeTimelineEntry(entry)
+  const summary = summarizeJobReviewTimelineEntry(entry)
 
   return (
     <div
@@ -310,7 +312,7 @@ function SavedEntryRow({
       </span>
       <div className='min-w-0 flex-1'>
         <p className='text-[13px] font-semibold text-[var(--foreground)]'>
-          {entry.date ? formatCptOptDate(entry.date) : '날짜 없음'}
+          {entry.date ? formatJobReviewDate(entry.date) : '날짜 없음'}
         </p>
         {summary ? (
           <p className='mt-0.5 line-clamp-2 text-[12px] leading-relaxed text-[var(--muted)]'>
@@ -348,23 +350,23 @@ function SavedEntryRow({
 
 function SingleEntryForm({
   entry,
-  cptOptType,
+  jobReviewType,
   highlight = false,
   onChange,
 }: {
-  entry: CptOptTimelineEntry
-  cptOptType: CptOptTypeId | null
+  entry: JobReviewTimelineEntry
+  jobReviewType: JobReviewTypeId | null
   highlight?: boolean
-  onChange: (patch: Partial<CptOptTimelineEntry>) => void
+  onChange: (patch: Partial<JobReviewTimelineEntry>) => void
 }) {
   const contentKeys = useMemo(
     () =>
-      CPT_OPT_TIMELINE_FIELDS.filter((field) => entry[field.key].trim()).map(
+      JOB_REVIEW_TIMELINE_FIELDS.filter((field) => entry[field.key].trim()).map(
         (field) => field.key,
       ),
     [entry],
   )
-  const [selectedKeys, setSelectedKeys] = useState<Set<CptOptTimelineFieldKey>>(
+  const [selectedKeys, setSelectedKeys] = useState<Set<JobReviewTimelineFieldKey>>(
     () => new Set(contentKeys),
   )
 
@@ -376,7 +378,7 @@ function SingleEntryForm({
     })
   }, [entry.id, contentKeys])
 
-  function toggleField(key: CptOptTimelineFieldKey) {
+  function toggleField(key: JobReviewTimelineFieldKey) {
     const active = selectedKeys.has(key)
     if (active) {
       const next = new Set(selectedKeys)
@@ -388,7 +390,7 @@ function SingleEntryForm({
     setSelectedKeys(new Set(selectedKeys).add(key))
   }
 
-  const visibleFields = CPT_OPT_TIMELINE_FIELDS.filter((field) =>
+  const visibleFields = JOB_REVIEW_TIMELINE_FIELDS.filter((field) =>
     selectedKeys.has(field.key),
   )
 
@@ -427,7 +429,7 @@ function SingleEntryForm({
             해당하는 것만 골라 작성하세요. 여러 개 선택해도 됩니다.
           </p>
           <div className='mt-2 flex flex-wrap gap-1.5'>
-            {CPT_OPT_TIMELINE_FIELDS.map((field) => {
+            {JOB_REVIEW_TIMELINE_FIELDS.map((field) => {
               const active = selectedKeys.has(field.key)
               return (
                 <button
@@ -453,7 +455,7 @@ function SingleEntryForm({
       <div className='space-y-2 p-3 sm:p-3.5'>
         {visibleFields.length === 0 ? (
           <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-4 text-center text-[12px] leading-relaxed text-[var(--muted)]'>
-            위에서 준비 · 제출 · 결과 · 다음 스텝 중 필요한 항목을 선택해 주세요
+            위에서 단계 · 플랫폼 · 서류 · 면접 · 결과 중 필요한 항목을 선택하거나, 아래 단계 후기만 작성해도 됩니다
           </p>
         ) : (
           visibleFields.map((field) => (
@@ -461,19 +463,38 @@ function SingleEntryForm({
               key={field.key}
               field={field}
               value={entry[field.key]}
-              placeholder={getCptOptTimelinePlaceholder(cptOptType, field.key)}
+              placeholder={getJobReviewTimelinePlaceholder(jobReviewType, field.key)}
               onChange={(next) => onChange({ [field.key]: next })}
               onRemove={() => toggleField(field.key)}
             />
           ))
         )}
+
+        <div className='rounded-xl border border-black/[0.06] bg-[#fafbfc] px-3 py-3 sm:px-3.5 sm:py-3.5'>
+          <p className='text-[12px] font-semibold text-[var(--foreground)]'>
+            단계 후기
+          </p>
+          <p className='mt-0.5 text-[11px] leading-relaxed text-[var(--muted)]'>
+            질문, 분위기, 준비 팁, 피드백 등 이 단계에서 겪은 내용을 자유롭게
+            적어 주세요.
+          </p>
+          <div className='mt-2.5'>
+            <TipTapEditor
+              value={entry.stageReviewHtml}
+              onChange={(html) => onChange({ stageReviewHtml: html })}
+              placeholder='예: OA는 LC medium 2문제, 90분이었어요. Phone은 resume deep dive + behavioral 위주였습니다.'
+              minHeightClassName='min-h-[160px]'
+              maxLength={JOB_REVIEW_STAGE_REVIEW_MAX}
+            />
+          </div>
+        </div>
       </div>
 
-      {!isTimelineEntryFilled(entry) ? (
+      {!isJobReviewTimelineEntryFilled(entry) ? (
         <p className='border-t border-black/[0.04] px-3.5 py-2 text-[11px] text-[var(--muted)] sm:px-4'>
-          날짜와 선택한 항목의 내용을 입력해 주세요
+          날짜와 선택한 항목 또는 단계 후기를 입력해 주세요
         </p>
-      ) : !isTimelineEntryComplete(entry) ? (
+      ) : !isJobReviewTimelineEntryComplete(entry) ? (
         <p className='border-t border-black/[0.04] px-3.5 py-2 text-[11px] text-amber-700 sm:px-4'>
           날짜와 내용을 함께 입력해 주세요
         </p>
@@ -483,13 +504,13 @@ function SingleEntryForm({
 }
 
 function QuickStepButtons({
-  cptOptType,
+  jobReviewType,
   onApply,
 }: {
-  cptOptType: CptOptTypeId | null
-  onApply: (patch: Partial<CptOptTimelineEntry>) => void
+  jobReviewType: JobReviewTypeId | null
+  onApply: (patch: Partial<JobReviewTimelineEntry>) => void
 }) {
-  const quickSteps = cptOptType ? CPT_OPT_QUICK_STEPS[cptOptType] : []
+  const quickSteps = jobReviewType ? JOB_REVIEW_QUICK_STEPS[jobReviewType] : []
   if (quickSteps.length === 0) return null
 
   return (
@@ -570,7 +591,7 @@ function TimelineField({
   onChange,
   onRemove,
 }: {
-  field: (typeof CPT_OPT_TIMELINE_FIELDS)[number]
+  field: (typeof JOB_REVIEW_TIMELINE_FIELDS)[number]
   value: string
   placeholder: string
   onChange: (value: string) => void
@@ -598,9 +619,9 @@ function TimelineField({
       <textarea
         value={value}
         onChange={(e) =>
-          onChange(e.target.value.slice(0, CPT_OPT_FIELD_MAX))
+          onChange(e.target.value.slice(0, JOB_REVIEW_FIELD_MAX))
         }
-        maxLength={CPT_OPT_FIELD_MAX}
+        maxLength={JOB_REVIEW_FIELD_MAX}
         rows={value.trim() ? 2 : 2}
         placeholder={placeholder}
         className='mt-2 w-full resize-none rounded-lg bg-white/80 px-2.5 py-2 text-[13px] leading-relaxed outline-none ring-1 ring-black/[0.05] transition placeholder:text-[var(--muted)] focus:bg-white focus:ring-[var(--brand)]/30 sm:text-[14px]'

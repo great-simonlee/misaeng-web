@@ -2,21 +2,21 @@
 
 import { cn } from '@lib'
 import {
-  CPT_OPT_TYPES,
-  getCptOptTypeLabel,
-  getCptOptTypeStyle,
-  type CptOptTypeId,
-} from '@lib/community/cptOpt'
+  JOB_REVIEW_TYPES,
+  getJobReviewTypeLabel,
+  getJobReviewTypeStyle,
+  type JobReviewTypeId,
+} from '@lib/community/jobReview'
 
-type CptOptTypeBadgeProps = {
-  type: CptOptTypeId | null | undefined
+type JobReviewTypeBadgeProps = {
+  type: JobReviewTypeId | null | undefined
   className?: string
 }
 
-export function CptOptTypeBadge({ type, className }: CptOptTypeBadgeProps) {
-  const label = getCptOptTypeLabel(type)
+export function JobReviewTypeBadge({ type, className }: JobReviewTypeBadgeProps) {
+  const label = getJobReviewTypeLabel(type)
   if (!label) return null
-  const style = getCptOptTypeStyle(type)
+  const style = getJobReviewTypeStyle(type)
   return (
     <span
       className={cn(
@@ -30,17 +30,17 @@ export function CptOptTypeBadge({ type, className }: CptOptTypeBadgeProps) {
   )
 }
 
-type CptOptTypePickerProps = {
-  value: CptOptTypeId | null
-  onChange: (value: CptOptTypeId) => void
+type JobReviewTypePickerProps = {
+  value: JobReviewTypeId | null
+  onChange: (value: JobReviewTypeId) => void
 }
 
-export function CptOptTypePicker({ value, onChange }: CptOptTypePickerProps) {
+export function JobReviewTypePicker({ value, onChange }: JobReviewTypePickerProps) {
   return (
     <div className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
-      {CPT_OPT_TYPES.map((item) => {
+      {JOB_REVIEW_TYPES.map((item) => {
         const active = value === item.id
-        const style = getCptOptTypeStyle(item.id)
+        const style = getJobReviewTypeStyle(item.id)
         return (
           <button
             key={item.id}

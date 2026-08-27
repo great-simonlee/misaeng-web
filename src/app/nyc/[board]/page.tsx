@@ -1,6 +1,7 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 
 import {
+  getCommunityBoardRedirect,
   getNycCategory,
   isCommunityBoardId,
   isCommunityBoardWip,
@@ -17,6 +18,10 @@ export default async function CommunityBoardPage({
 }: CommunityBoardPageProps) {
   const { board } = await params
   if (!isCommunityBoardId(board)) notFound()
+
+  const redirectTo = getCommunityBoardRedirect(board)
+  if (redirectTo) redirect(redirectTo)
+
   const category = getNycCategory(board)
   if (!category) notFound()
 

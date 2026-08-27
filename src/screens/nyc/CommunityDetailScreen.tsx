@@ -33,6 +33,7 @@ import { CommunityCommentsSection } from '@widgets/nyc/CommunityCommentsSection'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
 import { FoodDetailContent } from '@widgets/nyc/FoodDetailContent'
 import { CptOptDetailContent } from '@widgets/nyc/CptOptDetailContent'
+import { JobReviewDetailContent } from '@widgets/nyc/JobReviewDetailContent'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 
 interface CommunityDetailScreenProps {
@@ -152,7 +153,8 @@ export function CommunityDetailScreen({
   const isAuthor = user?.uid === post.authorUid && !post.id.startsWith('mock-')
   const anonymous = isAnonymousBoard(boardId)
   const isFood = boardId === 'food'
-  const isCptOpt = boardId === 'cpt-opt'
+  const isCptOpt = boardId === 'status'
+  const isJobReview = boardId === 'job-review'
   const bodyHtml = post.contentHtml || `<p>${post.description}</p>`
   const tone = boardToneForId(boardId)
   const metaBits = [
@@ -173,16 +175,19 @@ export function CommunityDetailScreen({
       <BoardPageShell width='narrow'>
         <div
           className={
-            isFood || isCptOpt
+            isFood || isCptOpt || isJobReview
               ? 'pb-16 pt-0 sm:pb-20 sm:pt-6 lg:pt-8'
               : 'pb-16 pt-5 sm:pb-20 sm:pt-7'
           }
         >
-          <BoardBackLink
-            href={`/nyc/${boardId}`}
-            label={`${title} 목록`}
-            className={isFood || isCptOpt ? 'mb-4 px-1 sm:px-0' : 'mb-4'}
-          />
+          {/* 맛집은 히어로 위 뒤로가기가 있어 상단 링크는 생략 */}
+          {!isFood ? (
+            <BoardBackLink
+              href={`/nyc/${boardId}`}
+              label={`${title} 목록`}
+              className={isCptOpt || isJobReview ? 'mb-4 px-1 sm:px-0' : 'mb-4'}
+            />
+          ) : null}
 
           {isFood ? (
             <FoodDetailContent
@@ -194,6 +199,14 @@ export function CommunityDetailScreen({
             />
           ) : isCptOpt ? (
             <CptOptDetailContent
+              post={post}
+              boardId={boardId}
+              boardTitle={title}
+              isAuthor={isAuthor}
+              onDelete={() => void handleDelete()}
+            />
+          ) : isJobReview ? (
+            <JobReviewDetailContent
               post={post}
               boardId={boardId}
               boardTitle={title}

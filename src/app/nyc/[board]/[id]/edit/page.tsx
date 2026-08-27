@@ -1,6 +1,7 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 
 import {
+  getCommunityBoardRedirect,
   getNycCategory,
   isCommunityBoardId,
   isCommunityBoardWip,
@@ -17,6 +18,10 @@ export default async function CommunityEditPage({
 }: CommunityEditPageProps) {
   const { board, id } = await params
   if (!isCommunityBoardId(board)) notFound()
+
+  const redirectTo = getCommunityBoardRedirect(board)
+  if (redirectTo) redirect(`${redirectTo}/${id}/edit`)
+
   const category = getNycCategory(board)
   if (!category) notFound()
 

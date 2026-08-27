@@ -8,7 +8,15 @@ import {
   getCptOptTypeLabel,
   isCptOptTypeId,
 } from '@lib/community/cptOpt'
-import { isCommunityBoardId } from '@lib/constants/nyc'
+import {
+  getJobReviewTypeLabel,
+  isJobReviewTypeId,
+  normalizeJobReviewTimeline,
+  normalizeJobReviewTips,
+  normalizeJobReviewType,
+} from '@lib/community/jobReview'
+import { isCommunityBoardId, isAnonymousBoard } from '@lib/constants/nyc'
+import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import {
   COMMUNITY_BODY_MAX,
   isFoodCategoryId,
@@ -33,6 +41,8 @@ import type {
   FoodCategoryId,
   FoodGalleryPhoto,
   FoodMenuItem,
+  JobReviewTimelineEntry,
+  JobReviewTypeId,
 } from '@/types/nyc'
 
 export const runtime = 'nodejs'
@@ -59,11 +69,20 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
       }
       const posts = await listStoredCommunityPostsByAuthor(user.uid)
-      return NextResponse.json({ posts })
+      return NextResponse.json({
+        posts: posts.map((item) =>
+          sanitizeAnonymousCommunityPost(item, user.uid),
+        ),
+      })
     }
 
+    const user = await resolveAuthenticatedUser()
     const posts = await listStoredCommunityPosts(board)
-    return NextResponse.json({ posts })
+    return NextResponse.json({
+      posts: posts.map((item) =>
+        sanitizeAnonymousCommunityPost(item, user?.uid),
+      ),
+    })
   } catch (error) {
     console.error('Community list error:', error)
     return NextResponse.json(
@@ -97,6 +116,10 @@ type CreateBody = {
   cptOptType?: CptOptTypeId | null
   cptOptTimeline?: CptOptTimelineEntry[] | null
   cptOptTips?: string | null
+  jobReviewType?: JobReviewTypeId | null
+  jobReviewTimeline?: JobReviewTimelineEntry[] | null
+  jobReviewTips?: string | null
+  jobReviewIndustry?: string | null
 }
 
 export async function POST(request: Request) {
@@ -144,7 +167,9 @@ export async function POST(request: Request) {
   const now = Date.now()
   const id = `c_${now.toString(36)}_${Math.random().toString(36).slice(2, 8)}`
   const isFood = categoryId === 'food'
-  const isCptOpt = categoryId === 'cpt-opt'
+  const isCptOpt = categoryId === 'status' || categoryId === 'cpt-opt'
+  const isJobReview = categoryId === 'job-review'
+  const isAnonymous = isAnonymousBoard(categoryId)
   const menuItems = isFood ? normalizeFoodMenuItems(body?.menuItems) : []
   const galleryPhotos = isFood
     ? normalizeFoodGalleryPhotos(body?.galleryPhotos)
@@ -185,6 +210,21 @@ export async function POST(request: Request) {
     : []
   const cptOptTips = isCptOpt ? normalizeCptOptTips(body?.cptOptTips) : null
 
+  const jobReviewType = isJobReview
+    ? isJobReviewTypeId(body?.jobReviewType)
+      ? body!.jobReviewType!
+      : normalizeJobReviewType(body?.jobReviewType, body?.detail)
+    : null
+  const jobReviewTimeline = isJobReview
+    ? normalizeJobReviewTimeline(body?.jobReviewTimeline)
+    : []
+  const jobReviewTips = isJobReview
+    ? normalizeJobReviewTips(body?.jobReviewTips)
+    : null
+  const jobReviewIndustry = isJobReview
+    ? String(body?.jobReviewIndustry || '').trim() || null
+    : null
+
   if (isFood) {
     if (partySize == null) {
       return NextResponse.json(
@@ -221,7 +261,7 @@ export async function POST(request: Request) {
   if (isCptOpt) {
     if (!cptOptType) {
       return NextResponse.json(
-        { error: 'CPT / OPT / STEM OPT 유형을 선택해 주세요.' },
+        { error: 'CPT / OPT / STEM OPT / 비자 / 영주권 유형을 선택해 주세요.' },
         { status: 400 },
       )
     }
@@ -233,17 +273,34 @@ export async function POST(request: Request) {
     }
   }
 
+  if (isJobReview) {
+    if (!jobReviewType) {
+      return NextResponse.json(
+        { error: '인턴 / 신입 / 경력 / 계약 유형을 선택해 주세요.' },
+        { status: 400 },
+      )
+    }
+    if (jobReviewTimeline.length === 0) {
+      return NextResponse.json(
+        { error: '채용 단계를 최소 1건 이상 입력해 주세요.' },
+        { status: 400 },
+      )
+    }
+  }
+
   const profile = await getSupabaseProfile(user.uid)
-  const authorNickname =
-    profile?.nickname?.trim() ||
-    (typeof body?.authorNickname === 'string'
-      ? body.authorNickname.trim()
-      : '') ||
-    null
-  const authorPhotoURL =
-    (typeof profile?.photoURL === 'string' && profile.photoURL.trim()) ||
-    (typeof body?.authorPhotoURL === 'string' && body.authorPhotoURL.trim()) ||
-    null
+  const authorNickname = isAnonymous
+    ? null
+    : profile?.nickname?.trim() ||
+      (typeof body?.authorNickname === 'string'
+        ? body.authorNickname.trim()
+        : '') ||
+      null
+  const authorPhotoURL = isAnonymous
+    ? null
+    : (typeof profile?.photoURL === 'string' && profile.photoURL.trim()) ||
+      (typeof body?.authorPhotoURL === 'string' && body.authorPhotoURL.trim()) ||
+      null
 
   const post: CommunityPost = {
     id,
@@ -254,21 +311,29 @@ export async function POST(request: Request) {
     location: String(body?.location || '').trim() || (placeName ?? ''),
     detail: isCptOpt
       ? getCptOptTypeLabel(cptOptType)
-      : String(body?.detail || '').trim(),
+      : isJobReview
+        ? getJobReviewTypeLabel(jobReviewType)
+        : String(body?.detail || '').trim(),
     authorUid: user.uid,
     authorEmail: user.email,
     authorNickname,
     authorPhotoURL,
-    authorSchoolId:
-      typeof body?.authorSchoolId === 'string' ? body.authorSchoolId : null,
-    authorSchoolName:
-      typeof body?.authorSchoolName === 'string'
+    authorSchoolId: isAnonymous
+      ? null
+      : typeof body?.authorSchoolId === 'string'
+        ? body.authorSchoolId
+        : null,
+    authorSchoolName: isAnonymous
+      ? null
+      : typeof body?.authorSchoolName === 'string'
         ? body.authorSchoolName
         : null,
     createdAt: now,
     updatedAt: now,
     status: 'open',
     viewCount: 0,
+    recommendCount: 0,
+    commentCount: 0,
     beenThereCount: 0,
     thumbnailUrl: isFood ? thumbnailUrl : null,
     partySize: isFood ? partySize : null,
@@ -284,11 +349,17 @@ export async function POST(request: Request) {
     cptOptType: isCptOpt ? cptOptType : null,
     cptOptTimeline: isCptOpt ? cptOptTimeline : [],
     cptOptTips: isCptOpt ? cptOptTips || null : null,
+    jobReviewType: isJobReview ? jobReviewType : null,
+    jobReviewTimeline: isJobReview ? jobReviewTimeline : [],
+    jobReviewTips: isJobReview ? jobReviewTips || null : null,
+    jobReviewIndustry: isJobReview ? jobReviewIndustry : null,
   }
 
   try {
     const saved = await saveStoredCommunityPost(post)
-    return NextResponse.json({ post: saved })
+    return NextResponse.json({
+      post: sanitizeAnonymousCommunityPost(saved, user.uid),
+    })
   } catch (error) {
     console.error('Community create error:', error)
     return NextResponse.json(

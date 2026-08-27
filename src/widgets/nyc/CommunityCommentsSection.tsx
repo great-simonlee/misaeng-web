@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { SchoolBadge } from '@components'
+import { SchoolBadge, UserAvatar } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import {
@@ -332,32 +332,12 @@ function CommentItem({
 
   return (
     <div className='flex gap-3'>
-      {photoURL ? (
-        <div
-          className={cn(
-            'shrink-0 overflow-hidden rounded-full bg-[#e8eaee]',
-            isReply ? 'h-8 w-8' : 'h-9 w-9',
-          )}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={photoURL}
-            alt=''
-            className='h-full w-full object-cover'
-          />
-        </div>
-      ) : (
-        <div
-          className={cn(
-            'flex shrink-0 items-center justify-center rounded-full font-bold',
-            isReply
-              ? 'h-8 w-8 text-[12px] bg-[#eef0f3] text-[var(--muted)]'
-              : 'h-9 w-9 text-[13px] bg-[var(--brand-light)] text-[var(--brand)]',
-          )}
-        >
-          {initial}
-        </div>
-      )}
+      <UserAvatar
+        photoURL={photoURL}
+        initial={initial}
+        size={isReply ? 'sm' : 'md'}
+        muted={anonymousBoard}
+      />
 
       <div className='min-w-0 flex-1'>
         <div className='flex items-start justify-between gap-3'>

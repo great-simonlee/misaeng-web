@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../../../agent-auth/lib/authHelpers'
+import {
+  sanitizeAnonymousCommunityComment,
+} from '@lib/community/anonymous'
+import { getMockCommunityPost } from '@lib/constants/communityMock'
 import { listMockCommunityComments } from '@lib/constants/communityCommentsMock'
+import { isAnonymousBoard } from '@lib/constants/nyc'
 import {
   getStoredCommunityPost,
   isCommunityStorageConfigured,
@@ -21,16 +26,28 @@ interface RouteContext {
   params: Promise<{ id: string }>
 }
 
+async function resolvePostCategoryId(postId: string): Promise<string | null> {
+  if (postId.startsWith('mock-')) {
+    return getMockCommunityPost(postId)?.categoryId ?? null
+  }
+  if (!isCommunityStorageConfigured()) return null
+  const post = await getStoredCommunityPost(postId)
+  return post?.categoryId ?? null
+}
+
 export async function GET(_request: Request, context: RouteContext) {
   try {
     const { id: postId } = await context.params
+    const categoryId = await resolvePostCategoryId(postId)
+    const isAnonymous = categoryId ? isAnonymousBoard(categoryId) : false
+    const user = await resolveAuthenticatedUser()
     const stored = isCommunityCommentStorageConfigured()
       ? await listStoredCommunityComments(postId)
       : []
     let comments =
       stored.length > 0 ? stored : listMockCommunityComments(postId)
 
-    if (stored.length > 0) {
+    if (stored.length > 0 && !isAnonymous) {
       comments = await enrichCommentAuthors(comments)
       const changed = comments.some(
         (item, index) =>
@@ -44,6 +61,12 @@ export async function GET(_request: Request, context: RouteContext) {
           // 표시만 보강
         }
       }
+    }
+
+    if (isAnonymous) {
+      comments = comments.map((item) =>
+        sanitizeAnonymousCommunityComment(item, user?.uid),
+      )
     }
 
     return NextResponse.json({ comments })
@@ -144,6 +167,9 @@ export async function POST(request: Request, context: RouteContext) {
     )
   }
 
+  const categoryId = await resolvePostCategoryId(postId)
+  const isAnonymous = categoryId ? isAnonymousBoard(categoryId) : false
+
   const existing = await listStoredCommunityComments(postId)
   let parentId =
     payload?.parentId == null || payload.parentId === ''
@@ -164,18 +190,20 @@ export async function POST(request: Request, context: RouteContext) {
 
   const now = Date.now()
   const profile = await getSupabaseProfile(user.uid)
-  const authorNickname =
-    (typeof profile?.nickname === 'string' && profile.nickname.trim()) ||
-    (typeof payload?.authorNickname === 'string'
-      ? payload.authorNickname.trim() || null
-      : null) ||
-    null
-  const authorPhotoURL =
-    (typeof profile?.photoURL === 'string' && profile.photoURL.trim()) ||
-    (typeof payload?.authorPhotoURL === 'string'
-      ? payload.authorPhotoURL.trim() || null
-      : null) ||
-    null
+  const authorNickname = isAnonymous
+    ? null
+    : (typeof profile?.nickname === 'string' && profile.nickname.trim()) ||
+      (typeof payload?.authorNickname === 'string'
+        ? payload.authorNickname.trim() || null
+        : null) ||
+      null
+  const authorPhotoURL = isAnonymous
+    ? null
+    : (typeof profile?.photoURL === 'string' && profile.photoURL.trim()) ||
+      (typeof payload?.authorPhotoURL === 'string'
+        ? payload.authorPhotoURL.trim() || null
+        : null) ||
+      null
 
   const comment: CommunityComment = {
     id: `cmt_${now.toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
@@ -186,8 +214,9 @@ export async function POST(request: Request, context: RouteContext) {
     authorEmail: user.email,
     authorNickname,
     authorPhotoURL,
-    authorSchoolId:
-      typeof payload?.authorSchoolId === 'string'
+    authorSchoolId: isAnonymous
+      ? null
+      : typeof payload?.authorSchoolId === 'string'
         ? payload.authorSchoolId
         : null,
     createdAt: now,
@@ -198,7 +227,9 @@ export async function POST(request: Request, context: RouteContext) {
   try {
     const next = [...existing, comment]
     await saveStoredCommunityComments(postId, next)
-    return NextResponse.json({ comment })
+    return NextResponse.json({
+      comment: sanitizeAnonymousCommunityComment(comment, user.uid),
+    })
   } catch (error) {
     console.error('Community comment create error:', error)
     return NextResponse.json(

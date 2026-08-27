@@ -239,6 +239,7 @@ export type CommunityBoardId =
   | 'events'
   | 'food'
   | 'marketplace'
+  | 'status'
   | 'cpt-opt'
   | 'visa'
   | 'job-review'
@@ -268,6 +269,10 @@ export interface CommunityPost {
   status: PostStatus
   /** 상세 조회 수 */
   viewCount: number
+  /** 추천 수 (목록 카드용) */
+  recommendCount: number
+  /** 댓글 수 (목록 카드용) */
+  commentCount: number
   /** 맛집 보드: 나도 가봤어요 수 */
   beenThereCount: number
   /** 목록 썸네일 (맛집 등) */
@@ -298,22 +303,59 @@ export interface CommunityPost {
   cptOptTimeline: CptOptTimelineEntry[]
   /** CPT/OPT: 조심해야 할 점 */
   cptOptTips: string | null
+  /** 취업 후기: 지원 유형 */
+  jobReviewType: JobReviewTypeId | null
+  /** 취업 후기: 단계별 타임라인 */
+  jobReviewTimeline: JobReviewTimelineEntry[]
+  /** 취업 후기: 다음 지원자에게 (레거시 plain) */
+  jobReviewTips: string | null
+  /** 취업 후기: 업계 (테크, 금융 등) */
+  jobReviewIndustry: string | null
 }
 
-/** CPT / OPT / STEM OPT */
-export type CptOptTypeId = 'cpt' | 'opt' | 'stem-opt'
+/** CPT / OPT / STEM OPT / 비자 / 영주권 */
+export type CptOptTypeId =
+  | 'cpt'
+  | 'opt'
+  | 'stem-opt'
+  | 'visa'
+  | 'green-card'
 
-/** CPT·OPT 진행 단계 (날짜별) */
+/** CPT·OPT·비자·영주권 진행 단계 (날짜별) */
 export interface CptOptTimelineEntry {
   id: string
   /** YYYY-MM-DD 또는 자유 입력 */
   date: string
-  /** 준비한 것 */
+  /** 뭘 준비했는지 */
   prepared: string
-  /** 제출한 것 */
+  /** 어떻게 제출했는지 */
   submitted: string
-  /** 결과 수령 */
+  /** 결과를 어떻게 받았는지 */
   resultReceived: string
+  /** 다음 스텝 */
+  nextStep: string
+}
+
+/** 취업 후기 지원 유형 */
+export type JobReviewTypeId = 'intern' | 'new-grad' | 'experienced' | 'contract'
+
+/** 취업 후기 단계별 기록 */
+export interface JobReviewTimelineEntry {
+  id: string
+  /** YYYY-MM-DD */
+  date: string
+  /** 단계 (서류, OA, Phone, Onsite 등) */
+  stageLabel: string
+  /** 지원 경로 (LinkedIn, Handshake, Referral 등) */
+  platform: string
+  /** 제출 서류 */
+  documentsSubmitted: string
+  /** 면접 차수 */
+  interviewRound: string
+  /** 단계별 후기 (리치 텍스트) */
+  stageReviewHtml: string
+  /** 결과 (Pass, Reject, Offer 등) */
+  outcome: string
 }
 
 /** 맛집 보드 카테고리 */

@@ -22,6 +22,12 @@ import {
   type CptOptTypeId,
 } from '@lib/community/cptOpt'
 import {
+  JOB_REVIEW_TYPES,
+  getJobReviewListTimestamp,
+  normalizeJobReviewType,
+  type JobReviewTypeId,
+} from '@lib/community/jobReview'
+import {
   FOOD_CATEGORIES,
   FOOD_CUISINES,
   normalizeFoodCuisine,
@@ -220,8 +226,12 @@ export function CommunityListScreen({
   const [draftSort, setDraftSort] = useState<SortOption>('newest')
   const [viewMode, setViewMode] = useState<FoodViewMode>('list')
   const isFoodBoard = boardId === 'food'
-  const isCptOptBoard = boardId === 'cpt-opt'
+  const isCptOptBoard = boardId === 'status'
+  const isJobReviewBoard = boardId === 'job-review'
   const [cptOptType, setCptOptType] = useState<CptOptTypeId | 'all'>('all')
+  const [jobReviewType, setJobReviewType] = useState<JobReviewTypeId | 'all'>(
+    'all',
+  )
   /** 푸터가 보이면 플로팅 버튼 숨김 (푸터 위로 올리지 않음) */
   const [mapFabHidden, setMapFabHidden] = useState(false)
 
@@ -303,6 +313,13 @@ export function CommunityListScreen({
           normalizeCptOptType(post.cptOptType, post.detail) === cptOptType,
       )
     }
+    if (isJobReviewBoard && jobReviewType !== 'all') {
+      next = next.filter(
+        (post) =>
+          normalizeJobReviewType(post.jobReviewType, post.detail) ===
+          jobReviewType,
+      )
+    }
     if (!isFoodBoard && q) {
       next = next.filter((post) => {
         const haystack = [
@@ -317,6 +334,21 @@ export function CommunityListScreen({
                   entry.prepared,
                   entry.submitted,
                   entry.resultReceived,
+                  entry.nextStep,
+                ]),
+              ]
+            : []),
+          ...(isJobReviewBoard
+            ? [
+                post.jobReviewTips,
+                post.jobReviewIndustry,
+                ...(post.jobReviewTimeline ?? []).flatMap((entry) => [
+                  entry.stageLabel,
+                  entry.platform,
+                  entry.documentsSubmitted,
+                  entry.interviewRound,
+                  entry.stageReviewHtml,
+                  entry.outcome,
                 ]),
               ]
             : []),
@@ -329,13 +361,26 @@ export function CommunityListScreen({
     const getSortTime = (post: CommunityPost) =>
       isCptOptBoard
         ? getCptOptListTimestamp(post)
-        : post.createdAt
+        : isJobReviewBoard
+          ? getJobReviewListTimestamp(post)
+          : post.createdAt
     return [...next].sort((a, b) =>
       sort === 'newest'
         ? getSortTime(b) - getSortTime(a)
         : getSortTime(a) - getSortTime(b),
     )
-  }, [posts, query, sort, foodCategory, foodCuisine, cptOptType, isFoodBoard, isCptOptBoard])
+  }, [
+    posts,
+    query,
+    sort,
+    foodCategory,
+    foodCuisine,
+    cptOptType,
+    jobReviewType,
+    isFoodBoard,
+    isCptOptBoard,
+    isJobReviewBoard,
+  ])
 
   /** 지도: 실데이터 + 복수 후기 목데이터(같은 placeId)를 합쳐 핀 데모 */
   const mapPosts = useMemo(() => {
@@ -412,6 +457,8 @@ export function CommunityListScreen({
                 ? '다른 분위기·음식 종류를 선택해 보세요.'
                 : isCptOptBoard
                   ? '다른 유형(CPT/OPT/STEM OPT)을 선택해 보세요.'
+                  : isJobReviewBoard
+                    ? '다른 유형(인턴·신입·경력·계약)을 선택해 보세요.'
                 : '필터를 바꿔 다시 찾아 보세요.'
           }
           actionHref={
@@ -499,6 +546,31 @@ export function CommunityListScreen({
                 label={item.label}
                 active={cptOptType === item.id}
                 onClick={() => setCptOptType(item.id)}
+              />
+            ))}
+          </ChipScrollRow>
+        </div>
+      ) : null}
+
+      {isJobReviewBoard ? (
+        <div className='mt-2 pb-1'>
+          <ChipScrollRow
+            ariaLabel='취업 후기 유형'
+            edgeColor='#ffffff'
+            leading={
+              <BoardQuickChip
+                label='전체'
+                active={jobReviewType === 'all'}
+                onClick={() => setJobReviewType('all')}
+              />
+            }
+          >
+            {JOB_REVIEW_TYPES.map((item) => (
+              <BoardQuickChip
+                key={item.id}
+                label={item.label}
+                active={jobReviewType === item.id}
+                onClick={() => setJobReviewType(item.id)}
               />
             ))}
           </ChipScrollRow>
@@ -608,7 +680,7 @@ export function CommunityListScreen({
               </h4>
               <div className='mt-2 grid grid-cols-2 gap-2'>
                 {(
-                  isCptOptBoard
+                  isCptOptBoard || isJobReviewBoard
                     ? ([
                         { id: 'newest', label: '최근 업데이트순' },
                         { id: 'oldest', label: '오래된 업데이트순' },

@@ -5,13 +5,36 @@ import {
   listMockCommunityPosts,
 } from '@lib/constants/communityMock'
 import { applyLocalViewCount } from '@lib/community/engagement.client'
-import { listLocalBeenThere } from '@lib/community/engagement.local'
+import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
+import {
+  listLocalBeenThere,
+  listLocalRecommendsForTarget,
+} from '@lib/community/engagement.local'
+import {
+  countOpenComments,
+  listMockCommunityComments,
+} from '@lib/constants/communityCommentsMock'
+import { listLocalCommunityComments } from '@lib/community/comments.local'
 
 function withLocalCounts(post: CommunityPost): CommunityPost {
   const localBeenThere = listLocalBeenThere(post.id).length
+  const localRecommends = listLocalRecommendsForTarget('post', post.id).length
+  const localComments = listLocalCommunityComments(post.id).filter(
+    (item) => item.status === 'open',
+  ).length
+  const mockComments = post.id.startsWith('mock-')
+    ? countOpenComments(listMockCommunityComments(post.id))
+    : 0
+
   return {
     ...post,
     viewCount: applyLocalViewCount(post.viewCount, post.id),
+    recommendCount: Math.max(post.recommendCount || 0, localRecommends),
+    commentCount: Math.max(
+      post.commentCount || 0,
+      localComments,
+      mockComments,
+    ),
     beenThereCount: Math.max(post.beenThereCount || 0, localBeenThere),
     thumbnailUrl: post.thumbnailUrl ?? null,
     partySize: post.partySize ?? null,
@@ -26,6 +49,12 @@ function withLocalCounts(post: CommunityPost): CommunityPost {
     cptOptType: post.cptOptType ?? null,
     cptOptTimeline: Array.isArray(post.cptOptTimeline) ? post.cptOptTimeline : [],
     cptOptTips: post.cptOptTips ?? null,
+    jobReviewType: post.jobReviewType ?? null,
+    jobReviewTimeline: Array.isArray(post.jobReviewTimeline)
+      ? post.jobReviewTimeline
+      : [],
+    jobReviewTips: post.jobReviewTips ?? null,
+    jobReviewIndustry: post.jobReviewIndustry ?? null,
   }
 }
 
@@ -45,7 +74,9 @@ export async function fetchCommunityPosts(
   } catch {
     // 목 데이터로 폴백
   }
-  return listMockCommunityPosts(boardId).map(withLocalCounts)
+  return listMockCommunityPosts(boardId)
+    .map(withLocalCounts)
+    .map((post) => sanitizeAnonymousCommunityPost(post))
 }
 
 export async function fetchCommunityPost(
@@ -63,7 +94,9 @@ export async function fetchCommunityPost(
     // 목 데이터로 폴백
   }
   const mock = getMockCommunityPost(id)
-  return mock ? withLocalCounts(mock) : null
+  return mock
+    ? sanitizeAnonymousCommunityPost(withLocalCounts(mock))
+    : null
 }
 
 export async function createCommunityPostRequest(input: {
@@ -90,6 +123,10 @@ export async function createCommunityPostRequest(input: {
   cptOptType?: CommunityPost['cptOptType']
   cptOptTimeline?: CommunityPost['cptOptTimeline']
   cptOptTips?: CommunityPost['cptOptTips']
+  jobReviewType?: CommunityPost['jobReviewType']
+  jobReviewTimeline?: CommunityPost['jobReviewTimeline']
+  jobReviewTips?: CommunityPost['jobReviewTips']
+  jobReviewIndustry?: CommunityPost['jobReviewIndustry'] | null
 }): Promise<CommunityPost> {
   const res = await fetch('/api/community', {
     method: 'POST',
@@ -137,6 +174,10 @@ export async function updateCommunityPostRequest(
     cptOptType?: CommunityPost['cptOptType']
     cptOptTimeline?: CommunityPost['cptOptTimeline']
     cptOptTips?: CommunityPost['cptOptTips']
+    jobReviewType?: CommunityPost['jobReviewType']
+    jobReviewTimeline?: CommunityPost['jobReviewTimeline']
+    jobReviewTips?: CommunityPost['jobReviewTips']
+    jobReviewIndustry?: CommunityPost['jobReviewIndustry'] | null
   },
 ): Promise<CommunityPost> {
   if (id.startsWith('mock-')) {

@@ -13,7 +13,9 @@ const NYC_NAV_LINKS = [
   { href: '/nyc/housing', label: '하우징' },
   { href: '/nyc/food', label: '맛집' },
   { href: '/nyc/marketplace', label: '중고거래' },
-  { href: '/nyc/cpt-opt', label: 'CPT/OPT' },
+  { href: '/nyc/status', label: 'OPT·비자·영주권' },
+  { href: '/nyc/job-review', label: '취업 후기' },
+  { href: '/nyc/anonymous', label: '익명게시판' },
 ] as const
 
 const ACCOUNT_LINKS = [

@@ -16,6 +16,7 @@ import {
   NYC_CATEGORIES,
   NYC_COMMUNITY_BOARD_IDS,
   NYC_PAGE_SHELL_CLASS,
+  resolveMergedCommunityBoardId,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { cn } from '@lib'
@@ -327,20 +328,20 @@ export function MyPostsScreen() {
 
 function mapCommunity(posts: CommunityPost[]): MyPostItem[] {
   return posts.map((post) => {
-    const category = getNycCategory(post.categoryId)
-    const categoryId = (category?.id ?? post.categoryId) as NycCommunityBoardId
+    const mergedId =
+      resolveMergedCommunityBoardId(post.categoryId) ?? post.categoryId
+    const category = getNycCategory(mergedId)
+    const categoryId = (category?.id ?? mergedId) as NycCommunityBoardId
     const isMock = post.id.startsWith('mock-')
     return {
       id: post.id,
       title: post.title,
       meta:
         [post.location, post.detail].filter(Boolean).join(' · ') || '상세 보기',
-      href: `/nyc/${post.categoryId}/${post.id}`,
-      editHref: isMock
-        ? null
-        : `/nyc/${post.categoryId}/${post.id}/edit`,
+      href: `/nyc/${categoryId}/${post.id}`,
+      editHref: isMock ? null : `/nyc/${categoryId}/${post.id}/edit`,
       categoryId,
-      boardLabel: category?.title ?? post.categoryId,
+      boardLabel: category?.title ?? categoryId,
       authorSchoolId: post.authorSchoolId,
       status: post.status === 'closed' ? 'closed' : 'open',
       canManage: !isMock,

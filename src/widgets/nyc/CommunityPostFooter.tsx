@@ -3,11 +3,12 @@
 import Link from 'next/link'
 
 import { getCommunityAuthorDisplayName } from '@lib/community/author'
-import { cn } from '@lib'
+import { UserAvatar } from '@components'
 import type { CommunityPost } from '@/types/nyc'
 import { CommunityEngagementBar } from '@widgets/nyc/CommunityEngagementBar'
 import { CommunityPostReportAction } from '@widgets/nyc/CommunityPostReportAction'
 import { CopyLinkButton } from '@widgets/nyc/CopyLinkButton'
+import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
 
 type CommunityPostFooterProps = {
   post: CommunityPost
@@ -38,7 +39,7 @@ export function CommunityPostFooter({
     <div className='rounded-2xl bg-[#f7f8fa] px-4 py-4 sm:px-5'>
       <div className='flex items-center justify-between gap-3'>
         <div className='flex min-w-0 items-center gap-2.5'>
-          <AuthorAvatar
+          <UserAvatar
             photoURL={photoURL}
             initial={authorInitial}
             size='md'
@@ -78,6 +79,12 @@ export function CommunityPostFooter({
       </div>
 
       <div className='mt-3 flex flex-wrap items-center gap-2'>
+        <PostLikeButton
+          kind='community'
+          id={post.id}
+          boardId={boardId}
+          variant='pill'
+        />
         <CommunityEngagementBar
           postId={post.id}
           boardId={boardId}
@@ -85,52 +92,6 @@ export function CommunityPostFooter({
         />
         <CopyLinkButton variant='pill' />
       </div>
-    </div>
-  )
-}
-
-function AuthorAvatar({
-  photoURL,
-  initial,
-  size,
-  muted = false,
-}: {
-  photoURL: string | null
-  initial: string
-  size: 'sm' | 'md'
-  muted?: boolean
-}) {
-  const sizeClass = size === 'sm' ? 'h-8 w-8 text-[12px]' : 'h-9 w-9 text-[13px]'
-
-  if (photoURL) {
-    return (
-      <div
-        className={cn(
-          'shrink-0 overflow-hidden rounded-full bg-[#e8eaee]',
-          sizeClass,
-        )}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={photoURL}
-          alt=''
-          className='h-full w-full object-cover'
-        />
-      </div>
-    )
-  }
-
-  return (
-    <div
-      className={cn(
-        'flex shrink-0 items-center justify-center rounded-full font-bold',
-        sizeClass,
-        muted
-          ? 'bg-white text-[var(--muted)]'
-          : 'bg-white text-[var(--brand)]',
-      )}
-    >
-      {initial}
     </div>
   )
 }

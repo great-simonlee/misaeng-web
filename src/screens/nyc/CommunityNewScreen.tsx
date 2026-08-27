@@ -61,6 +61,7 @@ import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { PlaceSearchField } from '@widgets/nyc/PlaceSearchField'
 import { RestaurantNameField } from '@widgets/nyc/RestaurantNameField'
 import { CptOptWriteScreen } from '@screens/nyc/CptOptWriteScreen'
+import { JobReviewWriteScreen } from '@screens/nyc/JobReviewWriteScreen'
 
 interface CommunityNewScreenProps {
   boardId: NycCommunityBoardId
@@ -103,12 +104,16 @@ export function CommunityNewScreen({
   title,
   editPostId,
 }: CommunityNewScreenProps) {
-  if (boardId === 'cpt-opt') {
+  if (boardId === 'status') {
     return <CptOptWriteScreen title={title} editPostId={editPostId} />
+  }
+  if (boardId === 'job-review') {
+    return <JobReviewWriteScreen title={title} editPostId={editPostId} />
   }
 
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const isEdit = Boolean(editPostId)
+  const anonymousBoard = isAnonymousBoard(boardId)
   const loginNext = editPostId
     ? `/nyc/${boardId}/${editPostId}/edit`
     : `/nyc/${boardId}/new`
@@ -560,12 +565,16 @@ export function CommunityNewScreen({
         : await createCommunityPostRequest({
             categoryId: boardId,
             ...payload,
-            authorNickname: profile?.nickname?.trim() || null,
-            authorPhotoURL: profile?.photoURL?.trim() || null,
-            authorSchoolId: isAnonymousBoard(boardId)
+            authorNickname: anonymousBoard
+              ? null
+              : profile?.nickname?.trim() || null,
+            authorPhotoURL: anonymousBoard
+              ? null
+              : profile?.photoURL?.trim() || null,
+            authorSchoolId: anonymousBoard
               ? null
               : (profile?.verifiedSchoolId ?? null),
-            authorSchoolName: isAnonymousBoard(boardId)
+            authorSchoolName: anonymousBoard
               ? null
               : (profile?.verifiedSchoolName ?? null),
           })
@@ -1130,6 +1139,12 @@ export function CommunityNewScreen({
         />
 
         <BoardSurface className='p-5 sm:p-6'>
+          {anonymousBoard && !isEdit ? (
+            <div className='mb-5 rounded-xl bg-[#f4f5f7] px-4 py-3 text-[13px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-black/[0.06]'>
+              작성자 이름·학교·프로필 사진은 다른 사람에게 보이지 않아요. 로그인은
+              글 관리(수정·삭제)를 위해 필요합니다.
+            </div>
+          ) : null}
           <form onSubmit={handleSubmit} className='space-y-5'>
             <Field label='제목' required>
               <input

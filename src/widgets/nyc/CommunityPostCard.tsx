@@ -19,6 +19,10 @@ import {
   hasCptOptPostUpdate,
 } from '@lib/community/cptOpt'
 import {
+  getJobReviewTimelineDateRange,
+  hasJobReviewPostUpdate,
+} from '@lib/community/jobReview'
+import {
   NYC_COMMUNITY_BOARD_META,
   isAnonymousBoard,
   type NycCommunityBoardId,
@@ -28,9 +32,12 @@ import type { CommunityPost } from '@/types/nyc'
 import { BoardSurface } from '@widgets/nyc/BoardPageShell'
 import { CptOptActivityMeta } from '@widgets/nyc/CptOptActivityMeta'
 import { CptOptTypeBadge } from '@widgets/nyc/CptOptTypeBadge'
+import { JobReviewActivityMeta } from '@widgets/nyc/JobReviewActivityMeta'
+import { JobReviewTypeBadge } from '@widgets/nyc/JobReviewTypeBadge'
 import { FoodCategoryBadge } from '@widgets/nyc/FoodCategoryBadge'
 import { FoodCardCommentStat } from '@widgets/nyc/FoodCardCommentStat'
 import { FoodCardRecommendStat } from '@widgets/nyc/FoodCardRecommendStat'
+import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
 
 interface CommunityPostCardProps {
   post: CommunityPost
@@ -41,8 +48,11 @@ export function CommunityPostCard({ post, boardId }: CommunityPostCardProps) {
   if (boardId === 'food') {
     return <FoodListingCard post={post} boardId={boardId} />
   }
-  if (boardId === 'cpt-opt') {
+  if (boardId === 'status') {
     return <CptOptListingCard post={post} boardId={boardId} />
+  }
+  if (boardId === 'job-review') {
+    return <JobReviewListingCard post={post} boardId={boardId} />
   }
   return <TextListingCard post={post} boardId={boardId} />
 }
@@ -110,6 +120,14 @@ function FoodListingCard({
               />
             </div>
           ) : null}
+          <div className='absolute right-2.5 top-2.5 z-10'>
+            <PostLikeButton
+              kind='community'
+              id={post.id}
+              boardId={boardId}
+              variant='overlay'
+            />
+          </div>
           {metaChips.length > 0 ? (
             <>
               <div
@@ -151,8 +169,11 @@ function FoodListingCard({
                 {formatCommunityCount(post.viewCount)}
               </span>
             </span>
-            <FoodCardRecommendStat postId={post.id} />
-            <FoodCardCommentStat postId={post.id} />
+            <FoodCardRecommendStat
+              postId={post.id}
+              count={post.recommendCount}
+            />
+            <FoodCardCommentStat postId={post.id} count={post.commentCount} />
             <span className='inline-flex items-center gap-1.5'>
               <PinIcon className='size-3.5' />
               <span>
@@ -195,17 +216,23 @@ function CptOptListingCard({
           <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
             <CptOptTypeBadge type={post.cptOptType} />
             {wasUpdated ? (
-              <span className='inline-flex rounded-full bg-[#fff8f5] px-2 py-0.5 text-[10px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
+              <span className='inline-flex items-center rounded-full bg-[#fff8f5] px-2.5 py-1 text-[11px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
                 업데이트됨
               </span>
             ) : null}
-            <SchoolBadge schoolId={post.authorSchoolId} />
+            <SchoolBadge schoolId={post.authorSchoolId} size='md' />
             {metaLine ? (
-              <span className='truncate text-[12px] font-medium text-[var(--muted)]'>
+              <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted-foreground)] ring-1 ring-black/8'>
                 {metaLine}
               </span>
             ) : null}
           </div>
+          <PostLikeButton
+            kind='community'
+            id={post.id}
+            boardId={boardId}
+            variant='icon'
+          />
         </div>
 
         <div className='mt-2'>
@@ -235,6 +262,94 @@ function CptOptListingCard({
             {stepCount > 0 ? (
               <>
                 타임라인 {stepCount}단계
+                {dateRange ? (
+                  <span className='block text-[10px] font-normal text-[var(--muted)]'>
+                    {dateRange}
+                  </span>
+                ) : null}
+              </>
+            ) : null}
+          </span>
+        </div>
+      </Link>
+    </BoardSurface>
+  )
+}
+
+/** 취업 후기: 타임라인 요약 카드 */
+function JobReviewListingCard({
+  post,
+  boardId,
+}: {
+  post: CommunityPost
+  boardId: NycCommunityBoardId
+}) {
+  const stepCount = post.jobReviewTimeline?.length ?? 0
+  const dateRange = getJobReviewTimelineDateRange(post.jobReviewTimeline)
+  const metaLine = [post.location, post.jobReviewIndustry]
+    .filter(Boolean)
+    .join(' · ')
+  const wasUpdated = hasJobReviewPostUpdate(post)
+
+  return (
+    <BoardSurface
+      as='article'
+      className='group overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_20px_40px_rgba(15,23,42,0.08)]'
+    >
+      <Link
+        href={`/nyc/${boardId}/${post.id}`}
+        className='block touch-manipulation px-4 py-4 sm:px-5 sm:py-5'
+      >
+        <div className='flex items-start justify-between gap-3'>
+          <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
+            <JobReviewTypeBadge type={post.jobReviewType} />
+            {wasUpdated ? (
+              <span className='inline-flex items-center rounded-full bg-[#fff8f5] px-2.5 py-1 text-[11px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
+                업데이트됨
+              </span>
+            ) : null}
+            <SchoolBadge schoolId={post.authorSchoolId} size='md' />
+            {metaLine ? (
+              <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted-foreground)] ring-1 ring-black/8'>
+                {metaLine}
+              </span>
+            ) : null}
+          </div>
+          <PostLikeButton
+            kind='community'
+            id={post.id}
+            boardId={boardId}
+            variant='icon'
+          />
+        </div>
+
+        <div className='mt-2'>
+          <JobReviewActivityMeta
+            createdAt={post.createdAt}
+            updatedAt={post.updatedAt}
+            compact
+          />
+        </div>
+
+        <h3 className='mt-2.5 text-[16px] font-semibold leading-snug tracking-[-0.025em] text-[var(--foreground)] sm:text-[17px]'>
+          <span className='line-clamp-2'>{post.title}</span>
+        </h3>
+
+        <p className='mt-2 line-clamp-2 text-[13px] leading-relaxed text-[var(--muted)] sm:text-[14px]'>
+          {post.jobReviewTips?.trim() || post.description}
+        </p>
+
+        <div className='mt-3.5 flex items-center justify-between gap-3 border-t border-black/[0.04] pt-3 text-[12px] font-medium text-[var(--muted)]'>
+          <span className='inline-flex items-center gap-1.5'>
+            <EyeIcon className='size-3.5' />
+            <span className='tabular-nums'>
+              {formatCommunityCount(post.viewCount)}
+            </span>
+          </span>
+          <span className='text-right text-[11px] leading-snug'>
+            {stepCount > 0 ? (
+              <>
+                채용 단계 {stepCount}건
                 {dateRange ? (
                   <span className='block text-[10px] font-normal text-[var(--muted)]'>
                     {dateRange}

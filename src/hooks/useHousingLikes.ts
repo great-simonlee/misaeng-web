@@ -1,36 +1,24 @@
 'use client'
 
-import { useMemo, useSyncExternalStore } from 'react'
+import { useMemo } from 'react'
 
-import {
-  getLikedHousingIds,
-  subscribeHousingLikes,
-  toggleHousingLike,
-} from '@lib/utils/housingLikes'
-
-function getSnapshot() {
-  return getLikedHousingIds().join('|')
-}
-
-function getServerSnapshot() {
-  return ''
-}
+import { usePostLikes } from '@hooks/usePostLikes'
 
 export function useHousingLikes() {
-  const snapshot = useSyncExternalStore(
-    subscribeHousingLikes,
-    getSnapshot,
-    getServerSnapshot,
-  )
+  const { likedEntries, isLiked, toggleLike } = usePostLikes()
   const likedIds = useMemo(
-    () => (snapshot ? snapshot.split('|').filter(Boolean) : []),
-    [snapshot],
+    () =>
+      likedEntries
+        .filter((entry) => entry.kind === 'housing')
+        .map((entry) => entry.id),
+    [likedEntries],
   )
 
   return {
     likedIds,
-    isLiked: (postId: string) => likedIds.includes(postId),
-    toggleLike: (postId: string) => toggleHousingLike(postId),
+    isLiked: (postId: string) => isLiked({ kind: 'housing', id: postId }),
+    toggleLike: (postId: string) =>
+      toggleLike({ kind: 'housing', id: postId }),
   }
 }
 

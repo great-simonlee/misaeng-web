@@ -7,12 +7,24 @@ import { formatCommunityCount } from '@lib/constants/communityMock'
 
 type FoodCardCommentStatProps = {
   postId: string
+  /** 목록 API에서 받은 값 — 있으면 추가 요청 없음 */
+  count?: number
 }
 
-export function FoodCardCommentStat({ postId }: FoodCardCommentStatProps) {
-  const [count, setCount] = useState<number | null>(null)
+export function FoodCardCommentStat({
+  postId,
+  count: countProp,
+}: FoodCardCommentStatProps) {
+  const [count, setCount] = useState<number | null>(
+    countProp != null ? countProp : null,
+  )
 
   useEffect(() => {
+    if (countProp != null) {
+      setCount(countProp)
+      return
+    }
+
     let cancelled = false
     void fetchCommunityCommentCount(postId).then((total) => {
       if (!cancelled) setCount(total)
@@ -20,7 +32,7 @@ export function FoodCardCommentStat({ postId }: FoodCardCommentStatProps) {
     return () => {
       cancelled = true
     }
-  }, [postId])
+  }, [postId, countProp])
 
   return (
     <span className='inline-flex items-center gap-1.5'>

@@ -1,54 +1,30 @@
-const STORAGE_KEY = 'misaeng.nyc.housingLikes'
-const CHANGE_EVENT = 'misaeng:housing-likes-changed'
+/**
+ * 하우징 찜 — postLikes 호환 래퍼
+ * @deprecated 새 코드는 `@lib/utils/postLikes` 사용
+ */
 
-function readIds(): string[] {
-  if (typeof window === 'undefined') return []
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw) as unknown
-    if (!Array.isArray(parsed)) return []
-    return parsed.map(String).filter(Boolean)
-  } catch {
-    return []
-  }
-}
-
-function writeIds(ids: string[]) {
-  if (typeof window === 'undefined') return
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids))
-  window.dispatchEvent(new Event(CHANGE_EVENT))
-}
+import {
+  getLikedEntries,
+  isPostLiked,
+  subscribePostLikes,
+  togglePostLike,
+} from '@lib/utils/postLikes'
 
 export function getLikedHousingIds(): string[] {
-  return readIds()
+  return getLikedEntries()
+    .filter((entry) => entry.kind === 'housing')
+    .map((entry) => entry.id)
 }
 
 export function isHousingLiked(postId: string): boolean {
-  return readIds().includes(postId)
+  return isPostLiked({ kind: 'housing', id: postId })
 }
 
 /** @returns 좋아요 후 상태 */
 export function toggleHousingLike(postId: string): boolean {
-  const ids = readIds()
-  const index = ids.indexOf(postId)
-  if (index >= 0) {
-    ids.splice(index, 1)
-    writeIds(ids)
-    return false
-  }
-  ids.unshift(postId)
-  writeIds(ids)
-  return true
+  return togglePostLike({ kind: 'housing', id: postId })
 }
 
 export function subscribeHousingLikes(onChange: () => void): () => void {
-  if (typeof window === 'undefined') return () => {}
-  const handler = () => onChange()
-  window.addEventListener(CHANGE_EVENT, handler)
-  window.addEventListener('storage', handler)
-  return () => {
-    window.removeEventListener(CHANGE_EVENT, handler)
-    window.removeEventListener('storage', handler)
-  }
+  return subscribePostLikes(onChange)
 }
