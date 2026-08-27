@@ -72,6 +72,9 @@ function post(
     | 'jobReviewTimeline'
     | 'jobReviewTips'
     | 'jobReviewIndustry'
+    | 'roommateLookingFor'
+    | 'roommateBudgetMax'
+    | 'roommateMoveInDate'
     | 'authorUid'
     | 'authorEmail'
     | 'authorNickname'
@@ -104,6 +107,9 @@ function post(
     jobReviewTimeline?: CommunityPost['jobReviewTimeline']
     jobReviewTips?: CommunityPost['jobReviewTips']
     jobReviewIndustry?: CommunityPost['jobReviewIndustry']
+    roommateLookingFor?: CommunityPost['roommateLookingFor']
+    roommateBudgetMax?: CommunityPost['roommateBudgetMax']
+    roommateMoveInDate?: CommunityPost['roommateMoveInDate']
   },
 ): CommunityPost {
   const mockTimelineBoard = isTimelineBoardMockPost(partial)
@@ -141,6 +147,9 @@ function post(
       ? withMockCommunityPrefix(partial.jobReviewTips, mockTimelineBoard)
       : null,
     jobReviewIndustry: partial.jobReviewIndustry ?? null,
+    roommateLookingFor: partial.roommateLookingFor ?? null,
+    roommateBudgetMax: partial.roommateBudgetMax ?? null,
+    roommateMoveInDate: partial.roommateMoveInDate ?? null,
     viewCount: partial.viewCount ?? 0,
     recommendCount: partial.recommendCount ?? 0,
     commentCount: partial.commentCount ?? 0,
@@ -1030,6 +1039,79 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     authorSchoolName: null,
     createdAt: NOW - 1 * DAY,
     viewCount: 67,
+  }),
+  post({
+    id: 'mock-roommate-1',
+    categoryId: 'roommate',
+    title: '브루클린에서 룸메이트 구해요',
+    description:
+      '조용한 생활 패턴, 주말 외에는 재택 위주입니다. 예산은 $1,400까지 가능해요.',
+    contentHtml: `
+      <p>Bushwick / Williamsburg 쪽 2bed에서 룸메이트를 구합니다.</p>
+      <ul>
+        <li>조용한 편, 주중 재택</li>
+        <li>반려동물 없음</li>
+        <li>보증금·유틸 협의 가능</li>
+      </ul>
+    `,
+    location: '브루클린',
+    detail: '룸메이트 구해요',
+    roommateLookingFor: 'roommate',
+    roommateBudgetMax: 1400,
+    roommateMoveInDate: '2026-09-01',
+    thumbnailUrl:
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80',
+    galleryPhotos: [
+      {
+        id: 'g1',
+        imageUrl:
+          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80',
+        caption: '',
+      },
+      {
+        id: 'g2',
+        imageUrl:
+          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+        caption: '',
+      },
+    ],
+    authorUid: 'mock-user-20',
+    authorEmail: 'roommate@nyu.edu',
+    authorSchoolId: 'nyu',
+    authorSchoolName: 'NYU',
+    createdAt: NOW - 10 * HOUR,
+    viewCount: 31,
+  }),
+  post({
+    id: 'mock-roommate-2',
+    categoryId: 'roommate',
+    title: '맨해튼 서블렛 — 9~11월',
+    description: '유학 중 잠시 비는 방 서블렛합니다. 가구 포함, 지하철 5분.',
+    contentHtml: `
+      <p>Upper East Side studio를 9월~11월 서블렛합니다.</p>
+      <p>침대·책상·주방용품 포함이고, 6 train 도보 5분입니다.</p>
+    `,
+    location: '맨해튼 UES',
+    detail: '서블렛',
+    roommateLookingFor: 'sublet',
+    roommateBudgetMax: 2200,
+    roommateMoveInDate: '2026-09-15',
+    thumbnailUrl:
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
+    galleryPhotos: [
+      {
+        id: 'g3',
+        imageUrl:
+          'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
+        caption: '',
+      },
+    ],
+    authorUid: 'mock-user-21',
+    authorEmail: 'sublet@columbia.edu',
+    authorSchoolId: null,
+    authorSchoolName: null,
+    createdAt: NOW - 2 * DAY,
+    viewCount: 54,
   }),
 ]
 

@@ -48,6 +48,50 @@ export function upsertLocalCommunityComment(comment: CommunityComment) {
   return comment
 }
 
+/** 로컬 댓글 소프트 삭제 (대댓글 포함) */
+export function markLocalCommunityCommentDeleted(
+  postId: string,
+  commentId: string,
+): CommunityComment | null {
+  const all = readAll()
+  const now = Date.now()
+  let found: CommunityComment | null = null
+  const next = all.map((item) => {
+    if (item.postId !== postId) return item
+    const shouldDelete =
+      item.id === commentId ||
+      (item.parentId === commentId && item.status === 'open')
+    if (!shouldDelete) return item
+    const updated = {
+      ...item,
+      status: 'deleted' as const,
+      updatedAt: now,
+    }
+    if (item.id === commentId) found = updated
+    return updated
+  })
+  if (!found) {
+    // 원격/목 댓글도 로컬에 삭제 마킹해 목록에서 숨김
+    found = {
+      id: commentId,
+      postId,
+      parentId: null,
+      body: '',
+      authorUid: '',
+      authorEmail: '',
+      authorNickname: null,
+      authorPhotoURL: null,
+      authorSchoolId: null,
+      createdAt: now,
+      updatedAt: now,
+      status: 'deleted',
+    }
+    next.push(found)
+  }
+  writeAll(next)
+  return found
+}
+
 export function mergeCommunityComments(
   primary: CommunityComment[],
   secondary: CommunityComment[],

@@ -27,6 +27,7 @@ import {
 } from '@lib/community/jobReview'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
 import { htmlToPlainText } from '@lib/community/html'
+import { isSchoolVerified } from '@lib/community/schoolGate'
 import {
   NYC_COMMUNITY_BOARD_META,
   type NycCommunityBoardId,
@@ -39,6 +40,7 @@ import {
 } from '@widgets/nyc/BoardPageShell'
 import { JobReviewTimelineEditor } from '@widgets/nyc/JobReviewTimelineEditor'
 import { JobReviewTypeBadge, JobReviewTypePicker } from '@widgets/nyc/JobReviewTypeBadge'
+import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 
 interface JobReviewWriteScreenProps {
   title: string
@@ -209,6 +211,10 @@ export function JobReviewWriteScreen({
         <LoadingState fullPage label='로그인 확인 중…' />
       </BoardPageShell>
     )
+  }
+
+  if (!isSchoolVerified(profile)) {
+    return <SchoolVerificationRequired nextPath={loginNext} />
   }
 
   if (loadingEdit) {

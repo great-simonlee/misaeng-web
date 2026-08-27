@@ -64,7 +64,7 @@ export default function RootLayout({
             <ToastProvider>
               <SiteHeader />
 
-              <main className='flex flex-1 flex-col pt-14 md:pt-0'>
+              <main className='flex flex-1 flex-col pt-14 sm:pt-16 md:pt-0'>
                 {children}
               </main>
 

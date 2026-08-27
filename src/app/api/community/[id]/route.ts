@@ -16,6 +16,13 @@ import {
   normalizeJobReviewType,
 } from '@lib/community/jobReview'
 import {
+  getRoommateLookingForLabel,
+  isRoommateLookingFor,
+  normalizeRoommateBudgetMax,
+  normalizeRoommateLookingFor,
+  normalizeRoommateMoveInDate,
+} from '@lib/community/roommate'
+import {
   COMMUNITY_BODY_MAX,
   isFoodCategoryId,
   normalizeFoodGalleryPhotos,
@@ -40,6 +47,7 @@ import type {
   FoodMenuItem,
   JobReviewTimelineEntry,
   JobReviewTypeId,
+  RoommateLookingFor,
 } from '@/types/nyc'
 
 export const runtime = 'nodejs'
@@ -72,6 +80,9 @@ type UpdateBody = {
   jobReviewTimeline?: JobReviewTimelineEntry[] | null
   jobReviewTips?: string | null
   jobReviewIndustry?: string | null
+  roommateLookingFor?: RoommateLookingFor | null
+  roommateBudgetMax?: number | null
+  roommateMoveInDate?: string | null
 }
 
 export async function GET(_request: Request, context: RouteContext) {
@@ -149,12 +160,14 @@ export async function PATCH(request: Request, context: RouteContext) {
   const isCptOpt =
     existing.categoryId === 'status' || existing.categoryId === 'cpt-opt'
   const isJobReview = existing.categoryId === 'job-review'
+  const isRoommate = existing.categoryId === 'roommate'
   const menuItems = isFood
     ? normalizeFoodMenuItems(body.menuItems ?? existing.menuItems)
     : []
-  const galleryPhotos = isFood
-    ? normalizeFoodGalleryPhotos(body.galleryPhotos ?? existing.galleryPhotos)
-    : []
+  const galleryPhotos =
+    isFood || isRoommate
+      ? normalizeFoodGalleryPhotos(body.galleryPhotos ?? existing.galleryPhotos)
+      : []
   const partySize = isFood
     ? normalizePartySize(body.partySize ?? existing.partySize)
     : null
@@ -238,6 +251,35 @@ export async function PATCH(request: Request, context: RouteContext) {
       null
     : null
 
+  const roommateLookingFor = isRoommate
+    ? isRoommateLookingFor(body.roommateLookingFor)
+      ? body.roommateLookingFor!
+      : normalizeRoommateLookingFor(
+          body.roommateLookingFor ?? existing.roommateLookingFor,
+          body.detail ?? existing.detail,
+        )
+    : null
+  const roommateBudgetMax = isRoommate
+    ? normalizeRoommateBudgetMax(
+        body.roommateBudgetMax ??
+          existing.roommateBudgetMax ??
+          body.detail ??
+          existing.detail,
+      )
+    : null
+  const roommateMoveInDate = isRoommate
+    ? normalizeRoommateMoveInDate(
+        body.roommateMoveInDate ?? existing.roommateMoveInDate,
+      )
+    : null
+
+  if (isRoommate && !roommateLookingFor) {
+    return NextResponse.json(
+      { error: '룸메이트 / 방 / 서블렛 중 유형을 선택해 주세요.' },
+      { status: 400 },
+    )
+  }
+
   if (isFood) {
     if (partySize == null) {
       return NextResponse.json(
@@ -312,9 +354,11 @@ export async function PATCH(request: Request, context: RouteContext) {
       ? getCptOptTypeLabel(cptOptType)
       : isJobReview
         ? getJobReviewTypeLabel(jobReviewType)
-        : String(body.detail ?? existing.detail).trim(),
+        : isRoommate
+          ? getRoommateLookingForLabel(roommateLookingFor)
+          : String(body.detail ?? existing.detail).trim(),
     updatedAt: Date.now(),
-    thumbnailUrl: isFood ? thumbnailUrl : null,
+    thumbnailUrl: isFood || isRoommate ? thumbnailUrl : null,
     partySize: isFood ? partySize : null,
     totalSpend: isFood ? totalSpend : null,
     waitMinutes: isFood ? waitMinutes : null,
@@ -332,6 +376,9 @@ export async function PATCH(request: Request, context: RouteContext) {
     jobReviewTimeline: isJobReview ? jobReviewTimeline : [],
     jobReviewTips: isJobReview ? jobReviewTips || null : null,
     jobReviewIndustry: isJobReview ? jobReviewIndustry : null,
+    roommateLookingFor: isRoommate ? roommateLookingFor : null,
+    roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
+    roommateMoveInDate: isRoommate ? roommateMoveInDate : null,
   }
 
   try {

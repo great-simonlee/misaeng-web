@@ -25,6 +25,7 @@ import {
 } from '@lib/community/cptOpt'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
 import { htmlToPlainText } from '@lib/community/html'
+import { isSchoolVerified } from '@lib/community/schoolGate'
 import {
   isStatusCommunityBoard,
   NYC_COMMUNITY_BOARD_META,
@@ -38,6 +39,7 @@ import {
 } from '@widgets/nyc/BoardPageShell'
 import { CptOptTimelineEditor } from '@widgets/nyc/CptOptTimelineEditor'
 import { CptOptTypeBadge, CptOptTypePicker } from '@widgets/nyc/CptOptTypeBadge'
+import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 
 interface CptOptWriteScreenProps {
   title: string
@@ -209,6 +211,10 @@ export function CptOptWriteScreen({
         <LoadingState fullPage label='로그인 확인 중…' />
       </BoardPageShell>
     )
+  }
+
+  if (!isSchoolVerified(profile)) {
+    return <SchoolVerificationRequired nextPath={loginNext} />
   }
 
   if (loadingEdit) {

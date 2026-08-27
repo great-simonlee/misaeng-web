@@ -5,6 +5,7 @@ import type { Map as LeafletMap, Marker as LeafletMarker } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 import type { FoodPlacePoint } from '@lib/community/foodMap'
+import { getLeafletTileConfig } from '@lib/community/leafletTiles'
 import { cn } from '@lib'
 
 type FoodPlaceMapProps = {
@@ -39,15 +40,12 @@ export function FoodPlaceMap({
       }).setView([place.latitude, place.longitude], 15)
 
       L.control.zoom({ position: 'bottomright' }).addTo(map)
-      L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-        {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 19,
-        },
-      ).addTo(map)
+      const tiles = getLeafletTileConfig()
+      L.tileLayer(tiles.url, {
+        attribution: tiles.attribution,
+        subdomains: tiles.subdomains,
+        maxZoom: tiles.maxZoom,
+      }).addTo(map)
 
       mapRef.current = map
       setReady(true)

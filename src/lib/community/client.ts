@@ -55,6 +55,9 @@ function withLocalCounts(post: CommunityPost): CommunityPost {
       : [],
     jobReviewTips: post.jobReviewTips ?? null,
     jobReviewIndustry: post.jobReviewIndustry ?? null,
+    roommateLookingFor: post.roommateLookingFor ?? null,
+    roommateBudgetMax: post.roommateBudgetMax ?? null,
+    roommateMoveInDate: post.roommateMoveInDate ?? null,
   }
 }
 
@@ -127,6 +130,9 @@ export async function createCommunityPostRequest(input: {
   jobReviewTimeline?: CommunityPost['jobReviewTimeline']
   jobReviewTips?: CommunityPost['jobReviewTips']
   jobReviewIndustry?: CommunityPost['jobReviewIndustry'] | null
+  roommateLookingFor?: CommunityPost['roommateLookingFor'] | null
+  roommateBudgetMax?: CommunityPost['roommateBudgetMax'] | null
+  roommateMoveInDate?: CommunityPost['roommateMoveInDate'] | null
 }): Promise<CommunityPost> {
   const res = await fetch('/api/community', {
     method: 'POST',
@@ -178,6 +184,9 @@ export async function updateCommunityPostRequest(
     jobReviewTimeline?: CommunityPost['jobReviewTimeline']
     jobReviewTips?: CommunityPost['jobReviewTips']
     jobReviewIndustry?: CommunityPost['jobReviewIndustry'] | null
+    roommateLookingFor?: CommunityPost['roommateLookingFor'] | null
+    roommateBudgetMax?: CommunityPost['roommateBudgetMax'] | null
+    roommateMoveInDate?: CommunityPost['roommateMoveInDate'] | null
   },
 ): Promise<CommunityPost> {
   if (id.startsWith('mock-')) {

@@ -62,6 +62,14 @@ export const NYC_CATEGORIES = [
     available: true,
   },
   {
+    id: 'roommate',
+    title: '룸메이트 · 서블렛',
+    description: '룸메이트·방·서블렛 구하기',
+    href: '/nyc/roommate',
+    postHref: '/nyc/roommate/new',
+    available: true,
+  },
+  {
     id: 'anonymous',
     title: '익명게시판',
     description: '익명으로 이야기 나누기',
@@ -84,6 +92,7 @@ export const NYC_COMMUNITY_BOARD_IDS = [
   'job-review',
   'green-card',
   'anonymous',
+  'roommate',
 ] as const
 
 export type NycCommunityBoardId = (typeof NYC_COMMUNITY_BOARD_IDS)[number]
@@ -204,6 +213,18 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     detailInput: null,
     titlePlaceholder: 'Google SWE Intern — 3라운드 면접 후기',
     descriptionPlaceholder: '다음 지원자에게 꼭 알려주고 싶은 팁',
+  },
+  roommate: {
+    writeLabel: '글 올리기',
+    listIntro:
+      '룸메이트·방·서블렛을 찾고 있다면 올려 주세요. 계정당 1개만 등록할 수 있어요.',
+    locationLabel: '희망 동네',
+    locationPlaceholder: '플러싱 / 브루클린 / 맨해튼',
+    detailLabel: '월 예산 ($)',
+    detailPlaceholder: '1500',
+    detailInput: 'number',
+    titlePlaceholder: '브루클린에서 룸메이트 구해요',
+    descriptionPlaceholder: '생활 패턴, 예산, 입주 시기, 연락 방법을 적어 주세요.',
   },
   'green-card': {
     writeLabel: '후기 남기기',

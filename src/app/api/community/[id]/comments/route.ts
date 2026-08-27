@@ -4,6 +4,11 @@ import { resolveAuthenticatedUser } from '../../../agent-auth/lib/authHelpers'
 import {
   sanitizeAnonymousCommunityComment,
 } from '@lib/community/anonymous'
+import {
+  isSchoolVerified,
+  SCHOOL_VERIFY_REQUIRED_CODE,
+  SCHOOL_VERIFY_REQUIRED_MESSAGE,
+} from '@lib/community/schoolGate'
 import { getMockCommunityPost } from '@lib/constants/communityMock'
 import { listMockCommunityComments } from '@lib/constants/communityCommentsMock'
 import { isAnonymousBoard } from '@lib/constants/nyc'
@@ -144,6 +149,17 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
   }
 
+  const profile = await getSupabaseProfile(user.uid)
+  if (!isSchoolVerified(profile)) {
+    return NextResponse.json(
+      {
+        error: SCHOOL_VERIFY_REQUIRED_MESSAGE,
+        code: SCHOOL_VERIFY_REQUIRED_CODE,
+      },
+      { status: 403 },
+    )
+  }
+
   const { id: postId } = await context.params
   const postExists =
     postId.startsWith('mock-') ||
@@ -189,7 +205,6 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   const now = Date.now()
-  const profile = await getSupabaseProfile(user.uid)
   const authorNickname = isAnonymous
     ? null
     : (typeof profile?.nickname === 'string' && profile.nickname.trim()) ||
@@ -204,6 +219,11 @@ export async function POST(request: Request, context: RouteContext) {
         ? payload.authorPhotoURL.trim() || null
         : null) ||
       null
+  const authorSchoolId = isAnonymous
+    ? null
+    : (typeof profile?.verifiedSchoolId === 'string' &&
+        profile.verifiedSchoolId.trim()) ||
+      null
 
   const comment: CommunityComment = {
     id: `cmt_${now.toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
@@ -214,11 +234,7 @@ export async function POST(request: Request, context: RouteContext) {
     authorEmail: user.email,
     authorNickname,
     authorPhotoURL,
-    authorSchoolId: isAnonymous
-      ? null
-      : typeof payload?.authorSchoolId === 'string'
-        ? payload.authorSchoolId
-        : null,
+    authorSchoolId,
     createdAt: now,
     updatedAt: now,
     status: 'open',
@@ -236,6 +252,165 @@ export async function POST(request: Request, context: RouteContext) {
       {
         error:
           error instanceof Error ? error.message : '댓글 등록에 실패했어요.',
+      },
+      { status: 500 },
+    )
+  }
+}
+
+type PatchBody = {
+  commentId?: string
+  body?: string
+}
+
+export async function PATCH(request: Request, context: RouteContext) {
+  if (!isCommunityCommentStorageConfigured()) {
+    return NextResponse.json(
+      {
+        error:
+          'Supabase 설정이 필요해요. 로컬에서는 브라우저에 임시 저장돼요.',
+        code: 'STORAGE_UNAVAILABLE',
+      },
+      { status: 503 },
+    )
+  }
+
+  const user = await resolveAuthenticatedUser()
+  if (!user?.uid) {
+    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+  }
+
+  const { id: postId } = await context.params
+  const payload = (await request.json().catch(() => null)) as PatchBody | null
+  const commentId = String(payload?.commentId || '').trim()
+  const body = String(payload?.body || '').trim()
+
+  if (!commentId) {
+    return NextResponse.json(
+      { error: '수정할 댓글을 지정해 주세요.' },
+      { status: 400 },
+    )
+  }
+  if (!body) {
+    return NextResponse.json({ error: '댓글을 입력해 주세요.' }, { status: 400 })
+  }
+  if (body.length > 2000) {
+    return NextResponse.json(
+      { error: '댓글은 2000자 이내로 작성해 주세요.' },
+      { status: 400 },
+    )
+  }
+
+  const existing = await listStoredCommunityComments(postId)
+  const target = existing.find((item) => item.id === commentId)
+  if (!target || target.status !== 'open') {
+    return NextResponse.json(
+      { error: '댓글을 찾을 수 없어요.' },
+      { status: 404 },
+    )
+  }
+  if (target.authorUid !== user.uid) {
+    return NextResponse.json(
+      { error: '본인이 작성한 댓글만 수정할 수 있어요.' },
+      { status: 403 },
+    )
+  }
+
+  const now = Date.now()
+  const updated: CommunityComment = {
+    ...target,
+    body,
+    updatedAt: now,
+  }
+  const next = existing.map((item) =>
+    item.id === commentId ? updated : item,
+  )
+
+  try {
+    await saveStoredCommunityComments(postId, next)
+    const categoryId = await resolvePostCategoryId(postId)
+    const isAnonymous = categoryId ? isAnonymousBoard(categoryId) : false
+    return NextResponse.json({
+      comment: isAnonymous
+        ? sanitizeAnonymousCommunityComment(updated, user.uid)
+        : updated,
+    })
+  } catch (error) {
+    console.error('Community comment update error:', error)
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error ? error.message : '댓글 수정에 실패했어요.',
+      },
+      { status: 500 },
+    )
+  }
+}
+
+export async function DELETE(request: Request, context: RouteContext) {
+  if (!isCommunityCommentStorageConfigured()) {
+    return NextResponse.json(
+      {
+        error:
+          'Supabase 설정이 필요해요. 로컬에서는 브라우저에 임시 저장돼요.',
+        code: 'STORAGE_UNAVAILABLE',
+      },
+      { status: 503 },
+    )
+  }
+
+  const user = await resolveAuthenticatedUser()
+  if (!user?.uid) {
+    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+  }
+
+  const { id: postId } = await context.params
+  const { searchParams } = new URL(request.url)
+  const commentId = String(searchParams.get('commentId') || '').trim()
+  if (!commentId) {
+    return NextResponse.json(
+      { error: '삭제할 댓글을 지정해 주세요.' },
+      { status: 400 },
+    )
+  }
+
+  const existing = await listStoredCommunityComments(postId)
+  const target = existing.find((item) => item.id === commentId)
+  if (!target || target.status !== 'open') {
+    return NextResponse.json(
+      { error: '댓글을 찾을 수 없어요.' },
+      { status: 404 },
+    )
+  }
+  if (target.authorUid !== user.uid) {
+    return NextResponse.json(
+      { error: '본인이 작성한 댓글만 삭제할 수 있어요.' },
+      { status: 403 },
+    )
+  }
+
+  const now = Date.now()
+  const next = existing.map((item) => {
+    const shouldDelete =
+      item.id === commentId ||
+      (item.parentId === commentId && item.status === 'open')
+    if (!shouldDelete) return item
+    return {
+      ...item,
+      status: 'deleted' as const,
+      updatedAt: now,
+    }
+  })
+
+  try {
+    await saveStoredCommunityComments(postId, next)
+    return NextResponse.json({ ok: true, commentId })
+  } catch (error) {
+    console.error('Community comment delete error:', error)
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error ? error.message : '댓글 삭제에 실패했어요.',
       },
       { status: 500 },
     )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
 import { BottomSheet, BottomSheetSelect } from '@components'
@@ -93,6 +93,7 @@ export function MyPageScreen() {
   } = useAuth()
   const { success, error: toastError } = useToast()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [editingNickname, setEditingNickname] = useState(false)
@@ -126,6 +127,12 @@ export function MyPageScreen() {
       router.replace(`/nyc/login?next=${encodeURIComponent('/nyc/me')}`)
     }
   }, [user, loading, sessionLoading, router])
+
+  useEffect(() => {
+    if (searchParams.get('verify') !== 'school') return
+    if (profile?.schoolEmailVerified) return
+    setSchoolVerifyOpen(true)
+  }, [searchParams, profile?.schoolEmailVerified])
 
   useEffect(() => {
     if (!editingNickname) {

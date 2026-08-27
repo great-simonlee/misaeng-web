@@ -14,6 +14,11 @@ import {
   normalizeJobReviewTips,
   normalizeJobReviewType,
 } from '@lib/community/jobReview'
+import {
+  normalizeRoommateBudgetMax,
+  normalizeRoommateLookingFor,
+  normalizeRoommateMoveInDate,
+} from '@lib/community/roommate'
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import type { CommunityPost } from '@/types/nyc'
@@ -182,6 +187,14 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       data.jobReviewIndustry.trim()
         ? data.jobReviewIndustry.trim()
         : null,
+    roommateLookingFor: normalizeRoommateLookingFor(
+      data.roommateLookingFor,
+      String(data.detail || '').trim(),
+    ),
+    roommateBudgetMax: normalizeRoommateBudgetMax(
+      data.roommateBudgetMax ?? data.detail,
+    ),
+    roommateMoveInDate: normalizeRoommateMoveInDate(data.roommateMoveInDate),
   }
 }
 

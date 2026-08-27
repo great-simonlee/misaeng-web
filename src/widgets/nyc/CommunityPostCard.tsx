@@ -38,6 +38,12 @@ import { FoodCategoryBadge } from '@widgets/nyc/FoodCategoryBadge'
 import { FoodCardCommentStat } from '@widgets/nyc/FoodCardCommentStat'
 import { FoodCardRecommendStat } from '@widgets/nyc/FoodCardRecommendStat'
 import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
+import {
+  formatRoommateBudget,
+  formatRoommateMoveInDate,
+  getRoommateLookingForLabel,
+  getRoommateLookingForStyle,
+} from '@lib/community/roommate'
 
 interface CommunityPostCardProps {
   post: CommunityPost
@@ -375,11 +381,23 @@ function TextListingCard({
   const anonymous = isAnonymousBoard(boardId)
   const boardMeta = NYC_COMMUNITY_BOARD_META[boardId]
   const isMarket = boardId === 'marketplace'
-  const priceLabel =
-    isMarket && post.detail?.trim() ? `$${post.detail.trim()}` : null
+  const isRoommate = boardId === 'roommate'
+  const roommateLabel = isRoommate
+    ? getRoommateLookingForLabel(post.roommateLookingFor)
+    : null
+  const roommateStyle = getRoommateLookingForStyle(post.roommateLookingFor)
+  const budgetLabel = isRoommate
+    ? formatRoommateBudget(post.roommateBudgetMax)
+    : isMarket && post.detail?.trim()
+      ? `$${post.detail.trim()}`
+      : null
+  const moveInLabel = isRoommate
+    ? formatRoommateMoveInDate(post.roommateMoveInDate)
+    : null
   const metaLine = [
     post.location,
-    !isMarket && post.detail ? post.detail : null,
+    !isMarket && !isRoommate && post.detail ? post.detail : null,
+    moveInLabel ? `입주 ${moveInLabel}` : null,
   ]
     .filter(Boolean)
     .join(' · ')
@@ -402,6 +420,16 @@ function TextListingCard({
             ) : (
               <SchoolBadge schoolId={post.authorSchoolId} />
             )}
+            {roommateLabel ? (
+              <span
+                className={cn(
+                  'inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1',
+                  roommateStyle.badge,
+                )}
+              >
+                {roommateLabel}
+              </span>
+            ) : null}
             {metaLine ? (
               <span className='truncate text-[12px] font-medium text-[var(--muted)]'>
                 {metaLine}
@@ -417,9 +445,10 @@ function TextListingCard({
           <h3 className='min-w-0 flex-1 text-[16px] font-semibold leading-snug tracking-[-0.025em] text-[var(--foreground)] sm:text-[17px]'>
             <span className='line-clamp-2'>{post.title}</span>
           </h3>
-          {priceLabel ? (
+          {budgetLabel ? (
             <span className='shrink-0 rounded-full bg-[#eef4ff] px-2.5 py-1 text-[14px] font-semibold tabular-nums text-[#3b5bdb]'>
-              {priceLabel}
+              {budgetLabel}
+              {isRoommate ? <span className='text-[11px] font-medium'>/월</span> : null}
             </span>
           ) : null}
         </div>

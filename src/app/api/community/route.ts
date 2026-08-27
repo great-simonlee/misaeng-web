@@ -15,8 +15,20 @@ import {
   normalizeJobReviewTips,
   normalizeJobReviewType,
 } from '@lib/community/jobReview'
+import {
+  getRoommateLookingForLabel,
+  isRoommateLookingFor,
+  normalizeRoommateBudgetMax,
+  normalizeRoommateLookingFor,
+  normalizeRoommateMoveInDate,
+} from '@lib/community/roommate'
 import { isCommunityBoardId, isAnonymousBoard } from '@lib/constants/nyc'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
+import {
+  isSchoolVerified,
+  SCHOOL_VERIFY_REQUIRED_CODE,
+  SCHOOL_VERIFY_REQUIRED_MESSAGE,
+} from '@lib/community/schoolGate'
 import {
   COMMUNITY_BODY_MAX,
   isFoodCategoryId,
@@ -43,6 +55,7 @@ import type {
   FoodMenuItem,
   JobReviewTimelineEntry,
   JobReviewTypeId,
+  RoommateLookingFor,
 } from '@/types/nyc'
 
 export const runtime = 'nodejs'
@@ -120,6 +133,9 @@ type CreateBody = {
   jobReviewTimeline?: JobReviewTimelineEntry[] | null
   jobReviewTips?: string | null
   jobReviewIndustry?: string | null
+  roommateLookingFor?: RoommateLookingFor | null
+  roommateBudgetMax?: number | null
+  roommateMoveInDate?: string | null
 }
 
 export async function POST(request: Request) {
@@ -136,6 +152,17 @@ export async function POST(request: Request) {
   const user = await resolveAuthenticatedUser()
   if (!user?.uid || !user.email) {
     return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+  }
+
+  const profile = await getSupabaseProfile(user.uid)
+  if (!isSchoolVerified(profile)) {
+    return NextResponse.json(
+      {
+        error: SCHOOL_VERIFY_REQUIRED_MESSAGE,
+        code: SCHOOL_VERIFY_REQUIRED_CODE,
+      },
+      { status: 403 },
+    )
   }
 
   const body = (await request.json().catch(() => null)) as CreateBody | null
@@ -169,11 +196,13 @@ export async function POST(request: Request) {
   const isFood = categoryId === 'food'
   const isCptOpt = categoryId === 'status' || categoryId === 'cpt-opt'
   const isJobReview = categoryId === 'job-review'
+  const isRoommate = categoryId === 'roommate'
   const isAnonymous = isAnonymousBoard(categoryId)
   const menuItems = isFood ? normalizeFoodMenuItems(body?.menuItems) : []
-  const galleryPhotos = isFood
-    ? normalizeFoodGalleryPhotos(body?.galleryPhotos)
-    : []
+  const galleryPhotos =
+    isFood || isRoommate
+      ? normalizeFoodGalleryPhotos(body?.galleryPhotos)
+      : []
   const partySize = isFood ? normalizePartySize(body?.partySize) : null
   const totalSpend = isFood ? normalizeTotalSpend(body?.totalSpend) : null
   const waitMinutes = isFood ? normalizeWaitMinutes(body?.waitMinutes) : null
@@ -224,6 +253,41 @@ export async function POST(request: Request) {
   const jobReviewIndustry = isJobReview
     ? String(body?.jobReviewIndustry || '').trim() || null
     : null
+
+  const roommateLookingFor = isRoommate
+    ? isRoommateLookingFor(body?.roommateLookingFor)
+      ? body!.roommateLookingFor!
+      : normalizeRoommateLookingFor(body?.roommateLookingFor, body?.detail)
+    : null
+  const roommateBudgetMax = isRoommate
+    ? normalizeRoommateBudgetMax(body?.roommateBudgetMax ?? body?.detail)
+    : null
+  const roommateMoveInDate = isRoommate
+    ? normalizeRoommateMoveInDate(body?.roommateMoveInDate)
+    : null
+
+  if (isRoommate) {
+    const mine = await listStoredCommunityPostsByAuthor(user.uid)
+    const existing = mine.find(
+      (item) => item.categoryId === 'roommate' && item.status === 'open',
+    )
+    if (existing) {
+      return NextResponse.json(
+        {
+          error:
+            '룸메이트·서블렛 글은 계정당 1개만 올릴 수 있어요. 기존 글을 수정하거나 삭제한 뒤 다시 올려 주세요.',
+          existingPostId: existing.id,
+        },
+        { status: 409 },
+      )
+    }
+    if (!roommateLookingFor) {
+      return NextResponse.json(
+        { error: '룸메이트 / 방 / 서블렛 중 유형을 선택해 주세요.' },
+        { status: 400 },
+      )
+    }
+  }
 
   if (isFood) {
     if (partySize == null) {
@@ -288,7 +352,6 @@ export async function POST(request: Request) {
     }
   }
 
-  const profile = await getSupabaseProfile(user.uid)
   const authorNickname = isAnonymous
     ? null
     : profile?.nickname?.trim() ||
@@ -300,6 +363,16 @@ export async function POST(request: Request) {
     ? null
     : (typeof profile?.photoURL === 'string' && profile.photoURL.trim()) ||
       (typeof body?.authorPhotoURL === 'string' && body.authorPhotoURL.trim()) ||
+      null
+  const authorSchoolId = isAnonymous
+    ? null
+    : (typeof profile?.verifiedSchoolId === 'string' &&
+        profile.verifiedSchoolId.trim()) ||
+      null
+  const authorSchoolName = isAnonymous
+    ? null
+    : (typeof profile?.verifiedSchoolName === 'string' &&
+        profile.verifiedSchoolName.trim()) ||
       null
 
   const post: CommunityPost = {
@@ -313,21 +386,15 @@ export async function POST(request: Request) {
       ? getCptOptTypeLabel(cptOptType)
       : isJobReview
         ? getJobReviewTypeLabel(jobReviewType)
-        : String(body?.detail || '').trim(),
+        : isRoommate
+          ? getRoommateLookingForLabel(roommateLookingFor)
+          : String(body?.detail || '').trim(),
     authorUid: user.uid,
     authorEmail: user.email,
     authorNickname,
     authorPhotoURL,
-    authorSchoolId: isAnonymous
-      ? null
-      : typeof body?.authorSchoolId === 'string'
-        ? body.authorSchoolId
-        : null,
-    authorSchoolName: isAnonymous
-      ? null
-      : typeof body?.authorSchoolName === 'string'
-        ? body.authorSchoolName
-        : null,
+    authorSchoolId,
+    authorSchoolName,
     createdAt: now,
     updatedAt: now,
     status: 'open',
@@ -335,7 +402,7 @@ export async function POST(request: Request) {
     recommendCount: 0,
     commentCount: 0,
     beenThereCount: 0,
-    thumbnailUrl: isFood ? thumbnailUrl : null,
+    thumbnailUrl: isFood || isRoommate ? thumbnailUrl : null,
     partySize: isFood ? partySize : null,
     totalSpend: isFood ? totalSpend : null,
     waitMinutes: isFood ? waitMinutes : null,
@@ -353,6 +420,9 @@ export async function POST(request: Request) {
     jobReviewTimeline: isJobReview ? jobReviewTimeline : [],
     jobReviewTips: isJobReview ? jobReviewTips || null : null,
     jobReviewIndustry: isJobReview ? jobReviewIndustry : null,
+    roommateLookingFor: isRoommate ? roommateLookingFor : null,
+    roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
+    roommateMoveInDate: isRoommate ? roommateMoveInDate : null,
   }
 
   try {

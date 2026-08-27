@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { Map as LeafletMap, Marker as LeafletMarker } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
+import { getLeafletTileConfig } from '@lib/community/leafletTiles'
 import { cn } from '@lib'
 import { BoardSurface } from '@widgets/nyc/BoardPageShell'
 
@@ -110,16 +111,13 @@ export function HousingLocationMap({
         scrollWheelZoom: false,
       }).setView([latitude, longitude], 15)
 
+      const tiles = getLeafletTileConfig()
       L.control.zoom({ position: 'bottomright' }).addTo(map)
-      L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-        {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 19,
-        },
-      ).addTo(map)
+      L.tileLayer(tiles.url, {
+        attribution: tiles.attribution,
+        subdomains: tiles.subdomains,
+        maxZoom: tiles.maxZoom,
+      }).addTo(map)
 
       // 지도/핀 클릭 시 구글 맵스
       map.on('click', () => {

@@ -9,9 +9,16 @@ import { getErrorMessage, useToast } from '@hooks/useToast'
 import {
   buildCommentThreads,
   createCommunityCommentRequest,
+  deleteCommunityCommentRequest,
   fetchCommunityComments,
+  updateCommunityCommentRequest,
 } from '@lib/community/comments.client'
 import { createCommunityReportRequest } from '@lib/community/engagement.client'
+import {
+  getSchoolVerifyHref,
+  isSchoolVerified,
+  SCHOOL_VERIFY_REQUIRED_MESSAGE,
+} from '@lib/community/schoolGate'
 import { formatCommunityRelativeTime } from '@lib/constants/communityMock'
 import { countOpenComments } from '@lib/constants/communityCommentsMock'
 import { cn } from '@lib'
@@ -43,6 +50,10 @@ export function CommunityCommentsSection({
   const [submitting, setSubmitting] = useState(false)
   const [reportTargetId, setReportTargetId] = useState<string | null>(null)
   const [reporting, setReporting] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editDraft, setEditDraft] = useState('')
+  const [savingEdit, setSavingEdit] = useState(false)
 
   const loadComments = useCallback(async () => {
     setLoading(true)
@@ -66,9 +77,16 @@ export function CommunityCommentsSection({
   const loginHref = `/nyc/login?next=${encodeURIComponent(
     loginNext || `/nyc`,
   )}`
+  const schoolVerified = isSchoolVerified(profile)
+  const schoolVerifyHref = getSchoolVerifyHref(loginNext || `/nyc`)
+  const canCompose = Boolean(user) && schoolVerified
 
   async function submitComment(body: string, parentId: string | null) {
     if (!user?.uid || !user.email) return
+    if (!isSchoolVerified(profile)) {
+      toastError(SCHOOL_VERIFY_REQUIRED_MESSAGE)
+      return
+    }
     const text = body.trim()
     if (!text) {
       toastError('댓글을 입력해 주세요')
@@ -140,6 +158,88 @@ export function CommunityCommentsSection({
     }
   }
 
+  async function handleDeleteComment(commentId: string) {
+    if (!user?.uid) return
+    const ok = window.confirm(
+      '이 댓글을 삭제할까요?\n삭제하면 답글도 함께 삭제돼요.',
+    )
+    if (!ok) return
+
+    setDeletingId(commentId)
+    try {
+      await deleteCommunityCommentRequest({
+        postId,
+        commentId,
+        authorUid: user.uid,
+      })
+      setComments((prev) => {
+        const next = prev.map((item) => {
+          const shouldDelete =
+            item.id === commentId || item.parentId === commentId
+          return shouldDelete
+            ? { ...item, status: 'deleted' as const, updatedAt: Date.now() }
+            : item
+        })
+        onCountChange?.(countOpenComments(next))
+        return next
+      })
+      if (replyToId === commentId) {
+        setReplyToId(null)
+        setReplyDraft('')
+      }
+      if (editingId === commentId) {
+        setEditingId(null)
+        setEditDraft('')
+      }
+      success('댓글을 삭제했어요')
+    } catch (err) {
+      toastError(getErrorMessage(err, '댓글 삭제에 실패했어요'))
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  function startEdit(comment: CommunityComment) {
+    setEditingId(comment.id)
+    setEditDraft(comment.body)
+    setReplyToId(null)
+    setReplyDraft('')
+  }
+
+  function cancelEdit() {
+    setEditingId(null)
+    setEditDraft('')
+  }
+
+  async function handleSaveEdit(commentId: string) {
+    if (!user?.uid) return
+    const text = editDraft.trim()
+    if (!text) {
+      toastError('댓글을 입력해 주세요')
+      return
+    }
+
+    setSavingEdit(true)
+    try {
+      const updated = await updateCommunityCommentRequest({
+        postId,
+        commentId,
+        body: text,
+        authorUid: user.uid,
+      })
+      setComments((prev) =>
+        prev.map((item) => (item.id === commentId ? updated : item)),
+      )
+      setEditingId(null)
+      setEditDraft('')
+      success('댓글을 수정했어요')
+    } catch (err) {
+      toastError(getErrorMessage(err, '댓글 수정에 실패했어요'))
+    } finally {
+      setSavingEdit(false)
+    }
+  }
+
   return (
     <section className='mt-6 overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.05] sm:mt-7'>
       <div className='px-5 py-5 sm:px-6'>
@@ -167,6 +267,17 @@ export function CommunityCommentsSection({
           <p className='mt-4 text-[13px] text-[var(--muted)]'>
             로그인 상태를 확인하는 중이에요…
           </p>
+        ) : !schoolVerified ? (
+          <div className='mt-4 rounded-xl bg-[#f7f8fa] px-4 py-3.5 text-[13px] text-[var(--muted-foreground)]'>
+            댓글을 쓰려면{' '}
+            <Link
+              href={schoolVerifyHref}
+              className='font-semibold text-[var(--brand)] underline-offset-2 hover:underline'
+            >
+              학교 이메일 인증
+            </Link>
+            이 필요해요.
+          </div>
         ) : (
           <form
             className='mt-4'
@@ -221,17 +332,45 @@ export function CommunityCommentsSection({
               <CommentItem
                 comment={thread}
                 anonymousBoard={anonymousBoard}
+                isAuthor={Boolean(user?.uid && user.uid === thread.authorUid)}
                 canReport={Boolean(user)}
                 loginHref={loginHref}
+                deleting={deletingId === thread.id}
+                editing={editingId === thread.id}
+                editDraft={editingId === thread.id ? editDraft : ''}
+                savingEdit={savingEdit && editingId === thread.id}
+                onEditDraftChange={setEditDraft}
                 onReply={
-                  user
+                  canCompose
                     ? () => {
                         setReplyToId(thread.id)
                         setReplyDraft('')
+                        setEditingId(null)
+                        setEditDraft('')
                       }
                     : undefined
                 }
-                onReport={() => setReportTargetId(thread.id)}
+                onReport={
+                  user?.uid && user.uid !== thread.authorUid
+                    ? () => setReportTargetId(thread.id)
+                    : undefined
+                }
+                onStartEdit={
+                  user?.uid && user.uid === thread.authorUid
+                    ? () => startEdit(thread)
+                    : undefined
+                }
+                onCancelEdit={cancelEdit}
+                onSaveEdit={
+                  user?.uid && user.uid === thread.authorUid
+                    ? () => void handleSaveEdit(thread.id)
+                    : undefined
+                }
+                onDelete={
+                  user?.uid && user.uid === thread.authorUid
+                    ? () => void handleDeleteComment(thread.id)
+                    : undefined
+                }
               />
 
               {thread.replies.length > 0 && (
@@ -241,16 +380,44 @@ export function CommunityCommentsSection({
                       key={reply.id}
                       comment={reply}
                       anonymousBoard={anonymousBoard}
+                      isAuthor={Boolean(
+                        user?.uid && user.uid === reply.authorUid,
+                      )}
                       canReport={Boolean(user)}
                       loginHref={loginHref}
                       isReply
-                      onReport={() => setReportTargetId(reply.id)}
+                      deleting={deletingId === reply.id}
+                      editing={editingId === reply.id}
+                      editDraft={editingId === reply.id ? editDraft : ''}
+                      savingEdit={savingEdit && editingId === reply.id}
+                      onEditDraftChange={setEditDraft}
+                      onReport={
+                        user?.uid && user.uid !== reply.authorUid
+                          ? () => setReportTargetId(reply.id)
+                          : undefined
+                      }
+                      onStartEdit={
+                        user?.uid && user.uid === reply.authorUid
+                          ? () => startEdit(reply)
+                          : undefined
+                      }
+                      onCancelEdit={cancelEdit}
+                      onSaveEdit={
+                        user?.uid && user.uid === reply.authorUid
+                          ? () => void handleSaveEdit(reply.id)
+                          : undefined
+                      }
+                      onDelete={
+                        user?.uid && user.uid === reply.authorUid
+                          ? () => void handleDeleteComment(reply.id)
+                          : undefined
+                      }
                     />
                   ))}
                 </div>
               )}
 
-              {replyToId === thread.id && user && (
+              {replyToId === thread.id && canCompose && (
                 <form
                   className='mt-4 ml-3 border-l-2 border-[var(--brand)]/25 pl-5 sm:ml-5 sm:pl-6'
                   onSubmit={(e) => {
@@ -307,18 +474,38 @@ function CommentItem({
   comment,
   anonymousBoard,
   isReply = false,
+  isAuthor = false,
   canReport = false,
   loginHref,
+  deleting = false,
+  editing = false,
+  editDraft = '',
+  savingEdit = false,
+  onEditDraftChange,
   onReply,
   onReport,
+  onStartEdit,
+  onCancelEdit,
+  onSaveEdit,
+  onDelete,
 }: {
   comment: CommunityComment
   anonymousBoard: boolean
   isReply?: boolean
+  isAuthor?: boolean
   canReport?: boolean
   loginHref?: string
+  deleting?: boolean
+  editing?: boolean
+  editDraft?: string
+  savingEdit?: boolean
+  onEditDraftChange?: (value: string) => void
   onReply?: () => void
   onReport?: () => void
+  onStartEdit?: () => void
+  onCancelEdit?: () => void
+  onSaveEdit?: () => void
+  onDelete?: () => void
 }) {
   const displayName = anonymousBoard
     ? '익명'
@@ -358,42 +545,109 @@ function CommentItem({
             </time>
           </div>
 
-          {canReport && onReport ? (
-            <button
-              type='button'
-              onClick={onReport}
-              className='shrink-0 pt-0.5 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
-            >
-              신고
-            </button>
-          ) : loginHref ? (
-            <Link
-              href={loginHref}
-              className='shrink-0 pt-0.5 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
-            >
-              신고
-            </Link>
-          ) : null}
+          {!editing && (
+            <div className='flex shrink-0 items-center gap-2.5 pt-0.5 text-[12px] font-medium'>
+              {isAuthor ? (
+                <>
+                  {onStartEdit ? (
+                    <button
+                      type='button'
+                      onClick={onStartEdit}
+                      className='text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
+                    >
+                      수정
+                    </button>
+                  ) : null}
+                  {onDelete ? (
+                    <button
+                      type='button'
+                      onClick={onDelete}
+                      disabled={deleting}
+                      className='text-red-600 touch-manipulation hover:text-red-700 disabled:opacity-50'
+                    >
+                      {deleting ? '삭제 중…' : '삭제'}
+                    </button>
+                  ) : null}
+                </>
+              ) : canReport && onReport ? (
+                <button
+                  type='button'
+                  onClick={onReport}
+                  className='text-[var(--muted)] touch-manipulation hover:text-red-600'
+                >
+                  신고
+                </button>
+              ) : loginHref ? (
+                <Link
+                  href={loginHref}
+                  className='text-[var(--muted)] touch-manipulation hover:text-red-600'
+                >
+                  신고
+                </Link>
+              ) : null}
+            </div>
+          )}
         </div>
 
-        <p
-          className={cn(
-            'mt-1.5 whitespace-pre-wrap leading-relaxed text-[var(--foreground)]',
-            isReply ? 'text-[13px]' : 'text-[14px]',
-          )}
-        >
-          {comment.body}
-        </p>
-
-        {onReply ? (
-          <button
-            type='button'
-            onClick={onReply}
-            className='mt-2 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--brand)]'
+        {editing ? (
+          <form
+            className='mt-2'
+            onSubmit={(e) => {
+              e.preventDefault()
+              onSaveEdit?.()
+            }}
           >
-            답글 달기
-          </button>
-        ) : null}
+            <textarea
+              value={editDraft}
+              onChange={(e) => onEditDraftChange?.(e.target.value)}
+              rows={isReply ? 2 : 3}
+              maxLength={2000}
+              className={cn(
+                'w-full resize-none rounded-xl border-0 bg-[#f7f8fa] px-3.5 py-2.5 leading-relaxed outline-none focus:bg-white focus:ring-2 focus:ring-[var(--brand)]/15',
+                isReply ? 'text-[13px]' : 'text-[14px]',
+              )}
+              autoFocus
+            />
+            <div className='mt-2 flex justify-end gap-2'>
+              <button
+                type='button'
+                onClick={onCancelEdit}
+                disabled={savingEdit}
+                className='h-8 rounded-full px-3 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)] disabled:opacity-50'
+              >
+                취소
+              </button>
+              <button
+                type='submit'
+                disabled={savingEdit || !editDraft.trim()}
+                className='h-8 rounded-full bg-[var(--foreground)] px-3.5 text-[12px] font-semibold text-white touch-manipulation disabled:opacity-50'
+              >
+                {savingEdit ? '저장 중…' : '수정 완료'}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <p
+              className={cn(
+                'mt-1.5 whitespace-pre-wrap leading-relaxed text-[var(--foreground)]',
+                isReply ? 'text-[13px]' : 'text-[14px]',
+              )}
+            >
+              {comment.body}
+            </p>
+
+            {onReply ? (
+              <button
+                type='button'
+                onClick={onReply}
+                className='mt-2 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--brand)]'
+              >
+                답글 달기
+              </button>
+            ) : null}
+          </>
+        )}
       </div>
     </div>
   )

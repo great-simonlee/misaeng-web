@@ -16,6 +16,10 @@ import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { fetchCommunityPosts } from '@lib/community/client'
 import {
+  getSchoolVerifyHref,
+  isSchoolVerified,
+} from '@lib/community/schoolGate'
+import {
   CPT_OPT_TYPES,
   getCptOptListTimestamp,
   normalizeCptOptType,
@@ -46,6 +50,7 @@ import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CommunityPostCard } from '@widgets/nyc/CommunityPostCard'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
+import { RoommateListScreen } from '@screens/nyc/RoommateListScreen'
 
 const FoodPostsMap = dynamic(
   () =>
@@ -208,8 +213,12 @@ export function CommunityListScreen({
   boardId,
   title,
 }: CommunityListScreenProps) {
+  if (boardId === 'roommate') {
+    return <RoommateListScreen />
+  }
+
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
-  const { user, loading: authLoading } = useAuth()
+  const { user, profile, loading: authLoading } = useAuth()
   const { error: toastError } = useToast()
   const [posts, setPosts] = useState<CommunityPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -423,8 +432,19 @@ export function CommunityListScreen({
 
   const newPath = `/nyc/${boardId}/new`
   const loginNext = `/nyc/login?next=${encodeURIComponent(newPath)}`
-  const canWrite = Boolean(user)
-  const postHref = canWrite ? newPath : loginNext
+  const schoolVerified = isSchoolVerified(profile)
+  const canWrite = Boolean(user) && schoolVerified
+  const postHref = !user
+    ? loginNext
+    : schoolVerified
+      ? newPath
+      : getSchoolVerifyHref(newPath)
+  const writeCtaLabel = !user
+    ? '로그인'
+    : schoolVerified
+      ? meta.writeLabel
+      : '학교 인증하기'
+  const showWriteCta = !authLoading && Boolean(user)
 
   const listSection = (
     <section className={cn('pt-4 sm:pt-5', isFoodBoard ? 'pb-20 sm:pb-24' : 'pb-14 sm:pb-16')}>
@@ -452,7 +472,9 @@ export function CommunityListScreen({
             posts.length === 0
               ? canWrite
                 ? '첫 글을 올려 커뮤니티를 시작해 보세요.'
-                : '로그인 후 글을 올릴 수 있어요.'
+                : user
+                  ? '학교 이메일 인증 후 글을 올릴 수 있어요.'
+                  : '로그인 후 글을 올릴 수 있어요.'
                 : isFoodBoard
                 ? '다른 분위기·음식 종류를 선택해 보세요.'
                 : isCptOptBoard
@@ -463,16 +485,12 @@ export function CommunityListScreen({
           }
           actionHref={
             posts.length === 0
-              ? canWrite
-                ? newPath
-                : loginNext
+              ? postHref
               : undefined
           }
           actionLabel={
             posts.length === 0
-              ? canWrite
-                ? meta.writeLabel
-                : '로그인'
+              ? writeCtaLabel
               : undefined
           }
         />
@@ -511,8 +529,8 @@ export function CommunityListScreen({
         breadcrumbLabel={title}
         intro={meta.listIntro}
         writeHref={postHref}
-        writeLabel={meta.writeLabel}
-        showWrite={!authLoading && canWrite}
+        writeLabel={schoolVerified ? meta.writeLabel : '학교 인증하기'}
+        showWrite={showWriteCta}
         showFilter={!isFoodBoard}
         onFilterClick={isFoodBoard ? undefined : openFilters}
         filterCount={isFoodBoard ? 0 : activeFilterCount}
@@ -576,6 +594,7 @@ export function CommunityListScreen({
           </ChipScrollRow>
         </div>
       ) : null}
+
 
       {isFoodBoard && viewMode === 'map' ? (
         <section className='relative mt-3 pb-[5.5rem]'>

@@ -22,6 +22,11 @@ import {
 } from '@lib/constants/nyc'
 import type { CommunityPost } from '@/types/nyc'
 import {
+  formatRoommateBudget,
+  formatRoommateMoveInDate,
+  getRoommateLookingForLabel,
+} from '@lib/community/roommate'
+import {
   BoardBackLink,
   BoardMetaChip,
   BoardPageShell,
@@ -155,19 +160,31 @@ export function CommunityDetailScreen({
   const isFood = boardId === 'food'
   const isCptOpt = boardId === 'status'
   const isJobReview = boardId === 'job-review'
+  const isRoommate = boardId === 'roommate'
   const bodyHtml = post.contentHtml || `<p>${post.description}</p>`
   const tone = boardToneForId(boardId)
+  const roommateBudget = formatRoommateBudget(post.roommateBudgetMax)
+  const roommateMoveIn = formatRoommateMoveInDate(post.roommateMoveInDate)
+  const roommateType = getRoommateLookingForLabel(post.roommateLookingFor)
   const metaBits = [
     post.location && {
       label: meta.locationLabel,
       value: post.location,
     },
-    post.detail &&
-      meta.detailLabel && {
-        label: meta.detailLabel,
-        value:
-          boardId === 'marketplace' ? `$${post.detail}` : post.detail,
-      },
+    isRoommate && roommateType
+      ? { label: '유형', value: roommateType }
+      : post.detail &&
+          meta.detailLabel && {
+            label: meta.detailLabel,
+            value:
+              boardId === 'marketplace' ? `$${post.detail}` : post.detail,
+          },
+    isRoommate && roommateBudget
+      ? { label: '월 예산', value: `${roommateBudget}/월` }
+      : null,
+    isRoommate && roommateMoveIn
+      ? { label: '입주 희망일', value: roommateMoveIn }
+      : null,
   ].filter(Boolean) as { label: string; value: string }[]
 
   return (

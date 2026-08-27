@@ -17,6 +17,7 @@ import {
   fetchCommunityPost,
   updateCommunityPostRequest,
 } from '@lib/community/client'
+import { isSchoolVerified } from '@lib/community/schoolGate'
 import {
   COMMUNITY_BODY_MAX,
   FOOD_CATEGORIES,
@@ -60,8 +61,10 @@ import {
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { PlaceSearchField } from '@widgets/nyc/PlaceSearchField'
 import { RestaurantNameField } from '@widgets/nyc/RestaurantNameField'
+import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 import { CptOptWriteScreen } from '@screens/nyc/CptOptWriteScreen'
 import { JobReviewWriteScreen } from '@screens/nyc/JobReviewWriteScreen'
+import { RoommateWriteScreen } from '@screens/nyc/RoommateWriteScreen'
 
 interface CommunityNewScreenProps {
   boardId: NycCommunityBoardId
@@ -109,6 +112,9 @@ export function CommunityNewScreen({
   }
   if (boardId === 'job-review') {
     return <JobReviewWriteScreen title={title} editPostId={editPostId} />
+  }
+  if (boardId === 'roommate') {
+    return <RoommateWriteScreen title={title} editPostId={editPostId} />
   }
 
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
@@ -600,6 +606,10 @@ export function CommunityNewScreen({
         />
       </BoardPageShell>
     )
+  }
+
+  if (!isSchoolVerified(profile)) {
+    return <SchoolVerificationRequired nextPath={loginNext} />
   }
 
   if (isFood) {

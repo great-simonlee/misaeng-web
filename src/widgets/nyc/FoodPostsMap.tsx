@@ -11,6 +11,7 @@ import {
   NYC_MAP_DEFAULT_ZOOM,
   type FoodMapPin,
 } from '@lib/community/foodMap'
+import { getLeafletTileConfig } from '@lib/community/leafletTiles'
 import type { NycCommunityBoardId } from '@lib/constants/nyc'
 import { cn } from '@lib'
 import type { CommunityPost } from '@/types/nyc'
@@ -60,15 +61,12 @@ export function FoodPostsMap({
 
       L.control.zoom({ position: 'bottomright' }).addTo(map)
 
-      L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-        {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 19,
-        },
-      ).addTo(map)
+      const tiles = getLeafletTileConfig()
+      L.tileLayer(tiles.url, {
+        attribution: tiles.attribution,
+        subdomains: tiles.subdomains,
+        maxZoom: tiles.maxZoom,
+      }).addTo(map)
 
       mapRef.current = map
       setReady(true)

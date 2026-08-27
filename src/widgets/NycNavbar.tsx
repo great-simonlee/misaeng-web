@@ -15,6 +15,7 @@ const NYC_NAV_LINKS = [
   { href: '/nyc/marketplace', label: '중고거래' },
   { href: '/nyc/status', label: 'OPT·비자·영주권' },
   { href: '/nyc/job-review', label: '취업 후기' },
+  { href: '/nyc/roommate', label: '룸메이트·서블렛' },
   { href: '/nyc/anonymous', label: '익명게시판' },
 ] as const
 
@@ -28,7 +29,7 @@ const ACCOUNT_LINKS = [
   },
 ] as const
 
-const MOBILE_HEADER_HEIGHT_PX = 56
+const MOBILE_HEADER_HEIGHT_CLASS = 'top-14 sm:top-16'
 
 export function NycNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -133,7 +134,7 @@ export function NycNavbar() {
           right: accountMenuStyle.right,
           zIndex: 10001,
         }}
-        className='hidden min-w-[12.5rem] rounded-xl border border-[var(--border)] bg-white py-1 shadow-[0_8px_30px_rgba(15,23,42,0.12)] md:block'
+        className='hidden min-w-[12.5rem] rounded-xl border border-[var(--border)] bg-white py-1 shadow-[0_8px_30px_rgba(15,23,42,0.12)] xl:block'
       >
         {ACCOUNT_LINKS.map(({ href, label, match }) => (
           <Link
@@ -164,13 +165,18 @@ export function NycNavbar() {
           <button
             type='button'
             aria-label='메뉴 닫기'
-            className='fixed inset-0 z-[9998] bg-black/60 md:hidden'
-            style={{ top: MOBILE_HEADER_HEIGHT_PX }}
+            className={cn(
+              'fixed inset-x-0 bottom-0 z-[9998] bg-black/60 xl:hidden',
+              MOBILE_HEADER_HEIGHT_CLASS,
+            )}
             onClick={() => setMobileOpen(false)}
           />
           <div
-            className='fixed left-0 right-0 max-h-[calc(100dvh-56px)] w-full overflow-y-auto rounded-b-2xl border-t border-[var(--border)] bg-white shadow-xl md:hidden'
-            style={{ top: MOBILE_HEADER_HEIGHT_PX, zIndex: 9999 }}
+            className={cn(
+              'fixed inset-x-0 max-h-[calc(100dvh-3.5rem)] w-full overflow-y-auto rounded-b-2xl border-t border-[var(--border)] bg-white shadow-xl sm:max-h-[calc(100dvh-4rem)] xl:hidden',
+              MOBILE_HEADER_HEIGHT_CLASS,
+            )}
+            style={{ zIndex: 9999 }}
             aria-label='NYC 모바일 메뉴'
           >
             <nav
@@ -251,10 +257,10 @@ export function NycNavbar() {
             : 'bg-[var(--background)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--background)]/80',
         )}
       >
-        <div className='relative mx-auto grid h-14 w-full max-w-7xl min-w-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 sm:h-16 sm:gap-3 sm:px-6 lg:px-8'>
+        <div className='relative mx-auto grid h-14 w-full max-w-7xl min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-4 sm:h-16 sm:gap-3 sm:px-6 lg:px-8'>
           <Link
             href='/nyc'
-            className='flex min-h-[44px] min-w-0 items-center gap-2 justify-self-start transition-opacity active:opacity-80'
+            className='flex min-h-[44px] shrink-0 items-center gap-2 justify-self-start transition-opacity active:opacity-80'
             aria-label='NYC 커뮤니티 홈'
           >
             <Image
@@ -271,7 +277,7 @@ export function NycNavbar() {
           </Link>
 
           <nav
-            className='hidden items-center justify-center gap-6 md:flex lg:gap-8'
+            className='hidden min-w-0 items-center justify-center gap-4 overflow-hidden xl:flex 2xl:gap-6'
             aria-label='NYC 메뉴'
           >
             {NYC_NAV_LINKS.map(({ href, label }) => (
@@ -279,7 +285,7 @@ export function NycNavbar() {
                 key={href}
                 href={href}
                 className={cn(
-                  'text-sm font-medium transition-colors',
+                  'shrink-0 whitespace-nowrap text-[13px] font-medium transition-colors 2xl:text-sm',
                   isActive(href)
                     ? 'font-semibold text-[var(--foreground)]'
                     : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]',
@@ -289,17 +295,30 @@ export function NycNavbar() {
               </Link>
             ))}
           </nav>
-          {/* 모바일: 중앙 컬럼 자리 유지 */}
-          <span className='md:hidden' aria-hidden />
+          {/* 좁은 화면: 중앙 컬럼 자리 유지 */}
+          <span className='xl:hidden' aria-hidden />
 
           <div className='flex shrink-0 items-center justify-end gap-2 justify-self-end'>
-            {!loading && !user && !mobileOpen && (
-              <Link
-                href={`/nyc/login?next=${encodeURIComponent(pathname)}`}
-                className='inline-flex h-9 items-center rounded-full border border-[var(--border)] px-3.5 text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--surface)]'
-              >
-                로그인
-              </Link>
+            {!loading && !user && (
+              <>
+                {!mobileOpen && (
+                  <Link
+                    href={`/nyc/login?next=${encodeURIComponent(pathname)}`}
+                    className='inline-flex h-9 items-center rounded-full border border-[var(--border)] px-3.5 text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--surface)]'
+                  >
+                    로그인
+                  </Link>
+                )}
+                <button
+                  type='button'
+                  onClick={() => setMobileOpen((o) => !o)}
+                  className='inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--muted-foreground)] touch-manipulation transition hover:bg-[var(--surface)] xl:hidden'
+                  aria-expanded={mobileOpen}
+                  aria-label={mobileOpen ? '메뉴 닫기' : '메뉴 열기'}
+                >
+                  {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+                </button>
+              </>
             )}
 
             {!loading && user && (
@@ -310,11 +329,11 @@ export function NycNavbar() {
                   </span>
                 )}
 
-                {/* 모바일: 프로필 + 전체 메뉴 */}
+                {/* 좁은 화면: 프로필 + 전체 메뉴 */}
                 <button
                   type='button'
                   onClick={() => setMobileOpen((o) => !o)}
-                  className='inline-flex h-9 shrink-0 cursor-pointer items-center gap-0.5 rounded-full border border-[var(--border)] bg-white p-0.5 touch-manipulation transition hover:bg-[var(--surface)] md:hidden'
+                  className='inline-flex h-9 shrink-0 cursor-pointer items-center gap-0.5 rounded-full border border-[var(--border)] bg-white p-0.5 touch-manipulation transition hover:bg-[var(--surface)] xl:hidden'
                   aria-expanded={mobileOpen}
                   aria-label={mobileOpen ? '메뉴 닫기' : '메뉴 열기'}
                 >
@@ -327,25 +346,27 @@ export function NycNavbar() {
                   </span>
                 </button>
 
-                {/* 데스크톱: 계정 드롭다운 (마이페이지 / 내가 올린 글 / 좋아요) */}
-                <div ref={accountRef} className='relative hidden md:block'>
-                <button
-                  ref={accountButtonRef}
-                  type='button'
-                  onClick={() => setAccountOpen((o) => !o)}
-                  className='inline-flex h-9 shrink-0 cursor-pointer items-center gap-0.5 rounded-full border border-[var(--border)] bg-white p-0.5 touch-manipulation transition hover:bg-[var(--surface)]'
-                  aria-expanded={accountOpen}
-                  aria-haspopup='menu'
-                  aria-label={accountOpen ? '계정 메뉴 닫기' : '계정 메뉴 열기'}
-                >
-                  <ProfileAvatar
-                    photoURL={avatarURL}
-                    displayName={displayName}
-                  />
-                  <span className='inline-flex size-7 items-center justify-center text-[var(--muted-foreground)]'>
-                    {accountOpen ? <CloseIcon /> : <MenuIcon />}
-                  </span>
-                </button>
+                {/* 넓은 데스크톱: 계정 드롭다운 */}
+                <div ref={accountRef} className='relative hidden xl:block'>
+                  <button
+                    ref={accountButtonRef}
+                    type='button'
+                    onClick={() => setAccountOpen((o) => !o)}
+                    className='inline-flex h-9 shrink-0 cursor-pointer items-center gap-0.5 rounded-full border border-[var(--border)] bg-white p-0.5 touch-manipulation transition hover:bg-[var(--surface)]'
+                    aria-expanded={accountOpen}
+                    aria-haspopup='menu'
+                    aria-label={
+                      accountOpen ? '계정 메뉴 닫기' : '계정 메뉴 열기'
+                    }
+                  >
+                    <ProfileAvatar
+                      photoURL={avatarURL}
+                      displayName={displayName}
+                    />
+                    <span className='inline-flex size-7 items-center justify-center text-[var(--muted-foreground)]'>
+                      {accountOpen ? <CloseIcon /> : <MenuIcon />}
+                    </span>
+                  </button>
                 </div>
               </>
             )}

@@ -199,7 +199,7 @@ export type HousingListingInput = Omit<
 /** @deprecated HousingListingInput 사용 */
 export type HousingPostInput = HousingListingInput
 
-export type RoommateLookingFor = 'room' | 'roommate'
+export type RoommateLookingFor = 'room' | 'roommate' | 'sublet'
 
 export interface RoommatePost {
   id: string
@@ -245,6 +245,7 @@ export type CommunityBoardId =
   | 'job-review'
   | 'green-card'
   | 'anonymous'
+  | 'roommate'
 
 export interface CommunityPost {
   id: string
@@ -311,6 +312,12 @@ export interface CommunityPost {
   jobReviewTips: string | null
   /** 취업 후기: 업계 (테크, 금융 등) */
   jobReviewIndustry: string | null
+  /** 룸메이트/서블렛: 구하는 유형 */
+  roommateLookingFor: RoommateLookingFor | null
+  /** 룸메이트/서블렛: 월 예산 상한 (USD) */
+  roommateBudgetMax: number | null
+  /** 룸메이트/서블렛: 입주 희망일 (YYYY-MM-DD) */
+  roommateMoveInDate: string | null
 }
 
 /** CPT / OPT / STEM OPT / 비자 / 영주권 */
