@@ -427,6 +427,21 @@ export async function POST(request: Request) {
 
   try {
     const saved = await saveStoredCommunityPost(post)
+    try {
+      const { awardPostCredit } = await import('@lib/community/creditLedger')
+      await awardPostCredit({
+        uid: user.uid,
+        postId: saved.id,
+        boardId: saved.categoryId,
+        timelineCount: isCptOpt
+          ? cptOptTimeline.length
+          : isJobReview
+            ? jobReviewTimeline.length
+            : undefined,
+      })
+    } catch (creditError) {
+      console.error('Community credit award (post) error:', creditError)
+    }
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),
     })

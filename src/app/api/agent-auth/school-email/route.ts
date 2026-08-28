@@ -160,6 +160,15 @@ export async function POST(request: Request) {
 
       const verified = await markSchoolVerified(user.uid, email)
 
+      try {
+        const { awardSchoolVerifyCredit } = await import(
+          '@lib/community/creditLedger'
+        )
+        await awardSchoolVerifyCredit(user.uid)
+      } catch (creditError) {
+        console.error('Community credit award (school) error:', creditError)
+      }
+
       return NextResponse.json({
         ok: true,
         schoolName: verified.schoolName,

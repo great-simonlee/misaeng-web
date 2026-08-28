@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 const COMMUNITY_LINKS = [
   { href: '/nyc/housing', label: '하우징' },
+  { href: '/nyc/credit', label: '크레딧' },
   { href: '/nyc/partners', label: '파트너' },
 ] as const
 

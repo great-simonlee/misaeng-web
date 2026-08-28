@@ -243,6 +243,27 @@ export async function POST(request: Request, context: RouteContext) {
   try {
     const next = [...existing, comment]
     await saveStoredCommunityComments(postId, next)
+
+    try {
+      const post = isCommunityStorageConfigured()
+        ? await getStoredCommunityPost(postId)
+        : null
+      const parent = parentId
+        ? existing.find((item) => item.id === parentId)
+        : null
+      const { awardCommentCredit } = await import('@lib/community/creditLedger')
+      await awardCommentCredit({
+        uid: user.uid,
+        commentId: comment.id,
+        postId,
+        boardId: categoryId,
+        postAuthorUid: post?.authorUid ?? null,
+        parentAuthorUid: parent?.authorUid ?? null,
+      })
+    } catch (creditError) {
+      console.error('Community credit award (comment) error:', creditError)
+    }
+
     return NextResponse.json({
       comment: sanitizeAnonymousCommunityComment(comment, user.uid),
     })
@@ -404,6 +425,30 @@ export async function DELETE(request: Request, context: RouteContext) {
 
   try {
     await saveStoredCommunityComments(postId, next)
+    try {
+      const { revokeSourceCredit } = await import('@lib/community/creditLedger')
+      await revokeSourceCredit({
+        uid: user.uid,
+        sourceId: commentId,
+        reasons: ['comment'],
+      })
+      // 함께 삭제된 대댓글 회수 (작성자 본인 것만 위에서 soft-delete됨 — 타인의 대댓글도 soft-delete될 수 있음)
+      for (const item of next) {
+        if (
+          item.parentId === commentId &&
+          item.status === 'deleted' &&
+          item.authorUid
+        ) {
+          await revokeSourceCredit({
+            uid: item.authorUid,
+            sourceId: item.id,
+            reasons: ['comment'],
+          })
+        }
+      }
+    } catch (creditError) {
+      console.error('Community credit revoke (comment) error:', creditError)
+    }
     return NextResponse.json({ ok: true, commentId })
   } catch (error) {
     console.error('Community comment delete error:', error)

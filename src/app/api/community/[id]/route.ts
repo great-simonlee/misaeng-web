@@ -383,6 +383,21 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   try {
     const saved = await saveStoredCommunityPost(next)
+    try {
+      const { awardPostCredit } = await import('@lib/community/creditLedger')
+      await awardPostCredit({
+        uid: user.uid,
+        postId: saved.id,
+        boardId: saved.categoryId,
+        timelineCount: isCptOpt
+          ? cptOptTimeline.length
+          : isJobReview
+            ? jobReviewTimeline.length
+            : undefined,
+      })
+    } catch (creditError) {
+      console.error('Community credit award (post update) error:', creditError)
+    }
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),
     })
@@ -424,6 +439,16 @@ export async function DELETE(_request: Request, context: RouteContext) {
     const ok = await deleteStoredCommunityPost(id)
     if (!ok) {
       return NextResponse.json({ error: '삭제에 실패했어요.' }, { status: 500 })
+    }
+    try {
+      const { revokeSourceCredit } = await import('@lib/community/creditLedger')
+      await revokeSourceCredit({
+        uid: user.uid,
+        sourceId: id,
+        reasons: ['food', 'status', 'job-review', 'review-bonus'],
+      })
+    } catch (creditError) {
+      console.error('Community credit revoke (post) error:', creditError)
     }
     return NextResponse.json({ ok: true })
   } catch (error) {

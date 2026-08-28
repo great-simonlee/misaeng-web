@@ -19,6 +19,7 @@ import { CptOptActivityMeta } from '@widgets/nyc/CptOptActivityMeta'
 import { CptOptTypeBadge } from '@widgets/nyc/CptOptTypeBadge'
 import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
+import { CreditReviewRequestCard } from '@widgets/nyc/CreditReviewRequestCard'
 import type { NycCommunityBoardId } from '@lib/constants/nyc'
 
 type CptOptDetailContentProps = {
@@ -71,6 +72,16 @@ export function CptOptDetailContent({
               새 기록 추가
             </Link>
           </BoardSurface>
+        </div>
+      ) : null}
+
+      {isAuthor ? (
+        <div className='mb-5 px-1 sm:px-0'>
+          <CreditReviewRequestCard
+            post={post}
+            boardId={boardId}
+            isAuthor={isAuthor}
+          />
         </div>
       ) : null}
 

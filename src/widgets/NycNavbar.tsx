@@ -29,6 +29,14 @@ const ACCOUNT_LINKS = [
   },
 ] as const
 
+const TEAM_ACCOUNT_LINKS = [
+  {
+    href: '/nyc/team/credit-reviews',
+    label: '크레딧 리뷰',
+    match: 'prefix' as const,
+  },
+] as const
+
 const MOBILE_HEADER_HEIGHT_CLASS = 'top-14 sm:top-16'
 
 export function NycNavbar() {
@@ -43,6 +51,9 @@ export function NycNavbar() {
   } | null>(null)
   const pathname = usePathname()
   const { user, loading, avatarURL, displayName, isMisaengUser } = useAuth()
+  const accountMenuLinks = isMisaengUser
+    ? [...ACCOUNT_LINKS, ...TEAM_ACCOUNT_LINKS]
+    : [...ACCOUNT_LINKS]
   const [navPath, setNavPath] = useState(pathname)
   if (pathname !== navPath) {
     setNavPath(pathname)
@@ -136,7 +147,7 @@ export function NycNavbar() {
         }}
         className='hidden min-w-[12.5rem] rounded-xl border border-[var(--border)] bg-white py-1 shadow-[0_8px_30px_rgba(15,23,42,0.12)] xl:block'
       >
-        {ACCOUNT_LINKS.map(({ href, label, match }) => (
+        {accountMenuLinks.map(({ href, label, match }) => (
           <Link
             key={href}
             href={href}
@@ -215,7 +226,7 @@ export function NycNavbar() {
 
               <div className='mx-1 mt-2 border-t border-[var(--border)] pt-2'>
                 {!loading && user ? (
-                  ACCOUNT_LINKS.map(({ href, label, match }) => (
+                  accountMenuLinks.map(({ href, label, match }) => (
                     <Link
                       key={href}
                       href={href}

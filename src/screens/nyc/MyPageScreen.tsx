@@ -20,6 +20,7 @@ import { getErrorMessage, useToast } from '@hooks/useToast'
 import { ProfileVerificationSection } from '@widgets/nyc/ProfileVerificationSection'
 import { MyPageSkeleton } from '@widgets/nyc/MyPageSkeleton'
 import { ProfileCardAction } from '@widgets/nyc/ProfileCardAction'
+import { MyPageCreditSection } from '@widgets/nyc/MyPageCreditSection'
 
 import type { NycUserProfile } from '@/types/nyc'
 
@@ -327,6 +328,8 @@ export function MyPageScreen() {
                     {verifiedSchoolLabel}
                   </p>
                 ) : null}
+
+                <MyPageCreditSection className='mt-3' />
               </div>
 
               {showSchoolVerifyCta ? (
