@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { TipTapEditor } from '@components'
 import { cn } from '@lib'
@@ -366,20 +366,24 @@ function SingleEntryForm({
       ),
     [entry],
   )
+  const [entryId, setEntryId] = useState(entry.id)
   const [selectedKeys, setSelectedKeys] = useState<Set<JobReviewTimelineFieldKey>>(
     () => new Set(contentKeys),
   )
 
-  useEffect(() => {
-    setSelectedKeys((prev) => {
-      const next = new Set(prev)
-      for (const key of contentKeys) next.add(key)
-      return next
-    })
-  }, [entry.id, contentKeys])
+  if (entryId !== entry.id) {
+    setEntryId(entry.id)
+    setSelectedKeys(new Set(contentKeys))
+  }
+
+  const visibleKeySet = useMemo(() => {
+    const next = new Set(selectedKeys)
+    for (const key of contentKeys) next.add(key)
+    return next
+  }, [selectedKeys, contentKeys])
 
   function toggleField(key: JobReviewTimelineFieldKey) {
-    const active = selectedKeys.has(key)
+    const active = visibleKeySet.has(key)
     if (active) {
       const next = new Set(selectedKeys)
       next.delete(key)
@@ -391,7 +395,7 @@ function SingleEntryForm({
   }
 
   const visibleFields = JOB_REVIEW_TIMELINE_FIELDS.filter((field) =>
-    selectedKeys.has(field.key),
+    visibleKeySet.has(field.key),
   )
 
   return (
@@ -430,7 +434,7 @@ function SingleEntryForm({
           </p>
           <div className='mt-2 flex flex-wrap gap-1.5'>
             {JOB_REVIEW_TIMELINE_FIELDS.map((field) => {
-              const active = selectedKeys.has(field.key)
+              const active = visibleKeySet.has(field.key)
               return (
                 <button
                   key={field.key}

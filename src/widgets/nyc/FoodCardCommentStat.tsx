@@ -15,19 +15,15 @@ export function FoodCardCommentStat({
   postId,
   count: countProp,
 }: FoodCardCommentStatProps) {
-  const [count, setCount] = useState<number | null>(
-    countProp != null ? countProp : null,
-  )
+  const [fetchedCount, setFetchedCount] = useState<number | null>(null)
+  const count = countProp != null ? countProp : fetchedCount
 
   useEffect(() => {
-    if (countProp != null) {
-      setCount(countProp)
-      return
-    }
+    if (countProp != null) return
 
     let cancelled = false
     void fetchCommunityCommentCount(postId).then((total) => {
-      if (!cancelled) setCount(total)
+      if (!cancelled) setFetchedCount(total)
     })
     return () => {
       cancelled = true

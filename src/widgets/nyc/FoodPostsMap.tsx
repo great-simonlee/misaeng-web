@@ -46,6 +46,7 @@ export function FoodPostsMap({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return
     let cancelled = false
+    const markers = markersRef.current
 
     void (async () => {
       const L = (await import('leaflet')).default
@@ -75,8 +76,8 @@ export function FoodPostsMap({
 
     return () => {
       cancelled = true
-      markersRef.current.forEach((marker) => marker.remove())
-      markersRef.current.clear()
+      markers.forEach((marker) => marker.remove())
+      markers.clear()
       mapRef.current?.remove()
       mapRef.current = null
       setReady(false)

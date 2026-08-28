@@ -18,7 +18,6 @@ import { htmlToPlainText } from '@lib/community/html'
 import {
   ROOMMATE_BUDGET_MAX,
   ROOMMATE_LOOKING_FOR_OPTIONS,
-  formatRoommateBudget,
   getRoommateLookingForLabel,
   getRoommateLookingForStyle,
   isRoommateLookingFor,

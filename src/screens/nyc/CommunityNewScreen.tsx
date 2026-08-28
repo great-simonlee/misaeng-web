@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
@@ -117,6 +116,20 @@ export function CommunityNewScreen({
     return <RoommateWriteScreen title={title} editPostId={editPostId} />
   }
 
+  return (
+    <CommunityBoardNewScreen
+      boardId={boardId}
+      title={title}
+      editPostId={editPostId}
+    />
+  )
+}
+
+function CommunityBoardNewScreen({
+  boardId,
+  title,
+  editPostId,
+}: CommunityNewScreenProps) {
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const isEdit = Boolean(editPostId)
   const anonymousBoard = isAnonymousBoard(boardId)

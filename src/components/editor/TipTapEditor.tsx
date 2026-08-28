@@ -74,7 +74,7 @@ export function TipTapEditor({
         if (size - deleted + text.length > limit) return true
         return false
       },
-      handlePaste(view, event, _slice) {
+      handlePaste(view, event) {
         const limit = maxLengthRef.current
         if (limit == null) return false
         const pasted = event.clipboardData?.getData('text/plain') ?? ''

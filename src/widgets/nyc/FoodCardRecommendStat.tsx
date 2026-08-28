@@ -17,19 +17,15 @@ export function FoodCardRecommendStat({
   count: countProp,
 }: FoodCardRecommendStatProps) {
   const { user } = useAuth()
-  const [count, setCount] = useState<number | null>(
-    countProp != null ? countProp : null,
-  )
+  const [fetchedCount, setFetchedCount] = useState<number | null>(null)
+  const count = countProp != null ? countProp : fetchedCount
 
   useEffect(() => {
-    if (countProp != null) {
-      setCount(countProp)
-      return
-    }
+    if (countProp != null) return
 
     let cancelled = false
     void fetchPostRecommendSummary(postId, user?.uid).then((summary) => {
-      if (!cancelled) setCount(summary.count)
+      if (!cancelled) setFetchedCount(summary.count)
     })
     return () => {
       cancelled = true

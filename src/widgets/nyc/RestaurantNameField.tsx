@@ -61,7 +61,7 @@ export function RestaurantNameField({
           return
         }
         setVenues(Array.isArray(data?.venues) ? data.venues : [])
-      } catch (err) {
+      } catch {
         if (controller.signal.aborted) return
         setVenues([])
       } finally {
@@ -145,6 +145,7 @@ export function RestaurantNameField({
               <button
                 type='button'
                 role='option'
+                aria-selected={item.name === value}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
                   onChange(item.name)

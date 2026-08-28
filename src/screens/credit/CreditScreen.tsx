@@ -15,9 +15,7 @@ import {
   COMMUNITY_CREDIT_REDEEM_PROCESS,
   COMMUNITY_CREDIT_REVOCATION,
   COMMUNITY_CREDIT_WORKFLOW,
-  commentDaysEquivalent,
   foodPostsEquivalent,
-  premiumPostsEquivalent,
   type CommunityCreditRedeemOption,
 } from '@lib/constants/communityCredit'
 import { cn } from '@lib'

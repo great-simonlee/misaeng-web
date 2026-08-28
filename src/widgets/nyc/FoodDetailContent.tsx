@@ -58,32 +58,31 @@ export function FoodDetailContent({
   const anonymous = isAnonymousBoard(boardId)
   const slides = buildFoodDetailCarouselSlides(post)
   const bodyHtml = post.contentHtml || `<p>${post.description}</p>`
-  const menuItems = post.menuItems || []
-  const galleryPhotos = post.galleryPhotos || []
+  const menuItems = post.menuItems ?? []
   const [lightbox, setLightbox] = useState<LightboxState | null>(null)
 
   const menuLightboxItems = useMemo<PhotoLightboxItem[]>(
     () =>
-      menuItems
+      (post.menuItems || [])
         .filter((item) => item.imageUrl?.trim())
         .map((item) => ({
           id: item.id,
           imageUrl: item.imageUrl,
           caption: formatFoodMenuDisplay(item),
         })),
-    [menuItems],
+    [post.menuItems],
   )
 
   const galleryLightboxItems = useMemo<PhotoLightboxItem[]>(
     () =>
-      galleryPhotos
+      (post.galleryPhotos || [])
         .filter((item) => item.imageUrl?.trim())
         .map((item) => ({
           id: item.id,
           imageUrl: item.imageUrl,
           caption: item.caption,
         })),
-    [galleryPhotos],
+    [post.galleryPhotos],
   )
 
   const partySize =

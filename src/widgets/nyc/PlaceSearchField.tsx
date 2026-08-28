@@ -257,6 +257,7 @@ export function PlaceSearchField({
                   <button
                     type='button'
                     role='option'
+                    aria-selected={false}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => void selectResult(item)}
                     className='flex w-full flex-col px-3.5 py-2.5 text-left touch-manipulation transition hover:bg-[#f8f9fb] active:bg-[#f3f4f6]'

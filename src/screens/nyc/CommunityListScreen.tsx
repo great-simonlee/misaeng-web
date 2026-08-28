@@ -217,6 +217,13 @@ export function CommunityListScreen({
     return <RoommateListScreen />
   }
 
+  return <CommunityBoardListScreen boardId={boardId} title={title} />
+}
+
+function CommunityBoardListScreen({
+  boardId,
+  title,
+}: CommunityListScreenProps) {
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const { user, profile, loading: authLoading } = useAuth()
   const { error: toastError } = useToast()
