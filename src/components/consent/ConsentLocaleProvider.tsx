@@ -4,9 +4,9 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from 'react'
 
@@ -24,17 +24,31 @@ const ConsentLocaleContext = createContext<ConsentLocaleContextValue | null>(
   null,
 )
 
-export function ConsentLocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<ConsentUiLanguage>('en')
+function subscribeLanguage() {
+  return () => {}
+}
 
-  useEffect(() => {
-    setLocale(detectConsentLocale(navigator.language))
-  }, [])
+function getBrowserLocale(): ConsentUiLanguage {
+  return detectConsentLocale(navigator.language)
+}
+
+function getServerLocale(): ConsentUiLanguage {
+  return 'en'
+}
+
+export function ConsentLocaleProvider({ children }: { children: ReactNode }) {
+  const detected = useSyncExternalStore(
+    subscribeLanguage,
+    getBrowserLocale,
+    getServerLocale,
+  )
+  const [override, setOverride] = useState<ConsentUiLanguage | null>(null)
+  const locale = override ?? detected
 
   const value = useMemo(
     () => ({
       locale,
-      setLocale,
+      setLocale: setOverride,
       copy: CONSENT_COPY[locale],
     }),
     [locale],
@@ -96,7 +110,7 @@ export function ConsentLocaleToggle({ className = '' }: { className?: string }) 
             : 'text-[#8b95a7] hover:text-[var(--foreground)]'
         }`}
       >
-            {copy.localeKo}
+        {copy.localeKo}
       </button>
     </div>
   )

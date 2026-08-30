@@ -27,27 +27,30 @@ export function ReconsentGate({ children }: { children: React.ReactNode }) {
     pathname.startsWith('/nyc/terms-of-use') ||
     pathname.startsWith('/nyc/privacy-policy')
 
-  const loadStatus = useCallback(async () => {
-    if (!user || skip) {
-      setStatus(null)
-      return
-    }
-    const res = await fetch('/api/legal/consent/status', {
+  useEffect(() => {
+    if (loading || sessionLoading || !user || skip) return
+
+    let cancelled = false
+
+    void fetch('/api/legal/consent/status', {
       credentials: 'include',
       cache: 'no-store',
     })
-    if (!res.ok) {
-      setStatus(null)
-      return
-    }
-    const data = (await res.json()) as ConsentStatus
-    setStatus(data)
-  }, [skip, user])
+      .then(async (res) => {
+        if (!res.ok) return null
+        return (await res.json()) as ConsentStatus
+      })
+      .then((data) => {
+        if (!cancelled) setStatus(data)
+      })
+      .catch(() => {
+        if (!cancelled) setStatus(null)
+      })
 
-  useEffect(() => {
-    if (loading || sessionLoading) return
-    void loadStatus()
-  }, [loadStatus, loading, sessionLoading])
+    return () => {
+      cancelled = true
+    }
+  }, [loading, sessionLoading, skip, user])
 
   const handleAgreed = useCallback(async () => {
     if (!status) return
@@ -68,13 +71,17 @@ export function ReconsentGate({ children }: { children: React.ReactNode }) {
         | null
       throw new Error(data?.error || 'Consent failed')
     }
-    setStatus((prev) => (prev ? { ...prev, required: false, reason: 'none' } : prev))
+    setStatus((prev) =>
+      prev ? { ...prev, required: false, reason: 'none' } : prev,
+    )
   }, [locale, status])
+
+  const showModal = Boolean(user && !skip && status?.required)
 
   return (
     <>
       {children}
-      {user && !skip && status?.required ? (
+      {showModal && status ? (
         <ReconsentModal status={status} onAgreed={handleAgreed} />
       ) : null}
     </>

@@ -58,12 +58,23 @@ export function NycLoginScreen() {
   const canSubmitAuth =
     !needsTermsAcceptance || acceptedTerms
 
-  useEffect(() => {
-    if (mode !== 'signup') {
+  const consentPayload = useMemo(
+    () => ({
+      acceptedTerms,
+      termsVersion: policy?.termsVersion || DEFAULT_TERMS_VERSION,
+      privacyVersion: policy?.privacyVersion || DEFAULT_PRIVACY_VERSION,
+      uiLanguage: locale,
+    }),
+    [acceptedTerms, locale, policy?.privacyVersion, policy?.termsVersion],
+  )
+
+  const changeMode = useCallback((nextMode: 'signin' | 'signup' | 'reset') => {
+    setMode(nextMode)
+    if (nextMode !== 'signup') {
       setAcceptedTerms(false)
       setShowTermsError(false)
     }
-  }, [mode])
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -84,13 +95,6 @@ export function NycLoginScreen() {
     }
   }, [loading, sessionLoading, user, router, next])
 
-  const consentPayload = {
-    acceptedTerms,
-    termsVersion: policy?.termsVersion || DEFAULT_TERMS_VERSION,
-    privacyVersion: policy?.privacyVersion || DEFAULT_PRIVACY_VERSION,
-    uiLanguage: locale,
-  }
-
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (needsTermsAcceptance && !acceptedTerms) {
@@ -102,7 +106,7 @@ export function NycLoginScreen() {
       if (mode === 'reset') {
         await resetPassword(email.trim())
         success('비밀번호 재설정 메일을 보냈어요')
-        setMode('signin')
+        changeMode('signin')
         return
       }
       if (mode === 'signin') {
@@ -153,10 +157,9 @@ export function NycLoginScreen() {
     },
     [
       acceptedTerms,
-      locale,
+      consentPayload,
       mode,
       next,
-      policy,
       router,
       signInGoogle,
       success,
@@ -228,7 +231,7 @@ export function NycLoginScreen() {
                   type='button'
                   role='tab'
                   aria-selected={mode === 'signin'}
-                  onClick={() => setMode('signin')}
+                  onClick={() => changeMode('signin')}
                   className={`min-h-[40px] rounded-full text-[14px] transition ${
                     mode === 'signin'
                       ? 'bg-white font-semibold text-[var(--foreground)] shadow-[0_2px_8px_rgba(15,23,42,0.07)]'
@@ -241,7 +244,7 @@ export function NycLoginScreen() {
                   type='button'
                   role='tab'
                   aria-selected={mode === 'signup'}
-                  onClick={() => setMode('signup')}
+                  onClick={() => changeMode('signup')}
                   className={`min-h-[40px] rounded-full text-[14px] transition ${
                     mode === 'signup'
                       ? 'bg-white font-semibold text-[var(--foreground)] shadow-[0_2px_8px_rgba(15,23,42,0.07)]'
@@ -303,7 +306,7 @@ export function NycLoginScreen() {
                 <button
                   type='button'
                   className='text-[13px] font-medium text-[#667085] transition hover:text-[#F64310]'
-                  onClick={() => setMode('reset')}
+                  onClick={() => changeMode('reset')}
                 >
                   비밀번호 찾기
                 </button>
@@ -402,7 +405,7 @@ export function NycLoginScreen() {
                 <button
                   type='button'
                   className='font-semibold text-[#F64310]'
-                  onClick={() => setMode('signup')}
+                  onClick={() => changeMode('signup')}
                 >
                   회원가입
                 </button>
@@ -413,7 +416,7 @@ export function NycLoginScreen() {
                 <button
                   type='button'
                   className='font-semibold text-[#F64310]'
-                  onClick={() => setMode('signin')}
+                  onClick={() => changeMode('signin')}
                 >
                   로그인
                 </button>
@@ -424,7 +427,7 @@ export function NycLoginScreen() {
                 <button
                   type='button'
                   className='font-semibold text-[#F64310]'
-                  onClick={() => setMode('signin')}
+                  onClick={() => changeMode('signin')}
                 >
                   돌아가기
                 </button>
