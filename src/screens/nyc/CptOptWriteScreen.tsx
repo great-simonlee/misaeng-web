@@ -37,6 +37,7 @@ import {
   BoardBackLink,
   BoardPageShell,
 } from '@widgets/nyc/BoardPageShell'
+import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
 import { CptOptTimelineEditor } from '@widgets/nyc/CptOptTimelineEditor'
 import { CptOptTypeBadge, CptOptTypePicker } from '@widgets/nyc/CptOptTypeBadge'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
@@ -248,6 +249,8 @@ export function CptOptWriteScreen({
         ) : (
           <CreateHero writeLabel={meta.writeLabel} />
         )}
+
+        <CommunityWritingGuidelines className='mt-5' />
 
         <form onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
           {isEdit ? (

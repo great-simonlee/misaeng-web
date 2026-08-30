@@ -39,6 +39,7 @@ import {
   BoardPageShell,
   BoardSurface,
 } from '@widgets/nyc/BoardPageShell'
+import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 
 interface RoommateWriteScreenProps {
@@ -328,6 +329,7 @@ export function RoommateWriteScreen({
         />
 
         <BoardSurface className='p-5 sm:p-6'>
+          <CommunityWritingGuidelines className='mb-5' />
           {!isEdit ? (
             <div className='mb-5 rounded-xl bg-[#fff8f5] px-4 py-3 text-[13px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--brand)]/15'>
               룸메이트·서블렛 글은{' '}

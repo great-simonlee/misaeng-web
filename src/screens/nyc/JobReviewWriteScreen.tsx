@@ -38,6 +38,7 @@ import {
   BoardBackLink,
   BoardPageShell,
 } from '@widgets/nyc/BoardPageShell'
+import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
 import { JobReviewTimelineEditor } from '@widgets/nyc/JobReviewTimelineEditor'
 import { JobReviewTypeBadge, JobReviewTypePicker } from '@widgets/nyc/JobReviewTypeBadge'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
@@ -248,6 +249,8 @@ export function JobReviewWriteScreen({
         ) : (
           <CreateHero writeLabel={meta.writeLabel} />
         )}
+
+        <CommunityWritingGuidelines className='mt-5' />
 
         <form onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
           {isEdit ? (

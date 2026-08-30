@@ -35,6 +35,7 @@ export function NycLoginScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const authReady = useMemo(
     () => isAppConnectConfigured() && isGoogleSignInConfigured(),
     [],
@@ -43,6 +44,13 @@ export function NycLoginScreen() {
     () => (configured || isAppConnectConfigured()) && isGoogleSignInConfigured(),
     [configured],
   )
+  const needsTermsAcceptance = mode === 'signup'
+  const canSubmitAuth =
+    !needsTermsAcceptance || acceptedTerms
+
+  useEffect(() => {
+    if (mode !== 'signup') setAcceptedTerms(false)
+  }, [mode])
 
   useEffect(() => {
     if (!loading && !sessionLoading && user) {
@@ -52,6 +60,10 @@ export function NycLoginScreen() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    if (needsTermsAcceptance && !acceptedTerms) {
+      toastError('이용약관 및 개인정보처리방침에 동의해 주세요')
+      return
+    }
     setSubmitting(true)
     try {
       if (mode === 'reset') {
@@ -88,6 +100,10 @@ export function NycLoginScreen() {
       email: string | null
       name: string | null
     }) => {
+      if (mode === 'signup' && !acceptedTerms) {
+        toastError('이용약관 및 개인정보처리방침에 동의해 주세요')
+        return
+      }
       setSubmitting(true)
       try {
         await signInGoogle(credential)
@@ -99,7 +115,15 @@ export function NycLoginScreen() {
         setSubmitting(false)
       }
     },
-    [next, router, signInGoogle, success, toastError],
+    [
+      acceptedTerms,
+      mode,
+      next,
+      router,
+      signInGoogle,
+      success,
+      toastError,
+    ],
   )
 
   const handleGoogleError = useCallback(
@@ -248,9 +272,78 @@ export function NycLoginScreen() {
               </div>
             )}
 
+            {mode === 'signup' && (
+              <label className='flex gap-3 rounded-xl bg-[#fff8f5] px-3.5 py-3 ring-1 ring-[var(--brand)]/15'>
+                <input
+                  type='checkbox'
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  className='mt-1 size-4 shrink-0 accent-[#F64310]'
+                  required
+                />
+                <span className='text-[13px] leading-relaxed text-[#475467]'>
+                  <span className='font-semibold text-[var(--foreground)]'>
+                    I agree to the Terms of Use (including binding arbitration
+                    and class-action waiver in Section 22) and the Privacy
+                    Policy.
+                  </span>{' '}
+                  <span className='text-[#667085]'>
+                    이용약관(
+                    <Link
+                      href='/nyc/terms-of-use#governing-law'
+                      className='font-medium text-[#F64310] underline-offset-2 hover:underline'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    >
+                      22조 중재·집단소송 포기
+                    </Link>
+                    포함) 및{' '}
+                    <Link
+                      href='/nyc/privacy-policy'
+                      className='font-medium text-[#F64310] underline-offset-2 hover:underline'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    >
+                      개인정보처리방침
+                    </Link>
+                    에 동의합니다.
+                  </span>
+                </span>
+              </label>
+            )}
+
+            {mode === 'signin' && (
+              <p className='text-[12px] leading-relaxed text-[#98a2b3]'>
+                By signing in, you agree to our{' '}
+                <Link
+                  href='/nyc/terms-of-use'
+                  className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
+                >
+                  Terms of Use
+                </Link>{' '}
+                (including{' '}
+                <Link
+                  href='/nyc/terms-of-use#governing-law'
+                  className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
+                >
+                  arbitration & class-action waiver
+                </Link>
+                ) and{' '}
+                <Link
+                  href='/nyc/privacy-policy'
+                  className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
+                >
+                  Privacy Policy
+                </Link>
+                .
+              </p>
+            )}
+
             <button
               type='submit'
-              disabled={submitting || !isAppConnectConfigured()}
+              disabled={
+                submitting || !isAppConnectConfigured() || !canSubmitAuth
+              }
               className='min-h-[48px] w-full rounded-full bg-[linear-gradient(135deg,#ff4c14_0%,#f64310_50%,#df390e_100%)] text-[15px] font-semibold text-white shadow-[0_10px_20px_rgba(246,67,16,0.24)] transition hover:brightness-[1.03] disabled:cursor-not-allowed disabled:opacity-50'
             >
               {submitLabel}
@@ -267,7 +360,9 @@ export function NycLoginScreen() {
                 </div>
 
                 <GoogleSignInButton
-                  disabled={submitting || !canUseGoogle}
+                  disabled={
+                    submitting || !canUseGoogle || !canSubmitAuth
+                  }
                   onCredential={(credential) =>
                     void handleGoogleCredential(credential)
                   }

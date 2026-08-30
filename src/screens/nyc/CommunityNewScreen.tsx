@@ -61,6 +61,7 @@ import {
   BoardSurface,
 } from '@widgets/nyc/BoardPageShell'
 import { AnonymousTopicSelect } from '@widgets/nyc/AnonymousTopicSelect'
+import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { PlaceSearchField } from '@widgets/nyc/PlaceSearchField'
 import { RestaurantNameField } from '@widgets/nyc/RestaurantNameField'
@@ -204,7 +205,7 @@ function CommunityBoardNewScreen({
           return
         }
         setPostTitle(
-          anonymousBoard
+          isAnonymousBoard(boardId)
             ? post.title.slice(0, ANONYMOUS_TITLE_MAX)
             : post.title,
         )
@@ -660,6 +661,8 @@ function CommunityBoardNewScreen({
             label={isEdit ? '글로 돌아가기' : `${title} 목록`}
             className='mb-6'
           />
+
+          <CommunityWritingGuidelines className='mb-6' />
 
           <section>
             <h2 className='text-[1.25rem] font-semibold tracking-[-0.03em] text-[var(--foreground)]'>
@@ -1181,12 +1184,10 @@ function CommunityBoardNewScreen({
         />
 
         <BoardSurface className='p-5 sm:p-6'>
-          {anonymousBoard && !isEdit ? (
-            <div className='mb-5 rounded-xl bg-[#f4f5f7] px-4 py-3 text-[13px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-black/[0.06]'>
-              작성자 이름·학교·프로필 사진은 다른 사람에게 보이지 않아요. 로그인은
-              글 관리(수정·삭제)를 위해 필요합니다.
-            </div>
-          ) : null}
+          <CommunityWritingGuidelines
+            anonymous={anonymousBoard}
+            className='mb-5'
+          />
           <form onSubmit={handleSubmit} className='space-y-5'>
             <Field
               label='제목'

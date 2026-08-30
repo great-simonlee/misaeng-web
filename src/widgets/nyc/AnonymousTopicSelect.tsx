@@ -34,7 +34,6 @@ export function AnonymousTopicSelect({
   const triggerRef = useRef<HTMLButtonElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
   const [open, setOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
   const position = useAnchoredPosition(triggerRef, open, 8)
 
   const topics = [
@@ -43,10 +42,6 @@ export function AnonymousTopicSelect({
   ]
   const hasValue = Boolean(value.trim())
   const displayLabel = hasValue ? value : placeholder
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -86,7 +81,7 @@ export function AnonymousTopicSelect({
   }
 
   const dropdown =
-    mounted && open && position
+    open && position && typeof document !== 'undefined'
       ? createPortal(
           <ul
             ref={listRef}

@@ -1,5 +1,5 @@
-import { PrivacyPolicyScreen } from '@screens/legal/PrivacyPolicyScreen'
+import { redirect } from 'next/navigation'
 
-export default function PrivacyPolicyPage() {
-  return <PrivacyPolicyScreen />
+export default function PrivacyPolicyRedirectPage() {
+  redirect('/nyc/privacy-policy')
 }

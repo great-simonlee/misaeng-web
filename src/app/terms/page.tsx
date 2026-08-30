@@ -1,5 +1,5 @@
-import { TermsOfUseScreen } from '@screens/legal/TermsOfUseScreen'
+import { redirect } from 'next/navigation'
 
-export default function TermsOfUsePage() {
-  return <TermsOfUseScreen />
+export default function TermsOfUseRedirectPage() {
+  redirect('/nyc/terms-of-use')
 }

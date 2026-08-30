@@ -10,6 +10,7 @@ import { getErrorMessage, useToast } from '@hooks/useToast'
 // import { createHousingPost } from '@lib/firebase/housing'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
 import { LoadingState } from '@components'
+import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
 
 export function HousingNewScreen() {
   const { user, loading, isAuthenticated, isMisaengUser } = useRequireAuth(
@@ -141,6 +142,7 @@ export function HousingNewScreen() {
           onSubmit={handleSubmit}
           className='mt-8 space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-6'
         >
+          <CommunityWritingGuidelines className='mb-2' />
           <Field label='스트리트 주소' required>
             <input
               required

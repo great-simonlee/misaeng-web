@@ -17,6 +17,8 @@ const COMPANY_LINKS = [
 const SUPPORT_LINKS = [
   { href: '/contact', label: '문의하기' },
   { href: '/nyc/me', label: '마이페이지' },
+  { href: '/nyc/terms-of-use', label: '이용약관' },
+  { href: '/nyc/privacy-policy', label: '개인정보처리방침' },
   {
     href: 'mailto:info@misaeng.com?subject=%5BMisaeng%5D%20%EA%B4%91%EA%B3%A0%C2%B7%EC%A0%9C%ED%9C%B4',
     label: '광고·제휴',
@@ -96,7 +98,7 @@ export function NycFooter() {
               aria-label='Legal'
             >
               <Link
-                href='/terms'
+                href='/nyc/terms-of-use'
                 className='text-white/45 touch-manipulation transition hover:text-white'
               >
                 Terms of Use
@@ -105,7 +107,7 @@ export function NycFooter() {
                 ·
               </span>
               <Link
-                href='/privacy'
+                href='/nyc/privacy-policy'
                 className='text-white/45 touch-manipulation transition hover:text-white'
               >
                 Privacy Policy
