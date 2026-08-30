@@ -171,7 +171,7 @@ export const COMMUNITY_CREDIT_REDEEM_PROCESS: readonly CommunityCreditWorkflowSt
       step: 4,
       title: '세션 진행',
       description:
-        '약속된 시간에 온·오프라인으로 진행합니다. 노쇼·당일 취소 등은 정책에 따라 크레딧이 반환되지 않을 수 있습니다.',
+        '약속된 시간에 Zoom으로 진행합니다. 노쇼·당일 취소 등은 정책에 따라 크레딧이 반환되지 않을 수 있습니다.',
     },
   ] as const
 
@@ -299,9 +299,9 @@ export const COMMUNITY_CREDIT_REDEEM_OPTIONS: readonly CommunityCreditRedeemOpti
       cost: 120,
       duration: '약 30분',
       description:
-        '관심 업계·직무에서 일하거나 공부하는 선배·동료와 1:1 대화. 진로·업계 culture·뉴욕 생활 팁 등을 나눕니다.',
+        '관심 업계·직무에서 일하거나 공부하는 선배·동료와 Zoom 1:1 대화. 진로·업계 culture·뉴욕 생활 팁 등을 나눕니다.',
       includes: [
-        '1:1 온·오프라인 미팅 (Zoom 또는 NYC 오프라인)',
+        '1:1 Zoom 콜 (약 30분)',
         '사전 질문 3–5개 검토 후 대화',
         '미생 운영진의 일정·매칭 조율',
       ],
@@ -325,9 +325,9 @@ export const COMMUNITY_CREDIT_REDEEM_OPTIONS: readonly CommunityCreditRedeemOpti
       cost: 400,
       duration: '약 30분',
       description:
-        'F-1·OPT·H-1B·영주권 등 미국 이민·비자 관련 질문에 대한 이민 변호사 30분 Q&A 세션입니다.',
+        'F-1·OPT·H-1B·영주권 등 미국 이민·비자 관련 질문에 대한 이민 변호사 Zoom 30분 Q&A 세션입니다.',
       includes: [
-        '이민 변호사 30분 Q&A',
+        '이민 변호사 Zoom 30분 Q&A',
         '비자·신분·영주권 관련 일반 절차·개념 안내',
         '후속 대리 필요 시 별도 안내',
       ],

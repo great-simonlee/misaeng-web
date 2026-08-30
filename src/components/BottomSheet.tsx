@@ -79,14 +79,14 @@ export function BottomSheet({
             className='h-1 w-10 rounded-full bg-[#e2e5ea]'
             aria-hidden
           />
-          <div className='flex w-full items-center justify-between gap-3 px-5 pb-3 pt-3'>
-            <h3 className='min-w-0 flex-1 text-[15px] font-semibold leading-tight tracking-tight text-[var(--foreground)]'>
+          <div className='relative flex w-full items-center px-5 pb-3 pt-3'>
+            <h3 className='w-full text-center text-[15px] font-semibold leading-tight tracking-tight text-[var(--foreground)]'>
               {title}
             </h3>
             <button
               type='button'
               onClick={onClose}
-              className='shrink-0 px-1 py-1 text-[13px] font-medium leading-none text-[var(--muted)] touch-manipulation transition hover:text-[var(--foreground)]'
+              className='absolute right-5 top-1/2 -translate-y-1/2 px-1 py-1 text-[13px] font-medium leading-none text-[var(--muted)] touch-manipulation transition hover:text-[var(--foreground)]'
             >
               닫기
             </button>

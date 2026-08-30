@@ -128,14 +128,14 @@ export function NycLoginScreen() {
         : '재설정 메일 보내기'
 
   return (
-    <div className='relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#eef1f6_0%,#e8edf4_42%,#f4f6fa_100%)]'>
+    <div className='relative min-h-[calc(100dvh-3.5rem)] overflow-hidden bg-[linear-gradient(180deg,#eef1f6_0%,#e8edf4_42%,#f4f6fa_100%)] sm:min-h-[calc(100dvh-4rem)] md:flex md:items-center md:justify-center'>
       <div className='pointer-events-none absolute inset-0 overflow-hidden'>
         <div className='absolute -left-20 -top-28 h-72 w-72 rounded-full bg-[#F64310]/20 blur-3xl' />
         <div className='absolute right-[-72px] top-[14%] h-80 w-80 rounded-full bg-[#ff6b3d]/22 blur-3xl' />
         <div className='absolute bottom-[-100px] left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[#ffb08f]/28 blur-3xl' />
       </div>
 
-      <div className='relative mx-auto max-w-[420px] px-4 pb-12 pt-10 sm:px-6 sm:pb-16 sm:pt-12'>
+      <div className='relative mx-auto w-full max-w-[420px] px-4 pb-12 pt-10 sm:px-6 sm:pb-16 sm:pt-12 md:py-12'>
         <div className='rounded-[1.5rem] border border-white/80 bg-white/92 p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_20px_48px_rgba(15,23,42,0.10)] backdrop-blur-sm sm:p-7'>
           <header className='text-center sm:text-left'>
             <p className='text-[11px] font-medium tracking-[0.22em] text-[#8b95a7]'>

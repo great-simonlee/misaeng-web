@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
 import { BottomSheet } from '@components'
-import { useToast } from '@hooks/useToast'
 import {
   COMMUNITY_CREDIT_REDEEM_OPTIONS,
   type CommunityCreditEntry,
@@ -72,7 +72,7 @@ function CreditPillGlow() {
 
 /** 프로필 카드용 간단 크레딧 잔액 + 내역 모달 */
 export function MyPageCreditSection({ className }: Props) {
-  const { success } = useToast()
+  const router = useRouter()
   const [summary, setSummary] = useState<CreditSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -176,8 +176,15 @@ export function MyPageCreditSection({ className }: Props) {
 
   function handleRedeemSubmit() {
     if (!selectedRedeemId) return
+    const href =
+      selectedRedeemId === 'coffee-chat'
+        ? '/nyc/credit/coffee-chat'
+        : selectedRedeemId === 'lawyer-consult'
+          ? '/nyc/credit/lawyer-consult'
+          : null
+    if (!href) return
     setRequestOpen(false)
-    success('보상 신청은 순차 오픈 예정이에요. 크레딧 가이드에서 자세히 확인해 주세요.')
+    router.push(href)
   }
 
   const redeemOptions = COMMUNITY_CREDIT_REDEEM_OPTIONS.filter(
