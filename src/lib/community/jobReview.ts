@@ -32,8 +32,14 @@ export const JOB_REVIEW_TYPES: {
   {
     id: 'experienced',
     label: '경력',
-    description: '이직 · Mid/Senior 레벨',
+    description: 'Mid / Senior 레벨 채용',
     summary: '리크루터 연락부터 멀티 라운드 면접',
+  },
+  {
+    id: 'job-change',
+    label: '이직',
+    description: '재직 중·퇴사 후 이직 지원',
+    summary: '현직 병행 지원·오퍼 협상까지의 과정',
   },
   {
     id: 'contract',
@@ -76,6 +82,14 @@ export const JOB_REVIEW_TYPE_STYLES: Record<
       'bg-[#f5f3ff] ring-[#6d28d9] shadow-[0_0_0_1px_rgba(109,40,217,0.08)]',
     accent: '#6d28d9',
     soft: '#f5f3ff',
+  },
+  'job-change': {
+    badge: 'bg-[#fdf2f8] text-[#be185d] ring-[#f9a8d4]/60',
+    picker: 'bg-white ring-black/[0.06] hover:ring-[#be185d]/25',
+    pickerActive:
+      'bg-[#fdf2f8] ring-[#be185d] shadow-[0_0_0_1px_rgba(190,24,93,0.08)]',
+    accent: '#be185d',
+    soft: '#fdf2f8',
   },
   contract: {
     badge: 'bg-[#fff7ed] text-[#c2410c] ring-[#fdba74]/60',
@@ -161,6 +175,13 @@ const JOB_REVIEW_PLACEHOLDERS: Record<
     documentsSubmitted: '예: Updated resume',
     interviewRound: '예: HM 1:1',
     outcome: '예: Onsite invite',
+  },
+  'job-change': {
+    stageLabel: '예: Recruiter screen',
+    platform: '예: LinkedIn / Referral',
+    documentsSubmitted: '예: Resume, LinkedIn',
+    interviewRound: '예: HM + Team',
+    outcome: '예: Offer · 연봉 협상',
   },
   contract: {
     stageLabel: '예: 에이전시 서류',
@@ -253,6 +274,30 @@ export const JOB_REVIEW_QUICK_STEPS: Record<
       },
     },
   ],
+  'job-change': [
+    {
+      label: '지원',
+      patch: {
+        stageLabel: '서류 지원',
+        platform: 'LinkedIn / Referral',
+        documentsSubmitted: 'Resume',
+      },
+    },
+    {
+      label: '면접',
+      patch: {
+        stageLabel: 'Hiring Manager',
+        interviewRound: 'HM + Team',
+      },
+    },
+    {
+      label: '오퍼',
+      patch: {
+        stageLabel: 'Offer · 협상',
+        outcome: 'Offer received',
+      },
+    },
+  ],
   contract: [
     {
       label: '서류',
@@ -282,6 +327,7 @@ export function isJobReviewTypeId(value: unknown): value is JobReviewTypeId {
     value === 'intern' ||
     value === 'new-grad' ||
     value === 'experienced' ||
+    value === 'job-change' ||
     value === 'contract'
   )
 }
@@ -294,7 +340,8 @@ export function normalizeJobReviewType(
   const detail = String(detailFallback || '').trim().toLowerCase()
   if (detail.includes('인턴') || detail === 'intern') return 'intern'
   if (detail.includes('신입') || detail.includes('new')) return 'new-grad'
-  if (detail.includes('경력') || detail.includes('이직')) return 'experienced'
+  if (detail.includes('이직') || detail.includes('job-change')) return 'job-change'
+  if (detail.includes('경력') || detail.includes('experienced')) return 'experienced'
   if (detail.includes('계약') || detail.includes('contract')) return 'contract'
   return null
 }

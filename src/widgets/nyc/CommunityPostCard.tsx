@@ -14,14 +14,9 @@ import {
   formatCommunityCount,
   formatCommunityRelativeTime,
 } from '@lib/constants/communityMock'
-import {
-  getCptOptTimelineDateRange,
-  hasCptOptPostUpdate,
-} from '@lib/community/cptOpt'
-import {
-  getJobReviewTimelineDateRange,
-  hasJobReviewPostUpdate,
-} from '@lib/community/jobReview'
+import { getCptOptTimelineDateRange } from '@lib/community/cptOpt'
+import { getJobReviewTimelineDateRange } from '@lib/community/jobReview'
+import { getListingContextTag } from '@lib/community/listingMeta'
 import {
   NYC_COMMUNITY_BOARD_META,
   isAnonymousBoard,
@@ -37,10 +32,11 @@ import { JobReviewTypeBadge } from '@widgets/nyc/JobReviewTypeBadge'
 import { FoodCategoryBadge } from '@widgets/nyc/FoodCategoryBadge'
 import { FoodCardCommentStat } from '@widgets/nyc/FoodCardCommentStat'
 import { FoodCardRecommendStat } from '@widgets/nyc/FoodCardRecommendStat'
+import { ListingAuthorMeta } from '@widgets/nyc/ListingAuthorMeta'
 import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
 import {
   formatRoommateBudget,
-  formatRoommateMoveInDate,
+  formatRoommateMoveInRange,
   getRoommateLookingForLabel,
   getRoommateLookingForStyle,
 } from '@lib/community/roommate'
@@ -206,8 +202,11 @@ function CptOptListingCard({
 }) {
   const stepCount = post.cptOptTimeline?.length ?? 0
   const dateRange = getCptOptTimelineDateRange(post.cptOptTimeline)
-  const metaLine = [post.location].filter(Boolean).join(' · ')
-  const wasUpdated = hasCptOptPostUpdate(post)
+  const contextTag = getListingContextTag(
+    [post.location],
+    post.authorSchoolId,
+    post.authorSchoolName,
+  )
 
   return (
     <BoardSurface
@@ -221,15 +220,10 @@ function CptOptListingCard({
         <div className='flex items-start justify-between gap-3'>
           <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
             <CptOptTypeBadge type={post.cptOptType} />
-            {wasUpdated ? (
-              <span className='inline-flex items-center rounded-full bg-[#fff8f5] px-2.5 py-1 text-[11px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
-                업데이트됨
-              </span>
-            ) : null}
             <SchoolBadge schoolId={post.authorSchoolId} size='md' />
-            {metaLine ? (
+            {contextTag ? (
               <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted-foreground)] ring-1 ring-black/8'>
-                {metaLine}
+                {contextTag}
               </span>
             ) : null}
           </div>
@@ -238,14 +232,6 @@ function CptOptListingCard({
             id={post.id}
             boardId={boardId}
             variant='icon'
-          />
-        </div>
-
-        <div className='mt-2'>
-          <CptOptActivityMeta
-            createdAt={post.createdAt}
-            updatedAt={post.updatedAt}
-            compact
           />
         </div>
 
@@ -258,13 +244,21 @@ function CptOptListingCard({
         </p>
 
         <div className='mt-3.5 flex items-center justify-between gap-3 border-t border-black/[0.04] pt-3 text-[12px] font-medium text-[var(--muted)]'>
-          <span className='inline-flex items-center gap-1.5'>
-            <EyeIcon className='size-3.5' />
+          <ListingAuthorMeta post={post}>
+            <EyeIcon className='size-3.5 shrink-0' />
             <span className='tabular-nums'>
               {formatCommunityCount(post.viewCount)}
             </span>
-          </span>
-          <span className='text-right text-[11px] leading-snug'>
+            <span className='text-black/20' aria-hidden>
+              ·
+            </span>
+            <CptOptActivityMeta
+              createdAt={post.createdAt}
+              updatedAt={post.updatedAt}
+              compact
+            />
+          </ListingAuthorMeta>
+          <span className='shrink-0 text-right text-[11px] leading-snug'>
             {stepCount > 0 ? (
               <>
                 타임라인 {stepCount}단계
@@ -292,10 +286,11 @@ function JobReviewListingCard({
 }) {
   const stepCount = post.jobReviewTimeline?.length ?? 0
   const dateRange = getJobReviewTimelineDateRange(post.jobReviewTimeline)
-  const metaLine = [post.location, post.jobReviewIndustry]
-    .filter(Boolean)
-    .join(' · ')
-  const wasUpdated = hasJobReviewPostUpdate(post)
+  const contextTag = getListingContextTag(
+    [post.location, post.jobReviewIndustry],
+    post.authorSchoolId,
+    post.authorSchoolName,
+  )
 
   return (
     <BoardSurface
@@ -309,15 +304,10 @@ function JobReviewListingCard({
         <div className='flex items-start justify-between gap-3'>
           <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
             <JobReviewTypeBadge type={post.jobReviewType} />
-            {wasUpdated ? (
-              <span className='inline-flex items-center rounded-full bg-[#fff8f5] px-2.5 py-1 text-[11px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
-                업데이트됨
-              </span>
-            ) : null}
             <SchoolBadge schoolId={post.authorSchoolId} size='md' />
-            {metaLine ? (
+            {contextTag ? (
               <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted-foreground)] ring-1 ring-black/8'>
-                {metaLine}
+                {contextTag}
               </span>
             ) : null}
           </div>
@@ -326,14 +316,6 @@ function JobReviewListingCard({
             id={post.id}
             boardId={boardId}
             variant='icon'
-          />
-        </div>
-
-        <div className='mt-2'>
-          <JobReviewActivityMeta
-            createdAt={post.createdAt}
-            updatedAt={post.updatedAt}
-            compact
           />
         </div>
 
@@ -346,13 +328,21 @@ function JobReviewListingCard({
         </p>
 
         <div className='mt-3.5 flex items-center justify-between gap-3 border-t border-black/[0.04] pt-3 text-[12px] font-medium text-[var(--muted)]'>
-          <span className='inline-flex items-center gap-1.5'>
-            <EyeIcon className='size-3.5' />
+          <ListingAuthorMeta post={post}>
+            <EyeIcon className='size-3.5 shrink-0' />
             <span className='tabular-nums'>
               {formatCommunityCount(post.viewCount)}
             </span>
-          </span>
-          <span className='text-right text-[11px] leading-snug'>
+            <span className='text-black/20' aria-hidden>
+              ·
+            </span>
+            <JobReviewActivityMeta
+              createdAt={post.createdAt}
+              updatedAt={post.updatedAt}
+              compact
+            />
+          </ListingAuthorMeta>
+          <span className='shrink-0 text-right text-[11px] leading-snug'>
             {stepCount > 0 ? (
               <>
                 채용 단계 {stepCount}건
@@ -392,12 +382,15 @@ function TextListingCard({
       ? `$${post.detail.trim()}`
       : null
   const moveInLabel = isRoommate
-    ? formatRoommateMoveInDate(post.roommateMoveInDate)
+    ? formatRoommateMoveInRange(
+        post.roommateMoveInDate,
+        post.roommateMoveOutDate,
+      )
     : null
   const metaLine = [
     post.location,
     !isMarket && !isRoommate && post.detail ? post.detail : null,
-    moveInLabel ? `입주 ${moveInLabel}` : null,
+    moveInLabel ? `기간 ${moveInLabel}` : null,
   ]
     .filter(Boolean)
     .join(' · ')

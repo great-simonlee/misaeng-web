@@ -58,6 +58,7 @@ function withLocalCounts(post: CommunityPost): CommunityPost {
     roommateLookingFor: post.roommateLookingFor ?? null,
     roommateBudgetMax: post.roommateBudgetMax ?? null,
     roommateMoveInDate: post.roommateMoveInDate ?? null,
+    roommateMoveOutDate: post.roommateMoveOutDate ?? null,
   }
 }
 
@@ -72,7 +73,19 @@ export async function fetchCommunityPosts(
     if (res.ok) {
       const data = (await res.json()) as { posts?: CommunityPost[] }
       const posts = Array.isArray(data.posts) ? data.posts : []
-      if (posts.length > 0) return posts.map(withLocalCounts)
+      if (posts.length > 0) {
+        const mapped = posts.map(withLocalCounts)
+        // 룸메이트: 인증 학교 태그·유형 예시용 목 글을 API 결과와 함께 표시
+        if (boardId === 'roommate') {
+          const mocks = listMockCommunityPosts('roommate').map(withLocalCounts)
+          const ids = new Set(mapped.map((item) => item.id))
+          return [
+            ...mapped,
+            ...mocks.filter((item) => !ids.has(item.id)),
+          ].sort((a, b) => b.createdAt - a.createdAt)
+        }
+        return mapped
+      }
     }
   } catch {
     // 목 데이터로 폴백
@@ -133,6 +146,7 @@ export async function createCommunityPostRequest(input: {
   roommateLookingFor?: CommunityPost['roommateLookingFor'] | null
   roommateBudgetMax?: CommunityPost['roommateBudgetMax'] | null
   roommateMoveInDate?: CommunityPost['roommateMoveInDate'] | null
+  roommateMoveOutDate?: CommunityPost['roommateMoveOutDate'] | null
 }): Promise<CommunityPost> {
   const res = await fetch('/api/community', {
     method: 'POST',
@@ -187,6 +201,7 @@ export async function updateCommunityPostRequest(
     roommateLookingFor?: CommunityPost['roommateLookingFor'] | null
     roommateBudgetMax?: CommunityPost['roommateBudgetMax'] | null
     roommateMoveInDate?: CommunityPost['roommateMoveInDate'] | null
+    roommateMoveOutDate?: CommunityPost['roommateMoveOutDate'] | null
   },
 ): Promise<CommunityPost> {
   if (id.startsWith('mock-')) {

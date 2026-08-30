@@ -1,7 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   BottomSheet,
@@ -14,9 +13,12 @@ import { getErrorMessage, useToast } from '@hooks/useToast'
 import { fetchCommunityPosts } from '@lib/community/client'
 import {
   ROOMMATE_BUDGET_MAX,
+  ROOMMATE_INTENT_OPTIONS,
   ROOMMATE_LOOKING_FOR_OPTIONS,
   formatRoommateBudget,
   normalizeRoommateLookingFor,
+  roommateMatchesIntent,
+  type RoommateIntent,
   type RoommateLookingFor,
 } from '@lib/community/roommate'
 import {
@@ -27,8 +29,9 @@ import { NYC_COMMUNITY_BOARD_META } from '@lib/constants/nyc'
 import { cn } from '@lib'
 import type { CommunityPost } from '@/types/nyc'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
+import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
+import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { EmptyState } from '@widgets/nyc/EmptyState'
-import { HousingPostCardSkeletonGrid } from '@widgets/nyc/HousingPostCardSkeleton'
 import { RoommatePostCard } from '@widgets/nyc/RoommatePostCard'
 
 const BOARD_ID = 'roommate' as const
@@ -54,6 +57,7 @@ const NEIGHBORHOOD_HINTS = [
   'Astoria',
 ] as const
 
+type IntentFilter = 'all' | RoommateIntent
 type LookingForFilter = 'all' | RoommateLookingFor
 type NeighborhoodFilter = 'all' | string
 
@@ -66,52 +70,19 @@ export function RoommateListScreen() {
   const [loading, setLoading] = useState(true)
   const [filtersOpen, setFiltersOpen] = useState(false)
 
+  const [intent, setIntent] = useState<IntentFilter>('all')
   const [lookingFor, setLookingFor] = useState<LookingForFilter>('all')
   const [neighborhood, setNeighborhood] = useState<NeighborhoodFilter>('all')
   const [budgetMin, setBudgetMin] = useState(BUDGET_BOUNDS.min)
   const [budgetMax, setBudgetMax] = useState(BUDGET_BOUNDS.max)
 
+  const [draftIntent, setDraftIntent] = useState<IntentFilter>('all')
   const [draftLookingFor, setDraftLookingFor] =
     useState<LookingForFilter>('all')
   const [draftNeighborhood, setDraftNeighborhood] =
     useState<NeighborhoodFilter>('all')
   const [draftBudgetMin, setDraftBudgetMin] = useState(BUDGET_BOUNDS.min)
   const [draftBudgetMax, setDraftBudgetMax] = useState(BUDGET_BOUNDS.max)
-
-  const chipScrollRef = useRef<HTMLDivElement>(null)
-  const [chipEdge, setChipEdge] = useState({ left: false, right: false })
-
-  function updateChipScrollHint() {
-    const el = chipScrollRef.current
-    if (!el) return
-    const { scrollLeft, scrollWidth, clientWidth } = el
-    setChipEdge({
-      left: scrollLeft > 4,
-      right: scrollLeft + clientWidth < scrollWidth - 4,
-    })
-  }
-
-  function scrollChips(direction: 'left' | 'right') {
-    const el = chipScrollRef.current
-    if (!el) return
-    el.scrollBy({
-      left: direction === 'right' ? 140 : -140,
-      behavior: 'smooth',
-    })
-  }
-
-  useEffect(() => {
-    updateChipScrollHint()
-    const el = chipScrollRef.current
-    if (!el) return
-    const ro = new ResizeObserver(updateChipScrollHint)
-    ro.observe(el)
-    window.addEventListener('resize', updateChipScrollHint)
-    return () => {
-      ro.disconnect()
-      window.removeEventListener('resize', updateChipScrollHint)
-    }
-  }, [])
 
   const loadPosts = useCallback(
     async (opts?: { silent?: boolean }) => {
@@ -147,6 +118,7 @@ export function RoommateListScreen() {
 
   function matchesFilters(
     post: CommunityPost,
+    intentFilter: IntentFilter,
     looking: LookingForFilter,
     area: NeighborhoodFilter,
     min: number,
@@ -157,6 +129,13 @@ export function RoommateListScreen() {
       post.detail,
     )
     if (looking !== 'all' && type !== looking) return false
+    if (
+      looking === 'all' &&
+      intentFilter !== 'all' &&
+      !roommateMatchesIntent(type, intentFilter)
+    ) {
+      return false
+    }
     if (
       area !== 'all' &&
       !(post.location || '').toLowerCase().includes(area.toLowerCase())
@@ -175,9 +154,16 @@ export function RoommateListScreen() {
   const filteredPosts = useMemo(
     () =>
       posts.filter((post) =>
-        matchesFilters(post, lookingFor, neighborhood, budgetMin, budgetMax),
+        matchesFilters(
+          post,
+          intent,
+          lookingFor,
+          neighborhood,
+          budgetMin,
+          budgetMax,
+        ),
       ),
-    [posts, lookingFor, neighborhood, budgetMin, budgetMax],
+    [posts, intent, lookingFor, neighborhood, budgetMin, budgetMax],
   )
 
   const draftResultCount = useMemo(
@@ -185,6 +171,7 @@ export function RoommateListScreen() {
       posts.filter((post) =>
         matchesFilters(
           post,
+          draftIntent,
           draftLookingFor,
           draftNeighborhood,
           draftBudgetMin,
@@ -193,6 +180,7 @@ export function RoommateListScreen() {
       ).length,
     [
       posts,
+      draftIntent,
       draftLookingFor,
       draftNeighborhood,
       draftBudgetMin,
@@ -202,13 +190,13 @@ export function RoommateListScreen() {
 
   const activeFilterCount = useMemo(() => {
     let count = 0
-    if (lookingFor !== 'all') count += 1
+    if (intent !== 'all' || lookingFor !== 'all') count += 1
     if (neighborhood !== 'all') count += 1
     if (budgetMin > BUDGET_BOUNDS.min || budgetMax < BUDGET_BOUNDS.max) {
       count += 1
     }
     return count
-  }, [lookingFor, neighborhood, budgetMin, budgetMax])
+  }, [intent, lookingFor, neighborhood, budgetMin, budgetMax])
 
   const neighborhoodOptions = useMemo(() => {
     const fromPosts = [
@@ -241,6 +229,10 @@ export function RoommateListScreen() {
         ROOMMATE_LOOKING_FOR_OPTIONS.find((item) => item.id === lookingFor)
           ?.label ?? '',
       )
+    } else if (intent !== 'all') {
+      parts.push(
+        ROOMMATE_INTENT_OPTIONS.find((item) => item.id === intent)?.label ?? '',
+      )
     }
     if (neighborhood !== 'all') parts.push(neighborhood)
     if (budgetMin > BUDGET_BOUNDS.min || budgetMax < BUDGET_BOUNDS.max) {
@@ -248,11 +240,19 @@ export function RoommateListScreen() {
         `${formatRoommateBudget(budgetMin) ?? `$${budgetMin}`}–${formatRoommateBudget(budgetMax) ?? `$${budgetMax}`}`,
       )
     }
-    if (parts.length === 0) return `등록 글 ${filteredPosts.length}개`
+    if (parts.length === 0) return `${filteredPosts.length}개의 글`
     return `${parts.filter(Boolean).join(' · ')} · ${filteredPosts.length}개`
-  }, [lookingFor, neighborhood, budgetMin, budgetMax, filteredPosts.length])
+  }, [
+    intent,
+    lookingFor,
+    neighborhood,
+    budgetMin,
+    budgetMax,
+    filteredPosts.length,
+  ])
 
   function openFilters() {
+    setDraftIntent(intent)
     setDraftLookingFor(lookingFor)
     setDraftNeighborhood(neighborhood)
     setDraftBudgetMin(budgetMin)
@@ -261,6 +261,7 @@ export function RoommateListScreen() {
   }
 
   function applyFilters() {
+    setIntent(draftIntent)
     setLookingFor(draftLookingFor)
     setNeighborhood(draftNeighborhood)
     setBudgetMin(draftBudgetMin)
@@ -269,10 +270,12 @@ export function RoommateListScreen() {
   }
 
   function clearAllFilters() {
+    setIntent('all')
     setLookingFor('all')
     setNeighborhood('all')
     setBudgetMin(BUDGET_BOUNDS.min)
     setBudgetMax(BUDGET_BOUNDS.max)
+    setDraftIntent('all')
     setDraftLookingFor('all')
     setDraftNeighborhood('all')
     setDraftBudgetMin(BUDGET_BOUNDS.min)
@@ -280,7 +283,14 @@ export function RoommateListScreen() {
   }
 
   function toggleQuickLookingFor(id: RoommateLookingFor) {
-    setLookingFor((prev) => (prev === id ? 'all' : id))
+    if (lookingFor === id) {
+      setLookingFor('all')
+      setIntent('all')
+      return
+    }
+    const option = ROOMMATE_LOOKING_FOR_OPTIONS.find((item) => item.id === id)
+    setLookingFor(id)
+    setIntent(option?.intent ?? 'all')
   }
 
   function toggleQuickBudget(min: number, max: number) {
@@ -306,144 +316,57 @@ export function RoommateListScreen() {
 
   return (
     <PullToRefresh onRefresh={refreshPosts} className='flex flex-1 flex-col'>
-      <BoardPageShell width='wide' className='flex flex-1 flex-col'>
-        <header className='pt-5 sm:pt-8 lg:pt-10'>
-          <div className='flex flex-wrap items-start justify-between gap-3'>
-            <div className='min-w-0'>
-              <h1 className='text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]'>
-                룸메이트 · 서블렛
-              </h1>
-              <p className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>
-                {meta.listIntro}
-              </p>
-            </div>
-            {!authLoading && user ? (
-              <Link
-                href={postHref}
-                className='inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)]'
-              >
-                <PencilIcon className='size-3.5' />
-                {schoolVerified ? meta.writeLabel : '학교 인증하기'}
-              </Link>
-            ) : !authLoading ? (
-              <Link
-                href={loginNext}
-                className='inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)]'
-              >
-                <PencilIcon className='size-3.5' />
-                로그인
-              </Link>
-            ) : null}
-          </div>
-
-          <div className='mt-4 flex items-center gap-2 sm:mt-5 sm:gap-2.5'>
-            <button
-              type='button'
-              onClick={openFilters}
-              className={cn(
-                'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[12px] font-semibold touch-manipulation transition sm:h-9 sm:px-3.5 sm:text-[13px]',
-                activeFilterCount > 0
-                  ? 'border-[var(--foreground)] bg-white text-[var(--foreground)]'
-                  : 'border-[#dddddd] bg-white text-[var(--foreground)] hover:border-[#b0b0b0]',
-              )}
-            >
-              <FiltersIcon className='size-3.5' />
-              필터
-              {activeFilterCount > 0 ? (
-                <span className='inline-flex min-w-4.5 items-center justify-center rounded-full bg-[var(--foreground)] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white'>
-                  {activeFilterCount}
-                </span>
-              ) : null}
-            </button>
-
-            <span
-              className='hidden h-6 w-px shrink-0 bg-[#dddddd] sm:block'
-              aria-hidden
+      <BoardPageShell width='narrow' className='flex flex-1 flex-col'>
+        <BoardListToolbar
+          breadcrumbLabel='룸메이트 · 서블렛'
+          intro={meta.listIntro}
+          writeHref={postHref}
+          writeLabel={authLoading ? meta.writeLabel : writeCtaLabel}
+          onFilterClick={openFilters}
+          filterCount={activeFilterCount}
+          showWrite={!authLoading}
+        >
+          <ChipScrollRow ariaLabel='빠른 필터'>
+            <BoardQuickChip
+              label='전체'
+              active={lookingFor === 'all' && intent === 'all'}
+              onClick={() => {
+                setLookingFor('all')
+                setIntent('all')
+              }}
             />
-
-            <div className='relative min-w-0 flex-1'>
-              <div
-                ref={chipScrollRef}
-                onScroll={updateChipScrollHint}
-                className='overflow-x-auto overflow-y-hidden scroll-smooth py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
-              >
-                <div
-                  className='flex w-max items-center gap-1.5 pr-12'
-                  role='listbox'
-                  aria-label='빠른 필터'
-                >
-                  {ROOMMATE_LOOKING_FOR_OPTIONS.map((option) => (
-                    <QuickChip
-                      key={option.id}
-                      label={option.label}
-                      active={lookingFor === option.id}
-                      onClick={() => toggleQuickLookingFor(option.id)}
-                    />
-                  ))}
-                  {BUDGET_PRESETS.map((preset) => (
-                    <QuickChip
-                      key={preset.id}
-                      label={preset.label}
-                      active={activeBudgetPreset === preset.id}
-                      onClick={() => toggleQuickBudget(preset.min, preset.max)}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {chipEdge.left ? (
-                <div className='pointer-events-none absolute inset-y-0 left-0 z-10 flex w-14 items-center'>
-                  <div
-                    aria-hidden
-                    className='absolute inset-y-0 left-0 w-8 bg-white'
-                  />
-                  <div
-                    aria-hidden
-                    className='absolute inset-y-0 left-7 right-0 bg-gradient-to-r from-white to-transparent'
-                  />
-                  <button
-                    type='button'
-                    aria-label='이전 필터 보기'
-                    onClick={() => scrollChips('left')}
-                    className='pointer-events-auto relative ml-0.5 inline-flex size-6 items-center justify-center rounded-full border border-[#dddddd] bg-white text-[var(--foreground)] shadow-sm'
-                  >
-                    <ChevronIcon className='size-3.5 rotate-180' />
-                  </button>
-                </div>
-              ) : null}
-
-              {chipEdge.right ? (
-                <div className='pointer-events-none absolute inset-y-0 right-0 z-10 flex w-14 items-center justify-end'>
-                  <div
-                    aria-hidden
-                    className='absolute inset-y-0 right-0 w-8 bg-white'
-                  />
-                  <div
-                    aria-hidden
-                    className='absolute inset-y-0 right-7 left-0 bg-gradient-to-l from-white to-transparent'
-                  />
-                  <button
-                    type='button'
-                    aria-label='더 많은 필터 보기'
-                    onClick={() => scrollChips('right')}
-                    className='pointer-events-auto relative mr-0.5 inline-flex size-6 items-center justify-center rounded-full border border-[#dddddd] bg-white text-[var(--foreground)] shadow-sm'
-                  >
-                    <ChevronIcon className='size-3.5' />
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </header>
+            {ROOMMATE_LOOKING_FOR_OPTIONS.map((option) => (
+              <BoardQuickChip
+                key={option.id}
+                label={option.label}
+                active={lookingFor === option.id}
+                onClick={() => toggleQuickLookingFor(option.id)}
+              />
+            ))}
+            {BUDGET_PRESETS.map((preset) => (
+              <BoardQuickChip
+                key={preset.id}
+                label={preset.label}
+                active={activeBudgetPreset === preset.id}
+                onClick={() => toggleQuickBudget(preset.min, preset.max)}
+              />
+            ))}
+          </ChipScrollRow>
+        </BoardListToolbar>
 
         <section className='flex-1 pb-14 pt-4 sm:pb-16 sm:pt-5'>
           {loading ? (
-            <>
-              <Skeleton className='mb-3.5 h-3.5 w-36' />
-              <HousingPostCardSkeletonGrid />
-            </>
+            <div className='space-y-4'>
+              <Skeleton className='h-3.5 w-28' />
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Skeleton
+                  key={index}
+                  className='h-[9.5rem] w-full rounded-[1.25rem]'
+                />
+              ))}
+            </div>
           ) : filteredPosts.length === 0 ? (
-              <EmptyState
+            <EmptyState
               title={
                 posts.length === 0
                   ? '아직 룸메이트·서블렛 글이 없습니다'
@@ -460,9 +383,7 @@ export function RoommateListScreen() {
               }
               actionHref={posts.length === 0 ? postHref : undefined}
               actionLabel={
-                posts.length === 0
-                  ? writeCtaLabel
-                  : '필터 초기화'
+                posts.length === 0 ? writeCtaLabel : '필터 초기화'
               }
               onAction={posts.length === 0 ? undefined : clearAllFilters}
             />
@@ -471,7 +392,7 @@ export function RoommateListScreen() {
               <p className='mb-3.5 text-[12px] font-medium text-[var(--muted)] sm:mb-4 sm:text-[13px]'>
                 {summaryLabel}
               </p>
-              <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5'>
+              <div className='flex flex-col gap-4 sm:gap-5'>
                 {filteredPosts.map((post) => (
                   <RoommatePostCard key={post.id} post={post} />
                 ))}
@@ -490,6 +411,7 @@ export function RoommateListScreen() {
               <button
                 type='button'
                 onClick={() => {
+                  setDraftIntent('all')
                   setDraftLookingFor('all')
                   setDraftNeighborhood('all')
                   setDraftBudgetMin(BUDGET_BOUNDS.min)
@@ -512,21 +434,53 @@ export function RoommateListScreen() {
           <div className='space-y-7 overflow-x-hidden px-3 pb-2'>
             <section>
               <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                유형
+                분류
               </h4>
               <div className='mt-3 flex flex-wrap gap-2'>
                 <SheetChip
                   label='전체'
-                  active={draftLookingFor === 'all'}
-                  onClick={() => setDraftLookingFor('all')}
+                  active={draftIntent === 'all' && draftLookingFor === 'all'}
+                  onClick={() => {
+                    setDraftIntent('all')
+                    setDraftLookingFor('all')
+                  }}
                 />
-                {ROOMMATE_LOOKING_FOR_OPTIONS.map((option) => (
+                {ROOMMATE_INTENT_OPTIONS.map((option) => (
                   <SheetChip
                     key={option.id}
                     label={option.label}
-                    active={draftLookingFor === option.id}
-                    onClick={() => setDraftLookingFor(option.id)}
+                    active={
+                      draftIntent === option.id && draftLookingFor === 'all'
+                    }
+                    onClick={() => {
+                      setDraftIntent(option.id)
+                      setDraftLookingFor('all')
+                    }}
                   />
+                ))}
+              </div>
+              <div className='mt-4 space-y-3'>
+                {ROOMMATE_INTENT_OPTIONS.map((group) => (
+                  <div key={group.id}>
+                    <p className='text-[12px] font-medium text-[var(--muted)]'>
+                      {group.label}
+                    </p>
+                    <div className='mt-2 flex flex-wrap gap-2'>
+                      {ROOMMATE_LOOKING_FOR_OPTIONS.filter(
+                        (item) => item.intent === group.id,
+                      ).map((option) => (
+                        <SheetChip
+                          key={option.id}
+                          label={option.label}
+                          active={draftLookingFor === option.id}
+                          onClick={() => {
+                            setDraftLookingFor(option.id)
+                            setDraftIntent(option.intent)
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </section>
@@ -536,9 +490,11 @@ export function RoommateListScreen() {
                 월 예산
               </h4>
               <p className='mt-1 text-[12px] text-[var(--muted)]'>
-                {(formatRoommateBudget(draftBudgetMin) ?? `$${draftBudgetMin}`) +
+                {(formatRoommateBudget(draftBudgetMin) ??
+                  `$${draftBudgetMin}`) +
                   ' – ' +
-                  (formatRoommateBudget(draftBudgetMax) ?? `$${draftBudgetMax}`)}
+                  (formatRoommateBudget(draftBudgetMax) ??
+                    `$${draftBudgetMax}`)}
               </p>
               <div className='mt-3'>
                 <RangeSlider
@@ -601,33 +557,6 @@ export function RoommateListScreen() {
   )
 }
 
-function QuickChip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type='button'
-      role='option'
-      aria-selected={active}
-      onClick={onClick}
-      className={cn(
-        'inline-flex h-9 shrink-0 items-center rounded-full border px-3 text-[12px] font-medium leading-none touch-manipulation transition sm:px-3.5 sm:text-[13px]',
-        active
-          ? 'border-[var(--foreground)] bg-white text-[var(--foreground)]'
-          : 'border-[#dddddd] bg-white text-[var(--foreground)] hover:border-[#b0b0b0]',
-      )}
-    >
-      {label}
-    </button>
-  )
-}
-
 function SheetChip({
   label,
   active,
@@ -650,60 +579,5 @@ function SheetChip({
     >
       {label}
     </button>
-  )
-}
-
-function FiltersIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='1.8'
-      className={className}
-      aria-hidden
-    >
-      <path
-        strokeLinecap='round'
-        d='M4 7h10M18 7h2M4 12h2M10 12h10M4 17h8M16 17h4'
-      />
-      <circle cx='16' cy='7' r='2' />
-      <circle cx='8' cy='12' r='2' />
-      <circle cx='14' cy='17' r='2' />
-    </svg>
-  )
-}
-
-function ChevronIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='2.2'
-      className={className}
-      aria-hidden
-    >
-      <path strokeLinecap='round' strokeLinejoin='round' d='M9 5l7 7-7 7' />
-    </svg>
-  )
-}
-
-function PencilIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='2'
-      className={className}
-      aria-hidden
-    >
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        d='M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z'
-      />
-    </svg>
   )
 }

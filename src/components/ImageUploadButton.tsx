@@ -103,7 +103,10 @@ export function ImagePreview({
 
 type PhotoUploadZoneProps = {
   src?: string | null
-  onUploaded: (url: string) => void
+  /** 한 장씩 업로드될 때 호출 (onUploadedMany가 있으면 생략 가능) */
+  onUploaded?: (url: string) => void
+  /** 여러 장 업로드 완료 시 한 번에 전달 (multiple일 때 권장) */
+  onUploadedMany?: (urls: string[]) => void
   onRemove?: () => void
   /** 빈 상태 메인 문구 */
   emptyLabel?: string
@@ -114,33 +117,58 @@ type PhotoUploadZoneProps = {
   aspectClassName?: string
   /** 작은 메뉴 썸네일용 */
   compact?: boolean
+  /** 갤러리에서 여러 장 한 번에 선택 */
+  multiple?: boolean
+  /** multiple일 때 이번에 추가할 수 있는 최대 장수 */
+  maxFiles?: number
 }
 
 /** 탭해서 올리는 사진 영역 (대표·메뉴 공통) */
 export function PhotoUploadZone({
   src,
   onUploaded,
+  onUploadedMany,
   onRemove,
   emptyLabel = '사진 추가',
   emptyHint = '탭해서 올리기',
   className,
   aspectClassName = 'aspect-[16/10]',
   compact = false,
+  multiple = false,
+  maxFiles,
 }: PhotoUploadZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const canPickMultiple = multiple && !src
+  const pickLimit = Math.max(1, maxFiles ?? (canPickMultiple ? 20 : 1))
+
   async function handleFiles(files: FileList | null) {
-    const file = files?.[0]
-    if (!file) return
+    if (!files?.length) return
+    const selected = Array.from(files).slice(
+      0,
+      canPickMultiple ? pickLimit : 1,
+    )
+    if (selected.length === 0) return
+
     setUploading(true)
     setError(null)
+    const uploaded: string[] = []
     try {
-      const url = await uploadCommunityImageFile(file)
-      onUploaded(url)
+      for (const file of selected) {
+        const url = await uploadCommunityImageFile(file)
+        uploaded.push(url)
+        if (!onUploadedMany) onUploaded?.(url)
+      }
+      if (onUploadedMany && uploaded.length > 0) {
+        onUploadedMany(uploaded)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '업로드 실패')
+      if (onUploadedMany && uploaded.length > 0) {
+        onUploadedMany(uploaded)
+      }
     } finally {
       setUploading(false)
       if (inputRef.current) inputRef.current.value = ''
@@ -247,6 +275,7 @@ export function PhotoUploadZone({
         ref={inputRef}
         type='file'
         accept={IMAGE_LIBRARY_ACCEPT}
+        multiple={canPickMultiple}
         className='hidden'
         onChange={(e) => void handleFiles(e.target.files)}
       />

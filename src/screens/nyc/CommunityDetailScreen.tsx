@@ -23,7 +23,7 @@ import {
 import type { CommunityPost } from '@/types/nyc'
 import {
   formatRoommateBudget,
-  formatRoommateMoveInDate,
+  formatRoommateMoveInRange,
   getRoommateLookingForLabel,
 } from '@lib/community/roommate'
 import {
@@ -164,7 +164,10 @@ export function CommunityDetailScreen({
   const bodyHtml = post.contentHtml || `<p>${post.description}</p>`
   const tone = boardToneForId(boardId)
   const roommateBudget = formatRoommateBudget(post.roommateBudgetMax)
-  const roommateMoveIn = formatRoommateMoveInDate(post.roommateMoveInDate)
+  const roommateMoveIn = formatRoommateMoveInRange(
+    post.roommateMoveInDate,
+    post.roommateMoveOutDate,
+  )
   const roommateType = getRoommateLookingForLabel(post.roommateLookingFor)
   const metaBits = [
     post.location && {
@@ -180,10 +183,10 @@ export function CommunityDetailScreen({
               boardId === 'marketplace' ? `$${post.detail}` : post.detail,
           },
     isRoommate && roommateBudget
-      ? { label: '월 예산', value: `${roommateBudget}/월` }
+      ? { label: '월 예산·월세', value: `${roommateBudget}/월` }
       : null,
     isRoommate && roommateMoveIn
-      ? { label: '입주 희망일', value: roommateMoveIn }
+      ? { label: '입주·이사', value: roommateMoveIn }
       : null,
   ].filter(Boolean) as { label: string; value: string }[]
 
@@ -192,9 +195,11 @@ export function CommunityDetailScreen({
       <BoardPageShell width='narrow'>
         <div
           className={
-            isFood || isCptOpt || isJobReview
+            isFood
               ? 'pb-16 pt-0 sm:pb-20 sm:pt-6 lg:pt-8'
-              : 'pb-16 pt-5 sm:pb-20 sm:pt-7'
+              : isCptOpt || isJobReview
+                ? 'pb-16 pt-4 sm:pb-20 sm:pt-6 lg:pt-8'
+                : 'pb-16 pt-5 sm:pb-20 sm:pt-7'
           }
         >
           {/* 맛집은 히어로 위 뒤로가기가 있어 상단 링크는 생략 */}

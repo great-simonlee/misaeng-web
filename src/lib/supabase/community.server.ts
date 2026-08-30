@@ -18,6 +18,7 @@ import {
   normalizeRoommateBudgetMax,
   normalizeRoommateLookingFor,
   normalizeRoommateMoveInDate,
+  normalizeRoommateMoveOutDate,
 } from '@lib/community/roommate'
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
@@ -195,6 +196,10 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       data.roommateBudgetMax ?? data.detail,
     ),
     roommateMoveInDate: normalizeRoommateMoveInDate(data.roommateMoveInDate),
+    roommateMoveOutDate: normalizeRoommateMoveOutDate(
+      data.roommateMoveOutDate,
+      normalizeRoommateMoveInDate(data.roommateMoveInDate),
+    ),
   }
 }
 
@@ -291,11 +296,17 @@ export async function listStoredCommunityPosts(
       return post.categoryId === boardId
     })
 
-  if (boardId === 'food') {
-    return Promise.all(filtered.map(enrichStoredCommunityPostCounts))
-  }
+  const withCounts =
+    boardId === 'food'
+      ? await Promise.all(filtered.map(enrichStoredCommunityPostCounts))
+      : filtered
 
-  return filtered
+  // 목록에서도 최신 프로필 사진·닉네임 반영 (저장은 상세 조회 시)
+  return Promise.all(
+    withCounts.map((item) =>
+      enrichCommunityPostAuthor(item, { persist: false }),
+    ),
+  )
 }
 
 /** 내 글 관리용 — open/closed 모두 포함 */
@@ -310,6 +321,7 @@ export async function listStoredCommunityPostsByAuthor(
 
 async function enrichCommunityPostAuthor(
   post: CommunityPost,
+  options?: { persist?: boolean },
 ): Promise<CommunityPost> {
   if (isAnonymousBoard(post.categoryId)) return post
 
@@ -326,6 +338,7 @@ async function enrichCommunityPostAuthor(
     storedPhoto && !storedPhoto.startsWith('blob:') ? storedPhoto : null
 
   const authorNickname = storedNickname || profileNickname
+  // 목록·상세 모두 최신 프로필 사진을 우선 사용
   const authorPhotoURL = profilePhoto || safeStoredPhoto
 
   if (
@@ -340,10 +353,12 @@ async function enrichCommunityPostAuthor(
     authorNickname,
     authorPhotoURL,
   }
-  try {
-    await saveStoredCommunityPost(enriched)
-  } catch {
-    // 표시만 보강
+  if (options?.persist !== false) {
+    try {
+      await saveStoredCommunityPost(enriched)
+    } catch {
+      // 표시만 보강
+    }
   }
   return enriched
 }

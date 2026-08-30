@@ -16,11 +16,14 @@ import {
   normalizeJobReviewType,
 } from '@lib/community/jobReview'
 import {
+  getRoommateFormConfig,
   getRoommateLookingForLabel,
   isRoommateLookingFor,
   normalizeRoommateBudgetMax,
   normalizeRoommateLookingFor,
   normalizeRoommateMoveInDate,
+  normalizeRoommateMoveOutDate,
+  ROOMMATE_TITLE_MAX,
 } from '@lib/community/roommate'
 import { isCommunityBoardId, isAnonymousBoard } from '@lib/constants/nyc'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
@@ -136,6 +139,7 @@ type CreateBody = {
   roommateLookingFor?: RoommateLookingFor | null
   roommateBudgetMax?: number | null
   roommateMoveInDate?: string | null
+  roommateMoveOutDate?: string | null
 }
 
 export async function POST(request: Request) {
@@ -265,6 +269,12 @@ export async function POST(request: Request) {
   const roommateMoveInDate = isRoommate
     ? normalizeRoommateMoveInDate(body?.roommateMoveInDate)
     : null
+  const roommateMoveOutDate = isRoommate
+    ? normalizeRoommateMoveOutDate(
+        body?.roommateMoveOutDate,
+        roommateMoveInDate,
+      )
+    : null
 
   if (isRoommate) {
     const mine = await listStoredCommunityPostsByAuthor(user.uid)
@@ -283,7 +293,50 @@ export async function POST(request: Request) {
     }
     if (!roommateLookingFor) {
       return NextResponse.json(
-        { error: '룸메이트 / 방 / 서블렛 중 유형을 선택해 주세요.' },
+        { error: '유형을 선택해 주세요.' },
+        { status: 400 },
+      )
+    }
+    if (title.length > ROOMMATE_TITLE_MAX) {
+      return NextResponse.json(
+        {
+          error: `제목은 ${ROOMMATE_TITLE_MAX}자 이내로 작성해 주세요.`,
+        },
+        { status: 400 },
+      )
+    }
+    const formConfig = getRoommateFormConfig(roommateLookingFor)
+    if (formConfig?.locationRequired && !String(body?.location || '').trim()) {
+      return NextResponse.json(
+        { error: `${formConfig.locationLabel}을(를) 입력해 주세요.` },
+        { status: 400 },
+      )
+    }
+    if (formConfig?.budgetRequired && roommateBudgetMax == null) {
+      return NextResponse.json(
+        { error: `${formConfig.budgetLabel}을(를) 입력해 주세요.` },
+        { status: 400 },
+      )
+    }
+    if (formConfig?.moveInStartRequired && !roommateMoveInDate) {
+      return NextResponse.json(
+        { error: `${formConfig.moveInStartLabel}을(를) 선택해 주세요.` },
+        { status: 400 },
+      )
+    }
+    if (formConfig?.moveInEndRequired && !roommateMoveOutDate) {
+      return NextResponse.json(
+        { error: `${formConfig.moveInEndLabel}을(를) 선택해 주세요.` },
+        { status: 400 },
+      )
+    }
+    if (
+      body?.roommateMoveOutDate &&
+      roommateMoveInDate &&
+      !roommateMoveOutDate
+    ) {
+      return NextResponse.json(
+        { error: '종료일은 시작일 이후로 선택해 주세요.' },
         { status: 400 },
       )
     }
@@ -423,6 +476,7 @@ export async function POST(request: Request) {
     roommateLookingFor: isRoommate ? roommateLookingFor : null,
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
     roommateMoveInDate: isRoommate ? roommateMoveInDate : null,
+    roommateMoveOutDate: isRoommate ? roommateMoveOutDate : null,
   }
 
   try {

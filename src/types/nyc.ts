@@ -199,7 +199,12 @@ export type HousingListingInput = Omit<
 /** @deprecated HousingListingInput 사용 */
 export type HousingPostInput = HousingListingInput
 
-export type RoommateLookingFor = 'room' | 'roommate' | 'sublet'
+/** 룸메이트·서블렛 구하는 유형 (레거시 'roommate'는 has-room으로 정규화) */
+export type RoommateLookingFor =
+  | 'has-room'
+  | 'together'
+  | 'room'
+  | 'sublet'
 
 export interface RoommatePost {
   id: string
@@ -314,10 +319,12 @@ export interface CommunityPost {
   jobReviewIndustry: string | null
   /** 룸메이트/서블렛: 구하는 유형 */
   roommateLookingFor: RoommateLookingFor | null
-  /** 룸메이트/서블렛: 월 예산 상한 (USD) */
+  /** 룸메이트/서블렛: 월 예산·월세 (USD) */
   roommateBudgetMax: number | null
-  /** 룸메이트/서블렛: 입주 희망일 (YYYY-MM-DD) */
+  /** 룸메이트/서블렛: 입주 시작일 (YYYY-MM-DD) */
   roommateMoveInDate: string | null
+  /** 룸메이트/서블렛: 입주·서블렛 종료일 (YYYY-MM-DD) */
+  roommateMoveOutDate: string | null
 }
 
 /** CPT / OPT / STEM OPT / 비자 / 영주권 */
@@ -341,10 +348,17 @@ export interface CptOptTimelineEntry {
   resultReceived: string
   /** 다음 스텝 */
   nextStep: string
+  /** 단계별 후기 (리치 텍스트) */
+  stageReviewHtml: string
 }
 
 /** 취업 후기 지원 유형 */
-export type JobReviewTypeId = 'intern' | 'new-grad' | 'experienced' | 'contract'
+export type JobReviewTypeId =
+  | 'intern'
+  | 'new-grad'
+  | 'experienced'
+  | 'job-change'
+  | 'contract'
 
 /** 취업 후기 단계별 기록 */
 export interface JobReviewTimelineEntry {

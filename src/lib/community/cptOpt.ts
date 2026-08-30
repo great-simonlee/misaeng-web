@@ -1,4 +1,6 @@
 import type { CptOptTimelineEntry, CptOptTypeId } from '@/types/nyc'
+import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
+import { COMMUNITY_BODY_MAX } from '@lib/community/food'
 
 export type { CptOptTimelineEntry, CptOptTypeId } from '@/types/nyc'
 
@@ -269,6 +271,7 @@ export const CPT_OPT_QUICK_STEPS: Record<
 
 export const CPT_OPT_TIMELINE_MAX = 20
 export const CPT_OPT_FIELD_MAX = 280
+export const CPT_OPT_STAGE_REVIEW_MAX = COMMUNITY_BODY_MAX
 export const CPT_OPT_TIPS_MAX = 800
 
 export function isCptOptTypeId(value: unknown): value is CptOptTypeId {
@@ -353,13 +356,21 @@ export function summarizeTimelineEntry(entry: CptOptTimelineEntry) {
     .join(' · ')
 }
 
+export function getTimelineEntryPreview(entry: CptOptTimelineEntry) {
+  const summary = summarizeTimelineEntry(entry)
+  if (summary) return summary
+  const plain = htmlToPlainText(entry.stageReviewHtml || '')
+  if (!plain) return ''
+  return plain.length > 80 ? `${plain.slice(0, 80)}…` : plain
+}
+
 export function getLatestTimelineEntryId(
   entries: CptOptTimelineEntry[],
 ): string | null {
   const sorted = sortTimelineByDate(entries)
   for (let index = sorted.length - 1; index >= 0; index -= 1) {
     const entry = sorted[index]
-    if (summarizeTimelineEntry(entry)) return entry.id
+    if (getTimelineEntryPreview(entry)) return entry.id
   }
   return null
 }
@@ -404,12 +415,16 @@ export function normalizeCptOptTimeline(raw: unknown): CptOptTimelineEntry[] {
       const submitted = String(data.submitted || '').trim()
       const resultReceived = String(data.resultReceived || '').trim()
       const nextStep = String(data.nextStep || '').trim()
+      const stageReviewHtml = normalizeCptOptStageReviewHtml(
+        data.stageReviewHtml,
+      )
       if (
         !date &&
         !prepared &&
         !submitted &&
         !resultReceived &&
-        !nextStep
+        !nextStep &&
+        !stageReviewHtml
       ) {
         return null
       }
@@ -422,10 +437,17 @@ export function normalizeCptOptTimeline(raw: unknown): CptOptTimelineEntry[] {
         submitted: submitted.slice(0, CPT_OPT_FIELD_MAX),
         resultReceived: resultReceived.slice(0, CPT_OPT_FIELD_MAX),
         nextStep: nextStep.slice(0, CPT_OPT_FIELD_MAX),
+        stageReviewHtml,
       }
     })
     .filter((item): item is CptOptTimelineEntry => Boolean(item))
     .slice(0, CPT_OPT_TIMELINE_MAX)
+}
+
+function normalizeCptOptStageReviewHtml(raw: unknown) {
+  const html = String(raw || '').trim()
+  if (!html || !htmlToPlainText(html)) return ''
+  return sanitizeCommunityHtml(html).slice(0, CPT_OPT_STAGE_REVIEW_MAX)
 }
 
 export function normalizeCptOptTips(raw: unknown) {
@@ -458,7 +480,12 @@ export function createEmptyTimelineEntry(): CptOptTimelineEntry {
     submitted: '',
     resultReceived: '',
     nextStep: '',
+    stageReviewHtml: '',
   }
+}
+
+function hasStageReviewContent(entry: CptOptTimelineEntry) {
+  return Boolean(htmlToPlainText(entry.stageReviewHtml || ''))
 }
 
 export function isTimelineEntryFilled(entry: CptOptTimelineEntry) {
@@ -467,7 +494,8 @@ export function isTimelineEntryFilled(entry: CptOptTimelineEntry) {
       entry.prepared.trim() ||
       entry.submitted.trim() ||
       entry.resultReceived.trim() ||
-      entry.nextStep.trim(),
+      entry.nextStep.trim() ||
+      hasStageReviewContent(entry),
   )
 }
 
@@ -477,6 +505,7 @@ export function isTimelineEntryComplete(entry: CptOptTimelineEntry) {
     entry.prepared.trim() ||
       entry.submitted.trim() ||
       entry.resultReceived.trim() ||
-      entry.nextStep.trim(),
+      entry.nextStep.trim() ||
+      hasStageReviewContent(entry),
   )
 }

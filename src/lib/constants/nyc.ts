@@ -217,10 +217,10 @@ export const NYC_COMMUNITY_BOARD_META: Record<
   roommate: {
     writeLabel: '글 올리기',
     listIntro:
-      '룸메이트·방·서블렛을 찾고 있다면 올려 주세요. 계정당 1개만 등록할 수 있어요.',
-    locationLabel: '희망 동네',
+      '방 올리기(룸메·서블렛)와 룸메 찾기를 나눠 올려 주세요. 계정당 1개만 등록할 수 있어요.',
+    locationLabel: '동네 / 위치',
     locationPlaceholder: '플러싱 / 브루클린 / 맨해튼',
-    detailLabel: '월 예산 ($)',
+    detailLabel: '월 예산·월세 ($)',
     detailPlaceholder: '1500',
     detailInput: 'number',
     titlePlaceholder: '브루클린에서 룸메이트 구해요',

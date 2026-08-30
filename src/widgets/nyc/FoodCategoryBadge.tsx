@@ -26,8 +26,10 @@ export function FoodCategoryBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-full font-semibold',
-        size === 'sm' ? 'px-2.5 py-1 text-[11px] leading-none' : 'px-3 py-1.5 text-[13px] leading-none',
+        'inline-flex items-center justify-center gap-1 rounded-full font-semibold tracking-tight',
+        size === 'sm'
+          ? 'h-6 px-2 text-[11px] leading-none'
+          : 'h-7 gap-1.5 px-2.5 text-[12px] leading-none',
         variant === 'solid' ? meta.badgeClass : meta.softClass,
         className,
       )}

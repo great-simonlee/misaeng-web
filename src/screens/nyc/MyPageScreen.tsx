@@ -9,8 +9,11 @@ import { useAuth } from '@hooks/useAuth'
 import {
   MAX_NICKNAME_LEN,
   MIN_NICKNAME_LEN,
+  NICKNAME_RULE_HINT,
   PROFILE_GENDER_OPTIONS,
   PROFILE_OCCUPATION_OPTIONS,
+  isValidNickname,
+  sanitizeNicknameInput,
 } from '@lib/constants/profile'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { getVerifiedSchool, resolveSchoolFromEmail } from '@lib/constants/schools'
@@ -250,7 +253,7 @@ export function MyPageScreen() {
   }
 
   const canSaveProfileSetup =
-    profileDraft.nickname.trim().length >= MIN_NICKNAME_LEN &&
+    isValidNickname(profileDraft.nickname) &&
     profileDraft.firstName.trim().length >= 1 &&
     Boolean(profileDraft.gender) &&
     Boolean(profileDraft.occupationType) &&
@@ -560,11 +563,18 @@ export function MyPageScreen() {
             type='text'
             value={nicknameDraft}
             maxLength={MAX_NICKNAME_LEN}
-            onChange={(e) => setNicknameDraft(e.target.value)}
-            placeholder={`${MIN_NICKNAME_LEN}~${MAX_NICKNAME_LEN}자`}
+            onChange={(e) => setNicknameDraft(sanitizeNicknameInput(e.target.value))}
+            placeholder='예: food.hunter'
+            inputMode='text'
+            autoCapitalize='off'
+            autoCorrect='off'
+            spellCheck={false}
             className='h-11 w-full rounded-xl bg-[#f4f5f7] px-3.5 text-sm text-[var(--foreground)] outline-none ring-1 ring-transparent transition placeholder:text-[var(--muted)] focus:bg-white focus:ring-[var(--brand)]/30'
             autoFocus
           />
+          <p className='text-[12px] leading-relaxed text-[var(--muted)]'>
+            {NICKNAME_RULE_HINT}
+          </p>
           <div className='flex items-center justify-between gap-2'>
             <span className='text-[11px] tabular-nums text-[var(--muted)]'>
               {nicknameDraft.trim().length}/{MAX_NICKNAME_LEN}
@@ -586,8 +596,7 @@ export function MyPageScreen() {
                 type='button'
                 onClick={() => void handleSaveNickname()}
                 disabled={
-                  savingNickname ||
-                  nicknameDraft.trim().length < MIN_NICKNAME_LEN
+                  savingNickname || !isValidNickname(nicknameDraft)
                 }
                 className='h-9 rounded-full bg-[var(--foreground)] px-4 text-[13px] font-semibold text-white touch-manipulation disabled:opacity-40'
               >
@@ -668,12 +677,19 @@ export function MyPageScreen() {
               onChange={(e) =>
                 setProfileDraft((prev) => ({
                   ...prev,
-                  nickname: e.target.value,
+                  nickname: sanitizeNicknameInput(e.target.value),
                 }))
               }
-              placeholder={`${MIN_NICKNAME_LEN}~${MAX_NICKNAME_LEN}자`}
+              placeholder='예: food.hunter'
+              inputMode='text'
+              autoCapitalize='off'
+              autoCorrect='off'
+              spellCheck={false}
               className='h-11 w-full rounded-xl bg-[#f4f5f7] px-3.5 text-sm text-[var(--foreground)] outline-none ring-1 ring-transparent transition placeholder:text-[var(--muted)] focus:bg-white focus:ring-[var(--brand)]/30'
             />
+            <p className='text-[12px] leading-relaxed text-[var(--muted)]'>
+              {NICKNAME_RULE_HINT}
+            </p>
           </label>
 
           <div className='space-y-2'>

@@ -262,9 +262,9 @@ export function NycNavbar() {
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-[10000] overflow-visible border-b border-[var(--border)] md:sticky md:z-50',
+          'fixed top-0 left-0 right-0 z-[10000] overflow-visible border-b border-[var(--border)]',
           mobileOpen
-            ? 'bg-[var(--background)] md:bg-[var(--background)]/95 md:backdrop-blur md:supports-[backdrop-filter]:bg-[var(--background)]/80'
+            ? 'bg-[var(--background)]'
             : 'bg-[var(--background)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--background)]/80',
         )}
       >

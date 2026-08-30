@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { LoadingState, PhotoUploadZone, TipTapEditor } from '@components'
 import { useRequireAuth } from '@hooks/useRequireAuth'
@@ -16,11 +16,16 @@ import {
 import { COMMUNITY_BODY_MAX, FOOD_GALLERY_MAX } from '@lib/community/food'
 import { htmlToPlainText } from '@lib/community/html'
 import {
-  ROOMMATE_BUDGET_MAX,
-  ROOMMATE_LOOKING_FOR_OPTIONS,
+  getRoommateFormConfig,
+  getRoommateIntent,
   getRoommateLookingForLabel,
+  getRoommateLookingForOptionsByIntent,
   getRoommateLookingForStyle,
-  isRoommateLookingFor,
+  normalizeRoommateLookingFor,
+  ROOMMATE_BUDGET_MAX,
+  ROOMMATE_INTENT_OPTIONS,
+  ROOMMATE_TITLE_MAX,
+  type RoommateIntent,
   type RoommateLookingFor,
 } from '@lib/community/roommate'
 import { isSchoolVerified } from '@lib/community/schoolGate'
@@ -63,9 +68,28 @@ export function RoommateWriteScreen({
   const [contentHtml, setContentHtml] = useState('')
   const [location, setLocation] = useState('')
   const [lookingFor, setLookingFor] = useState<RoommateLookingFor | null>(null)
+  const [intent, setIntent] = useState<RoommateIntent | null>(null)
   const [budgetMax, setBudgetMax] = useState('')
   const [moveInDate, setMoveInDate] = useState('')
+  const [moveOutDate, setMoveOutDate] = useState('')
   const [photoUrls, setPhotoUrls] = useState<string[]>([])
+
+  const formConfig = useMemo(
+    () => getRoommateFormConfig(lookingFor),
+    [lookingFor],
+  )
+  const subtypeOptions = useMemo(
+    () => getRoommateLookingForOptionsByIntent(intent),
+    [intent],
+  )
+
+  function selectIntent(next: RoommateIntent) {
+    setIntent(next)
+    setLookingFor((prev) => {
+      if (prev && getRoommateIntent(prev) === next) return prev
+      return null
+    })
+  }
 
   useEffect(() => {
     if (editPostId || !user?.uid) {
@@ -81,7 +105,9 @@ export function RoommateWriteScreen({
           (item) => item.categoryId === 'roommate' && item.status === 'open',
         )
         if (existing) {
-          toastError('이미 올린 룸메이트·서블렛 글이 있어요. 수정 화면으로 이동합니다.')
+          toastError(
+            '이미 올린 룸메이트·서블렛 글이 있어요. 수정 화면으로 이동합니다.',
+          )
           router.replace(`/nyc/${boardId}/${existing.id}/edit`)
           return
         }
@@ -117,20 +143,22 @@ export function RoommateWriteScreen({
           router.replace(`/nyc/${post.categoryId}/${post.id}/edit`)
           return
         }
-        setPostTitle(post.title)
+        setPostTitle(post.title.slice(0, ROOMMATE_TITLE_MAX))
         setContentHtml(post.contentHtml)
         setLocation(post.location)
-        setLookingFor(
-          isRoommateLookingFor(post.roommateLookingFor)
-            ? post.roommateLookingFor
-            : null,
+        const normalized = normalizeRoommateLookingFor(
+          post.roommateLookingFor,
+          post.detail,
         )
+        setLookingFor(normalized)
+        setIntent(getRoommateIntent(normalized))
         setBudgetMax(
           post.roommateBudgetMax != null
             ? String(post.roommateBudgetMax)
             : '',
         )
         setMoveInDate(post.roommateMoveInDate?.trim() || '')
+        setMoveOutDate(post.roommateMoveOutDate?.trim() || '')
         const photos = [
           ...(post.galleryPhotos ?? [])
             .map((item) => item.imageUrl?.trim())
@@ -159,13 +187,22 @@ export function RoommateWriteScreen({
       router.replace(`/nyc/login?next=${encodeURIComponent(loginNext)}`)
       return
     }
-    if (!lookingFor) {
-      toastError('룸메이트 / 방 / 서블렛 중 유형을 선택해 주세요')
+    if (!lookingFor || !formConfig) {
+      toastError('유형을 선택해 주세요')
+      return
+    }
+    const trimmedTitle = postTitle.trim()
+    if (!trimmedTitle) {
+      toastError('제목을 입력해 주세요')
+      return
+    }
+    if (trimmedTitle.length > ROOMMATE_TITLE_MAX) {
+      toastError(`제목은 ${ROOMMATE_TITLE_MAX}자 이내로 작성해 주세요`)
       return
     }
     const plain = htmlToPlainText(contentHtml)
-    if (!postTitle.trim() || !plain) {
-      toastError('제목과 본문을 입력해 주세요')
+    if (!plain) {
+      toastError('본문을 입력해 주세요')
       return
     }
     if (plain.length > COMMUNITY_BODY_MAX) {
@@ -174,10 +211,18 @@ export function RoommateWriteScreen({
       )
       return
     }
+    if (formConfig.locationRequired && !location.trim()) {
+      toastError(`${formConfig.locationLabel}을(를) 입력해 주세요`)
+      return
+    }
 
     const budgetValue = budgetMax.trim()
       ? Number(budgetMax.replace(/,/g, ''))
       : null
+    if (formConfig.budgetRequired && budgetValue == null) {
+      toastError(`${formConfig.budgetLabel}을(를) 입력해 주세요`)
+      return
+    }
     if (
       budgetValue != null &&
       (!Number.isFinite(budgetValue) ||
@@ -185,8 +230,23 @@ export function RoommateWriteScreen({
         budgetValue > ROOMMATE_BUDGET_MAX)
     ) {
       toastError(
-        `월 예산은 $0~$${ROOMMATE_BUDGET_MAX.toLocaleString('en-US')} 사이로 입력해 주세요`,
+        `금액은 $0~$${ROOMMATE_BUDGET_MAX.toLocaleString('en-US')} 사이로 입력해 주세요`,
       )
+      return
+    }
+
+    const start = moveInDate.trim()
+    const end = moveOutDate.trim()
+    if (formConfig.moveInStartRequired && !start) {
+      toastError(`${formConfig.moveInStartLabel}을(를) 선택해 주세요`)
+      return
+    }
+    if (formConfig.moveInEndRequired && !end) {
+      toastError(`${formConfig.moveInEndLabel}을(를) 선택해 주세요`)
+      return
+    }
+    if (start && end && end < start) {
+      toastError('종료일은 시작일 이후로 선택해 주세요')
       return
     }
 
@@ -198,14 +258,15 @@ export function RoommateWriteScreen({
         caption: '',
       }))
       const payload = {
-        title: postTitle.trim(),
+        title: trimmedTitle,
         contentHtml,
         location: location.trim(),
         detail: getRoommateLookingForLabel(lookingFor),
         roommateLookingFor: lookingFor,
         roommateBudgetMax:
           budgetValue != null ? Math.floor(budgetValue) : null,
-        roommateMoveInDate: moveInDate.trim() || null,
+        roommateMoveInDate: start || null,
+        roommateMoveOutDate: end || null,
         thumbnailUrl: photoUrls[0] ?? null,
         galleryPhotos,
       }
@@ -269,40 +330,40 @@ export function RoommateWriteScreen({
         <BoardSurface className='p-5 sm:p-6'>
           {!isEdit ? (
             <div className='mb-5 rounded-xl bg-[#fff8f5] px-4 py-3 text-[13px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--brand)]/15'>
-              룸메이트·서블렛 글은 <strong className='text-[var(--foreground)]'>계정당 1개</strong>만
-              올릴 수 있어요. 상황 바뀌면 기존 글을 수정하거나 삭제한 뒤 다시 올려 주세요.
+              룸메이트·서블렛 글은{' '}
+              <strong className='text-[var(--foreground)]'>계정당 1개</strong>
+              만 올릴 수 있어요. 상황 바뀌면 기존 글을 수정하거나 삭제한 뒤 다시
+              올려 주세요.
             </div>
           ) : null}
 
           <form onSubmit={(e) => void handleSubmit(e)} className='space-y-5'>
             <div>
               <p className='text-[13px] font-medium text-[var(--foreground)]'>
-                유형 <span className='text-[var(--brand)]'>*</span>
+                무엇을 올릴까요? <span className='text-[var(--brand)]'>*</span>
               </p>
-              <div className='mt-2 grid gap-2 sm:grid-cols-3'>
-                {ROOMMATE_LOOKING_FOR_OPTIONS.map((option) => {
-                  const active = lookingFor === option.id
-                  const style = getRoommateLookingForStyle(option.id)
+              <div className='mt-2 grid gap-2 sm:grid-cols-2'>
+                {ROOMMATE_INTENT_OPTIONS.map((option) => {
+                  const active = intent === option.id
                   return (
                     <button
                       key={option.id}
                       type='button'
-                      onClick={() => setLookingFor(option.id)}
+                      onClick={() => selectIntent(option.id)}
                       className={cn(
-                        'rounded-xl px-3 py-3 text-left ring-1 touch-manipulation transition',
+                        'rounded-xl px-3.5 py-3.5 text-left ring-1 touch-manipulation transition',
                         active
-                          ? 'ring-[var(--foreground)]'
+                          ? 'bg-[#fff8f5] ring-[var(--foreground)]'
                           : 'bg-white ring-black/[0.08] hover:ring-black/15',
                       )}
-                      style={
-                        active
-                          ? { backgroundColor: style.soft }
-                          : undefined
-                      }
                     >
                       <span
-                        className='block text-[13px] font-semibold'
-                        style={{ color: active ? style.accent : undefined }}
+                        className={cn(
+                          'block text-[14px] font-semibold',
+                          active
+                            ? 'text-[var(--brand)]'
+                            : 'text-[var(--foreground)]',
+                        )}
                       >
                         {option.label}
                       </span>
@@ -315,55 +376,153 @@ export function RoommateWriteScreen({
               </div>
             </div>
 
-            <Field label='제목' required>
+            {intent ? (
+              <div>
+                <p className='text-[13px] font-medium text-[var(--foreground)]'>
+                  세부 유형 <span className='text-[var(--brand)]'>*</span>
+                </p>
+                <div className='mt-2 grid gap-2'>
+                  {subtypeOptions.map((option) => {
+                    const active = lookingFor === option.id
+                    const style = getRoommateLookingForStyle(option.id)
+                    return (
+                      <button
+                        key={option.id}
+                        type='button'
+                        onClick={() => setLookingFor(option.id)}
+                        className={cn(
+                          'rounded-xl px-3.5 py-3 text-left ring-1 touch-manipulation transition',
+                          active
+                            ? 'ring-[var(--foreground)]'
+                            : 'bg-white ring-black/[0.08] hover:ring-black/15',
+                        )}
+                        style={
+                          active ? { backgroundColor: style.soft } : undefined
+                        }
+                      >
+                        <span
+                          className='block text-[13px] font-semibold'
+                          style={{ color: active ? style.accent : undefined }}
+                        >
+                          {option.label}
+                        </span>
+                        <span className='mt-0.5 block text-[11px] leading-snug text-[var(--muted)]'>
+                          {option.description}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            <Field
+              label='제목'
+              required
+              hint={`${postTitle.length}/${ROOMMATE_TITLE_MAX}`}
+            >
               <input
                 required
                 value={postTitle}
-                onChange={(e) => setPostTitle(e.target.value)}
+                maxLength={ROOMMATE_TITLE_MAX}
+                onChange={(e) =>
+                  setPostTitle(e.target.value.slice(0, ROOMMATE_TITLE_MAX))
+                }
                 className={inputClass}
-                placeholder={meta.titlePlaceholder}
+                placeholder={
+                  formConfig?.titlePlaceholder ?? meta.titlePlaceholder
+                }
               />
             </Field>
 
-            <div className='grid gap-4 sm:grid-cols-2'>
-              <Field label={meta.locationLabel}>
-                <input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className={inputClass}
-                  placeholder={meta.locationPlaceholder}
-                />
-              </Field>
-              <Field label='월 예산 상한 ($)'>
-                <input
-                  type='number'
-                  min={0}
-                  max={ROOMMATE_BUDGET_MAX}
-                  value={budgetMax}
-                  onChange={(e) => setBudgetMax(e.target.value)}
-                  className={inputClass}
-                  placeholder={meta.detailPlaceholder}
-                />
-              </Field>
-            </div>
+            {formConfig ? (
+              <>
+                <div className='grid gap-4 sm:grid-cols-2'>
+                  <Field
+                    label={formConfig.locationLabel}
+                    required={formConfig.locationRequired}
+                  >
+                    <input
+                      required={formConfig.locationRequired}
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      className={inputClass}
+                      placeholder={formConfig.locationPlaceholder}
+                    />
+                  </Field>
+                  <Field
+                    label={formConfig.budgetLabel}
+                    required={formConfig.budgetRequired}
+                  >
+                    <input
+                      type='number'
+                      required={formConfig.budgetRequired}
+                      min={0}
+                      max={ROOMMATE_BUDGET_MAX}
+                      value={budgetMax}
+                      onChange={(e) => setBudgetMax(e.target.value)}
+                      className={inputClass}
+                      placeholder={formConfig.budgetPlaceholder}
+                    />
+                  </Field>
+                </div>
 
-            <Field label='입주 희망일'>
-              <input
-                type='date'
-                value={moveInDate}
-                onChange={(e) => setMoveInDate(e.target.value)}
-                className={inputClass}
-              />
-            </Field>
+                <div className='grid gap-4 sm:grid-cols-2'>
+                  <Field
+                    label={formConfig.moveInStartLabel}
+                    required={formConfig.moveInStartRequired}
+                  >
+                    <input
+                      type='date'
+                      required={formConfig.moveInStartRequired}
+                      value={moveInDate}
+                      onChange={(e) => {
+                        const next = e.target.value
+                        setMoveInDate(next)
+                        if (moveOutDate && next && moveOutDate < next) {
+                          setMoveOutDate('')
+                        }
+                      }}
+                      className={inputClass}
+                    />
+                  </Field>
+                  <Field
+                    label={formConfig.moveInEndLabel}
+                    required={formConfig.moveInEndRequired}
+                  >
+                    <input
+                      type='date'
+                      required={formConfig.moveInEndRequired}
+                      value={moveOutDate}
+                      min={moveInDate || undefined}
+                      onChange={(e) => setMoveOutDate(e.target.value)}
+                      className={inputClass}
+                    />
+                  </Field>
+                </div>
+              </>
+            ) : (
+              <p className='rounded-xl bg-[#f7f8fa] px-4 py-3 text-[13px] text-[var(--muted)]'>
+                {intent
+                  ? '세부 유형을 선택하면 위치·예산·입주 기간 입력란이 나타나요.'
+                  : '방 올리기 / 룸메 찾기를 선택해 주세요.'}
+              </p>
+            )}
 
             <div>
               <div className='flex items-end justify-between gap-3'>
                 <div>
                   <p className='text-[13px] font-medium text-[var(--foreground)]'>
                     사진
+                    {formConfig?.photosRecommended ? (
+                      <span className='ml-1 text-[11px] font-medium text-[var(--muted)]'>
+                        (권장)
+                      </span>
+                    ) : null}
                   </p>
                   <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
-                    방·집·동네 사진 · 최대 {FOOD_GALLERY_MAX}장 · 첫 장이 대표 사진
+                    {formConfig?.photosHint ??
+                      `최대 ${FOOD_GALLERY_MAX}장 · 첫 장이 대표 사진`}
                   </p>
                 </div>
                 <p className='shrink-0 text-[12px] font-medium tabular-nums text-[var(--muted)]'>
@@ -404,13 +563,13 @@ export function RoommateWriteScreen({
                   <div className='min-w-0'>
                     <PhotoUploadZone
                       compact
+                      multiple
+                      maxFiles={FOOD_GALLERY_MAX - photoUrls.length}
                       className='min-w-0'
                       src={null}
-                      onUploaded={(url) => {
+                      onUploadedMany={(urls) => {
                         setPhotoUrls((prev) =>
-                          prev.length >= FOOD_GALLERY_MAX
-                            ? prev
-                            : [...prev, url],
+                          [...prev, ...urls].slice(0, FOOD_GALLERY_MAX),
                         )
                       }}
                       emptyLabel='추가'
@@ -430,7 +589,9 @@ export function RoommateWriteScreen({
                 <TipTapEditor
                   value={contentHtml}
                   onChange={setContentHtml}
-                  placeholder={meta.descriptionPlaceholder}
+                  placeholder={
+                    formConfig?.bodyPlaceholder ?? meta.descriptionPlaceholder
+                  }
                   maxLength={COMMUNITY_BODY_MAX}
                 />
               </div>
@@ -462,16 +623,27 @@ const inputClass =
 function Field({
   label,
   required,
+  hint,
   children,
 }: {
   label: string
   required?: boolean
+  hint?: string
   children: React.ReactNode
 }) {
   return (
     <label className='block text-[13px] font-medium text-[var(--foreground)]'>
-      {label}
-      {required ? <span className='text-[var(--brand)]'> *</span> : null}
+      <span className='flex items-baseline justify-between gap-2'>
+        <span>
+          {label}
+          {required ? <span className='text-[var(--brand)]'> *</span> : null}
+        </span>
+        {hint ? (
+          <span className='text-[11px] font-medium tabular-nums text-[var(--muted)]'>
+            {hint}
+          </span>
+        ) : null}
+      </span>
       {children}
     </label>
   )

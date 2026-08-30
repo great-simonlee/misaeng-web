@@ -1,5 +1,7 @@
-import type { CommunityPost } from '@/types/nyc'
+import type { CommunityPost, RoommateLookingFor } from '@/types/nyc'
 import type { NycCommunityBoardId } from '@lib/constants/nyc'
+import { VERIFIED_SCHOOLS } from '@lib/constants/schools'
+import { getRoommateLookingForLabel } from '@lib/community/roommate'
 
 const NOW = Date.now()
 const MINUTE = 60 * 1000
@@ -45,6 +47,11 @@ function withMockCommunityHtmlPrefix(
   return `<p><strong>${MOCK_COMMUNITY_POST_PREFIX}</strong></p>\n${trimmed}`
 }
 
+/** 목 작성자 프로필 사진 (시드별 고정) */
+function mockAuthorPhoto(seed: string): string {
+  return `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(seed)}&size=80`
+}
+
 function post(
   partial: Omit<
     CommunityPost,
@@ -75,6 +82,7 @@ function post(
     | 'roommateLookingFor'
     | 'roommateBudgetMax'
     | 'roommateMoveInDate'
+    | 'roommateMoveOutDate'
     | 'authorUid'
     | 'authorEmail'
     | 'authorNickname'
@@ -110,6 +118,7 @@ function post(
     roommateLookingFor?: CommunityPost['roommateLookingFor']
     roommateBudgetMax?: CommunityPost['roommateBudgetMax']
     roommateMoveInDate?: CommunityPost['roommateMoveInDate']
+    roommateMoveOutDate?: CommunityPost['roommateMoveOutDate']
   },
 ): CommunityPost {
   const mockTimelineBoard = isTimelineBoardMockPost(partial)
@@ -150,6 +159,7 @@ function post(
     roommateLookingFor: partial.roommateLookingFor ?? null,
     roommateBudgetMax: partial.roommateBudgetMax ?? null,
     roommateMoveInDate: partial.roommateMoveInDate ?? null,
+    roommateMoveOutDate: partial.roommateMoveOutDate ?? null,
     viewCount: partial.viewCount ?? 0,
     recommendCount: partial.recommendCount ?? 0,
     commentCount: partial.commentCount ?? 0,
@@ -157,6 +167,136 @@ function post(
     updatedAt: partial.updatedAt ?? partial.createdAt,
     status: 'open',
   }
+}
+
+
+const ROOMMATE_MOCK_LOOKING_FOR: RoommateLookingFor[] = [
+  'has-room',
+  'sublet',
+  'together',
+  'room',
+]
+
+const ROOMMATE_MOCK_LOCATIONS = [
+  '브루클린 Bushwick',
+  '맨해튼 UES',
+  'Queens Astoria',
+  '맨해튼 Midtown',
+  '저지시티',
+  '브루클린 Williamsburg',
+  '플러싱',
+  '맨해튼 UWS',
+  'Queens LIC',
+  '브루클린 Park Slope',
+  '맨해튼 Harlem',
+  '브롱스',
+] as const
+
+const ROOMMATE_MOCK_PHOTOS = [
+  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80',
+  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
+  'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+  'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80',
+] as const
+
+const ROOMMATE_MOCK_TITLES: Record<RoommateLookingFor, string[]> = {
+  'has-room': [
+    '2bed 룸메 구해요',
+    '조용한 룸메 찾아요',
+    '재택 위주 룸메 환영',
+  ],
+  sublet: [
+    '단기 서블렛 올려요',
+    '가구 포함 서블렛',
+    '학기 중 비는 방 서블렛',
+  ],
+  together: [
+    '같이 방 구해요',
+    '2bed 같이 입주할 룸메',
+    '예산 맞춰 같이 구해요',
+  ],
+  room: [
+    '방만 구해요',
+    '스튜디오·1bed 찾아요',
+    '가까운 지하철 방 구해요',
+  ],
+}
+
+const ROOMMATE_MOCK_NICKNAMES = [
+  '브루클린살림',
+  '미드타운러',
+  '조용한룸메',
+  '학기중서블렛',
+  'UES입주',
+  '같이구해요',
+  '퀸즈루머',
+  '해밀턴하이츠',
+  '버클리룸메',
+  '소호근처',
+  '플러싱러버',
+  '맨해튼입주',
+]
+
+function buildRoommateMockPosts(): CommunityPost[] {
+  return VERIFIED_SCHOOLS.map((school, index) => {
+    const lookingFor =
+      ROOMMATE_MOCK_LOOKING_FOR[index % ROOMMATE_MOCK_LOOKING_FOR.length]
+    const location =
+      ROOMMATE_MOCK_LOCATIONS[index % ROOMMATE_MOCK_LOCATIONS.length]
+    const titleBase =
+      ROOMMATE_MOCK_TITLES[lookingFor][
+        Math.floor(index / ROOMMATE_MOCK_LOOKING_FOR.length) %
+          ROOMMATE_MOCK_TITLES[lookingFor].length
+      ]
+    const budget = 1200 + (index % 8) * 150
+    const startDay = 1 + (index % 20)
+    const endMonth = 9 + ((index % 4) + 1)
+    const start = `2026-09-${String(startDay).padStart(2, '0')}`
+    const end = `2026-${String(Math.min(endMonth, 12)).padStart(2, '0')}-${String(15 + (index % 10)).padStart(2, '0')}`
+    const hasPhoto = lookingFor === 'has-room' || lookingFor === 'sublet'
+    const photo = ROOMMATE_MOCK_PHOTOS[index % ROOMMATE_MOCK_PHOTOS.length]
+    const typeLabel = getRoommateLookingForLabel(lookingFor)
+
+    return post({
+      id: `mock-roommate-${school.id}`,
+      categoryId: 'roommate',
+      title: `${location.split(' ')[0]} ${titleBase}`.slice(0, 40),
+      description: `${school.shortName} 학생입니다. ${typeLabel} · ${location} 근처, 월 $${budget.toLocaleString('en-US')} 전후.`,
+      contentHtml: `
+        <p>${school.fullName} (${school.shortName}) 인증 계정 예시 글입니다.</p>
+        <p>${typeLabel}. ${location} 위주로 보고 있어요.</p>
+        <ul>
+          <li>월 예산/월세: $${budget.toLocaleString('en-US')}</li>
+          <li>입주: ${start} ~ ${end}</li>
+        </ul>
+      `,
+      location,
+      detail: typeLabel,
+      roommateLookingFor: lookingFor,
+      roommateBudgetMax: budget,
+      roommateMoveInDate: start,
+      roommateMoveOutDate: end,
+      thumbnailUrl: hasPhoto ? photo : null,
+      galleryPhotos: hasPhoto
+        ? [
+            {
+              id: `g-${school.id}`,
+              imageUrl: photo,
+              caption: '',
+            },
+          ]
+        : [],
+      authorUid: `mock-roommate-${school.id}`,
+      authorEmail: `roommate@${school.domains[0]}`,
+      authorNickname:
+        ROOMMATE_MOCK_NICKNAMES[index % ROOMMATE_MOCK_NICKNAMES.length],
+      authorPhotoURL: mockAuthorPhoto(`roommate-${school.id}`),
+      authorSchoolId: school.id,
+      authorSchoolName: school.shortName,
+      createdAt: NOW - (index + 1) * 3 * HOUR,
+      viewCount: 12 + index * 7,
+    })
+  })
 }
 
 export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
@@ -767,7 +907,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       <p>회사 시작일보다 <strong>최소 2–3주 전</strong>에 서류 넣는 걸 추천합니다.</p>
       <blockquote>학교마다 포털/양식이 다르니 ISS 체크리스트를 먼저 보세요.</blockquote>
     `,
-    location: 'NYU',
+    location: '',
     detail: 'CPT',
     cptOptType: 'cpt',
     cptOptTips:
@@ -780,6 +920,8 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         submitted: '',
         resultReceived: '',
         nextStep: '어드바이저 서명 받고 ISS에 제출',
+        stageReviewHtml:
+          '<p>오퍼레터 받은 날부터 체크리스트를 만들기 시작했어요. 학교 포털에 CPT 메뉴가 어디에 있는지 찾는 데 시간이 좀 걸렸습니다.</p>',
       },
       {
         id: 't2',
@@ -788,6 +930,8 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         submitted: 'ISS 포털에 PDF 업로드',
         resultReceived: '',
         nextStep: '새 I-20 이메일 수령 대기',
+        stageReviewHtml:
+          '<p>어드바이저 미팅은 15분 정도. PDF 용량이 커서 한 번 업로드 실패했고, 압축 후 다시 올렸더니 통과됐습니다.</p>',
       },
       {
         id: 't3',
@@ -796,10 +940,14 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         submitted: '',
         resultReceived: '새 I-20 PDF 이메일 수령',
         nextStep: '서명 후 근무 시작일 맞추기',
+        stageReviewHtml:
+          '<p>메일로 PDF가 왔고, 프린트·서명 후 스캔본을 회사에 전달했어요. 시작일 2주 전에 끝내길 잘한 것 같습니다.</p>',
       },
     ],
     authorUid: 'mock-user-7',
     authorEmail: 'cpt@nyu.edu',
+    authorNickname: 'CPT준비생',
+    authorPhotoURL: mockAuthorPhoto('cpt-nyu'),
     authorSchoolId: 'nyu',
     authorSchoolName: 'New York University',
     createdAt: NOW - 8 * HOUR,
@@ -834,6 +982,8 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         submitted: 'USCIS 온라인 제출',
         resultReceived: '',
         nextStep: '케이스 상태 주기적으로 확인',
+        stageReviewHtml:
+          '<p>온라인 제출은 생각보다 빨랐고, Receipt Notice가 며칠 안에 왔어요. 이후엔 USCIS 계정만 가끔 열어봤습니다.</p>',
       },
       {
         id: 't5',
@@ -842,12 +992,16 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         submitted: '',
         resultReceived: 'EAD 카드 우편 수령',
         nextStep: '근무 시작·STEM 연장 요건 확인',
+        stageReviewHtml:
+          '<p>카드가 오기 전에도 인터뷰는 계속 잡았어요. 수령 당일 바로 회사에 스캔본을 보냈습니다.</p>',
       },
     ],
     authorUid: 'mock-user-8',
     authorEmail: 'opt@columbia.edu',
-    authorSchoolId: null,
-    authorSchoolName: null,
+    authorNickname: '옵트대기중',
+    authorPhotoURL: mockAuthorPhoto('opt-columbia'),
+    authorSchoolId: 'columbia',
+    authorSchoolName: 'Columbia',
     createdAt: NOW - 2 * DAY,
   }),
   post({
@@ -879,6 +1033,8 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         submitted: 'STEM OPT 연장 신청',
         resultReceived: '',
         nextStep: '승인 통지·validation report 일정 확인',
+        stageReviewHtml:
+          '<p>I-983 작성할 때 회사 HR과 직함·주소를 맞춰 두는 게 중요했어요. DSO 리뷰에 며칠 걸렸습니다.</p>',
       },
       {
         id: 't7',
@@ -887,12 +1043,16 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
         submitted: '',
         resultReceived: 'I-797 승인 통지',
         nextStep: '6·12·18개월 보고 알림 설정',
+        stageReviewHtml:
+          '<p>승인 메일이 온 날 캘린더에 validation report 3개를 바로 넣었어요. 놓치면 정말 골치 아픕니다.</p>',
       },
     ],
     authorUid: 'mock-user-9',
     authorEmail: 'stem@baruch.edu',
-    authorSchoolId: null,
-    authorSchoolName: null,
+    authorNickname: '스템옵트러',
+    authorPhotoURL: mockAuthorPhoto('stem-baruch'),
+    authorSchoolId: 'baruch',
+    authorSchoolName: 'Baruch',
     createdAt: NOW - 4 * DAY,
   }),
   post({
@@ -953,6 +1113,8 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     ],
     authorUid: 'mock-user-10',
     authorEmail: 'intern@nyu.edu',
+    authorNickname: '구글인턴러',
+    authorPhotoURL: mockAuthorPhoto('google-intern'),
     authorSchoolId: 'nyu',
     authorSchoolName: 'NYU',
     createdAt: NOW - 3 * DAY,
@@ -999,8 +1161,10 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     ],
     authorUid: 'mock-user-11',
     authorEmail: 'finance@columbia.edu',
-    authorSchoolId: null,
-    authorSchoolName: null,
+    authorNickname: '제이피준비생',
+    authorPhotoURL: mockAuthorPhoto('jpm-analyst'),
+    authorSchoolId: 'columbia',
+    authorSchoolName: 'Columbia',
     createdAt: NOW - 6 * DAY,
   }),
   post({
@@ -1040,79 +1204,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     createdAt: NOW - 1 * DAY,
     viewCount: 67,
   }),
-  post({
-    id: 'mock-roommate-1',
-    categoryId: 'roommate',
-    title: '브루클린에서 룸메이트 구해요',
-    description:
-      '조용한 생활 패턴, 주말 외에는 재택 위주입니다. 예산은 $1,400까지 가능해요.',
-    contentHtml: `
-      <p>Bushwick / Williamsburg 쪽 2bed에서 룸메이트를 구합니다.</p>
-      <ul>
-        <li>조용한 편, 주중 재택</li>
-        <li>반려동물 없음</li>
-        <li>보증금·유틸 협의 가능</li>
-      </ul>
-    `,
-    location: '브루클린',
-    detail: '룸메이트 구해요',
-    roommateLookingFor: 'roommate',
-    roommateBudgetMax: 1400,
-    roommateMoveInDate: '2026-09-01',
-    thumbnailUrl:
-      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80',
-    galleryPhotos: [
-      {
-        id: 'g1',
-        imageUrl:
-          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80',
-        caption: '',
-      },
-      {
-        id: 'g2',
-        imageUrl:
-          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
-        caption: '',
-      },
-    ],
-    authorUid: 'mock-user-20',
-    authorEmail: 'roommate@nyu.edu',
-    authorSchoolId: 'nyu',
-    authorSchoolName: 'NYU',
-    createdAt: NOW - 10 * HOUR,
-    viewCount: 31,
-  }),
-  post({
-    id: 'mock-roommate-2',
-    categoryId: 'roommate',
-    title: '맨해튼 서블렛 — 9~11월',
-    description: '유학 중 잠시 비는 방 서블렛합니다. 가구 포함, 지하철 5분.',
-    contentHtml: `
-      <p>Upper East Side studio를 9월~11월 서블렛합니다.</p>
-      <p>침대·책상·주방용품 포함이고, 6 train 도보 5분입니다.</p>
-    `,
-    location: '맨해튼 UES',
-    detail: '서블렛',
-    roommateLookingFor: 'sublet',
-    roommateBudgetMax: 2200,
-    roommateMoveInDate: '2026-09-15',
-    thumbnailUrl:
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
-    galleryPhotos: [
-      {
-        id: 'g3',
-        imageUrl:
-          'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
-        caption: '',
-      },
-    ],
-    authorUid: 'mock-user-21',
-    authorEmail: 'sublet@columbia.edu',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: NOW - 2 * DAY,
-    viewCount: 54,
-  }),
+  ...buildRoommateMockPosts(),
 ]
 
 export function listMockCommunityPosts(

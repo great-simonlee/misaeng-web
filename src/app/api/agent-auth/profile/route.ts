@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../lib/authHelpers'
 import {
+  getNicknameValidationError,
   isProfileGender,
   isProfileOccupationType,
 } from '@lib/constants/profile'
@@ -49,7 +50,12 @@ export async function PATCH(request: Request) {
   const patch: Record<string, unknown> = { email: user.email }
 
   if (body.nickname !== undefined) {
-    patch.nickname = asTrimmedString(body.nickname)
+    const nickname = asTrimmedString(body.nickname)
+    const nicknameError = getNicknameValidationError(nickname)
+    if (nicknameError) {
+      return NextResponse.json({ error: nicknameError }, { status: 400 })
+    }
+    patch.nickname = nickname
   }
   if (body.mbti !== undefined) {
     const mbti = asTrimmedString(body.mbti).toUpperCase()

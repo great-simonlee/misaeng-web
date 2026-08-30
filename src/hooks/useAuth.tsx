@@ -338,8 +338,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (_file: File) => {
       if (!user) throw new Error('로그인이 필요해요')
 
+      const { compressImageForUpload } = await import('@lib/utils/compressImage')
+      const optimized = await compressImageForUpload(_file)
+
       const formData = new FormData()
-      formData.append('file', _file)
+      formData.append('file', optimized)
 
       const response = await fetch('/api/agent-auth/avatar', {
         method: 'POST',

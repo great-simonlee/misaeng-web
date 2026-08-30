@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from 'react'
 
+import { TipTapEditor } from '@components'
 import { cn } from '@lib'
 import {
   CPT_OPT_FIELD_MAX,
   CPT_OPT_QUICK_STEPS,
+  CPT_OPT_STAGE_REVIEW_MAX,
   CPT_OPT_TIMELINE_FIELDS,
   CPT_OPT_TIMELINE_MAX,
   createEmptyTimelineEntry,
@@ -457,7 +459,8 @@ function SingleEntryForm({
       <div className='space-y-2 p-3 sm:p-3.5'>
         {visibleFields.length === 0 ? (
           <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-4 text-center text-[12px] leading-relaxed text-[var(--muted)]'>
-            위에서 준비 · 제출 · 결과 · 다음 스텝 중 필요한 항목을 선택해 주세요
+            위에서 준비 · 제출 · 결과 · 다음 스텝 중 필요한 항목을 선택하거나,
+            아래 단계 후기만 작성해도 됩니다
           </p>
         ) : (
           visibleFields.map((field) => (
@@ -471,11 +474,29 @@ function SingleEntryForm({
             />
           ))
         )}
+
+        <div className='rounded-xl border border-black/[0.06] bg-[#fafbfc] px-3 py-3 sm:px-3.5 sm:py-3.5'>
+          <p className='text-[12px] font-semibold text-[var(--foreground)]'>
+            단계 후기
+          </p>
+          <p className='mt-0.5 text-[11px] leading-relaxed text-[var(--muted)]'>
+            그날에 겪은 일, 대기 시간, 팁, 실수 등 자유롭게 적어 주세요.
+          </p>
+          <div className='mt-2.5'>
+            <TipTapEditor
+              value={entry.stageReviewHtml}
+              onChange={(html) => onChange({ stageReviewHtml: html })}
+              placeholder='예: ISS 포털 업로드가 직 안 돼서 PDF를 다시 압축해 올렸어요. 어드바이저 서명은 하루 걸렸습니다.'
+              minHeightClassName='min-h-[160px]'
+              maxLength={CPT_OPT_STAGE_REVIEW_MAX}
+            />
+          </div>
+        </div>
       </div>
 
       {!isTimelineEntryFilled(entry) ? (
         <p className='border-t border-black/[0.04] px-3.5 py-2 text-[11px] text-[var(--muted)] sm:px-4'>
-          날짜와 선택한 항목의 내용을 입력해 주세요
+          날짜와 선택한 항목 또는 단계 후기를 입력해 주세요
         </p>
       ) : !isTimelineEntryComplete(entry) ? (
         <p className='border-t border-black/[0.04] px-3.5 py-2 text-[11px] text-amber-700 sm:px-4'>

@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import { useMemo, useState } from 'react'
 
-import { PhotoLightbox, SchoolBadge, type PhotoLightboxItem } from '@components'
+import { PhotoLightbox, type PhotoLightboxItem } from '@components'
 import {
   formatCommunityCount,
   formatCommunityRelativeTime,
@@ -129,22 +129,21 @@ export function FoodDetailContent({
         />
       </div>
 
-      <div className='mt-5 px-1 sm:mt-7 sm:px-0'>
-        <div className='flex flex-wrap items-center gap-2'>
+      <div className='mt-4 px-1 sm:mt-6 sm:px-0'>
+        <div className='flex flex-wrap items-center gap-1.5'>
           <FoodCategoryBadge
             categoryId={post.foodCategory}
             variant='soft'
             size='md'
           />
           {cuisineLabel ? (
-            <span className='inline-flex items-center rounded-full bg-[#f1f2f4] px-2.5 py-1 text-[12px] font-semibold text-[var(--muted-foreground)]'>
+            <span className='inline-flex h-7 items-center rounded-full bg-[#f4f5f7] px-2.5 text-[12px] font-semibold leading-none tracking-tight text-[#4b5563] ring-1 ring-black/[0.05]'>
               {cuisineLabel}
             </span>
           ) : null}
-          {!anonymous ? <SchoolBadge schoolId={post.authorSchoolId} /> : null}
         </div>
 
-        <h1 className='mt-3 text-[1.7rem] font-bold leading-[1.2] tracking-[-0.04em] text-[var(--foreground)] sm:text-[2rem]'>
+        <h1 className='mt-2.5 text-[1.7rem] font-bold leading-[1.2] tracking-[-0.04em] text-[var(--foreground)] sm:mt-3 sm:text-[2rem]'>
           {post.title}
         </h1>
 

@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
+import { useAnchoredPosition } from '@hooks/useAnchoredPosition'
 import { cn } from '@lib'
 import type { PlaceSearchResult } from '@/types/nyc'
 
@@ -26,18 +28,28 @@ export function PlaceSearchField({
   const [loading, setLoading] = useState(false)
   const [resolving, setResolving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
+  const inputWrapRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLUListElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const requestIdRef = useRef(0)
 
+  const listOpen = open && results.length > 0 && !value
+  const listPosition = useAnchoredPosition(inputWrapRef, listOpen)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   useEffect(() => {
     function onPointerDown(e: MouseEvent | TouchEvent) {
-      const el = rootRef.current
-      if (!el) return
-      if (e.target instanceof Node && !el.contains(e.target)) {
-        setOpen(false)
-      }
+      const target = e.target
+      if (!(target instanceof Node)) return
+      if (rootRef.current?.contains(target)) return
+      if (listRef.current?.contains(target)) return
+      setOpen(false)
     }
     document.addEventListener('mousedown', onPointerDown)
     document.addEventListener('touchstart', onPointerDown)
@@ -165,6 +177,51 @@ export function PlaceSearchField({
         )}&z=16&hl=ko&output=embed&iwloc=near`
       : null
 
+  const dropdown =
+    mounted && listOpen && listPosition
+      ? createPortal(
+          <ul
+            ref={listRef}
+            id={listId}
+            role='listbox'
+            className='fixed z-[10050] overflow-auto rounded-xl bg-white py-1 shadow-[0_12px_32px_rgba(15,23,42,0.18)] ring-1 ring-black/[0.08]'
+            style={{
+              top: listPosition.top,
+              left: listPosition.left,
+              width: listPosition.width,
+              maxHeight: listPosition.maxHeight,
+            }}
+          >
+            {results.map((item) => (
+              <li key={item.placeId}>
+                <button
+                  type='button'
+                  role='option'
+                  aria-selected={false}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => void selectResult(item)}
+                  className='flex w-full flex-col px-3.5 py-2.5 text-left touch-manipulation transition hover:bg-[#f8f9fb] active:bg-[#f3f4f6]'
+                >
+                  <span className='truncate text-[14px] font-medium text-[var(--foreground)]'>
+                    {mode === 'address'
+                      ? item.address || item.name
+                      : item.name}
+                  </span>
+                  <span className='mt-0.5 truncate text-[12px] text-[var(--muted)]'>
+                    {mode === 'address'
+                      ? item.name !== item.address
+                        ? item.name
+                        : '정확한 주소로 선택해 주세요'
+                      : item.address}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>,
+          document.body,
+        )
+      : null
+
   return (
     <div ref={rootRef} className={cn('relative', className)}>
       {value ? (
@@ -218,7 +275,7 @@ export function PlaceSearchField({
         </div>
       ) : (
         <>
-          <div className='relative'>
+          <div ref={inputWrapRef} className='relative'>
             <SearchIcon className='pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[var(--muted)]' />
             <input
               value={query}
@@ -236,7 +293,7 @@ export function PlaceSearchField({
               autoCorrect='off'
               spellCheck={false}
               role='combobox'
-              aria-expanded={open}
+              aria-expanded={listOpen}
               aria-controls={listId}
               aria-autocomplete='list'
             />
@@ -246,39 +303,7 @@ export function PlaceSearchField({
               </span>
             )}
           </div>
-          {open && results.length > 0 ? (
-            <ul
-              id={listId}
-              role='listbox'
-              className='absolute z-50 mt-1.5 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 shadow-[0_12px_32px_rgba(15,23,42,0.12)] ring-1 ring-black/[0.08]'
-            >
-              {results.map((item) => (
-                <li key={item.placeId}>
-                  <button
-                    type='button'
-                    role='option'
-                    aria-selected={false}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => void selectResult(item)}
-                    className='flex w-full flex-col px-3.5 py-2.5 text-left touch-manipulation transition hover:bg-[#f8f9fb] active:bg-[#f3f4f6]'
-                  >
-                    <span className='truncate text-[14px] font-medium text-[var(--foreground)]'>
-                      {mode === 'address'
-                        ? item.address || item.name
-                        : item.name}
-                    </span>
-                    <span className='mt-0.5 truncate text-[12px] text-[var(--muted)]'>
-                      {mode === 'address'
-                        ? item.name !== item.address
-                          ? item.name
-                          : '정확한 주소로 선택해 주세요'
-                        : item.address}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+          {dropdown}
           {!loading &&
           !resolving &&
           query.trim().length >= 2 &&
