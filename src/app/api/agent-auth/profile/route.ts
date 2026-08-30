@@ -10,6 +10,7 @@ import {
   getSupabaseProfile,
   isSupabaseProfileConfigured,
   upsertSupabaseProfile,
+  accountSuspendedResponse,
 } from '@lib/supabase/profile.server'
 
 type ProfilePatchBody = {
@@ -45,6 +46,8 @@ export async function PATCH(request: Request) {
   if (!user?.uid) {
     return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
   }
+  const suspended = await accountSuspendedResponse(user.uid)
+  if (suspended) return suspended
 
   const body = (await request.json()) as ProfilePatchBody
   const patch: Record<string, unknown> = { email: user.email }

@@ -5,6 +5,7 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
   eyebrow: 'LEGAL',
   title: 'Terms of Use',
   titleKo: '이용약관',
+  version: '2026-08-30',
   lastUpdated: 'August 30, 2026',
   lastUpdatedKo: '2026년 8월 30일',
   effectiveDate: 'August 30, 2026',

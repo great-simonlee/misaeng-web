@@ -282,6 +282,13 @@ export function MyPageScreen() {
           <h1 className='mt-1.5 text-[1.5rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] lg:text-[1.75rem]'>
             마이페이지
           </h1>
+          {profile?.status === 'suspended' ? (
+            <p className='mt-3 rounded-2xl bg-red-50 px-4 py-3 text-[13px] leading-relaxed text-red-700 ring-1 ring-red-100'>
+              This account is suspended. You can still browse, but posting,
+              comments, and credit requests are blocked. / 이 계정은 이용
+              정지되었습니다. 글·댓글·크레딧 요청을 할 수 없습니다.
+            </p>
+          ) : null}
         </div>
 
         <div className='grid gap-6 lg:grid-cols-[minmax(260px,300px)_minmax(0,1fr)] lg:items-start lg:gap-8'>

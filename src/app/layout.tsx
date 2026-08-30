@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from 'next/font/google'
 
 import { AuthProvider } from '@hooks/useAuth'
 import { ToastProvider } from '@hooks/useToast'
+import { ConsentLocaleProvider } from '@components/consent/ConsentLocaleProvider'
+import { ReconsentGate } from '@components/consent/ReconsentGate'
 import { SiteFooter } from '@widgets/SiteFooter'
 import { SiteHeader } from '@widgets/SiteHeader'
 import './globals.css'
@@ -61,15 +63,17 @@ export default function RootLayout({
       >
         <div className='flex min-h-dvh flex-col'>
           <AuthProvider>
-            <ToastProvider>
-              <SiteHeader />
+            <ConsentLocaleProvider>
+              <ToastProvider>
+                <SiteHeader />
 
-              <main className='flex flex-1 flex-col pt-14 sm:pt-16'>
-                {children}
-              </main>
+                <main className='flex flex-1 flex-col pt-14 sm:pt-16'>
+                  <ReconsentGate>{children}</ReconsentGate>
+                </main>
 
-              <SiteFooter />
-            </ToastProvider>
+                <SiteFooter />
+              </ToastProvider>
+            </ConsentLocaleProvider>
           </AuthProvider>
         </div>
       </body>

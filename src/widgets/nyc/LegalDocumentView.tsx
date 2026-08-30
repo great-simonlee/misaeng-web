@@ -41,14 +41,15 @@ export function LegalDocumentView({
           <span className='ml-2 text-[12px] font-normal'>(reference)</span>
         </p>
         <p className='mt-3 text-sm text-[var(--muted)]'>
-          Last updated: {doc.lastUpdated}
+          Version {doc.version} · Last updated: {doc.lastUpdated}
           <span className='mx-2 text-[var(--border)]' aria-hidden>
             ·
           </span>
           Effective: {doc.effectiveDate}
         </p>
         <p className='mt-1 text-[12px] text-[var(--muted)]/80'>
-          최종 업데이트: {doc.lastUpdatedKo} · 시행일: {doc.effectiveDateKo}
+          버전 {doc.version} · 최종 업데이트: {doc.lastUpdatedKo} · 시행일:{' '}
+          {doc.effectiveDateKo}
         </p>
 
         <div className='mt-5 rounded-xl bg-[#fff8f5] px-4 py-3.5 ring-1 ring-[var(--brand)]/15'>

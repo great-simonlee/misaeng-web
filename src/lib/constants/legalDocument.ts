@@ -24,6 +24,8 @@ export type LegalDocument = {
   eyebrow: string
   title: string
   titleKo: string
+  /** Machine version id (YYYY-MM-DD). Used for clickwrap / re-consent. */
+  version: string
   lastUpdated: string
   lastUpdatedKo: string
   effectiveDate: string

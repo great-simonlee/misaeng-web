@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
+import { accountSuspendedResponse } from '@lib/supabase/profile.server'
 import {
   normalizeCptOptTimeline,
   normalizeCptOptTips,
@@ -124,6 +125,8 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (!user?.uid) {
     return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
   }
+  const suspended = await accountSuspendedResponse(user.uid)
+  if (suspended) return suspended
 
   const { id } = await context.params
   const existing = await getStoredCommunityPost(id)
@@ -485,6 +488,8 @@ export async function DELETE(_request: Request, context: RouteContext) {
   if (!user?.uid) {
     return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
   }
+  const suspended = await accountSuspendedResponse(user.uid)
+  if (suspended) return suspended
 
   const { id } = await context.params
   const existing = await getStoredCommunityPost(id)

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { persistConsentRecord, assertAcceptedCurrentPolicy } from '@lib/consent/recordConsent'
 import {
   buildAuthUserFromHints,
   getAuthErrorMessage,
@@ -21,6 +22,10 @@ type GoogleAuthBody = {
   credential?: string
   email?: string | null
   name?: string | null
+  acceptedTerms?: boolean
+  termsVersion?: string
+  privacyVersion?: string
+  uiLanguage?: 'en' | 'ko'
 }
 
 const ELLIEO_LOGIN_BODIES = (idToken: string) => [
@@ -100,6 +105,15 @@ export async function POST(request: Request) {
       })
     }
 
+    const consentCheck = await assertAcceptedCurrentPolicy({
+      acceptedTerms: body.acceptedTerms,
+      termsVersion: body.termsVersion,
+      privacyVersion: body.privacyVersion,
+    })
+    if (!consentCheck.ok) {
+      return NextResponse.json(consentCheck.body, { status: consentCheck.status })
+    }
+
     const registerResult = await loginOrRegisterWithGoogle(
       idToken,
       body.email,
@@ -108,6 +122,22 @@ export async function POST(request: Request) {
     )
 
     if (registerResult.ok) {
+      if (registerResult.registered && registerResult.user?.uid) {
+        const consent = await persistConsentRecord({
+          request,
+          userId: registerResult.user.uid,
+          email: registerResult.user.email || body.email,
+          acceptedTerms: body.acceptedTerms,
+          termsVersion: body.termsVersion,
+          privacyVersion: body.privacyVersion,
+          uiLanguage: body.uiLanguage,
+          method: 'google_signup_checkbox',
+        })
+        if (!consent.ok) {
+          return NextResponse.json(consent.body, { status: consent.status })
+        }
+      }
+
       return NextResponse.json({
         ok: true,
         connected: true,

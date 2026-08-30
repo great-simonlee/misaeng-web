@@ -28,7 +28,7 @@ import {
   type RoommateIntent,
   type RoommateLookingFor,
 } from '@lib/community/roommate'
-import { isSchoolVerified } from '@lib/community/schoolGate'
+import { isAccountSuspended, isSchoolVerified } from '@lib/community/schoolGate'
 import {
   NYC_COMMUNITY_BOARD_META,
   type NycCommunityBoardId,
@@ -40,6 +40,7 @@ import {
   BoardSurface,
 } from '@widgets/nyc/BoardPageShell'
 import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
+import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 
 interface RoommateWriteScreenProps {
@@ -309,6 +310,10 @@ export function RoommateWriteScreen({
         />
       </BoardPageShell>
     )
+  }
+
+  if (isAccountSuspended(profile)) {
+    return <AccountSuspendedNotice />
   }
 
   if (!isSchoolVerified(profile)) {

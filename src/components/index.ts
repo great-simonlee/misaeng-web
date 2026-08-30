@@ -24,3 +24,13 @@ export { PullToRefresh } from './PullToRefresh'
 export { ImageUploadButton, ImagePreview, PhotoUploadZone } from './ImageUploadButton'
 export { PhotoLightbox, type PhotoLightboxItem } from './PhotoLightbox'
 export { UserAvatar } from './UserAvatar'
+export { BilingualStack } from './consent/BilingualStack'
+export { BilingualLocaleText } from './consent/BilingualLocaleText'
+export {
+  ConsentLocaleProvider,
+  ConsentLocaleToggle,
+  useConsentLocale,
+} from './consent/ConsentLocaleProvider'
+export { TermsConsentFields } from './consent/TermsConsentFields'
+export { ReconsentModal } from './consent/ReconsentModal'
+export { ReconsentGate } from './consent/ReconsentGate'

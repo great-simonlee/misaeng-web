@@ -28,11 +28,26 @@ interface AuthContextValue {
   configured: boolean
   isMisaengUser: boolean
   signInEmail: (email: string, password: string) => Promise<void>
-  signUpEmail: (email: string, password: string) => Promise<void>
+  signUpEmail: (
+    email: string,
+    password: string,
+    consent: {
+      acceptedTerms: boolean
+      termsVersion: string
+      privacyVersion: string
+      uiLanguage: 'en' | 'ko'
+    },
+  ) => Promise<void>
   signInGoogle: (params: {
     idToken: string
     email?: string | null
     name?: string | null
+    consent?: {
+      acceptedTerms: boolean
+      termsVersion: string
+      privacyVersion: string
+      uiLanguage: 'en' | 'ko'
+    }
   }) => Promise<void>
   resetPassword: (email: string) => Promise<void>
   logout: () => Promise<void>
@@ -105,6 +120,7 @@ function mapProfile(uid: string, email: string, raw: Record<string, unknown> | n
     phoneVerified: Boolean(raw?.phoneVerified),
     instagramHandle: null,
     instagramVerified: false,
+    status: raw?.status === 'suspended' ? 'suspended' : 'active',
     otpQuota: null,
     createdAt: now,
     updatedAt: now,
@@ -198,6 +214,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 verifiedSchoolName: prev.verifiedSchoolName,
                 phone: prev.phone,
                 phoneVerified: prev.phoneVerified,
+                status: prev.status,
               }
             : {}),
           ...patch,
@@ -247,7 +264,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await loadSession()
   }, [loadSession])
 
-  const signUpEmailFn = useCallback(async (email: string, password: string) => {
+  const signUpEmailFn = useCallback(async (
+    email: string,
+    password: string,
+    consent: {
+      acceptedTerms: boolean
+      termsVersion: string
+      privacyVersion: string
+      uiLanguage: 'en' | 'ko'
+    },
+  ) => {
     const response = await fetch('/api/agent-auth/email', {
       method: 'POST',
       credentials: 'include',
@@ -258,6 +284,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         mode: 'signup',
         email,
         password,
+        acceptedTerms: consent.acceptedTerms,
+        termsVersion: consent.termsVersion,
+        privacyVersion: consent.privacyVersion,
+        uiLanguage: consent.uiLanguage,
       }),
     })
 
@@ -273,7 +303,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadSession])
 
   const signInGoogleFn = useCallback(
-    async (params: { idToken: string; email?: string | null; name?: string | null }) => {
+    async (params: {
+      idToken: string
+      email?: string | null
+      name?: string | null
+      consent?: {
+        acceptedTerms: boolean
+        termsVersion: string
+        privacyVersion: string
+        uiLanguage: 'en' | 'ko'
+      }
+    }) => {
       const response = await fetch('/api/agent-auth/google', {
         method: 'POST',
         credentials: 'include',
@@ -284,6 +324,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           idToken: params.idToken,
           email: params.email,
           name: params.name,
+          ...(params.consent || {}),
         }),
       })
 

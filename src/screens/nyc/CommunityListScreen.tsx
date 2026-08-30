@@ -17,6 +17,7 @@ import { getErrorMessage, useToast } from '@hooks/useToast'
 import { fetchCommunityPosts } from '@lib/community/client'
 import {
   getSchoolVerifyHref,
+  isAccountSuspended,
   isSchoolVerified,
 } from '@lib/community/schoolGate'
 import {
@@ -440,18 +441,23 @@ function CommunityBoardListScreen({
   const newPath = `/nyc/${boardId}/new`
   const loginNext = `/nyc/login?next=${encodeURIComponent(newPath)}`
   const schoolVerified = isSchoolVerified(profile)
-  const canWrite = Boolean(user) && schoolVerified
+  const suspended = isAccountSuspended(profile)
+  const canWrite = Boolean(user) && schoolVerified && !suspended
   const postHref = !user
     ? loginNext
-    : schoolVerified
-      ? newPath
-      : getSchoolVerifyHref(newPath)
+    : suspended
+      ? '/nyc/me'
+      : schoolVerified
+        ? newPath
+        : getSchoolVerifyHref(newPath)
   const writeCtaLabel = !user
     ? '로그인'
-    : schoolVerified
-      ? meta.writeLabel
-      : '학교 인증하기'
-  const showWriteCta = !authLoading && Boolean(user)
+    : suspended
+      ? '이용 정지'
+      : schoolVerified
+        ? meta.writeLabel
+        : '학교 인증하기'
+  const showWriteCta = !authLoading && Boolean(user) && !suspended
 
   const listSection = (
     <section className={cn('pt-4 sm:pt-5', isFoodBoard ? 'pb-20 sm:pb-24' : 'pb-14 sm:pb-16')}>

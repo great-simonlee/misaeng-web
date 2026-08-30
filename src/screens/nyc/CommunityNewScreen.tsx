@@ -16,7 +16,7 @@ import {
   fetchCommunityPost,
   updateCommunityPostRequest,
 } from '@lib/community/client'
-import { isSchoolVerified } from '@lib/community/schoolGate'
+import { isAccountSuspended, isSchoolVerified } from '@lib/community/schoolGate'
 import {
   COMMUNITY_BODY_MAX,
   FOOD_CATEGORIES,
@@ -65,6 +65,7 @@ import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuideli
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { PlaceSearchField } from '@widgets/nyc/PlaceSearchField'
 import { RestaurantNameField } from '@widgets/nyc/RestaurantNameField'
+import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 import { CptOptWriteScreen } from '@screens/nyc/CptOptWriteScreen'
 import { JobReviewWriteScreen } from '@screens/nyc/JobReviewWriteScreen'
@@ -639,6 +640,10 @@ function CommunityBoardNewScreen({
         />
       </BoardPageShell>
     )
+  }
+
+  if (isAccountSuspended(profile)) {
+    return <AccountSuspendedNotice />
   }
 
   if (!isSchoolVerified(profile)) {

@@ -23,6 +23,7 @@ import {
 } from '@lib/community/roommate'
 import {
   getSchoolVerifyHref,
+  isAccountSuspended,
   isSchoolVerified,
 } from '@lib/community/schoolGate'
 import { NYC_COMMUNITY_BOARD_META } from '@lib/constants/nyc'
@@ -302,17 +303,22 @@ export function RoommateListScreen() {
   const newPath = `/nyc/${BOARD_ID}/new`
   const loginNext = `/nyc/login?next=${encodeURIComponent(newPath)}`
   const schoolVerified = isSchoolVerified(profile)
-  const canWrite = Boolean(user) && schoolVerified
+  const suspended = isAccountSuspended(profile)
+  const canWrite = Boolean(user) && schoolVerified && !suspended
   const postHref = !user
     ? loginNext
-    : schoolVerified
-      ? newPath
-      : getSchoolVerifyHref(newPath)
+    : suspended
+      ? '/nyc/me'
+      : schoolVerified
+        ? newPath
+        : getSchoolVerifyHref(newPath)
   const writeCtaLabel = !user
     ? '로그인'
-    : schoolVerified
-      ? meta.writeLabel
-      : '학교 인증하기'
+    : suspended
+      ? '이용 정지'
+      : schoolVerified
+        ? meta.writeLabel
+        : '학교 인증하기'
 
   return (
     <PullToRefresh onRefresh={refreshPosts} className='flex flex-1 flex-col'>
@@ -324,7 +330,7 @@ export function RoommateListScreen() {
           writeLabel={authLoading ? meta.writeLabel : writeCtaLabel}
           onFilterClick={openFilters}
           filterCount={activeFilterCount}
-          showWrite={!authLoading}
+          showWrite={!authLoading && !suspended}
         >
           <ChipScrollRow ariaLabel='빠른 필터'>
             <BoardQuickChip

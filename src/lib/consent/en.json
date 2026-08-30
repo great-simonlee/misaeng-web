@@ -1,0 +1,17 @@
+{
+  "agreeCheckbox": "I have read and agree to the Terms of Use and Privacy Policy.",
+  "agreeCheckboxAria": "Terms checkbox",
+  "termsLink": "Terms of Use",
+  "privacyLink": "Privacy Policy",
+  "arbitrationNotice": "These Terms include a binding individual arbitration agreement and class-action waiver. You may opt out within 30 days by emailing info@misaeng.com.",
+  "languageNotice": "The English version of these Terms is the official and controlling version. The Korean text is provided for convenience only. If there is any conflict or inconsistency between the English and Korean versions, the English version prevails.",
+  "agreeError": "Please agree to the Terms to continue.",
+  "signUp": "Sign Up",
+  "reconsentTitle": "Updated terms require your agreement",
+  "reconsentBody": "Please review the updated Terms of Use and Privacy Policy. You must agree before continuing to use Misaeng NYC.",
+  "reconsentConfirm": "I agree / Continue",
+  "optOutHint": "Arbitration opt-out: email info@misaeng.com within 30 days of agreeing, subject line “Arbitration Opt-Out”.",
+  "saving": "Saving…",
+  "localeEn": "EN",
+  "localeKo": "KO"
+}

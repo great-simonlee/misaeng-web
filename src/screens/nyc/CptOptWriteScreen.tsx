@@ -25,7 +25,7 @@ import {
 } from '@lib/community/cptOpt'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
 import { htmlToPlainText } from '@lib/community/html'
-import { isSchoolVerified } from '@lib/community/schoolGate'
+import { isAccountSuspended, isSchoolVerified } from '@lib/community/schoolGate'
 import {
   isStatusCommunityBoard,
   NYC_COMMUNITY_BOARD_META,
@@ -40,6 +40,7 @@ import {
 import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
 import { CptOptTimelineEditor } from '@widgets/nyc/CptOptTimelineEditor'
 import { CptOptTypeBadge, CptOptTypePicker } from '@widgets/nyc/CptOptTypeBadge'
+import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 
 interface CptOptWriteScreenProps {
@@ -212,6 +213,10 @@ export function CptOptWriteScreen({
         <LoadingState fullPage label='로그인 확인 중…' />
       </BoardPageShell>
     )
+  }
+
+  if (isAccountSuspended(profile)) {
+    return <AccountSuspendedNotice />
   }
 
   if (!isSchoolVerified(profile)) {

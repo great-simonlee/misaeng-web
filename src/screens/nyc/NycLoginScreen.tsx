@@ -7,6 +7,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import { TermsConsentFields } from '@components/consent/TermsConsentFields'
+import { useConsentLocale } from '@components/consent/ConsentLocaleProvider'
+import {
+  DEFAULT_PRIVACY_VERSION,
+  DEFAULT_TERMS_VERSION,
+} from '@lib/consent/copy'
+import type { LegalPolicy } from '@lib/consent/types'
 import { AuthConfigBanner } from '@widgets/nyc/AuthConfigBanner'
 import { GoogleSignInButton } from '@widgets/nyc/GoogleSignInButton'
 import { isAppConnectConfigured } from '@lib/constants/appConnect'
@@ -31,11 +38,14 @@ export function NycLoginScreen() {
   const searchParams = useSearchParams()
   const next = searchParams.get('next') || '/nyc'
 
+  const { locale } = useConsentLocale()
   const [mode, setMode] = useState<'signin' | 'signup' | 'reset'>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const [showTermsError, setShowTermsError] = useState(false)
+  const [policy, setPolicy] = useState<LegalPolicy | null>(null)
   const authReady = useMemo(
     () => isAppConnectConfigured() && isGoogleSignInConfigured(),
     [],
@@ -49,8 +59,24 @@ export function NycLoginScreen() {
     !needsTermsAcceptance || acceptedTerms
 
   useEffect(() => {
-    if (mode !== 'signup') setAcceptedTerms(false)
+    if (mode !== 'signup') {
+      setAcceptedTerms(false)
+      setShowTermsError(false)
+    }
   }, [mode])
+
+  useEffect(() => {
+    let cancelled = false
+    void fetch('/api/legal/policy', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data: { policy?: LegalPolicy }) => {
+        if (!cancelled && data?.policy) setPolicy(data.policy)
+      })
+      .catch(() => null)
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     if (!loading && !sessionLoading && user) {
@@ -58,10 +84,17 @@ export function NycLoginScreen() {
     }
   }, [loading, sessionLoading, user, router, next])
 
+  const consentPayload = {
+    acceptedTerms,
+    termsVersion: policy?.termsVersion || DEFAULT_TERMS_VERSION,
+    privacyVersion: policy?.privacyVersion || DEFAULT_PRIVACY_VERSION,
+    uiLanguage: locale,
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (needsTermsAcceptance && !acceptedTerms) {
-      toastError('이용약관 및 개인정보처리방침에 동의해 주세요')
+      setShowTermsError(true)
       return
     }
     setSubmitting(true)
@@ -76,7 +109,7 @@ export function NycLoginScreen() {
         await signInEmail(email.trim(), password)
         success('로그인했어요')
       } else {
-        await signUpEmail(email.trim(), password)
+        await signUpEmail(email.trim(), password, consentPayload)
         success('회원가입이 완료되었어요')
       }
       router.replace(next)
@@ -101,12 +134,15 @@ export function NycLoginScreen() {
       name: string | null
     }) => {
       if (mode === 'signup' && !acceptedTerms) {
-        toastError('이용약관 및 개인정보처리방침에 동의해 주세요')
+        setShowTermsError(true)
         return
       }
       setSubmitting(true)
       try {
-        await signInGoogle(credential)
+        await signInGoogle({
+          ...credential,
+          consent: mode === 'signup' ? consentPayload : undefined,
+        })
         success('로그인했어요')
         router.replace(next)
       } catch (err) {
@@ -117,8 +153,10 @@ export function NycLoginScreen() {
     },
     [
       acceptedTerms,
+      locale,
       mode,
       next,
+      policy,
       router,
       signInGoogle,
       success,
@@ -144,12 +182,12 @@ export function NycLoginScreen() {
     : null
 
   const submitLabel = submitting
-    ? '잠시만 기다려 주세요…'
+    ? 'Please wait… / 잠시만 기다려 주세요…'
     : mode === 'signin'
-      ? '로그인'
+      ? 'Sign in / 로그인'
       : mode === 'signup'
-        ? '회원가입'
-        : '재설정 메일 보내기'
+        ? 'Sign Up / 가입하기'
+        : 'Send reset email / 재설정 메일 보내기'
 
   return (
     <div className='relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#eef1f6_0%,#e8edf4_42%,#f4f6fa_100%)]'>
@@ -273,69 +311,52 @@ export function NycLoginScreen() {
             )}
 
             {mode === 'signup' && (
-              <label className='flex gap-3 rounded-xl bg-[#fff8f5] px-3.5 py-3 ring-1 ring-[var(--brand)]/15'>
-                <input
-                  type='checkbox'
-                  checked={acceptedTerms}
-                  onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  className='mt-1 size-4 shrink-0 accent-[#F64310]'
-                  required
-                />
-                <span className='text-[13px] leading-relaxed text-[#475467]'>
-                  <span className='font-semibold text-[var(--foreground)]'>
-                    I agree to the Terms of Use (including binding arbitration
-                    and class-action waiver in Section 22) and the Privacy
-                    Policy.
-                  </span>{' '}
-                  <span className='text-[#667085]'>
-                    이용약관(
-                    <Link
-                      href='/nyc/terms-of-use#governing-law'
-                      className='font-medium text-[#F64310] underline-offset-2 hover:underline'
-                      target='_blank'
-                      rel='noopener noreferrer'
-                    >
-                      22조 중재·집단소송 포기
-                    </Link>
-                    포함) 및{' '}
-                    <Link
-                      href='/nyc/privacy-policy'
-                      className='font-medium text-[#F64310] underline-offset-2 hover:underline'
-                      target='_blank'
-                      rel='noopener noreferrer'
-                    >
-                      개인정보처리방침
-                    </Link>
-                    에 동의합니다.
-                  </span>
-                </span>
-              </label>
+              <TermsConsentFields
+                checked={acceptedTerms}
+                onChange={(nextChecked) => {
+                  setAcceptedTerms(nextChecked)
+                  if (nextChecked) setShowTermsError(false)
+                }}
+                error={showTermsError}
+              />
             )}
 
             {mode === 'signin' && (
               <p className='text-[12px] leading-relaxed text-[#98a2b3]'>
-                By signing in, you agree to our{' '}
-                <Link
-                  href='/nyc/terms-of-use'
-                  className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
-                >
-                  Terms of Use
-                </Link>{' '}
-                (including{' '}
-                <Link
-                  href='/nyc/terms-of-use#governing-law'
-                  className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
-                >
-                  arbitration & class-action waiver
-                </Link>
-                ) and{' '}
-                <Link
-                  href='/nyc/privacy-policy'
-                  className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
-                >
-                  Privacy Policy
-                </Link>
-                .
+                <span className='block'>
+                  By signing in, you agree to our{' '}
+                  <Link
+                    href='/nyc/terms-of-use'
+                    className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
+                  >
+                    Terms of Use
+                  </Link>{' '}
+                  and{' '}
+                  <Link
+                    href='/nyc/privacy-policy'
+                    className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
+                </span>
+                <span className='mt-0.5 block'>
+                  로그인하면{' '}
+                  <Link
+                    href='/nyc/terms-of-use'
+                    className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
+                  >
+                    이용약관
+                  </Link>
+                  및{' '}
+                  <Link
+                    href='/nyc/privacy-policy'
+                    className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
+                  >
+                    개인정보처리방침
+                  </Link>
+                  에 동의하게 됩니다.
+                </span>
               </p>
             )}
 

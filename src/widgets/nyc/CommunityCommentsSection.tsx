@@ -16,7 +16,9 @@ import {
 } from '@lib/community/comments.client'
 import { createCommunityReportRequest } from '@lib/community/engagement.client'
 import {
+  ACCOUNT_SUSPENDED_MESSAGE,
   getSchoolVerifyHref,
+  isAccountSuspended,
   isSchoolVerified,
   SCHOOL_VERIFY_REQUIRED_MESSAGE,
 } from '@lib/community/schoolGate'
@@ -80,10 +82,14 @@ export function CommunityCommentsSection({
   )}`
   const schoolVerified = isSchoolVerified(profile)
   const schoolVerifyHref = getSchoolVerifyHref(loginNext || `/nyc`)
-  const canCompose = Boolean(user) && schoolVerified
+  const canCompose = Boolean(user) && schoolVerified && !isAccountSuspended(profile)
 
   async function submitComment(body: string, parentId: string | null) {
     if (!user?.uid || !user.email) return
+    if (isAccountSuspended(profile)) {
+      toastError(ACCOUNT_SUSPENDED_MESSAGE)
+      return
+    }
     if (!isSchoolVerified(profile)) {
       toastError(SCHOOL_VERIFY_REQUIRED_MESSAGE)
       return
@@ -268,6 +274,10 @@ export function CommunityCommentsSection({
           <p className='mt-4 text-[13px] text-[var(--muted)]'>
             로그인 상태를 확인하는 중이에요…
           </p>
+        ) : isAccountSuspended(profile) ? (
+          <div className='mt-4 rounded-xl bg-red-50 px-4 py-3.5 text-[13px] text-red-700'>
+            {ACCOUNT_SUSPENDED_MESSAGE}
+          </div>
         ) : !schoolVerified ? (
           <div className='mt-4 rounded-xl bg-[#f7f8fa] px-4 py-3.5 text-[13px] text-[var(--muted-foreground)]'>
             댓글을 쓰려면{' '}

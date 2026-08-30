@@ -1,0 +1,17 @@
+{
+  "agreeCheckbox": "이용약관 및 개인정보처리방침을 읽었으며 이에 동의합니다.",
+  "agreeCheckboxAria": "약관 동의 체크박스",
+  "termsLink": "이용약관",
+  "privacyLink": "개인정보처리방침",
+  "arbitrationNotice": "본 약관에는 구속력 있는 개별 중재 합의 및 집단소송 포기 조항이 포함되어 있습니다. 가입 후 30일 이내 info@misaeng.com 으로 이메일을 보내 옵트아웃할 수 있습니다.",
+  "languageNotice": "본 약관의 영문본이 공식·기준 문서입니다. 한글은 참고용 번역이며, 영문과 한글에 차이·불일치가 있을 경우 영문본이 우선합니다.",
+  "agreeError": "약관에 동의해 주세요.",
+  "signUp": "가입하기",
+  "reconsentTitle": "업데이트된 약관에 동의해 주세요",
+  "reconsentBody": "이용약관 및 개인정보처리방침이 변경되었습니다. Misaeng NYC를 계속 이용하려면 동의해야 합니다.",
+  "reconsentConfirm": "동의하고 계속하기",
+  "optOutHint": "중재 옵트아웃: 동의 후 30일 이내 info@misaeng.com 으로 제목 “Arbitration Opt-Out” 이메일을 보내 주세요.",
+  "saving": "저장 중…",
+  "localeEn": "EN",
+  "localeKo": "KO"
+}

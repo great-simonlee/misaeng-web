@@ -159,6 +159,12 @@ export async function POST(request: Request) {
   }
 
   const profile = await getSupabaseProfile(user.uid)
+  if (profile?.status === 'suspended') {
+    return NextResponse.json(
+      { error: 'This account is suspended. / 이 계정은 이용 정지되었습니다.' },
+      { status: 403 },
+    )
+  }
   if (!isSchoolVerified(profile)) {
     return NextResponse.json(
       {

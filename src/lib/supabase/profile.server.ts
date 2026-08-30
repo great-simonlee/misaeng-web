@@ -3,6 +3,13 @@ import {
   isSupabaseStorageConfigured,
 } from '@lib/supabase/avatar.server'
 import { getSupabaseAvatarBucket } from '@lib/supabase/server'
+import { NextResponse } from 'next/server'
+
+import {
+  ACCOUNT_SUSPENDED_CODE,
+  ACCOUNT_SUSPENDED_MESSAGE,
+  isAccountSuspended,
+} from '@lib/community/schoolGate'
 
 export type SupabaseProfileRecord = {
   uid: string
@@ -20,6 +27,11 @@ export type SupabaseProfileRecord = {
   verifiedSchoolName?: string | null
   phone?: string | null
   phoneVerified?: boolean
+  termsVersion?: string | null
+  privacyVersion?: string | null
+  consentedAt?: string | null
+  consentUiLanguage?: 'en' | 'ko' | null
+  status?: 'active' | 'suspended' | null
   updatedAt?: number
 }
 
@@ -127,4 +139,13 @@ export async function upsertSupabaseProfile(
   }
 
   return next
+}
+
+export async function accountSuspendedResponse(uid: string) {
+  const profile = await getSupabaseProfile(uid)
+  if (!isAccountSuspended(profile)) return null
+  return NextResponse.json(
+    { error: ACCOUNT_SUSPENDED_MESSAGE, code: ACCOUNT_SUSPENDED_CODE },
+    { status: 403 },
+  )
 }

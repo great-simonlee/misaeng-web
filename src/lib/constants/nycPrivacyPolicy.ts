@@ -5,6 +5,7 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
   eyebrow: 'LEGAL',
   title: 'Privacy Policy',
   titleKo: '개인정보처리방침',
+  version: '2026-08-30',
   lastUpdated: 'August 30, 2026',
   lastUpdatedKo: '2026년 8월 30일',
   effectiveDate: 'August 30, 2026',

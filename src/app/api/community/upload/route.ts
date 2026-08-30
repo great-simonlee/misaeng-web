@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
+import { accountSuspendedResponse } from '@lib/supabase/profile.server'
 import {
   isCommunityImageStorageConfigured,
   uploadCommunityImageToSupabase,
@@ -26,6 +27,8 @@ export async function POST(request: Request) {
     if (!user?.uid) {
       return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
     }
+    const suspended = await accountSuspendedResponse(user.uid)
+    if (suspended) return suspended
 
     const formData = await request.formData()
     const file = formData.get('file')

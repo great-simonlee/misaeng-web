@@ -13,6 +13,7 @@ import { isSchoolOtpEnabled } from '@lib/constants/verificationSafety'
 import {
   isSupabaseProfileConfigured,
   upsertSupabaseProfile,
+  accountSuspendedResponse,
 } from '@lib/supabase/profile.server'
 import { isSchoolEmail } from '@lib/utils/verification'
 
@@ -117,6 +118,8 @@ export async function POST(request: Request) {
     if (!user?.uid) {
       return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
     }
+    const suspended = await accountSuspendedResponse(user.uid)
+    if (suspended) return suspended
 
     const body = (await request.json()) as SchoolEmailBody
     const action = body.action || 'send'

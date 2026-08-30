@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { persistConsentRecord, assertAcceptedCurrentPolicy } from '@lib/consent/recordConsent'
 import { getEllieoBaseUrl, ellieoUpstreamFetch } from '../lib/ellieoServer'
 import {
   getAuthErrorMessage,
@@ -12,6 +13,10 @@ type EmailAuthBody = {
   email?: string
   password?: string
   name?: string
+  acceptedTerms?: boolean
+  termsVersion?: string
+  privacyVersion?: string
+  uiLanguage?: 'en' | 'ko'
 }
 
 export async function POST(request: Request) {
@@ -74,9 +79,34 @@ export async function POST(request: Request) {
       })
     }
 
+    const consentCheck = await assertAcceptedCurrentPolicy({
+      acceptedTerms: body.acceptedTerms,
+      termsVersion: body.termsVersion,
+      privacyVersion: body.privacyVersion,
+    })
+    if (!consentCheck.ok) {
+      return NextResponse.json(consentCheck.body, { status: consentCheck.status })
+    }
+
     const result = await registerWithEmail(email, password, body.name)
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 401 })
+    }
+
+    if (result.user?.uid) {
+      const consent = await persistConsentRecord({
+        request,
+        userId: result.user.uid,
+        email: result.user.email || email,
+        acceptedTerms: body.acceptedTerms,
+        termsVersion: body.termsVersion,
+        privacyVersion: body.privacyVersion,
+        uiLanguage: body.uiLanguage,
+        method: 'signup_checkbox',
+      })
+      if (!consent.ok) {
+        return NextResponse.json(consent.body, { status: consent.status })
+      }
     }
 
     return NextResponse.json({

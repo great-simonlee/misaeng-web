@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../../../agent-auth/lib/authHelpers'
+import { accountSuspendedResponse } from '@lib/supabase/profile.server'
 import {
   isCommunityEngagementStorageConfigured,
   listStoredRecommends,
@@ -75,6 +76,8 @@ export async function POST(request: Request, context: RouteContext) {
   if (!user?.uid) {
     return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
   }
+  const suspended = await accountSuspendedResponse(user.uid)
+  if (suspended) return suspended
 
   const { id: postId } = await context.params
   const payload = (await request.json().catch(() => null)) as ToggleBody | null

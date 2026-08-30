@@ -567,6 +567,8 @@ export interface NycUserProfile {
   /** 인스타그램 인증 (예정) */
   instagramHandle: string | null
   instagramVerified: boolean
+  /** ERP 관리 상태 */
+  status: 'active' | 'suspended' | null
   /** 인증 발송 쿼터 (비용 방지) */
   otpQuota: {
     dayKey: string

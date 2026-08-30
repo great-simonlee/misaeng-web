@@ -11,6 +11,17 @@ export function isSchoolVerified(
   return Boolean(profile?.schoolEmailVerified)
 }
 
+export function isAccountSuspended(
+  profile: { status?: string | null } | null | undefined,
+): boolean {
+  return profile?.status === 'suspended'
+}
+
+export const ACCOUNT_SUSPENDED_CODE = 'ACCOUNT_SUSPENDED'
+
+export const ACCOUNT_SUSPENDED_MESSAGE =
+  'This account is suspended. / 이 계정은 이용 정지되었습니다.'
+
 export const SCHOOL_VERIFY_REQUIRED_CODE = 'SCHOOL_VERIFICATION_REQUIRED'
 
 export const SCHOOL_VERIFY_REQUIRED_MESSAGE =
