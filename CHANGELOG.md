@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.0.24](https://github.com/great-simonlee/misaeng-web/compare/v0.0.23...v0.0.24) (2026-08-30)
+
 ## [0.0.23](https://github.com/great-simonlee/misaeng-web/compare/v0.0.22...v0.0.23) (2026-08-30)
 
 ## [0.0.22](https://github.com/great-simonlee/misaeng-web/compare/v0.0.21...v0.0.22) (2026-08-28)
