@@ -241,7 +241,7 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     writeLabel: '익명으로 글 남기기',
     listIntro: '이름 없이 편하게 나누는 NYC 익명 게시판이에요.',
     locationLabel: '주제 (선택)',
-    locationPlaceholder: '고민 · 질문 · 일상',
+    locationPlaceholder: '주제를 선택해 주세요',
     detailLabel: null,
     detailPlaceholder: '',
     detailInput: null,

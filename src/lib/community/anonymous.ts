@@ -8,6 +8,14 @@ function isViewerAuthor(
   return Boolean(viewerUid && authorUid && viewerUid === authorUid)
 }
 
+/** 익명 표시명 — 첫 글자만 보이고 나머지는 ** (예: 익명 → 익**) */
+export function maskAnonymousDisplayName(name?: string | null): string {
+  const base = name?.trim() || '익명'
+  const first = Array.from(base)[0]
+  if (!first) return '**'
+  return `${first}**`
+}
+
 /** 익명 게시판 글 — 타인에게는 작성자 식별 정보를 숨김 */
 export function sanitizeAnonymousCommunityPost(
   post: CommunityPost,

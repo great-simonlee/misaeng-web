@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { SchoolBadge, UserAvatar } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import { maskAnonymousDisplayName } from '@lib/community/anonymous'
 import {
   buildCommentThreads,
   createCommunityCommentRequest,
@@ -508,7 +509,7 @@ function CommentItem({
   onDelete?: () => void
 }) {
   const displayName = anonymousBoard
-    ? '익명'
+    ? maskAnonymousDisplayName('익명')
     : comment.authorNickname?.trim() ||
       comment.authorEmail.split('@')[0] ||
       '회원'
@@ -519,12 +520,13 @@ function CommentItem({
 
   return (
     <div className='flex gap-3'>
-      <UserAvatar
-        photoURL={photoURL}
-        initial={initial}
-        size={isReply ? 'sm' : 'md'}
-        muted={anonymousBoard}
-      />
+      {!anonymousBoard ? (
+        <UserAvatar
+          photoURL={photoURL}
+          initial={initial}
+          size={isReply ? 'sm' : 'md'}
+        />
+      ) : null}
 
       <div className='min-w-0 flex-1'>
         <div className='flex items-start justify-between gap-3'>

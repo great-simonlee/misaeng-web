@@ -41,6 +41,9 @@ import { htmlToPlainText } from '@lib/community/html'
 import { uploadCommunityImageFile } from '@lib/community/upload.client'
 import { IMAGE_LIBRARY_ACCEPT } from '@lib/constants/imageUpload'
 import {
+  ANONYMOUS_TITLE_MAX,
+} from '@lib/constants/anonymousTopics'
+import {
   NYC_COMMUNITY_BOARD_META,
   isAnonymousBoard,
   type NycCommunityBoardId,
@@ -57,6 +60,7 @@ import {
   BoardPageShell,
   BoardSurface,
 } from '@widgets/nyc/BoardPageShell'
+import { AnonymousTopicSelect } from '@widgets/nyc/AnonymousTopicSelect'
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { PlaceSearchField } from '@widgets/nyc/PlaceSearchField'
 import { RestaurantNameField } from '@widgets/nyc/RestaurantNameField'
@@ -199,7 +203,11 @@ function CommunityBoardNewScreen({
           router.replace(`/nyc/${post.categoryId}/${post.id}/edit`)
           return
         }
-        setPostTitle(post.title)
+        setPostTitle(
+          anonymousBoard
+            ? post.title.slice(0, ANONYMOUS_TITLE_MAX)
+            : post.title,
+        )
         setContentHtml(post.contentHtml)
         setLocation(post.location)
         setDetail(post.detail)
@@ -460,6 +468,17 @@ function CommunityBoardNewScreen({
     let locationValue = location.trim()
     let titleValue = postTitle.trim()
     let detailValue = detail.trim()
+
+    if (anonymousBoard) {
+      if (!titleValue) {
+        toastError('제목을 입력해 주세요')
+        return
+      }
+      if (titleValue.length > ANONYMOUS_TITLE_MAX) {
+        toastError(`제목은 ${ANONYMOUS_TITLE_MAX}자 이내로 작성해 주세요`)
+        return
+      }
+    }
 
     if (isFood) {
       if (!selectedPlace) {
@@ -1169,24 +1188,54 @@ function CommunityBoardNewScreen({
             </div>
           ) : null}
           <form onSubmit={handleSubmit} className='space-y-5'>
-            <Field label='제목' required>
+            <Field
+              label='제목'
+              required
+              hint={
+                anonymousBoard
+                  ? `${postTitle.length}/${ANONYMOUS_TITLE_MAX}`
+                  : undefined
+              }
+            >
               <input
                 required
                 value={postTitle}
-                onChange={(e) => setPostTitle(e.target.value)}
+                maxLength={anonymousBoard ? ANONYMOUS_TITLE_MAX : undefined}
+                onChange={(e) =>
+                  setPostTitle(
+                    anonymousBoard
+                      ? e.target.value.slice(0, ANONYMOUS_TITLE_MAX)
+                      : e.target.value,
+                  )
+                }
                 className={inputClass}
                 placeholder={meta.titlePlaceholder}
               />
             </Field>
 
-            <div className='grid gap-4 sm:grid-cols-2'>
+            <div
+              className={cn(
+                'grid gap-4',
+                meta.detailInput && meta.detailLabel
+                  ? 'sm:grid-cols-2'
+                  : null,
+              )}
+            >
               <Field label={meta.locationLabel}>
-                <input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className={inputClass}
-                  placeholder={meta.locationPlaceholder}
-                />
+                {anonymousBoard ? (
+                  <AnonymousTopicSelect
+                    value={location}
+                    onChange={setLocation}
+                    placeholder={meta.locationPlaceholder}
+                  />
+                ) : (
+                  <input
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className={inputClass}
+                    placeholder={meta.locationPlaceholder}
+                  />
+                )}
               </Field>
               {meta.detailInput && meta.detailLabel && (
                 <Field label={meta.detailLabel}>
@@ -1246,18 +1295,29 @@ const inputClass =
 function Field({
   label,
   required,
+  hint,
   children,
 }: {
   label: string
   required?: boolean
+  hint?: string
   children: React.ReactNode
 }) {
   return (
     <label className='block text-[13px] font-medium text-[var(--foreground)]'>
-      {label}
-      {required ? (
-        <span className='text-[var(--brand)]'> *</span>
-      ) : null}
+      <span className='flex items-baseline justify-between gap-2'>
+        <span>
+          {label}
+          {required ? (
+            <span className='text-[var(--brand)]'> *</span>
+          ) : null}
+        </span>
+        {hint ? (
+          <span className='text-[11px] font-medium tabular-nums text-[var(--muted)]'>
+            {hint}
+          </span>
+        ) : null}
+      </span>
       {children}
     </label>
   )

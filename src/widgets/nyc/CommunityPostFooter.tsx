@@ -3,6 +3,7 @@
 import Link from 'next/link'
 
 import { getCommunityAuthorDisplayName } from '@lib/community/author'
+import { maskAnonymousDisplayName } from '@lib/community/anonymous'
 import { UserAvatar, SchoolBadge } from '@components'
 import type { CommunityPost } from '@/types/nyc'
 import { CommunityEngagementBar } from '@widgets/nyc/CommunityEngagementBar'
@@ -30,7 +31,7 @@ export function CommunityPostFooter({
   onDelete,
 }: CommunityPostFooterProps) {
   const authorName = anonymous
-    ? '익명'
+    ? maskAnonymousDisplayName('익명')
     : getCommunityAuthorDisplayName(post)
   const authorInitial = authorName.charAt(0).toUpperCase()
   const photoURL = anonymous ? null : post.authorPhotoURL?.trim() || null
@@ -39,13 +40,14 @@ export function CommunityPostFooter({
     <div className='rounded-2xl border border-black/[0.04] bg-[#f7f8fa] px-4 py-3.5 sm:px-5 sm:py-4'>
       <div className='flex items-center justify-between gap-3'>
         <div className='flex min-w-0 items-center gap-3'>
-          <UserAvatar
-            photoURL={photoURL}
-            initial={authorInitial}
-            size='lg'
-            muted={anonymous}
-            className='ring-2 ring-white shadow-sm shadow-black/[0.04]'
-          />
+          {!anonymous ? (
+            <UserAvatar
+              photoURL={photoURL}
+              initial={authorInitial}
+              size='lg'
+              className='ring-2 ring-white shadow-sm shadow-black/[0.04]'
+            />
+          ) : null}
           <div className='flex min-w-0 items-center gap-2'>
             <p className='truncate text-[15px] font-semibold tracking-[-0.01em] text-[var(--foreground)]'>
               {authorName}
