@@ -55,8 +55,7 @@ export function NycLoginScreen() {
     [configured],
   )
   const needsTermsAcceptance = mode === 'signup'
-  const canSubmitAuth =
-    !needsTermsAcceptance || acceptedTerms
+  const canSubmitAuth = !needsTermsAcceptance || acceptedTerms
 
   const consentPayload = useMemo(
     () => ({

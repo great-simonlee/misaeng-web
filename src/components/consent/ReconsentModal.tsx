@@ -3,14 +3,11 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { useBodyScrollLock } from '@hooks/useBodyScrollLock'
 import { CONSENT_COPY } from '@lib/consent/copy'
-import {
-  PRIVACY_HREF,
-  TERMS_HREF,
-} from '@lib/consent/copy'
+import { PRIVACY_HREF, TERMS_HREF } from '@lib/consent/copy'
 import type { ConsentStatus } from '@lib/consent/types'
 
-import { BilingualStack } from './BilingualStack'
 import {
   ConsentLocaleToggle,
   useConsentLocale,
@@ -29,6 +26,8 @@ export function ReconsentModal({ status, onAgreed }: ReconsentModalProps) {
   const [error, setError] = useState(false)
   const [saving, setSaving] = useState(false)
 
+  useBodyScrollLock(true)
+
   async function handleContinue() {
     if (!accepted) {
       setError(true)
@@ -45,16 +44,30 @@ export function ReconsentModal({ status, onAgreed }: ReconsentModalProps) {
     }
   }
 
+  const summary =
+    locale === 'ko'
+      ? status.policy.summaryKo || CONSENT_COPY.ko.reconsentBody
+      : status.policy.summaryEn || CONSENT_COPY.en.reconsentBody
+
   return (
     <div
-      className='fixed inset-0 z-[80] flex items-end justify-center bg-black/50 p-4 sm:items-center'
+      className='fixed inset-0 z-[10050] flex items-end justify-center overscroll-none bg-black/55 p-4 sm:items-center'
       role='dialog'
       aria-modal='true'
       aria-labelledby='reconsent-title'
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') e.stopPropagation()
+      }}
     >
-      <div className='max-h-[92vh] w-full max-w-[440px] overflow-y-auto rounded-[1.5rem] bg-white p-5 shadow-2xl sm:p-6'>
+      <div
+        className='absolute inset-0 touch-none'
+        aria-hidden
+        onClick={(e) => e.stopPropagation()}
+        onWheel={(e) => e.preventDefault()}
+      />
+      <div className='relative max-h-[92vh] w-full max-w-[440px] overflow-y-auto overscroll-contain rounded-[1.5rem] bg-white p-5 shadow-2xl touch-pan-y sm:p-6'>
         <div className='flex items-start justify-between gap-3'>
-          <div>
+          <div className='min-w-0'>
             <p className='text-[11px] font-medium tracking-[0.18em] text-[#8b95a7]'>
               MISAENG NYC
             </p>
@@ -62,23 +75,19 @@ export function ReconsentModal({ status, onAgreed }: ReconsentModalProps) {
               id='reconsent-title'
               className='mt-1 text-[1.25rem] font-semibold tracking-[-0.02em] text-[var(--foreground)]'
             >
-              {CONSENT_COPY.en.reconsentTitle}
+              {copy.reconsentTitle}
             </h2>
-            <p className='mt-0.5 text-[13px] text-[#667085]'>
-              {CONSENT_COPY.ko.reconsentTitle}
-            </p>
           </div>
-          <ConsentLocaleToggle />
+          <ConsentLocaleToggle className='shrink-0' />
         </div>
 
-        <BilingualStack
-          className='mt-4'
-          en={status.policy.summaryEn || CONSENT_COPY.en.reconsentBody}
-          ko={status.policy.summaryKo || CONSENT_COPY.ko.reconsentBody}
-        />
+        <p className='mt-4 text-[13px] leading-relaxed text-[var(--foreground)]'>
+          {summary}
+        </p>
 
         <p className='mt-3 text-[12px] text-[#98a2b3]'>
-          Terms {status.policy.termsVersion} · Privacy {status.policy.privacyVersion}
+          Terms {status.policy.termsVersion} · Privacy{' '}
+          {status.policy.privacyVersion}
         </p>
 
         <div className='mt-3 flex gap-3 text-[13px]'>
@@ -88,7 +97,7 @@ export function ReconsentModal({ status, onAgreed }: ReconsentModalProps) {
             rel='noopener noreferrer'
             className='font-semibold text-[#F64310] underline-offset-2 hover:underline'
           >
-            {CONSENT_COPY.en.termsLink} / {CONSENT_COPY.ko.termsLink}
+            {copy.termsLink}
           </Link>
           <Link
             href={PRIVACY_HREF}
@@ -96,7 +105,7 @@ export function ReconsentModal({ status, onAgreed }: ReconsentModalProps) {
             rel='noopener noreferrer'
             className='font-semibold text-[#F64310] underline-offset-2 hover:underline'
           >
-            {CONSENT_COPY.en.privacyLink} / {CONSENT_COPY.ko.privacyLink}
+            {copy.privacyLink}
           </Link>
         </div>
 
@@ -118,9 +127,7 @@ export function ReconsentModal({ status, onAgreed }: ReconsentModalProps) {
           disabled={saving || !accepted}
           className='mt-4 min-h-[48px] w-full rounded-full bg-[linear-gradient(135deg,#ff4c14_0%,#f64310_50%,#df390e_100%)] text-[15px] font-semibold text-white shadow-[0_10px_20px_rgba(246,67,16,0.24)] transition hover:brightness-[1.03] disabled:cursor-not-allowed disabled:opacity-50'
         >
-          {saving
-            ? copy.saving
-            : `${CONSENT_COPY.en.reconsentConfirm} / ${CONSENT_COPY.ko.reconsentConfirm}`}
+          {saving ? copy.saving : copy.reconsentConfirm}
         </button>
       </div>
     </div>
