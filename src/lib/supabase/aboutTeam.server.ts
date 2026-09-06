@@ -98,15 +98,17 @@ export async function getAboutTeamMembers(): Promise<AboutTeamMember[]> {
     headers: storageHeaders(),
   })
   if (!res?.ok) return DEFAULT_ABOUT_TEAM
-  const stored = await res.json().catch(() => null)
-  const rawList = Array.isArray(stored)
+  const stored: unknown = await res.json().catch(() => null)
+  const rawList: unknown[] | null = Array.isArray(stored)
     ? stored
-    : Array.isArray(stored?.members)
-      ? stored.members
+    : stored &&
+        typeof stored === 'object' &&
+        Array.isArray((stored as { members?: unknown }).members)
+      ? (stored as { members: unknown[] }).members
       : null
   if (!rawList) return DEFAULT_ABOUT_TEAM
   return rawList
-    .map((item, index) => normalizeMember(item, index))
+    .map((item: unknown, index: number) => normalizeMember(item, index))
     .filter((item): item is AboutTeamMember => Boolean(item))
     .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name))
     .map((member, index) => ({ ...member, sortOrder: index }))
