@@ -1,9 +1,11 @@
-import { AboutScreen } from '@screens/about/AboutScreen'
+import { NextResponse } from 'next/server'
+
 import { getAboutTeamMembers } from '@lib/supabase/aboutTeam.server'
 
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-export default async function AboutPage() {
+export async function GET() {
   const members = await getAboutTeamMembers()
-  return <AboutScreen members={members} />
+  return NextResponse.json({ members })
 }

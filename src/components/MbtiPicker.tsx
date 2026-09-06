@@ -105,7 +105,6 @@ export function MbtiPicker({
         open={open}
         onClose={() => setOpen(false)}
         title='MBTI 선택'
-        overlayClassName='z-[10002]'
         scrollable={false}
         footer={
           <div className='flex items-center justify-between gap-3 px-4 py-2.5'>

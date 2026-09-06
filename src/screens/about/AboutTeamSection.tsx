@@ -3,6 +3,8 @@
 import Image from 'next/image'
 import { useState } from 'react'
 
+import { descriptionParagraphs, type AboutTeamMember } from '@lib/about/team'
+
 /** Mobile-only (sm:hidden parent): full-width, 48px+ touch target, clean iOS-adjacent row */
 function MobileReadBioButton({ onClick }: { onClick: () => void }) {
   return (
@@ -55,6 +57,7 @@ function MobileShowLessBioButton({ onClick }: { onClick: () => void }) {
 }
 
 function MailRow({ email }: { email: string }) {
+  if (!email) return null
   return (
     <div className='mt-6 flex items-center gap-2.5'>
       <span
@@ -85,38 +88,125 @@ function MailRow({ email }: { email: string }) {
   )
 }
 
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return '?'
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+}
+
 function Portrait({
   src,
   alt,
+  name,
   priority,
 }: {
   src: string
   alt: string
+  name: string
   priority?: boolean
 }) {
+  const url = String(src || '').trim()
+  const isRemote = /^https?:\/\//i.test(url)
+  const isLocal = url.startsWith('/')
+
   return (
     <div className='relative mx-auto aspect-square w-44 shrink-0 overflow-hidden rounded-full shadow-[0_16px_48px_-20px_rgba(0,0,0,0.35)] ring-2 ring-[#F64310]/25 sm:w-52 md:mx-0 md:w-56'>
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        className='object-cover object-center'
-        sizes='(max-width: 768px) 176px, 224px'
-        priority={priority}
-      />
+      {isRemote ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={url} alt={alt} className='absolute inset-0 h-full w-full object-cover object-center' />
+      ) : isLocal ? (
+        <Image
+          src={url}
+          alt={alt}
+          fill
+          className='object-cover object-center'
+          sizes='(max-width: 768px) 176px, 224px'
+          priority={priority}
+        />
+      ) : (
+        <div className='flex h-full w-full items-center justify-center bg-[#F64310]/10 text-3xl font-semibold text-[#F64310]'>
+          {initials(name)}
+        </div>
+      )}
     </div>
   )
 }
 
-const textBlock =
-  'min-w-0 border-l-[3px] border-[#F64310] pl-5 sm:pl-7 md:max-w-2xl'
+function BioParagraphs({
+  paragraphs,
+  compact,
+}: {
+  paragraphs: string[]
+  compact?: boolean
+}) {
+  if (paragraphs.length === 0) return null
+  const gap = compact ? 'space-y-3' : 'space-y-4'
+  const leading = compact ? 'leading-[1.65]' : 'leading-[1.7]'
+  return (
+    <div className={gap}>
+      {paragraphs.map((paragraph, index) => (
+        <p key={index} className={`text-sm ${leading} text-[var(--muted-foreground)]`}>
+          {paragraph}
+        </p>
+      ))}
+    </div>
+  )
+}
 
-export function AboutTeamSection() {
-  const [bioExpanded, setBioExpanded] = useState(false)
-  const [mimiBioExpanded, setMimiBioExpanded] = useState(false)
-  const [lauraBioExpanded, setLauraBioExpanded] = useState(false)
-  const [dalstonBioExpanded, setDalstonBioExpanded] = useState(false)
-  const [euniceBioExpanded, setEuniceBioExpanded] = useState(false)
+const textBlock = 'min-w-0 border-l-[3px] border-[#F64310] pl-5 sm:pl-7 md:max-w-2xl'
+
+function MemberCopy({
+  member,
+  expanded,
+  onToggle,
+  compactBio,
+}: {
+  member: AboutTeamMember
+  expanded: boolean
+  onToggle: () => void
+  compactBio: boolean
+}) {
+  const paragraphs = descriptionParagraphs(member.description)
+
+  return (
+    <div className={textBlock}>
+      <h3 className='text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl'>
+        {member.name}
+      </h3>
+      {member.position ? (
+        <p className='mt-1 text-sm font-semibold text-[#F64310]'>{member.position}</p>
+      ) : null}
+      {member.role ? (
+        <p className='mt-1 text-xs leading-snug text-[var(--muted-foreground)] sm:text-sm'>
+          {member.role}
+        </p>
+      ) : null}
+      {paragraphs.length > 0 ? (
+        <>
+          <div className='mt-5 hidden sm:block'>
+            <BioParagraphs paragraphs={paragraphs} compact={compactBio} />
+          </div>
+          <div className='mt-4 sm:hidden'>
+            {expanded ? (
+              <>
+                <BioParagraphs paragraphs={paragraphs} compact={compactBio} />
+                <MobileShowLessBioButton onClick={onToggle} />
+              </>
+            ) : (
+              <MobileReadBioButton onClick={onToggle} />
+            )}
+          </div>
+        </>
+      ) : null}
+      <MailRow email={member.email} />
+    </div>
+  )
+}
+
+export function AboutTeamSection({ members }: { members: AboutTeamMember[] }) {
+  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({})
+  const team = Array.isArray(members) ? members : []
 
   return (
     <section
@@ -140,292 +230,59 @@ export function AboutTeamSection() {
         </p>
       </div>
 
-      <div className='mt-14 space-y-0 md:mt-16'>
-        {/* Seunghoon — photo left */}
-        <article className='flex flex-col gap-10 md:grid md:grid-cols-[minmax(180px,34%)_1fr] md:items-center md:gap-x-12 md:gap-y-0 lg:gap-x-16'>
-          <div className='flex justify-center md:justify-end md:pr-4'>
-            <Portrait
-              src='/img/simon_image.JPG'
-              alt='Seunghoon Lee — Founder & Managing Member'
-              priority
-            />
-          </div>
-          <div className={textBlock}>
-            <h3 className='text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl'>
-              Seunghoon Lee
-            </h3>
-            <p className='mt-1 text-sm font-semibold text-[#F64310]'>Founder & Managing Member</p>
-            <p className='mt-1 text-xs leading-snug text-[var(--muted-foreground)] sm:text-sm'>
-              Strategic Investment & Business Architecture
-            </p>
-            <div className='mt-5 hidden space-y-4 sm:block'>
-              <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
-                As the Founder and Major Investor of Misaeng, I am currently leading the strategic
-                deployment of capital and the establishment of our U.S. operational infrastructure. My
-                focus is on building a scalable business model that brings transparency to the New York
-                City housing market through verified listings and professional, preference-based
-                matching.
-              </p>
-              <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
-                To maintain the highest level of governance, I oversee the high-level corporate strategy
-                and investment roadmap, while our New York-based Operations Manager executes daily field
-                activities and partnership management. This structural separation ensures that our
-                expansion is driven by robust professional standards and long-term investment goals.
-              </p>
-            </div>
-            <div className='mt-4 sm:hidden'>
-              {bioExpanded ? (
-                <>
-                  <div className='space-y-4'>
-                    <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
-                      As the Founder and Major Investor of Misaeng, I am currently leading the strategic
-                      deployment of capital and the establishment of our U.S. operational infrastructure.
-                      My focus is on building a scalable business model that brings transparency to the
-                      New York City housing market through verified listings and professional,
-                      preference-based matching.
-                    </p>
-                    <p className='text-sm leading-[1.7] text-[var(--muted-foreground)]'>
-                      To maintain the highest level of governance, I oversee the high-level corporate
-                      strategy and investment roadmap, while our New York-based Operations Manager executes
-                      daily field activities and partnership management. This structural separation
-                      ensures that our expansion is driven by robust professional standards and long-term
-                      investment goals.
-                    </p>
-                  </div>
-                  <MobileShowLessBioButton onClick={() => setBioExpanded(false)} />
-                </>
-              ) : (
-                <MobileReadBioButton onClick={() => setBioExpanded(true)} />
-              )}
-            </div>
-            <MailRow email='simon@misaeng.com' />
-          </div>
-        </article>
+      {team.length === 0 ? null : (
+        <div className='mt-14 space-y-0 md:mt-16'>
+          {team.map((member, index) => {
+            const photoLeft = index % 2 === 0
+            const compactBio = index !== 0
+            const alt = [member.name, member.position, member.role].filter(Boolean).join(' — ')
+            const expanded = Boolean(expandedIds[member.id])
+            const portrait = (
+              <Portrait
+                src={member.photoURL}
+                alt={alt || member.name}
+                name={member.name}
+                priority={index === 0}
+              />
+            )
+            const copy = (
+              <MemberCopy
+                member={member}
+                expanded={expanded}
+                compactBio={compactBio}
+                onToggle={() =>
+                  setExpandedIds((prev) => ({ ...prev, [member.id]: !prev[member.id] }))
+                }
+              />
+            )
 
-        {/* Laura — photo right (mobile: photo first via flex-col-reverse) */}
-        <article className='mt-12 flex flex-col-reverse gap-10 border-t border-[var(--border)] pt-12 md:mt-16 md:grid md:grid-cols-[1fr_minmax(180px,34%)] md:items-center md:gap-x-12 md:gap-y-0 lg:gap-x-16'>
-          <div className={textBlock}>
-            <h3 className='text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl'>
-              Laura Fanelli
-            </h3>
-            <p className='mt-1 text-sm font-semibold text-[#F64310]'>Sales & Operations Manager</p>
-            <p className='mt-1 text-xs leading-snug text-[var(--muted-foreground)] sm:text-sm'>
-              Team Lead of Business Operations & Talent Management
-            </p>
-            <div className='mt-5 hidden space-y-3 sm:block'>
-              <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                As the Operations Manager at Misaeng, I oversee hiring, client relations, and on-site
-                property tours for interested renters. I strive to find the right properties to match
-                tenant preferences and that ultimately feel like home.
-              </p>
-              <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                At Misaeng, we find people looking for the same things in a home and help bring them
-                together to make the hassle of finding a living situation in NYC smoother. It is my job to
-                make sure you are not alone in the renting process, which can be vast and overwhelming.
-                I&apos;ve lived in the city for over 10 years and bring that lived knowledge to finding you
-                a spot that works best for you.
-              </p>
-            </div>
-            <div className='mt-4 sm:hidden'>
-              {lauraBioExpanded ? (
-                <>
-                  <div className='space-y-3'>
-                    <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                      As the Operations Manager at Misaeng, I oversee hiring, client relations, and on-site
-                      property tours for interested renters. I strive to find the right properties to match
-                      tenant preferences and that ultimately feel like home.
-                    </p>
-                    <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                      At Misaeng, we find people looking for the same things in a home and help bring them
-                      together to make the hassle of finding a living situation in NYC smoother. It is my
-                      job to make sure you are not alone in the renting process, which can be vast and
-                      overwhelming. I&apos;ve lived in the city for over 10 years and bring that lived
-                      knowledge to finding you a spot that works best for you.
-                    </p>
-                  </div>
-                  <MobileShowLessBioButton onClick={() => setLauraBioExpanded(false)} />
-                </>
-              ) : (
-                <MobileReadBioButton onClick={() => setLauraBioExpanded(true)} />
-              )}
-            </div>
-            <MailRow email='laura@misaeng.com' />
-          </div>
-          <div className='flex justify-center md:justify-start md:pl-4'>
-            <Portrait
-              src='/img/laura.png'
-              alt='Laura Fanelli — Sales & Operations Manager, Team Lead of Business Operations & Talent Management'
-            />
-          </div>
-        </article>
-
-        {/* Mimi — photo left again */}
-        <article className='mt-12 flex flex-col gap-10 border-t border-[var(--border)] pt-12 md:mt-16 md:grid md:grid-cols-[minmax(180px,34%)_1fr] md:items-center md:gap-x-12 md:gap-y-0 lg:gap-x-16'>
-          <div className='flex justify-center md:justify-end md:pr-4'>
-            <Portrait
-              src='/img/mimi.png'
-              alt='Mimi Nguyen — Sales Associate, Client Relations & Strategic Partnerships'
-            />
-          </div>
-          <div className={textBlock}>
-            <h3 className='text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl'>
-              Mimi Nguyen
-            </h3>
-            <p className='mt-1 text-sm font-semibold text-[#F64310]'>Sales Associate</p>
-            <p className='mt-1 text-xs leading-snug text-[var(--muted-foreground)] sm:text-sm'>
-              Client Relations & Strategic Partnerships
-            </p>
-            <div className='mt-5 hidden space-y-3 sm:block'>
-              <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                As a Sales Client professional, I focus on building strong, long-term relationships with
-                clients and delivering tailored solutions that drive measurable results. My approach centers
-                on understanding client needs, ensuring exceptional service, and creating value at every
-                stage of our partnership.
-              </p>
-              <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                I am committed to clear communication, attention to detail, and a client-first mindset that
-                supports both immediate goals and long-term success. By aligning our services with each
-                client&apos;s unique objectives, I help ensure their satisfaction and growth.
-              </p>
-            </div>
-            <div className='mt-4 sm:hidden'>
-              {mimiBioExpanded ? (
-                <>
-                  <div className='space-y-3'>
-                    <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                      As a Sales Client professional, I focus on building strong, long-term relationships
-                      with clients and delivering tailored solutions that drive measurable results. My
-                      approach centers on understanding client needs, ensuring exceptional service, and
-                      creating value at every stage of our partnership.
-                    </p>
-                    <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                      I am committed to clear communication, attention to detail, and a client-first mindset
-                      that supports both immediate goals and long-term success. By aligning our services with
-                      each client&apos;s unique objectives, I help ensure their satisfaction and growth.
-                    </p>
-                  </div>
-                  <MobileShowLessBioButton onClick={() => setMimiBioExpanded(false)} />
-                </>
-              ) : (
-                <MobileReadBioButton onClick={() => setMimiBioExpanded(true)} />
-              )}
-            </div>
-            <MailRow email='mimi@misaeng.com' />
-          </div>
-        </article>
-
-        {/* Dalston — photo right */}
-        <article className='mt-12 flex flex-col-reverse gap-10 border-t border-[var(--border)] pt-12 md:mt-16 md:grid md:grid-cols-[1fr_minmax(180px,34%)] md:items-center md:gap-x-12 md:gap-y-0 lg:gap-x-16'>
-          <div className={textBlock}>
-            <h3 className='text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl'>
-              Dalston Vuong
-            </h3>
-            <p className='mt-1 text-sm font-semibold text-[#F64310]'>
-              Partnership & Operations Intern
-            </p>
-            <p className='mt-1 text-xs leading-snug text-[var(--muted-foreground)] sm:text-sm'>
-              Client Outreach & Housing Relations
-            </p>
-            <div className='mt-5 hidden space-y-3 sm:block'>
-              <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                As a Partnership & Operations Intern at Misaeng, I focus on connecting students and
-                professionals with verified housing options across New York City. My day to day centers
-                on client outreach — understanding what people are looking for, matching them with the
-                right properties, and making sure the process feels straightforward from first contact to
-                move-in.
-              </p>
-              <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                Growing up around rental properties in the NYC area has given me a natural understanding
-                of how the housing market works from both sides of the table. I bring that perspective
-                to every client interaction, alongside a background in business and finance from
-                Binghamton University&apos;s School of Management.
-              </p>
-            </div>
-            <div className='mt-4 sm:hidden'>
-              {dalstonBioExpanded ? (
-                <>
-                  <div className='space-y-3'>
-                    <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                      As a Partnership & Operations Intern at Misaeng, I focus on connecting students
-                      and professionals with verified housing options across New York City. My day to day
-                      centers on client outreach — understanding what people are looking for, matching
-                      them with the right properties, and making sure the process feels straightforward
-                      from first contact to move-in.
-                    </p>
-                    <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                      Growing up around rental properties in the NYC area has given me a natural
-                      understanding of how the housing market works from both sides of the table. I
-                      bring that perspective to every client interaction, alongside a background in
-                      business and finance from Binghamton University&apos;s School of Management.
-                    </p>
-                  </div>
-                  <MobileShowLessBioButton onClick={() => setDalstonBioExpanded(false)} />
-                </>
-              ) : (
-                <MobileReadBioButton onClick={() => setDalstonBioExpanded(true)} />
-              )}
-            </div>
-            <MailRow email='dalston@misaeng.com' />
-          </div>
-          <div className='flex justify-center md:justify-start md:pl-4'>
-            <Portrait
-              src='/img/dalston.png'
-              alt='Dalston Vuong — Partnership & Operations Intern, Client Outreach & Housing Relations'
-            />
-          </div>
-        </article>
-
-        {/* Eunice — photo left */}
-        <article className='mt-12 flex flex-col gap-10 border-t border-[var(--border)] pt-12 md:mt-16 md:grid md:grid-cols-[minmax(180px,34%)_1fr] md:items-center md:gap-x-12 md:gap-y-0 lg:gap-x-16'>
-          <div className='flex justify-center md:justify-end md:pr-4'>
-            <Portrait
-              src='/img/eunice.png'
-              alt='Eunice Jeon — Partnership & Operations Intern, Client Outreach & Housing Relations'
-            />
-          </div>
-          <div className={textBlock}>
-            <h3 className='text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl'>
-              Eunice Jeon
-            </h3>
-            <p className='mt-1 text-sm font-semibold text-[#F64310]'>
-              Partnership & Operations Intern
-            </p>
-            <p className='mt-1 text-xs leading-snug text-[var(--muted-foreground)] sm:text-sm'>
-              Client Outreach & Housing Relations
-            </p>
-            <div className='mt-5 hidden sm:block'>
-              <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                As a Partnership & Operations Intern at Misaeng, I focus on expanding Ellieo&apos;s
-                reach by identifying housing providers across New York City and building relationships
-                with clients. Through accurate data collection and organized communication, I connect the
-                right partners with the right opportunities. My hands-on approach to developing a trusted
-                housing community supports platform growth and partner success. By combining outreach
-                efforts and a driven mindset with Ellieo&apos;s mission, I help students access verified,
-                quality housing.
-              </p>
-            </div>
-            <div className='mt-4 sm:hidden'>
-              {euniceBioExpanded ? (
-                <>
-                  <p className='text-sm leading-[1.65] text-[var(--muted-foreground)]'>
-                    As a Partnership & Operations Intern at Misaeng, I focus on expanding Ellieo&apos;s
-                    reach by identifying housing providers across New York City and building relationships
-                    with clients. Through accurate data collection and organized communication, I connect
-                    the right partners with the right opportunities. My hands-on approach to developing a
-                    trusted housing community supports platform growth and partner success. By combining
-                    outreach efforts and a driven mindset with Ellieo&apos;s mission, I help students
-                    access verified, quality housing.
-                  </p>
-                  <MobileShowLessBioButton onClick={() => setEuniceBioExpanded(false)} />
-                </>
-              ) : (
-                <MobileReadBioButton onClick={() => setEuniceBioExpanded(true)} />
-              )}
-            </div>
-            <MailRow email='eunice@misaeng.com' />
-          </div>
-        </article>
-      </div>
+            return (
+              <article
+                key={member.id}
+                className={
+                  photoLeft
+                    ? `flex flex-col gap-10 md:grid md:grid-cols-[minmax(180px,34%)_1fr] md:items-center md:gap-x-12 md:gap-y-0 lg:gap-x-16${
+                        index === 0 ? '' : ' mt-12 border-t border-[var(--border)] pt-12 md:mt-16'
+                      }`
+                    : 'mt-12 flex flex-col-reverse gap-10 border-t border-[var(--border)] pt-12 md:mt-16 md:grid md:grid-cols-[1fr_minmax(180px,34%)] md:items-center md:gap-x-12 md:gap-y-0 lg:gap-x-16'
+                }
+              >
+                {photoLeft ? (
+                  <>
+                    <div className='flex justify-center md:justify-end md:pr-4'>{portrait}</div>
+                    {copy}
+                  </>
+                ) : (
+                  <>
+                    {copy}
+                    <div className='flex justify-center md:justify-start md:pl-4'>{portrait}</div>
+                  </>
+                )}
+              </article>
+            )
+          })}
+        </div>
+      )}
     </section>
   )
 }

@@ -3,8 +3,9 @@
 import Image from 'next/image'
 
 import { AboutTeamSection } from './AboutTeamSection'
+import type { AboutTeamMember } from '@lib/about/team'
 
-export function AboutScreen() {
+export function AboutScreen({ members }: { members: AboutTeamMember[] }) {
   return (
     <div className='min-h-screen min-w-0 overflow-x-hidden bg-[var(--background)]'>
       {/* Hero */}
@@ -150,7 +151,7 @@ export function AboutScreen() {
         </p>
       </section>
 
-      <AboutTeamSection />
+      <AboutTeamSection members={members} />
 
       {/* Office & Contact */}
       <section className='mx-auto max-w-7xl border-t border-[var(--border)] px-4 pt-8 pb-12 sm:px-6 sm:pt-10 sm:pb-16 lg:px-8'>

@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
+import { useBodyScrollLock } from '@hooks/useBodyScrollLock'
 import { cn } from '@lib'
 
 type BottomSheetProps = {
@@ -13,14 +15,14 @@ type BottomSheetProps = {
   footer?: ReactNode
   /** 시트 본문 최대 높이 (기본: 70dvh) */
   maxHeightClassName?: string
-  /** 중첩 시트 등 z-index 조정 (기본: z-[10001]) */
+  /** 중첩 시트 등 z-index 조정 (기본: 헤더·푸터보다 위) */
   overlayClassName?: string
   /** 본문 스크롤 비활성화 (컴팩트 시트용) */
   scrollable?: boolean
   className?: string
 }
 
-/** 하단에서 올라오는 공용 바텀시트 */
+/** 하단에서 올라오는 공용 바텀시트 — body 포털로 헤더/푸터 위에 표시 */
 export function BottomSheet({
   open,
   onClose,
@@ -28,32 +30,28 @@ export function BottomSheet({
   children,
   footer,
   maxHeightClassName = 'max-h-[min(70dvh,560px)]',
-  overlayClassName = 'z-[10001]',
+  overlayClassName = 'z-[10050]',
   scrollable = true,
   className,
 }: BottomSheetProps) {
+  useBodyScrollLock(open)
+
   useEffect(() => {
     if (!open) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
 
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', onKey)
-
-    return () => {
-      document.body.style.overflow = prev
-      window.removeEventListener('keydown', onKey)
-    }
+    return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose])
 
-  if (!open) return null
+  if (!open || typeof document === 'undefined') return null
 
-  return (
+  return createPortal(
     <div
       className={cn(
-        'fixed inset-0 flex items-end justify-center sm:items-center',
+        'fixed inset-0 flex items-end justify-center overscroll-none sm:items-center',
         overlayClassName,
       )}
       role='dialog'
@@ -63,8 +61,9 @@ export function BottomSheet({
       <button
         type='button'
         aria-label='닫기'
-        className='absolute inset-0 bg-black/40 backdrop-blur-[2px] nyc-sheet-backdrop'
+        className='absolute inset-0 touch-none bg-black/40 backdrop-blur-[2px] nyc-sheet-backdrop'
         onClick={onClose}
+        onWheel={(e) => e.preventDefault()}
       />
       <div
         className={cn(
@@ -94,7 +93,7 @@ export function BottomSheet({
         </div>
         <div
           className={cn(
-            'min-h-0 flex-1 overflow-x-hidden overscroll-contain px-2',
+            'min-h-0 flex-1 overflow-x-hidden overscroll-contain touch-pan-y px-2',
             scrollable ? 'overflow-y-auto' : 'overflow-y-hidden',
             footer
               ? 'pb-3'
@@ -109,6 +108,7 @@ export function BottomSheet({
           </div>
         ) : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
