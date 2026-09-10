@@ -195,8 +195,30 @@ function CreateTimelineForm({
       <GuideBox
         tone='create'
         title='날짜별로 여러 건을 한 번에 남겨 주세요'
-        description='날짜를 고른 뒤 그날에 한 일을 적고, 「이 기록 추가」로 목록에 넣은 다음 다음 날짜를 이어서 작성할 수 있어요. 추가한 기록은 수정·삭제도 가능합니다.'
+        description='날짜를 고른 뒤 그날에 한 일을 적고, 「이 기록 추가」로 목록에 넣은 다음 다음 날짜를 이어서 작성할 수 있어요. 추가한 기록은 위 목록에서 수정·삭제할 수 있습니다.'
       />
+
+      {savedEntries.length > 0 ? (
+        <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
+          <SectionHeading
+            title={`추가된 기록 ${savedEntries.length}건`}
+            description='작성칸 위에 쌓여요. 수정·삭제로 날짜별 내용을 관리하세요'
+          />
+          {savedEntries.map((entry, index) => {
+            const isActiveEdit = draftMode === 'edit' && draft.id === entry.id
+            return (
+              <SavedEntryRow
+                key={entry.id}
+                entry={entry}
+                index={index}
+                active={isActiveEdit}
+                onEdit={() => startEdit(entry)}
+                onRemove={() => removeSaved(entry.id)}
+              />
+            )
+          })}
+        </section>
+      ) : null}
 
       <section className='space-y-2.5'>
         <div className='flex items-center justify-between gap-2'>
@@ -266,28 +288,6 @@ function CreateTimelineForm({
           </p>
         )}
       </section>
-
-      {savedEntries.length > 0 ? (
-        <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
-          <SectionHeading
-            title={`추가된 기록 ${savedEntries.length}건`}
-            description='수정·삭제로 날짜별 내용을 관리할 수 있어요'
-          />
-          {savedEntries.map((entry, index) => {
-            const isActiveEdit = draftMode === 'edit' && draft.id === entry.id
-            return (
-              <SavedEntryRow
-                key={entry.id}
-                entry={entry}
-                index={index}
-                active={isActiveEdit}
-                onEdit={() => startEdit(entry)}
-                onRemove={() => removeSaved(entry.id)}
-              />
-            )
-          })}
-        </section>
-      ) : null}
     </div>
   )
 }
@@ -435,6 +435,32 @@ function UpdateTimelineForm({
         }
       />
 
+      {savedEntries.length > 0 ? (
+        <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
+          <SectionHeading
+            title={`저장된 기록 ${savedEntries.length}건`}
+            description='작성칸 위에 쌓여요. 수정·삭제로 날짜별 내용을 관리하세요'
+          />
+          {savedEntries.map((entry, index) => {
+            const isActiveEdit = draftMode === 'edit' && draft.id === entry.id
+            return (
+              <SavedEntryRow
+                key={entry.id}
+                entry={entry}
+                index={index}
+                active={isActiveEdit}
+                onEdit={() => startEdit(entry)}
+                onRemove={
+                  savedEntries.length > 1 || isTimelineEntryFilled(draft)
+                    ? () => removeSaved(entry.id)
+                    : undefined
+                }
+              />
+            )
+          })}
+        </section>
+      ) : null}
+
       <section className='space-y-2.5'>
         <div className='flex items-center justify-between gap-2'>
           <div>
@@ -503,32 +529,6 @@ function UpdateTimelineForm({
           </p>
         )}
       </section>
-
-      {savedEntries.length > 0 ? (
-        <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
-          <SectionHeading
-            title={`저장된 기록 ${savedEntries.length}건`}
-            description='수정·삭제로 날짜별 내용을 관리할 수 있어요'
-          />
-          {savedEntries.map((entry, index) => {
-            const isActiveEdit = draftMode === 'edit' && draft.id === entry.id
-            return (
-              <SavedEntryRow
-                key={entry.id}
-                entry={entry}
-                index={index}
-                active={isActiveEdit}
-                onEdit={() => startEdit(entry)}
-                onRemove={
-                  savedEntries.length > 1 || isTimelineEntryFilled(draft)
-                    ? () => removeSaved(entry.id)
-                    : undefined
-                }
-              />
-            )
-          })}
-        </section>
-      ) : null}
     </div>
   )
 }

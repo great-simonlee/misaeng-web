@@ -39,6 +39,10 @@ import {
 import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
 import { CptOptTimelineEditor } from '@widgets/nyc/CptOptTimelineEditor'
 import { CptOptTypeBadge, CptOptTypePicker } from '@widgets/nyc/CptOptTypeBadge'
+import {
+  CptOptWriteOrientationModal,
+  useStatusWriteOrientation,
+} from '@widgets/nyc/CptOptWriteOrientationModal'
 import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 import { StatusEmployerSelect } from '@widgets/nyc/StatusEmployerSelect'
@@ -72,6 +76,7 @@ export function CptOptWriteScreen({
   const [timeline, setTimeline] = useState<CptOptTimelineEntry[]>([])
   const [existingTimelineIds, setExistingTimelineIds] = useState<string[]>([])
   const [showMoreSettings, setShowMoreSettings] = useState(false)
+  const orientation = useStatusWriteOrientation(!isEdit)
 
   useEffect(() => {
     if (!editPostId || !user?.uid) return
@@ -250,7 +255,10 @@ export function CptOptWriteScreen({
             recordCount={existingTimelineIds.length}
           />
         ) : (
-          <CreateHero writeLabel={meta.writeLabel} />
+          <CreateHero
+            writeLabel={meta.writeLabel}
+            onOpenGuide={orientation.openManual}
+          />
         )}
 
         <CommunityWritingGuidelines className='mt-5' />
@@ -437,16 +445,38 @@ export function CptOptWriteScreen({
           </p>
         </form>
       </div>
+
+      {!isEdit ? (
+        <CptOptWriteOrientationModal
+          open={orientation.open}
+          onClose={orientation.close}
+        />
+      ) : null}
     </BoardPageShell>
   )
 }
 
-function CreateHero({ writeLabel }: { writeLabel: string }) {
+function CreateHero({
+  writeLabel,
+  onOpenGuide,
+}: {
+  writeLabel: string
+  onOpenGuide: () => void
+}) {
   return (
     <div className='rounded-2xl bg-[#f7f8fa] px-4 py-5 ring-1 ring-black/[0.04] sm:px-5'>
-      <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--muted)]'>
-        최초 등록
-      </p>
+      <div className='flex items-start justify-between gap-3'>
+        <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--muted)]'>
+          최초 등록
+        </p>
+        <button
+          type='button'
+          onClick={onOpenGuide}
+          className='shrink-0 rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/20 touch-manipulation hover:bg-[#fff8f5]'
+        >
+          작성 가이드
+        </button>
+      </div>
       <h1 className='mt-1.5 text-[1.35rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.55rem]'>
         {writeLabel}
       </h1>
