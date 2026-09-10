@@ -47,8 +47,27 @@ export function CommunityCommentsSection({
   loginNext,
   onCountChange,
 }: CommunityCommentsSectionProps) {
-  const { user, profile, loading: authLoading } = useAuth()
+  const { user, profile, nickname, loading: authLoading } = useAuth()
   const { error: toastError, success } = useToast()
+  const myNickname = useMemo(
+    () =>
+      resolveCommunityNickname({
+        nickname: nickname ?? profile?.nickname,
+        displayName: profile?.displayName,
+        firstName: profile?.firstName,
+        lastName: profile?.lastName,
+        email: user?.email ?? profile?.email,
+      }),
+    [
+      nickname,
+      user?.email,
+      profile?.email,
+      profile?.nickname,
+      profile?.displayName,
+      profile?.firstName,
+      profile?.lastName,
+    ],
+  )
   const [comments, setComments] = useState<CommunityComment[]>([])
   const [loading, setLoading] = useState(true)
   const [draft, setDraft] = useState('')
@@ -66,14 +85,22 @@ export function CommunityCommentsSection({
     setLoading(true)
     try {
       const data = await fetchCommunityComments(postId)
-      setComments(data)
-      onCountChange?.(countOpenComments(data))
+      const normalized =
+        myNickname && user?.uid
+          ? data.map((item) =>
+              item.authorUid === user.uid && !item.authorNickname?.trim()
+                ? { ...item, authorNickname: myNickname }
+                : item,
+            )
+          : data
+      setComments(normalized)
+      onCountChange?.(countOpenComments(normalized))
     } catch (err) {
       toastError(getErrorMessage(err, '댓글을 불러오지 못했어요'))
     } finally {
       setLoading(false)
     }
-  }, [onCountChange, postId, toastError])
+  }, [myNickname, onCountChange, postId, toastError, user?.uid])
 
   useEffect(() => {
     void loadComments()
@@ -112,9 +139,7 @@ export function CommunityCommentsSection({
         parentId,
         authorUid: user.uid,
         authorEmail: user.email,
-        authorNickname: anonymousBoard
-          ? null
-          : resolveCommunityNickname(profile),
+        authorNickname: anonymousBoard ? null : myNickname,
         authorPhotoURL: anonymousBoard
           ? null
           : (profile?.photoURL ?? null),
@@ -122,8 +147,16 @@ export function CommunityCommentsSection({
           ? null
           : (profile?.verifiedSchoolId ?? null),
       })
+      // 응답에 닉네임이 비어 있으면 내 닉네임으로 보강
+      const withNickname =
+        !anonymousBoard && !created.authorNickname?.trim() && myNickname
+          ? { ...created, authorNickname: myNickname }
+          : created
       setComments((prev) => {
-        const next = [...prev.filter((item) => item.id !== created.id), created]
+        const next = [
+          ...prev.filter((item) => item.id !== withNickname.id),
+          withNickname,
+        ]
         onCountChange?.(countOpenComments(next))
         return next
       })
@@ -348,6 +381,7 @@ export function CommunityCommentsSection({
                 comment={thread}
                 anonymousBoard={anonymousBoard}
                 isAuthor={Boolean(user?.uid && user.uid === thread.authorUid)}
+                viewerNickname={myNickname}
                 canReport={Boolean(user)}
                 loginHref={loginHref}
                 deleting={deletingId === thread.id}
@@ -398,6 +432,7 @@ export function CommunityCommentsSection({
                       isAuthor={Boolean(
                         user?.uid && user.uid === reply.authorUid,
                       )}
+                      viewerNickname={myNickname}
                       canReport={Boolean(user)}
                       loginHref={loginHref}
                       isReply
@@ -490,6 +525,7 @@ function CommentItem({
   anonymousBoard,
   isReply = false,
   isAuthor = false,
+  viewerNickname = null,
   canReport = false,
   loginHref,
   deleting = false,
@@ -508,6 +544,7 @@ function CommentItem({
   anonymousBoard: boolean
   isReply?: boolean
   isAuthor?: boolean
+  viewerNickname?: string | null
   canReport?: boolean
   loginHref?: string
   deleting?: boolean
@@ -524,7 +561,10 @@ function CommentItem({
 }) {
   const displayName = anonymousBoard
     ? maskAnonymousDisplayName('익명')
-    : getCommentAuthorDisplayName(comment)
+    : getCommentAuthorDisplayName(
+        comment,
+        isAuthor ? viewerNickname : null,
+      )
   const initial = displayName.charAt(0).toUpperCase()
   const photoURL = anonymousBoard
     ? null

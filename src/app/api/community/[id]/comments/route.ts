@@ -22,7 +22,7 @@ import {
   saveStoredCommunityComments,
 } from '@lib/supabase/communityComments.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
-import { resolveCommunityNickname } from '@lib/community/author'
+import { resolveCommunityNickname, sanitizeCommunityNickname } from '@lib/community/author'
 import type { CommunityComment } from '@/types/nyc'
 
 export const runtime = 'nodejs'
@@ -88,11 +88,17 @@ export async function GET(_request: Request, context: RouteContext) {
 async function enrichCommentAuthors(
   comments: CommunityComment[],
 ): Promise<CommunityComment[]> {
-  const needsEnrich = comments.filter(
-    (item) =>
-      item.status === 'open' &&
-      (!item.authorPhotoURL?.trim() || !item.authorNickname?.trim()),
-  )
+  const needsEnrich = comments.filter((item) => {
+    if (item.status !== 'open') return false
+    if (!item.authorPhotoURL?.trim()) return true
+    const nick = item.authorNickname?.trim() || ''
+    if (!nick) return true
+    // 예전에 저장된 이메일 아이디도 닉네임으로 교체
+    const emailLocal = item.authorEmail?.split('@')[0]?.trim()
+    if (emailLocal && nick === emailLocal) return true
+    if (nick.includes('@')) return true
+    return false
+  })
   if (needsEnrich.length === 0) return comments
 
   const uids = [...new Set(needsEnrich.map((item) => item.authorUid))]
@@ -107,29 +113,26 @@ async function enrichCommentAuthors(
   return comments.map((item) => {
     const profile = byUid.get(item.authorUid)
     if (!profile) return item
+    const email =
+      (typeof profile.email === 'string' ? profile.email : null) ||
+      item.authorEmail
     const nickname =
-      item.authorNickname?.trim() ||
-      resolveCommunityNickname(
-        profile
-          ? {
-              nickname:
-                typeof profile.nickname === 'string' ? profile.nickname : null,
-              firstName:
-                typeof profile.firstName === 'string'
-                  ? profile.firstName
-                  : null,
-              lastName:
-                typeof profile.lastName === 'string' ? profile.lastName : null,
-            }
-          : null,
-      ) ||
-      null
+      sanitizeCommunityNickname(item.authorNickname, email) ||
+      resolveCommunityNickname({
+        nickname:
+          typeof profile.nickname === 'string' ? profile.nickname : null,
+        firstName:
+          typeof profile.firstName === 'string' ? profile.firstName : null,
+        lastName:
+          typeof profile.lastName === 'string' ? profile.lastName : null,
+        email,
+      })
     const photoURL =
       item.authorPhotoURL?.trim() ||
       (typeof profile.photoURL === 'string' ? profile.photoURL.trim() : '') ||
       null
     if (
-      nickname === item.authorNickname &&
+      nickname === (item.authorNickname?.trim() || null) &&
       photoURL === item.authorPhotoURL
     ) {
       return item
@@ -238,12 +241,16 @@ export async function POST(request: Request, context: RouteContext) {
                   : null,
               lastName:
                 typeof profile.lastName === 'string' ? profile.lastName : null,
+              email: user.email,
             }
-          : null,
+          : { email: user.email },
       ) ||
-      (typeof payload?.authorNickname === 'string'
-        ? payload.authorNickname.trim() || null
-        : null) ||
+      sanitizeCommunityNickname(
+        typeof payload?.authorNickname === 'string'
+          ? payload.authorNickname
+          : null,
+        user.email,
+      ) ||
       null
   const authorPhotoURL = isAnonymous
     ? null

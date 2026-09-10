@@ -8,45 +8,71 @@ type CommentAuthorFields = Pick<CommunityComment, 'authorNickname'> & {
   authorEmail?: string | null
 }
 
-/**
- * 커뮤니티 작성자 표시명.
- * 닉네임만 사용하고, 이메일 아이디(@ 앞부분)는 절대 노출하지 않는다.
- */
-export function getCommunityAuthorDisplayName(post: AuthorFields): string {
-  return post.authorNickname?.trim() || '회원'
-}
-
-/** 댓글 작성자 표시명 — 닉네임 우선, 이메일 아이디 미사용 */
-export function getCommentAuthorDisplayName(
-  comment: CommentAuthorFields,
-): string {
-  return comment.authorNickname?.trim() || '회원'
-}
-
 function looksLikeEmail(value: string): boolean {
   return value.includes('@')
 }
 
-/** 프로필에서 커뮤니티용 닉네임 후보 (이메일·이메일형 문자열 제외) */
-export function resolveCommunityNickname(profile: {
-  nickname?: string | null
-  displayName?: string | null
-  name?: string | null
-  firstName?: string | null
-  lastName?: string | null
-} | null | undefined): string | null {
-  const nickname = profile?.nickname?.trim()
-  if (nickname && !looksLikeEmail(nickname)) return nickname
+/** 이메일 로컬파트·빈 값·'회원' 제외 */
+export function sanitizeCommunityNickname(
+  value: string | null | undefined,
+  email?: string | null,
+): string | null {
+  const trimmed = value?.trim() || ''
+  if (!trimmed || looksLikeEmail(trimmed) || trimmed === '회원') return null
+  const emailLocal = email?.split('@')[0]?.trim()
+  if (emailLocal && trimmed === emailLocal) return null
+  return trimmed
+}
 
-  const displayName =
-    profile?.displayName?.trim() || profile?.name?.trim() || ''
-  if (displayName && !looksLikeEmail(displayName)) return displayName
+/**
+ * 커뮤니티 작성자 표시명.
+ * 닉네임만 사용하고, 이메일 아이디(@ 앞부분)는 절대 노출하지 않는다.
+ */
+export function getCommunityAuthorDisplayName(
+  post: AuthorFields,
+  fallbackNickname?: string | null,
+): string {
+  return (
+    sanitizeCommunityNickname(post.authorNickname, post.authorEmail) ||
+    sanitizeCommunityNickname(fallbackNickname, post.authorEmail) ||
+    '회원'
+  )
+}
 
-  const fullName = [profile?.firstName, profile?.lastName]
-    .map((part) => (typeof part === 'string' ? part.trim() : ''))
-    .filter(Boolean)
-    .join(' ')
-  if (fullName && !looksLikeEmail(fullName)) return fullName
+/** 댓글 작성자 표시명 — 저장된 닉네임, 없으면 폴백 닉네임 */
+export function getCommentAuthorDisplayName(
+  comment: CommentAuthorFields,
+  fallbackNickname?: string | null,
+): string {
+  return (
+    sanitizeCommunityNickname(comment.authorNickname, comment.authorEmail) ||
+    sanitizeCommunityNickname(fallbackNickname, comment.authorEmail) ||
+    '회원'
+  )
+}
 
-  return null
+/** 프로필·계정 정보에서 커뮤니티용 닉네임 후보 (이메일형·이메일 아이디 제외) */
+export function resolveCommunityNickname(
+  profile: {
+    nickname?: string | null
+    displayName?: string | null
+    name?: string | null
+    firstName?: string | null
+    lastName?: string | null
+    email?: string | null
+  } | null | undefined,
+): string | null {
+  const email = profile?.email
+  return (
+    sanitizeCommunityNickname(profile?.nickname, email) ||
+    sanitizeCommunityNickname(profile?.displayName, email) ||
+    sanitizeCommunityNickname(profile?.name, email) ||
+    sanitizeCommunityNickname(
+      [profile?.firstName, profile?.lastName]
+        .map((part) => (typeof part === 'string' ? part.trim() : ''))
+        .filter(Boolean)
+        .join(' '),
+      email,
+    )
+  )
 }
