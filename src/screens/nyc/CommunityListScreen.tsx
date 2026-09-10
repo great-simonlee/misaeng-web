@@ -40,11 +40,16 @@ import {
 } from '@lib/community/food'
 import {
   NYC_COMMUNITY_BOARD_META,
+  isAnonymousBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { listMockCommunityPosts } from '@lib/constants/communityMock'
 import { cn } from '@lib'
 import type { CommunityPost, FoodCategoryId } from '@/types/nyc'
+import {
+  AnonymousBoardNoticeModal,
+  useAnonymousBoardNotice,
+} from '@widgets/nyc/AnonymousBoardNoticeModal'
 import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
@@ -245,6 +250,8 @@ function CommunityBoardListScreen({
   const isFoodBoard = boardId === 'food'
   const isCptOptBoard = boardId === 'status'
   const isJobReviewBoard = boardId === 'job-review'
+  const isAnonymous = isAnonymousBoard(boardId)
+  const anonymousNotice = useAnonymousBoardNotice(isAnonymous)
   const [cptOptType, setCptOptType] = useState<CptOptTypeId | 'all'>('all')
   const [jobReviewType, setJobReviewType] = useState<JobReviewTypeId | 'all'>(
     'all',
@@ -743,6 +750,14 @@ function CommunityBoardListScreen({
             </section>
           </div>
         </BottomSheet>
+      ) : null}
+
+      {isAnonymous ? (
+        <AnonymousBoardNoticeModal
+          open={anonymousNotice.open}
+          onClose={anonymousNotice.close}
+          onSnooze24h={anonymousNotice.snooze24h}
+        />
       ) : null}
     </BoardPageShell>
   )

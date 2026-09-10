@@ -22,6 +22,7 @@ import {
   saveStoredCommunityComments,
 } from '@lib/supabase/communityComments.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
+import { resolveCommunityNickname } from '@lib/community/author'
 import type { CommunityComment } from '@/types/nyc'
 
 export const runtime = 'nodejs'
@@ -108,7 +109,20 @@ async function enrichCommentAuthors(
     if (!profile) return item
     const nickname =
       item.authorNickname?.trim() ||
-      (typeof profile.nickname === 'string' ? profile.nickname.trim() : '') ||
+      resolveCommunityNickname(
+        profile
+          ? {
+              nickname:
+                typeof profile.nickname === 'string' ? profile.nickname : null,
+              firstName:
+                typeof profile.firstName === 'string'
+                  ? profile.firstName
+                  : null,
+              lastName:
+                typeof profile.lastName === 'string' ? profile.lastName : null,
+            }
+          : null,
+      ) ||
       null
     const photoURL =
       item.authorPhotoURL?.trim() ||
@@ -213,7 +227,20 @@ export async function POST(request: Request, context: RouteContext) {
   const now = Date.now()
   const authorNickname = isAnonymous
     ? null
-    : (typeof profile?.nickname === 'string' && profile.nickname.trim()) ||
+    : resolveCommunityNickname(
+        profile
+          ? {
+              nickname:
+                typeof profile.nickname === 'string' ? profile.nickname : null,
+              firstName:
+                typeof profile.firstName === 'string'
+                  ? profile.firstName
+                  : null,
+              lastName:
+                typeof profile.lastName === 'string' ? profile.lastName : null,
+            }
+          : null,
+      ) ||
       (typeof payload?.authorNickname === 'string'
         ? payload.authorNickname.trim() || null
         : null) ||

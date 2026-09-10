@@ -77,39 +77,7 @@ export const COMMUNITY_MOCK_COMMENTS: CommunityComment[] = [
     authorSchoolId: null,
     createdAt: NOW - 2.5 * HOUR,
   }),
-  comment({
-    id: 'mock-cmt-cpt-1',
-    postId: 'mock-cpt-1',
-    parentId: null,
-    body: '타임라인 정리 최고예요. OGS 미팅은 얼마나 걸렸나요?',
-    authorUid: 'mock-user-d',
-    authorEmail: 'd@nyu.edu',
-    authorNickname: 'OPT준비생',
-    authorSchoolId: 'nyu',
-    createdAt: NOW - 4 * HOUR,
-  }),
-  comment({
-    id: 'mock-cmt-cpt-1-r1',
-    postId: 'mock-cpt-1',
-    parentId: 'mock-cmt-cpt-1',
-    body: '저는 신청 후 약 1주일 정도 걸렸어요. 성수기엔 더 길 수 있어요.',
-    authorUid: 'mock-user-7',
-    authorEmail: 'cpt@nyu.edu',
-    authorNickname: null,
-    authorSchoolId: 'nyu',
-    createdAt: NOW - 3 * HOUR,
-  }),
-  comment({
-    id: 'mock-cmt-cpt-1-r2',
-    postId: 'mock-cpt-1',
-    parentId: 'mock-cmt-cpt-1',
-    body: '감사합니다! 바로 캘린더에 넣어둘게요.',
-    authorUid: 'mock-user-d',
-    authorEmail: 'd@nyu.edu',
-    authorNickname: 'OPT준비생',
-    authorSchoolId: 'nyu',
-    createdAt: NOW - 2 * HOUR,
-  }),
+
 ]
 
 export function listMockCommunityComments(

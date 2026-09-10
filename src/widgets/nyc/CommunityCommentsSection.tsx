@@ -8,6 +8,10 @@ import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { maskAnonymousDisplayName } from '@lib/community/anonymous'
 import {
+  getCommentAuthorDisplayName,
+  resolveCommunityNickname,
+} from '@lib/community/author'
+import {
   buildCommentThreads,
   createCommunityCommentRequest,
   deleteCommunityCommentRequest,
@@ -110,7 +114,7 @@ export function CommunityCommentsSection({
         authorEmail: user.email,
         authorNickname: anonymousBoard
           ? null
-          : (profile?.nickname ?? null),
+          : resolveCommunityNickname(profile),
         authorPhotoURL: anonymousBoard
           ? null
           : (profile?.photoURL ?? null),
@@ -520,9 +524,7 @@ function CommentItem({
 }) {
   const displayName = anonymousBoard
     ? maskAnonymousDisplayName('익명')
-    : comment.authorNickname?.trim() ||
-      comment.authorEmail.split('@')[0] ||
-      '회원'
+    : getCommentAuthorDisplayName(comment)
   const initial = displayName.charAt(0).toUpperCase()
   const photoURL = anonymousBoard
     ? null

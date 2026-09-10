@@ -247,17 +247,12 @@ function CreateTimelineForm({
 
         {(!isEditing && canAddMore) || isEditing ? (
           <>
-            {!isEditing ? (
-              <QuickStepButtons
-                cptOptType={cptOptType}
-                onApply={(patch) => handleDraftChange(patch)}
-              />
-            ) : null}
-
             <SingleEntryForm
+              key={draft.id}
               entry={draft}
               cptOptType={cptOptType}
               highlight
+              showQuickSteps={!isEditing}
               onChange={handleDraftChange}
             />
 
@@ -488,17 +483,12 @@ function UpdateTimelineForm({
 
         {(!isEditing && canAddMore) || isEditing ? (
           <>
-            {!isEditing ? (
-              <QuickStepButtons
-                cptOptType={cptOptType}
-                onApply={(patch) => handleDraftChange(patch)}
-              />
-            ) : null}
-
             <SingleEntryForm
+              key={draft.id}
               entry={draft}
               cptOptType={cptOptType}
               highlight
+              showQuickSteps={!isEditing}
               onChange={handleDraftChange}
             />
 
@@ -602,50 +592,65 @@ function SingleEntryForm({
   entry,
   cptOptType,
   highlight = false,
+  showQuickSteps = false,
   onChange,
 }: {
   entry: CptOptTimelineEntry
   cptOptType: CptOptTypeId | null
   highlight?: boolean
+  showQuickSteps?: boolean
   onChange: (patch: Partial<CptOptTimelineEntry>) => void
 }) {
-  const contentKeys = useMemo(
-    () =>
-      CPT_OPT_TIMELINE_FIELDS.filter((field) => entry[field.key].trim()).map(
-        (field) => field.key,
-      ),
-    [entry],
-  )
-  const [entryId, setEntryId] = useState(entry.id)
   const [selectedKeys, setSelectedKeys] = useState<Set<CptOptTimelineFieldKey>>(
-    () => new Set(contentKeys),
+    () =>
+      new Set(
+        CPT_OPT_TIMELINE_FIELDS.filter((field) => entry[field.key].trim()).map(
+          (field) => field.key,
+        ),
+      ),
   )
 
-  if (entryId !== entry.id) {
-    setEntryId(entry.id)
-    setSelectedKeys(new Set(contentKeys))
+  function selectField(key: CptOptTimelineFieldKey) {
+    setSelectedKeys((prev) => {
+      if (prev.has(key)) return prev
+      return new Set(prev).add(key)
+    })
   }
 
-  const visibleKeySet = useMemo(() => {
-    const next = new Set(selectedKeys)
-    for (const key of contentKeys) next.add(key)
-    return next
-  }, [selectedKeys, contentKeys])
+  function deselectField(key: CptOptTimelineFieldKey) {
+    setSelectedKeys((prev) => {
+      const next = new Set(prev)
+      next.delete(key)
+      return next
+    })
+    onChange({ [key]: '' })
+  }
 
   function toggleField(key: CptOptTimelineFieldKey) {
-    const active = visibleKeySet.has(key)
-    if (active) {
-      const next = new Set(selectedKeys)
-      next.delete(key)
-      setSelectedKeys(next)
-      onChange({ [key]: '' })
-      return
-    }
-    setSelectedKeys(new Set(selectedKeys).add(key))
+    if (selectedKeys.has(key)) deselectField(key)
+    else selectField(key)
+  }
+
+  function handleFieldChange(key: CptOptTimelineFieldKey, next: string) {
+    // 내용을 백스페이스로 비워도 선택한 카테고리는 유지
+    selectField(key)
+    onChange({ [key]: next })
+  }
+
+  function applyQuickStep(patch: Partial<CptOptTimelineEntry>) {
+    setSelectedKeys((prev) => {
+      const next = new Set(prev)
+      for (const field of CPT_OPT_TIMELINE_FIELDS) {
+        const value = patch[field.key]
+        if (typeof value === 'string' && value.trim()) next.add(field.key)
+      }
+      return next
+    })
+    onChange(patch)
   }
 
   const visibleFields = CPT_OPT_TIMELINE_FIELDS.filter((field) =>
-    visibleKeySet.has(field.key),
+    selectedKeys.has(field.key),
   )
 
   return (
@@ -675,6 +680,12 @@ function SingleEntryForm({
           />
         </label>
 
+        {showQuickSteps ? (
+          <div className='mt-3'>
+            <QuickStepButtons cptOptType={cptOptType} onApply={applyQuickStep} />
+          </div>
+        ) : null}
+
         <div className='mt-3'>
           <p className='text-[12px] font-semibold text-[var(--foreground)]'>
             기록할 항목 선택
@@ -684,7 +695,7 @@ function SingleEntryForm({
           </p>
           <div className='mt-2 flex flex-wrap gap-1.5'>
             {CPT_OPT_TIMELINE_FIELDS.map((field) => {
-              const active = visibleKeySet.has(field.key)
+              const active = selectedKeys.has(field.key)
               return (
                 <button
                   key={field.key}
@@ -719,8 +730,8 @@ function SingleEntryForm({
               field={field}
               value={entry[field.key]}
               placeholder={getCptOptTimelinePlaceholder(cptOptType, field.key)}
-              onChange={(next) => onChange({ [field.key]: next })}
-              onRemove={() => toggleField(field.key)}
+              onChange={(next) => handleFieldChange(field.key, next)}
+              onRemove={() => deselectField(field.key)}
             />
           ))
         )}
@@ -736,7 +747,7 @@ function SingleEntryForm({
             <TipTapEditor
               value={entry.stageReviewHtml}
               onChange={(html) => onChange({ stageReviewHtml: html })}
-              placeholder='예: OGS 포털 업로드가 직 안 돼서 PDF를 다시 압축해 올렸어요. 오퍼레터 날짜 맞추는 데 하루 걸렸습니다.'
+              placeholder='예: OGS 포털 업로드가 잘 안 돼서 PDF를 다시 압축해 올렸어요. 오퍼레터 날짜 맞추는 데 하루 걸렸습니다.'
               minHeightClassName='min-h-[160px]'
               maxLength={CPT_OPT_STAGE_REVIEW_MAX}
             />
