@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { BottomSheetSelect } from '@components'
 import {
@@ -28,42 +28,32 @@ export function StatusEmployerSelect({
   className,
   inputClassName,
 }: StatusEmployerSelectProps) {
-  const [optionValue, setOptionValue] = useState(
-    () => parseStatusEmployerLocation(value).optionValue,
-  )
+  // 그 외 선택 직후 아직 텍스트가 비어 있을 때만 로컬로 유지 (effect 없이)
+  const [pendingOther, setPendingOther] = useState(false)
 
-  useEffect(() => {
-    const parsed = parseStatusEmployerLocation(value)
-    if (parsed.optionValue) {
-      setOptionValue(parsed.optionValue)
-      return
-    }
-    // 그 외 선택 후 아직 미입력(value='')이면 선택 유지
-    setOptionValue((prev) => (isStatusEmployerOther(prev) ? prev : ''))
-  }, [value])
-
-  const otherText = isStatusEmployerOther(optionValue)
-    ? parseStatusEmployerLocation(value).otherText
-    : ''
+  const parsed = parseStatusEmployerLocation(value)
+  const optionValue =
+    parsed.optionValue ||
+    (pendingOther ? STATUS_EMPLOYER_OTHER_VALUE : '')
+  const otherText = isStatusEmployerOther(optionValue) ? parsed.otherText : ''
 
   function handleSelect(nextValue: string) {
-    setOptionValue(nextValue)
     if (!nextValue) {
+      setPendingOther(false)
       onChange('')
       return
     }
     if (isStatusEmployerOther(nextValue)) {
-      const parsed = parseStatusEmployerLocation(value)
-      onChange(
-        isStatusEmployerOther(parsed.optionValue) ? parsed.otherText : '',
-      )
+      setPendingOther(true)
+      onChange(isStatusEmployerOther(parsed.optionValue) ? parsed.otherText : '')
       return
     }
+    setPendingOther(false)
     onChange(formatStatusEmployerLocation(nextValue, ''))
   }
 
   function handleOtherText(nextText: string) {
-    setOptionValue(STATUS_EMPLOYER_OTHER_VALUE)
+    setPendingOther(true)
     onChange(nextText)
   }
 
