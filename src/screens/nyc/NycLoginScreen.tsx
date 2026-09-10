@@ -181,47 +181,42 @@ export function NycLoginScreen() {
       : '로그인'
   const description = isResetMode
     ? '가입한 이메일을 입력하면 비밀번호 재설정 링크를 보내드려요.'
-    : null
+    : mode === 'signup'
+      ? 'Google 또는 이메일로 빠르게 가입하세요.'
+      : 'Google 또는 이메일로 로그인하세요.'
 
   const submitLabel = submitting
-    ? 'Please wait… / 잠시만 기다려 주세요…'
+    ? '잠시만 기다려 주세요…'
     : mode === 'signin'
-      ? 'Sign in / 로그인'
+      ? '이메일로 로그인'
       : mode === 'signup'
-        ? 'Sign Up / 가입하기'
-        : 'Send reset email / 재설정 메일 보내기'
+        ? '이메일로 가입하기'
+        : '재설정 메일 보내기'
 
   return (
-    <div className='relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#eef1f6_0%,#e8edf4_42%,#f4f6fa_100%)]'>
-      <div className='pointer-events-none absolute inset-0 overflow-hidden'>
+    <div className='relative min-h-[100dvh] bg-[linear-gradient(180deg,#eef1f6_0%,#e8edf4_42%,#f4f6fa_100%)]'>
+      <div className='pointer-events-none absolute inset-0 overflow-hidden' aria-hidden>
         <div className='absolute -left-20 -top-28 h-72 w-72 rounded-full bg-[#F64310]/20 blur-3xl' />
         <div className='absolute right-[-72px] top-[14%] h-80 w-80 rounded-full bg-[#ff6b3d]/22 blur-3xl' />
-        <div className='absolute bottom-[-100px] left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[#ffb08f]/28 blur-3xl' />
       </div>
 
-      <div className='relative mx-auto max-w-[420px] px-4 pb-12 pt-10 sm:px-6 sm:pb-16 sm:pt-12'>
-        <div className='rounded-[1.5rem] border border-white/80 bg-white/92 p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_20px_48px_rgba(15,23,42,0.10)] backdrop-blur-sm sm:p-7'>
-          <header className='text-center sm:text-left'>
+      <div className='relative mx-auto flex min-h-[100dvh] max-w-[420px] flex-col justify-center px-4 py-8 sm:px-6 sm:py-10'>
+        <div className='rounded-[1.5rem] border border-white/80 bg-white/92 p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_20px_48px_rgba(15,23,42,0.10)] backdrop-blur-sm sm:p-6'>
+          <header>
             <p className='text-[11px] font-medium tracking-[0.22em] text-[#8b95a7]'>
-              MISAENG NYC COMMUNITY
+              MISAENG NYC
             </p>
-            <h1 className='mt-2 text-[1.625rem] font-semibold leading-tight tracking-[-0.025em] text-[var(--foreground)] sm:text-[1.75rem]'>
+            <h1 className='mt-1.5 text-[1.5rem] font-semibold leading-tight tracking-[-0.025em] text-[var(--foreground)]'>
               {title}
             </h1>
-            <p className='mt-2 text-[14px] font-normal leading-[1.55] text-[#667085]'>
-              {description ?? (
-                <>
-                  유학생 · 직장인을 위한
-                  <br />
-                  New York City 정보 공유 공간이에요.
-                </>
-              )}
+            <p className='mt-1.5 text-[13px] leading-relaxed text-[#667085]'>
+              {description}
             </p>
           </header>
 
           {!isResetMode && (
             <div
-              className='mt-6 rounded-full bg-[#edf0f5] p-1'
+              className='mt-5 rounded-full bg-[#edf0f5] p-1'
               role='tablist'
               aria-label='인증 모드'
             >
@@ -257,13 +252,37 @@ export function NycLoginScreen() {
           )}
 
           {!authReady && process.env.NODE_ENV !== 'production' && (
-            <div className='mt-5'>
+            <div className='mt-4'>
               <AuthConfigBanner />
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className='mt-6 space-y-5'>
-            <div className='space-y-4'>
+          {/* Google을 상단에 배치 — 스크롤 없이 바로 보이게 */}
+          {!isResetMode && (
+            <div className='mt-5 space-y-3'>
+              <GoogleSignInButton
+                disabled={submitting || !canUseGoogle}
+                onCredential={(credential) =>
+                  void handleGoogleCredential(credential)
+                }
+                onError={handleGoogleError}
+              />
+
+              <div className='flex items-center gap-3 pt-1'>
+                <span className='h-px flex-1 bg-[#e4e7ec]' />
+                <span className='text-[12px] font-medium text-[#98a2b3]'>
+                  또는 이메일로
+                </span>
+                <span className='h-px flex-1 bg-[#e4e7ec]' />
+              </div>
+            </div>
+          )}
+
+          <form
+            onSubmit={handleSubmit}
+            className={isResetMode ? 'mt-5 space-y-4' : 'mt-4 space-y-4'}
+          >
+            <div className='space-y-3'>
               <label className='block'>
                 <span className='text-[13px] font-medium text-[#344054]'>
                   이메일
@@ -301,10 +320,49 @@ export function NycLoginScreen() {
             </div>
 
             {mode === 'signin' && (
-              <div className='-mt-2 flex justify-end'>
+              <div className='-mt-1 flex items-center justify-between gap-3'>
+                <p className='min-w-0 text-[11px] leading-snug text-[#98a2b3]'>
+                  {locale === 'ko' ? (
+                    <>
+                      로그인 시{' '}
+                      <Link
+                        href='/nyc/terms-of-use'
+                        className='underline-offset-2 hover:text-[#F64310] hover:underline'
+                      >
+                        이용약관
+                      </Link>
+                      ·
+                      <Link
+                        href='/nyc/privacy-policy'
+                        className='underline-offset-2 hover:text-[#F64310] hover:underline'
+                      >
+                        개인정보
+                      </Link>
+                      에 동의합니다.
+                    </>
+                  ) : (
+                    <>
+                      By signing in you agree to our{' '}
+                      <Link
+                        href='/nyc/terms-of-use'
+                        className='underline-offset-2 hover:text-[#F64310] hover:underline'
+                      >
+                        Terms
+                      </Link>
+                      {' & '}
+                      <Link
+                        href='/nyc/privacy-policy'
+                        className='underline-offset-2 hover:text-[#F64310] hover:underline'
+                      >
+                        Privacy
+                      </Link>
+                      .
+                    </>
+                  )}
+                </p>
                 <button
                   type='button'
-                  className='text-[13px] font-medium text-[#667085] transition hover:text-[#F64310]'
+                  className='shrink-0 text-[13px] font-medium text-[#667085] transition hover:text-[#F64310]'
                   onClick={() => changeMode('reset')}
                 >
                   비밀번호 찾기
@@ -323,45 +381,6 @@ export function NycLoginScreen() {
               />
             )}
 
-            {mode === 'signin' && (
-              <p className='text-[12px] leading-relaxed text-[#98a2b3]'>
-                <span className='block'>
-                  By signing in, you agree to our{' '}
-                  <Link
-                    href='/nyc/terms-of-use'
-                    className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
-                  >
-                    Terms of Use
-                  </Link>{' '}
-                  and{' '}
-                  <Link
-                    href='/nyc/privacy-policy'
-                    className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
-                  >
-                    Privacy Policy
-                  </Link>
-                  .
-                </span>
-                <span className='mt-0.5 block'>
-                  로그인하면{' '}
-                  <Link
-                    href='/nyc/terms-of-use'
-                    className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
-                  >
-                    이용약관
-                  </Link>
-                  및{' '}
-                  <Link
-                    href='/nyc/privacy-policy'
-                    className='font-medium text-[#667085] underline-offset-2 hover:text-[#F64310] hover:underline'
-                  >
-                    개인정보처리방침
-                  </Link>
-                  에 동의하게 됩니다.
-                </span>
-              </p>
-            )}
-
             <button
               type='submit'
               disabled={
@@ -371,32 +390,10 @@ export function NycLoginScreen() {
             >
               {submitLabel}
             </button>
-
-            {!isResetMode && (
-              <>
-                <div className='flex items-center gap-3'>
-                  <span className='h-px flex-1 bg-[#e4e7ec]' />
-                  <span className='text-[12px] font-medium text-[#98a2b3]'>
-                    또는
-                  </span>
-                  <span className='h-px flex-1 bg-[#e4e7ec]' />
-                </div>
-
-                <GoogleSignInButton
-                  disabled={
-                    submitting || !canUseGoogle || !canSubmitAuth
-                  }
-                  onCredential={(credential) =>
-                    void handleGoogleCredential(credential)
-                  }
-                  onError={handleGoogleError}
-                />
-              </>
-            )}
           </form>
         </div>
 
-        <footer className='mt-5 space-y-2 text-center'>
+        <footer className='mt-4 space-y-1.5 text-center'>
           <p className='text-[14px] font-normal text-[#667085]'>
             {mode === 'signin' ? (
               <>
@@ -436,7 +433,7 @@ export function NycLoginScreen() {
 
           <Link
             href='/nyc'
-            className='inline-flex min-h-[40px] items-center text-[13px] font-medium text-[#98a2b3] transition hover:text-[#F64310]'
+            className='inline-flex min-h-[36px] items-center text-[13px] font-medium text-[#98a2b3] transition hover:text-[#F64310]'
           >
             ← NYC로 돌아가기
           </Link>

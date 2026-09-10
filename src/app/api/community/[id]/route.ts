@@ -32,6 +32,7 @@ import {
   normalizeFoodGalleryPhotos,
   normalizeFoodMenuItems,
   normalizePartySize,
+  normalizeTipIncluded,
   normalizeTotalSpend,
   normalizeWaitMinutes,
 } from '@lib/community/food'
@@ -69,6 +70,7 @@ type UpdateBody = {
   thumbnailUrl?: string | null
   partySize?: number | null
   totalSpend?: number | null
+  tipIncluded?: boolean | null
   waitMinutes?: number | null
   foodCategory?: FoodCategoryId | null
   menuItems?: FoodMenuItem[] | null
@@ -180,6 +182,13 @@ export async function PATCH(request: Request, context: RouteContext) {
     : null
   const totalSpend = isFood
     ? normalizeTotalSpend(body.totalSpend ?? existing.totalSpend)
+    : null
+  const tipIncluded = isFood
+    ? normalizeTipIncluded(
+        body.tipIncluded !== undefined
+          ? body.tipIncluded
+          : existing.tipIncluded,
+      )
     : null
   const waitMinutes = isFood
     ? normalizeWaitMinutes(body.waitMinutes ?? existing.waitMinutes)
@@ -355,6 +364,12 @@ export async function PATCH(request: Request, context: RouteContext) {
         { status: 400 },
       )
     }
+    if (tipIncluded == null) {
+      return NextResponse.json(
+        { error: '팁 포함 여부를 선택해 주세요.' },
+        { status: 400 },
+      )
+    }
     if (waitMinutes == null) {
       return NextResponse.json(
         { error: '웨이팅 시간을 입력해 주세요. (없으면 0)' },
@@ -423,6 +438,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     thumbnailUrl: isFood || isRoommate ? thumbnailUrl : null,
     partySize: isFood ? partySize : null,
     totalSpend: isFood ? totalSpend : null,
+    tipIncluded: isFood ? tipIncluded : null,
     waitMinutes: isFood ? waitMinutes : null,
     foodCategory,
     menuItems,

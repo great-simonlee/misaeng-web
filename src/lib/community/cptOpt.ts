@@ -20,19 +20,19 @@ export const CPT_OPT_TYPES: {
     id: 'cpt',
     label: 'CPT',
     description: '재학 중 인턴·취업 허가',
-    summary: '학교 ISS에 신청하고 I-20을 받는 과정',
+    summary: 'OGS에 신청하고 새 I-20을 받는 과정',
   },
   {
     id: 'opt',
     label: 'OPT',
     description: '졸업 후 1년 취업 허가',
-    summary: 'USCIS I-765 제출 후 EAD 카드 수령',
+    summary: 'OGS 추천 후 USCIS I-765 · EAD 수령',
   },
   {
     id: 'stem-opt',
     label: 'STEM OPT',
     description: 'STEM 전공 OPT 24개월 연장',
-    summary: 'I-983 작성·제출과 SEVP 검증 보고',
+    summary: 'I-983·OGS 확인 후 SEVP 검증 보고',
   },
   {
     id: 'visa',
@@ -147,20 +147,20 @@ const CPT_OPT_PLACEHOLDERS: Record<
   Record<CptOptTimelineFieldKey, string>
 > = {
   cpt: {
-    prepared: '예: 오퍼레터, CPT 신청서, 어드바이저 서명',
-    submitted: '예: ISS 포털에 PDF 업로드 후 확인 메일 발송',
+    prepared: '예: CPT 모듈 수료, 오퍼레터, OGS 체크리스트',
+    submitted: '예: OGS 포털에 CPT 신청서·오퍼레터 업로드',
     resultReceived: '예: 학교 이메일로 새 I-20 PDF 수령',
     nextStep: '예: I-20 출력·서명 후 근무 시작일 맞추기',
   },
   opt: {
-    prepared: '예: I-765, 여권 사진, 졸업 증명서',
-    submitted: '예: USCIS 온라인으로 I-765 제출·수수료 결제',
+    prepared: '예: OGS OPT 워크숍, I-765, 여권 사진, 졸업 증명',
+    submitted: '예: OGS 추천 후 USCIS 온라인 I-765 제출·수수료 결제',
     resultReceived: '예: EAD 카드 우편 수령, 계정에서 승인 확인',
     nextStep: '예: EAD 유효기간·STEM 연장 요건 캘린더에 넣기',
   },
   'stem-opt': {
-    prepared: '예: I-983, 회사 정보, DSO 연락',
-    submitted: '예: STEM OPT 연장 신청서 제출, SEVP 업데이트',
+    prepared: '예: I-983, 회사 정보, OGS/DSO 연락',
+    submitted: '예: OGS 확인 후 STEM OPT 연장 신청서 제출',
     resultReceived: '예: I-797 승인 통지 이메일/우편 수령',
     nextStep: '예: 6·12·18개월 validation report 일정 잡기',
   },
@@ -184,15 +184,29 @@ export const CPT_OPT_QUICK_STEPS: Record<
 > = {
   cpt: [
     {
-      label: '학교 신청',
+      label: 'CPT 모듈 수료',
+      patch: {
+        prepared: 'CPT 모듈(오리엔테이션) 완료',
+        nextStep: '오퍼레터 대기·체크리스트 확인',
+      },
+    },
+    {
+      label: 'Job offer letter 수령',
+      patch: {
+        prepared: 'Job offer letter 수령',
+        nextStep: 'OGS CPT 신청서 작성',
+      },
+    },
+    {
+      label: 'CPT 신청서 제출',
       patch: {
         prepared: '오퍼레터, CPT 신청서',
-        submitted: 'ISS 포털 업로드',
+        submitted: 'OGS 포털에 신청서 제출',
         nextStep: '새 I-20 수령 대기',
       },
     },
     {
-      label: 'I-20 수령',
+      label: '새 I-20 수령',
       patch: {
         resultReceived: '새 I-20 이메일 수령',
         nextStep: '서명 후 근무 시작',
@@ -200,6 +214,14 @@ export const CPT_OPT_QUICK_STEPS: Record<
     },
   ],
   opt: [
+    {
+      label: 'OGS 추천',
+      patch: {
+        prepared: 'OPT 서류·졸업 요건 확인',
+        submitted: 'OGS에 OPT 추천 요청',
+        nextStep: 'I-765 제출 준비',
+      },
+    },
     {
       label: 'I-765 제출',
       patch: {
@@ -221,7 +243,7 @@ export const CPT_OPT_QUICK_STEPS: Record<
       label: 'I-983 제출',
       patch: {
         prepared: 'I-983, 회사 정보',
-        submitted: 'I-983 제출',
+        submitted: 'OGS에 I-983 제출',
         nextStep: '승인·validation report 일정 확인',
       },
     },
@@ -269,7 +291,7 @@ export const CPT_OPT_QUICK_STEPS: Record<
   ],
 }
 
-export const CPT_OPT_TIMELINE_MAX = 20
+export const CPT_OPT_TIMELINE_MAX = 8
 export const CPT_OPT_FIELD_MAX = 280
 export const CPT_OPT_STAGE_REVIEW_MAX = COMMUNITY_BODY_MAX
 export const CPT_OPT_TIPS_MAX = 800

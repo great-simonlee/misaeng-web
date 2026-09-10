@@ -81,7 +81,7 @@ export const COMMUNITY_MOCK_COMMENTS: CommunityComment[] = [
     id: 'mock-cmt-cpt-1',
     postId: 'mock-cpt-1',
     parentId: null,
-    body: '타임라인 정리 최고예요. ISS 미팅은 얼마나 걸렸나요?',
+    body: '타임라인 정리 최고예요. OGS 미팅은 얼마나 걸렸나요?',
     authorUid: 'mock-user-d',
     authorEmail: 'd@nyu.edu',
     authorNickname: 'OPT준비생',

@@ -2,6 +2,7 @@ import {
   normalizeFoodCategory,
   normalizeFoodGalleryPhotos,
   normalizeFoodMenuItems,
+  normalizeTipIncluded,
   normalizeWaitMinutes,
 } from '@lib/community/food'
 import {
@@ -145,6 +146,7 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       const n = Number(data.totalSpend)
       return Number.isFinite(n) && n >= 0 ? Math.floor(n) : null
     })(),
+    tipIncluded: normalizeTipIncluded(data.tipIncluded),
     waitMinutes: normalizeWaitMinutes(data.waitMinutes),
     foodCategory: normalizeFoodCategory(data.foodCategory),
     menuItems: normalizeFoodMenuItems(data.menuItems),

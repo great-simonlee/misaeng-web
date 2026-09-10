@@ -161,6 +161,7 @@ function CommunityBoardNewScreen({
   const [foodCuisine, setFoodCuisine] = useState<FoodCuisineId | null>(null)
   const [partySize, setPartySize] = useState('2')
   const [totalSpend, setTotalSpend] = useState('')
+  const [tipIncluded, setTipIncluded] = useState<boolean | null>(null)
   const [waitMinutes, setWaitMinutes] = useState('')
   const [menuDrafts, setMenuDrafts] = useState<MenuDraft[]>([])
   const [galleryDrafts, setGalleryDrafts] = useState<GalleryDraft[]>([])
@@ -220,6 +221,11 @@ function CommunityBoardNewScreen({
         )
         setTotalSpend(
           post.totalSpend != null ? String(Math.floor(post.totalSpend)) : '',
+        )
+        setTipIncluded(
+          post.tipIncluded === true || post.tipIncluded === false
+            ? post.tipIncluded
+            : null,
         )
         setWaitMinutes(
           post.waitMinutes != null ? String(post.waitMinutes) : '',
@@ -529,6 +535,10 @@ function CommunityBoardNewScreen({
         toastError(`총 금액을 $0~$${FOOD_SPEND_MAX.toLocaleString('en-US')} 정수로 입력해 주세요`)
         return
       }
+      if (tipIncluded == null) {
+        toastError('팁 포함 / 팁 제외 중 하나를 선택해 주세요')
+        return
+      }
       if (waitMinutesNum == null) {
         toastError(`웨이팅을 0~${FOOD_WAIT_MAX}분 정수로 입력해 주세요`)
         return
@@ -590,6 +600,7 @@ function CommunityBoardNewScreen({
         thumbnailUrl: isFood ? thumb : null,
         partySize: isFood ? partySizeNum : null,
         totalSpend: isFood ? totalSpendNum : null,
+        tipIncluded: isFood ? tipIncluded : null,
         waitMinutes: isFood ? waitMinutesNum : null,
         foodCategory: isFood ? foodCategory : null,
         menuItems: isFood ? menuItems : [],
@@ -771,17 +782,85 @@ function CommunityBoardNewScreen({
                 onChange={setPartySize}
               />
               <div className='mx-4 border-t border-black/[0.05]' />
-              <VisitIntField
-                label='총 금액'
-                hint={`$0 ~ $${FOOD_SPEND_MAX.toLocaleString('en-US')} · 정수`}
-                unit='$'
-                unitPrefix
-                value={totalSpend}
-                min={FOOD_SPEND_MIN}
-                max={FOOD_SPEND_MAX}
-                onChange={setTotalSpend}
-                placeholder='0'
-              />
+              <div className='flex items-center justify-between gap-2.5 px-4 py-3.5'>
+                <div className='min-w-0 shrink'>
+                  <p className='text-[14px] font-semibold tracking-tight text-[var(--foreground)]'>
+                    총 금액
+                  </p>
+                  <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
+                    $0 ~ ${FOOD_SPEND_MAX.toLocaleString('en-US')} · 정수
+                  </p>
+                </div>
+
+                <div className='flex shrink-0 items-center gap-1.5'>
+                  <div
+                    role='group'
+                    aria-label='팁 포함 여부'
+                    className='inline-flex h-9 items-center rounded-full bg-[#f1f2f4] p-0.5 ring-1 ring-black/[0.04]'
+                  >
+                    {(
+                      [
+                        { value: true, label: '팁포함' },
+                        { value: false, label: '팁제외' },
+                      ] as const
+                    ).map((option) => {
+                      const active = tipIncluded === option.value
+                      return (
+                        <button
+                          key={option.label}
+                          type='button'
+                          onClick={() => setTipIncluded(option.value)}
+                          className={cn(
+                            'h-8 min-w-[3.25rem] rounded-full px-2 text-[11px] font-semibold tracking-tight touch-manipulation transition',
+                            active
+                              ? 'bg-white text-[var(--foreground)] shadow-[0_1px_3px_rgba(15,23,42,0.12)]'
+                              : 'text-[var(--muted)]',
+                          )}
+                        >
+                          {option.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  <label className='flex h-11 min-w-[5.5rem] cursor-text items-center justify-center rounded-xl bg-[#f8f8f9] px-3 ring-1 ring-black/[0.05] transition focus-within:ring-[var(--brand)]/40'>
+                    <span className='mr-1 text-[14px] font-semibold text-[var(--muted)]'>
+                      $
+                    </span>
+                    <input
+                      required
+                      type='text'
+                      inputMode='numeric'
+                      pattern='[0-9]*'
+                      autoComplete='off'
+                      enterKeyHint='done'
+                      placeholder='0'
+                      value={totalSpend}
+                      onChange={(e) =>
+                        setTotalSpend(
+                          sanitizeFoodIntInput(
+                            e.target.value,
+                            FOOD_SPEND_MIN,
+                            FOOD_SPEND_MAX,
+                          ),
+                        )
+                      }
+                      onBlur={() => {
+                        if (totalSpend === '') return
+                        const parsed = parseFoodInt(
+                          totalSpend,
+                          FOOD_SPEND_MIN,
+                          FOOD_SPEND_MAX,
+                        )
+                        if (parsed != null) setTotalSpend(String(parsed))
+                        else setTotalSpend(String(FOOD_SPEND_MIN))
+                      }}
+                      className='w-14 bg-transparent text-center text-[18px] font-semibold tabular-nums tracking-tight text-[var(--foreground)] outline-none'
+                      aria-label='총 금액'
+                    />
+                  </label>
+                </div>
+              </div>
               <div className='mx-4 border-t border-black/[0.05]' />
               <VisitIntField
                 label='웨이팅'

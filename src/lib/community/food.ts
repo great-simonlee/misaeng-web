@@ -198,18 +198,42 @@ export function parseFoodInt(
   return Math.min(max, Math.max(min, n))
 }
 
-/** 맛집: "2인 총 $45" */
+/** 맛집: "2인 총 $45 · 팁 포함" */
 export function formatFoodPartySpend(
   partySize: number | null | undefined,
   totalSpend: number | null | undefined,
+  tipIncluded?: boolean | null,
 ): string | null {
   const people = Math.floor(Number(partySize) || 0)
   const spend = Number(totalSpend)
   if (people <= 0 && !(spend > 0)) return null
   const parts: string[] = []
   if (people > 0) parts.push(`${people}인`)
-  if (spend > 0) parts.push(`총 $${formatUsd(spend)}`)
+  if (spend > 0) {
+    const tipLabel =
+      tipIncluded === true
+        ? ' · 팁 포함'
+        : tipIncluded === false
+          ? ' · 팁 제외'
+          : ''
+    parts.push(`총 $${formatUsd(spend)}${tipLabel}`)
+  }
   return parts.join(' ')
+}
+
+export function formatFoodTipIncluded(
+  tipIncluded: boolean | null | undefined,
+): string | null {
+  if (tipIncluded === true) return '팁 포함'
+  if (tipIncluded === false) return '팁 제외'
+  return null
+}
+
+export function normalizeTipIncluded(raw: unknown): boolean | null {
+  if (raw === true || raw === false) return raw
+  if (raw === 'true' || raw === 1 || raw === '1') return true
+  if (raw === 'false' || raw === 0 || raw === '0') return false
+  return null
 }
 
 /** 맛집: "웨이팅 25분" | "웨이팅 없음" */

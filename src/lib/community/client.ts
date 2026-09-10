@@ -39,6 +39,7 @@ function withLocalCounts(post: CommunityPost): CommunityPost {
     thumbnailUrl: post.thumbnailUrl ?? null,
     partySize: post.partySize ?? null,
     totalSpend: post.totalSpend ?? null,
+    tipIncluded: post.tipIncluded ?? null,
     waitMinutes: post.waitMinutes ?? null,
     foodCategory: post.foodCategory ?? null,
     menuItems: Array.isArray(post.menuItems) ? post.menuItems : [],
@@ -128,6 +129,7 @@ export async function createCommunityPostRequest(input: {
   thumbnailUrl?: string | null
   partySize?: number | null
   totalSpend?: number | null
+  tipIncluded?: boolean | null
   waitMinutes?: number | null
   foodCategory?: CommunityPost['foodCategory']
   menuItems?: CommunityPost['menuItems']
@@ -183,6 +185,7 @@ export async function updateCommunityPostRequest(
     thumbnailUrl?: string | null
     partySize?: number | null
     totalSpend?: number | null
+    tipIncluded?: boolean | null
     waitMinutes?: number | null
     foodCategory?: CommunityPost['foodCategory']
     menuItems?: CommunityPost['menuItems']

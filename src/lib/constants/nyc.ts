@@ -170,7 +170,7 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     listIntro:
       '날짜별로 뭘 준비·제출했는지, 결과는 어떻게 받았는지, 다음 스텝은 뭔지를 남겨 보세요.',
     locationLabel: '학교 / 회사 / 관련 기관 (선택)',
-    locationPlaceholder: '예: NYU, 테크 스타트업, 대사관',
+    locationPlaceholder: '예: 한국계 IT·소프트웨어 회사',
     detailLabel: '유형',
     detailPlaceholder: '',
     detailInput: null,
@@ -183,7 +183,7 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     listIntro:
       '날짜별로 뭘 준비·제출했는지, 결과는 어떻게 받았는지, 다음 스텝은 뭔지를 남겨 보세요.',
     locationLabel: '학교 / 회사 / 관련 기관 (선택)',
-    locationPlaceholder: '예: NYU, 테크 스타트업, 대사관',
+    locationPlaceholder: '예: 한국계 IT·소프트웨어 회사',
     detailLabel: '유형',
     detailPlaceholder: '',
     detailInput: null,

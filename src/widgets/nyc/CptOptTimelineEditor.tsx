@@ -80,28 +80,214 @@ function CreateTimelineForm({
   cptOptType: CptOptTypeId | null
   className?: string
 }) {
-  const entry = value[0] ?? createEmptyTimelineEntry()
+  const [draftMode, setDraftMode] = useState<DraftMode>('add')
+  const [draft, setDraft] = useState(() => createEmptyTimelineEntry())
+  const [editSnapshot, setEditSnapshot] = useState<CptOptTimelineEntry | null>(
+    null,
+  )
+  const [committedIds, setCommittedIds] = useState<string[]>([])
 
-  function updateEntry(patch: Partial<CptOptTimelineEntry>) {
-    onChange([{ ...entry, ...patch }])
+  const committedIdSet = useMemo(
+    () => new Set(committedIds),
+    [committedIds],
+  )
+
+  const savedEntries = useMemo(
+    () =>
+      sortTimelineByDate(
+        value.filter((entry) => committedIdSet.has(entry.id)),
+      ),
+    [value, committedIdSet],
+  )
+
+  const canAddMore = savedEntries.length < CPT_OPT_TIMELINE_MAX
+  const isEditing = draftMode === 'edit'
+  const draftComplete = isTimelineEntryComplete(draft)
+
+  function syncAddDraft(nextDraft: CptOptTimelineEntry) {
+    setDraft(nextDraft)
+    onChange(
+      isTimelineEntryFilled(nextDraft)
+        ? [...savedEntries, nextDraft]
+        : savedEntries,
+    )
+  }
+
+  function syncEditDraft(nextDraft: CptOptTimelineEntry) {
+    setDraft(nextDraft)
+    onChange(
+      value.map((entry) => (entry.id === nextDraft.id ? nextDraft : entry)),
+    )
+  }
+
+  function startAdd() {
+    setDraftMode('add')
+    setEditSnapshot(null)
+    setDraft(createEmptyTimelineEntry())
+    onChange(savedEntries)
+  }
+
+  function commitCurrentDraft() {
+    if (!draftComplete) return
+    if (!canAddMore && !isEditing) return
+
+    const nextSaved = sortTimelineByDate(
+      savedEntries.some((entry) => entry.id === draft.id)
+        ? savedEntries.map((entry) =>
+            entry.id === draft.id ? draft : entry,
+          )
+        : [...savedEntries, draft],
+    )
+    setCommittedIds(nextSaved.map((entry) => entry.id))
+    setDraftMode('add')
+    setEditSnapshot(null)
+    setDraft(createEmptyTimelineEntry())
+    onChange(nextSaved)
+  }
+
+  function startEdit(entry: CptOptTimelineEntry) {
+    setDraftMode('edit')
+    setEditSnapshot(entry)
+    setDraft({ ...entry })
+    onChange(savedEntries)
+  }
+
+  function cancelDraft() {
+    if (draftMode === 'edit' && editSnapshot) {
+      onChange(
+        value.map((entry) =>
+          entry.id === editSnapshot.id ? editSnapshot : entry,
+        ),
+      )
+    } else {
+      onChange(savedEntries)
+    }
+    startAdd()
+  }
+
+  function removeSaved(id: string) {
+    const nextSaved = savedEntries.filter((entry) => entry.id !== id)
+    setCommittedIds(nextSaved.map((entry) => entry.id))
+
+    if (draftMode === 'edit' && draft.id === id) {
+      setDraftMode('add')
+      setEditSnapshot(null)
+      setDraft(createEmptyTimelineEntry())
+      onChange(nextSaved)
+      return
+    }
+
+    onChange(
+      draftMode === 'add' && isTimelineEntryFilled(draft)
+        ? [...nextSaved, draft]
+        : nextSaved,
+    )
+  }
+
+  function handleDraftChange(patch: Partial<CptOptTimelineEntry>) {
+    const nextDraft = { ...draft, ...patch }
+    if (draftMode === 'add') syncAddDraft(nextDraft)
+    else syncEditDraft(nextDraft)
   }
 
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn('space-y-4', className)}>
       <GuideBox
         tone='create'
-        title='신분 서류 시작점만 남겨 주세요'
-        description='날짜를 고른 뒤, 준비·제출·결과·다음 스텝 중 해당하는 항목만 선택해서 적으면 됩니다. 나중에 업데이트로 이어서 추가할 수 있어요.'
+        title='날짜별로 여러 건을 한 번에 남겨 주세요'
+        description='날짜를 고른 뒤 그날에 한 일을 적고, 「이 기록 추가」로 목록에 넣은 다음 다음 날짜를 이어서 작성할 수 있어요. 추가한 기록은 수정·삭제도 가능합니다.'
       />
-      <QuickStepButtons
-        cptOptType={cptOptType}
-        onApply={(patch) => updateEntry(patch)}
-      />
-      <SingleEntryForm
-        entry={entry}
-        cptOptType={cptOptType}
-        onChange={updateEntry}
-      />
+
+      <section className='space-y-2.5'>
+        <div className='flex items-center justify-between gap-2'>
+          <div>
+            <p className='text-[14px] font-semibold text-[var(--foreground)]'>
+              {isEditing ? '선택한 기록 수정' : '진행 기록 작성'}
+            </p>
+            <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
+              {isEditing
+                ? '수정 후 「수정 완료」를 눌러 주세요'
+                : canAddMore
+                  ? `최대 ${CPT_OPT_TIMELINE_MAX}건까지 추가할 수 있어요`
+                  : `최대 ${CPT_OPT_TIMELINE_MAX}건까지입니다`}
+            </p>
+          </div>
+          {isEditing ? (
+            <button
+              type='button'
+              onClick={cancelDraft}
+              className='shrink-0 rounded-full bg-white px-3 py-1.5 text-[12px] font-medium text-[var(--muted)] ring-1 ring-black/[0.08] touch-manipulation hover:text-[var(--foreground)]'
+            >
+              취소
+            </button>
+          ) : null}
+        </div>
+
+        {(!isEditing && canAddMore) || isEditing ? (
+          <>
+            {!isEditing ? (
+              <QuickStepButtons
+                cptOptType={cptOptType}
+                onApply={(patch) => handleDraftChange(patch)}
+              />
+            ) : null}
+
+            <SingleEntryForm
+              entry={draft}
+              cptOptType={cptOptType}
+              highlight
+              onChange={handleDraftChange}
+            />
+
+            <div className='flex flex-wrap items-center gap-2'>
+              <button
+                type='button'
+                disabled={!draftComplete || (!isEditing && !canAddMore)}
+                onClick={commitCurrentDraft}
+                className='inline-flex h-10 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-40'
+              >
+                {isEditing ? '수정 완료' : '이 기록 추가'}
+              </button>
+              {!isEditing && isTimelineEntryFilled(draft) ? (
+                <button
+                  type='button'
+                  onClick={startAdd}
+                  className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
+                >
+                  작성 내용 비우기
+                </button>
+              ) : null}
+            </div>
+          </>
+        ) : (
+          <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-3 text-[12px] text-[var(--muted)] ring-1 ring-black/[0.04]'>
+            기록 한도에 도달했습니다. 기존 기록을 삭제하면 다시 추가할 수
+            있어요.
+          </p>
+        )}
+      </section>
+
+      {savedEntries.length > 0 ? (
+        <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
+          <SectionHeading
+            title={`추가된 기록 ${savedEntries.length}건`}
+            description='수정·삭제로 날짜별 내용을 관리할 수 있어요'
+          />
+          {savedEntries.map((entry, index) => {
+            const isActiveEdit = draftMode === 'edit' && draft.id === entry.id
+            return (
+              <SavedEntryRow
+                key={entry.id}
+                entry={entry}
+                index={index}
+                active={isActiveEdit}
+                onEdit={() => startEdit(entry)}
+                onRemove={() => removeSaved(entry.id)}
+              />
+            )
+          })}
+        </section>
+      ) : null}
     </div>
   )
 }
@@ -119,29 +305,35 @@ function UpdateTimelineForm({
   existingIdSet: Set<string>
   className?: string
 }) {
-  const savedEntries = useMemo(
-    () =>
-      sortTimelineByDate(
-        value.filter((entry) => existingIdSet.has(entry.id)),
-      ),
-    [value, existingIdSet],
-  )
-
   const [draftMode, setDraftMode] = useState<DraftMode>('add')
   const [draft, setDraft] = useState(() => createEmptyTimelineEntry())
   const [editSnapshot, setEditSnapshot] = useState<CptOptTimelineEntry | null>(
     null,
   )
+  const [sessionCommittedIds, setSessionCommittedIds] = useState<string[]>([])
 
-  const canAddMore = value.length < CPT_OPT_TIMELINE_MAX
+  const savedIdSet = useMemo(() => {
+    const next = new Set(existingIdSet)
+    for (const id of sessionCommittedIds) next.add(id)
+    return next
+  }, [existingIdSet, sessionCommittedIds])
+
+  const savedEntries = useMemo(
+    () =>
+      sortTimelineByDate(value.filter((entry) => savedIdSet.has(entry.id))),
+    [value, savedIdSet],
+  )
+
+  const canAddMore = savedEntries.length < CPT_OPT_TIMELINE_MAX
+  const isEditing = draftMode === 'edit'
+  const draftComplete = isTimelineEntryComplete(draft)
 
   function syncAddDraft(nextDraft: CptOptTimelineEntry) {
     setDraft(nextDraft)
-    const withoutDraft = value.filter((entry) => existingIdSet.has(entry.id))
     onChange(
       isTimelineEntryFilled(nextDraft)
-        ? [...withoutDraft, nextDraft]
-        : withoutDraft,
+        ? [...savedEntries, nextDraft]
+        : savedEntries,
     )
   }
 
@@ -160,10 +352,33 @@ function UpdateTimelineForm({
     onChange(savedEntries)
   }
 
+  function commitCurrentDraft() {
+    if (!draftComplete) return
+    if (!canAddMore && !isEditing) return
+
+    const nextSaved = sortTimelineByDate(
+      savedEntries.some((entry) => entry.id === draft.id)
+        ? savedEntries.map((entry) =>
+            entry.id === draft.id ? draft : entry,
+          )
+        : [...savedEntries, draft],
+    )
+    setSessionCommittedIds(
+      nextSaved
+        .map((entry) => entry.id)
+        .filter((id) => !existingIdSet.has(id)),
+    )
+    setDraftMode('add')
+    setEditSnapshot(null)
+    setDraft(createEmptyTimelineEntry())
+    onChange(nextSaved)
+  }
+
   function startEdit(entry: CptOptTimelineEntry) {
     setDraftMode('edit')
     setEditSnapshot(entry)
     setDraft({ ...entry })
+    onChange(savedEntries)
   }
 
   function cancelDraft() {
@@ -180,10 +395,26 @@ function UpdateTimelineForm({
   }
 
   function removeSaved(id: string) {
+    const nextSaved = savedEntries.filter((entry) => entry.id !== id)
+    setSessionCommittedIds(
+      nextSaved
+        .map((entry) => entry.id)
+        .filter((entryId) => !existingIdSet.has(entryId)),
+    )
+
     if (draftMode === 'edit' && draft.id === id) {
-      startAdd()
+      setDraftMode('add')
+      setEditSnapshot(null)
+      setDraft(createEmptyTimelineEntry())
+      onChange(nextSaved)
+      return
     }
-    onChange(value.filter((entry) => entry.id !== id))
+
+    onChange(
+      draftMode === 'add' && isTimelineEntryFilled(draft)
+        ? [...nextSaved, draft]
+        : nextSaved,
+    )
   }
 
   function handleDraftChange(patch: Partial<CptOptTimelineEntry>) {
@@ -192,17 +423,15 @@ function UpdateTimelineForm({
     else syncEditDraft(nextDraft)
   }
 
-  const isEditing = draftMode === 'edit'
-
   return (
     <div className={cn('space-y-4', className)}>
       <GuideBox
         tone='update'
-        title={isEditing ? '기존 기록 수정 중' : '이번에 추가할 1건'}
+        title={isEditing ? '기존 기록 수정 중' : '진행 기록 추가'}
         description={
           isEditing
-            ? '준비·제출·결과 수령·다음 스텝을 고친 뒤, 아래 업데이트 버튼으로 저장해 주세요.'
-            : '새 날짜를 고르고, 준비·제출·결과·다음 스텝 중 필요한 항목만 선택해 적어 주세요.'
+            ? '준비·제출·결과 수령·다음 스텝을 고친 뒤 「수정 완료」를 눌러 주세요.'
+            : '새 날짜를 고르고 내용을 적은 뒤 「이 기록 추가」로 여러 건을 이어서 남길 수 있어요.'
         }
       />
 
@@ -214,8 +443,10 @@ function UpdateTimelineForm({
             </p>
             <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
               {isEditing
-                ? '수정이 끝나면 아래 업데이트 버튼으로 저장하세요'
-                : '한 번에 한 건만 작성할 수 있어요'}
+                ? '수정 후 「수정 완료」를 눌러 주세요'
+                : canAddMore
+                  ? `최대 ${CPT_OPT_TIMELINE_MAX}건까지 추가할 수 있어요`
+                  : `최대 ${CPT_OPT_TIMELINE_MAX}건까지입니다`}
             </p>
           </div>
           {isEditing ? (
@@ -224,41 +455,60 @@ function UpdateTimelineForm({
               onClick={cancelDraft}
               className='shrink-0 rounded-full bg-white px-3 py-1.5 text-[12px] font-medium text-[var(--muted)] ring-1 ring-black/[0.08] touch-manipulation hover:text-[var(--foreground)]'
             >
-              추가 모드로
+              취소
             </button>
           ) : null}
         </div>
 
-        {!isEditing && canAddMore ? (
-          <QuickStepButtons
-            cptOptType={cptOptType}
-            onApply={(patch) => handleDraftChange(patch)}
-          />
-        ) : null}
+        {(!isEditing && canAddMore) || isEditing ? (
+          <>
+            {!isEditing ? (
+              <QuickStepButtons
+                cptOptType={cptOptType}
+                onApply={(patch) => handleDraftChange(patch)}
+              />
+            ) : null}
 
-        <SingleEntryForm
-          entry={draft}
-          cptOptType={cptOptType}
-          highlight
-          onChange={handleDraftChange}
-        />
+            <SingleEntryForm
+              entry={draft}
+              cptOptType={cptOptType}
+              highlight
+              onChange={handleDraftChange}
+            />
 
-        {!isEditing && isTimelineEntryFilled(draft) ? (
-          <button
-            type='button'
-            onClick={startAdd}
-            className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
-          >
-            작성 내용 비우기
-          </button>
-        ) : null}
+            <div className='flex flex-wrap items-center gap-2'>
+              <button
+                type='button'
+                disabled={!draftComplete || (!isEditing && !canAddMore)}
+                onClick={commitCurrentDraft}
+                className='inline-flex h-10 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-40'
+              >
+                {isEditing ? '수정 완료' : '이 기록 추가'}
+              </button>
+              {!isEditing && isTimelineEntryFilled(draft) ? (
+                <button
+                  type='button'
+                  onClick={startAdd}
+                  className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
+                >
+                  작성 내용 비우기
+                </button>
+              ) : null}
+            </div>
+          </>
+        ) : (
+          <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-3 text-[12px] text-[var(--muted)] ring-1 ring-black/[0.04]'>
+            기록 한도에 도달했습니다. 기존 기록을 삭제하면 다시 추가할 수
+            있어요.
+          </p>
+        )}
       </section>
 
       {savedEntries.length > 0 ? (
         <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
           <SectionHeading
-            title={`이전 기록 ${savedEntries.length}건`}
-            description='참고용이에요. 고칠 항목만 선택해 수정할 수 있습니다'
+            title={`저장된 기록 ${savedEntries.length}건`}
+            description='수정·삭제로 날짜별 내용을 관리할 수 있어요'
           />
           {savedEntries.map((entry, index) => {
             const isActiveEdit = draftMode === 'edit' && draft.id === entry.id
@@ -486,7 +736,7 @@ function SingleEntryForm({
             <TipTapEditor
               value={entry.stageReviewHtml}
               onChange={(html) => onChange({ stageReviewHtml: html })}
-              placeholder='예: ISS 포털 업로드가 직 안 돼서 PDF를 다시 압축해 올렸어요. 어드바이저 서명은 하루 걸렸습니다.'
+              placeholder='예: OGS 포털 업로드가 직 안 돼서 PDF를 다시 압축해 올렸어요. 오퍼레터 날짜 맞추는 데 하루 걸렸습니다.'
               minHeightClassName='min-h-[160px]'
               maxLength={CPT_OPT_STAGE_REVIEW_MAX}
             />

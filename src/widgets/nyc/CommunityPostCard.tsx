@@ -71,7 +71,11 @@ function FoodListingCard({
   const thumbnail = resolveCommunityThumbnail(post)
   const foodCategory = getFoodCategory(post.foodCategory)
   const cuisineLabel = getFoodCuisineLabel(normalizeFoodCuisine(post.detail))
-  const foodSpend = formatFoodPartySpend(post.partySize, post.totalSpend)
+  const foodSpend = formatFoodPartySpend(
+    post.partySize,
+    post.totalSpend,
+    post.tipIncluded,
+  )
   const foodWait = formatFoodWait(post.waitMinutes)
   const metaChips = [
     cuisineLabel ? (

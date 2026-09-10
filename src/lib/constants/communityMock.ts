@@ -64,6 +64,7 @@ function post(
     | 'thumbnailUrl'
     | 'partySize'
     | 'totalSpend'
+    | 'tipIncluded'
     | 'waitMinutes'
     | 'foodCategory'
     | 'menuItems'
@@ -100,6 +101,7 @@ function post(
     thumbnailUrl?: string | null
     partySize?: number | null
     totalSpend?: number | null
+    tipIncluded?: boolean | null
     waitMinutes?: number | null
     foodCategory?: CommunityPost['foodCategory']
     menuItems?: CommunityPost['menuItems']
@@ -137,6 +139,7 @@ function post(
     thumbnailUrl: partial.thumbnailUrl ?? null,
     partySize: partial.partySize ?? null,
     totalSpend: partial.totalSpend ?? null,
+    tipIncluded: partial.tipIncluded ?? null,
     waitMinutes: partial.waitMinutes ?? null,
     foodCategory: partial.foodCategory ?? null,
     menuItems: partial.menuItems ?? [],
@@ -331,6 +334,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&q=80',
     partySize: 2,
     totalSpend: 35,
+    tipIncluded: true,
     waitMinutes: 25,
     foodCategory: 'restaurant',
     placeId: 'mock-place-flushing',
@@ -385,6 +389,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80',
     partySize: 1,
     totalSpend: 13,
+    tipIncluded: false,
     waitMinutes: 0,
     foodCategory: 'study',
     placeId: 'mock-place-ktown',
@@ -433,6 +438,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&q=80',
     partySize: 3,
     totalSpend: 68,
+    tipIncluded: true,
     waitMinutes: 45,
     foodCategory: 'vibe',
     placeId: 'mock-place-brooklyn',
@@ -472,6 +478,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800&q=80',
     partySize: 2,
     totalSpend: 18.0,
+    tipIncluded: false,
     waitMinutes: 10,
     foodCategory: 'value',
     placeId: 'mock-place-queens',
@@ -510,6 +517,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=800&q=80',
     partySize: 3,
     totalSpend: 58,
+    tipIncluded: true,
     waitMinutes: 10,
     foodCategory: 'restaurant',
     placeId: 'mock-place-flushing',
@@ -537,6 +545,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1552611052-33e04de081de?w=800&q=80',
     partySize: 1,
     totalSpend: 16,
+    tipIncluded: false,
     waitMinutes: 5,
     foodCategory: 'value',
     placeId: 'mock-place-flushing',
@@ -564,6 +573,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=800&q=80',
     partySize: 1,
     totalSpend: 9,
+    tipIncluded: true,
     waitMinutes: 0,
     foodCategory: 'study',
     placeId: 'mock-place-ktown',
@@ -591,6 +601,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1515823662972-da45a9da5243?w=800&q=80',
     partySize: 2,
     totalSpend: 22,
+    tipIncluded: false,
     waitMinutes: 0,
     foodCategory: 'vibe',
     placeId: 'mock-place-ktown',
@@ -618,6 +629,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&q=80',
     partySize: 4,
     totalSpend: 96,
+    tipIncluded: true,
     waitMinutes: 20,
     foodCategory: 'vibe',
     placeId: 'mock-place-brooklyn',
@@ -646,6 +658,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=800&q=80',
     partySize: 2,
     totalSpend: 32,
+    tipIncluded: false,
     waitMinutes: 15,
     foodCategory: 'restaurant',
     placeId: 'mock-place-midtown',
@@ -682,6 +695,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&q=80',
     partySize: 1,
     totalSpend: 14,
+    tipIncluded: true,
     waitMinutes: 5,
     foodCategory: 'value',
     placeId: 'mock-place-midtown',
@@ -709,6 +723,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&q=80',
     partySize: 2,
     totalSpend: 41,
+    tipIncluded: false,
     waitMinutes: 25,
     foodCategory: 'restaurant',
     placeId: 'mock-place-midtown',
@@ -736,6 +751,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&q=80',
     partySize: 2,
     totalSpend: 38,
+    tipIncluded: true,
     waitMinutes: 20,
     foodCategory: 'restaurant',
     placeId: 'mock-place-ev-ramen',
@@ -763,6 +779,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=800&q=80',
     partySize: 1,
     totalSpend: 19,
+    tipIncluded: false,
     waitMinutes: 10,
     foodCategory: 'vibe',
     placeId: 'mock-place-ev-ramen',
@@ -790,6 +807,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&q=80',
     partySize: 2,
     totalSpend: 72,
+    tipIncluded: true,
     waitMinutes: 15,
     foodCategory: 'vibe',
     placeId: 'mock-place-wv-pasta',
@@ -817,6 +835,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=80',
     partySize: 2,
     totalSpend: 24,
+    tipIncluded: false,
     waitMinutes: 0,
     foodCategory: 'value',
     placeId: 'mock-place-queens-taco',
@@ -894,47 +913,57 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     categoryId: 'status',
     title: 'CPT 신청 타임라인 — 내가 겪은 순서',
     description:
-      '학교 ISS / 회사 offer / I-20 순서만 정리해도 훨씬 수월해졌어요.',
+      '학교 OGS / 회사 offer / I-20 순서만 정리해도 훨씬 수월해졌어요.',
     contentHtml: `
       <p>CPT 처음 신청할 때 헷갈렸던 부분을 순서대로 남깁니다.</p>
       <h2>제가 한 순서</h2>
       <ol>
-        <li>오퍼레터 수령</li>
-        <li>학교 CPT 신청서 제출</li>
-        <li>어드바이저 미팅</li>
+        <li>CPT 모듈 수료</li>
+        <li>Job offer letter 수령</li>
+        <li>CPT 신청서 OGS 제출</li>
         <li>새 I-20 수령 후 근무 시작</li>
       </ol>
       <p>회사 시작일보다 <strong>최소 2–3주 전</strong>에 서류 넣는 걸 추천합니다.</p>
-      <blockquote>학교마다 포털/양식이 다르니 ISS 체크리스트를 먼저 보세요.</blockquote>
+      <blockquote>학교마다 포털/양식이 다르니 OGS 체크리스트를 먼저 보세요.</blockquote>
     `,
     location: '',
     detail: 'CPT',
     cptOptType: 'cpt',
     cptOptTips:
-      '회사 시작일보다 최소 2–3주 전에 학교에 서류를 넣으세요. 학교마다 포털/양식이 달라 ISS 체크리스트를 먼저 확인하는 게 좋아요.',
+      '회사 시작일보다 최소 2–3주 전에 OGS에 서류를 넣으세요. 학교마다 포털/양식이 달라 OGS 체크리스트를 먼저 확인하는 게 좋아요.',
     cptOptTimeline: [
       {
         id: 't1',
-        date: '2025-01-10',
-        prepared: '오퍼레터, CPT 신청서 초안',
+        date: '2025-01-05',
+        prepared: 'CPT 모듈(오리엔테이션) 수료',
         submitted: '',
         resultReceived: '',
-        nextStep: '어드바이저 서명 받고 ISS에 제출',
+        nextStep: '오퍼레터·OGS 체크리스트 준비',
         stageReviewHtml:
-          '<p>오퍼레터 받은 날부터 체크리스트를 만들기 시작했어요. 학교 포털에 CPT 메뉴가 어디에 있는지 찾는 데 시간이 좀 걸렸습니다.</p>',
+          '<p>CPT 모듈을 먼저 끝내야 포털에서 신청 버튼이 열렸어요. 영상·퀴즈까지 한두 시간이면 충분했습니다.</p>',
       },
       {
         id: 't2',
-        date: '2025-01-18',
-        prepared: '어드바이저 서명',
-        submitted: 'ISS 포털에 PDF 업로드',
+        date: '2025-01-10',
+        prepared: 'Job offer letter 수령',
+        submitted: '',
         resultReceived: '',
-        nextStep: '새 I-20 이메일 수령 대기',
+        nextStep: 'CPT 신청서 작성 후 OGS 제출',
         stageReviewHtml:
-          '<p>어드바이저 미팅은 15분 정도. PDF 용량이 커서 한 번 업로드 실패했고, 압축 후 다시 올렸더니 통과됐습니다.</p>',
+          '<p>오퍼레터에 직함·주소·근무 시작일이 정확히 적혀 있는지 확인했어요. OGS 양식과 날짜가 맞아야 합니다.</p>',
       },
       {
         id: 't3',
+        date: '2025-01-18',
+        prepared: '오퍼레터, CPT 신청서',
+        submitted: 'OGS 포털에 신청서 제출',
+        resultReceived: '',
+        nextStep: '새 I-20 이메일 수령 대기',
+        stageReviewHtml:
+          '<p>OGS 포털 업로드. PDF 용량이 커서 한 번 실패했고, 압축 후 다시 올렸더니 통과됐습니다.</p>',
+      },
+      {
+        id: 't4',
         date: '2025-01-28',
         prepared: '',
         submitted: '',
@@ -969,7 +998,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       </ul>
       <p>대기 기간에 포트폴리오를 정리해 둔 게 가장 도움이 됐어요.</p>
     `,
-    location: '테크 스타트업',
+    location: '미국 IT·소프트웨어 회사',
     detail: 'OPT',
     cptOptType: 'opt',
     cptOptTips:
@@ -1020,7 +1049,7 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
       </ul>
       <p>저는 Google Calendar에 알림 3개를 걸어두고 있습니다. 추천해요.</p>
     `,
-    location: '핀테크',
+    location: '미국 금융·핀테크 회사',
     detail: 'STEM OPT',
     cptOptType: 'stem-opt',
     cptOptTips:

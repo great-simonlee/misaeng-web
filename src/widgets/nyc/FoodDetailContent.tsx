@@ -11,6 +11,7 @@ import {
 import {
   buildFoodDetailCarouselSlides,
   formatFoodMenuDisplay,
+  formatFoodTipIncluded,
   formatUsd,
   getFoodCuisineLabel,
   getFoodMenuName,
@@ -91,6 +92,7 @@ export function FoodDetailContent({
     post.totalSpend != null && Number.isFinite(post.totalSpend)
       ? Math.floor(post.totalSpend)
       : null
+  const tipLabel = formatFoodTipIncluded(post.tipIncluded)
   const waitMinutes =
     post.waitMinutes != null && Number.isFinite(post.waitMinutes)
       ? Math.max(0, Math.floor(post.waitMinutes))
@@ -169,7 +171,11 @@ export function FoodDetailContent({
             <MetricCell
               label='총 금액'
               value={
-                totalSpend != null ? `$${formatUsd(totalSpend)}` : '—'
+                totalSpend != null
+                  ? `$${formatUsd(totalSpend)}${
+                      tipLabel ? ` · ${tipLabel}` : ''
+                    }`
+                  : '—'
               }
               emphasize
             />

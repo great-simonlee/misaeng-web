@@ -287,6 +287,8 @@ export interface CommunityPost {
   partySize: number | null
   /** 맛집: 총 지출(USD) */
   totalSpend: number | null
+  /** 맛집: 총 금액에 팁 포함 여부 */
+  tipIncluded: boolean | null
   /** 맛집: 웨이팅 시간(분). 0 = 없음 */
   waitMinutes: number | null
   /** 맛집: 맛집 | 가성비 | 느좋 | 카공 */

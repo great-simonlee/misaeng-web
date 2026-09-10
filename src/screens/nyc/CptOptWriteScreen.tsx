@@ -16,7 +16,6 @@ import {
 import {
   CPT_OPT_TIPS_MAX,
   CPT_OPT_TYPES,
-  createEmptyTimelineEntry,
   getCptOptTypeLabel,
   getCptOptTypeStyle,
   isTimelineEntryComplete,
@@ -42,6 +41,7 @@ import { CptOptTimelineEditor } from '@widgets/nyc/CptOptTimelineEditor'
 import { CptOptTypeBadge, CptOptTypePicker } from '@widgets/nyc/CptOptTypeBadge'
 import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
+import { StatusEmployerSelect } from '@widgets/nyc/StatusEmployerSelect'
 
 interface CptOptWriteScreenProps {
   title: string
@@ -69,9 +69,7 @@ export function CptOptWriteScreen({
   const [contentHtml, setContentHtml] = useState('')
   const [location, setLocation] = useState('')
   const [cptOptType, setCptOptType] = useState<CptOptTypeId | null>(null)
-  const [timeline, setTimeline] = useState<CptOptTimelineEntry[]>([
-    createEmptyTimelineEntry(),
-  ])
+  const [timeline, setTimeline] = useState<CptOptTimelineEntry[]>([])
   const [existingTimelineIds, setExistingTimelineIds] = useState<string[]>([])
   const [showMoreSettings, setShowMoreSettings] = useState(false)
 
@@ -152,7 +150,7 @@ export function CptOptWriteScreen({
       toastError(
         isEdit
           ? '진행 기록을 최소 1건 남겨 주세요'
-          : '첫 진행 기록(날짜 + 내용)을 입력해 주세요',
+          : '진행 기록(날짜 + 내용)을 최소 1건 입력해 주세요',
       )
       return
     }
@@ -299,14 +297,11 @@ export function CptOptWriteScreen({
                         placeholder={meta.titlePlaceholder}
                       />
                     </Field>
-                    <Field label={meta.locationLabel}>
-                      <input
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
-                        className={inputClass}
-                        placeholder={meta.locationPlaceholder}
-                      />
-                    </Field>
+                    <StatusEmployerSelect
+                      value={location}
+                      onChange={setLocation}
+                      label={meta.locationLabel}
+                    />
                     <div>
                       <p className='text-[13px] font-medium text-[var(--foreground)]'>
                         조심해야 할 점
@@ -318,7 +313,7 @@ export function CptOptWriteScreen({
                         <TipTapEditor
                           value={contentHtml}
                           onChange={setContentHtml}
-                          placeholder='예: 회사 시작일 2–3주 전에 학교에 서류를 넣으세요. 학교마다 포털이 달라 ISS 체크리스트를 먼저 확인하세요.'
+                          placeholder='예: 회사 시작일 2–3주 전에 OGS에 서류를 넣으세요. 학교마다 포털이 달라 OGS 체크리스트를 먼저 확인하세요.'
                           minHeightClassName='min-h-[160px]'
                           maxLength={COMMUNITY_BODY_MAX}
                         />
@@ -369,7 +364,7 @@ export function CptOptWriteScreen({
               <CreateSection
                 step={2}
                 title='기본 정보'
-                description='제목과 학교·회사를 적어 주세요'
+                description='제목과 회사·기관 유형을 선택해 주세요'
               >
                 <Field label='제목' required>
                   <input
@@ -380,20 +375,18 @@ export function CptOptWriteScreen({
                     placeholder={meta.titlePlaceholder}
                   />
                 </Field>
-                <Field label={meta.locationLabel} className='mt-4'>
-                  <input
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className={inputClass}
-                    placeholder={meta.locationPlaceholder}
-                  />
-                </Field>
+                <StatusEmployerSelect
+                  className='mt-4'
+                  value={location}
+                  onChange={setLocation}
+                  label={meta.locationLabel}
+                />
               </CreateSection>
 
               <CreateSection
                 step={3}
-                title='첫 진행 기록'
-                description='날짜를 고른 뒤, 준비·제출·결과·다음 스텝 중 필요한 항목만 골라 작성하세요'
+                title='진행 기록'
+                description='날짜별로 여러 건을 추가·수정·삭제할 수 있어요'
               >
                 <CptOptTimelineEditor
                   value={timeline}
@@ -411,7 +404,7 @@ export function CptOptWriteScreen({
                 <TipTapEditor
                   value={contentHtml}
                   onChange={setContentHtml}
-                  placeholder='예: 회사 시작일 2–3주 전에 학교에 서류를 넣으세요. 학교마다 포털이 달라 ISS 체크리스트를 먼저 확인하세요.'
+                  placeholder='예: 회사 시작일 2–3주 전에 OGS에 서류를 넣으세요. 학교마다 포털이 달라 OGS 체크리스트를 먼저 확인하세요.'
                   minHeightClassName='min-h-[200px]'
                   maxLength={COMMUNITY_BODY_MAX}
                 />
@@ -429,7 +422,7 @@ export function CptOptWriteScreen({
                     : '후기 등록하기'}
               </button>
               <p className='text-center text-[12px] text-[var(--muted)]'>
-                등록 후에도 몇 달에 걸쳐 진행 기록을 이어서 추가할 수 있어요.
+                등록 후에도 진행 기록을 이어서 추가·수정할 수 있어요.
               </p>
             </>
           )}
@@ -458,9 +451,9 @@ function CreateHero({ writeLabel }: { writeLabel: string }) {
         {writeLabel}
       </h1>
       <p className='mt-2 text-[13px] leading-relaxed text-[var(--muted)]'>
-        유형·기본 정보·첫 진행 기록을 한 번에 세팅하는 화면이에요. OPT·비자·영주권
-        후기를 이 게시판에서 함께 남길 수 있고, 이후 진행 상황은 업데이트에서
-        한 건씩 추가하면 됩니다.
+        유형·기본 정보·진행 기록을 한 번에 세팅하는 화면이에요. 날짜별로 여러
+        건을 남겨 두고, OPT·비자·영주권 후기도 이 게시판에서 함께 남길 수
+        있습니다. 이후 진행 상황은 업데이트에서 이어서 추가하면 됩니다.
       </p>
     </div>
   )
