@@ -24,6 +24,7 @@ import { ProfileVerificationSection } from '@widgets/nyc/ProfileVerificationSect
 import { MyPageSkeleton } from '@widgets/nyc/MyPageSkeleton'
 import { ProfileCardAction } from '@widgets/nyc/ProfileCardAction'
 import { MyPageCreditSection } from '@widgets/nyc/MyPageCreditSection'
+import { MyPageReferralSection } from '@widgets/nyc/MyPageReferralSection'
 
 import type { NycUserProfile } from '@/types/nyc'
 
@@ -540,6 +541,8 @@ export function MyPageScreen() {
                 </div>
               </div>
             </section>
+
+            <MyPageReferralSection />
 
             <ProfileVerificationSection
               profile={profile}

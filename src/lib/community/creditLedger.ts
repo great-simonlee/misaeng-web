@@ -2,6 +2,7 @@ import {
   COMMUNITY_CREDIT_BONUS_RULES,
   COMMUNITY_CREDIT_EARN_RULES,
   COMMUNITY_CREDIT_LIMITS,
+  COMMUNITY_CREDIT_REFERRAL_POST,
   COMMUNITY_CREDIT_REVIEW_BONUS,
   COMMUNITY_CREDIT_TIMELINE_ENTRY,
   COMMUNITY_CREDIT_TIMELINE_POST_MAX,
@@ -39,6 +40,9 @@ function earnAmountForReason(reason: CommunityCreditEarnReason): number {
   if (reason === 'review-bonus') {
     return COMMUNITY_CREDIT_REVIEW_BONUS
   }
+  if (reason === 'referral') {
+    return COMMUNITY_CREDIT_REFERRAL_POST
+  }
   const rule = COMMUNITY_CREDIT_EARN_RULES.find((item) => item.id === reason)
   return rule?.amount ?? 0
 }
@@ -52,6 +56,9 @@ function earnLabelForReason(reason: CommunityCreditEarnReason): string {
   }
   if (reason === 'review-bonus') {
     return '최종 결과 리뷰 보너스'
+  }
+  if (reason === 'referral') {
+    return '추천 코드 사용'
   }
   return (
     COMMUNITY_CREDIT_EARN_RULES.find((item) => item.id === reason)?.label ??
@@ -307,6 +314,35 @@ export async function awardSchoolVerifyCredit(
   return mutateAccount(uid, (account) =>
     claimBonus(account, 'school-verify', 'school-verify'),
   )
+}
+
+/** 다른 사람이 추천 코드를 사용하면 추천인에게 +10 (1명당 1회, 최대 7명) */
+export async function awardReferralBindCredit(args: {
+  referrerUid: string
+  referredUid: string
+}): Promise<CommunityCreditAccount | null> {
+  const referrerUid = String(args.referrerUid || '').trim()
+  const referredUid = String(args.referredUid || '').trim()
+  if (!referrerUid || !referredUid || referrerUid === referredUid) return null
+
+  const amount = COMMUNITY_CREDIT_REFERRAL_POST
+  if (amount <= 0) return null
+
+  const sourceId = `referral:${referredUid}`
+  return mutateAccount(referrerUid, (account) => {
+    if (hasEarnForSource(account, 'referral', sourceId)) return account
+    if (netEarnedForSource(account, 'referral', sourceId) > 0) return account
+
+    return appendEntry(account, {
+      id: newEntryId('referral'),
+      kind: 'earn',
+      reason: 'referral',
+      amount,
+      label: earnLabelForReason('referral'),
+      sourceId,
+      createdAt: Date.now(),
+    })
+  })
 }
 
 /** 미생 팀 승인 후 최종 결과 리뷰 보너스 (+20) */

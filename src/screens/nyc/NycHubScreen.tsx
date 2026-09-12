@@ -9,6 +9,7 @@ import { MagazinePreviewSection } from '@widgets/nyc/MagazinePreviewSection'
 import { PartnerSchoolsMarquee } from '@widgets/nyc/PartnerSchoolsMarquee'
 import { PartnerInfluencersSection } from '@widgets/nyc/PartnerInfluencersSection'
 import { ProfessionalsSection } from '@widgets/nyc/ProfessionalsSection'
+import { captureReferralFromLocation } from '@lib/community/referral'
 
 /** 임시: 허브 진입 시 스피너 노출 시간 (ms) */
 const TEMP_SPLASH_MS = 1200
@@ -18,6 +19,7 @@ export function NycHubScreen() {
   const [showSplash, setShowSplash] = useState(true)
 
   useEffect(() => {
+    captureReferralFromLocation()
     const id = window.setTimeout(() => setShowSplash(false), TEMP_SPLASH_MS)
     return () => window.clearTimeout(id)
   }, [])

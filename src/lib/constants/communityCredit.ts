@@ -10,6 +10,7 @@ export type CommunityCreditEarnReason =
   | 'school-verify'
   | 'first-post'
   | 'review-bonus'
+  | 'referral'
 
 export type CommunityCreditEntry = {
   id: string
@@ -100,6 +101,10 @@ export const COMMUNITY_CREDIT_POST_TOTAL_MAX =
   COMMUNITY_CREDIT_TIMELINE_POST_MAX + COMMUNITY_CREDIT_REVIEW_BONUS
 /** 환산 안내용 — 후기 1편을 자동 최대치로 채웠을 때 */
 export const COMMUNITY_CREDIT_PREMIUM_POST = COMMUNITY_CREDIT_TIMELINE_POST_MAX
+/** 다른 사람이 내 추천 코드를 사용하면 추천인에게 1명당 */
+export const COMMUNITY_CREDIT_REFERRAL_POST = 10
+/** 추천 코드로 크레딧을 받을 수 있는 최대 인원 */
+export const COMMUNITY_CREDIT_REFERRAL_MAX = 7
 
 export const COMMUNITY_CREDIT_PRINCIPLES = [
   {
@@ -261,6 +266,25 @@ export const COMMUNITY_CREDIT_EARN_RULES: readonly CommunityCreditEarnRule[] = [
       '동일 문장 복붙 도배',
     ],
     tip: '질문에 답하거나 경험을 덧붙이는 댓글이 커뮤니티에 더 도움이 됩니다.',
+  },
+  {
+    id: 'referral',
+    label: '추천 코드 사용',
+    amount: COMMUNITY_CREDIT_REFERRAL_POST,
+    maxAmount: COMMUNITY_CREDIT_REFERRAL_POST * COMMUNITY_CREDIT_REFERRAL_MAX,
+    description: `다른 사람이 내 추천 코드를 사용하면 추천한 사람에게 ${COMMUNITY_CREDIT_REFERRAL_POST} 크레딧이 쌓입니다. 최대 ${COMMUNITY_CREDIT_REFERRAL_MAX}명까지.`,
+    conditions: [
+      '추천 링크로 가입했거나, 마이페이지에서 추천인 코드를 연결한 경우',
+      `사용한 사람 1명당 ${COMMUNITY_CREDIT_REFERRAL_POST} 크레딧`,
+      `계정당 최대 ${COMMUNITY_CREDIT_REFERRAL_MAX}명`,
+      '본인 코드로 스스로를 추천할 수 없음',
+    ],
+    notEligible: [
+      '본인 추천',
+      `이미 ${COMMUNITY_CREDIT_REFERRAL_MAX}명이 코드를 사용한 경우`,
+      '이미 다른 추천인과 연결된 계정',
+    ],
+    tip: '마이페이지에서 추천 링크를 복사해 선후배·친구에게 공유하세요.',
   },
 ] as const
 

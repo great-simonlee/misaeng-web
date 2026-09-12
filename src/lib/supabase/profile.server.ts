@@ -32,6 +32,12 @@ export type SupabaseProfileRecord = {
   consentedAt?: string | null
   consentUiLanguage?: 'en' | 'ko' | null
   status?: 'active' | 'suspended' | null
+  /** 공개 추천 코드 (8자) */
+  referralCode?: string | null
+  /** 연결된 추천인 uid */
+  referredByUid?: string | null
+  referredByCode?: string | null
+  referredAt?: number | null
   updatedAt?: number
 }
 

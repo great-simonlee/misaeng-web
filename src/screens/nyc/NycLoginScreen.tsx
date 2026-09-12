@@ -18,6 +18,12 @@ import { AuthConfigBanner } from '@widgets/nyc/AuthConfigBanner'
 import { GoogleSignInButton } from '@widgets/nyc/GoogleSignInButton'
 import { isAppConnectConfigured } from '@lib/constants/appConnect'
 import { isGoogleSignInConfigured } from '@lib/google/config'
+import {
+  bindPersistedReferralIfNeeded,
+  captureReferralFromLocation,
+  persistReferralCode,
+  REFERRAL_QUERY_KEY,
+} from '@lib/community/referral'
 
 const inputClass =
   'mt-2 min-h-[48px] w-full rounded-xl border border-[#dde2ea] bg-white px-3.5 text-[15px] font-normal text-[var(--foreground)] outline-none transition placeholder:text-[#98a2b3] focus:border-[#F64310] focus:shadow-[0_0_0_3px_rgba(246,67,16,0.12)]'
@@ -76,6 +82,12 @@ export function NycLoginScreen() {
   }, [])
 
   useEffect(() => {
+    captureReferralFromLocation()
+    const ref = searchParams.get(REFERRAL_QUERY_KEY)
+    if (ref) persistReferralCode(ref)
+  }, [searchParams])
+
+  useEffect(() => {
     let cancelled = false
     void fetch('/api/legal/policy', { cache: 'no-store' })
       .then((res) => res.json())
@@ -113,6 +125,7 @@ export function NycLoginScreen() {
         success('로그인했어요')
       } else {
         await signUpEmail(email.trim(), password, consentPayload)
+        await bindPersistedReferralIfNeeded()
         success('회원가입이 완료되었어요')
       }
       router.replace(next)
@@ -146,7 +159,10 @@ export function NycLoginScreen() {
           ...credential,
           consent: mode === 'signup' ? consentPayload : undefined,
         })
-        success('로그인했어요')
+        if (mode === 'signup') {
+          await bindPersistedReferralIfNeeded()
+        }
+        success(mode === 'signup' ? '회원가입이 완료되었어요' : '로그인했어요')
         router.replace(next)
       } catch (err) {
         toastError(getErrorMessage(err, 'Google 로그인에 실패했어요'))
@@ -257,11 +273,23 @@ export function NycLoginScreen() {
             </div>
           )}
 
-          {/* Google을 상단에 배치 — 스크롤 없이 바로 보이게 */}
+          {mode === 'signup' && (
+            <div className='mt-5'>
+              <TermsConsentFields
+                checked={acceptedTerms}
+                onChange={(nextChecked) => {
+                  setAcceptedTerms(nextChecked)
+                  if (nextChecked) setShowTermsError(false)
+                }}
+                error={showTermsError}
+              />
+            </div>
+          )}
+
           {!isResetMode && (
-            <div className='mt-5 space-y-3'>
+            <div className={mode === 'signup' ? 'mt-4 space-y-3' : 'mt-5 space-y-3'}>
               <GoogleSignInButton
-                disabled={submitting || !canUseGoogle}
+                disabled={submitting || !canUseGoogle || !canSubmitAuth}
                 onCredential={(credential) =>
                   void handleGoogleCredential(credential)
                 }
@@ -368,17 +396,6 @@ export function NycLoginScreen() {
                   비밀번호 찾기
                 </button>
               </div>
-            )}
-
-            {mode === 'signup' && (
-              <TermsConsentFields
-                checked={acceptedTerms}
-                onChange={(nextChecked) => {
-                  setAcceptedTerms(nextChecked)
-                  if (nextChecked) setShowTermsError(false)
-                }}
-                error={showTermsError}
-              />
             )}
 
             <button
