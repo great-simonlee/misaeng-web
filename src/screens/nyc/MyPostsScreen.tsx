@@ -6,15 +6,21 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { LoadingState, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import {
+  cityLoginPath,
+  hrefForCommunityPost,
+  type CityId,
+} from '@lib/constants/cities'
 import {
   deleteCommunityPostRequest,
   fetchMyCommunityPosts,
 } from '@lib/community/client'
 import {
+  getCityCategories,
   getNycCategory,
-  NYC_CATEGORIES,
-  NYC_COMMUNITY_BOARD_IDS,
+  isCommunityBoardId,
   NYC_PAGE_SHELL_CLASS,
   resolveMergedCommunityBoardId,
   type NycCommunityBoardId,
@@ -27,15 +33,14 @@ import {
 } from '@widgets/nyc/AccountCategoryNav'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 
-type MyPostsCommunityCategory = Extract<
-  (typeof NYC_CATEGORIES)[number],
-  { id: NycCommunityBoardId }
->
-
-const MY_POSTS_COMMUNITY_CATEGORIES = NYC_CATEGORIES.filter(
-  (category): category is MyPostsCommunityCategory =>
-    (NYC_COMMUNITY_BOARD_IDS as readonly string[]).includes(category.id),
-)
+function getMyPostsCategories(city: CityId) {
+  return getCityCategories(city).filter(
+    (
+      category,
+    ): category is (typeof category & { id: NycCommunityBoardId }) =>
+      isCommunityBoardId(category.id),
+  )
+}
 
 type MyPostItem = {
   id: string
@@ -54,19 +59,22 @@ type CategoryFilter = 'all' | NycCommunityBoardId
 
 export function MyPostsScreen() {
   const { user, loading } = useAuth()
+  const city = useCity()
+  const href = useCityPath()
   const router = useRouter()
   const { error: toastError, success } = useToast()
   const [posts, setPosts] = useState<MyPostItem[]>([])
   const [loadingPosts, setLoadingPosts] = useState(true)
   const [category, setCategory] = useState<CategoryFilter>('all')
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const boards = useMemo(() => getMyPostsCategories(city), [city])
 
   useEffect(() => {
     if (loading) return
     if (!user) {
-      router.replace(`/nyc/login?next=${encodeURIComponent('/nyc/me/posts')}`)
+      router.replace(cityLoginPath(city, href('/me/posts')))
     }
-  }, [user, loading, router])
+  }, [user, loading, router, city, href])
 
   const loadPosts = useCallback(async () => {
     if (!user) {
@@ -76,14 +84,14 @@ export function MyPostsScreen() {
     setLoadingPosts(true)
     try {
       const community = await fetchMyCommunityPosts()
-      setPosts(mapCommunity(community))
+      setPosts(mapCommunity(community, city))
     } catch (err) {
       toastError(getErrorMessage(err, '내 글을 불러오지 못했어요'))
       setPosts([])
     } finally {
       setLoadingPosts(false)
     }
-  }, [user, toastError])
+  }, [user, toastError, city])
 
   useEffect(() => {
     if (loading || !user) return
@@ -110,13 +118,13 @@ export function MyPostsScreen() {
 
   const counts = useMemo(() => {
     const map = Object.fromEntries(
-      MY_POSTS_COMMUNITY_CATEGORIES.map((category) => [category.id, 0]),
+      boards.map((category) => [category.id, 0]),
     ) as Record<NycCommunityBoardId, number>
     for (const post of posts) {
       map[post.categoryId] = (map[post.categoryId] ?? 0) + 1
     }
     return map
-  }, [posts])
+  }, [posts, boards])
 
   const filteredPosts = useMemo(() => {
     if (category === 'all') return posts
@@ -124,20 +132,20 @@ export function MyPostsScreen() {
   }, [posts, category])
 
   const sortedBoards = useMemo(() => {
-    return [...MY_POSTS_COMMUNITY_CATEGORIES].sort((a, b) => {
+    return [...boards].sort((a, b) => {
       const diff = counts[b.id] - counts[a.id]
       if (diff !== 0) return diff
       return (
-        MY_POSTS_COMMUNITY_CATEGORIES.findIndex((c) => c.id === a.id) -
-        MY_POSTS_COMMUNITY_CATEGORIES.findIndex((c) => c.id === b.id)
+        boards.findIndex((c) => c.id === a.id) -
+        boards.findIndex((c) => c.id === b.id)
       )
     })
-  }, [counts])
+  }, [counts, boards])
 
   const selectedBoard =
     category === 'all'
       ? null
-      : MY_POSTS_COMMUNITY_CATEGORIES.find((c) => c.id === category) ?? null
+      : boards.find((c) => c.id === category) ?? null
 
   if (loading) {
     return <LoadingState fullPage />
@@ -248,7 +256,7 @@ export function MyPostsScreen() {
                     : '해당 게시판에서 글을 올리면 여기에 보여요'}
                 </p>
                 <Link
-                  href={selectedBoard?.href ?? '/nyc'}
+                  href={selectedBoard?.href ?? href()}
                   className='mt-5 inline-flex h-10 items-center rounded-full bg-[var(--foreground)] px-5 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--navy-light)]'
                 >
                   {selectedBoard
@@ -326,7 +334,7 @@ export function MyPostsScreen() {
   )
 }
 
-function mapCommunity(posts: CommunityPost[]): MyPostItem[] {
+function mapCommunity(posts: CommunityPost[], city: CityId): MyPostItem[] {
   return posts.map((post) => {
     const mergedId =
       resolveMergedCommunityBoardId(post.categoryId) ?? post.categoryId
@@ -338,8 +346,8 @@ function mapCommunity(posts: CommunityPost[]): MyPostItem[] {
       title: post.title,
       meta:
         [post.location, post.detail].filter(Boolean).join(' · ') || '상세 보기',
-      href: `/nyc/${categoryId}/${post.id}`,
-      editHref: isMock ? null : `/nyc/${categoryId}/${post.id}/edit`,
+      href: hrefForCommunityPost(post, city),
+      editHref: isMock ? null : hrefForCommunityPost(post, city, 'edit'),
       categoryId,
       boardLabel: category?.title ?? categoryId,
       authorSchoolId: post.authorSchoolId,

@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 
+import { useCity } from '@hooks/useCity'
+import { hrefForCommunityPost } from '@lib/constants/cities'
 import {
   CPT_OPT_TIMELINE_FIELDS,
   formatCptOptDate,
@@ -37,6 +39,7 @@ export function CptOptDetailContent({
   isAuthor,
   onDelete,
 }: CptOptDetailContentProps) {
+  const city = useCity()
   const tipsHtml = (() => {
     const html = post.contentHtml?.trim() || ''
     if (html && htmlToPlainText(html)) return html
@@ -102,7 +105,7 @@ export function CptOptDetailContent({
               </p>
             </div>
             <Link
-              href={`/nyc/${boardId}/${post.id}/edit`}
+              href={hrefForCommunityPost(post, city, 'edit')}
               className='inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)]'
             >
               새 기록 추가
@@ -121,27 +124,35 @@ export function CptOptDetailContent({
         </div>
       ) : null}
 
-      <div className='mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 px-1 sm:px-0'>
-        <CptOptTypeBadge type={post.cptOptType} />
-        <CptOptActivityMeta
-          createdAt={post.createdAt}
-          updatedAt={post.updatedAt}
-        />
-        <span className='text-[12px] text-[var(--muted)]'>
-          · 조회 {formatCommunityCount(post.viewCount)}
-        </span>
-      </div>
-
       <h1 className='px-1 text-[1.55rem] font-semibold leading-[1.25] tracking-[-0.035em] text-[var(--foreground)] sm:px-0 sm:text-[1.9rem]'>
         {post.title}
       </h1>
 
-      {post.location?.trim() ? (
-        <p className='mt-3 flex items-center gap-1.5 px-1 text-[14px] font-medium text-[var(--muted-foreground)] sm:px-0'>
-          <BuildingIcon className='size-4 shrink-0 opacity-60' />
-          {post.location.trim()}
-        </p>
-      ) : null}
+      <div className='mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-1.5 px-1 text-[12px] text-[var(--muted)] sm:px-0'>
+        <CptOptTypeBadge type={post.cptOptType} />
+        {post.location?.trim() ? (
+          <>
+            <span className='text-black/20' aria-hidden>
+              ·
+            </span>
+            <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#eef4ff] px-2.5 py-1 text-[11px] font-semibold text-[#3b5bdb] ring-1 ring-[#3b5bdb]/15'>
+              {post.location.trim()}
+            </span>
+          </>
+        ) : null}
+        <span className='text-black/20' aria-hidden>
+          ·
+        </span>
+        <CptOptActivityMeta
+          createdAt={post.createdAt}
+          updatedAt={post.updatedAt}
+          compact
+        />
+        <span className='text-black/20' aria-hidden>
+          ·
+        </span>
+        <span>조회 {formatCommunityCount(post.viewCount)}</span>
+      </div>
 
       {timeline.length > 0 ? (
         <section className='mt-8'>
@@ -172,7 +183,7 @@ export function CptOptDetailContent({
               <div className='min-w-0 flex-1'>
                 <CommunityRichBody
                   html={tipsHtml}
-                  className='text-[14px] leading-[1.7] text-[var(--foreground)] sm:text-[15px]'
+                  className='!text-[13px] !leading-[1.65] text-[var(--foreground)]'
                 />
               </div>
             </div>
@@ -186,7 +197,7 @@ export function CptOptDetailContent({
           boardId={boardId}
           anonymous={false}
           isAuthor={isAuthor}
-          loginNext={`/nyc/${boardId}/${post.id}`}
+          loginNext={hrefForCommunityPost(post, city)}
           editLabel='업데이트'
           onDelete={onDelete}
         />
@@ -204,19 +215,3 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
-function BuildingIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='1.8'
-      className={className}
-      aria-hidden
-    >
-      <path d='M4 20V8l8-4 8 4v12' strokeLinecap='round' strokeLinejoin='round' />
-      <path d='M9 20v-6h6v6' strokeLinecap='round' strokeLinejoin='round' />
-      <path d='M9 10h.01M15 10h.01M9 14h.01M15 14h.01' strokeLinecap='round' />
-    </svg>
-  )
-}

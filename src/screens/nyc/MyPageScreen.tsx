@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from 'react'
 import { BottomSheet, BottomSheetSelect } from '@components'
 import { MbtiPicker } from '@components/MbtiPicker'
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityPath } from '@hooks/useCity'
+import { cityLoginPath } from '@lib/constants/cities'
 import {
   MAX_NICKNAME_LEN,
   MIN_NICKNAME_LEN,
@@ -17,7 +19,6 @@ import {
 } from '@lib/constants/profile'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { getVerifiedSchool, resolveSchoolFromEmail } from '@lib/constants/schools'
-import { isSchoolOtpEnabled } from '@lib/constants/verificationSafety'
 import { cn } from '@lib'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { ProfileVerificationSection } from '@widgets/nyc/ProfileVerificationSection'
@@ -37,7 +38,10 @@ type ProfileSetupDraft = {
   occupationType: string
 }
 
-function getVerifiedSchoolLabel(profile: NycUserProfile | null) {
+function getVerifiedAffiliationLabel(profile: NycUserProfile | null) {
+  const company = profile?.workplaceCompanyName?.trim()
+  if (profile?.workplaceStatus === 'approved' && company) return company
+
   if (!profile?.schoolEmailVerified) return null
 
   const storedName = profile.verifiedSchoolName?.trim()
@@ -97,6 +101,8 @@ export function MyPageScreen() {
     saveOccupationType,
   } = useAuth()
   const { success, error: toastError } = useToast()
+  const city = useCity()
+  const href = useCityPath()
   const router = useRouter()
   const searchParams = useSearchParams()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -109,6 +115,8 @@ export function MyPageScreen() {
   const [savingOccupation, setSavingOccupation] = useState(false)
   const [completeProfileOpen, setCompleteProfileOpen] = useState(false)
   const [schoolVerifyOpen, setSchoolVerifyOpen] = useState(false)
+  const [workplaceVerifyOpen, setWorkplaceVerifyOpen] = useState(false)
+  const [identityVerifyOpen, setIdentityVerifyOpen] = useState(false)
   const [savingProfileSetup, setSavingProfileSetup] = useState(false)
   const [profileDraft, setProfileDraft] = useState<ProfileSetupDraft>({
     nickname: '',
@@ -120,24 +128,47 @@ export function MyPageScreen() {
   })
 
   const profileComplete = isProfileSetupComplete(profile)
-  const showSchoolVerifyCta =
-    profileComplete &&
-    !profile?.schoolEmailVerified &&
-    isSchoolOtpEnabled()
-  const verifiedSchoolLabel = getVerifiedSchoolLabel(profile)
+  const workplaceStatus = profile?.workplaceStatus ?? 'none'
+  const identityVerified =
+    Boolean(profile?.schoolEmailVerified) || workplaceStatus === 'approved'
+  const showWorkplacePendingCta =
+    profileComplete && workplaceStatus === 'pending'
+  const showIdentityVerifyCta =
+    profileComplete && !identityVerified && !showWorkplacePendingCta
+  const affiliationLabel = getVerifiedAffiliationLabel(profile)
 
   useEffect(() => {
     if (loading || sessionLoading) return
     if (!user) {
-      router.replace(`/nyc/login?next=${encodeURIComponent('/nyc/me')}`)
+      router.replace(cityLoginPath(city, href('/me')))
     }
-  }, [user, loading, sessionLoading, router])
+  }, [user, loading, sessionLoading, router, city, href])
 
   useEffect(() => {
-    if (searchParams.get('verify') !== 'school') return
-    if (profile?.schoolEmailVerified) return
-    setSchoolVerifyOpen(true)
-  }, [searchParams, profile?.schoolEmailVerified])
+    const verify = searchParams.get('verify')
+    if (verify === 'workplace') {
+      if (profile?.workplaceStatus === 'approved') return
+      setWorkplaceVerifyOpen(true)
+      return
+    }
+    if (verify === 'school') {
+      if (profile?.schoolEmailVerified) return
+      setSchoolVerifyOpen(true)
+      return
+    }
+    if (verify !== 'identity') return
+    if (
+      profile?.schoolEmailVerified ||
+      profile?.workplaceStatus === 'approved'
+    ) {
+      return
+    }
+    setIdentityVerifyOpen(true)
+  }, [
+    searchParams,
+    profile?.schoolEmailVerified,
+    profile?.workplaceStatus,
+  ])
 
   useEffect(() => {
     if (!editingNickname) {
@@ -148,7 +179,7 @@ export function MyPageScreen() {
   async function handleLogout() {
     await logout()
     success('로그아웃했어요')
-    router.push('/nyc')
+    router.push(href())
   }
 
   async function handlePhotoChange(file: File | undefined) {
@@ -334,19 +365,24 @@ export function MyPageScreen() {
                     </span>
                   )}
                 </div>
-                {verifiedSchoolLabel ? (
+                {affiliationLabel ? (
                   <p className='mt-1.5 text-[13px] text-[var(--muted-foreground)] lg:text-[12px]'>
-                    {verifiedSchoolLabel}
+                    {affiliationLabel}
                   </p>
                 ) : null}
 
                 <MyPageCreditSection className='mt-3' />
               </div>
 
-              {showSchoolVerifyCta ? (
+              {showWorkplacePendingCta ? (
                 <ProfileCardAction
-                  variant='school'
-                  onClick={() => setSchoolVerifyOpen(true)}
+                  variant='workplacePending'
+                  onClick={() => setWorkplaceVerifyOpen(true)}
+                />
+              ) : showIdentityVerifyCta ? (
+                <ProfileCardAction
+                  variant='identity'
+                  onClick={() => setIdentityVerifyOpen(true)}
                 />
               ) : !profileComplete ? (
                 <ProfileCardAction
@@ -548,6 +584,10 @@ export function MyPageScreen() {
               profile={profile}
               openSchoolVerify={schoolVerifyOpen}
               onSchoolVerifyOpenChange={setSchoolVerifyOpen}
+              openWorkplaceVerify={workplaceVerifyOpen}
+              onWorkplaceVerifyOpenChange={setWorkplaceVerifyOpen}
+              openIdentityVerify={identityVerifyOpen}
+              onIdentityVerifyOpenChange={setIdentityVerifyOpen}
             />
           </div>
 

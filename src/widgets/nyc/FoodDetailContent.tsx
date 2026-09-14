@@ -17,6 +17,8 @@ import {
   getFoodMenuName,
 } from '@lib/community/food'
 import { resolveFoodPlacePoint } from '@lib/community/foodMap'
+import { useCity, useCityPath } from '@hooks/useCity'
+import { hrefForCommunityPost } from '@lib/constants/cities'
 import { isAnonymousBoard, type NycCommunityBoardId } from '@lib/constants/nyc'
 import type { CommunityPost } from '@/types/nyc'
 import { FoodCategoryBadge } from '@widgets/nyc/FoodCategoryBadge'
@@ -56,6 +58,8 @@ export function FoodDetailContent({
   isAuthor,
   onDelete,
 }: FoodDetailContentProps) {
+  const city = useCity()
+  const href = useCityPath()
   const anonymous = isAnonymousBoard(boardId)
   const slides = buildFoodDetailCarouselSlides(post)
   const bodyHtml = post.contentHtml || `<p>${post.description}</p>`
@@ -126,7 +130,7 @@ export function FoodDetailContent({
       <div className='-mx-4 sm:mx-0 sm:overflow-hidden sm:rounded-[1.25rem]'>
         <FoodDetailHeroCarousel
           slides={slides}
-          backHref={`/nyc/${boardId}`}
+          backHref={href(`/${boardId}`)}
           backLabel={`${boardTitle} 목록`}
         />
       </div>
@@ -304,7 +308,7 @@ export function FoodDetailContent({
           boardId={boardId}
           anonymous={anonymous}
           isAuthor={isAuthor}
-          loginNext={`/nyc/${boardId}/${post.id}`}
+          loginNext={hrefForCommunityPost(post, city)}
           onDelete={onDelete}
         />
       </div>

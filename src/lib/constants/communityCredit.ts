@@ -227,7 +227,7 @@ export const COMMUNITY_CREDIT_EARN_RULES: readonly CommunityCreditEarnRule[] = [
   },
   {
     id: 'job-review',
-    label: '취업 후기',
+    label: '면접·취업',
     amount: COMMUNITY_CREDIT_TIMELINE_ENTRY,
     maxAmount: COMMUNITY_CREDIT_TIMELINE_POST_MAX,
     unitLabel: '타임라인 1단계',

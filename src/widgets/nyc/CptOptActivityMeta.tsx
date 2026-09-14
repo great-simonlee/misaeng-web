@@ -25,7 +25,7 @@ export function CptOptActivityMeta({
 
   if (compact) {
     return (
-      <span className={cn('text-[12px] text-[var(--muted)]', className)}>
+      <span className={cn('whitespace-nowrap text-[11px] text-[var(--muted)] sm:text-[12px]', className)}>
         {wasUpdated ? (
           <>
             <span className='font-medium text-[var(--foreground)]'>

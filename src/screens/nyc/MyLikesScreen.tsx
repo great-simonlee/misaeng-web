@@ -6,7 +6,14 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { LoadingState, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { usePostLikes } from '@hooks/usePostLikes'
+import {
+  cityLoginPath,
+  hrefForCommunityPost,
+  hrefForHousingListing,
+  type CityId,
+} from '@lib/constants/cities'
 import { fetchCommunityPost } from '@lib/community/client'
 import { getCptOptTypeLabel } from '@lib/community/cptOpt'
 import { getJobReviewTypeLabel } from '@lib/community/jobReview'
@@ -17,8 +24,8 @@ import {
   getListingUnitNet,
 } from '@lib/constants/housingMock'
 import {
-  NYC_CATEGORIES,
   NYC_PAGE_SHELL_CLASS,
+  getCityCategories,
   getNycCategory,
   resolveMergedCommunityBoardId,
   type NycCategoryId,
@@ -56,6 +63,8 @@ const LIKEABLE_CATEGORY_IDS: NycCategoryId[] = [
 
 export function MyLikesScreen() {
   const { user, loading } = useAuth()
+  const city = useCity()
+  const href = useCityPath()
   const router = useRouter()
   const { likedEntries } = usePostLikes()
   const [items, setItems] = useState<LikedItem[]>([])
@@ -72,9 +81,9 @@ export function MyLikesScreen() {
   useEffect(() => {
     if (loading) return
     if (!user) {
-      router.replace(`/nyc/login?next=${encodeURIComponent('/nyc/me/likes')}`)
+      router.replace(cityLoginPath(city, href('/me/likes')))
     }
-  }, [user, loading, router])
+  }, [user, loading, router, city, href])
 
   useEffect(() => {
     if (!user) {
@@ -93,7 +102,7 @@ export function MyLikesScreen() {
 
     ;(async () => {
       const results = await Promise.all(
-        likedEntries.map((entry) => resolveLikedItem(entry)),
+        likedEntries.map((entry) => resolveLikedItem(entry, city)),
       )
       if (cancelled) return
       setItems(results.filter((item): item is LikedItem => item != null))
@@ -105,14 +114,14 @@ export function MyLikesScreen() {
     }
     // likedKey로 직렬화된 변경만 추적
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, likedKey])
+  }, [user, likedKey, city])
 
   const likeableCategories = useMemo(
     () =>
-      NYC_CATEGORIES.filter((board) =>
+      getCityCategories(city).filter((board) =>
         LIKEABLE_CATEGORY_IDS.includes(board.id),
       ),
-    [],
+    [city],
   )
 
   const counts = useMemo(() => {
@@ -253,7 +262,7 @@ export function MyLikesScreen() {
                     : '해당 게시판에서 하트를 누르면 여기에 보여요'}
                 </p>
                 <Link
-                  href={selectedBoard?.href ?? '/nyc/housing'}
+                  href={selectedBoard?.href ?? href('/housing')}
                   className='mt-5 inline-flex h-10 items-center rounded-full bg-[var(--foreground)] px-5 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--navy-light)]'
                 >
                   {selectedBoard
@@ -324,6 +333,7 @@ export function MyLikesScreen() {
 
 async function resolveLikedItem(
   entry: PostLikeEntry,
+  city: CityId,
 ): Promise<LikedItem | null> {
   if (entry.kind === 'housing') {
     const listing = await fetchHousingListing(entry.id)
@@ -333,7 +343,7 @@ async function resolveLikedItem(
 
   const post = await fetchCommunityPost(entry.id)
   if (!post || post.status === 'closed') return null
-  return mapCommunity(post, entry.boardId)
+  return mapCommunity(post, city, entry.boardId)
 }
 
 function formatHousingRentMeta(post: HousingPost): string {
@@ -349,7 +359,7 @@ function mapHousing(post: HousingPost): LikedItem {
     id: post.id,
     title: getListingDisplayAddress(post),
     meta: `${getListingArea(post)} · ${formatHousingRentMeta(post)}`,
-    href: `/nyc/housing/${post.id}`,
+    href: hrefForHousingListing(post),
     categoryId: 'housing',
     boardLabel: '하우징',
     authorSchoolId: post.authorSchoolId,
@@ -358,6 +368,7 @@ function mapHousing(post: HousingPost): LikedItem {
 
 function mapCommunity(
   post: CommunityPost,
+  city: CityId,
   preferredBoardId?: string,
 ): LikedItem | null {
   const rawBoardId = preferredBoardId || post.categoryId
@@ -387,7 +398,7 @@ function mapCommunity(
     id: post.id,
     title: post.title,
     meta,
-    href: `/nyc/${boardId}/${post.id}`,
+    href: hrefForCommunityPost(post, city),
     categoryId,
     boardLabel: category?.title ?? boardId,
     authorSchoolId: post.authorSchoolId,

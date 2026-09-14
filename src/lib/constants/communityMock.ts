@@ -1,7 +1,11 @@
-import type { CommunityPost, RoommateLookingFor } from '@/types/nyc'
+import type { CommunityPost } from '@/types/nyc'
+import {
+  communityPostMatchesCity,
+  isSharedCommunityBoard,
+  resolveCityId,
+  type CityId,
+} from '@lib/constants/cities'
 import type { NycCommunityBoardId } from '@lib/constants/nyc'
-import { VERIFIED_SCHOOLS } from '@lib/constants/schools'
-import { getRoommateLookingForLabel } from '@lib/community/roommate'
 
 const NOW = Date.now()
 const MINUTE = 60 * 1000
@@ -84,6 +88,7 @@ function post(
     | 'roommateBudgetMax'
     | 'roommateMoveInDate'
     | 'roommateMoveOutDate'
+    | 'city'
     | 'authorUid'
     | 'authorEmail'
     | 'authorNickname'
@@ -121,6 +126,7 @@ function post(
     roommateBudgetMax?: CommunityPost['roommateBudgetMax']
     roommateMoveInDate?: CommunityPost['roommateMoveInDate']
     roommateMoveOutDate?: CommunityPost['roommateMoveOutDate']
+    city?: CommunityPost['city']
   },
 ): CommunityPost {
   const mockTimelineBoard = isTimelineBoardMockPost(partial)
@@ -163,6 +169,9 @@ function post(
     roommateBudgetMax: partial.roommateBudgetMax ?? null,
     roommateMoveInDate: partial.roommateMoveInDate ?? null,
     roommateMoveOutDate: partial.roommateMoveOutDate ?? null,
+    city: isSharedCommunityBoard(partial.categoryId)
+      ? null
+      : resolveCityId(partial.city),
     viewCount: partial.viewCount ?? 0,
     recommendCount: partial.recommendCount ?? 0,
     commentCount: partial.commentCount ?? 0,
@@ -170,136 +179,6 @@ function post(
     updatedAt: partial.updatedAt ?? partial.createdAt,
     status: 'open',
   }
-}
-
-
-const ROOMMATE_MOCK_LOOKING_FOR: RoommateLookingFor[] = [
-  'has-room',
-  'sublet',
-  'together',
-  'room',
-]
-
-const ROOMMATE_MOCK_LOCATIONS = [
-  '브루클린 Bushwick',
-  '맨해튼 UES',
-  'Queens Astoria',
-  '맨해튼 Midtown',
-  '저지시티',
-  '브루클린 Williamsburg',
-  '플러싱',
-  '맨해튼 UWS',
-  'Queens LIC',
-  '브루클린 Park Slope',
-  '맨해튼 Harlem',
-  '브롱스',
-] as const
-
-const ROOMMATE_MOCK_PHOTOS = [
-  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80',
-  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
-  'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
-  'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80',
-] as const
-
-const ROOMMATE_MOCK_TITLES: Record<RoommateLookingFor, string[]> = {
-  'has-room': [
-    '2bed 룸메 구해요',
-    '조용한 룸메 찾아요',
-    '재택 위주 룸메 환영',
-  ],
-  sublet: [
-    '단기 서블렛 올려요',
-    '가구 포함 서블렛',
-    '학기 중 비는 방 서블렛',
-  ],
-  together: [
-    '같이 방 구해요',
-    '2bed 같이 입주할 룸메',
-    '예산 맞춰 같이 구해요',
-  ],
-  room: [
-    '방만 구해요',
-    '스튜디오·1bed 찾아요',
-    '가까운 지하철 방 구해요',
-  ],
-}
-
-const ROOMMATE_MOCK_NICKNAMES = [
-  '브루클린살림',
-  '미드타운러',
-  '조용한룸메',
-  '학기중서블렛',
-  'UES입주',
-  '같이구해요',
-  '퀸즈루머',
-  '해밀턴하이츠',
-  '버클리룸메',
-  '소호근처',
-  '플러싱러버',
-  '맨해튼입주',
-]
-
-function buildRoommateMockPosts(): CommunityPost[] {
-  return VERIFIED_SCHOOLS.map((school, index) => {
-    const lookingFor =
-      ROOMMATE_MOCK_LOOKING_FOR[index % ROOMMATE_MOCK_LOOKING_FOR.length]
-    const location =
-      ROOMMATE_MOCK_LOCATIONS[index % ROOMMATE_MOCK_LOCATIONS.length]
-    const titleBase =
-      ROOMMATE_MOCK_TITLES[lookingFor][
-        Math.floor(index / ROOMMATE_MOCK_LOOKING_FOR.length) %
-          ROOMMATE_MOCK_TITLES[lookingFor].length
-      ]
-    const budget = 1200 + (index % 8) * 150
-    const startDay = 1 + (index % 20)
-    const endMonth = 9 + ((index % 4) + 1)
-    const start = `2026-09-${String(startDay).padStart(2, '0')}`
-    const end = `2026-${String(Math.min(endMonth, 12)).padStart(2, '0')}-${String(15 + (index % 10)).padStart(2, '0')}`
-    const hasPhoto = lookingFor === 'has-room' || lookingFor === 'sublet'
-    const photo = ROOMMATE_MOCK_PHOTOS[index % ROOMMATE_MOCK_PHOTOS.length]
-    const typeLabel = getRoommateLookingForLabel(lookingFor)
-
-    return post({
-      id: `mock-roommate-${school.id}`,
-      categoryId: 'roommate',
-      title: `${location.split(' ')[0]} ${titleBase}`.slice(0, 40),
-      description: `${school.shortName} 학생입니다. ${typeLabel} · ${location} 근처, 월 $${budget.toLocaleString('en-US')} 전후.`,
-      contentHtml: `
-        <p>${school.fullName} (${school.shortName}) 인증 계정 예시 글입니다.</p>
-        <p>${typeLabel}. ${location} 위주로 보고 있어요.</p>
-        <ul>
-          <li>월 예산/월세: $${budget.toLocaleString('en-US')}</li>
-          <li>입주: ${start} ~ ${end}</li>
-        </ul>
-      `,
-      location,
-      detail: typeLabel,
-      roommateLookingFor: lookingFor,
-      roommateBudgetMax: budget,
-      roommateMoveInDate: start,
-      roommateMoveOutDate: end,
-      thumbnailUrl: hasPhoto ? photo : null,
-      galleryPhotos: hasPhoto
-        ? [
-            {
-              id: `g-${school.id}`,
-              imageUrl: photo,
-              caption: '',
-            },
-          ]
-        : [],
-      authorUid: `mock-roommate-${school.id}`,
-      authorEmail: `roommate@${school.domains[0]}`,
-      authorNickname:
-        ROOMMATE_MOCK_NICKNAMES[index % ROOMMATE_MOCK_NICKNAMES.length],
-      authorPhotoURL: mockAuthorPhoto(`roommate-${school.id}`),
-      authorSchoolId: school.id,
-      authorSchoolName: school.shortName,
-      createdAt: NOW - (index + 1) * 3 * HOUR,
-      viewCount: 12 + index * 7,
-    })
-  })
 }
 
 export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
@@ -908,164 +787,17 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
     authorSchoolName: null,
     createdAt: NOW - 3 * DAY,
   }),
-  post({
-    id: 'mock-job-1',
-    categoryId: 'job-review',
-    title: 'Google SWE Intern — 3라운드 면접 후기',
-    description:
-      'Handshake로 지원 → OA → Phone → Virtual onsite. 총 3주 걸렸어요.',
-    contentHtml: `
-      <p>2024 Summer SWE Intern 전형 후기입니다.</p>
-      <ul>
-        <li>OA는 LC medium 2문제, 90분</li>
-        <li>Phone은 resume deep dive + behavioral</li>
-        <li>Onsite는 coding 2 + Googleyness 1</li>
-      </ul>
-      <p>Referral 없이 Handshake cold apply로 시작했어요.</p>
-    `,
-    location: 'Google',
-    detail: '인턴',
-    jobReviewType: 'intern',
-    jobReviewIndustry: '테크',
-    jobReviewTips:
-      'OA 전에 LC medium 타이머 연습 2주 추천. Handshake보다 LinkedIn referral 응답률이 더 좋았다는 후기도 많아요.',
-    jobReviewTimeline: [
-      {
-        id: 'jr1',
-        date: '2024-01-10',
-        stageLabel: '서류 지원',
-        platform: 'Handshake',
-        documentsSubmitted: 'Resume, Transcript',
-        interviewRound: '',
-        stageReviewHtml:
-          '<p>Cold apply로 시작했고, 3일 후 OA 초대 메일을 받았어요.</p>',
-        outcome: 'Pass',
-      },
-      {
-        id: 'jr2',
-        date: '2024-01-15',
-        stageLabel: 'Online Assessment',
-        platform: 'HackerRank',
-        documentsSubmitted: '',
-        interviewRound: 'OA',
-        stageReviewHtml:
-          '<p>LC medium 2문제, 90분 제한이었어요. 타이머 연습이 도움이 됐습니다.</p>',
-        outcome: 'Pass',
-      },
-      {
-        id: 'jr3',
-        date: '2024-01-25',
-        stageLabel: 'Virtual Onsite',
-        platform: 'Google Meet',
-        documentsSubmitted: '',
-        interviewRound: 'Final (3 rounds)',
-        stageReviewHtml:
-          '<p>Coding 2라운드 + Googleyness 1라운드. 카메라 ON, 노트 필기 허용.</p>',
-        outcome: 'Offer',
-      },
-    ],
-    authorUid: 'mock-user-10',
-    authorEmail: 'intern@nyu.edu',
-    authorNickname: '구글인턴러',
-    authorPhotoURL: mockAuthorPhoto('google-intern'),
-    authorSchoolId: 'nyu',
-    authorSchoolName: 'NYU',
-    createdAt: NOW - 3 * DAY,
-    updatedAt: NOW - 2 * HOUR,
-  }),
-  post({
-    id: 'mock-job-2',
-    categoryId: 'job-review',
-    title: 'JP Morgan Analyst — Superday 후기',
-    description: 'Campus recruiting, 1차 networking → Superday까지 6주.',
-    contentHtml: `
-      <p>금융 Analyst 신입 전형 후기입니다.</p>
-      <p>Behavioral + Case + Fit interview가 Superday에서 연속으로 진행됐어요.</p>
-    `,
-    location: 'JP Morgan',
-    detail: '신입',
-    jobReviewType: 'new-grad',
-    jobReviewIndustry: '금융',
-    jobReviewTips:
-      'Superday 전날은 질문 리스트만 보고 새로운 걸 외우지 마세요. Why JPM, Why NYC는 꼭 준비.',
-    jobReviewTimeline: [
-      {
-        id: 'jr4',
-        date: '2023-09-01',
-        stageLabel: 'Campus Info Session',
-        platform: '학교 Career Fair',
-        documentsSubmitted: 'Resume',
-        interviewRound: 'Networking',
-        stageReviewHtml:
-          '<p>Recruiter 1:1 후 follow-up email을 같은 날 보냈어요.</p>',
-        outcome: 'Pass',
-      },
-      {
-        id: 'jr5',
-        date: '2023-10-15',
-        stageLabel: 'Superday',
-        platform: 'In-person NYC',
-        documentsSubmitted: '',
-        interviewRound: '4 rounds',
-        stageReviewHtml:
-          '<p>Behavioral, Case, Fit, Senior MD 인터뷰가 하루에 연속으로 진행됐어요.</p>',
-        outcome: 'Offer',
-      },
-    ],
-    authorUid: 'mock-user-11',
-    authorEmail: 'finance@columbia.edu',
-    authorNickname: '제이피준비생',
-    authorPhotoURL: mockAuthorPhoto('jpm-analyst'),
-    authorSchoolId: 'columbia',
-    authorSchoolName: 'Columbia',
-    createdAt: NOW - 6 * DAY,
-  }),
-  post({
-    id: 'mock-anon-1',
-    categoryId: 'anonymous',
-    title: 'OPT 없이 남은 기간, 어떻게 보내고 계세요?',
-    description:
-      '졸업 후 카드 오기 전까지 시간이 길어서 불안해요. 비슷한 경험 있으신 분 조언 부탁드려요.',
-    contentHtml: `
-      <p>졸업은 했는데 EAD 카드가 아직 안 와서 마음이 조급합니다.</p>
-      <p>그동안 네트워킹·포트폴리오 정리는 하고 있는데, 합법적으로 할 수 있는 일이 더 있는지 궁금해요.</p>
-    `,
-    location: '고민 · 질문',
-    detail: '',
-    authorUid: 'mock-user-12',
-    authorEmail: 'anon@example.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: NOW - 5 * HOUR,
-    viewCount: 42,
-  }),
-  post({
-    id: 'mock-anon-2',
-    categoryId: 'anonymous',
-    title: '맨해튼에서 혼밥하기 좋은 곳 추천해 주세요',
-    description: '바에 앉아서 혼자 밥 먹기 편한 곳 있으면 알려주세요.',
-    contentHtml: `
-      <p>퇴근 후 혼자 식사할 때 부담 없는 분위기의 식당을 찾고 있어요.</p>
-      <p>가격대는 $15–25 정도면 좋겠습니다.</p>
-    `,
-    location: '일상',
-    detail: '',
-    authorUid: 'mock-user-13',
-    authorEmail: 'anon2@example.com',
-    authorSchoolId: null,
-    authorSchoolName: null,
-    createdAt: NOW - 1 * DAY,
-    viewCount: 67,
-  }),
-  ...buildRoommateMockPosts(),
 ]
 
 export function listMockCommunityPosts(
   boardId?: NycCommunityBoardId,
+  city?: CityId,
 ): CommunityPost[] {
-  const items = COMMUNITY_MOCK_POSTS.filter(
-    (item) => !boardId || item.categoryId === boardId,
-  )
+  const items = COMMUNITY_MOCK_POSTS.filter((item) => {
+    if (boardId && item.categoryId !== boardId) return false
+    if (!city) return true
+    return communityPostMatchesCity(item, city)
+  })
   if (boardId === 'status' || boardId === 'job-review') {
     return items.sort(
       (a, b) =>

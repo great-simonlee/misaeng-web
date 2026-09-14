@@ -1,4 +1,8 @@
+'use client'
+
 import Link from 'next/link'
+
+import { useCityPath } from '@hooks/useCity'
 
 interface AuthConfigBannerProps {
   className?: string
@@ -6,6 +10,7 @@ interface AuthConfigBannerProps {
 
 /** 로컬 개발용 — Production(Vercel)에서는 표시하지 않음 */
 export function AuthConfigBanner({ className }: AuthConfigBannerProps) {
+  const href = useCityPath()
   if (process.env.NODE_ENV === 'production') {
     return null
   }
@@ -35,7 +40,7 @@ export function AuthConfigBanner({ className }: AuthConfigBannerProps) {
       </code>{' '}
       참고).{' '}
       <Link
-        href='/nyc/login'
+        href={href('/login')}
         className='font-semibold underline-offset-2 hover:underline'
       >
         로그인 페이지

@@ -4,7 +4,9 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import { cityLoginPath } from '@lib/constants/cities'
 import {
   fetchBeenThereSummary,
   fetchPostRecommendSummary,
@@ -26,6 +28,8 @@ export function CommunityEngagementBar({
   loginNext,
   className,
 }: CommunityEngagementBarProps) {
+  const city = useCity()
+  const href = useCityPath()
   const { user, loading: authLoading } = useAuth()
   const { error: toastError, success } = useToast()
   const [count, setCount] = useState(0)
@@ -36,9 +40,10 @@ export function CommunityEngagementBar({
   const [beenThereBusy, setBeenThereBusy] = useState(false)
   const isFood = boardId === 'food'
 
-  const loginHref = `/nyc/login?next=${encodeURIComponent(
-    loginNext || `/nyc/${boardId}/${postId}`,
-  )}`
+  const loginHref = cityLoginPath(
+    city,
+    loginNext || href(`/${boardId}/${postId}`),
+  )
 
   const loadSummary = useCallback(async () => {
     try {

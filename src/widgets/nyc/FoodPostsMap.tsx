@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Map as LeafletMap, Marker as LeafletMarker } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
+import { useCity } from '@hooks/useCity'
+import { hrefForCommunityPost } from '@lib/constants/cities'
 import {
   buildFoodMapPins,
   NYC_MAP_CENTER,
@@ -25,9 +27,10 @@ type FoodPostsMapProps = {
 /** 맛집 후기 좌표를 Leaflet 핀으로 표시 */
 export function FoodPostsMap({
   posts,
-  boardId,
+  boardId: _boardId,
   className,
 }: FoodPostsMapProps) {
+  const city = useCity()
   const pins = useMemo(() => buildFoodMapPins(posts), [posts])
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<LeafletMap | null>(null)
@@ -214,7 +217,7 @@ export function FoodPostsMap({
               {selected.posts.map((post) => (
                 <li key={post.id}>
                   <Link
-                    href={`/nyc/${boardId}/${post.id}`}
+                    href={hrefForCommunityPost(post, city)}
                     className='flex items-center gap-3 px-4 py-2.5 touch-manipulation transition hover:bg-[#fafbfc]'
                   >
                     {post.thumbnailUrl ? (

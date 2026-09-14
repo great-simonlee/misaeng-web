@@ -3,6 +3,8 @@
 import Link from 'next/link'
 
 import { SchoolBadge, UserAvatar } from '@components'
+import { useCity } from '@hooks/useCity'
+import { hrefForCommunityPost } from '@lib/constants/cities'
 import { getCommunityAuthorDisplayName } from '@lib/community/author'
 import {
   formatRoommateBudget,
@@ -33,6 +35,7 @@ interface RoommatePostCardProps {
 
 /** 취업 후기·OPT 보드와 같은 텍스트 중심 목록 카드 */
 export function RoommatePostCard({ post }: RoommatePostCardProps) {
+  const city = useCity()
   const typeLabel = getRoommateLookingForLabel(post.roommateLookingFor)
   const typeStyle = getRoommateLookingForStyle(post.roommateLookingFor)
   const budget = formatRoommateBudget(post.roommateBudgetMax)
@@ -52,7 +55,7 @@ export function RoommatePostCard({ post }: RoommatePostCardProps) {
       className='group overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_20px_40px_rgba(15,23,42,0.08)]'
     >
       <Link
-        href={`/nyc/roommate/${post.id}`}
+        href={hrefForCommunityPost(post, city)}
         className='block touch-manipulation px-4 py-4 sm:px-5 sm:py-5'
       >
         <div className='flex gap-3.5 sm:gap-4'>

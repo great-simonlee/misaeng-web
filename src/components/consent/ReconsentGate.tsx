@@ -4,24 +4,23 @@ import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
+import { isCityId } from '@lib/constants/cities'
 import type { ConsentStatus } from '@lib/consent/types'
 
 import { useConsentLocale } from './ConsentLocaleProvider'
 import { ReconsentModal } from './ReconsentModal'
 
-const PASSTHROUGH = [
-  '/nyc/login',
-  '/nyc/terms-of-use',
-  '/nyc/privacy-policy',
-  '/terms',
-  '/privacy',
-]
+const PASSTHROUGH = ['/terms', '/privacy']
 
 function isPassthroughPath(pathname: string) {
+  if (PASSTHROUGH.includes(pathname)) return true
+  const [maybeCity, ...rest] = pathname.split('/').filter(Boolean)
+  if (!isCityId(maybeCity)) return false
+  const suffix = rest[0] ?? ''
   return (
-    PASSTHROUGH.includes(pathname) ||
-    pathname.startsWith('/nyc/terms-of-use') ||
-    pathname.startsWith('/nyc/privacy-policy')
+    suffix === 'login' ||
+    suffix === 'terms-of-use' ||
+    suffix === 'privacy-policy'
   )
 }
 

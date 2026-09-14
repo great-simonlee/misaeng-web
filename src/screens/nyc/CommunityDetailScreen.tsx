@@ -5,7 +5,13 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { LoadingState, PullToRefresh, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import {
+  communityPostMatchesCity,
+  hrefForCommunityPost,
+  isSharedCommunityBoard,
+} from '@lib/constants/cities'
 import {
   deleteCommunityPostRequest,
   fetchCommunityPost,
@@ -18,6 +24,7 @@ import {
 import {
   NYC_COMMUNITY_BOARD_META,
   isAnonymousBoard,
+  isStatusCommunityBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import type { CommunityPost } from '@/types/nyc'
@@ -52,6 +59,8 @@ export function CommunityDetailScreen({
   title,
   postId,
 }: CommunityDetailScreenProps) {
+  const city = useCity()
+  const href = useCityPath()
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const { user } = useAuth()
   const { error: toastError, success } = useToast()
@@ -119,7 +128,7 @@ export function CommunityDetailScreen({
     try {
       await deleteCommunityPostRequest(post.id)
       success('글을 삭제했어요')
-      router.push('/nyc/me/posts')
+      router.push(href('/me/posts'))
     } catch (err) {
       toastError(getErrorMessage(err, '삭제에 실패했어요'))
     }
@@ -135,11 +144,20 @@ export function CommunityDetailScreen({
     )
   }
 
+  const boardMatch = isStatusCommunityBoard(boardId)
+    ? isStatusCommunityBoard(post?.categoryId ?? '')
+    : post?.categoryId === boardId
+  const cityMatch =
+    !post ||
+    isSharedCommunityBoard(post.categoryId) ||
+    communityPostMatchesCity(post, city)
+
   if (
     error ||
     !post ||
     post.status === 'closed' ||
-    post.categoryId !== boardId
+    !boardMatch ||
+    !cityMatch
   ) {
     return (
       <PullToRefresh onRefresh={refreshPost}>
@@ -147,7 +165,7 @@ export function CommunityDetailScreen({
           <EmptyState
             title='게시글을 찾을 수 없습니다'
             description={error ?? '삭제된 글일 수 있습니다.'}
-            actionHref={`/nyc/${boardId}`}
+            actionHref={href(`/${boardId}`)}
             actionLabel={`${title} 목록으로`}
           />
         </BoardPageShell>
@@ -205,7 +223,7 @@ export function CommunityDetailScreen({
           {/* 맛집은 히어로 위 뒤로가기가 있어 상단 링크는 생략 */}
           {!isFood ? (
             <BoardBackLink
-              href={`/nyc/${boardId}`}
+              href={href(`/${boardId}`)}
               label={`${title} 목록`}
               className={isCptOpt || isJobReview ? 'mb-4 px-1 sm:px-0' : 'mb-4'}
             />
@@ -286,7 +304,7 @@ export function CommunityDetailScreen({
                   boardId={boardId}
                   anonymous={anonymous}
                   isAuthor={isAuthor}
-                  loginNext={`/nyc/${boardId}/${post.id}`}
+                  loginNext={hrefForCommunityPost(post, city)}
                   onDelete={() => void handleDelete()}
                 />
               </BoardSurface>
@@ -297,7 +315,7 @@ export function CommunityDetailScreen({
             postId={post.id}
             boardId={boardId}
             anonymousBoard={anonymous}
-            loginNext={`/nyc/${boardId}/${post.id}`}
+            loginNext={hrefForCommunityPost(post, city)}
           />
         </div>
       </BoardPageShell>

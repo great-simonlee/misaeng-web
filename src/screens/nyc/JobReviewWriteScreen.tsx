@@ -6,8 +6,10 @@ import type { FormEvent, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 
 import { LoadingState, TipTapEditor } from '@components'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { useRequireAuth } from '@hooks/useRequireAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import { hrefForCommunityPost } from '@lib/constants/cities'
 import {
   createCommunityPostRequest,
   fetchCommunityPost,
@@ -15,8 +17,6 @@ import {
 } from '@lib/community/client'
 import {
   JOB_REVIEW_TIPS_MAX,
-  JOB_REVIEW_TYPES,
-  createEmptyJobReviewTimelineEntry,
   getJobReviewTypeLabel,
   getJobReviewTypeStyle,
   isJobReviewBoard,
@@ -25,9 +25,14 @@ import {
   normalizeJobReviewTimeline,
   type JobReviewTimelineEntry,
 } from '@lib/community/jobReview'
+import {
+  clearWriteDraft,
+  loadWriteDraft,
+  saveWriteDraft,
+} from '@lib/community/writeDraft'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
 import { htmlToPlainText } from '@lib/community/html'
-import { isAccountSuspended, isSchoolVerified } from '@lib/community/schoolGate'
+import { isAccountSuspended, isIdentityVerified } from '@lib/community/schoolGate'
 import {
   NYC_COMMUNITY_BOARD_META,
   type NycCommunityBoardId,
@@ -38,11 +43,25 @@ import {
   BoardBackLink,
   BoardPageShell,
 } from '@widgets/nyc/BoardPageShell'
-import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
 import { JobReviewTimelineEditor } from '@widgets/nyc/JobReviewTimelineEditor'
 import { JobReviewTypeBadge, JobReviewTypePicker } from '@widgets/nyc/JobReviewTypeBadge'
+import {
+  JobReviewWriteOrientationModal,
+  useJobReviewWriteOrientation,
+} from '@widgets/nyc/CptOptWriteOrientationModal'
 import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
+import { StatusEmployerSelect } from '@widgets/nyc/StatusEmployerSelect'
+import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
+
+type JobReviewWriteDraft = {
+  postTitle: string
+  contentHtml: string
+  location: string
+  industry: string
+  jobReviewType: JobReviewTypeId | null
+  timeline: JobReviewTimelineEntry[]
+}
 
 interface JobReviewWriteScreenProps {
   title: string
@@ -53,12 +72,14 @@ export function JobReviewWriteScreen({
   title,
   editPostId,
 }: JobReviewWriteScreenProps) {
+  const city = useCity()
+  const href = useCityPath()
   const boardId: NycCommunityBoardId = 'job-review'
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const isEdit = Boolean(editPostId)
   const loginNext = editPostId
-    ? `/nyc/${boardId}/${editPostId}/edit`
-    : `/nyc/${boardId}/new`
+    ? href(`/${boardId}/${editPostId}/edit`)
+    : href(`/${boardId}/new`)
   const { user, profile, loading, isAuthenticated } =
     useRequireAuth(loginNext)
   const { error: toastError, success } = useToast()
@@ -71,11 +92,31 @@ export function JobReviewWriteScreen({
   const [location, setLocation] = useState('')
   const [industry, setIndustry] = useState('')
   const [jobReviewType, setJobReviewType] = useState<JobReviewTypeId | null>(null)
-  const [timeline, setTimeline] = useState<JobReviewTimelineEntry[]>([
-    createEmptyJobReviewTimelineEntry(),
-  ])
+  const [timeline, setTimeline] = useState<JobReviewTimelineEntry[]>([])
   const [existingTimelineIds, setExistingTimelineIds] = useState<string[]>([])
   const [showMoreSettings, setShowMoreSettings] = useState(false)
+  const [draftHydrated, setDraftHydrated] = useState(isEdit)
+  const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null)
+  const orientation = useJobReviewWriteOrientation(!isEdit)
+
+  useEffect(() => {
+    if (isEdit || !user?.uid) return
+    const stored = loadWriteDraft<JobReviewWriteDraft>(
+      'job-review',
+      city,
+      user.uid,
+    )
+    if (stored) {
+      setPostTitle(stored.data.postTitle ?? '')
+      setContentHtml(stored.data.contentHtml ?? '')
+      setLocation(stored.data.location ?? '')
+      setIndustry(stored.data.industry ?? '')
+      setJobReviewType(stored.data.jobReviewType ?? null)
+      setTimeline(Array.isArray(stored.data.timeline) ? stored.data.timeline : [])
+      setDraftSavedAt(stored.savedAt)
+    }
+    setDraftHydrated(true)
+  }, [city, isEdit, user?.uid])
 
   useEffect(() => {
     if (!editPostId || !user?.uid) return
@@ -86,12 +127,12 @@ export function JobReviewWriteScreen({
         if (cancelled) return
         if (!post || !isJobReviewBoard(post.categoryId)) {
           toastError('글을 찾을 수 없어요')
-          router.replace('/nyc/me/posts')
+          router.replace(href('/me/posts'))
           return
         }
         if (post.authorUid !== user.uid) {
           toastError('수정 권한이 없어요')
-          router.replace(`/nyc/${boardId}/${post.id}`)
+          router.replace(hrefForCommunityPost(post, city))
           return
         }
         setPostTitle(post.title)
@@ -114,7 +155,7 @@ export function JobReviewWriteScreen({
       } catch (err) {
         if (!cancelled) {
           toastError(getErrorMessage(err, '글을 불러오지 못했어요'))
-          router.replace('/nyc/me/posts')
+          router.replace(href('/me/posts'))
         }
       } finally {
         if (!cancelled) setLoadingEdit(false)
@@ -123,14 +164,14 @@ export function JobReviewWriteScreen({
     return () => {
       cancelled = true
     }
-  }, [editPostId, user?.uid, router, toastError])
+  }, [city, editPostId, href, user?.uid, router, toastError])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!user?.email) return
 
     if (!jobReviewType) {
-      toastError('인턴 / 신입 / 경력 / 계약 중 유형을 선택해 주세요')
+      toastError('인턴 / 신입 / 경력 / 이직 / 계약 중 유형을 선택해 주세요')
       return
     }
 
@@ -138,14 +179,14 @@ export function JobReviewWriteScreen({
     if (!plain) {
       toastError(
         isEdit
-          ? '다음 지원자에게 전할 팁이 비어 있어요. 글 정보에서 확인해 주세요'
-          : '다음 지원자에게 전할 팁을 입력해 주세요',
+          ? '조심해야 할 점이 비어 있어요. 글 정보에서 확인해 주세요'
+          : '조심해야 할 점을 입력해 주세요',
       )
       return
     }
     if (plain.length > COMMUNITY_BODY_MAX) {
       toastError(
-        `팁은 ${COMMUNITY_BODY_MAX.toLocaleString('en-US')}자 이내로 작성해 주세요`,
+        `조심해야 할 점은 ${COMMUNITY_BODY_MAX.toLocaleString('en-US')}자 이내로 작성해 주세요`,
       )
       return
     }
@@ -154,8 +195,8 @@ export function JobReviewWriteScreen({
     if (normalizedTimeline.length === 0) {
       toastError(
         isEdit
-          ? '채용 단계 기록을 최소 1건 남겨 주세요'
-          : '첫 채용 단계(날짜 + 내용)를 입력해 주세요',
+          ? '진행 기록을 최소 1건 남겨 주세요'
+          : '진행 기록(날짜 + 내용)을 최소 1건 입력해 주세요',
       )
       return
     }
@@ -187,6 +228,7 @@ export function JobReviewWriteScreen({
           ? await updateCommunityPostRequest(editPostId, payload)
           : await createCommunityPostRequest({
               categoryId: boardId,
+              city,
               ...payload,
               authorNickname: profile?.nickname?.trim() || null,
               authorPhotoURL: profile?.photoURL?.trim() || null,
@@ -194,12 +236,15 @@ export function JobReviewWriteScreen({
               authorSchoolName: profile?.verifiedSchoolName ?? null,
             })
 
+      if (!isEdit && user.uid) {
+        clearWriteDraft('job-review', city, user.uid)
+      }
       success(
         isEdit
           ? '진행 기록을 업데이트했어요. 목록 맨 위로 올라갔습니다'
           : '후기를 등록했어요. 나중에 진행 상황을 이어서 추가할 수 있어요',
       )
-      router.push(`/nyc/${boardId}/${post.id}`)
+      router.push(hrefForCommunityPost(post, city))
     } catch (err) {
       toastError(getErrorMessage(err, '저장에 실패했어요'))
     } finally {
@@ -207,7 +252,30 @@ export function JobReviewWriteScreen({
     }
   }
 
-  if (loading || !isAuthenticated) {
+  function handleSaveDraft() {
+    if (!user?.uid) return
+    try {
+      const savedAt = saveWriteDraft<JobReviewWriteDraft>(
+        'job-review',
+        city,
+        user.uid,
+        {
+          postTitle,
+          contentHtml,
+          location,
+          industry,
+          jobReviewType,
+          timeline,
+        },
+      )
+      setDraftSavedAt(savedAt)
+      success('임시 저장했어요')
+    } catch {
+      toastError('임시 저장에 실패했어요')
+    }
+  }
+
+  if (loading || !isAuthenticated || !draftHydrated) {
     return (
       <BoardPageShell width='narrow'>
         <LoadingState fullPage label='로그인 확인 중…' />
@@ -219,7 +287,7 @@ export function JobReviewWriteScreen({
     return <AccountSuspendedNotice />
   }
 
-  if (!isSchoolVerified(profile)) {
+  if (!isIdentityVerified(profile)) {
     return <SchoolVerificationRequired nextPath={loginNext} />
   }
 
@@ -237,8 +305,8 @@ export function JobReviewWriteScreen({
         <BoardBackLink
           href={
             isEdit && editPostId
-              ? `/nyc/${boardId}/${editPostId}`
-              : `/nyc/${boardId}`
+              ? href(`/${boardId}/${editPostId}`)
+              : href(`/${boardId}`)
           }
           label={isEdit ? '글로 돌아가기' : `${title} 목록`}
           className='mb-5'
@@ -254,8 +322,6 @@ export function JobReviewWriteScreen({
         ) : (
           <CreateHero writeLabel={meta.writeLabel} />
         )}
-
-        <CommunityWritingGuidelines className='mt-5' />
 
         <form onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
           {isEdit ? (
@@ -281,7 +347,7 @@ export function JobReviewWriteScreen({
                       글 정보 수정
                     </p>
                     <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
-                      제목·회사·팁을 바꾸고 싶을 때만 열어 주세요
+                      제목·회사·조심해야 할 점을 바꾸고 싶을 때만 열어 주세요
                     </p>
                   </div>
                   <span className='text-[12px] font-medium text-[var(--brand)]'>
@@ -299,35 +365,26 @@ export function JobReviewWriteScreen({
                         placeholder={meta.titlePlaceholder}
                       />
                     </Field>
-                    <Field label={meta.locationLabel}>
-                      <input
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
-                        className={inputClass}
-                        placeholder={meta.locationPlaceholder}
-                      />
-                    </Field>
-                    <Field label='업계 (선택)' className='mt-4'>
-                      <input
-                        value={industry}
-                        onChange={(e) => setIndustry(e.target.value)}
-                        className={inputClass}
-                        placeholder='테크, 금융, 컨설팅'
-                      />
-                    </Field>
+                    <StatusEmployerSelect
+                      value={location}
+                      onChange={setLocation}
+                      label={meta.locationLabel}
+                    />
                     <div>
                       <p className='text-[13px] font-medium text-[var(--foreground)]'>
-                        다음 지원자에게
+                        조심해야 할 점
                       </p>
                       <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
-                        면접·서류·플랫폼 선택 등 꼭 알려주고 싶은 팁
+                        다음 사람이 실수하지 않도록 꼭 알려주고 싶은 팁
                       </p>
                       <div className='mt-1.5'>
                         <TipTapEditor
                           value={contentHtml}
                           onChange={setContentHtml}
-                          placeholder='예: OA 전에 LC medium 2문제 타입 연습하면 좋아요.'
+                          placeholder='예: OA 전에 LC medium 2문제 타입을 연습하세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.'
                           minHeightClassName='min-h-[160px]'
+                          contentClassName='!text-[13px] !leading-[1.65]'
+                          simpleToolbar
                           maxLength={COMMUNITY_BODY_MAX}
                         />
                       </div>
@@ -341,43 +398,26 @@ export function JobReviewWriteScreen({
                 disabled={submitting || !postTitle.trim() || !jobReviewType}
                 className='inline-flex h-12 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[15px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-50'
               >
-                {submitting ? '업데이트 중…' : '채용 단계 업데이트'}
+                {submitting ? '업데이트 중…' : '진행 기록 업데이트'}
               </button>
               <p className='text-center text-[12px] leading-relaxed text-[var(--muted)]'>
-                저장하면 목록 맨 위로 올라가고, 다른 사람에게도 최신 채용
-                과정이 보입니다.
+                저장하면 목록 맨 위로 올라가고, 다른 사람에게도 최신 진행
+                상황이 보입니다.
               </p>
             </>
           ) : (
             <>
-              <CreateSection
-                step={1}
-                title='어떤 유형인가요?'
-                description='인턴 · 신입 · 경력 · 계약 중 해당하는 것을 선택해 주세요'
-              >
+              <CreateSection step={1} title='어떤 유형인가요?'>
                 <JobReviewTypePicker
                   value={jobReviewType}
                   onChange={setJobReviewType}
                 />
-                {jobReviewType ? (
-                  <div
-                    className='mt-3 rounded-xl px-3.5 py-3 text-[12px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-black/[0.05]'
-                    style={{
-                      backgroundColor: getJobReviewTypeStyle(jobReviewType).soft,
-                    }}
-                  >
-                    {
-                      JOB_REVIEW_TYPES.find((item) => item.id === jobReviewType)
-                        ?.summary
-                    }
-                  </div>
-                ) : null}
               </CreateSection>
 
               <CreateSection
                 step={2}
                 title='기본 정보'
-                description='제목, 회사, 업계를 적어 주세요'
+                description='제목과 회사를 입력해 주세요'
               >
                 <Field label='제목' required>
                   <input
@@ -388,28 +428,18 @@ export function JobReviewWriteScreen({
                     placeholder={meta.titlePlaceholder}
                   />
                 </Field>
-                <Field label='회사 (선택)' className='mt-4'>
-                  <input
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className={inputClass}
-                    placeholder='Google, Meta, JP Morgan'
-                  />
-                </Field>
-                <Field label='업계 (선택)' className='mt-4'>
-                  <input
-                    value={industry}
-                    onChange={(e) => setIndustry(e.target.value)}
-                    className={inputClass}
-                    placeholder='테크, 금융, 컨설팅'
-                  />
-                </Field>
+                <StatusEmployerSelect
+                  className='mt-4'
+                  value={location}
+                  onChange={setLocation}
+                  label={meta.locationLabel}
+                />
               </CreateSection>
 
               <CreateSection
                 step={3}
-                title='첫 채용 단계'
-                description='날짜를 고른 뒤, 단계·플랫폼·서류·면접·결과 중 필요한 항목을 선택하고, 단계 후기를 작성하세요'
+                title='진행 기록'
+                description='날짜별로 여러 건을 추가·수정·삭제할 수 있어요'
               >
                 <JobReviewTimelineEditor
                   value={timeline}
@@ -421,38 +451,46 @@ export function JobReviewWriteScreen({
 
               <CreateSection
                 step={4}
-                title='다음 지원자에게'
-                description='면접·서류·플랫폼 선택 등 꼭 알려주고 싶은 팁'
+                title='조심해야 할 점'
+                description='다음 사람이 실수하지 않도록 꼭 알려주고 싶은 팁'
               >
                 <TipTapEditor
                   value={contentHtml}
                   onChange={setContentHtml}
-                  placeholder='예: OA 전에 LC medium 2문제 타입 연습하면 좋아요. Handshake보다 LinkedIn referral이 응답률 높았습니다.'
+                  placeholder='예: OA 전에 LC medium 2문제 타입을 연습하세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.'
                   minHeightClassName='min-h-[200px]'
+                  contentClassName='!text-[13px] !leading-[1.65]'
+                  simpleToolbar
                   maxLength={COMMUNITY_BODY_MAX}
                 />
               </CreateSection>
 
-              <button
-                type='submit'
-                disabled={submitting || !postTitle.trim() || !jobReviewType}
-                className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
+              <WriteDraftActions
+                onSave={handleSaveDraft}
+                savedAt={draftSavedAt}
+                disabled={submitting}
               >
-                {submitting
-                  ? '등록 중…'
-                  : !jobReviewType
-                    ? '유형을 선택해 주세요'
-                    : '후기 등록하기'}
-              </button>
+                <button
+                  type='submit'
+                  disabled={submitting || !postTitle.trim() || !jobReviewType}
+                  className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
+                >
+                  {submitting
+                    ? '등록 중…'
+                    : !jobReviewType
+                      ? '유형을 선택해 주세요'
+                      : '후기 등록하기'}
+                </button>
+              </WriteDraftActions>
               <p className='text-center text-[12px] text-[var(--muted)]'>
-                등록 후에도 면접·오퍼 등 새 단계를 이어서 추가할 수 있어요.
+                등록 후에도 진행 기록을 이어서 추가·수정할 수 있어요.
               </p>
             </>
           )}
 
           <p className='text-center text-[12px] text-[var(--muted)]'>
             <Link
-              href={`/nyc/${boardId}`}
+              href={href(`/${boardId}`)}
               className='underline-offset-2 hover:underline'
             >
               목록으로 돌아가기
@@ -460,13 +498,23 @@ export function JobReviewWriteScreen({
           </p>
         </form>
       </div>
+
+      {!isEdit ? (
+        <JobReviewWriteOrientationModal
+          open={orientation.open}
+          agreeing={orientation.agreeing}
+          error={orientation.error}
+          onClose={() => void orientation.agree()}
+          listHref={href(`/${boardId}`)}
+        />
+      ) : null}
     </BoardPageShell>
   )
 }
 
 function CreateHero({ writeLabel }: { writeLabel: string }) {
   return (
-    <div className='rounded-2xl bg-[#f7f8fa] px-4 py-5 ring-1 ring-black/[0.04] sm:px-5'>
+    <div>
       <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--muted)]'>
         최초 등록
       </p>
@@ -474,9 +522,8 @@ function CreateHero({ writeLabel }: { writeLabel: string }) {
         {writeLabel}
       </h1>
       <p className='mt-2 text-[13px] leading-relaxed text-[var(--muted)]'>
-        유형·회사·첫 채용 단계를 한 번에 세팅하는 화면이에요. 서류부터
-        면접·오퍼까지 단계별로 남기고, 이후 새 단계는 업데이트에서
-        한 건씩 추가하면 됩니다.
+        유형을 고르고 날짜별 진행 기록을 남겨 주세요. 등록 후에도 이어서 추가할
+        수 있어요.
       </p>
     </div>
   )
@@ -504,10 +551,10 @@ function UpdateHero({
           className='text-[11px] font-semibold tracking-[0.08em]'
           style={{ color: style.accent }}
         >
-          채용 과정 업데이트
+          진행 업데이트
         </p>
         <h1 className='mt-1.5 text-[1.25rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.4rem]'>
-          새 채용 단계 추가
+          새 진행 기록 추가
         </h1>
         <p className='mt-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
           지금 추가할 날짜와 내용만 적어 주세요. 저장하면 목록 맨 위로
@@ -540,7 +587,7 @@ function CreateSection({
 }: {
   step: number
   title: string
-  description: string
+  description?: string
   children: ReactNode
 }) {
   return (
@@ -553,9 +600,11 @@ function CreateSection({
           <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
             {title}
           </h2>
-          <p className='mt-0.5 text-[12px] leading-relaxed text-[var(--muted)]'>
-            {description}
-          </p>
+          {description ? (
+            <p className='mt-0.5 text-[12px] leading-relaxed text-[var(--muted)]'>
+              {description}
+            </p>
+          ) : null}
         </div>
       </div>
       <div className='pl-10'>{children}</div>

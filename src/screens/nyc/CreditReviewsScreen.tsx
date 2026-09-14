@@ -5,7 +5,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import { cityLoginPath, hrefForCommunityPost } from '@lib/constants/cities'
 import { COMMUNITY_CREDIT_REVIEW_BONUS } from '@lib/constants/communityCredit'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { cn } from '@lib'
@@ -35,6 +37,8 @@ function formatTime(ts: number) {
 
 export function CreditReviewsScreen() {
   const { user, loading, sessionLoading, isMisaengUser } = useAuth()
+  const city = useCity()
+  const href = useCityPath()
   const router = useRouter()
   const { success, error: toastError } = useToast()
   const [requests, setRequests] = useState<ReviewRequest[]>([])
@@ -69,15 +73,13 @@ export function CreditReviewsScreen() {
   useEffect(() => {
     if (loading || sessionLoading) return
     if (!user) {
-      router.replace(
-        `/nyc/login?next=${encodeURIComponent('/nyc/team/credit-reviews')}`,
-      )
+      router.replace(cityLoginPath(city, href('/team/credit-reviews')))
       return
     }
     if (!isMisaengUser) {
-      router.replace('/nyc')
+      router.replace(href())
     }
-  }, [user, loading, sessionLoading, isMisaengUser, router])
+  }, [user, loading, sessionLoading, isMisaengUser, router, city, href])
 
   useEffect(() => {
     if (!isMisaengUser) return
@@ -193,7 +195,13 @@ export function CreditReviewsScreen() {
                       {item.boardId} · {item.status}
                     </p>
                     <Link
-                      href={`/nyc/${item.boardId === 'cpt-opt' ? 'status' : item.boardId}/${item.postId}`}
+                      href={hrefForCommunityPost(
+                        {
+                          id: item.postId,
+                          categoryId: item.boardId,
+                        },
+                        city,
+                      )}
                       className='mt-1 block text-[15px] font-semibold text-[var(--foreground)] hover:underline'
                     >
                       {item.postTitle}

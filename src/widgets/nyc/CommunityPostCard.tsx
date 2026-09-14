@@ -1,7 +1,15 @@
+'use client'
+
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { SchoolBadge } from '@components'
+import { useCity } from '@hooks/useCity'
+import {
+  getCity,
+  hrefForCommunityPost,
+  parseCityId,
+} from '@lib/constants/cities'
 import {
   formatFoodPartySpend,
   formatFoodWait,
@@ -46,6 +54,11 @@ interface CommunityPostCardProps {
   boardId: NycCommunityBoardId
 }
 
+function usePostHref(post: CommunityPost) {
+  const city = useCity()
+  return hrefForCommunityPost(post, city)
+}
+
 export function CommunityPostCard({ post, boardId }: CommunityPostCardProps) {
   if (boardId === 'food') {
     return <FoodListingCard post={post} boardId={boardId} />
@@ -67,6 +80,7 @@ function FoodListingCard({
   post: CommunityPost
   boardId: NycCommunityBoardId
 }) {
+  const postHref = usePostHref(post)
   const anonymous = isAnonymousBoard(boardId)
   const thumbnail = resolveCommunityThumbnail(post)
   const foodCategory = getFoodCategory(post.foodCategory)
@@ -100,7 +114,7 @@ function FoodListingCard({
       className='group flex h-full flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_22px_44px_rgba(15,23,42,0.09)]'
     >
       <Link
-        href={`/nyc/${boardId}/${post.id}`}
+        href={postHref}
         className='flex h-full flex-col touch-manipulation'
       >
         <div className='relative aspect-[16/10] overflow-hidden bg-[#e8eaee] md:aspect-[4/3]'>
@@ -204,6 +218,8 @@ function CptOptListingCard({
   post: CommunityPost
   boardId: NycCommunityBoardId
 }) {
+  const postHref = usePostHref(post)
+  const postCity = parseCityId(post.city)
   const stepCount = post.cptOptTimeline?.length ?? 0
   const dateRange = getCptOptTimelineDateRange(post.cptOptTimeline)
   const contextTag = getListingContextTag(
@@ -218,15 +234,20 @@ function CptOptListingCard({
       className='group overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_20px_40px_rgba(15,23,42,0.08)]'
     >
       <Link
-        href={`/nyc/${boardId}/${post.id}`}
+        href={postHref}
         className='block touch-manipulation px-4 py-4 sm:px-5 sm:py-5'
       >
         <div className='flex items-start justify-between gap-3'>
           <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
             <CptOptTypeBadge type={post.cptOptType} />
+            {postCity ? (
+              <span className='inline-flex items-center rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted-foreground)] ring-1 ring-black/8'>
+                {getCity(postCity).shortLabel}
+              </span>
+            ) : null}
             <SchoolBadge schoolId={post.authorSchoolId} size='md' />
             {contextTag ? (
-              <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted-foreground)] ring-1 ring-black/8'>
+              <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#eef4ff] px-2.5 py-1 text-[11px] font-semibold text-[#3b5bdb] ring-1 ring-[#3b5bdb]/15'>
                 {contextTag}
               </span>
             ) : null}
@@ -247,34 +268,21 @@ function CptOptListingCard({
           {post.cptOptTips?.trim() || post.description}
         </p>
 
-        <div className='mt-3.5 flex items-center justify-between gap-3 border-t border-black/[0.04] pt-3 text-[12px] font-medium text-[var(--muted)]'>
-          <ListingAuthorMeta post={post}>
-            <ListingEngagementCounts
-              viewCount={post.viewCount}
-              recommendCount={post.recommendCount}
-            />
-            <span className='text-black/20' aria-hidden>
-              ·
-            </span>
+        <TimelineSummaryRow
+          label={stepCount > 0 ? `타임라인 ${stepCount}단계` : null}
+          dateRange={dateRange}
+        />
+
+        <TimelineListingFooter
+          post={post}
+          activity={
             <CptOptActivityMeta
               createdAt={post.createdAt}
               updatedAt={post.updatedAt}
               compact
             />
-          </ListingAuthorMeta>
-          <span className='shrink-0 text-right text-[11px] leading-snug'>
-            {stepCount > 0 ? (
-              <>
-                타임라인 {stepCount}단계
-                {dateRange ? (
-                  <span className='block text-[10px] font-normal text-[var(--muted)]'>
-                    {dateRange}
-                  </span>
-                ) : null}
-              </>
-            ) : null}
-          </span>
-        </div>
+          }
+        />
       </Link>
     </BoardSurface>
   )
@@ -288,6 +296,7 @@ function JobReviewListingCard({
   post: CommunityPost
   boardId: NycCommunityBoardId
 }) {
+  const postHref = usePostHref(post)
   const stepCount = post.jobReviewTimeline?.length ?? 0
   const dateRange = getJobReviewTimelineDateRange(post.jobReviewTimeline)
   const contextTag = getListingContextTag(
@@ -302,7 +311,7 @@ function JobReviewListingCard({
       className='group overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_20px_40px_rgba(15,23,42,0.08)]'
     >
       <Link
-        href={`/nyc/${boardId}/${post.id}`}
+        href={postHref}
         className='block touch-manipulation px-4 py-4 sm:px-5 sm:py-5'
       >
         <div className='flex items-start justify-between gap-3'>
@@ -310,7 +319,7 @@ function JobReviewListingCard({
             <JobReviewTypeBadge type={post.jobReviewType} />
             <SchoolBadge schoolId={post.authorSchoolId} size='md' />
             {contextTag ? (
-              <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted-foreground)] ring-1 ring-black/8'>
+              <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#eef4ff] px-2.5 py-1 text-[11px] font-semibold text-[#3b5bdb] ring-1 ring-[#3b5bdb]/15'>
                 {contextTag}
               </span>
             ) : null}
@@ -331,34 +340,21 @@ function JobReviewListingCard({
           {post.jobReviewTips?.trim() || post.description}
         </p>
 
-        <div className='mt-3.5 flex items-center justify-between gap-3 border-t border-black/[0.04] pt-3 text-[12px] font-medium text-[var(--muted)]'>
-          <ListingAuthorMeta post={post}>
-            <ListingEngagementCounts
-              viewCount={post.viewCount}
-              recommendCount={post.recommendCount}
-            />
-            <span className='text-black/20' aria-hidden>
-              ·
-            </span>
+        <TimelineSummaryRow
+          label={stepCount > 0 ? `채용 단계 ${stepCount}건` : null}
+          dateRange={dateRange}
+        />
+
+        <TimelineListingFooter
+          post={post}
+          activity={
             <JobReviewActivityMeta
               createdAt={post.createdAt}
               updatedAt={post.updatedAt}
               compact
             />
-          </ListingAuthorMeta>
-          <span className='shrink-0 text-right text-[11px] leading-snug'>
-            {stepCount > 0 ? (
-              <>
-                채용 단계 {stepCount}건
-                {dateRange ? (
-                  <span className='block text-[10px] font-normal text-[var(--muted)]'>
-                    {dateRange}
-                  </span>
-                ) : null}
-              </>
-            ) : null}
-          </span>
-        </div>
+          }
+        />
       </Link>
     </BoardSurface>
   )
@@ -372,6 +368,7 @@ function TextListingCard({
   post: CommunityPost
   boardId: NycCommunityBoardId
 }) {
+  const postHref = usePostHref(post)
   const anonymous = isAnonymousBoard(boardId)
   const boardMeta = NYC_COMMUNITY_BOARD_META[boardId]
   const isMarket = boardId === 'marketplace'
@@ -405,7 +402,7 @@ function TextListingCard({
       className='group overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_20px_40px_rgba(15,23,42,0.08)]'
     >
       <Link
-        href={`/nyc/${boardId}/${post.id}`}
+        href={postHref}
         className='block touch-manipulation px-4 py-4 sm:px-5 sm:py-5'
       >
         <div className='flex items-start justify-between gap-3'>
@@ -486,6 +483,49 @@ function FoodOverlayChip({
     >
       {children}
     </span>
+  )
+}
+
+function TimelineSummaryRow({
+  label,
+  dateRange,
+}: {
+  label: string | null
+  dateRange: string | null
+}) {
+  if (!label && !dateRange) return null
+
+  return (
+    <div className='mt-1.5 flex items-center justify-between gap-3 text-[11px] font-medium text-[var(--muted)]'>
+      <span className='min-w-0'>{label}</span>
+      {dateRange ? (
+        <span className='shrink-0 text-right font-normal'>{dateRange}</span>
+      ) : null}
+    </div>
+  )
+}
+
+function TimelineListingFooter({
+  post,
+  activity,
+}: {
+  post: CommunityPost
+  activity: ReactNode
+}) {
+  return (
+    <div className='mt-1.5 flex items-center justify-between gap-3 border-t border-black/[0.04] pt-2 text-[12px] font-medium text-[var(--muted)]'>
+      <ListingAuthorMeta post={post} />
+      <span className='inline-flex shrink-0 items-center gap-1.5 text-[11px]'>
+        <ListingEngagementCounts
+          viewCount={post.viewCount}
+          recommendCount={post.recommendCount}
+        />
+        <span className='text-black/20' aria-hidden>
+          ·
+        </span>
+        {activity}
+      </span>
+    </div>
   )
 }
 

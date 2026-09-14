@@ -7,6 +7,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { usePagedGallery } from '@hooks/usePagedGallery'
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityPath } from '@hooks/useCity'
+import { housingListingMatchesCity } from '@lib/constants/cities'
 import { useToast } from '@hooks/useToast'
 import {
   formatHousingAvailableDate,
@@ -67,6 +69,8 @@ interface HousingDetailScreenProps {
 }
 
 export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
+  const city = useCity()
+  const href = useCityPath()
   const { user } = useAuth()
   const { success, error: toastError } = useToast()
   const searchParams = useSearchParams()
@@ -216,14 +220,18 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     return <LoadingState fullPage />
   }
 
-  if (!listing || listing.status === 'closed') {
+  if (
+    !listing ||
+    listing.status === 'closed' ||
+    !housingListingMatchesCity(listing, city)
+  ) {
     return (
       <PullToRefresh onRefresh={refreshListing}>
         <BoardPageShell width='narrow' className='py-12'>
           <EmptyState
             title='게시글을 찾을 수 없습니다'
             description='마감되었거나 삭제된 하우징 글일 수 있습니다.'
-            actionHref='/nyc/housing'
+            actionHref={href('/housing')}
             actionLabel='하우징 목록으로'
           />
         </BoardPageShell>
@@ -253,7 +261,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     <BoardPageShell width='wide'>
       <article className='pb-16 pt-5 sm:pb-20 sm:pt-7'>
         <BoardBackLink
-          href='/nyc/housing'
+          href={href('/housing')}
           label='하우징 목록'
           className='mb-5'
         />

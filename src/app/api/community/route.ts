@@ -25,10 +25,19 @@ import {
   normalizeRoommateMoveOutDate,
   ROOMMATE_TITLE_MAX,
 } from '@lib/community/roommate'
-import { isCommunityBoardId, isAnonymousBoard } from '@lib/constants/nyc'
+import {
+  isSharedCommunityBoard,
+  parseCityId,
+  resolveCityId,
+} from '@lib/constants/cities'
+import {
+  isAnonymousBoard,
+  isCommunityBoardId,
+  isStatusCommunityBoard,
+} from '@lib/constants/nyc'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import {
-  isSchoolVerified,
+  isIdentityVerified,
   SCHOOL_VERIFY_REQUIRED_CODE,
   SCHOOL_VERIFY_REQUIRED_MESSAGE,
 } from '@lib/community/schoolGate'
@@ -94,7 +103,8 @@ export async function GET(request: Request) {
     }
 
     const user = await resolveAuthenticatedUser()
-    const posts = await listStoredCommunityPosts(board)
+    const city = resolveCityId(searchParams.get('city'))
+    const posts = await listStoredCommunityPosts(board, city)
     return NextResponse.json({
       posts: posts.map((item) =>
         sanitizeAnonymousCommunityPost(item, user?.uid),
@@ -111,6 +121,7 @@ export async function GET(request: Request) {
 
 type CreateBody = {
   categoryId?: string
+  city?: string | null
   title?: string
   contentHtml?: string
   location?: string
@@ -167,7 +178,7 @@ export async function POST(request: Request) {
       { status: 403 },
     )
   }
-  if (!isSchoolVerified(profile)) {
+  if (!isIdentityVerified(profile)) {
     return NextResponse.json(
       {
         error: SCHOOL_VERIFY_REQUIRED_MESSAGE,
@@ -443,9 +454,26 @@ export async function POST(request: Request) {
         profile.verifiedSchoolName.trim()) ||
       null
 
+  const city = isStatusCommunityBoard(categoryId)
+    ? parseCityId(body?.city)
+    : isSharedCommunityBoard(categoryId)
+      ? null
+      : parseCityId(body?.city)
+  if (
+    (!isSharedCommunityBoard(categoryId) ||
+      isStatusCommunityBoard(categoryId)) &&
+    !city
+  ) {
+    return NextResponse.json(
+      { error: '도시를 확인해 주세요.' },
+      { status: 400 },
+    )
+  }
+
   const post: CommunityPost = {
     id,
     categoryId,
+    city,
     title,
     contentHtml,
     description: htmlToPlainText(contentHtml).slice(0, 240),

@@ -7,23 +7,26 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
+import { cityLoginPath } from '@lib/constants/cities'
+import { CitySelectModal } from '@widgets/nyc/CitySelectModal'
 
-const NYC_NAV_LINKS = [
-  { href: '/nyc/housing', label: '하우징' },
-  { href: '/nyc/food', label: '맛집' },
-  { href: '/nyc/marketplace', label: '중고거래' },
-  { href: '/nyc/status', label: 'OPT·비자·영주권' },
-  { href: '/nyc/job-review', label: '취업 후기' },
-  { href: '/nyc/roommate', label: '룸메이트·서블렛' },
-  { href: '/nyc/anonymous', label: '익명게시판' },
+const NAV_LINKS = [
+  { path: '/housing', label: '하우징' },
+  { path: '/food', label: '맛집' },
+  { path: '/marketplace', label: '중고거래' },
+  { path: '/status', label: 'CPT·OPT·비자·영주권' },
+  { path: '/job-review', label: '면접·취업' },
+  { path: '/roommate', label: '룸메이트·서블렛' },
+  { path: '/anonymous', label: '익명게시판' },
 ] as const
 
 const ACCOUNT_LINKS = [
-  { href: '/nyc/me', label: '마이페이지', match: 'exact' as const },
-  { href: '/nyc/me/posts', label: '내가 올린 글', match: 'prefix' as const },
+  { path: '/me', label: '마이페이지', match: 'exact' as const },
+  { path: '/me/posts', label: '내가 올린 글', match: 'prefix' as const },
   {
-    href: '/nyc/me/likes',
+    path: '/me/likes',
     label: '내가 좋아요 누른 글',
     match: 'prefix' as const,
   },
@@ -31,7 +34,7 @@ const ACCOUNT_LINKS = [
 
 const TEAM_ACCOUNT_LINKS = [
   {
-    href: '/nyc/team/credit-reviews',
+    path: '/team/credit-reviews',
     label: '크레딧 리뷰',
     match: 'prefix' as const,
   },
@@ -41,6 +44,7 @@ const MOBILE_HEADER_HEIGHT_CLASS = 'top-14 sm:top-16'
 
 export function NycNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [cityOpen, setCityOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const accountRef = useRef<HTMLDivElement>(null)
@@ -50,15 +54,28 @@ export function NycNavbar() {
     right: number
   } | null>(null)
   const pathname = usePathname()
+  const city = useCity()
+  const cityInfo = useCityInfo()
+  const href = useCityPath()
   const { user, loading, avatarURL, displayName, isMisaengUser } = useAuth()
-  const accountMenuLinks = isMisaengUser
-    ? [...ACCOUNT_LINKS, ...TEAM_ACCOUNT_LINKS]
-    : [...ACCOUNT_LINKS]
+  const navLinks = NAV_LINKS.map((item) => ({
+    ...item,
+    href: href(item.path),
+  }))
+  const accountMenuLinks = (
+    isMisaengUser
+      ? [...ACCOUNT_LINKS, ...TEAM_ACCOUNT_LINKS]
+      : [...ACCOUNT_LINKS]
+  ).map((item) => ({
+    ...item,
+    href: href(item.path),
+  }))
   const [navPath, setNavPath] = useState(pathname)
   if (pathname !== navPath) {
     setNavPath(pathname)
     setMobileOpen(false)
     setAccountOpen(false)
+    setCityOpen(false)
   }
 
   useEffect(() => {
@@ -188,33 +205,33 @@ export function NycNavbar() {
               MOBILE_HEADER_HEIGHT_CLASS,
             )}
             style={{ zIndex: 9999 }}
-            aria-label='NYC 모바일 메뉴'
+            aria-label={`${cityInfo.shortLabel} 모바일 메뉴`}
           >
             <nav
               className='flex flex-col px-2 py-2 pb-4'
-              aria-label='NYC 모바일 메뉴'
+              aria-label={`${cityInfo.shortLabel} 모바일 메뉴`}
             >
               <div className='flex flex-col px-1'>
                 <Link
-                  href='/nyc'
+                  href={href()}
                   onClick={() => setMobileOpen(false)}
                   className={cn(
                     'flex h-11 items-center rounded-xl px-3 text-[15px] font-medium touch-manipulation active:bg-[var(--surface)]',
-                    pathname === '/nyc'
+                    pathname === href()
                       ? 'bg-[#F64310]/[0.08] font-semibold text-[#F64310]'
                       : 'text-[var(--foreground)]',
                   )}
                 >
                   커뮤니티 홈
                 </Link>
-                {NYC_NAV_LINKS.map(({ href, label }) => (
+                {navLinks.map(({ href: itemHref, label }) => (
                   <Link
-                    key={href}
-                    href={href}
+                    key={itemHref}
+                    href={itemHref}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
                       'flex h-11 items-center rounded-xl px-3 text-[15px] font-medium touch-manipulation active:bg-[var(--surface)]',
-                      isActive(href)
+                      isActive(itemHref)
                         ? 'bg-[#F64310]/[0.08] font-semibold text-[#F64310]'
                         : 'text-[var(--foreground)]',
                     )}
@@ -243,7 +260,7 @@ export function NycNavbar() {
                   ))
                 ) : (
                   <Link
-                    href={`/nyc/login?next=${encodeURIComponent(pathname)}`}
+                    href={cityLoginPath(city, pathname)}
                     onClick={() => setMobileOpen(false)}
                     className='flex h-11 w-full items-center justify-center rounded-xl border border-[var(--border)] text-[15px] font-semibold text-[var(--foreground)] touch-manipulation active:bg-[var(--surface)]'
                   >
@@ -269,35 +286,45 @@ export function NycNavbar() {
         )}
       >
         <div className='relative mx-auto grid h-14 w-full max-w-7xl min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-4 sm:h-16 sm:gap-3 sm:px-6 lg:px-8'>
-          <Link
-            href='/nyc'
-            className='flex min-h-[44px] shrink-0 items-center gap-2 justify-self-start transition-opacity active:opacity-80'
-            aria-label='NYC 커뮤니티 홈'
-          >
-            <Image
-              src='/banner.png'
-              alt='Misaeng NYC'
-              width={126}
-              height={36}
-              className='h-6 w-auto max-w-[96px] object-contain sm:h-[2.025rem] sm:max-w-none'
-              priority
-            />
-            <span className='rounded-full bg-[#F64310]/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-[#F64310] sm:px-2 sm:text-[10px]'>
-              NYC
-            </span>
-          </Link>
+          <div className='flex min-h-[44px] shrink-0 items-center gap-1.5 justify-self-start sm:gap-2'>
+            <Link
+              href={href()}
+              className='flex items-center transition-opacity active:opacity-80'
+              aria-label={`${cityInfo.shortLabel} 커뮤니티 홈`}
+            >
+              <Image
+                src='/banner.png'
+                alt={cityInfo.brand}
+                width={126}
+                height={36}
+                className='h-6 w-auto max-w-[96px] object-contain sm:h-[2.025rem] sm:max-w-none'
+                priority
+              />
+            </Link>
+            <button
+              type='button'
+              onClick={() => setCityOpen(true)}
+              className='inline-flex items-center gap-0.5 whitespace-nowrap rounded-full bg-[#F64310]/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-[#F64310] touch-manipulation transition hover:bg-[#F64310]/15 sm:px-2 sm:text-[10px]'
+              aria-haspopup='dialog'
+              aria-expanded={cityOpen}
+              aria-label='도시 선택'
+            >
+              {cityInfo.name}
+              <ChevronIcon className='size-2.5 sm:size-3' />
+            </button>
+          </div>
 
           <nav
             className='hidden min-w-0 items-center justify-center gap-4 overflow-hidden xl:flex 2xl:gap-6'
-            aria-label='NYC 메뉴'
+            aria-label={`${cityInfo.shortLabel} 메뉴`}
           >
-            {NYC_NAV_LINKS.map(({ href, label }) => (
+            {navLinks.map(({ href: itemHref, label }) => (
               <Link
-                key={href}
-                href={href}
+                key={itemHref}
+                href={itemHref}
                 className={cn(
                   'shrink-0 whitespace-nowrap text-[13px] font-medium transition-colors 2xl:text-sm',
-                  isActive(href)
+                  isActive(itemHref)
                     ? 'font-semibold text-[var(--foreground)]'
                     : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]',
                 )}
@@ -314,7 +341,7 @@ export function NycNavbar() {
               <>
                 {!mobileOpen && (
                   <Link
-                    href={`/nyc/login?next=${encodeURIComponent(pathname)}`}
+                    href={cityLoginPath(city, pathname)}
                     className='inline-flex h-9 items-center rounded-full border border-[var(--border)] px-3.5 text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--surface)]'
                   >
                     로그인
@@ -387,7 +414,29 @@ export function NycNavbar() {
 
       {accountMenuOverlay}
       {mobileMenuOverlay}
+      <CitySelectModal
+        open={cityOpen}
+        onClose={() => setCityOpen(false)}
+        currentCity={city}
+      />
     </>
+  )
+}
+
+function ChevronIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox='0 0 20 20'
+      fill='currentColor'
+      className={className}
+      aria-hidden
+    >
+      <path
+        fillRule='evenodd'
+        d='M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z'
+        clipRule='evenodd'
+      />
+    </svg>
   )
 }
 

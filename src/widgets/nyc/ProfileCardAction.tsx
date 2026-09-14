@@ -1,6 +1,11 @@
 import { cn } from '@lib'
 
-type Variant = 'profile' | 'school'
+type Variant =
+  | 'profile'
+  | 'identity'
+  | 'school'
+  | 'workplace'
+  | 'workplacePending'
 
 type Props = {
   variant: Variant
@@ -20,6 +25,17 @@ const VARIANTS = {
     chevron: 'text-[#F64310]/45 group-hover:text-[#F64310]',
     Icon: ProfileCompleteIcon,
   },
+  identity: {
+    title: '본인 인증해 보세요',
+    description: '학교 메일 또는 직장 메일로 인증해요',
+    descriptionDesktop: '학교·직장 메일로 인증해요',
+    shell:
+      'border-[#F64310]/18 bg-[linear-gradient(180deg,#fffaf8_0%,#fff3ee_100%)] ring-[#F64310]/8 hover:border-[#F64310]/28 hover:bg-[#fff3ee]',
+    icon: 'bg-[#F64310]/10 text-[#F64310]',
+    titleColor: 'text-[#C9340A]',
+    chevron: 'text-[#F64310]/45 group-hover:text-[#F64310]',
+    Icon: IdentityVerifyIcon,
+  },
   school: {
     title: '학교 이메일 인증해 보세요',
     description: '학교 메일로 학생 인증을 완료해요',
@@ -30,6 +46,28 @@ const VARIANTS = {
     titleColor: 'text-[#57068c]',
     chevron: 'text-[#57068c]/45 group-hover:text-[#57068c]',
     Icon: SchoolVerifyIcon,
+  },
+  workplace: {
+    title: '직장인 인증해 보세요',
+    description: '직장 메일과 회사 이름으로 인증해요',
+    descriptionDesktop: '직장인 인증을 진행해요',
+    shell:
+      'border-[#0f766e]/16 bg-[linear-gradient(180deg,#f4fbfa_0%,#ecf8f6_100%)] ring-[#0f766e]/8 hover:border-[#0f766e]/24 hover:bg-[#ecf8f6]',
+    icon: 'bg-[#0f766e]/10 text-[#0f766e]',
+    titleColor: 'text-[#0f766e]',
+    chevron: 'text-[#0f766e]/45 group-hover:text-[#0f766e]',
+    Icon: WorkplaceVerifyIcon,
+  },
+  workplacePending: {
+    title: '직장인 인증을 확인하고 있어요',
+    description: '이메일 인증은 끝났어요. 미생 팀 확인을 기다려 주세요',
+    descriptionDesktop: '미생 팀 확인을 기다려 주세요',
+    shell:
+      'border-amber-200/80 bg-[linear-gradient(180deg,#fffbeb_0%,#fef3c7_100%)] ring-amber-200/50 hover:border-amber-300 hover:bg-[#fef3c7]',
+    icon: 'bg-amber-100 text-amber-700',
+    titleColor: 'text-amber-800',
+    chevron: 'text-amber-400/70 group-hover:text-amber-600',
+    Icon: WorkplaceVerifyIcon,
   },
 } as const
 
@@ -98,6 +136,55 @@ function ProfileCompleteIcon() {
         strokeLinejoin='round'
         d='M19 8v3m1.5-1.5H17.5'
       />
+    </svg>
+  )
+}
+
+function IdentityVerifyIcon() {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='1.8'
+      className='size-[18px]'
+      aria-hidden
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M12 3 3.5 7.5 12 12l8.5-4.5L12 3Z'
+      />
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M6.2 10.2V16c0 1.2 2.6 2.4 5.8 2.4s5.8-1.2 5.8-2.4v-5.8'
+      />
+    </svg>
+  )
+}
+
+function WorkplaceVerifyIcon() {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='1.8'
+      className='size-[18px]'
+      aria-hidden
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M8 7V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1'
+      />
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M4.5 9.5h15v9a1.5 1.5 0 0 1-1.5 1.5h-12a1.5 1.5 0 0 1-1.5-1.5v-9Z'
+      />
+      <path strokeLinecap='round' strokeLinejoin='round' d='M4.5 13h15' />
     </svg>
   )
 }

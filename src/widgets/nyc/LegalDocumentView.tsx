@@ -1,5 +1,8 @@
+'use client'
+
 import Link from 'next/link'
 
+import { useCityInfo, useCityPath } from '@hooks/useCity'
 import type {
   BilingualText,
   LegalBlock,
@@ -22,6 +25,8 @@ export function LegalDocumentView({
   relatedLabel,
   relatedLabelKo,
 }: LegalDocumentViewProps) {
+  const href = useCityPath()
+  const cityInfo = useCityInfo()
   return (
     <div className='flex flex-1 flex-col bg-[linear-gradient(180deg,#f6f7f9_0%,#ffffff_28%,#ffffff_100%)]'>
       <article
@@ -134,10 +139,10 @@ export function LegalDocumentView({
         <div className='mt-12 flex flex-col gap-3 border-t border-[var(--border)] pt-8 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex flex-wrap gap-x-4 gap-y-2 text-sm'>
             <Link
-              href='/nyc'
+              href={href()}
               className='font-semibold text-[#F64310] touch-manipulation hover:underline'
             >
-              ← Back to NYC
+              ← Back to {cityInfo.shortLabel}
             </Link>
             <Link
               href={relatedHref}

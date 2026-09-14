@@ -1,3 +1,5 @@
+import type { CityId } from '@lib/constants/cities'
+
 /** 추천인 코드 — 클라이언트 유틸 */
 
 export const REFERRAL_QUERY_KEY = 'ref'
@@ -58,10 +60,14 @@ export function captureReferralFromLocation() {
   if (code) persistReferralCode(code)
 }
 
-export function buildReferralShareUrl(origin: string, code: string): string {
+export function buildReferralShareUrl(
+  origin: string,
+  code: string,
+  city: CityId = 'nyc',
+): string {
   const next = normalizeReferralCode(code)
   const base = origin.replace(/\/$/, '')
-  return `${base}/nyc?${REFERRAL_QUERY_KEY}=${encodeURIComponent(next)}`
+  return `${base}/${city}?${REFERRAL_QUERY_KEY}=${encodeURIComponent(next)}`
 }
 
 export async function bindReferralCodeRequest(code: string) {

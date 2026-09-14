@@ -21,6 +21,13 @@ import {
   normalizeRoommateMoveInDate,
   normalizeRoommateMoveOutDate,
 } from '@lib/community/roommate'
+import {
+  communityPostMatchesCity,
+  isSharedCommunityBoard,
+  parseCityId,
+  resolveCityId,
+  type CityId,
+} from '@lib/constants/cities'
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import type { CommunityPost } from '@/types/nyc'
@@ -202,6 +209,11 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       data.roommateMoveOutDate,
       normalizeRoommateMoveInDate(data.roommateMoveInDate),
     ),
+    city: isStatusCommunityBoard(categoryId)
+      ? parseCityId(typeof data.city === 'string' ? data.city : null)
+      : isSharedCommunityBoard(categoryId)
+        ? null
+        : resolveCityId(typeof data.city === 'string' ? data.city : null),
   }
 }
 
@@ -286,16 +298,19 @@ export async function enrichStoredCommunityPostCounts(
 
 export async function listStoredCommunityPosts(
   boardId?: string,
+  city?: CityId,
 ): Promise<CommunityPost[]> {
   const posts = await listAllStoredCommunityPosts()
   const filtered = posts
     .filter((post) => post.status === 'open')
     .filter((post) => {
       if (!boardId) return true
-      if (isStatusCommunityBoard(boardId)) {
-        return isStatusCommunityBoard(post.categoryId)
-      }
-      return post.categoryId === boardId
+      const boardMatch = isStatusCommunityBoard(boardId)
+        ? isStatusCommunityBoard(post.categoryId)
+        : post.categoryId === boardId
+      if (!boardMatch) return false
+      if (!city || isSharedCommunityBoard(boardId)) return true
+      return communityPostMatchesCity(post, city)
     })
 
   const withCounts =

@@ -3,6 +3,7 @@ import type {
   HousingPartWall,
   HousingRoomType,
 } from '@/types/nyc'
+import { resolveCityId } from '@lib/constants/cities'
 import { normalizeErpRoomType } from './listing'
 
 const PART_WALL_OPTIONS: HousingPartWall[] = [
@@ -198,6 +199,7 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
 
   return {
     id,
+    city: resolveCityId(typeof data.city === 'string' ? data.city : null),
     property: {
       address: String(propertyRaw.address || '').trim(),
       displayedAddress: String(propertyRaw.displayedAddress || '').trim() || null,

@@ -6,6 +6,7 @@ import type { FormEvent } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
+import { useCityInfo, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { TermsConsentFields } from '@components/consent/TermsConsentFields'
 import { useConsentLocale } from '@components/consent/ConsentLocaleProvider'
@@ -40,9 +41,11 @@ export function NycLoginScreen() {
     resetPassword,
   } = useAuth()
   const { success, error: toastError } = useToast()
+  const href = useCityPath()
+  const cityInfo = useCityInfo()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const next = searchParams.get('next') || '/nyc'
+  const next = searchParams.get('next') || href()
 
   const { locale } = useConsentLocale()
   const [mode, setMode] = useState<'signin' | 'signup' | 'reset'>('signin')
@@ -354,14 +357,14 @@ export function NycLoginScreen() {
                     <>
                       로그인 시{' '}
                       <Link
-                        href='/nyc/terms-of-use'
+                        href={href('/terms-of-use')}
                         className='underline-offset-2 hover:text-[#F64310] hover:underline'
                       >
                         이용약관
                       </Link>
                       ·
                       <Link
-                        href='/nyc/privacy-policy'
+                        href={href('/privacy-policy')}
                         className='underline-offset-2 hover:text-[#F64310] hover:underline'
                       >
                         개인정보
@@ -372,14 +375,14 @@ export function NycLoginScreen() {
                     <>
                       By signing in you agree to our{' '}
                       <Link
-                        href='/nyc/terms-of-use'
+                        href={href('/terms-of-use')}
                         className='underline-offset-2 hover:text-[#F64310] hover:underline'
                       >
                         Terms
                       </Link>
                       {' & '}
                       <Link
-                        href='/nyc/privacy-policy'
+                        href={href('/privacy-policy')}
                         className='underline-offset-2 hover:text-[#F64310] hover:underline'
                       >
                         Privacy
@@ -449,10 +452,10 @@ export function NycLoginScreen() {
           </p>
 
           <Link
-            href='/nyc'
+            href={href()}
             className='inline-flex min-h-[36px] items-center text-[13px] font-medium text-[#98a2b3] transition hover:text-[#F64310]'
           >
-            ← NYC로 돌아가기
+            ← {cityInfo.shortLabel}로 돌아가기
           </Link>
         </footer>
       </div>

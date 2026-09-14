@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 
+import { useCity } from '@hooks/useCity'
+import { hrefForCommunityPost } from '@lib/constants/cities'
 import { COMMUNITY_CREDIT_REVIEW_BONUS } from '@lib/constants/communityCredit'
 import { postHasFinalResultForCreditReview } from '@lib/community/creditFinalResult'
 import { cn } from '@lib'
@@ -23,10 +25,11 @@ type Props = {
 
 export function CreditReviewRequestCard({
   post,
-  boardId,
+  boardId: _boardId,
   isAuthor,
   className,
 }: Props) {
+  const city = useCity()
   const [request, setRequest] = useState<ReviewRequest | null>(null)
   const [eligible, setEligible] = useState(() =>
     postHasFinalResultForCreditReview(post),
@@ -162,7 +165,7 @@ export function CreditReviewRequestCard({
           ) : null}
           {!eligible ? (
             <Link
-              href={`/nyc/${boardId}/${post.id}/edit`}
+              href={hrefForCommunityPost(post, city, 'edit')}
               className='inline-flex h-10 items-center justify-center rounded-full border border-[var(--border)] bg-white px-4 text-[13px] font-semibold text-[var(--foreground)] touch-manipulation'
             >
               타임라인 수정

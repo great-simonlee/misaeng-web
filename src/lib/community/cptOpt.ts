@@ -31,7 +31,7 @@ export const CPT_OPT_TYPES: {
   {
     id: 'stem-opt',
     label: 'STEM OPT',
-    description: 'STEM 전공 OPT 24개월 연장',
+    description: 'STEM OPT 연장',
     summary: 'I-983·OGS 확인 후 SEVP 검증 보고',
   },
   {
@@ -422,8 +422,8 @@ export function getCptOptTimelineDateRange(
     .filter(Boolean)
     .sort()
   if (dates.length === 0) return null
-  if (dates.length === 1) return formatCptOptDate(dates[0])
-  return `${formatCptOptDate(dates[0])} – ${formatCptOptDate(dates[dates.length - 1])}`
+  if (dates.length === 1) return formatCptOptDate(dates[0], { compactYear: true })
+  return `${formatCptOptDate(dates[0], { compactYear: true })} – ${formatCptOptDate(dates[dates.length - 1], { compactYear: true })}`
 }
 
 export function normalizeCptOptTimeline(raw: unknown): CptOptTimelineEntry[] {
@@ -478,14 +478,17 @@ export function normalizeCptOptTips(raw: unknown) {
     .slice(0, CPT_OPT_TIPS_MAX)
 }
 
-export function formatCptOptDate(value: string) {
+export function formatCptOptDate(
+  value: string,
+  options?: { compactYear?: boolean },
+) {
   const trimmed = value.trim()
   if (!trimmed) return ''
   if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
     const date = new Date(`${trimmed}T12:00:00`)
     if (!Number.isNaN(date.getTime())) {
       return date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
+        year: options?.compactYear ? '2-digit' : 'numeric',
         month: 'short',
         day: 'numeric',
       })

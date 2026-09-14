@@ -6,8 +6,10 @@ import type { FormEvent, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 
 import { LoadingState, TipTapEditor } from '@components'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { useRequireAuth } from '@hooks/useRequireAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import { hrefForCommunityPost } from '@lib/constants/cities'
 import {
   createCommunityPostRequest,
   fetchCommunityPost,
@@ -15,16 +17,20 @@ import {
 } from '@lib/community/client'
 import {
   CPT_OPT_TIPS_MAX,
-  CPT_OPT_TYPES,
   getCptOptTypeLabel,
   getCptOptTypeStyle,
   isTimelineEntryComplete,
   normalizeCptOptTimeline,
   type CptOptTimelineEntry,
 } from '@lib/community/cptOpt'
+import {
+  clearWriteDraft,
+  loadWriteDraft,
+  saveWriteDraft,
+} from '@lib/community/writeDraft'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
 import { htmlToPlainText } from '@lib/community/html'
-import { isAccountSuspended, isSchoolVerified } from '@lib/community/schoolGate'
+import { isAccountSuspended, isIdentityVerified } from '@lib/community/schoolGate'
 import {
   isStatusCommunityBoard,
   NYC_COMMUNITY_BOARD_META,
@@ -36,7 +42,6 @@ import {
   BoardBackLink,
   BoardPageShell,
 } from '@widgets/nyc/BoardPageShell'
-import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
 import { CptOptTimelineEditor } from '@widgets/nyc/CptOptTimelineEditor'
 import { CptOptTypeBadge, CptOptTypePicker } from '@widgets/nyc/CptOptTypeBadge'
 import {
@@ -46,6 +51,15 @@ import {
 import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 import { StatusEmployerSelect } from '@widgets/nyc/StatusEmployerSelect'
+import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
+
+type CptOptWriteDraft = {
+  postTitle: string
+  contentHtml: string
+  location: string
+  cptOptType: CptOptTypeId | null
+  timeline: CptOptTimelineEntry[]
+}
 
 interface CptOptWriteScreenProps {
   title: string
@@ -56,12 +70,14 @@ export function CptOptWriteScreen({
   title,
   editPostId,
 }: CptOptWriteScreenProps) {
+  const city = useCity()
+  const href = useCityPath()
   const boardId: NycCommunityBoardId = 'status'
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const isEdit = Boolean(editPostId)
   const loginNext = editPostId
-    ? `/nyc/${boardId}/${editPostId}/edit`
-    : `/nyc/${boardId}/new`
+    ? href(`/${boardId}/${editPostId}/edit`)
+    : href(`/${boardId}/new`)
   const { user, profile, loading, isAuthenticated } =
     useRequireAuth(loginNext)
   const { error: toastError, success } = useToast()
@@ -76,7 +92,23 @@ export function CptOptWriteScreen({
   const [timeline, setTimeline] = useState<CptOptTimelineEntry[]>([])
   const [existingTimelineIds, setExistingTimelineIds] = useState<string[]>([])
   const [showMoreSettings, setShowMoreSettings] = useState(false)
+  const [draftHydrated, setDraftHydrated] = useState(isEdit)
+  const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null)
   const orientation = useStatusWriteOrientation(!isEdit)
+
+  useEffect(() => {
+    if (isEdit || !user?.uid) return
+    const stored = loadWriteDraft<CptOptWriteDraft>('status', city, user.uid)
+    if (stored) {
+      setPostTitle(stored.data.postTitle ?? '')
+      setContentHtml(stored.data.contentHtml ?? '')
+      setLocation(stored.data.location ?? '')
+      setCptOptType(stored.data.cptOptType ?? null)
+      setTimeline(Array.isArray(stored.data.timeline) ? stored.data.timeline : [])
+      setDraftSavedAt(stored.savedAt)
+    }
+    setDraftHydrated(true)
+  }, [city, isEdit, user?.uid])
 
   useEffect(() => {
     if (!editPostId || !user?.uid) return
@@ -87,12 +119,12 @@ export function CptOptWriteScreen({
         if (cancelled) return
         if (!post || !isStatusCommunityBoard(post.categoryId)) {
           toastError('글을 찾을 수 없어요')
-          router.replace('/nyc/me/posts')
+          router.replace(href('/me/posts'))
           return
         }
         if (post.authorUid !== user.uid) {
           toastError('수정 권한이 없어요')
-          router.replace(`/nyc/${boardId}/${post.id}`)
+          router.replace(hrefForCommunityPost(post, city))
           return
         }
         setPostTitle(post.title)
@@ -114,7 +146,7 @@ export function CptOptWriteScreen({
       } catch (err) {
         if (!cancelled) {
           toastError(getErrorMessage(err, '글을 불러오지 못했어요'))
-          router.replace('/nyc/me/posts')
+          router.replace(href('/me/posts'))
         }
       } finally {
         if (!cancelled) setLoadingEdit(false)
@@ -123,7 +155,7 @@ export function CptOptWriteScreen({
     return () => {
       cancelled = true
     }
-  }, [editPostId, user?.uid, router, toastError])
+  }, [city, editPostId, href, user?.uid, router, toastError])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -190,6 +222,7 @@ export function CptOptWriteScreen({
           ? await updateCommunityPostRequest(editPostId, payload)
           : await createCommunityPostRequest({
               categoryId: boardId,
+              city,
               ...payload,
               authorNickname: profile?.nickname?.trim() || null,
               authorPhotoURL: profile?.photoURL?.trim() || null,
@@ -197,12 +230,15 @@ export function CptOptWriteScreen({
               authorSchoolName: profile?.verifiedSchoolName ?? null,
             })
 
+      if (!isEdit && user.uid) {
+        clearWriteDraft('status', city, user.uid)
+      }
       success(
         isEdit
           ? '진행 기록을 업데이트했어요. 목록 맨 위로 올라갔습니다'
           : '후기를 등록했어요. 나중에 진행 상황을 이어서 추가할 수 있어요',
       )
-      router.push(`/nyc/${boardId}/${post.id}`)
+      router.push(hrefForCommunityPost(post, city))
     } catch (err) {
       toastError(getErrorMessage(err, '저장에 실패했어요'))
     } finally {
@@ -210,7 +246,24 @@ export function CptOptWriteScreen({
     }
   }
 
-  if (loading || !isAuthenticated) {
+  function handleSaveDraft() {
+    if (!user?.uid) return
+    try {
+      const savedAt = saveWriteDraft<CptOptWriteDraft>('status', city, user.uid, {
+        postTitle,
+        contentHtml,
+        location,
+        cptOptType,
+        timeline,
+      })
+      setDraftSavedAt(savedAt)
+      success('임시 저장했어요')
+    } catch {
+      toastError('임시 저장에 실패했어요')
+    }
+  }
+
+  if (loading || !isAuthenticated || !draftHydrated) {
     return (
       <BoardPageShell width='narrow'>
         <LoadingState fullPage label='로그인 확인 중…' />
@@ -222,7 +275,7 @@ export function CptOptWriteScreen({
     return <AccountSuspendedNotice />
   }
 
-  if (!isSchoolVerified(profile)) {
+  if (!isIdentityVerified(profile)) {
     return <SchoolVerificationRequired nextPath={loginNext} />
   }
 
@@ -240,8 +293,8 @@ export function CptOptWriteScreen({
         <BoardBackLink
           href={
             isEdit && editPostId
-              ? `/nyc/${boardId}/${editPostId}`
-              : `/nyc/${boardId}`
+              ? href(`/${boardId}/${editPostId}`)
+              : href(`/${boardId}`)
           }
           label={isEdit ? '글로 돌아가기' : `${title} 목록`}
           className='mb-5'
@@ -255,13 +308,8 @@ export function CptOptWriteScreen({
             recordCount={existingTimelineIds.length}
           />
         ) : (
-          <CreateHero
-            writeLabel={meta.writeLabel}
-            onOpenGuide={orientation.openManual}
-          />
+          <CreateHero writeLabel={meta.writeLabel} />
         )}
-
-        <CommunityWritingGuidelines className='mt-5' />
 
         <form onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
           {isEdit ? (
@@ -323,6 +371,8 @@ export function CptOptWriteScreen({
                           onChange={setContentHtml}
                           placeholder='예: 회사 시작일 2–3주 전에 OGS에 서류를 넣으세요. 학교마다 포털이 달라 OGS 체크리스트를 먼저 확인하세요.'
                           minHeightClassName='min-h-[160px]'
+                          contentClassName='!text-[13px] !leading-[1.65]'
+                          simpleToolbar
                           maxLength={COMMUNITY_BODY_MAX}
                         />
                       </div>
@@ -345,34 +395,17 @@ export function CptOptWriteScreen({
             </>
           ) : (
             <>
-              <CreateSection
-                step={1}
-                title='어떤 유형인가요?'
-                description='CPT · OPT · STEM OPT · 비자 · 영주권 중 해당하는 것을 선택해 주세요'
-              >
+              <CreateSection step={1} title='어떤 유형인가요?'>
                 <CptOptTypePicker
                   value={cptOptType}
                   onChange={setCptOptType}
                 />
-                {cptOptType ? (
-                  <div
-                    className='mt-3 rounded-xl px-3.5 py-3 text-[12px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-black/[0.05]'
-                    style={{
-                      backgroundColor: getCptOptTypeStyle(cptOptType).soft,
-                    }}
-                  >
-                    {
-                      CPT_OPT_TYPES.find((item) => item.id === cptOptType)
-                        ?.summary
-                    }
-                  </div>
-                ) : null}
               </CreateSection>
 
               <CreateSection
                 step={2}
                 title='기본 정보'
-                description='제목과 회사·기관 유형을 선택해 주세요'
+                description='제목과 회사·기관을 입력해 주세요'
               >
                 <Field label='제목' required>
                   <input
@@ -414,21 +447,29 @@ export function CptOptWriteScreen({
                   onChange={setContentHtml}
                   placeholder='예: 회사 시작일 2–3주 전에 OGS에 서류를 넣으세요. 학교마다 포털이 달라 OGS 체크리스트를 먼저 확인하세요.'
                   minHeightClassName='min-h-[200px]'
+                  contentClassName='!text-[13px] !leading-[1.65]'
+                  simpleToolbar
                   maxLength={COMMUNITY_BODY_MAX}
                 />
               </CreateSection>
 
-              <button
-                type='submit'
-                disabled={submitting || !postTitle.trim() || !cptOptType}
-                className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
+              <WriteDraftActions
+                onSave={handleSaveDraft}
+                savedAt={draftSavedAt}
+                disabled={submitting}
               >
-                {submitting
-                  ? '등록 중…'
-                  : !cptOptType
-                    ? '유형을 선택해 주세요'
-                    : '후기 등록하기'}
-              </button>
+                <button
+                  type='submit'
+                  disabled={submitting || !postTitle.trim() || !cptOptType}
+                  className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
+                >
+                  {submitting
+                    ? '등록 중…'
+                    : !cptOptType
+                      ? '유형을 선택해 주세요'
+                      : '후기 등록하기'}
+                </button>
+              </WriteDraftActions>
               <p className='text-center text-[12px] text-[var(--muted)]'>
                 등록 후에도 진행 기록을 이어서 추가·수정할 수 있어요.
               </p>
@@ -437,7 +478,7 @@ export function CptOptWriteScreen({
 
           <p className='text-center text-[12px] text-[var(--muted)]'>
             <Link
-              href={`/nyc/${boardId}`}
+              href={href(`/${boardId}`)}
               className='underline-offset-2 hover:underline'
             >
               목록으로 돌아가기
@@ -449,41 +490,28 @@ export function CptOptWriteScreen({
       {!isEdit ? (
         <CptOptWriteOrientationModal
           open={orientation.open}
-          onClose={orientation.close}
+          agreeing={orientation.agreeing}
+          error={orientation.error}
+          onClose={() => void orientation.agree()}
+          listHref={href(`/${boardId}`)}
         />
       ) : null}
     </BoardPageShell>
   )
 }
 
-function CreateHero({
-  writeLabel,
-  onOpenGuide,
-}: {
-  writeLabel: string
-  onOpenGuide: () => void
-}) {
+function CreateHero({ writeLabel }: { writeLabel: string }) {
   return (
-    <div className='rounded-2xl bg-[#f7f8fa] px-4 py-5 ring-1 ring-black/[0.04] sm:px-5'>
-      <div className='flex items-start justify-between gap-3'>
-        <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--muted)]'>
-          최초 등록
-        </p>
-        <button
-          type='button'
-          onClick={onOpenGuide}
-          className='shrink-0 rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/20 touch-manipulation hover:bg-[#fff8f5]'
-        >
-          작성 가이드
-        </button>
-      </div>
+    <div>
+      <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--muted)]'>
+        최초 등록
+      </p>
       <h1 className='mt-1.5 text-[1.35rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.55rem]'>
         {writeLabel}
       </h1>
       <p className='mt-2 text-[13px] leading-relaxed text-[var(--muted)]'>
-        유형·기본 정보·진행 기록을 한 번에 세팅하는 화면이에요. 날짜별로 여러
-        건을 남겨 두고, OPT·비자·영주권 후기도 이 게시판에서 함께 남길 수
-        있습니다. 이후 진행 상황은 업데이트에서 이어서 추가하면 됩니다.
+        유형을 고르고 날짜별 진행 기록을 남겨 주세요. 등록 후에도 이어서 추가할
+        수 있어요.
       </p>
     </div>
   )
@@ -547,7 +575,7 @@ function CreateSection({
 }: {
   step: number
   title: string
-  description: string
+  description?: string
   children: ReactNode
 }) {
   return (
@@ -560,9 +588,11 @@ function CreateSection({
           <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
             {title}
           </h2>
-          <p className='mt-0.5 text-[12px] leading-relaxed text-[var(--muted)]'>
-            {description}
-          </p>
+          {description ? (
+            <p className='mt-0.5 text-[12px] leading-relaxed text-[var(--muted)]'>
+              {description}
+            </p>
+          ) : null}
         </div>
       </div>
       <div className='pl-10'>{children}</div>

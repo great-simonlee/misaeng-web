@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { useAnchoredPosition } from '@hooks/useAnchoredPosition'
+import { useCity } from '@hooks/useCity'
 import { cn } from '@lib'
 import type { FoodVenueOption } from '@lib/community/venues'
 
@@ -28,6 +29,7 @@ export function RestaurantNameField({
   inputClassName,
   placeholder = '음식점 이름',
 }: RestaurantNameFieldProps) {
+  const city = useCity()
   const listId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -63,6 +65,7 @@ export function RestaurantNameField({
       lng: String(longitude),
     })
     if (placeId?.trim()) params.set('placeId', placeId.trim())
+    params.set('city', city)
 
     void (async () => {
       try {
@@ -87,7 +90,7 @@ export function RestaurantNameField({
     })()
 
     return () => controller.abort()
-  }, [latitude, longitude, placeId])
+  }, [city, latitude, longitude, placeId])
 
   useEffect(() => {
     function onPointerDown(e: MouseEvent | TouchEvent) {

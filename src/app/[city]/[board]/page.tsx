@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 
+import { isCityId } from '@lib/constants/cities'
 import {
   getCommunityBoardRedirect,
   getNycCategory,
@@ -10,16 +11,16 @@ import { CommunityBoardWipScreen } from '@screens/nyc/CommunityBoardWipScreen'
 import { CommunityListScreen } from '@screens/nyc/CommunityListScreen'
 
 interface CommunityBoardPageProps {
-  params: Promise<{ board: string }>
+  params: Promise<{ city: string; board: string }>
 }
 
 export default async function CommunityBoardPage({
   params,
 }: CommunityBoardPageProps) {
-  const { board } = await params
-  if (!isCommunityBoardId(board)) notFound()
+  const { city, board } = await params
+  if (!isCityId(city) || !isCommunityBoardId(board)) notFound()
 
-  const redirectTo = getCommunityBoardRedirect(board)
+  const redirectTo = getCommunityBoardRedirect(board, city)
   if (redirectTo) redirect(redirectTo)
 
   const category = getNycCategory(board)

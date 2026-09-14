@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 
+import { useCity } from '@hooks/useCity'
+import { hrefForCommunityPost } from '@lib/constants/cities'
 import { getCommunityAuthorDisplayName } from '@lib/community/author'
 import { maskAnonymousDisplayName } from '@lib/community/anonymous'
 import { UserAvatar, SchoolBadge } from '@components'
@@ -30,6 +32,7 @@ export function CommunityPostFooter({
   editLabel = '수정',
   onDelete,
 }: CommunityPostFooterProps) {
+  const city = useCity()
   const authorName = anonymous
     ? maskAnonymousDisplayName('익명')
     : getCommunityAuthorDisplayName(post)
@@ -61,7 +64,7 @@ export function CommunityPostFooter({
         {isAuthor ? (
           <div className='flex shrink-0 items-center gap-0.5 text-[12px]'>
             <Link
-              href={`/nyc/${boardId}/${post.id}/edit`}
+              href={hrefForCommunityPost(post, city, 'edit')}
               className='rounded-lg px-2 py-1 font-medium text-[var(--muted-foreground)] touch-manipulation transition-colors hover:bg-black/[0.04] hover:text-[var(--foreground)]'
             >
               {editLabel}

@@ -9,14 +9,21 @@ import {
   PhotoUploadZone,
   TipTapEditor,
 } from '@components'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { useRequireAuth } from '@hooks/useRequireAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import { cityLoginPath, hrefForCommunityPost } from '@lib/constants/cities'
 import {
   createCommunityPostRequest,
   fetchCommunityPost,
   updateCommunityPostRequest,
 } from '@lib/community/client'
-import { isAccountSuspended, isSchoolVerified } from '@lib/community/schoolGate'
+import {
+  clearWriteDraft,
+  loadWriteDraft,
+  saveWriteDraft,
+} from '@lib/community/writeDraft'
+import { isAccountSuspended, isIdentityVerified } from '@lib/community/schoolGate'
 import {
   COMMUNITY_BODY_MAX,
   FOOD_CATEGORIES,
@@ -69,7 +76,9 @@ import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 import { CptOptWriteScreen } from '@screens/nyc/CptOptWriteScreen'
 import { JobReviewWriteScreen } from '@screens/nyc/JobReviewWriteScreen'
+import { AnonymousWriteScreen } from '@screens/nyc/AnonymousWriteScreen'
 import { RoommateWriteScreen } from '@screens/nyc/RoommateWriteScreen'
+import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
 
 interface CommunityNewScreenProps {
   boardId: NycCommunityBoardId
@@ -88,6 +97,22 @@ type MenuDraft = {
 type GalleryDraft = {
   key: string
   imageUrl: string
+}
+
+type FoodWriteDraft = {
+  postTitle: string
+  contentHtml: string
+  location: string
+  detail: string
+  selectedPlace: PlaceSearchResult | null
+  foodCategory: FoodCategoryId | null
+  foodCuisine: FoodCuisineId | null
+  partySize: string
+  totalSpend: string
+  tipIncluded: boolean | null
+  waitMinutes: string
+  menuDrafts: MenuDraft[]
+  galleryDrafts: GalleryDraft[]
 }
 
 let photoKeySeq = 0
@@ -121,6 +146,9 @@ export function CommunityNewScreen({
   if (boardId === 'roommate') {
     return <RoommateWriteScreen title={title} editPostId={editPostId} />
   }
+  if (boardId === 'anonymous') {
+    return <AnonymousWriteScreen title={title} editPostId={editPostId} />
+  }
 
   return (
     <CommunityBoardNewScreen
@@ -136,12 +164,14 @@ function CommunityBoardNewScreen({
   title,
   editPostId,
 }: CommunityNewScreenProps) {
+  const city = useCity()
+  const href = useCityPath()
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const isEdit = Boolean(editPostId)
   const anonymousBoard = isAnonymousBoard(boardId)
   const loginNext = editPostId
-    ? `/nyc/${boardId}/${editPostId}/edit`
-    : `/nyc/${boardId}/new`
+    ? href(`/${boardId}/${editPostId}/edit`)
+    : href(`/${boardId}/new`)
   const { user, profile, loading, isAuthenticated } =
     useRequireAuth(loginNext)
   const { error: toastError, success } = useToast()
@@ -180,6 +210,33 @@ function CommunityBoardNewScreen({
   menuDraftsRef.current = menuDrafts
   galleryDraftsRef.current = galleryDrafts
 
+  const [draftHydrated, setDraftHydrated] = useState(!isFood || isEdit)
+  const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!isFood || isEdit || !user?.uid) return
+    const stored = loadWriteDraft<FoodWriteDraft>('food', city, user.uid)
+    if (stored) {
+      setPostTitle(stored.data.postTitle ?? '')
+      setContentHtml(stored.data.contentHtml ?? '')
+      setLocation(stored.data.location ?? '')
+      setDetail(stored.data.detail ?? '')
+      setSelectedPlace(stored.data.selectedPlace ?? null)
+      setFoodCategory(stored.data.foodCategory ?? null)
+      setFoodCuisine(stored.data.foodCuisine ?? null)
+      setPartySize(stored.data.partySize ?? '2')
+      setTotalSpend(stored.data.totalSpend ?? '')
+      setTipIncluded(stored.data.tipIncluded ?? null)
+      setWaitMinutes(stored.data.waitMinutes ?? '')
+      setMenuDrafts(Array.isArray(stored.data.menuDrafts) ? stored.data.menuDrafts : [])
+      setGalleryDrafts(
+        Array.isArray(stored.data.galleryDrafts) ? stored.data.galleryDrafts : [],
+      )
+      setDraftSavedAt(stored.savedAt)
+    }
+    setDraftHydrated(true)
+  }, [city, isEdit, isFood, user?.uid])
+
   const galleryRemaining = FOOD_GALLERY_MAX - galleryDrafts.length
   const menuRemaining = FOOD_MENU_MAX - menuDrafts.length
   const canAddGallery = galleryRemaining > 0 && !galleryUploading
@@ -194,16 +251,16 @@ function CommunityBoardNewScreen({
         if (cancelled) return
         if (!post) {
           toastError('글을 찾을 수 없어요')
-          router.replace('/nyc/me/posts')
+          router.replace(href('/me/posts'))
           return
         }
         if (post.authorUid !== user.uid) {
           toastError('수정 권한이 없어요')
-          router.replace(`/nyc/${post.categoryId}/${post.id}`)
+          router.replace(hrefForCommunityPost(post, city))
           return
         }
         if (post.categoryId !== boardId) {
-          router.replace(`/nyc/${post.categoryId}/${post.id}/edit`)
+          router.replace(hrefForCommunityPost(post, city, 'edit'))
           return
         }
         setPostTitle(
@@ -260,7 +317,7 @@ function CommunityBoardNewScreen({
       } catch (err) {
         if (!cancelled) {
           toastError(getErrorMessage(err, '글을 불러오지 못했어요'))
-          router.replace('/nyc/me/posts')
+          router.replace(href('/me/posts'))
         }
       } finally {
         if (!cancelled) setLoadingEdit(false)
@@ -269,7 +326,7 @@ function CommunityBoardNewScreen({
     return () => {
       cancelled = true
     }
-  }, [editPostId, user?.uid, boardId, router, toastError])
+  }, [city, editPostId, href, user?.uid, boardId, router, toastError])
 
   useEffect(() => {
     const key = pendingFocusKeyRef.current
@@ -451,7 +508,7 @@ function CommunityBoardNewScreen({
     e.preventDefault()
     if (!user?.email) {
       toastError('로그인이 필요해요')
-      router.replace(`/nyc/login?next=${encodeURIComponent(loginNext)}`)
+      router.replace(cityLoginPath(city, loginNext))
       return
     }
 
@@ -615,6 +672,7 @@ function CommunityBoardNewScreen({
         ? await updateCommunityPostRequest(editPostId, payload)
         : await createCommunityPostRequest({
             categoryId: boardId,
+            city,
             ...payload,
             authorNickname: anonymousBoard
               ? null
@@ -629,8 +687,11 @@ function CommunityBoardNewScreen({
               ? null
               : (profile?.verifiedSchoolName ?? null),
           })
+      if (!isEdit && isFood && user.uid) {
+        clearWriteDraft('food', city, user.uid)
+      }
       success(isEdit ? '글을 수정했어요' : '글을 등록했어요')
-      router.push(`/nyc/${boardId}/${post.id}`)
+      router.push(hrefForCommunityPost(post, city))
     } catch (err) {
       toastError(getErrorMessage(err, isEdit ? '수정에 실패했어요' : '등록에 실패했어요'))
     } finally {
@@ -638,7 +699,32 @@ function CommunityBoardNewScreen({
     }
   }
 
-  if (loading || loadingEdit || !isAuthenticated || !user) {
+  function handleSaveDraft() {
+    if (!user?.uid || !isFood) return
+    try {
+      const savedAt = saveWriteDraft<FoodWriteDraft>('food', city, user.uid, {
+        postTitle,
+        contentHtml,
+        location,
+        detail,
+        selectedPlace,
+        foodCategory,
+        foodCuisine,
+        partySize,
+        totalSpend,
+        tipIncluded,
+        waitMinutes,
+        menuDrafts,
+        galleryDrafts,
+      })
+      setDraftSavedAt(savedAt)
+      success('임시 저장했어요')
+    } catch {
+      toastError('임시 저장에 실패했어요')
+    }
+  }
+
+  if (loading || loadingEdit || !isAuthenticated || !user || !draftHydrated) {
     return (
       <BoardPageShell width='narrow'>
         <LoadingState
@@ -657,7 +743,7 @@ function CommunityBoardNewScreen({
     return <AccountSuspendedNotice />
   }
 
-  if (!isSchoolVerified(profile)) {
+  if (!isIdentityVerified(profile)) {
     return <SchoolVerificationRequired nextPath={loginNext} />
   }
 
@@ -671,8 +757,8 @@ function CommunityBoardNewScreen({
           <BoardBackLink
             href={
               isEdit && editPostId
-                ? `/nyc/${boardId}/${editPostId}`
-                : `/nyc/${boardId}`
+                ? href(`/${boardId}/${editPostId}`)
+                : href(`/${boardId}`)
             }
             label={isEdit ? '글로 돌아가기' : `${title} 목록`}
             className='mb-6'
@@ -1216,38 +1302,58 @@ function CommunityBoardNewScreen({
           </section>
 
           <div className='mt-8'>
-            <button
-              type='submit'
-              disabled={
-                submitting ||
-                !postTitle.trim() ||
-                !selectedPlace?.placeId ||
-                selectedPlace.latitude == null ||
-                selectedPlace.longitude == null ||
-                !foodCategory ||
-                !foodCuisine
-              }
-              className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-[0.99] disabled:opacity-50 sm:h-12 sm:text-[15px]'
-            >
-              {submitting
-                ? isEdit
-                  ? '저장 중…'
-                  : '등록 중…'
-                : !postTitle.trim()
-                  ? '음식점 이름을 입력해 주세요'
-                  : !selectedPlace
-                    ? '주소를 선택해 주세요'
-                    : selectedPlace.latitude == null ||
-                        selectedPlace.longitude == null
-                      ? '주소 좌표를 확인 중이에요'
-                      : !foodCategory
-                        ? '카테고리를 선택해 주세요'
-                        : !foodCuisine
-                          ? '음식을 선택해 주세요'
-                          : isEdit
-                            ? '수정 완료'
-                            : '올리기'}
-            </button>
+            {isEdit ? (
+              <button
+                type='submit'
+                disabled={
+                  submitting ||
+                  !postTitle.trim() ||
+                  !selectedPlace?.placeId ||
+                  selectedPlace.latitude == null ||
+                  selectedPlace.longitude == null ||
+                  !foodCategory ||
+                  !foodCuisine
+                }
+                className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-[0.99] disabled:opacity-50 sm:h-12 sm:text-[15px]'
+              >
+                {submitting ? '저장 중…' : '수정 완료'}
+              </button>
+            ) : (
+              <WriteDraftActions
+                onSave={handleSaveDraft}
+                savedAt={draftSavedAt}
+                disabled={submitting}
+              >
+                <button
+                  type='submit'
+                  disabled={
+                    submitting ||
+                    !postTitle.trim() ||
+                    !selectedPlace?.placeId ||
+                    selectedPlace.latitude == null ||
+                    selectedPlace.longitude == null ||
+                    !foodCategory ||
+                    !foodCuisine
+                  }
+                  className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-[0.99] disabled:opacity-50 sm:h-12 sm:text-[15px]'
+                >
+                  {submitting
+                    ? '등록 중…'
+                    : !postTitle.trim()
+                      ? '음식점 이름을 입력해 주세요'
+                      : !selectedPlace
+                        ? '주소를 선택해 주세요'
+                        : selectedPlace.latitude == null ||
+                            selectedPlace.longitude == null
+                          ? '주소 좌표를 확인 중이에요'
+                          : !foodCategory
+                            ? '카테고리를 선택해 주세요'
+                            : !foodCuisine
+                              ? '음식을 선택해 주세요'
+                              : '올리기'}
+                </button>
+              </WriteDraftActions>
+            )}
           </div>
         </form>
       </BoardPageShell>
@@ -1258,13 +1364,13 @@ function CommunityBoardNewScreen({
     <BoardPageShell width='narrow'>
       <div className='pb-16 pt-4 sm:pt-6'>
         <BoardBackLink
-          href={
-            isEdit && editPostId
-              ? `/nyc/${boardId}/${editPostId}`
-              : `/nyc/${boardId}`
-          }
-          label={isEdit ? '글로 돌아가기' : `${title} 목록`}
-          className='mb-5'
+            href={
+              isEdit && editPostId
+                ? href(`/${boardId}/${editPostId}`)
+                : href(`/${boardId}`)
+            }
+            label={isEdit ? '글로 돌아가기' : `${title} 목록`}
+            className='mb-5'
         />
 
         <BoardSurface className='p-5 sm:p-6'>

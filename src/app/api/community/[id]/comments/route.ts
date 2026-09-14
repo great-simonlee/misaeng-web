@@ -5,7 +5,7 @@ import {
   sanitizeAnonymousCommunityComment,
 } from '@lib/community/anonymous'
 import {
-  isSchoolVerified,
+  isIdentityVerified,
   SCHOOL_VERIFY_REQUIRED_CODE,
   SCHOOL_VERIFY_REQUIRED_MESSAGE,
 } from '@lib/community/schoolGate'
@@ -173,7 +173,7 @@ export async function POST(request: Request, context: RouteContext) {
       { status: 403 },
     )
   }
-  if (!isSchoolVerified(profile)) {
+  if (!isIdentityVerified(profile)) {
     return NextResponse.json(
       {
         error: SCHOOL_VERIFY_REQUIRED_MESSAGE,

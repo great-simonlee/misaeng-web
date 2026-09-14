@@ -80,28 +80,193 @@ function CreateTimelineForm({
   jobReviewType: JobReviewTypeId | null
   className?: string
 }) {
-  const entry = value[0] ?? createEmptyJobReviewTimelineEntry()
+  const [draftMode, setDraftMode] = useState<DraftMode>('add')
+  const [draft, setDraft] = useState(() => createEmptyJobReviewTimelineEntry())
+  const [editSnapshot, setEditSnapshot] = useState<JobReviewTimelineEntry | null>(
+    null,
+  )
+  const [committedIds, setCommittedIds] = useState<string[]>(() =>
+    value.filter(isJobReviewTimelineEntryFilled).map((entry) => entry.id),
+  )
 
-  function updateEntry(patch: Partial<JobReviewTimelineEntry>) {
-    onChange([{ ...entry, ...patch }])
+  const committedIdSet = useMemo(() => new Set(committedIds), [committedIds])
+
+  const savedEntries = useMemo(
+    () =>
+      sortJobReviewTimelineByDate(
+        value.filter((entry) => committedIdSet.has(entry.id)),
+      ),
+    [value, committedIdSet],
+  )
+
+  const canAddMore = savedEntries.length < JOB_REVIEW_TIMELINE_MAX
+  const isEditing = draftMode === 'edit'
+  const draftComplete = isJobReviewTimelineEntryComplete(draft)
+
+  function syncAddDraft(nextDraft: JobReviewTimelineEntry) {
+    setDraft(nextDraft)
+    onChange(
+      isJobReviewTimelineEntryFilled(nextDraft)
+        ? [...savedEntries, nextDraft]
+        : savedEntries,
+    )
+  }
+
+  function syncEditDraft(nextDraft: JobReviewTimelineEntry) {
+    setDraft(nextDraft)
+    onChange(
+      value.map((entry) => (entry.id === nextDraft.id ? nextDraft : entry)),
+    )
+  }
+
+  function startAdd() {
+    setDraftMode('add')
+    setEditSnapshot(null)
+    setDraft(createEmptyJobReviewTimelineEntry())
+    onChange(savedEntries)
+  }
+
+  function commitCurrentDraft() {
+    if (!draftComplete) return
+    if (!canAddMore && !isEditing) return
+
+    const nextSaved = sortJobReviewTimelineByDate(
+      savedEntries.some((entry) => entry.id === draft.id)
+        ? savedEntries.map((entry) =>
+            entry.id === draft.id ? draft : entry,
+          )
+        : [...savedEntries, draft],
+    )
+    setCommittedIds(nextSaved.map((entry) => entry.id))
+    setDraftMode('add')
+    setEditSnapshot(null)
+    setDraft(createEmptyJobReviewTimelineEntry())
+    onChange(nextSaved)
+  }
+
+  function startEdit(entry: JobReviewTimelineEntry) {
+    setDraftMode('edit')
+    setEditSnapshot(entry)
+    setDraft({ ...entry })
+    onChange(savedEntries)
+  }
+
+  function cancelDraft() {
+    if (draftMode === 'edit' && editSnapshot) {
+      onChange(
+        value.map((entry) =>
+          entry.id === editSnapshot.id ? editSnapshot : entry,
+        ),
+      )
+    } else {
+      onChange(savedEntries)
+    }
+    startAdd()
+  }
+
+  function removeSaved(id: string) {
+    const nextSaved = savedEntries.filter((entry) => entry.id !== id)
+    setCommittedIds(nextSaved.map((entry) => entry.id))
+
+    if (draftMode === 'edit' && draft.id === id) {
+      setDraftMode('add')
+      setEditSnapshot(null)
+      setDraft(createEmptyJobReviewTimelineEntry())
+      onChange(nextSaved)
+      return
+    }
+
+    onChange(
+      draftMode === 'add' && isJobReviewTimelineEntryFilled(draft)
+        ? [...nextSaved, draft]
+        : nextSaved,
+    )
+  }
+
+  function handleDraftChange(patch: Partial<JobReviewTimelineEntry>) {
+    const nextDraft = { ...draft, ...patch }
+    if (draftMode === 'add') syncAddDraft(nextDraft)
+    else syncEditDraft(nextDraft)
   }
 
   return (
-    <div className={cn('space-y-3', className)}>
-      <GuideBox
-        tone='create'
-        title='첫 채용 단계만 남겨 주세요'
-        description='날짜를 고른 뒤, 단계·플랫폼·서류·면접·결과 중 해당하는 항목을 선택하고, 아래 에디터에 이 단계 후기를 자유롭게 적어 주세요. 나중에 업데이트로 이어서 추가할 수 있어요.'
-      />
-      <QuickStepButtons
-        jobReviewType={jobReviewType}
-        onApply={(patch) => updateEntry(patch)}
-      />
-      <SingleEntryForm
-        entry={entry}
-        jobReviewType={jobReviewType}
-        onChange={updateEntry}
-      />
+    <div className={cn('space-y-4', className)}>
+      {savedEntries.length > 0 ? (
+        <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
+          <SectionHeading
+            title={`추가된 기록 ${savedEntries.length}건`}
+            description='작성칸 위에 쌓여요. 수정·삭제로 날짜별 내용을 관리하세요'
+          />
+          {savedEntries.map((entry, index) => {
+            const isActiveEdit = draftMode === 'edit' && draft.id === entry.id
+            return (
+              <SavedEntryRow
+                key={entry.id}
+                entry={entry}
+                index={index}
+                active={isActiveEdit}
+                onEdit={() => startEdit(entry)}
+                onRemove={() => removeSaved(entry.id)}
+              />
+            )
+          })}
+        </section>
+      ) : null}
+
+      <section className='space-y-2.5'>
+        {isEditing ? (
+          <div className='flex items-center justify-between gap-2'>
+            <p className='text-[14px] font-semibold text-[var(--foreground)]'>
+              선택한 기록 수정
+            </p>
+            <button
+              type='button'
+              onClick={cancelDraft}
+              className='shrink-0 rounded-full bg-white px-3 py-1.5 text-[12px] font-medium text-[var(--muted)] ring-1 ring-black/[0.08] touch-manipulation hover:text-[var(--foreground)]'
+            >
+              취소
+            </button>
+          </div>
+        ) : null}
+
+        {(!isEditing && canAddMore) || isEditing ? (
+          <>
+            <SingleEntryForm
+              key={draft.id}
+              entry={draft}
+              jobReviewType={jobReviewType}
+              highlight
+              showQuickSteps={!isEditing}
+              onChange={handleDraftChange}
+            />
+
+            <div className='flex flex-wrap items-center gap-2'>
+              <button
+                type='button'
+                disabled={!draftComplete || (!isEditing && !canAddMore)}
+                onClick={commitCurrentDraft}
+                className='inline-flex h-10 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-40'
+              >
+                {isEditing ? '수정 완료' : '이 기록 추가'}
+              </button>
+              {!isEditing && isJobReviewTimelineEntryFilled(draft) ? (
+                <button
+                  type='button'
+                  onClick={startAdd}
+                  className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
+                >
+                  작성 내용 비우기
+                </button>
+              ) : null}
+            </div>
+          </>
+        ) : (
+          <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-3 text-[12px] text-[var(--muted)] ring-1 ring-black/[0.04]'>
+            기록 한도에 도달했습니다. 기존 기록을 삭제하면 다시 추가할 수
+            있어요.
+          </p>
+        )}
+      </section>
     </div>
   )
 }
@@ -119,29 +284,37 @@ function UpdateTimelineForm({
   existingIdSet: Set<string>
   className?: string
 }) {
-  const savedEntries = useMemo(
-    () =>
-      sortJobReviewTimelineByDate(
-        value.filter((entry) => existingIdSet.has(entry.id)),
-      ),
-    [value, existingIdSet],
-  )
-
   const [draftMode, setDraftMode] = useState<DraftMode>('add')
   const [draft, setDraft] = useState(() => createEmptyJobReviewTimelineEntry())
   const [editSnapshot, setEditSnapshot] = useState<JobReviewTimelineEntry | null>(
     null,
   )
+  const [sessionCommittedIds, setSessionCommittedIds] = useState<string[]>([])
 
-  const canAddMore = value.length < JOB_REVIEW_TIMELINE_MAX
+  const savedIdSet = useMemo(() => {
+    const next = new Set(existingIdSet)
+    for (const id of sessionCommittedIds) next.add(id)
+    return next
+  }, [existingIdSet, sessionCommittedIds])
+
+  const savedEntries = useMemo(
+    () =>
+      sortJobReviewTimelineByDate(
+        value.filter((entry) => savedIdSet.has(entry.id)),
+      ),
+    [value, savedIdSet],
+  )
+
+  const canAddMore = savedEntries.length < JOB_REVIEW_TIMELINE_MAX
+  const isEditing = draftMode === 'edit'
+  const draftComplete = isJobReviewTimelineEntryComplete(draft)
 
   function syncAddDraft(nextDraft: JobReviewTimelineEntry) {
     setDraft(nextDraft)
-    const withoutDraft = value.filter((entry) => existingIdSet.has(entry.id))
     onChange(
       isJobReviewTimelineEntryFilled(nextDraft)
-        ? [...withoutDraft, nextDraft]
-        : withoutDraft,
+        ? [...savedEntries, nextDraft]
+        : savedEntries,
     )
   }
 
@@ -160,10 +333,33 @@ function UpdateTimelineForm({
     onChange(savedEntries)
   }
 
+  function commitCurrentDraft() {
+    if (!draftComplete) return
+    if (!canAddMore && !isEditing) return
+
+    const nextSaved = sortJobReviewTimelineByDate(
+      savedEntries.some((entry) => entry.id === draft.id)
+        ? savedEntries.map((entry) =>
+            entry.id === draft.id ? draft : entry,
+          )
+        : [...savedEntries, draft],
+    )
+    setSessionCommittedIds(
+      nextSaved
+        .map((entry) => entry.id)
+        .filter((id) => !existingIdSet.has(id)),
+    )
+    setDraftMode('add')
+    setEditSnapshot(null)
+    setDraft(createEmptyJobReviewTimelineEntry())
+    onChange(nextSaved)
+  }
+
   function startEdit(entry: JobReviewTimelineEntry) {
     setDraftMode('edit')
     setEditSnapshot(entry)
     setDraft({ ...entry })
+    onChange(savedEntries)
   }
 
   function cancelDraft() {
@@ -180,10 +376,26 @@ function UpdateTimelineForm({
   }
 
   function removeSaved(id: string) {
+    const nextSaved = savedEntries.filter((entry) => entry.id !== id)
+    setSessionCommittedIds(
+      nextSaved
+        .map((entry) => entry.id)
+        .filter((entryId) => !existingIdSet.has(entryId)),
+    )
+
     if (draftMode === 'edit' && draft.id === id) {
-      startAdd()
+      setDraftMode('add')
+      setEditSnapshot(null)
+      setDraft(createEmptyJobReviewTimelineEntry())
+      onChange(nextSaved)
+      return
     }
-    onChange(value.filter((entry) => entry.id !== id))
+
+    onChange(
+      draftMode === 'add' && isJobReviewTimelineEntryFilled(draft)
+        ? [...nextSaved, draft]
+        : nextSaved,
+    )
   }
 
   function handleDraftChange(patch: Partial<JobReviewTimelineEntry>) {
@@ -192,73 +404,23 @@ function UpdateTimelineForm({
     else syncEditDraft(nextDraft)
   }
 
-  const isEditing = draftMode === 'edit'
-
   return (
     <div className={cn('space-y-4', className)}>
       <GuideBox
         tone='update'
-        title={isEditing ? '기존 기록 수정 중' : '이번에 추가할 1건'}
+        title={isEditing ? '기존 기록 수정 중' : '진행 기록 추가'}
         description={
           isEditing
-            ? '단계·플랫폼·서류·면접 기록을 고친 뒤, 아래 업데이트 버튼으로 저장해 주세요.'
-            : '새 날짜를 고르고, 단계·플랫폼·서류·면접 중 필요한 항목만 선택해 적어 주세요.'
+            ? '단계·플랫폼·서류·인터뷰·결과를 고친 뒤 「수정 완료」를 눌러 주세요.'
+            : '새 날짜를 고르고 내용을 적은 뒤 「이 기록 추가」로 여러 건을 이어서 남길 수 있어요.'
         }
       />
-
-      <section className='space-y-2.5'>
-        <div className='flex items-center justify-between gap-2'>
-          <div>
-            <p className='text-[14px] font-semibold text-[var(--brand)]'>
-              {isEditing ? '선택한 기록 수정' : '새 진행 기록'}
-            </p>
-            <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
-              {isEditing
-                ? '수정이 끝나면 아래 업데이트 버튼으로 저장하세요'
-                : '한 번에 한 건만 작성할 수 있어요'}
-            </p>
-          </div>
-          {isEditing ? (
-            <button
-              type='button'
-              onClick={cancelDraft}
-              className='shrink-0 rounded-full bg-white px-3 py-1.5 text-[12px] font-medium text-[var(--muted)] ring-1 ring-black/[0.08] touch-manipulation hover:text-[var(--foreground)]'
-            >
-              추가 모드로
-            </button>
-          ) : null}
-        </div>
-
-        {!isEditing && canAddMore ? (
-          <QuickStepButtons
-            jobReviewType={jobReviewType}
-            onApply={(patch) => handleDraftChange(patch)}
-          />
-        ) : null}
-
-        <SingleEntryForm
-          entry={draft}
-          jobReviewType={jobReviewType}
-          highlight
-          onChange={handleDraftChange}
-        />
-
-        {!isEditing && isJobReviewTimelineEntryFilled(draft) ? (
-          <button
-            type='button'
-            onClick={startAdd}
-            className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
-          >
-            작성 내용 비우기
-          </button>
-        ) : null}
-      </section>
 
       {savedEntries.length > 0 ? (
         <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
           <SectionHeading
-            title={`이전 기록 ${savedEntries.length}건`}
-            description='참고용이에요. 고칠 항목만 선택해 수정할 수 있습니다'
+            title={`저장된 기록 ${savedEntries.length}건`}
+            description='작성칸 위에 쌓여요. 수정·삭제로 날짜별 내용을 관리하세요'
           />
           {savedEntries.map((entry, index) => {
             const isActiveEdit = draftMode === 'edit' && draft.id === entry.id
@@ -270,7 +432,8 @@ function UpdateTimelineForm({
                 active={isActiveEdit}
                 onEdit={() => startEdit(entry)}
                 onRemove={
-                  savedEntries.length > 1 || isJobReviewTimelineEntryFilled(draft)
+                  savedEntries.length > 1 ||
+                  isJobReviewTimelineEntryFilled(draft)
                     ? () => removeSaved(entry.id)
                     : undefined
                 }
@@ -279,6 +442,70 @@ function UpdateTimelineForm({
           })}
         </section>
       ) : null}
+
+      <section className='space-y-2.5'>
+        <div className='flex items-center justify-between gap-2'>
+          <div>
+            <p className='text-[14px] font-semibold text-[var(--brand)]'>
+              {isEditing ? '선택한 기록 수정' : '새 진행 기록'}
+            </p>
+            <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
+              {isEditing
+                ? '수정 후 「수정 완료」를 눌러 주세요'
+                : canAddMore
+                  ? `최대 ${JOB_REVIEW_TIMELINE_MAX}건까지 추가할 수 있어요`
+                  : `최대 ${JOB_REVIEW_TIMELINE_MAX}건까지입니다`}
+            </p>
+          </div>
+          {isEditing ? (
+            <button
+              type='button'
+              onClick={cancelDraft}
+              className='shrink-0 rounded-full bg-white px-3 py-1.5 text-[12px] font-medium text-[var(--muted)] ring-1 ring-black/[0.08] touch-manipulation hover:text-[var(--foreground)]'
+            >
+              취소
+            </button>
+          ) : null}
+        </div>
+
+        {(!isEditing && canAddMore) || isEditing ? (
+          <>
+            <SingleEntryForm
+              key={draft.id}
+              entry={draft}
+              jobReviewType={jobReviewType}
+              highlight
+              showQuickSteps={!isEditing}
+              onChange={handleDraftChange}
+            />
+
+            <div className='flex flex-wrap items-center gap-2'>
+              <button
+                type='button'
+                disabled={!draftComplete || (!isEditing && !canAddMore)}
+                onClick={commitCurrentDraft}
+                className='inline-flex h-10 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-40'
+              >
+                {isEditing ? '수정 완료' : '이 기록 추가'}
+              </button>
+              {!isEditing && isJobReviewTimelineEntryFilled(draft) ? (
+                <button
+                  type='button'
+                  onClick={startAdd}
+                  className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
+                >
+                  작성 내용 비우기
+                </button>
+              ) : null}
+            </div>
+          </>
+        ) : (
+          <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-3 text-[12px] text-[var(--muted)] ring-1 ring-black/[0.04]'>
+            기록 한도에 도달했습니다. 기존 기록을 삭제하면 다시 추가할 수
+            있어요.
+          </p>
+        )}
+      </section>
     </div>
   )
 }
@@ -352,11 +579,13 @@ function SingleEntryForm({
   entry,
   jobReviewType,
   highlight = false,
+  showQuickSteps = false,
   onChange,
 }: {
   entry: JobReviewTimelineEntry
   jobReviewType: JobReviewTypeId | null
   highlight?: boolean
+  showQuickSteps?: boolean
   onChange: (patch: Partial<JobReviewTimelineEntry>) => void
 }) {
   const contentKeys = useMemo(
@@ -399,6 +628,13 @@ function SingleEntryForm({
   )
 
   return (
+    <div className='space-y-2.5'>
+      {showQuickSteps ? (
+        <QuickStepButtons
+          jobReviewType={jobReviewType}
+          onApply={(patch) => onChange(patch)}
+        />
+      ) : null}
     <div
       className={cn(
         'overflow-hidden rounded-2xl bg-white ring-1',
@@ -457,22 +693,16 @@ function SingleEntryForm({
       </div>
 
       <div className='space-y-2 p-3 sm:p-3.5'>
-        {visibleFields.length === 0 ? (
-          <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-4 text-center text-[12px] leading-relaxed text-[var(--muted)]'>
-            위에서 단계 · 플랫폼 · 서류 · 면접 · 결과 중 필요한 항목을 선택하거나, 아래 단계 후기만 작성해도 됩니다
-          </p>
-        ) : (
-          visibleFields.map((field) => (
-            <TimelineField
-              key={field.key}
-              field={field}
-              value={entry[field.key]}
-              placeholder={getJobReviewTimelinePlaceholder(jobReviewType, field.key)}
-              onChange={(next) => onChange({ [field.key]: next })}
-              onRemove={() => toggleField(field.key)}
-            />
-          ))
-        )}
+        {visibleFields.map((field) => (
+          <TimelineField
+            key={field.key}
+            field={field}
+            value={entry[field.key]}
+            placeholder={getJobReviewTimelinePlaceholder(jobReviewType, field.key)}
+            onChange={(next) => onChange({ [field.key]: next })}
+            onRemove={() => toggleField(field.key)}
+          />
+        ))}
 
         <div className='rounded-xl border border-black/[0.06] bg-[#fafbfc] px-3 py-3 sm:px-3.5 sm:py-3.5'>
           <p className='text-[12px] font-semibold text-[var(--foreground)]'>
@@ -488,6 +718,8 @@ function SingleEntryForm({
               onChange={(html) => onChange({ stageReviewHtml: html })}
               placeholder='예: OA는 LC medium 2문제, 90분이었어요. Phone은 resume deep dive + behavioral 위주였습니다.'
               minHeightClassName='min-h-[160px]'
+              contentClassName='!text-[13px] !leading-[1.65]'
+              simpleToolbar
               maxLength={JOB_REVIEW_STAGE_REVIEW_MAX}
             />
           </div>
@@ -503,6 +735,7 @@ function SingleEntryForm({
           날짜와 내용을 함께 입력해 주세요
         </p>
       ) : null}
+    </div>
     </div>
   )
 }
@@ -609,6 +842,11 @@ function TimelineField({
             {field.label}
           </p>
           <p className='mt-0.5 text-[10px] text-[var(--muted)]'>{field.hint}</p>
+          {field.guide ? (
+            <p className='mt-1 text-[11px] leading-relaxed text-[var(--muted-foreground)]'>
+              {field.guide}
+            </p>
+          ) : null}
         </div>
         {onRemove ? (
           <button
@@ -626,7 +864,7 @@ function TimelineField({
           onChange(e.target.value.slice(0, JOB_REVIEW_FIELD_MAX))
         }
         maxLength={JOB_REVIEW_FIELD_MAX}
-        rows={value.trim() ? 2 : 2}
+        rows={field.key === 'interviewRound' ? 4 : value.trim() ? 2 : 2}
         placeholder={placeholder}
         className='mt-2 w-full resize-none rounded-lg bg-white/80 px-2.5 py-2 text-[13px] leading-relaxed outline-none ring-1 ring-black/[0.05] transition placeholder:text-[var(--muted)] focus:bg-white focus:ring-[var(--brand)]/30 sm:text-[14px]'
       />

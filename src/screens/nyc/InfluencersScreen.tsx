@@ -2,9 +2,11 @@
 
 import Link from 'next/link'
 
+import { useCityPath } from '@hooks/useCity'
 import { MisaengNyInstagramDmCallout } from '@widgets/nyc/MisaengNyInstagramDmCallout'
 
 export function InfluencersScreen() {
+  const href = useCityPath()
   return (
     <div className='min-h-screen bg-[linear-gradient(180deg,#f6f7f9_0%,#ffffff_42%,#ffffff_100%)]'>
       <div className='mx-auto max-w-lg px-5 pb-12 pt-8 sm:px-6 sm:pt-10'>
@@ -33,7 +35,7 @@ export function InfluencersScreen() {
 
         <div className='mt-8 text-center'>
           <Link
-            href='/nyc'
+            href={href()}
             className='text-[13px] font-medium text-[var(--muted)] touch-manipulation transition hover:text-[var(--foreground)]'
           >
             커뮤니티 홈으로

@@ -5,6 +5,7 @@ import {
   isCommunityStorageConfigured,
   listStoredCommunityPosts,
 } from '@lib/supabase/community.server'
+import { resolveCityId } from '@lib/constants/cities'
 import { listMockCommunityPosts } from '@lib/constants/communityMock'
 
 export const runtime = 'nodejs'
@@ -30,11 +31,12 @@ export async function GET(request: Request) {
       )
     }
 
+    const city = resolveCityId(searchParams.get('city'))
     let posts = isCommunityStorageConfigured()
-      ? await listStoredCommunityPosts('food')
+      ? await listStoredCommunityPosts('food', city)
       : []
     if (posts.length === 0) {
-      posts = listMockCommunityPosts('food')
+      posts = listMockCommunityPosts('food', city)
     }
 
     const venues = collectNearbyFoodVenues(posts, {

@@ -1,7 +1,10 @@
+'use client'
+
 import Link from 'next/link'
 
 import { MarqueeRow } from '@components'
-import { NYC_PARTNER_ORGS } from '@lib/constants/nyc'
+import { useCityPath } from '@hooks/useCity'
+import { PARTNER_ORGS } from '@lib/constants/partners'
 import { PartnerSchoolLogo } from '@widgets/nyc/PartnerSchoolLogo'
 
 function PartnerItem({
@@ -49,6 +52,7 @@ function PartnerItem({
 }
 
 export function PartnerSchoolsMarquee() {
+  const href = useCityPath()
   return (
     <section aria-label='협력 학교 한인 학생회' className='mt-6'>
       <div className='mb-2.5 flex items-center justify-between gap-3'>
@@ -56,14 +60,14 @@ export function PartnerSchoolsMarquee() {
           협력 학교 한인 학생회
         </p>
         <Link
-          href='/nyc/partners'
+          href={href('/partners')}
           className='shrink-0 text-[12px] font-medium text-[var(--muted)] touch-manipulation transition hover:text-[#F64310]'
         >
           더보기
         </Link>
       </div>
       <MarqueeRow>
-        {NYC_PARTNER_ORGS.map((org) => (
+        {PARTNER_ORGS.map((org) => (
           <PartnerItem
             key={org.id}
             name={org.name}

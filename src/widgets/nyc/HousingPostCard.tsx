@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { HousingPricePair, SchoolBadge } from '@components'
+import { hrefForHousingListing } from '@lib/constants/cities'
 import { usePagedGallery } from '@hooks/usePagedGallery'
 import {
   formatHousingAvailableDate,
@@ -70,7 +71,7 @@ export function HousingPostCard({
             {images.map((src, index) => (
               <Link
                 key={`${listing.id}-${src}-${index}`}
-                href={`/nyc/housing/${listing.id}`}
+                href={hrefForHousingListing(listing)}
                 onClick={(event) => {
                   if (swipingRef.current) {
                     event.preventDefault()
@@ -138,7 +139,7 @@ export function HousingPostCard({
 
       <div className='flex flex-1 flex-col px-3.5 py-3.5 sm:px-3.5 sm:py-3'>
         <Link
-          href={`/nyc/housing/${listing.id}`}
+          href={hrefForHousingListing(listing)}
           className='flex flex-col gap-1 touch-manipulation sm:gap-1'
         >
           <div className='flex min-h-[2rem] min-w-0 items-center gap-2 sm:min-h-[1.75rem]'>
@@ -175,7 +176,10 @@ export function HousingPostCard({
                 highlighted={
                   highlightRoomType !== 'all' && room.type === highlightRoomType
                 }
-                href={`/nyc/housing/${listing.id}?room=${getRoomSelectionKey(room, index)}`}
+                href={hrefForHousingListing(
+                  listing,
+                  `?room=${getRoomSelectionKey(room, index)}`,
+                )}
               />
             ))}
           </ul>

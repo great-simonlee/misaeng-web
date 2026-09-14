@@ -1,10 +1,14 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 
-const COMMUNITY_LINKS = [
-  { href: '/nyc/housing', label: '하우징' },
-  { href: '/nyc/credit', label: '크레딧' },
-  { href: '/nyc/partners', label: '파트너' },
+import { useCityInfo, useCityPath } from '@hooks/useCity'
+
+const COMMUNITY_LINK_PATHS = [
+  { path: '/housing', label: '하우징' },
+  { path: '/credit', label: '크레딧' },
+  { path: '/partners', label: '파트너' },
 ] as const
 
 const COMPANY_LINKS = [
@@ -14,11 +18,11 @@ const COMPANY_LINKS = [
   { href: '/careers', label: '채용' },
 ] as const
 
-const SUPPORT_LINKS = [
+const SUPPORT_LINK_PATHS = [
   { href: '/contact', label: '문의하기' },
-  { href: '/nyc/me', label: '마이페이지' },
-  { href: '/nyc/terms-of-use', label: '이용약관' },
-  { href: '/nyc/privacy-policy', label: '개인정보처리방침' },
+  { path: '/me', label: '마이페이지' },
+  { path: '/terms-of-use', label: '이용약관' },
+  { path: '/privacy-policy', label: '개인정보처리방침' },
   {
     href: 'mailto:info@misaeng.com?subject=%5BMisaeng%5D%20%EA%B4%91%EA%B3%A0%C2%B7%EC%A0%9C%ED%9C%B4',
     label: '광고·제휴',
@@ -33,6 +37,18 @@ const SOCIAL_LINKS = [
 ] as const
 
 export function NycFooter() {
+  const cityInfo = useCityInfo()
+  const href = useCityPath()
+  const communityLinks = COMMUNITY_LINK_PATHS.map((item) => ({
+    href: href(item.path),
+    label: item.label,
+  }))
+  const supportLinks = SUPPORT_LINK_PATHS.map((item) => ({
+    href: 'href' in item && item.href ? item.href : href(item.path!),
+    label: item.label,
+    external: 'external' in item ? item.external : undefined,
+  }))
+
   return (
     <footer className='relative overflow-hidden bg-[#0b1220] text-white'>
       <div className='pointer-events-none absolute inset-0' aria-hidden>
@@ -44,9 +60,9 @@ export function NycFooter() {
         <div className='flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8'>
           <div className='min-w-0'>
             <Link
-              href='/nyc'
+              href={href()}
               className='inline-flex items-center gap-2 touch-manipulation'
-              aria-label='Misaeng NYC'
+              aria-label={cityInfo.brand}
             >
               <span className='inline-flex size-7 items-center justify-center overflow-hidden rounded-lg bg-white/95'>
                 <Image
@@ -58,11 +74,11 @@ export function NycFooter() {
                 />
               </span>
               <span className='text-[15px] font-semibold tracking-tight text-white'>
-                Misaeng NYC
+                Misaeng {cityInfo.shortLabel}
               </span>
             </Link>
             <p className='mt-2 max-w-sm text-[13px] leading-snug text-white/45'>
-              유학생·직장인을 위한 NYC 커뮤니티
+              유학생·직장인을 위한 {cityInfo.shortLabel} 커뮤니티
             </p>
           </div>
 
@@ -83,9 +99,9 @@ export function NycFooter() {
         </div>
 
         <div className='mt-6 grid grid-cols-3 gap-4 border-t border-white/10 pt-5 sm:mt-7 sm:gap-8 sm:pt-6'>
-          <FooterLinkGroup title='커뮤니티' links={COMMUNITY_LINKS} />
+          <FooterLinkGroup title='커뮤니티' links={communityLinks} />
           <FooterLinkGroup title='회사' links={COMPANY_LINKS} />
-          <FooterLinkGroup title='지원' links={SUPPORT_LINKS} />
+          <FooterLinkGroup title='지원' links={supportLinks} />
         </div>
 
         <div className='mt-5 flex flex-col gap-3 border-t border-white/10 pt-4 sm:mt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pt-5'>
@@ -98,7 +114,7 @@ export function NycFooter() {
               aria-label='Legal'
             >
               <Link
-                href='/nyc/terms-of-use'
+                href={href('/terms-of-use')}
                 className='text-white/45 touch-manipulation transition hover:text-white'
               >
                 Terms of Use
@@ -107,7 +123,7 @@ export function NycFooter() {
                 ·
               </span>
               <Link
-                href='/nyc/privacy-policy'
+                href={href('/privacy-policy')}
                 className='text-white/45 touch-manipulation transition hover:text-white'
               >
                 Privacy Policy

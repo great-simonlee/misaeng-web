@@ -25,12 +25,28 @@ export type SupabaseProfileRecord = {
   schoolEmailVerified?: boolean
   verifiedSchoolId?: string | null
   verifiedSchoolName?: string | null
+  workEmail?: string | null
+  workEmailVerified?: boolean
+  workplaceCompanyName?: string | null
+  workplaceStatus?: 'none' | 'pending' | 'approved' | 'rejected' | null
+  workplaceRequestId?: string | null
+  workplaceRejectReason?: string | null
+  workplaceReviewedAt?: number | null
+  workplaceReviewedByEmail?: string | null
   phone?: string | null
   phoneVerified?: boolean
   termsVersion?: string | null
   privacyVersion?: string | null
   consentedAt?: string | null
   consentUiLanguage?: 'en' | 'ko' | null
+  writeGuidelinesVersion?: string | null
+  writeGuidelinesConsentedAt?: string | null
+  writeGuidelinesSource?:
+    | 'status'
+    | 'job-review'
+    | 'roommate'
+    | 'anonymous'
+    | null
   status?: 'active' | 'suspended' | null
   /** 공개 추천 코드 (8자) */
   referralCode?: string | null

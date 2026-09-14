@@ -31,6 +31,8 @@ type BottomSheetSelectProps = {
   open?: boolean
   onOpenChange?: (open: boolean) => void
   disabled?: boolean
+  /** 중첩 시트 z-index */
+  overlayClassName?: string
 }
 
 /** 바텀시트에서 단일 값을 고르는 공용 셀렉트 */
@@ -46,6 +48,7 @@ export function BottomSheetSelect({
   open: controlledOpen,
   onOpenChange,
   disabled,
+  overlayClassName,
 }: BottomSheetSelectProps) {
   const listId = useId()
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
@@ -95,7 +98,12 @@ export function BottomSheetSelect({
         </button>
       )}
 
-      <BottomSheet open={open} onClose={() => setOpen(false)} title={title}>
+      <BottomSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        title={title}
+        overlayClassName={overlayClassName}
+      >
         <ul id={listId} role='listbox' aria-label={title} className='py-1'>
           {allOptions.map((option) => {
             const isSelected = option.value === value

@@ -1,3 +1,9 @@
+import {
+  cityPath,
+  getCity,
+  type CityId,
+} from '@lib/constants/cities'
+
 export const MISAENG_EMAIL_DOMAIN = '@misaeng.com'
 
 export const MISAENG_NY_INSTAGRAM_HANDLE = 'misaeng.ny'
@@ -17,64 +23,64 @@ export const NYC_CATEGORIES = [
     id: 'housing',
     title: '하우징',
     description: 'Misaeng 팀이 올리는 NYC 매물',
-    href: '/nyc/housing',
-    postHref: '/nyc/housing/new',
+    href: '/housing',
+    postHref: '/housing/new',
     available: true,
   },
   {
     id: 'events',
     title: '이벤트',
     description: '모임·공연·행사 공유',
-    href: '/nyc/events',
-    postHref: '/nyc/events/new',
+    href: '/events',
+    postHref: '/events/new',
     available: false,
   },
   {
     id: 'food',
     title: '맛집',
     description: '맛집·카페 추천',
-    href: '/nyc/food',
-    postHref: '/nyc/food/new',
+    href: '/food',
+    postHref: '/food/new',
     available: true,
   },
   {
     id: 'marketplace',
     title: '중고거래',
     description: '생활용품 사고팔기',
-    href: '/nyc/marketplace',
-    postHref: '/nyc/marketplace/new',
+    href: '/marketplace',
+    postHref: '/marketplace/new',
     available: false,
   },
   {
     id: 'status',
     title: 'OPT · 비자 · 영주권',
     description: '비자·CPT/OPT·영주권 후기',
-    href: '/nyc/status',
-    postHref: '/nyc/status/new',
+    href: '/status',
+    postHref: '/status/new',
     available: true,
   },
   {
     id: 'job-review',
-    title: '취업 후기',
+    title: '면접 · 취업 후기',
     description: '면접·취업·직장 경험',
-    href: '/nyc/job-review',
-    postHref: '/nyc/job-review/new',
+    href: '/job-review',
+    postHref: '/job-review/new',
     available: true,
   },
   {
     id: 'roommate',
     title: '룸메이트 · 서블렛',
     description: '룸메이트·방·서블렛 구하기',
-    href: '/nyc/roommate',
-    postHref: '/nyc/roommate/new',
+    href: '/roommate',
+    postHref: '/roommate/new',
     available: true,
   },
   {
     id: 'anonymous',
     title: '익명게시판',
     description: '익명으로 이야기 나누기',
-    href: '/nyc/anonymous',
-    postHref: '/nyc/anonymous/new',
+    href: '/anonymous',
+    postHref: '/anonymous/new',
     available: true,
   },
 ] as const
@@ -97,13 +103,19 @@ export const NYC_COMMUNITY_BOARD_IDS = [
 
 export type NycCommunityBoardId = (typeof NYC_COMMUNITY_BOARD_IDS)[number]
 
-/** 레거시 보드 → 통합 게시판(/nyc/status)으로 리다이렉트 */
-export const NYC_COMMUNITY_BOARD_REDIRECTS: Partial<
-  Record<NycCommunityBoardId, string>
-> = {
-  'cpt-opt': '/nyc/status',
-  visa: '/nyc/status',
-  'green-card': '/nyc/status',
+/** 레거시 보드 → 통합 게시판(/status)으로 리다이렉트 */
+const LEGACY_STATUS_BOARD_IDS = ['cpt-opt', 'visa', 'green-card'] as const
+
+export function getCityCategories(city: CityId) {
+  return NYC_CATEGORIES.map((category) => ({
+    ...category,
+    href: cityPath(city, category.href),
+    postHref: cityPath(city, category.postHref),
+    description:
+      category.id === 'housing'
+        ? `Misaeng 팀이 올리는 ${getCity(city).shortLabel} 매물`
+        : category.description,
+  }))
 }
 
 /** 목록·글쓰기 UI 대신 준비 중 안내를 보여줄 보드 */
@@ -174,7 +186,7 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     detailLabel: '유형',
     detailPlaceholder: '',
     detailInput: null,
-    titlePlaceholder: 'OPT 카드 수령까지 — 내 타임라인',
+    titlePlaceholder: '금융 회사 OPT 신청 타임라인',
     descriptionPlaceholder:
       '다음 사람이 실수하지 않도록 조심해야 할 점을 적어 주세요.',
   },
@@ -187,7 +199,7 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     detailLabel: '유형',
     detailPlaceholder: '',
     detailInput: null,
-    titlePlaceholder: 'OPT 카드 수령까지 — 내 타임라인',
+    titlePlaceholder: '금융 회사 OPT 신청 타임라인',
     descriptionPlaceholder:
       '다음 사람이 실수하지 않도록 조심해야 할 점을 적어 주세요.',
   },
@@ -205,14 +217,15 @@ export const NYC_COMMUNITY_BOARD_META: Record<
   'job-review': {
     writeLabel: '후기 올리기',
     listIntro:
-      '회사·플랫폼·서류·면접 단계별로 어떤 경험이었는지 남겨 보세요.',
+      '날짜별로 서류·인터뷰·결과를 남겨 보세요. 등록 후에도 이어서 추가할 수 있어요.',
     locationLabel: '회사 (선택)',
-    locationPlaceholder: 'Google, Meta, JP Morgan',
+    locationPlaceholder: '회사명을 입력해 주세요',
     detailLabel: '유형',
     detailPlaceholder: '',
     detailInput: null,
-    titlePlaceholder: 'Google SWE Intern — 3라운드 면접 후기',
-    descriptionPlaceholder: '다음 지원자에게 꼭 알려주고 싶은 팁',
+    titlePlaceholder: '금융 회사 인턴 지원 타임라인',
+    descriptionPlaceholder:
+      '다음 사람이 실수하지 않도록 조심해야 할 점을 적어 주세요.',
   },
   roommate: {
     writeLabel: '글 올리기',
@@ -224,7 +237,8 @@ export const NYC_COMMUNITY_BOARD_META: Record<
     detailPlaceholder: '1500',
     detailInput: 'number',
     titlePlaceholder: '브루클린에서 룸메이트 구해요',
-    descriptionPlaceholder: '생활 패턴, 예산, 입주 시기, 연락 방법을 적어 주세요.',
+    descriptionPlaceholder:
+      '생활 패턴, 예산, 입주 시기를 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요.',
   },
   'green-card': {
     writeLabel: '후기 남기기',
@@ -258,9 +272,15 @@ export function isCommunityBoardId(id: string): id is NycCommunityBoardId {
   return (NYC_COMMUNITY_BOARD_IDS as readonly string[]).includes(id)
 }
 
-export function getCommunityBoardRedirect(id: string): string | null {
+export function getCommunityBoardRedirect(
+  id: string,
+  city: CityId = 'nyc',
+): string | null {
   if (!isCommunityBoardId(id)) return null
-  return NYC_COMMUNITY_BOARD_REDIRECTS[id] ?? null
+  if ((LEGACY_STATUS_BOARD_IDS as readonly string[]).includes(id)) {
+    return cityPath(city, '/status')
+  }
+  return null
 }
 
 /** 레거시 cpt-opt·비자·영주권 보드를 통합 게시판(status)으로 매핑 */
@@ -268,8 +288,31 @@ export function resolveMergedCommunityBoardId(
   id: string,
 ): NycCommunityBoardId | null {
   if (!isCommunityBoardId(id)) return null
-  if (getCommunityBoardRedirect(id) === '/nyc/status') return 'status'
+  if ((LEGACY_STATUS_BOARD_IDS as readonly string[]).includes(id)) {
+    return 'status'
+  }
   return id
+}
+
+export function getCommunityBoardMeta(
+  boardId: NycCommunityBoardId,
+  city: CityId = 'nyc',
+) {
+  const meta = NYC_COMMUNITY_BOARD_META[boardId]
+  const cityName = getCity(city).name
+  if (boardId === 'anonymous') {
+    return {
+      ...meta,
+      listIntro: `이름 없이 편하게 나누는 ${cityName} 익명 게시판이에요.`,
+    }
+  }
+  if (boardId === 'events') {
+    return {
+      ...meta,
+      listIntro: `${cityName}에서 열리는 모임·공연·행사를 공유해 보세요.`,
+    }
+  }
+  return meta
 }
 
 /** 비자·OPT·영주권 통합 게시판 여부 (레거시 id 포함) */
@@ -286,111 +329,12 @@ export function isMisaengEmail(email: string | null | undefined): boolean {
   return email.toLowerCase().endsWith(MISAENG_EMAIL_DOMAIN)
 }
 
-/** handle이 있으면 Instagram 링크. logoSrc가 있으면 학교 로고 표시. */
-export const NYC_PARTNER_ORGS = [
-  {
-    id: 'nyu-kiso',
-    name: '뉴욕대 한인학생회',
-    shortName: 'NYU',
-    handle: 'nyu_kiso',
-    logoSrc: '/img/school/kiso.png',
-  },
-  {
-    id: 'fit-ksof',
-    name: 'FIT 한인학생회',
-    shortName: 'FIT',
-    handle: 'ksof_fit',
-    logoSrc: '/img/school/fit.png',
-  },
-  {
-    id: 'baruch-ksa',
-    name: '버룩 한인학생회',
-    shortName: 'BC',
-    handle: 'ksabaruch',
-    logoSrc: '/img/school/baruch.png',
-  },
-  {
-    id: 'parsons-ksa',
-    name: '파슨스 한인학생회',
-    shortName: 'PAR',
-    handle: 'parsons.kisp',
-    logoSrc: '/img/school/parsons.png',
-  },
-] as const
-
-/** 협력 인플루언서 플랫폼 */
-export const NYC_INFLUENCER_PLATFORMS = [
-  {
-    id: 'instagram',
-    title: '인스타그램',
-    description: 'NYC 라이프·로컬 인스타그램',
-  },
-  {
-    id: 'youtube',
-    title: '유튜버',
-    description: '브이로그·정보 유튜브',
-  },
-  {
-    id: 'tiktok',
-    title: '틱토커',
-    description: '숏폼으로 보는 뉴욕',
-  },
-] as const
-
-export type NycInfluencerPlatformId =
-  (typeof NYC_INFLUENCER_PLATFORMS)[number]['id']
-
-/** 협력 인플루언서 확정 전 모집 안내. handle이 있으면 플랫폼 프로필로 연결. */
-export const NYC_PARTNER_INFLUENCERS = [
-  {
-    id: 'ig-recruiting-1',
-    name: '협력 인플루언서를 찾습니다!',
-    shortName: 'IG',
-    handle: null,
-    platform: 'instagram',
-  },
-  {
-    id: 'ig-recruiting-2',
-    name: '현재 협력 인플루언서 찾는 중',
-    shortName: 'IG',
-    handle: null,
-    platform: 'instagram',
-  },
-  {
-    id: 'yt-recruiting-1',
-    name: '협력 인플루언서를 찾습니다!',
-    shortName: 'YT',
-    handle: null,
-    platform: 'youtube',
-  },
-  {
-    id: 'yt-recruiting-2',
-    name: '현재 협력 인플루언서 찾는 중',
-    shortName: 'YT',
-    handle: null,
-    platform: 'youtube',
-  },
-  {
-    id: 'tt-recruiting-1',
-    name: '협력 인플루언서를 찾습니다!',
-    shortName: 'TT',
-    handle: null,
-    platform: 'tiktok',
-  },
-  {
-    id: 'tt-recruiting-2',
-    name: '현재 협력 인플루언서 찾는 중',
-    shortName: 'TT',
-    handle: null,
-    platform: 'tiktok',
-  },
-] as const satisfies ReadonlyArray<{
-  id: string
-  name: string
-  shortName: string
-  handle: string | null
-  platform: NycInfluencerPlatformId
-}>
+export {
+  INFLUENCER_PLATFORMS as NYC_INFLUENCER_PLATFORMS,
+  PARTNER_INFLUENCERS as NYC_PARTNER_INFLUENCERS,
+  PARTNER_ORGS as NYC_PARTNER_ORGS,
+  type InfluencerPlatformId as NycInfluencerPlatformId,
+} from '@lib/constants/partners'
 
 export const NYC_PROFESSIONAL_CATEGORIES = [
   {

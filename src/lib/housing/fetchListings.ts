@@ -1,9 +1,13 @@
+import type { CityId } from '@lib/constants/cities'
 import { normalizeHousingListing } from '@lib/housing/normalize'
 import type { HousingListing } from '@/types/nyc'
 
-export async function fetchHousingListings(): Promise<HousingListing[]> {
+export async function fetchHousingListings(
+  city?: CityId,
+): Promise<HousingListing[]> {
   try {
-    const res = await fetch('/api/housing', { cache: 'no-store' })
+    const query = city ? `?city=${encodeURIComponent(city)}` : ''
+    const res = await fetch(`/api/housing${query}`, { cache: 'no-store' })
     if (!res.ok) return []
     const data = (await res.json()) as { listings?: unknown }
     if (!Array.isArray(data.listings)) return []

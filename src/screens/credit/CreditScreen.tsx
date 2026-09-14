@@ -1,5 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+
+import { useCityPath } from '@hooks/useCity'
 
 import {
   COMMUNITY_CREDIT_BONUS_RULES,
@@ -30,6 +34,7 @@ const TOC = [
 ] as const
 
 export function CreditScreen() {
+  const href = useCityPath()
   const openOptions = COMMUNITY_CREDIT_REDEEM_OPTIONS.filter((o) => !o.comingSoon)
   const comingSoonOptions = COMMUNITY_CREDIT_REDEEM_OPTIONS.filter((o) => o.comingSoon)
 
@@ -45,12 +50,12 @@ export function CreditScreen() {
           </h1>
           <p className='mt-3 max-w-2xl text-[15px] leading-[1.65] text-[var(--muted-foreground)]'>
             커뮤니티에 기여해 쌓은 크레딧으로 커피챗·이민 변호사 자문 등 보상을
-            신청할 수 있어요. 현금화는 불가하며, 학교 인증이 필요합니다.
+            신청할 수 있어요. 현금화는 불가하며, 학생 또는 직장인 인증이 필요합니다.
           </p>
           <div className='mt-4 flex flex-wrap gap-2'>
             <Tag>정수만 사용</Tag>
             <Tag>현금화 불가</Tag>
-            <Tag>학교 인증 필수</Tag>
+            <Tag>학생·직장인 인증 필수</Tag>
             <Tag muted>v{COMMUNITY_CREDIT_POLICY_VERSION}</Tag>
           </div>
         </div>
@@ -142,7 +147,7 @@ export function CreditScreen() {
                         {rule.label}
                         {rule.boardId ? (
                           <Link
-                            href={`/nyc/${rule.boardId}`}
+                            href={href(`/${rule.boardId}`)}
                             className='ml-2 text-[12px] font-normal text-[var(--brand)] hover:underline'
                           >
                             →
@@ -343,13 +348,13 @@ export function CreditScreen() {
           </p>
           <div className='mt-5 flex flex-wrap gap-2'>
             <Link
-              href='/nyc/me'
+              href={href('/me')}
               className='inline-flex h-10 items-center rounded-full bg-[var(--brand)] px-5 text-[13px] font-semibold text-white touch-manipulation'
             >
               마이페이지
             </Link>
             <Link
-              href='/nyc/food/new'
+              href={href('/food/new')}
               className='inline-flex h-10 items-center rounded-full border border-[var(--border)] px-5 text-[13px] font-semibold text-[var(--foreground)] touch-manipulation'
             >
               맛집 후기 쓰기

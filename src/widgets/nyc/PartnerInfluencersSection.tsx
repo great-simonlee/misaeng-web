@@ -1,13 +1,16 @@
+'use client'
+
 import Link from 'next/link'
 
 import { MarqueeRow } from '@components'
+import { useCityPath } from '@hooks/useCity'
 import {
-  NYC_PARTNER_INFLUENCERS,
-  type NycInfluencerPlatformId,
-} from '@lib/constants/nyc'
+  PARTNER_INFLUENCERS,
+  type InfluencerPlatformId,
+} from '@lib/constants/partners'
 
 function profileUrl(
-  platform: NycInfluencerPlatformId,
+  platform: InfluencerPlatformId,
   handle: string,
 ): string {
   switch (platform) {
@@ -40,7 +43,7 @@ function InfluencerItem({
   name: string
   shortName: string
   handle: string | null
-  platform: NycInfluencerPlatformId
+  platform: InfluencerPlatformId
 }) {
   const content = (
     <>
@@ -76,6 +79,7 @@ function InfluencerItem({
 }
 
 export function PartnerInfluencersSection() {
+  const href = useCityPath()
   return (
     <section aria-label='협력 인플루언서' className='mt-6'>
       <div className='mb-2.5 flex items-center justify-between gap-3'>
@@ -83,7 +87,7 @@ export function PartnerInfluencersSection() {
           협력 인플루언서
         </p>
         <Link
-          href='/nyc/influencers'
+          href={href('/influencers')}
           className='shrink-0 text-[12px] font-medium text-[var(--muted)] touch-manipulation transition hover:text-[#F64310]'
         >
           더보기
@@ -91,7 +95,7 @@ export function PartnerInfluencersSection() {
       </div>
 
       <MarqueeRow>
-        {NYC_PARTNER_INFLUENCERS.map((item) => (
+        {PARTNER_INFLUENCERS.map((item) => (
           <InfluencerItem
             key={item.id}
             name={item.name}

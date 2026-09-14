@@ -116,6 +116,34 @@ function mapProfile(uid: string, email: string, raw: Record<string, unknown> | n
       typeof raw?.verifiedSchoolName === 'string'
         ? raw.verifiedSchoolName
         : null,
+    workEmail: typeof raw?.workEmail === 'string' ? raw.workEmail : null,
+    workEmailVerified: Boolean(raw?.workEmailVerified),
+    workplaceCompanyName:
+      typeof raw?.workplaceCompanyName === 'string'
+        ? raw.workplaceCompanyName
+        : null,
+    workplaceStatus:
+      raw?.workplaceStatus === 'pending' ||
+      raw?.workplaceStatus === 'approved' ||
+      raw?.workplaceStatus === 'rejected'
+        ? raw.workplaceStatus
+        : 'none',
+    workplaceRequestId:
+      typeof raw?.workplaceRequestId === 'string'
+        ? raw.workplaceRequestId
+        : null,
+    workplaceRejectReason:
+      typeof raw?.workplaceRejectReason === 'string'
+        ? raw.workplaceRejectReason
+        : null,
+    workplaceReviewedAt:
+      typeof raw?.workplaceReviewedAt === 'number'
+        ? raw.workplaceReviewedAt
+        : null,
+    workplaceReviewedByEmail:
+      typeof raw?.workplaceReviewedByEmail === 'string'
+        ? raw.workplaceReviewedByEmail
+        : null,
     phone: typeof raw?.phone === 'string' ? raw.phone : null,
     phoneVerified: Boolean(raw?.phoneVerified),
     instagramHandle: null,
@@ -212,6 +240,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 schoolEmailVerified: prev.schoolEmailVerified,
                 verifiedSchoolId: prev.verifiedSchoolId,
                 verifiedSchoolName: prev.verifiedSchoolName,
+                workEmail: prev.workEmail,
+                workEmailVerified: prev.workEmailVerified,
+                workplaceCompanyName: prev.workplaceCompanyName,
+                workplaceStatus: prev.workplaceStatus,
+                workplaceRequestId: prev.workplaceRequestId,
+                workplaceRejectReason: prev.workplaceRejectReason,
+                workplaceReviewedAt: prev.workplaceReviewedAt,
+                workplaceReviewedByEmail: prev.workplaceReviewedByEmail,
                 phone: prev.phone,
                 phoneVerified: prev.phoneVerified,
                 status: prev.status,

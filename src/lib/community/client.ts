@@ -1,4 +1,9 @@
 import type { CommunityPost } from '@/types/nyc'
+import {
+  DEFAULT_CITY_ID,
+  isSharedCommunityBoard,
+  type CityId,
+} from '@lib/constants/cities'
 import type { NycCommunityBoardId } from '@lib/constants/nyc'
 import {
   getMockCommunityPost,
@@ -60,38 +65,33 @@ function withLocalCounts(post: CommunityPost): CommunityPost {
     roommateBudgetMax: post.roommateBudgetMax ?? null,
     roommateMoveInDate: post.roommateMoveInDate ?? null,
     roommateMoveOutDate: post.roommateMoveOutDate ?? null,
+    city: post.city ?? null,
   }
 }
 
 export async function fetchCommunityPosts(
   boardId: NycCommunityBoardId,
+  city: CityId = DEFAULT_CITY_ID,
 ): Promise<CommunityPost[]> {
   try {
-    const res = await fetch(
-      `/api/community?board=${encodeURIComponent(boardId)}`,
-      { cache: 'no-store' },
-    )
+    const params = new URLSearchParams({ board: boardId })
+    if (!isSharedCommunityBoard(boardId)) {
+      params.set('city', city)
+    }
+    const res = await fetch(`/api/community?${params.toString()}`, {
+      cache: 'no-store',
+    })
     if (res.ok) {
       const data = (await res.json()) as { posts?: CommunityPost[] }
       const posts = Array.isArray(data.posts) ? data.posts : []
       if (posts.length > 0) {
-        const mapped = posts.map(withLocalCounts)
-        // 룸메이트: 인증 학교 태그·유형 예시용 목 글을 API 결과와 함께 표시
-        if (boardId === 'roommate') {
-          const mocks = listMockCommunityPosts('roommate').map(withLocalCounts)
-          const ids = new Set(mapped.map((item) => item.id))
-          return [
-            ...mapped,
-            ...mocks.filter((item) => !ids.has(item.id)),
-          ].sort((a, b) => b.createdAt - a.createdAt)
-        }
-        return mapped
+        return posts.map(withLocalCounts)
       }
     }
   } catch {
     // 목 데이터로 폴백
   }
-  return listMockCommunityPosts(boardId)
+  return listMockCommunityPosts(boardId, city)
     .map(withLocalCounts)
     .map((post) => sanitizeAnonymousCommunityPost(post))
 }
@@ -118,6 +118,7 @@ export async function fetchCommunityPost(
 
 export async function createCommunityPostRequest(input: {
   categoryId: NycCommunityBoardId
+  city?: CityId | null
   title: string
   contentHtml: string
   location: string
@@ -205,6 +206,7 @@ export async function updateCommunityPostRequest(
     roommateBudgetMax?: CommunityPost['roommateBudgetMax'] | null
     roommateMoveInDate?: CommunityPost['roommateMoveInDate'] | null
     roommateMoveOutDate?: CommunityPost['roommateMoveOutDate'] | null
+    city?: CityId | null
   },
 ): Promise<CommunityPost> {
   if (id.startsWith('mock-')) {

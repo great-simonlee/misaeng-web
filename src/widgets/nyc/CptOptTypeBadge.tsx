@@ -63,11 +63,8 @@ export function CptOptTypePicker({ value, onChange }: CptOptTypePickerProps) {
             <span className='block text-[15px] font-semibold text-[var(--foreground)]'>
               {item.label}
             </span>
-            <span className='mt-1 block text-[12px] font-medium leading-snug text-[var(--foreground)]'>
+            <span className='mt-1 block text-[12px] font-light leading-snug text-[var(--muted-foreground)]'>
               {item.description}
-            </span>
-            <span className='mt-0.5 block text-[11px] leading-snug text-[var(--muted)]'>
-              {item.summary}
             </span>
           </button>
         )

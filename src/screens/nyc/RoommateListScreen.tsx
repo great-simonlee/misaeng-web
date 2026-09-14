@@ -9,8 +9,10 @@ import {
   Skeleton,
 } from '@components'
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { fetchCommunityPosts } from '@lib/community/client'
+import { cityLoginPath } from '@lib/constants/cities'
 import {
   ROOMMATE_BUDGET_MAX,
   ROOMMATE_INTENT_OPTIONS,
@@ -22,9 +24,10 @@ import {
   type RoommateLookingFor,
 } from '@lib/community/roommate'
 import {
-  getSchoolVerifyHref,
+  getIdentityVerifyCtaLabel,
+  getIdentityVerifyHref,
   isAccountSuspended,
-  isSchoolVerified,
+  isIdentityVerified,
 } from '@lib/community/schoolGate'
 import { NYC_COMMUNITY_BOARD_META } from '@lib/constants/nyc'
 import { cn } from '@lib'
@@ -63,6 +66,8 @@ type LookingForFilter = 'all' | RoommateLookingFor
 type NeighborhoodFilter = 'all' | string
 
 export function RoommateListScreen() {
+  const city = useCity()
+  const href = useCityPath()
   const meta = NYC_COMMUNITY_BOARD_META[BOARD_ID]
   const { user, profile, loading: authLoading } = useAuth()
   const { error: toastError } = useToast()
@@ -89,7 +94,7 @@ export function RoommateListScreen() {
     async (opts?: { silent?: boolean }) => {
       if (!opts?.silent) setLoading(true)
       try {
-        const data = await fetchCommunityPosts(BOARD_ID)
+        const data = await fetchCommunityPosts(BOARD_ID, city)
         setPosts(data)
       } catch (err) {
         if (!opts?.silent) {
@@ -100,7 +105,7 @@ export function RoommateListScreen() {
         setLoading(false)
       }
     },
-    [toastError],
+    [city, toastError],
   )
 
   useEffect(() => {
@@ -300,25 +305,26 @@ export function RoommateListScreen() {
     setBudgetMax(active ? BUDGET_BOUNDS.max : max)
   }
 
-  const newPath = `/nyc/${BOARD_ID}/new`
-  const loginNext = `/nyc/login?next=${encodeURIComponent(newPath)}`
-  const schoolVerified = isSchoolVerified(profile)
+  const newPath = href(`/${BOARD_ID}/new`)
+  const loginNext = cityLoginPath(city, newPath)
+  const identityVerified = isIdentityVerified(profile)
   const suspended = isAccountSuspended(profile)
-  const canWrite = Boolean(user) && schoolVerified && !suspended
+  const canWrite = Boolean(user) && identityVerified && !suspended
+  const verifyCta = getIdentityVerifyCtaLabel(profile)
   const postHref = !user
     ? loginNext
     : suspended
-      ? '/nyc/me'
-      : schoolVerified
+      ? href('/me')
+      : identityVerified
         ? newPath
-        : getSchoolVerifyHref(newPath)
+        : getIdentityVerifyHref(newPath, profile)
   const writeCtaLabel = !user
     ? '로그인'
     : suspended
       ? '이용 정지'
-      : schoolVerified
+      : identityVerified
         ? meta.writeLabel
-        : '학교 인증하기'
+        : verifyCta
 
   return (
     <PullToRefresh onRefresh={refreshPosts} className='flex flex-1 flex-col'>
@@ -383,7 +389,7 @@ export function RoommateListScreen() {
                   ? canWrite
                     ? '첫 글을 올려 커뮤니티를 시작해 보세요.'
                     : user
-                      ? '학교 이메일 인증 후 글을 올릴 수 있어요.'
+                      ? '학생 또는 직장인 인증 후 글을 올릴 수 있어요.'
                       : '로그인 후 글을 올릴 수 있어요.'
                   : '필터를 바꿔 다시 검색해 보세요.'
               }

@@ -1,6 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 
-import { NYC_COMMUNITY_BOARD_META, type NycCommunityBoardId } from '@lib/constants/nyc'
+import { useCity, useCityPath } from '@hooks/useCity'
+import { getCommunityBoardMeta, type NycCommunityBoardId } from '@lib/constants/nyc'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 
@@ -13,7 +16,9 @@ export function CommunityBoardWipScreen({
   boardId,
   title,
 }: CommunityBoardWipScreenProps) {
-  const intro = NYC_COMMUNITY_BOARD_META[boardId]?.listIntro
+  const city = useCity()
+  const href = useCityPath()
+  const intro = getCommunityBoardMeta(boardId, city)?.listIntro
 
   return (
     <BoardPageShell>
@@ -32,12 +37,12 @@ export function CommunityBoardWipScreen({
         <EmptyState
           title='준비 중이에요'
           description={`${title} 게시판은 지금 만들고 있어요. 조금만 기다려 주세요.`}
-          actionHref='/nyc'
+          actionHref={href()}
           actionLabel='커뮤니티 홈으로'
         />
         <p className='mt-6 text-center text-[13px] text-[var(--muted)]'>
           다른 게시판이 궁금하시면{' '}
-          <Link href='/nyc/food' className='font-semibold text-[var(--brand)]'>
+          <Link href={href('/food')} className='font-semibold text-[var(--brand)]'>
             맛집
           </Link>
           을 먼저 둘러보세요.

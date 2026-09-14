@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 
-import { NYC_PARTNER_ORGS } from '@lib/constants/nyc'
+import { useCityPath } from '@hooks/useCity'
+import { PARTNER_ORGS } from '@lib/constants/partners'
 import { MisaengNyInstagramDmCallout } from '@widgets/nyc/MisaengNyInstagramDmCallout'
 import { PartnerSchoolLogo } from '@widgets/nyc/PartnerSchoolLogo'
 
 export function PartnerSchoolsScreen() {
+  const href = useCityPath()
   return (
     <div className='min-h-screen bg-[linear-gradient(180deg,#f6f7f9_0%,#ffffff_42%,#ffffff_100%)]'>
       <div className='mx-auto max-w-lg px-5 pb-12 pt-8 sm:px-6 sm:pt-10'>
@@ -17,11 +19,11 @@ export function PartnerSchoolsScreen() {
           파트너 학생회
         </h1>
         <p className='mt-2 text-[14px] leading-relaxed text-[var(--muted-foreground)]'>
-          NYC 한인 학생회와 함께하는 소식을 모아 볼 예정이에요.
+          한인 학생회와 함께하는 소식을 모아 볼 예정이에요.
         </p>
 
         <ul className='mt-6 overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>
-          {NYC_PARTNER_ORGS.map((org, index) => {
+          {PARTNER_ORGS.map((org, index) => {
             const row = (
               <div className='flex items-center gap-3 px-5 py-4'>
                 <PartnerSchoolLogo
@@ -44,7 +46,7 @@ export function PartnerSchoolsScreen() {
               <li
                 key={org.id}
                 className={
-                  index === NYC_PARTNER_ORGS.length - 1
+                  index === PARTNER_ORGS.length - 1
                     ? undefined
                     : 'border-b border-[#f0f1f3]'
                 }
@@ -70,7 +72,7 @@ export function PartnerSchoolsScreen() {
 
         <div className='mt-8 text-center'>
           <Link
-            href='/nyc'
+            href={href()}
             className='text-[13px] font-medium text-[var(--muted)] touch-manipulation transition hover:text-[var(--foreground)]'
           >
             커뮤니티 홈으로

@@ -20,31 +20,31 @@ export const JOB_REVIEW_TYPES: {
   {
     id: 'intern',
     label: '인턴',
-    description: 'Summer / Co-op / 학기 중 인턴',
-    summary: '서류 → OA → 면접 → 오퍼까지의 전형',
+    description: 'Summer / Winter / 학기',
+    summary: '서류 → OA → 인터뷰 → 오퍼까지의 전형',
   },
   {
     id: 'new-grad',
     label: '신입',
-    description: '졸업 후 풀타임 · New Grad',
+    description: '졸업 후 풀타임',
     summary: '캠퍼스 리크루팅·온라인 지원 후기',
   },
   {
     id: 'experienced',
     label: '경력',
-    description: 'Mid / Senior 레벨 채용',
-    summary: '리크루터 연락부터 멀티 라운드 면접',
+    description: 'Mid / Senior 채용',
+    summary: '리크루터 연락부터 멀티 라운드 인터뷰',
   },
   {
     id: 'job-change',
     label: '이직',
-    description: '재직 중·퇴사 후 이직 지원',
+    description: '재직 중 · 퇴사 후 이직',
     summary: '현직 병행 지원·오퍼 협상까지의 과정',
   },
   {
     id: 'contract',
     label: '계약',
-    description: 'Contract · Freelance · Part-time',
+    description: '계약직 · 프리랜스',
     summary: '단기·프로젝트 기반 채용 과정',
   },
 ]
@@ -62,40 +62,35 @@ export const JOB_REVIEW_TYPE_STYLES: Record<
   intern: {
     badge: 'bg-[#eff6ff] text-[#1d4ed8] ring-[#93c5fd]/60',
     picker: 'bg-white ring-black/[0.06] hover:ring-[#1d4ed8]/25',
-    pickerActive:
-      'bg-[#eff6ff] ring-[#1d4ed8] shadow-[0_0_0_1px_rgba(29,78,216,0.08)]',
+    pickerActive: 'bg-[#eff6ff] ring-[#1d4ed8] shadow-[0_0_0_1px_rgba(29,78,216,0.08)]',
     accent: '#1d4ed8',
     soft: '#eff6ff',
   },
   'new-grad': {
     badge: 'bg-[#eefaf4] text-[#0f766e] ring-[#99f6e4]/60',
     picker: 'bg-white ring-black/[0.06] hover:ring-[#0f766e]/25',
-    pickerActive:
-      'bg-[#eefaf4] ring-[#0f766e] shadow-[0_0_0_1px_rgba(15,118,110,0.08)]',
+    pickerActive: 'bg-[#eefaf4] ring-[#0f766e] shadow-[0_0_0_1px_rgba(15,118,110,0.08)]',
     accent: '#0f766e',
     soft: '#eefaf4',
   },
   experienced: {
     badge: 'bg-[#f5f3ff] text-[#6d28d9] ring-[#c4b5fd]/60',
     picker: 'bg-white ring-black/[0.06] hover:ring-[#6d28d9]/25',
-    pickerActive:
-      'bg-[#f5f3ff] ring-[#6d28d9] shadow-[0_0_0_1px_rgba(109,40,217,0.08)]',
+    pickerActive: 'bg-[#f5f3ff] ring-[#6d28d9] shadow-[0_0_0_1px_rgba(109,40,217,0.08)]',
     accent: '#6d28d9',
     soft: '#f5f3ff',
   },
   'job-change': {
     badge: 'bg-[#fdf2f8] text-[#be185d] ring-[#f9a8d4]/60',
     picker: 'bg-white ring-black/[0.06] hover:ring-[#be185d]/25',
-    pickerActive:
-      'bg-[#fdf2f8] ring-[#be185d] shadow-[0_0_0_1px_rgba(190,24,93,0.08)]',
+    pickerActive: 'bg-[#fdf2f8] ring-[#be185d] shadow-[0_0_0_1px_rgba(190,24,93,0.08)]',
     accent: '#be185d',
     soft: '#fdf2f8',
   },
   contract: {
     badge: 'bg-[#fff7ed] text-[#c2410c] ring-[#fdba74]/60',
     picker: 'bg-white ring-black/[0.06] hover:ring-[#c2410c]/25',
-    pickerActive:
-      'bg-[#fff7ed] ring-[#c2410c] shadow-[0_0_0_1px_rgba(194,65,12,0.08)]',
+    pickerActive: 'bg-[#fff7ed] ring-[#c2410c] shadow-[0_0_0_1px_rgba(194,65,12,0.08)]',
     accent: '#c2410c',
     soft: '#fff7ed',
   },
@@ -106,6 +101,7 @@ export const JOB_REVIEW_TIMELINE_FIELDS: {
   label: string
   shortLabel: string
   hint: string
+  guide?: string
   rowClass: string
   labelClass: string
 }[] = [
@@ -135,9 +131,11 @@ export const JOB_REVIEW_TIMELINE_FIELDS: {
   },
   {
     key: 'interviewRound',
-    label: '몇 차 면접인지',
-    shortLabel: '면접',
-    hint: '1차 HR, 2차 Tech, Panel, HM 등',
+    label: '몇 차 인터뷰인지',
+    shortLabel: '인터뷰',
+    hint: '1차 Recruiter, 2차 Tech, Panel, HM 등',
+    guide:
+      '인터뷰 후기: 몇 차였는지와 함께, 어떤 질문을 받았고 어떻게 대답했는지도 적어 주세요. 기억나는 질문·답변을 구체적으로 남기면 다음 사람에게 도움이 돼요.',
     rowClass: 'border-l-[3px] border-[#34d399] bg-[#f6fffb]',
     labelClass: 'text-[#047857]',
   },
@@ -159,35 +157,35 @@ const JOB_REVIEW_PLACEHOLDERS: Record<
     stageLabel: '예: Online Assessment',
     platform: '예: Handshake → 회사 careers',
     documentsSubmitted: '예: Resume, Transcript, Cover letter',
-    interviewRound: '예: 1차 Recruiter screen',
+    interviewRound: '예: 1차 Recruiter screen. 질문: Why this intern role? → 수업에서 ~를 해보고 지원했어요.',
     outcome: '예: Pass → 다음 라운드 일정 잡힘',
   },
   'new-grad': {
     stageLabel: '예: 서류 지원',
     platform: '예: LinkedIn Easy Apply',
     documentsSubmitted: '예: Resume PDF, GitHub 링크',
-    interviewRound: '예: Phone screen',
+    interviewRound: '예: 2차 Tech. Q. 최근 프로젝트에서 막힌 점은? A. … 이렇게 대답했어요.',
     outcome: '예: Reject (2주 후 이메일)',
   },
   experienced: {
     stageLabel: '예: Recruiter reach-out',
     platform: '예: LinkedIn InMail',
     documentsSubmitted: '예: Updated resume',
-    interviewRound: '예: HM 1:1',
+    interviewRound: '예: HM 1:1. Q. Why this role? A. 팀의 방향이 ~해서 …',
     outcome: '예: Onsite invite',
   },
   'job-change': {
     stageLabel: '예: Recruiter screen',
     platform: '예: LinkedIn / Referral',
     documentsSubmitted: '예: Resume, LinkedIn',
-    interviewRound: '예: HM + Team',
+    interviewRound: '예: 2차 HM + Team. Q. 갈등 상황 대처? A. …',
     outcome: '예: Offer · 연봉 협상',
   },
   contract: {
     stageLabel: '예: 에이전시 서류',
     platform: '예: Recruiter referral',
     documentsSubmitted: '예: Resume, rate card',
-    interviewRound: '예: Client intro call',
+    interviewRound: '예: Client intro. Q. 가능한 시작일? A. 2주 뒤부터요.',
     outcome: '예: Contract offer',
   },
 }
@@ -213,7 +211,7 @@ export const JOB_REVIEW_QUICK_STEPS: Record<
       },
     },
     {
-      label: '면접',
+      label: '인터뷰',
       patch: {
         stageLabel: 'Technical Interview',
         interviewRound: '1차 Tech',
@@ -284,7 +282,7 @@ export const JOB_REVIEW_QUICK_STEPS: Record<
       },
     },
     {
-      label: '면접',
+      label: '인터뷰',
       patch: {
         stageLabel: 'Hiring Manager',
         interviewRound: 'HM + Team',
@@ -334,10 +332,12 @@ export function isJobReviewTypeId(value: unknown): value is JobReviewTypeId {
 
 export function normalizeJobReviewType(
   raw: unknown,
-  detailFallback?: string,
+  detailFallback?: string
 ): JobReviewTypeId | null {
   if (isJobReviewTypeId(raw)) return raw
-  const detail = String(detailFallback || '').trim().toLowerCase()
+  const detail = String(detailFallback || '')
+    .trim()
+    .toLowerCase()
   if (detail.includes('인턴') || detail === 'intern') return 'intern'
   if (detail.includes('신입') || detail.includes('new')) return 'new-grad'
   if (detail.includes('이직') || detail.includes('job-change')) return 'job-change'
@@ -346,22 +346,16 @@ export function normalizeJobReviewType(
   return null
 }
 
-export function hasJobReviewPostUpdate(post: {
-  createdAt: number
-  updatedAt: number
-}) {
+export function hasJobReviewPostUpdate(post: { createdAt: number; updatedAt: number }) {
   return post.updatedAt - post.createdAt > JOB_REVIEW_UPDATE_EPSILON_MS
 }
 
-export function getJobReviewListTimestamp(post: {
-  createdAt: number
-  updatedAt: number
-}) {
+export function getJobReviewListTimestamp(post: { createdAt: number; updatedAt: number }) {
   return post.updatedAt || post.createdAt
 }
 
 export function sortJobReviewTimelineByDate(
-  entries: JobReviewTimelineEntry[],
+  entries: JobReviewTimelineEntry[]
 ): JobReviewTimelineEntry[] {
   return [...entries].sort((a, b) => {
     const da = a.date.trim()
@@ -374,12 +368,7 @@ export function sortJobReviewTimelineByDate(
 }
 
 export function summarizeJobReviewTimelineEntry(entry: JobReviewTimelineEntry) {
-  const parts = [
-    entry.stageLabel,
-    entry.platform,
-    entry.interviewRound,
-    entry.outcome,
-  ]
+  const parts = [entry.stageLabel, entry.platform, entry.interviewRound, entry.outcome]
     .map((value) => value.trim())
     .filter(Boolean)
   const summary = parts.join(' · ')
@@ -390,7 +379,7 @@ export function summarizeJobReviewTimelineEntry(entry: JobReviewTimelineEntry) {
 }
 
 export function getLatestJobReviewTimelineEntryId(
-  entries: JobReviewTimelineEntry[],
+  entries: JobReviewTimelineEntry[]
 ): string | null {
   const sorted = sortJobReviewTimelineByDate(entries)
   for (let index = sorted.length - 1; index >= 0; index -= 1) {
@@ -411,22 +400,22 @@ export function getJobReviewTypeStyle(type: JobReviewTypeId | null | undefined) 
 
 export function getJobReviewTimelinePlaceholder(
   type: JobReviewTypeId | null | undefined,
-  field: JobReviewTimelineFieldKey,
+  field: JobReviewTimelineFieldKey
 ) {
   if (type) return JOB_REVIEW_PLACEHOLDERS[type][field]
   return JOB_REVIEW_PLACEHOLDERS.intern[field]
 }
 
 export function getJobReviewTimelineDateRange(
-  timeline: JobReviewTimelineEntry[] | null | undefined,
+  timeline: JobReviewTimelineEntry[] | null | undefined
 ) {
   const dates = (timeline ?? [])
     .map((entry) => entry.date.trim())
     .filter(Boolean)
     .sort()
   if (dates.length === 0) return null
-  if (dates.length === 1) return formatJobReviewDate(dates[0])
-  return `${formatJobReviewDate(dates[0])} – ${formatJobReviewDate(dates[dates.length - 1])}`
+  if (dates.length === 1) return formatJobReviewDate(dates[0], { compactYear: true })
+  return `${formatJobReviewDate(dates[0], { compactYear: true })} – ${formatJobReviewDate(dates[dates.length - 1], { compactYear: true })}`
 }
 
 function escapeLegacyReviewText(text: string) {
@@ -444,14 +433,13 @@ function normalizeStageReviewHtml(raw: unknown, legacyDetails?: string) {
   }
   const details = String(legacyDetails || '').trim()
   if (!details) return ''
-  return sanitizeCommunityHtml(
-    `<p>${escapeLegacyReviewText(details)}</p>`,
-  ).slice(0, JOB_REVIEW_STAGE_REVIEW_MAX)
+  return sanitizeCommunityHtml(`<p>${escapeLegacyReviewText(details)}</p>`).slice(
+    0,
+    JOB_REVIEW_STAGE_REVIEW_MAX
+  )
 }
 
-export function normalizeJobReviewTimeline(
-  raw: unknown,
-): JobReviewTimelineEntry[] {
+export function normalizeJobReviewTimeline(raw: unknown): JobReviewTimelineEntry[] {
   if (!Array.isArray(raw)) return []
   return raw
     .map((item, index) => {
@@ -463,10 +451,7 @@ export function normalizeJobReviewTimeline(
       const documentsSubmitted = String(data.documentsSubmitted || '').trim()
       const interviewRound = String(data.interviewRound || '').trim()
       const legacyDetails = String(data.details || '').trim()
-      const stageReviewHtml = normalizeStageReviewHtml(
-        data.stageReviewHtml,
-        legacyDetails,
-      )
+      const stageReviewHtml = normalizeStageReviewHtml(data.stageReviewHtml, legacyDetails)
       const outcome = String(data.outcome || '').trim()
       if (
         !date &&
@@ -480,9 +465,7 @@ export function normalizeJobReviewTimeline(
         return null
       }
       return {
-        id:
-          String(data.id || '').trim() ||
-          `jr_${index}_${Math.random().toString(36).slice(2, 7)}`,
+        id: String(data.id || '').trim() || `jr_${index}_${Math.random().toString(36).slice(2, 7)}`,
         date,
         stageLabel: stageLabel.slice(0, JOB_REVIEW_FIELD_MAX),
         platform: platform.slice(0, JOB_REVIEW_FIELD_MAX),
@@ -502,14 +485,14 @@ export function normalizeJobReviewTips(raw: unknown) {
     .slice(0, JOB_REVIEW_TIPS_MAX)
 }
 
-export function formatJobReviewDate(value: string) {
+export function formatJobReviewDate(value: string, options?: { compactYear?: boolean }) {
   const trimmed = value.trim()
   if (!trimmed) return ''
   if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
     const date = new Date(`${trimmed}T12:00:00`)
     if (!Number.isNaN(date.getTime())) {
       return date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
+        year: options?.compactYear ? '2-digit' : 'numeric',
         month: 'short',
         day: 'numeric',
       })
@@ -538,12 +521,12 @@ function hasStageReviewContent(entry: JobReviewTimelineEntry) {
 export function isJobReviewTimelineEntryFilled(entry: JobReviewTimelineEntry) {
   return Boolean(
     entry.date.trim() ||
-      entry.stageLabel.trim() ||
-      entry.platform.trim() ||
-      entry.documentsSubmitted.trim() ||
-      entry.interviewRound.trim() ||
-      hasStageReviewContent(entry) ||
-      entry.outcome.trim(),
+    entry.stageLabel.trim() ||
+    entry.platform.trim() ||
+    entry.documentsSubmitted.trim() ||
+    entry.interviewRound.trim() ||
+    hasStageReviewContent(entry) ||
+    entry.outcome.trim()
   )
 }
 
@@ -551,11 +534,11 @@ export function isJobReviewTimelineEntryComplete(entry: JobReviewTimelineEntry) 
   if (!entry.date.trim()) return false
   return Boolean(
     entry.stageLabel.trim() ||
-      entry.platform.trim() ||
-      entry.documentsSubmitted.trim() ||
-      entry.interviewRound.trim() ||
-      hasStageReviewContent(entry) ||
-      entry.outcome.trim(),
+    entry.platform.trim() ||
+    entry.documentsSubmitted.trim() ||
+    entry.interviewRound.trim() ||
+    hasStageReviewContent(entry) ||
+    entry.outcome.trim()
   )
 }
 

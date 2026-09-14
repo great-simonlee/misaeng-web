@@ -85,7 +85,9 @@ function CreateTimelineForm({
   const [editSnapshot, setEditSnapshot] = useState<CptOptTimelineEntry | null>(
     null,
   )
-  const [committedIds, setCommittedIds] = useState<string[]>([])
+  const [committedIds, setCommittedIds] = useState<string[]>(() =>
+    value.filter(isTimelineEntryFilled).map((entry) => entry.id),
+  )
 
   const committedIdSet = useMemo(
     () => new Set(committedIds),
@@ -192,12 +194,6 @@ function CreateTimelineForm({
 
   return (
     <div className={cn('space-y-4', className)}>
-      <GuideBox
-        tone='create'
-        title='날짜별로 여러 건을 한 번에 남겨 주세요'
-        description='날짜를 고른 뒤 그날에 한 일을 적고, 「이 기록 추가」로 목록에 넣은 다음 다음 날짜를 이어서 작성할 수 있어요. 추가한 기록은 위 목록에서 수정·삭제할 수 있습니다.'
-      />
-
       {savedEntries.length > 0 ? (
         <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
           <SectionHeading
@@ -221,20 +217,11 @@ function CreateTimelineForm({
       ) : null}
 
       <section className='space-y-2.5'>
-        <div className='flex items-center justify-between gap-2'>
-          <div>
+        {isEditing ? (
+          <div className='flex items-center justify-between gap-2'>
             <p className='text-[14px] font-semibold text-[var(--foreground)]'>
-              {isEditing ? '선택한 기록 수정' : '진행 기록 작성'}
+              선택한 기록 수정
             </p>
-            <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
-              {isEditing
-                ? '수정 후 「수정 완료」를 눌러 주세요'
-                : canAddMore
-                  ? `최대 ${CPT_OPT_TIMELINE_MAX}건까지 추가할 수 있어요`
-                  : `최대 ${CPT_OPT_TIMELINE_MAX}건까지입니다`}
-            </p>
-          </div>
-          {isEditing ? (
             <button
               type='button'
               onClick={cancelDraft}
@@ -242,8 +229,8 @@ function CreateTimelineForm({
             >
               취소
             </button>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
 
         {(!isEditing && canAddMore) || isEditing ? (
           <>
@@ -718,23 +705,16 @@ function SingleEntryForm({
       </div>
 
       <div className='space-y-2 p-3 sm:p-3.5'>
-        {visibleFields.length === 0 ? (
-          <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-4 text-center text-[12px] leading-relaxed text-[var(--muted)]'>
-            위에서 준비 · 제출 · 결과 · 다음 스텝 중 필요한 항목을 선택하거나,
-            아래 단계 후기만 작성해도 됩니다
-          </p>
-        ) : (
-          visibleFields.map((field) => (
-            <TimelineField
-              key={field.key}
-              field={field}
-              value={entry[field.key]}
-              placeholder={getCptOptTimelinePlaceholder(cptOptType, field.key)}
-              onChange={(next) => handleFieldChange(field.key, next)}
-              onRemove={() => deselectField(field.key)}
-            />
-          ))
-        )}
+        {visibleFields.map((field) => (
+          <TimelineField
+            key={field.key}
+            field={field}
+            value={entry[field.key]}
+            placeholder={getCptOptTimelinePlaceholder(cptOptType, field.key)}
+            onChange={(next) => handleFieldChange(field.key, next)}
+            onRemove={() => deselectField(field.key)}
+          />
+        ))}
 
         <div className='rounded-xl border border-black/[0.06] bg-[#fafbfc] px-3 py-3 sm:px-3.5 sm:py-3.5'>
           <p className='text-[12px] font-semibold text-[var(--foreground)]'>
@@ -749,6 +729,8 @@ function SingleEntryForm({
               onChange={(html) => onChange({ stageReviewHtml: html })}
               placeholder='예: OGS 포털 업로드가 잘 안 돼서 PDF를 다시 압축해 올렸어요. 오퍼레터 날짜 맞추는 데 하루 걸렸습니다.'
               minHeightClassName='min-h-[160px]'
+              contentClassName='!text-[13px] !leading-[1.65]'
+              simpleToolbar
               maxLength={CPT_OPT_STAGE_REVIEW_MAX}
             />
           </div>

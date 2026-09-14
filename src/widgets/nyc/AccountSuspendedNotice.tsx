@@ -1,5 +1,8 @@
+'use client'
+
 import Link from 'next/link'
 
+import { useCityPath } from '@hooks/useCity'
 import { ACCOUNT_SUSPENDED_MESSAGE } from '@lib/community/schoolGate'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 
@@ -10,6 +13,7 @@ type AccountSuspendedNoticeProps = {
 export function AccountSuspendedNotice({
   withShell = true,
 }: AccountSuspendedNoticeProps) {
+  const href = useCityPath()
   const body = (
     <div className='mx-auto max-w-md px-4 py-14 text-center sm:py-16'>
       <p className='text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--muted)]'>
@@ -23,7 +27,7 @@ export function AccountSuspendedNotice({
       </p>
       <p className='mt-8'>
         <Link
-          href='/nyc/me'
+          href={href('/me')}
           className='text-[13px] font-medium text-[var(--muted)] underline-offset-2 hover:text-[var(--foreground)] hover:underline'
         >
           마이페이지로

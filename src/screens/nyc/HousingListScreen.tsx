@@ -26,6 +26,7 @@ import {
   isHousingPriceFilterActive,
   type HousingListingKind,
 } from '@lib/constants/housingMock'
+import { useCity } from '@hooks/useCity'
 import { fetchHousingListings } from '@lib/housing/fetchListings'
 import { cn } from '@lib'
 import type {
@@ -54,6 +55,7 @@ function defaultPriceRange(kind: ListingKindFilter) {
 }
 
 export function HousingListScreen() {
+  const city = useCity()
   const [listingKind, setListingKind] = useState<ListingKindFilter>('all')
   const [unitType, setUnitType] = useState<UnitTypeFilter>('all')
   const [roomType, setRoomType] = useState<RoomTypeFilter>('all')
@@ -142,7 +144,7 @@ export function HousingListScreen() {
 
   useEffect(() => {
     let cancelled = false
-    void fetchHousingListings().then((listings) => {
+    void fetchHousingListings(city).then((listings) => {
       if (cancelled) return
       setPosts(listings)
       setLoading(false)
@@ -150,13 +152,13 @@ export function HousingListScreen() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [city])
 
   const refreshListings = useCallback(async () => {
-    const listings = await fetchHousingListings()
+    const listings = await fetchHousingListings(city)
     setPosts(listings)
     setLoading(false)
-  }, [])
+  }, [city])
 
   const filteredPosts = useMemo(() => {
     return posts.filter((listing) => {

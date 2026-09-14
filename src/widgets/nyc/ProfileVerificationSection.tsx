@@ -18,6 +18,11 @@ import {
   confirmSchoolEmailVerification,
   sendSchoolEmailVerification,
 } from '@lib/api/schoolVerification'
+import {
+  confirmWorkplaceEmailVerification,
+  sendWorkplaceEmailVerification,
+} from '@lib/api/workplaceVerification'
+import { WORKPLACE_COMPANY_MAX } from '@lib/constants/workplace'
 import { sendSchoolRegistrationRequest } from '@lib/api/schoolRegistrationRequest'
 import { resolveSchoolFromEmail } from '@lib/constants/schools'
 import {
@@ -29,25 +34,40 @@ import {
   isSchoolEmail,
   isValidEmailFormat,
 } from '@lib/utils/verification'
+import { getWorkplaceEmailError } from '@lib/utils/workplaceEmail'
 import type { NycUserProfile } from '@/types/nyc'
 
-type VerifyKind = 'school' | 'phone' | null
+type VerifyKind = 'school' | 'workplace' | 'phone' | 'chooser' | null
 
 type Props = {
   profile: NycUserProfile | null
   openSchoolVerify?: boolean
   onSchoolVerifyOpenChange?: (open: boolean) => void
+  openWorkplaceVerify?: boolean
+  onWorkplaceVerifyOpenChange?: (open: boolean) => void
+  openIdentityVerify?: boolean
+  onIdentityVerifyOpenChange?: (open: boolean) => void
 }
 
 export function ProfileVerificationSection({
   profile,
   openSchoolVerify = false,
   onSchoolVerifyOpenChange,
+  openWorkplaceVerify = false,
+  onWorkplaceVerifyOpenChange,
+  openIdentityVerify = false,
+  onIdentityVerifyOpenChange,
 }: Props) {
   const { user, refreshSession, mergeStoredProfile } = useAuth()
   const { success, error: toastError } = useToast()
   const [active, setActive] = useState<VerifyKind>(null)
-  const resolvedActive: VerifyKind = openSchoolVerify ? 'school' : active
+  const resolvedActive: VerifyKind = openWorkplaceVerify
+    ? 'workplace'
+    : openSchoolVerify
+      ? 'school'
+      : openIdentityVerify
+        ? 'chooser'
+        : active
 
   const closeVerify = useCallback(
     (kind: VerifyKind) => {
@@ -55,8 +75,18 @@ export function ProfileVerificationSection({
       if (kind === 'school') {
         onSchoolVerifyOpenChange?.(false)
       }
+      if (kind === 'workplace') {
+        onWorkplaceVerifyOpenChange?.(false)
+      }
+      if (kind === 'chooser') {
+        onIdentityVerifyOpenChange?.(false)
+      }
     },
-    [onSchoolVerifyOpenChange],
+    [
+      onSchoolVerifyOpenChange,
+      onWorkplaceVerifyOpenChange,
+      onIdentityVerifyOpenChange,
+    ],
   )
 
   const smsEnabled = isPhoneSmsEnabled()
@@ -67,6 +97,21 @@ export function ProfileVerificationSection({
       ? '학교 인증 후'
       : null
 
+  const workplaceStatus = profile?.workplaceStatus ?? 'none'
+  const workplaceApproved = workplaceStatus === 'approved'
+  const workplacePending = workplaceStatus === 'pending'
+
+  const workplaceDetail =
+    workplaceApproved
+      ? [profile?.workplaceCompanyName, profile?.workEmail]
+          .filter(Boolean)
+          .join(' · ') || '인증됨'
+      : workplacePending
+        ? '이메일 인증 완료 · 미생 팀 확인 대기'
+        : workplaceStatus === 'rejected'
+          ? profile?.workplaceRejectReason || '다시 인증해 주세요'
+          : '직장 메일과 회사 이름으로 인증'
+
   const items = [
     {
       id: 'school' as const,
@@ -76,6 +121,15 @@ export function ProfileVerificationSection({
       detail: profile?.schoolEmailVerified
         ? profile.schoolEmail || '인증됨'
         : '학교 메일로 학생 인증',
+      pending: false,
+    },
+    {
+      id: 'workplace' as const,
+      label: '직장인 인증',
+      verified: workplaceApproved,
+      schoolId: null as string | null,
+      detail: workplaceDetail,
+      pending: workplacePending,
     },
     {
       id: 'phone' as const,
@@ -102,17 +156,27 @@ export function ProfileVerificationSection({
 
   return (
     <section className='mt-0'>
-      <h2 className='mb-3 px-0.5 text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
+      <h2 className='mb-1.5 px-0.5 text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
         인증
       </h2>
+      <p className='mb-3 px-0.5 text-[11px] leading-relaxed text-[var(--muted)]'>
+        가입한 개인 메일과 다른 학교·직장 메일을 인증해도 이 계정에 연결돼요.
+      </p>
       <ul className='overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>
         {items.map((item, index) => {
           const isLast = index === items.length - 1
           const soon = 'soon' in item && item.soon
           const phoneBlocked = item.id === 'phone' && phoneBlockedReason
+          const pending = 'pending' in item && item.pending
           const canVerify =
-            !soon && !item.verified && !phoneBlocked &&
-            (item.id === 'school' || item.id === 'phone')
+            !soon &&
+            !item.verified &&
+            !pending &&
+            !phoneBlocked &&
+            (item.id === 'school' ||
+              item.id === 'workplace' ||
+              item.id === 'phone')
+          const canOpen = canVerify || (item.id === 'workplace' && pending)
 
           const row = (
             <div className='flex items-center gap-3.5 px-5 py-4'>
@@ -142,6 +206,10 @@ export function ProfileVerificationSection({
                 <span className='shrink-0 text-[12px] font-medium text-emerald-600'>
                   인증 완료
                 </span>
+              ) : pending ? (
+                <span className='shrink-0 text-[12px] font-medium text-amber-700'>
+                  검토 중
+                </span>
               ) : phoneBlocked ? (
                 <span className='shrink-0 text-[12px] text-[var(--muted)]'>
                   {phoneBlockedReason}
@@ -151,7 +219,7 @@ export function ProfileVerificationSection({
                   인증
                 </span>
               )}
-              {(canVerify || soon || phoneBlocked) && !item.verified && (
+              {(canOpen || soon || phoneBlocked) && !item.verified && (
                 <ChevronRight muted={!canVerify} />
               )}
             </div>
@@ -162,7 +230,7 @@ export function ProfileVerificationSection({
               key={item.id}
               className={isLast ? undefined : 'border-b border-[#f0f1f3]'}
             >
-              {canVerify ? (
+              {canOpen ? (
                 <button
                   type='button'
                   onClick={() => setActive(item.id)}
@@ -181,6 +249,65 @@ export function ProfileVerificationSection({
         <p className='mt-2.5 px-0.5 text-[11px] leading-relaxed text-[var(--muted)]'>
           휴대폰 SMS 인증은 현재 비활성화되어 있어요.
         </p>
+      )}
+
+      {resolvedActive === 'chooser' && user ? (
+        <VerifySheet
+          title='본인 인증'
+          onClose={() => closeVerify('chooser')}
+        >
+          <p className={verifyDescriptionClass}>
+            학교 메일 또는 직장 메일 중 편한 방법으로 인증해 주세요. 가입할 때
+            쓴 개인 메일과 달라도 이 계정에 연결돼요.
+          </p>
+          <button
+            type='button'
+            onClick={() => {
+              onIdentityVerifyOpenChange?.(false)
+              setActive('school')
+            }}
+            className={verifyPrimaryButtonClass}
+          >
+            학교 이메일로 학생 인증
+          </button>
+          <button
+            type='button'
+            onClick={() => {
+              onIdentityVerifyOpenChange?.(false)
+              setActive('workplace')
+            }}
+            className={verifyGhostButtonClass}
+          >
+            직장 이메일로 직장인 인증
+          </button>
+        </VerifySheet>
+      ) : null}
+
+      {resolvedActive === 'workplace' && user && (
+        workplacePending || workplaceApproved ? (
+          <WorkplaceStatusSheet
+            approved={workplaceApproved}
+            companyName={profile?.workplaceCompanyName}
+            workEmail={profile?.workEmail}
+            rejectReason={profile?.workplaceRejectReason}
+            onClose={() => closeVerify('workplace')}
+          />
+        ) : (
+          <WorkplaceEmailVerifyModal
+            initialEmail={profile?.workEmail ?? ''}
+            initialCompanyName={profile?.workplaceCompanyName ?? ''}
+            onClose={() => closeVerify('workplace')}
+            onSubmitted={(storedProfile) => {
+              if (storedProfile) mergeStoredProfile(storedProfile)
+              void refreshSession()
+              success(
+                '이메일 인증이 완료됐어요. 미생 팀 확인 후 직장인 인증이 완료돼요.',
+              )
+              closeVerify('workplace')
+            }}
+            onError={(msg) => toastError(msg)}
+          />
+        )
       )}
 
       {resolvedActive === 'school' && user && (
@@ -228,7 +355,7 @@ function VerificationItemIcon({
   verified,
   muted,
 }: {
-  kind: 'school' | 'phone' | 'instagram'
+  kind: 'school' | 'workplace' | 'phone' | 'instagram'
   verified: boolean
   muted?: boolean
 }) {
@@ -257,6 +384,9 @@ function VerificationItemIcon({
     school: muted
       ? 'bg-[#f0f1f3] text-[#94a3b8]'
       : 'bg-[#57068c]/10 text-[#57068c]',
+    workplace: muted
+      ? 'bg-[#f0f1f3] text-[#94a3b8]'
+      : 'bg-[#0f766e]/10 text-[#0f766e]',
     phone: muted
       ? 'bg-[#f0f1f3] text-[#94a3b8]'
       : 'bg-[#2563eb]/10 text-[#2563eb]',
@@ -269,9 +399,35 @@ function VerificationItemIcon({
       aria-hidden
     >
       {kind === 'school' && <SchoolVerifyIcon />}
+      {kind === 'workplace' && <WorkplaceRowIcon />}
       {kind === 'phone' && <PhoneVerifyIcon />}
       {kind === 'instagram' && <InstagramVerifyIcon />}
     </span>
+  )
+}
+
+function WorkplaceRowIcon() {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='1.8'
+      className='size-[18px]'
+      aria-hidden
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M8 7V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1'
+      />
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M4.5 9.5h15v9a1.5 1.5 0 0 1-1.5 1.5h-12a1.5 1.5 0 0 1-1.5-1.5v-9Z'
+      />
+      <path strokeLinecap='round' strokeLinejoin='round' d='M4.5 13h15' />
+    </svg>
   )
 }
 
@@ -438,6 +594,198 @@ function VerifySheet({
     <BottomSheet open onClose={onClose} title={title} scrollable={false}>
       <div className='space-y-4 px-3 pb-2 pt-1'>{children}</div>
     </BottomSheet>
+  )
+}
+
+function WorkplaceStatusSheet({
+  approved,
+  companyName,
+  workEmail,
+  rejectReason,
+  onClose,
+}: {
+  approved: boolean
+  companyName?: string | null
+  workEmail?: string | null
+  rejectReason?: string | null
+  onClose: () => void
+}) {
+  return (
+    <VerifySheet
+      title={approved ? '직장인 인증 완료' : '직장인 인증 검토 중'}
+      onClose={onClose}
+    >
+      <p className={verifyDescriptionClass}>
+        {approved
+          ? '미생 팀에서 직장인 인증을 확인했어요.'
+          : '직장 이메일 인증은 끝났어요. 회사 정보를 미생 팀에서 확인하고 있어요.'}
+      </p>
+      {companyName ? (
+        <p className='text-[14px] font-medium text-[var(--foreground)]'>
+          {companyName}
+        </p>
+      ) : null}
+      {workEmail ? (
+        <p className='text-[13px] text-[var(--muted)]'>{workEmail}</p>
+      ) : null}
+      {rejectReason ? (
+        <p className='text-[13px] text-red-600'>{rejectReason}</p>
+      ) : null}
+    </VerifySheet>
+  )
+}
+
+function WorkplaceEmailVerifyModal({
+  initialEmail,
+  initialCompanyName,
+  onClose,
+  onSubmitted,
+  onError,
+}: {
+  initialEmail?: string
+  initialCompanyName?: string
+  onClose: () => void
+  onSubmitted: (profile: Record<string, unknown> | null) => void
+  onError: (msg: string) => void
+}) {
+  const [step, setStep] = useState<'form' | 'code'>('form')
+  const [email, setEmail] = useState(initialEmail ?? '')
+  const [companyName, setCompanyName] = useState(initialCompanyName ?? '')
+  const [code, setCode] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [cooldown, setCooldown] = useState(0)
+
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const t = window.setInterval(() => {
+      setCooldown((c) => (c <= 1 ? 0 : c - 1))
+    }, 1000)
+    return () => window.clearInterval(t)
+  }, [cooldown])
+
+  async function handleSend() {
+    const trimmedEmail = email.trim().toLowerCase()
+    const trimmedCompany = companyName.trim()
+    const emailError = getWorkplaceEmailError(trimmedEmail)
+    if (emailError) {
+      onError(emailError)
+      return
+    }
+    if (trimmedCompany.length < 2) {
+      onError('회사 이름을 입력해 주세요')
+      return
+    }
+    setBusy(true)
+    try {
+      await sendWorkplaceEmailVerification({
+        email: trimmedEmail,
+        companyName: trimmedCompany,
+      })
+      setCode('')
+      setStep('code')
+      setCooldown(Math.ceil(SCHOOL_OTP_COOLDOWN_MS / 1000))
+    } catch (err) {
+      onError(getErrorMessage(err, '인증 메일 전송에 실패했어요'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handleConfirm() {
+    setBusy(true)
+    try {
+      const result = await confirmWorkplaceEmailVerification({
+        email: email.trim().toLowerCase(),
+        companyName: companyName.trim(),
+        code,
+      })
+      onSubmitted(result.profile)
+    } catch (err) {
+      onError(getErrorMessage(err, '인증에 실패했어요'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <VerifySheet title='직장인 인증' onClose={onClose}>
+      {step === 'form' ? (
+        <>
+          <p className={verifyDescriptionClass}>
+            지금 로그인한 계정에 직장 메일이 연결돼요. 가입 메일과 달라도
+            괜찮아요. 코드 확인 후 미생 팀이 회사 정보를 한 번 더 확인해요.
+          </p>
+          <label className='block space-y-2'>
+            <span className={verifyLabelClass}>회사 이름</span>
+            <VerifyClearableInput
+              value={companyName}
+              onChange={(value) =>
+                setCompanyName(value.slice(0, WORKPLACE_COMPANY_MAX))
+              }
+              placeholder='예: Misaeng LLC'
+              disabled={busy}
+            />
+            <span className={verifyHintClass}>
+              {companyName.length}/{WORKPLACE_COMPANY_MAX}
+            </span>
+          </label>
+          <label className='block space-y-2'>
+            <span className={verifyLabelClass}>직장 이메일</span>
+            <VerifyClearableInput
+              type='email'
+              value={email}
+              onChange={setEmail}
+              placeholder='name@company.com'
+              autoComplete='email'
+              disabled={busy}
+            />
+          </label>
+          <button
+            type='button'
+            disabled={busy || !email.trim() || companyName.trim().length < 2}
+            onClick={() => void handleSend()}
+            className={verifyPrimaryButtonClass}
+          >
+            {busy ? '전송 중…' : '인증 코드 받기'}
+          </button>
+        </>
+      ) : (
+        <>
+          <p className={`${verifyDescriptionClass} text-center`}>
+            <span className='font-medium text-[var(--foreground)]'>{email}</span>
+            <br />
+            으로 보낸 6자리 코드를 입력해 주세요
+          </p>
+          <OtpDigitInputs value={code} onChange={setCode} disabled={busy} />
+          <div className='space-y-2'>
+            <button
+              type='button'
+              disabled={busy || code.length !== 6}
+              onClick={() => void handleConfirm()}
+              className={verifyPrimaryButtonClass}
+            >
+              {busy ? '확인 중…' : '이메일 인증 완료'}
+            </button>
+            <button
+              type='button'
+              disabled={busy || cooldown > 0}
+              onClick={() => void handleSend()}
+              className={verifyLinkButtonClass}
+            >
+              {cooldown > 0 ? `재전송 ${cooldown}s` : '코드 다시 받기'}
+            </button>
+            <button
+              type='button'
+              disabled={busy}
+              onClick={() => setStep('form')}
+              className={verifyGhostButtonClass}
+            >
+              회사·이메일 다시 입력
+            </button>
+          </div>
+        </>
+      )}
+    </VerifySheet>
   )
 }
 
@@ -661,7 +1009,8 @@ function SchoolEmailVerifyModal({
       {step === 'email' ? (
         <>
           <p className={verifyDescriptionClass}>
-            학교 이메일로 6자리 코드를 보내 드려요.
+            지금 로그인한 계정에 학교 메일이 연결돼요. 가입 메일과 달라도
+            괜찮아요. 학교 메일로 6자리 코드를 보내 드려요.
           </p>
           <VerifyClearableInput
             type='email'

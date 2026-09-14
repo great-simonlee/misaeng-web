@@ -1,3 +1,5 @@
+import type { CityId } from '@lib/constants/cities'
+
 export type PostStatus = 'open' | 'closed'
 
 /** 유닛(아파트) 타입 */
@@ -165,6 +167,8 @@ export type HousingRoommateWaiting = {
  */
 export interface HousingListing {
   id: string
+  /** 도시 전용 매물. 없으면 NYC 레거시 */
+  city: CityId | null
   property: HousingProperty
   unit: HousingUnit
   description: string
@@ -255,6 +259,8 @@ export type CommunityBoardId =
 export interface CommunityPost {
   id: string
   categoryId: CommunityBoardId
+  /** 도시 전용 글은 필수. status는 필터용 도시, job-review는 null */
+  city: CityId | null
   title: string
   /** 목록 카드용 플레인 텍스트 요약 */
   description: string
@@ -373,7 +379,7 @@ export interface JobReviewTimelineEntry {
   platform: string
   /** 제출 서류 */
   documentsSubmitted: string
-  /** 면접 차수 */
+  /** 인터뷰 차수 */
   interviewRound: string
   /** 단계별 후기 (리치 텍스트) */
   stageReviewHtml: string
@@ -563,6 +569,15 @@ export interface NycUserProfile {
   /** 인증된 학교 (예: nyu → New York University) */
   verifiedSchoolId: string | null
   verifiedSchoolName: string | null
+  /** 직장 이메일 1차 인증 + 미생 팀 2차 컨펌 */
+  workEmail: string | null
+  workEmailVerified: boolean
+  workplaceCompanyName: string | null
+  workplaceStatus: 'none' | 'pending' | 'approved' | 'rejected'
+  workplaceRequestId: string | null
+  workplaceRejectReason: string | null
+  workplaceReviewedAt: number | null
+  workplaceReviewedByEmail: string | null
   /** 휴대폰 인증 */
   phone: string | null
   phoneVerified: boolean

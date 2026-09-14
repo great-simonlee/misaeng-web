@@ -1,11 +1,17 @@
+'use client'
+
 import Link from 'next/link'
 
-import { NYC_CATEGORIES } from '@lib/constants/nyc'
+import { useCity } from '@hooks/useCity'
+import { getCityCategories } from '@lib/constants/nyc'
 
 export function BoardHighlightCards() {
+  const city = useCity()
+  const categories = getCityCategories(city)
+
   return (
     <div className='flex flex-wrap gap-2 py-0.5'>
-      {NYC_CATEGORIES.map((board) => {
+      {categories.map((board) => {
         if (board.available && board.href) {
           return (
             <Link

@@ -16,6 +16,10 @@ type TipTapEditorProps = {
   placeholder?: string
   className?: string
   minHeightClassName?: string
+  /** 본문 영역 추가 클래스 (글자 크기 등) */
+  contentClassName?: string
+  /** 굵게·기울임·링크·사진만 표시 */
+  simpleToolbar?: boolean
   /** 플레인 텍스트 기준 최대 글자 수 */
   maxLength?: number
 }
@@ -26,6 +30,8 @@ export function TipTapEditor({
   placeholder = '내용을 입력해 주세요',
   className,
   minHeightClassName = 'min-h-[220px]',
+  contentClassName,
+  simpleToolbar = false,
   maxLength,
 }: TipTapEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -64,6 +70,7 @@ export function TipTapEditor({
           'prose-community outline-none',
           minHeightClassName,
           'px-3 py-3',
+          contentClassName,
         ),
       },
       handleTextInput(view, from, to, text) {
@@ -164,23 +171,27 @@ export function TipTapEditor({
           onClick={() => editor.chain().focus().toggleItalic().run()}
           label='기울임'
         />
-        <ToolbarButton
-          active={editor.isActive('heading', { level: 2 })}
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-          label='제목'
-        />
-        <ToolbarButton
-          active={editor.isActive('bulletList')}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          label='목록'
-        />
-        <ToolbarButton
-          active={editor.isActive('blockquote')}
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          label='인용'
-        />
+        {simpleToolbar ? null : (
+          <>
+            <ToolbarButton
+              active={editor.isActive('heading', { level: 2 })}
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 2 }).run()
+              }
+              label='제목'
+            />
+            <ToolbarButton
+              active={editor.isActive('bulletList')}
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              label='목록'
+            />
+            <ToolbarButton
+              active={editor.isActive('blockquote')}
+              onClick={() => editor.chain().focus().toggleBlockquote().run()}
+              label='인용'
+            />
+          </>
+        )}
         <ToolbarButton
           onClick={() => {
             const url = window.prompt('링크 URL을 입력하세요')

@@ -4,7 +4,9 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import { cityLoginPath } from '@lib/constants/cities'
 import { createCommunityReportRequest } from '@lib/community/engagement.client'
 import { cn } from '@lib'
 import type { CommunityReportReason } from '@/types/nyc'
@@ -23,14 +25,17 @@ export function CommunityPostReportAction({
   loginNext,
   className,
 }: CommunityPostReportActionProps) {
+  const city = useCity()
+  const href = useCityPath()
   const { user, loading: authLoading } = useAuth()
   const { error: toastError, success } = useToast()
   const [reportOpen, setReportOpen] = useState(false)
   const [reporting, setReporting] = useState(false)
 
-  const loginHref = `/nyc/login?next=${encodeURIComponent(
-    loginNext || `/nyc/${boardId}/${postId}`,
-  )}`
+  const loginHref = cityLoginPath(
+    city,
+    loginNext || href(`/${boardId}/${postId}`),
+  )
 
   async function handleReportSubmit(input: {
     reason: CommunityReportReason

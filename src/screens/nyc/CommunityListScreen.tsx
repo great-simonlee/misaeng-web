@@ -11,14 +11,24 @@ import {
   type SetStateAction,
 } from 'react'
 
-import { BottomSheet, LoadingState, PullToRefresh } from '@components'
+import { BottomSheet, BottomSheetSelect, LoadingState, PullToRefresh } from '@components'
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { fetchCommunityPosts } from '@lib/community/client'
 import {
-  getSchoolVerifyHref,
+  CITY_IDS,
+  cityLoginPath,
+  getCity,
+  resolvePostCity,
+  type CityId,
+} from '@lib/constants/cities'
+import { VERIFIED_SCHOOLS } from '@lib/constants/schools'
+import {
+  getIdentityVerifyCtaLabel,
+  getIdentityVerifyHref,
   isAccountSuspended,
-  isSchoolVerified,
+  isIdentityVerified,
 } from '@lib/community/schoolGate'
 import {
   CPT_OPT_TYPES,
@@ -39,11 +49,19 @@ import {
   type FoodCuisineId,
 } from '@lib/community/food'
 import {
-  NYC_COMMUNITY_BOARD_META,
+  getCommunityBoardMeta,
   isAnonymousBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { listMockCommunityPosts } from '@lib/constants/communityMock'
+import {
+  EMPTY_EMPLOYER_FILTER,
+  isEmployerFilterActive,
+  matchesEmployerFilter,
+  STATUS_EMPLOYER_OPTIONS,
+  STATUS_EMPLOYER_OTHER_VALUE,
+  type EmployerFilter,
+} from '@lib/constants/statusEmployer'
 import { cn } from '@lib'
 import type { CommunityPost, FoodCategoryId } from '@/types/nyc'
 import {
@@ -59,8 +77,7 @@ import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { RoommateListScreen } from '@screens/nyc/RoommateListScreen'
 
 const FoodPostsMap = dynamic(
-  () =>
-    import('@widgets/nyc/FoodPostsMap').then((mod) => mod.FoodPostsMap),
+  () => import('@widgets/nyc/FoodPostsMap').then((mod) => mod.FoodPostsMap),
   {
     ssr: false,
     loading: () => (
@@ -68,7 +85,7 @@ const FoodPostsMap = dynamic(
         <LoadingState label='지도를 불러오는 중…' />
       </div>
     ),
-  },
+  }
 )
 
 type SortOption = 'newest' | 'oldest'
@@ -128,7 +145,7 @@ function FoodCategoryStickyBar({
           root: null,
           threshold: 0,
           rootMargin: `-${navOffsetPx()}px 0px 0px 0px`,
-        },
+        }
       )
       observer.observe(target)
     }
@@ -162,9 +179,7 @@ function FoodCategoryStickyBar({
             label={cat.label}
             active={foodCategory === cat.id}
             onClick={() => setFoodCategory(cat.id)}
-            icon={
-              <FoodCategoryIcon categoryId={cat.id} className='size-3.5' />
-            }
+            icon={<FoodCategoryIcon categoryId={cat.id} className='size-3.5' />}
           />
         ))}
       </ChipScrollRow>
@@ -201,24 +216,17 @@ function FoodCategoryStickyBar({
           'z-[90] border-b border-black/[0.04] bg-white/95 backdrop-blur-md supports-[backdrop-filter]:bg-white/85',
           stuck
             ? 'fixed inset-x-0 top-14 py-2.5 sm:top-16'
-            : 'relative -mx-4 mt-2 px-4 py-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8',
+            : 'relative -mx-4 mt-2 px-4 py-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8'
         )}
       >
-        {stuck ? (
-          <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>{chips}</div>
-        ) : (
-          chips
-        )}
+        {stuck ? <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>{chips}</div> : chips}
       </div>
       {stuck ? <div style={{ height: barHeight }} aria-hidden /> : null}
     </>
   )
 }
 
-export function CommunityListScreen({
-  boardId,
-  title,
-}: CommunityListScreenProps) {
+export function CommunityListScreen({ boardId, title }: CommunityListScreenProps) {
   if (boardId === 'roommate') {
     return <RoommateListScreen />
   }
@@ -226,11 +234,10 @@ export function CommunityListScreen({
   return <CommunityBoardListScreen boardId={boardId} title={title} />
 }
 
-function CommunityBoardListScreen({
-  boardId,
-  title,
-}: CommunityListScreenProps) {
-  const meta = NYC_COMMUNITY_BOARD_META[boardId]
+function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) {
+  const city = useCity()
+  const href = useCityPath()
+  const meta = getCommunityBoardMeta(boardId, city)
   const { user, profile, loading: authLoading } = useAuth()
   const { error: toastError } = useToast()
   const [posts, setPosts] = useState<CommunityPost[]>([])
@@ -240,9 +247,7 @@ function CommunityBoardListScreen({
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortOption>('newest')
-  const [foodCategory, setFoodCategory] = useState<FoodCategoryId | 'all'>(
-    'all',
-  )
+  const [foodCategory, setFoodCategory] = useState<FoodCategoryId | 'all'>('all')
   const [foodCuisine, setFoodCuisine] = useState<FoodCuisineId | 'all'>('all')
   const [draftQuery, setDraftQuery] = useState('')
   const [draftSort, setDraftSort] = useState<SortOption>('newest')
@@ -253,9 +258,16 @@ function CommunityBoardListScreen({
   const isAnonymous = isAnonymousBoard(boardId)
   const anonymousNotice = useAnonymousBoardNotice(isAnonymous)
   const [cptOptType, setCptOptType] = useState<CptOptTypeId | 'all'>('all')
-  const [jobReviewType, setJobReviewType] = useState<JobReviewTypeId | 'all'>(
-    'all',
-  )
+  const [statusCity, setStatusCity] = useState<CityId | 'all'>('all')
+  const [statusSchool, setStatusSchool] = useState<string | 'all'>('all')
+  const [draftCptOptType, setDraftCptOptType] = useState<CptOptTypeId | 'all'>('all')
+  const [draftStatusCity, setDraftStatusCity] = useState<CityId | 'all'>('all')
+  const [draftStatusSchool, setDraftStatusSchool] = useState<string | 'all'>('all')
+  const [jobReviewType, setJobReviewType] = useState<JobReviewTypeId | 'all'>('all')
+  const [draftJobReviewType, setDraftJobReviewType] = useState<JobReviewTypeId | 'all'>('all')
+  const [jobReviewEmployer, setJobReviewEmployer] = useState<EmployerFilter>(EMPTY_EMPLOYER_FILTER)
+  const [draftJobReviewEmployer, setDraftJobReviewEmployer] =
+    useState<EmployerFilter>(EMPTY_EMPLOYER_FILTER)
   /** 푸터가 보이면 플로팅 버튼 숨김 (푸터 위로 올리지 않음) */
   const [mapFabHidden, setMapFabHidden] = useState(false)
 
@@ -277,12 +289,11 @@ function CommunityBoardListScreen({
         // 푸터가 살짝만 들어와도 버튼이 겹치기 전에 숨김
         rootMargin: '0px 0px -48px 0px',
         threshold: 0,
-      },
+      }
     )
     observer.observe(footer)
     return () => observer.disconnect()
   }, [isFoodBoard])
-
 
   const loadPosts = useCallback(
     async (opts?: { silent?: boolean }) => {
@@ -291,7 +302,7 @@ function CommunityBoardListScreen({
         setError(null)
       }
       try {
-        const data = await fetchCommunityPosts(boardId)
+        const data = await fetchCommunityPosts(boardId, city)
         setPosts(data)
         setError(null)
       } catch (err) {
@@ -303,7 +314,7 @@ function CommunityBoardListScreen({
         setLoading(false)
       }
     },
-    [boardId, toastError],
+    [boardId, city, toastError]
   )
 
   useEffect(() => {
@@ -327,22 +338,24 @@ function CommunityBoardListScreen({
       next = next.filter((post) => post.foodCategory === foodCategory)
     }
     if (isFoodBoard && foodCuisine !== 'all') {
-      next = next.filter(
-        (post) => normalizeFoodCuisine(post.detail) === foodCuisine,
-      )
+      next = next.filter((post) => normalizeFoodCuisine(post.detail) === foodCuisine)
     }
     if (isCptOptBoard && cptOptType !== 'all') {
-      next = next.filter(
-        (post) =>
-          normalizeCptOptType(post.cptOptType, post.detail) === cptOptType,
-      )
+      next = next.filter((post) => normalizeCptOptType(post.cptOptType, post.detail) === cptOptType)
+    }
+    if (isCptOptBoard && statusCity !== 'all') {
+      next = next.filter((post) => resolvePostCity(post.city) === statusCity)
+    }
+    if (isCptOptBoard && statusSchool !== 'all') {
+      next = next.filter((post) => post.authorSchoolId === statusSchool)
     }
     if (isJobReviewBoard && jobReviewType !== 'all') {
       next = next.filter(
-        (post) =>
-          normalizeJobReviewType(post.jobReviewType, post.detail) ===
-          jobReviewType,
+        (post) => normalizeJobReviewType(post.jobReviewType, post.detail) === jobReviewType
       )
+    }
+    if (isJobReviewBoard && isEmployerFilterActive(jobReviewEmployer)) {
+      next = next.filter((post) => matchesEmployerFilter(post.location, jobReviewEmployer))
     }
     if (!isFoodBoard && q) {
       next = next.filter((post) => {
@@ -353,6 +366,7 @@ function CommunityBoardListScreen({
           post.detail,
           ...(isCptOptBoard
             ? [
+                post.authorSchoolName,
                 post.cptOptTips,
                 ...(post.cptOptTimeline ?? []).flatMap((entry) => [
                   entry.prepared,
@@ -389,9 +403,7 @@ function CommunityBoardListScreen({
           ? getJobReviewListTimestamp(post)
           : post.createdAt
     return [...next].sort((a, b) =>
-      sort === 'newest'
-        ? getSortTime(b) - getSortTime(a)
-        : getSortTime(a) - getSortTime(b),
+      sort === 'newest' ? getSortTime(b) - getSortTime(a) : getSortTime(a) - getSortTime(b)
     )
   }, [
     posts,
@@ -400,7 +412,10 @@ function CommunityBoardListScreen({
     foodCategory,
     foodCuisine,
     cptOptType,
+    statusCity,
+    statusSchool,
     jobReviewType,
+    jobReviewEmployer,
     isFoodBoard,
     isCptOptBoard,
     isJobReviewBoard,
@@ -409,7 +424,7 @@ function CommunityBoardListScreen({
   /** 지도: 실데이터 + 복수 후기 목데이터(같은 placeId)를 합쳐 핀 데모 */
   const mapPosts = useMemo(() => {
     if (!isFoodBoard) return filteredPosts
-    const mocks = listMockCommunityPosts('food')
+    const mocks = listMockCommunityPosts('food', city)
     const byId = new Map<string, CommunityPost>()
     for (const post of mocks) byId.set(post.id, post)
     for (const post of filteredPosts) byId.set(post.id, post)
@@ -418,127 +433,126 @@ function CommunityBoardListScreen({
       merged = merged.filter((post) => post.foodCategory === foodCategory)
     }
     if (foodCuisine !== 'all') {
-      merged = merged.filter(
-        (post) => normalizeFoodCuisine(post.detail) === foodCuisine,
-      )
+      merged = merged.filter((post) => normalizeFoodCuisine(post.detail) === foodCuisine)
     }
     return merged.sort((a, b) => b.createdAt - a.createdAt)
-  }, [filteredPosts, foodCategory, foodCuisine, isFoodBoard])
+  }, [city, filteredPosts, foodCategory, foodCuisine, isFoodBoard])
 
   const activeFilterCount =
-    (query.trim() ? 1 : 0) + (sort !== 'newest' ? 1 : 0)
+    (query.trim() ? 1 : 0) +
+    (sort !== 'newest' ? 1 : 0) +
+    (isCptOptBoard && cptOptType !== 'all' ? 1 : 0) +
+    (isCptOptBoard && statusCity !== 'all' ? 1 : 0) +
+    (isCptOptBoard && statusSchool !== 'all' ? 1 : 0) +
+    (isJobReviewBoard && jobReviewType !== 'all' ? 1 : 0) +
+    (isJobReviewBoard && isEmployerFilterActive(jobReviewEmployer) ? 1 : 0)
 
   function openFilters() {
     setDraftQuery(query)
     setDraftSort(sort)
+    setDraftCptOptType(cptOptType)
+    setDraftStatusCity(statusCity)
+    setDraftStatusSchool(statusSchool)
+    setDraftJobReviewType(jobReviewType)
+    setDraftJobReviewEmployer(jobReviewEmployer)
     setFiltersOpen(true)
   }
 
   function applyFilters() {
     setQuery(draftQuery)
     setSort(draftSort)
+    if (isCptOptBoard) {
+      setCptOptType(draftCptOptType)
+      setStatusCity(draftStatusCity)
+      setStatusSchool(draftStatusSchool)
+    }
+    if (isJobReviewBoard) {
+      setJobReviewType(draftJobReviewType)
+      setJobReviewEmployer(draftJobReviewEmployer)
+    }
     setFiltersOpen(false)
   }
 
   function clearFilters() {
     setDraftQuery('')
     setDraftSort('newest')
+    setDraftCptOptType('all')
+    setDraftStatusCity('all')
+    setDraftStatusSchool('all')
+    setDraftJobReviewType('all')
+    setDraftJobReviewEmployer(EMPTY_EMPLOYER_FILTER)
   }
 
-  const newPath = `/nyc/${boardId}/new`
-  const loginNext = `/nyc/login?next=${encodeURIComponent(newPath)}`
-  const schoolVerified = isSchoolVerified(profile)
+  const newPath = href(`/${boardId}/new`)
+  const loginNext = cityLoginPath(city, newPath)
+  const identityVerified = isIdentityVerified(profile)
   const suspended = isAccountSuspended(profile)
-  const canWrite = Boolean(user) && schoolVerified && !suspended
+  const canWrite = Boolean(user) && identityVerified && !suspended
+  const verifyCta = getIdentityVerifyCtaLabel(profile)
   const postHref = !user
     ? loginNext
     : suspended
-      ? '/nyc/me'
-      : schoolVerified
+      ? href('/me')
+      : identityVerified
         ? newPath
-        : getSchoolVerifyHref(newPath)
+        : getIdentityVerifyHref(newPath, profile)
   const writeCtaLabel = !user
     ? '로그인'
     : suspended
       ? '이용 정지'
-      : schoolVerified
+      : identityVerified
         ? meta.writeLabel
-        : '학교 인증하기'
+        : verifyCta
   const showWriteCta = !authLoading && Boolean(user) && !suspended
 
   const listSection = (
     <section className={cn('pt-4 sm:pt-5', isFoodBoard ? 'pb-20 sm:pb-24' : 'pb-14 sm:pb-16')}>
-      {loading && (
-        <LoadingState className='py-20' label='글을 불러오는 중이에요…' />
-      )}
+      {loading && <LoadingState className='py-20' label='글을 불러오는 중이에요…' />}
 
       {!loading && error && (
         <EmptyState
           title='목록을 불러오지 못했어요'
           description={error}
-          actionHref={`/nyc/${boardId}`}
+          actionHref={href(`/${boardId}`)}
           actionLabel='다시 시도'
         />
       )}
 
       {!loading && !error && filteredPosts.length === 0 && (
         <EmptyState
-          title={
-            posts.length === 0
-              ? `아직 ${title} 글이 없습니다`
-              : '조건에 맞는 글이 없어요'
-          }
+          title={posts.length === 0 ? `아직 ${title} 글이 없습니다` : '조건에 맞는 글이 없어요'}
           description={
             posts.length === 0
               ? canWrite
                 ? '첫 글을 올려 커뮤니티를 시작해 보세요.'
                 : user
-                  ? '학교 이메일 인증 후 글을 올릴 수 있어요.'
+                  ? '학생 또는 직장인 인증 후 글을 올릴 수 있어요.'
                   : '로그인 후 글을 올릴 수 있어요.'
-                : isFoodBoard
-                ? '다른 분위기·음식 종류를 선택해 보세요.'
+              : isFoodBoard
+                ? '다른 분위기 · 음식 종류를 선택해 보세요.'
                 : isCptOptBoard
                   ? '다른 유형(CPT/OPT/STEM OPT)을 선택해 보세요.'
                   : isJobReviewBoard
-                    ? '다른 유형(인턴·신입·경력·계약)을 선택해 보세요.'
-                : '필터를 바꿔 다시 찾아 보세요.'
+                    ? '다른 유형이나 회사를 선택해 보세요.'
+                    : '필터를 바꿔 다시 찾아 보세요.'
           }
-          actionHref={
-            posts.length === 0
-              ? postHref
-              : undefined
-          }
-          actionLabel={
-            posts.length === 0
-              ? writeCtaLabel
-              : undefined
-          }
+          actionHref={posts.length === 0 ? postHref : undefined}
+          actionLabel={posts.length === 0 ? writeCtaLabel : undefined}
         />
       )}
 
       {!loading && filteredPosts.length > 0 && (
-        <>
-          <p className='mb-3.5 text-[12px] font-medium text-[var(--muted)] sm:mb-4 sm:text-[13px]'>
-            {!isFoodBoard && (query.trim() || sort !== 'newest')
-              ? `검색 결과 ${filteredPosts.length}`
-              : `${filteredPosts.length}개의 글`}
-          </p>
-          <div
-            className={
-              isFoodBoard
-                ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-5'
-                : 'flex flex-col gap-4 sm:gap-5'
-            }
-          >
-            {filteredPosts.map((post) => (
-              <CommunityPostCard
-                key={post.id}
-                post={post}
-                boardId={boardId}
-              />
-            ))}
-          </div>
-        </>
+        <div
+          className={
+            isFoodBoard
+              ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-5'
+              : 'flex flex-col gap-4 sm:gap-5'
+          }
+        >
+          {filteredPosts.map((post) => (
+            <CommunityPostCard key={post.id} post={post} boardId={boardId} />
+          ))}
+        </div>
       )}
     </section>
   )
@@ -549,7 +563,7 @@ function CommunityBoardListScreen({
         breadcrumbLabel={title}
         intro={meta.listIntro}
         writeHref={postHref}
-        writeLabel={schoolVerified ? meta.writeLabel : '학교 인증하기'}
+        writeLabel={identityVerified ? meta.writeLabel : verifyCta}
         showWrite={showWriteCta}
         showFilter={!isFoodBoard}
         onFilterClick={isFoodBoard ? undefined : openFilters}
@@ -565,57 +579,6 @@ function CommunityBoardListScreen({
         />
       ) : null}
 
-      {isCptOptBoard ? (
-        <div className='mt-2 pb-1'>
-          <ChipScrollRow
-            ariaLabel='CPT OPT 유형'
-            edgeColor='#ffffff'
-            leading={
-              <BoardQuickChip
-                label='전체'
-                active={cptOptType === 'all'}
-                onClick={() => setCptOptType('all')}
-              />
-            }
-          >
-            {CPT_OPT_TYPES.map((item) => (
-              <BoardQuickChip
-                key={item.id}
-                label={item.label}
-                active={cptOptType === item.id}
-                onClick={() => setCptOptType(item.id)}
-              />
-            ))}
-          </ChipScrollRow>
-        </div>
-      ) : null}
-
-      {isJobReviewBoard ? (
-        <div className='mt-2 pb-1'>
-          <ChipScrollRow
-            ariaLabel='취업 후기 유형'
-            edgeColor='#ffffff'
-            leading={
-              <BoardQuickChip
-                label='전체'
-                active={jobReviewType === 'all'}
-                onClick={() => setJobReviewType('all')}
-              />
-            }
-          >
-            {JOB_REVIEW_TYPES.map((item) => (
-              <BoardQuickChip
-                key={item.id}
-                label={item.label}
-                active={jobReviewType === item.id}
-                onClick={() => setJobReviewType(item.id)}
-              />
-            ))}
-          </ChipScrollRow>
-        </div>
-      ) : null}
-
-
       {isFoodBoard && viewMode === 'map' ? (
         <section className='relative mt-3 pb-[5.5rem]'>
           {loading ? (
@@ -626,7 +589,7 @@ function CommunityBoardListScreen({
             <EmptyState
               title='목록을 불러오지 못했어요'
               description={error}
-              actionHref={`/nyc/${boardId}`}
+              actionHref={href(`/${boardId}`)}
               actionLabel='다시 시도'
             />
           ) : (
@@ -645,9 +608,7 @@ function CommunityBoardListScreen({
         <div
           className={cn(
             'pointer-events-none fixed inset-x-0 bottom-0 z-[95] flex justify-center pb-[max(1.25rem,env(safe-area-inset-bottom))] transition duration-200 ease-out',
-            mapFabHidden
-              ? 'translate-y-3 opacity-0'
-              : 'translate-y-0 opacity-100',
+            mapFabHidden ? 'translate-y-3 opacity-0' : 'translate-y-0 opacity-100'
           )}
           aria-hidden={mapFabHidden}
         >
@@ -655,9 +616,7 @@ function CommunityBoardListScreen({
             type='button'
             tabIndex={mapFabHidden ? -1 : 0}
             disabled={mapFabHidden}
-            onClick={() =>
-              setViewMode((mode) => (mode === 'list' ? 'map' : 'list'))
-            }
+            onClick={() => setViewMode((mode) => (mode === 'list' ? 'map' : 'list'))}
             className='pointer-events-auto inline-flex h-12 items-center gap-2 rounded-full bg-white px-5 text-[14px] font-semibold text-[var(--foreground)] shadow-[0_4px_6px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.14)] ring-1 ring-black/[0.06] touch-manipulation transition hover:bg-[#fafbfc] active:scale-[0.98] disabled:pointer-events-none'
             aria-label={viewMode === 'list' ? '지도로 보기' : '리스트로 보기'}
           >
@@ -701,10 +660,74 @@ function CommunityBoardListScreen({
           }
         >
           <div className='space-y-6 px-4 pb-2'>
+            {isCptOptBoard ? (
+              <>
+                <FilterChipSection
+                  title='유형'
+                  ariaLabel='CPT OPT 유형'
+                  options={[
+                    { id: 'all', label: '전체' },
+                    ...CPT_OPT_TYPES.map((item) => ({
+                      id: item.id,
+                      label: item.label,
+                    })),
+                  ]}
+                  value={draftCptOptType}
+                  onChange={setDraftCptOptType}
+                />
+                <FilterChipSection
+                  title='도시'
+                  ariaLabel='도시'
+                  options={[
+                    { id: 'all', label: '전체' },
+                    ...CITY_IDS.map((id) => ({
+                      id,
+                      label: getCity(id).shortLabel,
+                    })),
+                  ]}
+                  value={draftStatusCity}
+                  onChange={setDraftStatusCity}
+                />
+                <FilterChipSection
+                  title='학교'
+                  ariaLabel='학교'
+                  options={[
+                    { id: 'all', label: '전체' },
+                    ...VERIFIED_SCHOOLS.map((school) => ({
+                      id: school.id,
+                      label: school.shortName,
+                    })),
+                  ]}
+                  value={draftStatusSchool}
+                  onChange={setDraftStatusSchool}
+                />
+              </>
+            ) : null}
+
+            {isJobReviewBoard ? (
+              <>
+                <FilterChipSection
+                  title='유형'
+                  ariaLabel='면접·취업 유형'
+                  options={[
+                    { id: 'all', label: '전체' },
+                    ...JOB_REVIEW_TYPES.map((item) => ({
+                      id: item.id,
+                      label: item.label,
+                    })),
+                  ]}
+                  value={draftJobReviewType}
+                  onChange={setDraftJobReviewType}
+                />
+                <EmployerFilterSection
+                  value={draftJobReviewEmployer}
+                  onChange={setDraftJobReviewEmployer}
+                />
+              </>
+            ) : null}
+
             <section>
-              <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>
-                검색
-              </h4>
+              <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>검색</h4>
               <input
                 value={draftQuery}
                 onChange={(e) => setDraftQuery(e.target.value)}
@@ -714,20 +737,17 @@ function CommunityBoardListScreen({
             </section>
 
             <section>
-              <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>
-                정렬
-              </h4>
+              <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>정렬</h4>
               <div className='mt-2 grid grid-cols-2 gap-2'>
-                {(
-                  isCptOptBoard || isJobReviewBoard
-                    ? ([
-                        { id: 'newest', label: '최근 업데이트순' },
-                        { id: 'oldest', label: '오래된 업데이트순' },
-                      ] as const)
-                    : ([
-                        { id: 'newest', label: '최신순' },
-                        { id: 'oldest', label: '오래된순' },
-                      ] as const)
+                {(isCptOptBoard || isJobReviewBoard
+                  ? ([
+                      { id: 'newest', label: '최근 업데이트순' },
+                      { id: 'oldest', label: '오래된 업데이트순' },
+                    ] as const)
+                  : ([
+                      { id: 'newest', label: '최신순' },
+                      { id: 'oldest', label: '오래된순' },
+                    ] as const)
                 ).map((option) => {
                   const active = draftSort === option.id
                   return (
@@ -739,7 +759,7 @@ function CommunityBoardListScreen({
                         'h-11 rounded-xl border text-[13px] font-semibold touch-manipulation transition',
                         active
                           ? 'border-[var(--foreground)] bg-white text-[var(--foreground)]'
-                          : 'border-black/[0.08] bg-white text-[var(--muted-foreground)] hover:border-black/15',
+                          : 'border-black/[0.08] bg-white text-[var(--muted-foreground)] hover:border-black/15'
                       )}
                     >
                       {option.label}
@@ -763,6 +783,92 @@ function CommunityBoardListScreen({
   )
 }
 
+function EmployerFilterSection({
+  value,
+  onChange,
+}: {
+  value: EmployerFilter
+  onChange: (next: EmployerFilter) => void
+}) {
+  const categoryOptions = STATUS_EMPLOYER_OPTIONS.filter(
+    (option) => option.value !== STATUS_EMPLOYER_OTHER_VALUE
+  )
+
+  return (
+    <section>
+      <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>회사</h4>
+      <div className='mt-2 flex flex-wrap gap-1.5' aria-label='회사 필터'>
+        <BoardQuickChip
+          label='전체'
+          active={value.mode === 'all'}
+          onClick={() => onChange(EMPTY_EMPLOYER_FILTER)}
+        />
+        <BoardQuickChip
+          label='회사명'
+          active={value.mode === 'name'}
+          onClick={() => onChange({ mode: 'name', name: value.name, category: '' })}
+        />
+        <BoardQuickChip
+          label='회사 카테고리'
+          active={value.mode === 'category'}
+          onClick={() => onChange({ mode: 'category', name: '', category: value.category })}
+        />
+      </div>
+      {value.mode === 'name' ? (
+        <input
+          value={value.name}
+          onChange={(e) => onChange({ ...value, mode: 'name', name: e.target.value })}
+          placeholder='회사명으로 검색'
+          className='mt-2 h-11 w-full rounded-xl border border-black/[0.08] bg-[#fafbfc] px-3.5 text-[15px] outline-none transition placeholder:text-[var(--muted)] focus:border-black/20 focus:bg-white'
+        />
+      ) : null}
+      {value.mode === 'category' ? (
+        <div className='mt-2'>
+          <BottomSheetSelect
+            title='회사 카테고리'
+            value={value.category}
+            options={categoryOptions}
+            onChange={(category) => onChange({ mode: 'category', name: '', category })}
+            placeholder='카테고리를 선택해 주세요'
+            emptyOption={{ value: '', label: '선택 안 함' }}
+            overlayClassName='z-[10060]'
+          />
+        </div>
+      ) : null}
+    </section>
+  )
+}
+
+function FilterChipSection<T extends string>({
+  title,
+  ariaLabel,
+  options,
+  value,
+  onChange,
+}: {
+  title: string
+  ariaLabel: string
+  options: ReadonlyArray<{ id: T; label: string }>
+  value: T
+  onChange: (value: T) => void
+}) {
+  return (
+    <section>
+      <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>{title}</h4>
+      <div className='mt-2 flex flex-wrap gap-1.5' aria-label={ariaLabel}>
+        {options.map((option) => (
+          <BoardQuickChip
+            key={option.id}
+            label={option.label}
+            active={value === option.id}
+            onClick={() => onChange(option.id)}
+          />
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function MapIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -778,11 +884,7 @@ function MapIcon({ className }: { className?: string }) {
         strokeLinejoin='round'
         d='M9 4.5 3.75 6.75v12.75L9 17.25l6 2.25 5.25-2.25V4.5L15 6.75 9 4.5Z'
       />
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        d='M9 4.5v12.75M15 6.75v12.75'
-      />
+      <path strokeLinecap='round' strokeLinejoin='round' d='M9 4.5v12.75M15 6.75v12.75' />
     </svg>
   )
 }

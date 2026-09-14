@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { FormEvent } from 'react'
 import { useState } from 'react'
 
+import { useCityPath } from '@hooks/useCity'
 import { useRequireAuth } from '@hooks/useRequireAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
@@ -13,8 +14,9 @@ import { LoadingState } from '@components'
 import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
 
 export function HousingNewScreen() {
+  const href = useCityPath()
   const { user, loading, isAuthenticated, isMisaengUser } = useRequireAuth(
-    '/nyc/housing/new',
+    href('/housing/new'),
   )
   const { error: toastError } = useToast()
   const [submitting, setSubmitting] = useState(false)
@@ -75,7 +77,7 @@ export function HousingNewScreen() {
         },
       )
       success('하우징 글을 등록했어요')
-      router.push(`/nyc/housing/${id}`)
+      router.push(href(`/housing/${id}`))
       */
     } catch (err) {
       toastError(getErrorMessage(err, '등록에 실패했어요'))
@@ -112,7 +114,7 @@ export function HousingNewScreen() {
         </p>
         <div className='mt-6 flex flex-wrap gap-3'>
           <Link
-            href='/nyc/housing'
+            href={href('/housing')}
             className='rounded-full border border-[var(--border)] px-5 py-2.5 text-sm font-semibold'
           >
             하우징 목록
@@ -126,7 +128,7 @@ export function HousingNewScreen() {
     <div className='min-h-screen bg-[var(--background)]'>
       <div className='mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-12'>
         <p className='text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]'>
-          <Link href='/nyc/housing' className='hover:text-[#F64310]'>
+          <Link href={href('/housing')} className='hover:text-[#F64310]'>
             하우징
           </Link>{' '}
           / 등록

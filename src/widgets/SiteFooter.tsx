@@ -2,14 +2,15 @@
 
 import { usePathname } from 'next/navigation'
 
+import { isCitySitePathname } from '@lib/constants/cities'
 import { CorporateFooter } from '@widgets/CorporateFooter'
 import { NycFooter } from '@widgets/NycFooter'
 
 export function SiteFooter() {
   const pathname = usePathname()
-  const isNyc = pathname === '/nyc' || pathname.startsWith('/nyc/')
+  const isCitySite = isCitySitePathname(pathname)
 
-  if (isNyc) {
+  if (isCitySite) {
     return <NycFooter />
   }
 

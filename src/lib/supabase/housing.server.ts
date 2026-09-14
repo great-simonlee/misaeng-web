@@ -1,3 +1,7 @@
+import {
+  housingListingMatchesCity,
+  type CityId,
+} from '@lib/constants/cities'
 import { normalizeHousingListing } from '@lib/housing/normalize'
 import type { HousingListing } from '@/types/nyc'
 
@@ -70,7 +74,9 @@ async function fetchListingJson(bucket: string, objectPath: string) {
   return normalizeHousingListing(data)
 }
 
-export async function listStoredHousingListings(): Promise<HousingListing[]> {
+export async function listStoredHousingListings(
+  city?: CityId,
+): Promise<HousingListing[]> {
   if (!isHousingStorageConfigured()) return []
 
   const bucket = await resolveBucket()
@@ -106,6 +112,9 @@ export async function listStoredHousingListings(): Promise<HousingListing[]> {
 
   return listings
     .filter((listing) => listing.status === 'open')
+    .filter((listing) =>
+      city ? housingListingMatchesCity(listing, city) : true,
+    )
     .sort((a, b) => b.createdAt - a.createdAt)
 }
 

@@ -5,7 +5,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { SchoolBadge, UserAvatar } from '@components'
 import { useAuth } from '@hooks/useAuth'
+import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import { cityLoginPath } from '@lib/constants/cities'
 import { maskAnonymousDisplayName } from '@lib/community/anonymous'
 import {
   getCommentAuthorDisplayName,
@@ -21,9 +23,10 @@ import {
 import { createCommunityReportRequest } from '@lib/community/engagement.client'
 import {
   ACCOUNT_SUSPENDED_MESSAGE,
-  getSchoolVerifyHref,
+  getIdentityVerifyHref,
+  getIdentityVerifyLinkLabel,
   isAccountSuspended,
-  isSchoolVerified,
+  isIdentityVerified,
   SCHOOL_VERIFY_REQUIRED_MESSAGE,
 } from '@lib/community/schoolGate'
 import { formatCommunityRelativeTime } from '@lib/constants/communityMock'
@@ -47,6 +50,8 @@ export function CommunityCommentsSection({
   loginNext,
   onCountChange,
 }: CommunityCommentsSectionProps) {
+  const city = useCity()
+  const href = useCityPath()
   const { user, profile, nickname, loading: authLoading } = useAuth()
   const { error: toastError, success } = useToast()
   const myNickname = useMemo(
@@ -108,12 +113,11 @@ export function CommunityCommentsSection({
 
   const threads = useMemo(() => buildCommentThreads(comments), [comments])
   const totalCount = countOpenComments(comments)
-  const loginHref = `/nyc/login?next=${encodeURIComponent(
-    loginNext || `/nyc`,
-  )}`
-  const schoolVerified = isSchoolVerified(profile)
-  const schoolVerifyHref = getSchoolVerifyHref(loginNext || `/nyc`)
-  const canCompose = Boolean(user) && schoolVerified && !isAccountSuspended(profile)
+  const fallbackNext = loginNext || href()
+  const loginHref = cityLoginPath(city, fallbackNext)
+  const identityVerified = isIdentityVerified(profile)
+  const verifyHref = getIdentityVerifyHref(fallbackNext, profile)
+  const canCompose = Boolean(user) && identityVerified && !isAccountSuspended(profile)
 
   async function submitComment(body: string, parentId: string | null) {
     if (!user?.uid || !user.email) return
@@ -121,7 +125,7 @@ export function CommunityCommentsSection({
       toastError(ACCOUNT_SUSPENDED_MESSAGE)
       return
     }
-    if (!isSchoolVerified(profile)) {
+    if (!isIdentityVerified(profile)) {
       toastError(SCHOOL_VERIFY_REQUIRED_MESSAGE)
       return
     }
@@ -315,14 +319,14 @@ export function CommunityCommentsSection({
           <div className='mt-4 rounded-xl bg-red-50 px-4 py-3.5 text-[13px] text-red-700'>
             {ACCOUNT_SUSPENDED_MESSAGE}
           </div>
-        ) : !schoolVerified ? (
+        ) : !identityVerified ? (
           <div className='mt-4 rounded-xl bg-[#f7f8fa] px-4 py-3.5 text-[13px] text-[var(--muted-foreground)]'>
             댓글을 쓰려면{' '}
             <Link
-              href={schoolVerifyHref}
+              href={verifyHref}
               className='font-semibold text-[var(--brand)] underline-offset-2 hover:underline'
             >
-              학교 이메일 인증
+              {getIdentityVerifyLinkLabel(profile)}
             </Link>
             이 필요해요.
           </div>

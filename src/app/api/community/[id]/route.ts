@@ -36,6 +36,7 @@ import {
   normalizeTotalSpend,
   normalizeWaitMinutes,
 } from '@lib/community/food'
+import { parseCityId } from '@lib/constants/cities'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import {
@@ -90,6 +91,7 @@ type UpdateBody = {
   roommateBudgetMax?: number | null
   roommateMoveInDate?: string | null
   roommateMoveOutDate?: string | null
+  city?: string | null
 }
 
 export async function GET(_request: Request, context: RouteContext) {
@@ -458,6 +460,9 @@ export async function PATCH(request: Request, context: RouteContext) {
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
     roommateMoveInDate: isRoommate ? roommateMoveInDate : null,
     roommateMoveOutDate: isRoommate ? roommateMoveOutDate : null,
+    city: isCptOpt
+      ? parseCityId(body.city) ?? existing.city
+      : existing.city,
   }
 
   try {

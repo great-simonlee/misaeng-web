@@ -14,6 +14,8 @@ const FALLBACK_BUCKET = 'avatars'
 const POLICY_PATH = 'legal/policy.json'
 const LOG_PREFIX = 'legal/consent-logs/'
 const LATEST_PREFIX = 'legal/consent-latest/'
+const WRITE_LOG_PREFIX = 'legal/write-consent-logs/'
+const WRITE_LATEST_PREFIX = 'legal/write-consent-latest/'
 
 function getSupabaseUrl() {
   return (
@@ -364,4 +366,150 @@ export function bilingualError(en: string, ko: string) {
     errorEn: en,
     errorKo: ko,
   }
+}
+
+export type WriteConsentSource =
+  | 'status'
+  | 'job-review'
+  | 'roommate'
+  | 'anonymous'
+
+export function normalizeWriteConsentSource(
+  value: unknown,
+): WriteConsentSource {
+  if (
+    value === 'job-review' ||
+    value === 'roommate' ||
+    value === 'anonymous'
+  ) {
+    return value
+  }
+  return 'status'
+}
+
+export type WriteConsentLog = {
+  id: string
+  user_id: string
+  email: string | null
+  guidelines_version: string
+  guidelines: string[]
+  source: WriteConsentSource
+  consented_at: string
+  ip_address: string | null
+  user_agent: string | null
+}
+
+function writeLogObjectPath(id: string) {
+  return `${WRITE_LOG_PREFIX}${id}.json`
+}
+
+function writeLatestObjectPath(userId: string) {
+  return `${WRITE_LATEST_PREFIX}${safeSegment(userId)}.json`
+}
+
+function normalizeWriteConsentLog(raw: unknown): WriteConsentLog | null {
+  if (!raw || typeof raw !== 'object') return null
+  const data = raw as Record<string, unknown>
+  const id = String(data.id || '').trim()
+  const userId = String(data.user_id || data.userId || '').trim()
+  const version = String(
+    data.guidelines_version || data.guidelinesVersion || '',
+  ).trim()
+  const consentedAt = String(data.consented_at || data.consentedAt || '').trim()
+  if (!id || !userId || !version || !consentedAt) return null
+  const source = normalizeWriteConsentSource(data.source)
+  const guidelines = Array.isArray(data.guidelines)
+    ? data.guidelines.map((item) => String(item || '').trim()).filter(Boolean)
+    : []
+  return {
+    id,
+    user_id: userId,
+    email:
+      typeof data.email === 'string' && data.email.trim()
+        ? data.email.trim()
+        : null,
+    guidelines_version: version,
+    guidelines,
+    source,
+    consented_at: consentedAt,
+    ip_address:
+      typeof data.ip_address === 'string'
+        ? data.ip_address
+        : typeof data.ipAddress === 'string'
+          ? data.ipAddress
+          : null,
+    user_agent:
+      typeof data.user_agent === 'string'
+        ? data.user_agent
+        : typeof data.userAgent === 'string'
+          ? data.userAgent
+          : null,
+  }
+}
+
+export async function getLatestWriteConsent(
+  userId: string,
+): Promise<WriteConsentLog | null> {
+  const id = String(userId || '').trim()
+  if (!id || !isLegalConsentStorageConfigured()) return null
+  const bucket = await resolveBucket()
+  return normalizeWriteConsentLog(
+    await fetchJsonObject(bucket, writeLatestObjectPath(id)),
+  )
+}
+
+export async function getWriteConsentStatus(
+  userId: string,
+  currentVersion: string,
+) {
+  const latest = await getLatestWriteConsent(userId)
+  return {
+    required: !latest || latest.guidelines_version !== currentVersion,
+    currentVersion,
+    current: latest
+      ? {
+          version: latest.guidelines_version,
+          consentedAt: latest.consented_at,
+          source: latest.source,
+        }
+      : null,
+  }
+}
+
+export async function appendWriteConsentLog(input: {
+  userId: string
+  email?: string | null
+  guidelinesVersion: string
+  guidelines: readonly string[]
+  source: WriteConsentSource
+  ipAddress?: string | null
+  userAgent?: string | null
+}): Promise<WriteConsentLog> {
+  if (!isLegalConsentStorageConfigured()) {
+    throw new Error(
+      'Legal storage is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+    )
+  }
+
+  const consentedAt = new Date().toISOString()
+  const id = `write_${consentedAt.replace(/[:.]/g, '-')}_${Math.random()
+    .toString(36)
+    .slice(2, 10)}`
+
+  const log: WriteConsentLog = {
+    id,
+    user_id: String(input.userId).trim(),
+    email: input.email?.trim() || null,
+    guidelines_version: input.guidelinesVersion,
+    guidelines: [...input.guidelines],
+    source: input.source,
+    consented_at: consentedAt,
+    ip_address: input.ipAddress || null,
+    user_agent: input.userAgent || null,
+  }
+
+  const bucket = await resolveBucket()
+  await upsertJsonObject(bucket, writeLogObjectPath(id), log)
+  await upsertJsonObject(bucket, writeLatestObjectPath(log.user_id), log)
+  return log
 }

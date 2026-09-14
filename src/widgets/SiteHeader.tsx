@@ -2,14 +2,15 @@
 
 import { usePathname } from 'next/navigation'
 
+import { isCitySitePathname } from '@lib/constants/cities'
 import { Navbar } from '@widgets/Navbar'
 import { NycNavbar } from '@widgets/NycNavbar'
 
 export function SiteHeader() {
   const pathname = usePathname()
-  const isNyc = pathname === '/nyc' || pathname.startsWith('/nyc/')
+  const isCitySite = isCitySitePathname(pathname)
 
-  if (isNyc) {
+  if (isCitySite) {
     return <NycNavbar />
   }
 

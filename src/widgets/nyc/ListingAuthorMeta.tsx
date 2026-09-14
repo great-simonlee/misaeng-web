@@ -32,7 +32,7 @@ export function ListingAuthorMeta({
         size='sm'
         className='!h-5 !w-5 text-[9px]'
       />
-      <span className='max-w-[7.5rem] truncate font-semibold text-[var(--muted-foreground)] sm:max-w-[10rem]'>
+      <span className='font-semibold text-[var(--muted-foreground)]'>
         {authorName}
       </span>
       {showSchool ? (

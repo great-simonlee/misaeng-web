@@ -1,10 +1,15 @@
+'use client'
+
 import Link from 'next/link'
+
+import { useCityPath } from '@hooks/useCity'
 
 interface SupabaseConfigBannerProps {
   className?: string
 }
 
 export function SupabaseConfigBanner({ className }: SupabaseConfigBannerProps) {
+  const href = useCityPath()
   return (
     <div
       className={
@@ -19,7 +24,7 @@ export function SupabaseConfigBanner({ className }: SupabaseConfigBannerProps) {
       참고). 설정 전에는 화면은 볼 수 있지만 데이터 저장·프로필 사진 업로드는
       동작하지 않습니다.{' '}
       <Link
-        href='/nyc/login'
+        href={href('/login')}
         className='font-semibold underline-offset-2 hover:underline'
       >
         로그인 페이지

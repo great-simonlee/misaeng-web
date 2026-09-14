@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 
 import { BottomSheet } from '@components'
+import { useCityPath } from '@hooks/useCity'
 import { useToast } from '@hooks/useToast'
 import {
   COMMUNITY_CREDIT_REDEEM_OPTIONS,
@@ -72,6 +73,7 @@ function CreditPillGlow() {
 
 /** 프로필 카드용 간단 크레딧 잔액 + 내역 모달 */
 export function MyPageCreditSection({ className }: Props) {
+  const href = useCityPath()
   const { success } = useToast()
   const [summary, setSummary] = useState<CreditSummary | null>(null)
   const [loading, setLoading] = useState(true)
@@ -304,7 +306,7 @@ export function MyPageCreditSection({ className }: Props) {
           </ul>
 
           <Link
-            href='/nyc/credit#redeem'
+            href={`${href('/credit')}#redeem`}
             onClick={() => setRequestOpen(false)}
             className='block px-0.5 text-[12px] font-medium text-[var(--brand)] hover:underline'
           >
@@ -345,7 +347,7 @@ export function MyPageCreditSection({ className }: Props) {
               </p>
             </div>
             <Link
-              href='/nyc/credit'
+              href={href('/credit')}
               onClick={() => setHistoryOpen(false)}
               className='text-[12px] font-medium text-[var(--brand)] hover:underline'
             >
@@ -384,7 +386,7 @@ export function MyPageCreditSection({ className }: Props) {
                 맛집·후기·댓글로 크레딧을 모아 보세요.
               </p>
               <Link
-                href='/nyc/food/new'
+                href={href('/food/new')}
                 onClick={() => setHistoryOpen(false)}
                 className='mt-4 inline-flex h-9 items-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white'
               >

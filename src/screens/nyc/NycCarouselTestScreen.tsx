@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Noto_Sans_KR } from 'next/font/google'
 
+import { useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
 import { NycIntroCarousel } from '@widgets/nyc/NycIntroCarousel'
 
@@ -13,6 +14,7 @@ const notoSansKr = Noto_Sans_KR({
 })
 
 export function NycCarouselTestScreen() {
+  const href = useCityPath()
   return (
     <div
       className={cn(
@@ -45,7 +47,7 @@ export function NycCarouselTestScreen() {
 
         <div className='mt-8 text-center'>
           <Link
-            href='/nyc'
+            href={href()}
             className='text-[13px] font-medium text-[#8a8272] touch-manipulation transition hover:text-[#101b30]'
           >
             커뮤니티 홈으로

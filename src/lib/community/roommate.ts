@@ -4,6 +4,7 @@ export type { RoommateLookingFor }
 
 export const ROOMMATE_TITLE_MAX = 40
 export const ROOMMATE_BUDGET_MAX = 20_000
+export const ROOMMATE_GALLERY_MAX = 6
 
 /** 작성 1단계: 방 올리기 vs 룸메·방 찾기 */
 export type RoommateIntent = 'offer-room' | 'seek'
@@ -97,10 +98,10 @@ const FORM_CONFIG: Record<RoommateLookingFor, RoommateFormConfig> = {
     moveInStartRequired: true,
     moveInEndRequired: false,
     photosRecommended: true,
-    photosHint: '방·집 사진 권장 · 여러 장 한 번에 선택 · 첫 장이 대표',
+    photosHint: '방·집 사진 권장 · 최대 6장 · 첫 장이 대표',
     titlePlaceholder: '예: Bushwick 2bed 룸메이트 구해요',
     bodyPlaceholder:
-      '방 구조, 생활 패턴, 유틸·보증금, 선호하는 룸메 스타일을 적어 주세요.',
+      '방 구조, 생활 패턴, 유틸·보증금을 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요.',
   },
   together: {
     locationLabel: '희망 동네',
@@ -114,10 +115,10 @@ const FORM_CONFIG: Record<RoommateLookingFor, RoommateFormConfig> = {
     moveInStartRequired: true,
     moveInEndRequired: false,
     photosRecommended: false,
-    photosHint: '참고 사진이 있으면 올려 주세요 · 여러 장 한 번에 선택 가능',
+    photosHint: '참고 사진이 있으면 올려 주세요 · 최대 6장',
     titlePlaceholder: '예: 9월 입주, Astoria 같이 구해요',
     bodyPlaceholder:
-      '예산, 희망 동네, 생활 패턴, 같이 구하고 싶은 조건을 적어 주세요.',
+      '예산, 희망 동네, 생활 패턴을 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요.',
   },
   room: {
     locationLabel: '희망 동네',
@@ -131,9 +132,10 @@ const FORM_CONFIG: Record<RoommateLookingFor, RoommateFormConfig> = {
     moveInStartRequired: true,
     moveInEndRequired: false,
     photosRecommended: false,
-    photosHint: '참고 사진이 있으면 올려 주세요 · 여러 장 한 번에 선택 가능',
+    photosHint: '참고 사진이 있으면 올려 주세요 · 최대 6장',
     titlePlaceholder: '예: Midtown 근처 방 구해요',
-    bodyPlaceholder: '예산, 희망 위치, 입주 시기, 필요한 조건을 적어 주세요.',
+    bodyPlaceholder:
+      '예산, 희망 위치, 입주 시기를 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요.',
   },
   sublet: {
     locationLabel: '서블렛 위치',
@@ -147,10 +149,10 @@ const FORM_CONFIG: Record<RoommateLookingFor, RoommateFormConfig> = {
     moveInStartRequired: true,
     moveInEndRequired: true,
     photosRecommended: true,
-    photosHint: '방·집 사진 권장 · 여러 장 한 번에 선택 · 첫 장이 대표',
+    photosHint: '방·집 사진 권장 · 최대 6장 · 첫 장이 대표',
     titlePlaceholder: '예: UES 스튜디오 9~11월 서블렛',
     bodyPlaceholder:
-      '기간, 가구 포함 여부, 교통, 유틸·보증금, 연락 방법을 적어 주세요.',
+      '기간, 가구 포함 여부, 교통, 유틸·보증금을 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요.',
   },
 }
 

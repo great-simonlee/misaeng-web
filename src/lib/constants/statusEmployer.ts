@@ -1,5 +1,7 @@
 /** Status(CPT/OPT/비자 등) 글의 학교·회사·기관 선택 옵션 */
 
+export const STATUS_EMPLOYER_NAME_MAX = 20
+
 export const STATUS_EMPLOYER_OTHER_VALUE = 'other' as const
 
 export type StatusEmployerOriginId = 'korean' | 'us' | 'foreign'
@@ -103,4 +105,39 @@ export function formatStatusEmployerLocation(
     return otherText.trim()
   }
   return getStatusEmployerLabel(optionValue) ?? ''
+}
+
+export type EmployerFilterMode = 'all' | 'name' | 'category'
+
+export type EmployerFilter = {
+  mode: EmployerFilterMode
+  name: string
+  category: string
+}
+
+export const EMPTY_EMPLOYER_FILTER: EmployerFilter = {
+  mode: 'all',
+  name: '',
+  category: '',
+}
+
+export function isEmployerFilterActive(filter: EmployerFilter) {
+  if (filter.mode === 'name') return Boolean(filter.name.trim())
+  if (filter.mode === 'category') return Boolean(filter.category)
+  return false
+}
+
+/** 회사명 부분 일치 또는 카테고리 정확 일치 */
+export function matchesEmployerFilter(
+  location: string | null | undefined,
+  filter: EmployerFilter,
+) {
+  if (!isEmployerFilterActive(filter)) return true
+  const parsed = parseStatusEmployerLocation(String(location || ''))
+  if (filter.mode === 'name') {
+    const query = filter.name.trim().toLowerCase()
+    if (!parsed.otherText) return false
+    return parsed.otherText.toLowerCase().includes(query)
+  }
+  return parsed.optionValue === filter.category
 }

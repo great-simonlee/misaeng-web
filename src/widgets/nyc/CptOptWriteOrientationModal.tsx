@@ -1,190 +1,191 @@
 'use client'
 
-import { useState, useSyncExternalStore } from 'react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { useBodyScrollLock } from '@hooks/useBodyScrollLock'
-import { cn } from '@lib'
-
-const ORIENTATION_STORAGE_KEY = 'misaeng.nyc.statusWriteOrientation.v1'
+import {
+  ANONYMOUS_WRITING_GUIDELINES,
+  COMMUNITY_WRITING_GUIDELINES,
+} from '@lib/constants/communityGuidelines'
 
 const ORIENTATION_STEPS = [
   {
     eyebrow: 'STEP 1',
     title: '날짜별로 남기는 후기예요',
     body: 'CPT · OPT · STEM OPT · 비자 · 영주권 진행을 한 날짜씩 기록해요. 나중에 보는 사람이 순서대로 따라갈 수 있게 남겨 주세요.',
-    bullets: [
-      '한 글에 날짜 기록을 여러 건 넣을 수 있어요 (최대 8건)',
-      '유형을 고른 뒤 제목·회사 정보를 적습니다',
-    ],
   },
   {
     eyebrow: 'STEP 2',
     title: '날짜 → 항목 → 내용 순서',
     body: '아래 작성칸에서 날짜를 고르고, 준비·제출·결과·다음 스텝 중 필요한 항목만 선택한 뒤 내용을 적어요.',
-    bullets: [
-      '빠른 입력 버튼으로 자주 쓰는 단계를 채울 수 있어요',
-      '단계 후기만 적어도 기록이 됩니다',
-    ],
   },
   {
     eyebrow: 'STEP 3',
     title: '「이 기록 추가」하면 위로 쌓여요',
     body: '작성을 마친 뒤 「이 기록 추가」를 누르면, 그 기록이 작성칸 위 목록으로 올라갑니다. 다음 날짜는 아래 작성칸에서 이어서 적으면 돼요.',
-    bullets: [
-      '목록에서 수정·삭제가 가능해요',
-      '다 적었으면 맨 아래 「후기 등록하기」로 올리세요',
-    ],
   },
 ] as const
 
-function getOrientationSeen(): boolean {
-  try {
-    return window.localStorage.getItem(ORIENTATION_STORAGE_KEY) === '1'
-  } catch {
-    return true
-  }
-}
+const JOB_REVIEW_ORIENTATION_STEPS = [
+  {
+    eyebrow: 'STEP 1',
+    title: '날짜별로 남기는 후기예요',
+    body: '인턴 · 신입 · 경력 · 이직 · 계약 전형을 한 날짜씩 기록해요. 나중에 보는 사람이 서류부터 오퍼까지 순서대로 따라갈 수 있게 남겨 주세요.',
+  },
+  {
+    eyebrow: 'STEP 2',
+    title: '날짜 → 항목 → 내용 순서',
+    body: '아래 작성칸에서 날짜를 고르고, 단계·플랫폼·서류·인터뷰·결과 중 필요한 항목만 선택한 뒤 내용을 적어요.',
+  },
+  {
+    eyebrow: 'STEP 3',
+    title: '「이 기록 추가」하면 위로 쌓여요',
+    body: '작성을 마친 뒤 「이 기록 추가」를 누르면, 그 기록이 작성칸 위 목록으로 올라갑니다. 다음 날짜는 아래 작성칸에서 이어서 적으면 돼요.',
+  },
+] as const
 
-function subscribeOrientation(onStoreChange: () => void) {
-  window.addEventListener('storage', onStoreChange)
-  return () => window.removeEventListener('storage', onStoreChange)
-}
+type OrientationStep = (typeof ORIENTATION_STEPS)[number]
+type WriteConsentSource = 'status' | 'job-review' | 'roommate' | 'anonymous'
 
-function markOrientationSeen() {
-  try {
-    window.localStorage.setItem(ORIENTATION_STORAGE_KEY, '1')
-  } catch {
-    /* ignore */
-  }
-}
-
-type CptOptWriteOrientationModalProps = {
+type WriteConsentModalProps = {
   open: boolean
-  onClose: () => void
+  agreeing: boolean
+  error?: string | null
+  onAgree: () => void
+  steps?: readonly OrientationStep[]
+  extraGuidelines?: readonly string[]
+  eyebrow?: string
+  titleId: string
+  listHref?: string
 }
 
-/** Status 글쓰기 첫 사용 오리엔테이션 (페이지형 모달) */
-export function CptOptWriteOrientationModal({
+function WriteConsentModal({
   open,
-  onClose,
-}: CptOptWriteOrientationModalProps) {
-  const [page, setPage] = useState(0)
+  agreeing,
+  error,
+  onAgree,
+  steps = [],
+  extraGuidelines = [],
+  eyebrow = '후기 작성',
+  titleId,
+  listHref,
+}: WriteConsentModalProps) {
   useBodyScrollLock(open)
 
   if (!open || typeof document === 'undefined') return null
-
-  const step = ORIENTATION_STEPS[page]
-  const isLast = page >= ORIENTATION_STEPS.length - 1
-
-  function handleClose() {
-    markOrientationSeen()
-    setPage(0)
-    onClose()
-  }
-
-  function handleNext() {
-    if (isLast) {
-      handleClose()
-      return
-    }
-    setPage((prev) => Math.min(prev + 1, ORIENTATION_STEPS.length - 1))
-  }
 
   return createPortal(
     <div
       className='fixed inset-0 z-[10050] flex items-end justify-center overscroll-none sm:items-center sm:p-4'
       role='dialog'
       aria-modal='true'
-      aria-labelledby='status-write-orientation-title'
+      aria-labelledby={titleId}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') e.stopPropagation()
+      }}
     >
-      <button
-        type='button'
-        aria-label='닫기'
+      <div
         className='absolute inset-0 touch-none bg-black/45 backdrop-blur-[2px]'
-        onClick={handleClose}
+        aria-hidden
       />
-      <div className='relative z-10 flex max-h-[min(88dvh,560px)] w-full max-w-[420px] flex-col overflow-hidden rounded-t-[1.5rem] bg-white shadow-[0_-8px_40px_rgba(15,23,42,0.14)] sm:rounded-[1.5rem]'>
+      <div className='relative z-10 flex max-h-[min(92dvh,640px)] w-full max-w-[440px] flex-col overflow-hidden rounded-t-[1.5rem] bg-white shadow-[0_-8px_40px_rgba(15,23,42,0.14)] sm:rounded-[1.5rem]'>
         <div className='flex shrink-0 flex-col items-center pt-3 sm:pt-4'>
-          <span className='h-1 w-10 rounded-full bg-[#e2e5ea] sm:hidden' aria-hidden />
-          <div className='mt-3 flex w-full items-center justify-between gap-3 px-5'>
+          <span
+            className='h-1 w-10 rounded-full bg-[#e2e5ea] sm:hidden'
+            aria-hidden
+          />
+          <div className='mt-3 w-full px-5'>
             <p className='text-[11px] font-semibold tracking-[0.14em] text-[var(--muted)]'>
-              작성 가이드
+              {eyebrow}
             </p>
-            <button
-              type='button'
-              onClick={handleClose}
-              className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
+            <h2
+              id={titleId}
+              className='mt-1 text-[1.25rem] font-semibold tracking-[-0.03em] text-[var(--foreground)]'
             >
-              건너뛰기
-            </button>
+              작성 전에 확인해 주세요
+            </h2>
+            <p className='mt-1.5 text-[13px] leading-relaxed text-[var(--muted)]'>
+              {steps.length > 0
+                ? '작성 가이드와 커뮤니티 안내를 확인하고 동의해 주세요.'
+                : '커뮤니티 작성 안내를 확인하고 동의해 주세요.'}
+            </p>
           </div>
         </div>
 
         <div className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-2 pt-4'>
-          <p className='text-[11px] font-semibold tracking-[0.12em] text-[var(--brand)]'>
-            {step.eyebrow}
-          </p>
-          <h2
-            id='status-write-orientation-title'
-            className='mt-1.5 text-[1.35rem] font-semibold tracking-[-0.03em] text-[var(--foreground)]'
-          >
-            {step.title}
-          </h2>
-          <p className='mt-3 text-[14px] leading-relaxed text-[var(--muted)]'>
-            {step.body}
-          </p>
-          <ul className='mt-4 space-y-2'>
-            {step.bullets.map((item) => (
-              <li
-                key={item}
-                className='flex gap-2.5 rounded-xl bg-[#f7f8fa] px-3.5 py-3 text-[13px] leading-relaxed text-[var(--foreground)] ring-1 ring-black/[0.04]'
-              >
-                <span
-                  className='mt-1.5 size-1.5 shrink-0 rounded-full bg-[var(--brand)]'
-                  aria-hidden
-                />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
+          {steps.length > 0 ? (
+            <section>
+              <p className='text-[12px] font-semibold text-[var(--foreground)]'>
+                작성 가이드
+              </p>
+              <ol className='mt-2 space-y-2'>
+                {steps.map((step) => (
+                  <li
+                    key={step.eyebrow}
+                    className='rounded-xl bg-[#f7f8fa] px-3.5 py-3 ring-1 ring-black/[0.04]'
+                  >
+                    <p className='text-[11px] font-semibold tracking-[0.12em] text-[var(--brand)]'>
+                      {step.eyebrow}
+                    </p>
+                    <p className='mt-1 text-[14px] font-semibold text-[var(--foreground)]'>
+                      {step.title}
+                    </p>
+                    <p className='mt-1 text-[12px] leading-relaxed text-[var(--muted)]'>
+                      {step.body}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
 
-          <div className='mt-6 flex items-center justify-center gap-1.5'>
-            {ORIENTATION_STEPS.map((item, index) => (
-              <button
-                key={item.eyebrow}
-                type='button'
-                aria-label={`${index + 1}페이지`}
-                aria-current={index === page ? 'step' : undefined}
-                onClick={() => setPage(index)}
-                className={cn(
-                  'h-1.5 rounded-full touch-manipulation transition-all',
-                  index === page
-                    ? 'w-5 bg-[var(--brand)]'
-                    : 'w-1.5 bg-[#d7dbe2]',
-                )}
-              />
-            ))}
-          </div>
+          <section className={steps.length > 0 ? 'mt-5' : undefined}>
+            <p className='text-[12px] font-semibold text-[var(--foreground)]'>
+              커뮤니티 작성 안내
+            </p>
+            <ul className='mt-2 space-y-1.5'>
+              {[...COMMUNITY_WRITING_GUIDELINES, ...extraGuidelines].map(
+                (item) => (
+                  <li
+                    key={item}
+                    className='flex gap-2 text-[13px] leading-relaxed text-[var(--muted-foreground)]'
+                  >
+                    <span
+                      className='mt-1.5 size-1 shrink-0 rounded-full bg-[var(--muted)]'
+                      aria-hidden
+                    />
+                    <span>{item}</span>
+                  </li>
+                ),
+              )}
+            </ul>
+          </section>
         </div>
 
-        <div className='flex shrink-0 gap-2 border-t border-black/[0.05] px-5 py-4'>
-          {page > 0 ? (
-            <button
-              type='button'
-              onClick={() => setPage((prev) => Math.max(0, prev - 1))}
-              className='h-11 flex-1 rounded-full bg-[#f4f5f7] text-[14px] font-semibold text-[var(--foreground)] touch-manipulation'
-            >
-              이전
-            </button>
+        <div className='shrink-0 border-t border-black/[0.05] px-5 pt-4 pb-[max(2rem,calc(env(safe-area-inset-bottom)+1.25rem))]'>
+          {error ? (
+            <p role='alert' className='mb-2 text-center text-[12px] font-medium text-red-600'>
+              {error}
+            </p>
           ) : null}
           <button
             type='button'
-            onClick={handleNext}
-            className='h-11 flex-[1.4] rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white touch-manipulation hover:bg-[var(--brand-hover)]'
+            onClick={onAgree}
+            disabled={agreeing}
+            className='min-h-[48px] w-full rounded-full bg-[linear-gradient(135deg,#ff4c14_0%,#f64310_50%,#df390e_100%)] text-[15px] font-semibold text-white shadow-[0_10px_20px_rgba(246,67,16,0.24)] transition hover:brightness-[1.03] disabled:cursor-not-allowed disabled:opacity-50'
           >
-            {isLast ? '작성 시작하기' : '다음'}
+            {agreeing ? '저장 중…' : '동의하고 작성하기'}
           </button>
+          {listHref ? (
+            <Link
+              href={listHref}
+              className='mt-3 flex min-h-11 items-center justify-center text-[13px] font-medium text-[var(--muted)] underline-offset-2 hover:underline'
+            >
+              목록으로 돌아가기
+            </Link>
+          ) : null}
         </div>
       </div>
     </div>,
@@ -192,28 +193,172 @@ export function CptOptWriteOrientationModal({
   )
 }
 
-/** 첫 작성 시에만 자동으로 열릴지 — localStorage + 세션 dismiss */
-export function useStatusWriteOrientation(enabled: boolean) {
-  const storedSeen = useSyncExternalStore(
-    subscribeOrientation,
-    getOrientationSeen,
-    () => true,
+function useWriteConsent(enabled: boolean, source: WriteConsentSource) {
+  const [required, setRequired] = useState(false)
+  const [ready, setReady] = useState(!enabled)
+  const [agreeing, setAgreeing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!enabled) {
+      setRequired(false)
+      setReady(true)
+      return
+    }
+
+    let cancelled = false
+    setReady(false)
+    void fetch('/api/community/write-consent', { cache: 'no-store' })
+      .then(async (res) => {
+        const data = (await res.json().catch(() => null)) as {
+          required?: boolean
+        } | null
+        if (cancelled) return
+        setRequired(Boolean(data?.required))
+      })
+      .catch(() => {
+        if (!cancelled) setRequired(true)
+      })
+      .finally(() => {
+        if (!cancelled) setReady(true)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [enabled])
+
+  async function agree() {
+    if (agreeing) return
+    setAgreeing(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/community/write-consent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source }),
+      })
+      if (!res.ok) {
+        throw new Error('동의 기록 저장에 실패했어요')
+      }
+      setRequired(false)
+    } catch {
+      setError('동의 기록 저장에 실패했어요. 다시 시도해 주세요.')
+    } finally {
+      setAgreeing(false)
+    }
+  }
+
+  return {
+    open: enabled && ready && required,
+    agree,
+    agreeing,
+    error,
+  }
+}
+
+type WriteConsentModalExportProps = {
+  open: boolean
+  agreeing?: boolean
+  error?: string | null
+  onClose: () => void
+  listHref?: string
+}
+
+/** Status 글쓰기: 미동의 시 가이드·안내 */
+export function CptOptWriteOrientationModal({
+  open,
+  agreeing = false,
+  error,
+  onClose,
+  listHref,
+}: WriteConsentModalExportProps) {
+  return (
+    <WriteConsentModal
+      open={open}
+      agreeing={agreeing}
+      error={error}
+      onAgree={onClose}
+      steps={ORIENTATION_STEPS}
+      titleId='status-write-consent-title'
+      listHref={listHref}
+    />
   )
-  const [sessionDismissed, setSessionDismissed] = useState(false)
-  const [manualOpen, setManualOpen] = useState(false)
+}
 
-  const autoOpen = enabled && !storedSeen && !sessionDismissed
-  const open = autoOpen || manualOpen
+export function useStatusWriteOrientation(enabled: boolean) {
+  return useWriteConsent(enabled, 'status')
+}
 
-  function close() {
-    markOrientationSeen()
-    setSessionDismissed(true)
-    setManualOpen(false)
-  }
+export function JobReviewWriteOrientationModal({
+  open,
+  agreeing = false,
+  error,
+  onClose,
+  listHref,
+}: WriteConsentModalExportProps) {
+  return (
+    <WriteConsentModal
+      open={open}
+      agreeing={agreeing}
+      error={error}
+      onAgree={onClose}
+      steps={JOB_REVIEW_ORIENTATION_STEPS}
+      titleId='job-review-write-consent-title'
+      listHref={listHref}
+    />
+  )
+}
 
-  function openManual() {
-    setManualOpen(true)
-  }
+export function useJobReviewWriteOrientation(enabled: boolean) {
+  return useWriteConsent(enabled, 'job-review')
+}
 
-  return { open, close, openManual }
+export function RoommateWriteOrientationModal({
+  open,
+  agreeing = false,
+  error,
+  onClose,
+  listHref,
+}: WriteConsentModalExportProps) {
+  return (
+    <WriteConsentModal
+      open={open}
+      agreeing={agreeing}
+      error={error}
+      onAgree={onClose}
+      eyebrow='룸메이트 · 서블렛'
+      titleId='roommate-write-consent-title'
+      listHref={listHref}
+    />
+  )
+}
+
+export function useRoommateWriteOrientation(enabled: boolean) {
+  return useWriteConsent(enabled, 'roommate')
+}
+
+export function AnonymousWriteOrientationModal({
+  open,
+  agreeing = false,
+  error,
+  onClose,
+  listHref,
+}: WriteConsentModalExportProps) {
+  return (
+    <WriteConsentModal
+      open={open}
+      agreeing={agreeing}
+      error={error}
+      onAgree={onClose}
+      extraGuidelines={ANONYMOUS_WRITING_GUIDELINES}
+      eyebrow='익명게시판'
+      titleId='anonymous-write-consent-title'
+      listHref={listHref}
+    />
+  )
+}
+
+export function useAnonymousWriteOrientation(enabled: boolean) {
+  return useWriteConsent(enabled, 'anonymous')
 }

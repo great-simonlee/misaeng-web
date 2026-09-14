@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
+import { cityLoginPath, getCityFromPathname } from '@lib/constants/cities'
 
 /** 로그인하지 않으면 로그인 페이지로 이동시킵니다. */
 export function useRequireAuth(nextPath: string) {
@@ -14,7 +15,7 @@ export function useRequireAuth(nextPath: string) {
   useEffect(() => {
     if (loading) return
     if (!user) {
-      router.replace(`/nyc/login?next=${encodeURIComponent(nextPath)}`)
+      router.replace(cityLoginPath(getCityFromPathname(nextPath), nextPath))
     }
   }, [user, loading, nextPath, router])
 

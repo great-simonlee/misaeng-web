@@ -162,6 +162,8 @@ npm run release -- --release-as 1.0.0     # 버전을 직접 지정
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anon key
 - `SUPABASE_SERVICE_ROLE_KEY`: 서버 전용 service role key
 - `SUPABASE_AVATAR_BUCKET`: 프로필 이미지 버킷 이름 (기본값: `avatars`)
+- `ELLIEO_ERP_BASE_URL`: 직장인 인증 알림을 보낼 ERP 주소 (기본값: `https://ellieo.io`)
+- `MISAENG_ERP_NOTIFY_SECRET`: ERP `/api/misaeng-admin/notify`와 동일한 공유 시크릿
 
 권장:
 
