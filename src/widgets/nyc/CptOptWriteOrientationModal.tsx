@@ -46,7 +46,11 @@ const JOB_REVIEW_ORIENTATION_STEPS = [
   },
 ] as const
 
-type OrientationStep = (typeof ORIENTATION_STEPS)[number]
+type OrientationStep = {
+  eyebrow: string
+  title: string
+  body: string
+}
 type WriteConsentSource = 'status' | 'job-review' | 'roommate' | 'anonymous'
 
 type WriteConsentModalProps = {
