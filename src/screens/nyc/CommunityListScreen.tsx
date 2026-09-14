@@ -488,14 +488,14 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
   const identityVerified = isIdentityVerified(profile)
   const suspended = isAccountSuspended(profile)
   const canWrite = Boolean(user) && identityVerified && !suspended
-  const verifyCta = getIdentityVerifyCtaLabel(profile)
+  const verifyCta = getIdentityVerifyCtaLabel()
   const postHref = !user
     ? loginNext
     : suspended
       ? href('/me')
       : identityVerified
         ? newPath
-        : getIdentityVerifyHref(newPath, profile)
+        : getIdentityVerifyHref(newPath)
   const writeCtaLabel = !user
     ? '로그인'
     : suspended

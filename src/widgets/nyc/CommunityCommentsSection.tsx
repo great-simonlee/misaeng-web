@@ -116,7 +116,7 @@ export function CommunityCommentsSection({
   const fallbackNext = loginNext || href()
   const loginHref = cityLoginPath(city, fallbackNext)
   const identityVerified = isIdentityVerified(profile)
-  const verifyHref = getIdentityVerifyHref(fallbackNext, profile)
+  const verifyHref = getIdentityVerifyHref(fallbackNext)
   const canCompose = Boolean(user) && identityVerified && !isAccountSuspended(profile)
 
   async function submitComment(body: string, parentId: string | null) {
@@ -326,7 +326,7 @@ export function CommunityCommentsSection({
               href={verifyHref}
               className='font-semibold text-[var(--brand)] underline-offset-2 hover:underline'
             >
-              {getIdentityVerifyLinkLabel(profile)}
+              {getIdentityVerifyLinkLabel()}
             </Link>
             이 필요해요.
           </div>

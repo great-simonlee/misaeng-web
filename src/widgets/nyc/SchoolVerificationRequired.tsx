@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 
-import { useAuth } from '@hooks/useAuth'
 import { useCityPath } from '@hooks/useCity'
 import {
   getIdentityVerifyCtaLabel,
@@ -23,8 +22,7 @@ export function SchoolVerificationRequired({
   withShell = true,
 }: SchoolVerificationRequiredProps) {
   const cityHref = useCityPath()
-  const { profile } = useAuth()
-  const href = getIdentityVerifyHref(nextPath, profile)
+  const href = getIdentityVerifyHref(nextPath)
 
   const body = (
     <div className='mx-auto max-w-md px-4 py-14 text-center sm:py-16'>
@@ -41,7 +39,7 @@ export function SchoolVerificationRequired({
         href={href}
         className='mt-8 inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand)] px-6 text-[14px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)]'
       >
-        {getIdentityVerifyCtaLabel(profile)}
+        {getIdentityVerifyCtaLabel()}
       </Link>
       <p className='mt-4'>
         <Link

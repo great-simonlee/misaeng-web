@@ -27,7 +27,6 @@ type FoodPostsMapProps = {
 /** 맛집 후기 좌표를 Leaflet 핀으로 표시 */
 export function FoodPostsMap({
   posts,
-  boardId: _boardId,
   className,
 }: FoodPostsMapProps) {
   const city = useCity()

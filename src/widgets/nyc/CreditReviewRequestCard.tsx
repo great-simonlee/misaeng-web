@@ -25,7 +25,6 @@ type Props = {
 
 export function CreditReviewRequestCard({
   post,
-  boardId: _boardId,
   isAuthor,
   className,
 }: Props) {

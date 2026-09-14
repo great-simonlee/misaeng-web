@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useId, useState, type ReactNode } from 'react'
+import { useId, useState, type ReactNode } from 'react'
 
 import { CONSENT_COPY } from '@lib/consent/copy'
 import { PRIVACY_HREF, TERMS_HREF } from '@lib/consent/copy'
@@ -34,13 +34,15 @@ export function TermsConsentFields({
   const copy = CONSENT_COPY[locale]
   const [acceptedTerms, setAcceptedTerms] = useState(checked)
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(checked)
+  const [prevChecked, setPrevChecked] = useState(checked)
 
-  useEffect(() => {
+  if (checked !== prevChecked) {
+    setPrevChecked(checked)
     if (!checked) {
       setAcceptedTerms(false)
       setAcceptedPrivacy(false)
     }
-  }, [checked])
+  }
 
   function updateTerms(next: boolean) {
     setAcceptedTerms(next)

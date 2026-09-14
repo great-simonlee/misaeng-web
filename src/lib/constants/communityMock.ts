@@ -51,11 +51,6 @@ function withMockCommunityHtmlPrefix(
   return `<p><strong>${MOCK_COMMUNITY_POST_PREFIX}</strong></p>\n${trimmed}`
 }
 
-/** 목 작성자 프로필 사진 (시드별 고정) */
-function mockAuthorPhoto(seed: string): string {
-  return `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(seed)}&size=80`
-}
-
 function post(
   partial: Omit<
     CommunityPost,

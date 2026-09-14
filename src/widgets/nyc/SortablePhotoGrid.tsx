@@ -38,8 +38,6 @@ export function SortablePhotoGrid({
 }: SortablePhotoGridProps) {
   const [dragging, setDragging] = useState<number | null>(null)
   const draggingRef = useRef<number | null>(null)
-  const urlsRef = useRef(urls)
-  urlsRef.current = urls
   const holdTimer = useRef<number | null>(null)
   const pointerId = useRef<number | null>(null)
   const start = useRef<{
@@ -89,7 +87,7 @@ export function SortablePhotoGrid({
     if (e.button !== 0) return
     if ((e.target as HTMLElement).closest('button')) return
     pointerId.current = e.pointerId
-    start.current = { x: e.clientX, y: e.clientY, index, at: Date.now() }
+    start.current = { x: e.clientX, y: e.clientY, index, at: e.timeStamp }
     clearHold()
     holdTimer.current = window.setTimeout(() => {
       if (pointerId.current == null || !start.current) return
@@ -104,7 +102,7 @@ export function SortablePhotoGrid({
     if (from == null) {
       if (!origin) return
       const dist = Math.hypot(e.clientX - origin.x, e.clientY - origin.y)
-      const elapsed = Date.now() - origin.at
+      const elapsed = e.timeStamp - origin.at
       if (dist >= SCROLL_CANCEL_PX && elapsed < MOVE_ACTIVATE_MS) {
         clearHold()
         start.current = null
@@ -125,7 +123,7 @@ export function SortablePhotoGrid({
     if (!(tile instanceof HTMLElement)) return
     const to = Number(tile.dataset.photoIndex)
     if (!Number.isInteger(to) || to === from) return
-    onChange(moveItem(urlsRef.current, from, to))
+    onChange(moveItem(urls, from, to))
     setDraggingIndex(to)
   }
 

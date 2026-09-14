@@ -31,9 +31,7 @@ export function isIdentityVerified(
   return isSchoolVerified(profile) || isWorkplaceApproved(profile)
 }
 
-export function prefersWorkplaceVerification(
-  _profile?: SchoolVerificationProfile,
-): boolean {
+export function prefersWorkplaceVerification(): boolean {
   return false
 }
 
@@ -53,15 +51,11 @@ export const SCHOOL_VERIFY_REQUIRED_CODE = 'SCHOOL_VERIFICATION_REQUIRED'
 export const SCHOOL_VERIFY_REQUIRED_MESSAGE =
   '글과 댓글을 작성하려면 학생 또는 직장인 인증이 필요해요.'
 
-export function getIdentityVerifyCtaLabel(
-  _profile?: SchoolVerificationProfile,
-): string {
+export function getIdentityVerifyCtaLabel(): string {
   return '인증하기'
 }
 
-export function getIdentityVerifyLinkLabel(
-  _profile?: SchoolVerificationProfile,
-): string {
+export function getIdentityVerifyLinkLabel(): string {
   return '학생 또는 직장인 인증'
 }
 
@@ -70,10 +64,7 @@ export function getSchoolVerifyHref(nextPath?: string): string {
   return getIdentityVerifyHref(nextPath)
 }
 
-export function getIdentityVerifyHref(
-  nextPath?: string,
-  _profile?: SchoolVerificationProfile,
-): string {
+export function getIdentityVerifyHref(nextPath?: string): string {
   const params = new URLSearchParams()
   params.set('verify', 'identity')
   if (nextPath?.trim()) {
