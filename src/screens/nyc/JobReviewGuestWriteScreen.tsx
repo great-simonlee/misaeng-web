@@ -11,6 +11,7 @@ import { NicknameAvailabilityHint } from '@components/NicknameAvailabilityHint'
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { useNicknameAvailability } from '@hooks/useNicknameAvailability'
+import { useStepAutosave } from '@hooks/useStepAutosave'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import {
   claimGuestPostsRequest,
@@ -64,6 +65,7 @@ import { JobReviewTimelineEditor } from '@widgets/nyc/JobReviewTimelineEditor'
 import { JobReviewTypePicker } from '@widgets/nyc/JobReviewTypeBadge'
 import { StatusEmployerSelect } from '@widgets/nyc/StatusEmployerSelect'
 import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
+import { AutosaveNotice } from '@widgets/nyc/AutosaveNotice'
 
 /**
  * 가입 없이 남기는 면접·취업 후기 (현직자 초대용).
@@ -202,30 +204,26 @@ export function JobReviewGuestWriteScreen() {
     setDraftHydrated(true)
   }, [city, draftHydrated, draftUid, loading])
 
-  const handleSaveDraft = useCallback(() => {
-    try {
-      const savedAt = saveWriteDraft<GuestWriteDraft>(
-        BOARD_ID,
-        city,
-        `${draftUid}:share`,
-        {
-          nickname,
-          email,
-          linkedinUrl,
-          coffeeChatOk,
-          postTitle,
-          contentHtml,
-          location,
-          industry,
-          jobReviewType,
-          timeline,
-        },
-      )
-      setDraftSavedAt(savedAt)
-      success('임시 저장했어요')
-    } catch {
-      toastError('임시 저장에 실패했어요')
-    }
+  const persistDraft = useCallback((): number => {
+    const savedAt = saveWriteDraft<GuestWriteDraft>(
+      BOARD_ID,
+      city,
+      `${draftUid}:share`,
+      {
+        nickname,
+        email,
+        linkedinUrl,
+        coffeeChatOk,
+        postTitle,
+        contentHtml,
+        location,
+        industry,
+        jobReviewType,
+        timeline,
+      },
+    )
+    setDraftSavedAt(savedAt)
+    return savedAt
   }, [
     city,
     coffeeChatOk,
@@ -238,10 +236,25 @@ export function JobReviewGuestWriteScreen() {
     location,
     nickname,
     postTitle,
-    success,
     timeline,
-    toastError,
   ])
+
+  const handleSaveDraft = useCallback(() => {
+    try {
+      persistDraft()
+      success('임시 저장했어요')
+    } catch {
+      toastError('임시 저장에 실패했어요')
+    }
+  }, [persistDraft, success, toastError])
+
+  const { requestSave, handleSectionFocus } = useStepAutosave(() => {
+    try {
+      persistDraft()
+    } catch (err) {
+      console.error('Guest job review autosave error:', err)
+    }
+  }, draftHydrated && phase === 'write' && !submitting)
 
   const handleGoogleCredential = useCallback(
     async (
@@ -422,7 +435,12 @@ export function JobReviewGuestWriteScreen() {
         {phase === 'write' ? (
           <>
             <WriteHero mode={mode} writeLabel={meta.writeLabel} />
-            <form onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
+            <form
+              onSubmit={(e) => void handleSubmit(e)}
+              onFocus={handleSectionFocus}
+              className='mt-6 space-y-8'
+            >
+              <AutosaveNotice savedAt={draftSavedAt} />
               <CreateSection
                 step={1}
                 title='작성자 정보'
@@ -526,7 +544,13 @@ export function JobReviewGuestWriteScreen() {
               </CreateSection>
 
               <CreateSection step={2} title='어떤 유형인가요?'>
-                <JobReviewTypePicker value={jobReviewType} onChange={setJobReviewType} />
+                <JobReviewTypePicker
+                  value={jobReviewType}
+                  onChange={(next) => {
+                    setJobReviewType(next)
+                    requestSave()
+                  }}
+                />
               </CreateSection>
 
               <CreateSection
@@ -546,7 +570,10 @@ export function JobReviewGuestWriteScreen() {
                 <StatusEmployerSelect
                   className='mt-4'
                   value={location}
-                  onChange={setLocation}
+                  onChange={(next) => {
+                    setLocation(next)
+                    requestSave()
+                  }}
                   label={meta.locationLabel}
                 />
               </CreateSection>
@@ -561,6 +588,7 @@ export function JobReviewGuestWriteScreen() {
                   onChange={setTimeline}
                   jobReviewType={jobReviewType}
                   mode='create'
+                  onEntryCommit={requestSave}
                 />
               </CreateSection>
 
@@ -1021,7 +1049,7 @@ function CreateSection({
   children: ReactNode
 }) {
   return (
-    <section>
+    <section data-autosave-section={`step-${step}`}>
       <div className='mb-3 flex items-start gap-3'>
         <span className='inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--foreground)] text-[12px] font-bold text-white'>
           {step}

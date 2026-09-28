@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { LoadingState, TipTapEditor } from '@components'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { useRequireAuth } from '@hooks/useRequireAuth'
+import { useStepAutosave } from '@hooks/useStepAutosave'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { hrefForCommunityPost } from '@lib/constants/cities'
 import {
@@ -50,6 +51,7 @@ import {
   useJobReviewWriteOrientation,
 } from '@widgets/nyc/CptOptWriteOrientationModal'
 import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
+import { AutosaveNotice } from '@widgets/nyc/AutosaveNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 import { StatusEmployerSelect } from '@widgets/nyc/StatusEmployerSelect'
 import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
@@ -97,7 +99,47 @@ export function JobReviewWriteScreen({
   const [showMoreSettings, setShowMoreSettings] = useState(false)
   const [draftHydrated, setDraftHydrated] = useState(isEdit)
   const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null)
+  const [submitted, setSubmitted] = useState(false)
   const orientation = useJobReviewWriteOrientation(!isEdit)
+
+  // 수정 중인 글은 글마다 따로 보관한다.
+  const draftKeyUid = user?.uid
+    ? editPostId
+      ? `${user.uid}:edit:${editPostId}`
+      : user.uid
+    : null
+
+  function persistDraft(): number | null {
+    if (!draftKeyUid) return null
+    const data: JobReviewWriteDraft = {
+      postTitle,
+      contentHtml,
+      location,
+      industry,
+      jobReviewType,
+      timeline,
+    }
+    if (!isEdit && !hasJobReviewDraftContent(data)) return null
+    const savedAt = saveWriteDraft<JobReviewWriteDraft>(
+      'job-review',
+      city,
+      draftKeyUid,
+      data,
+    )
+    setDraftSavedAt(savedAt)
+    return savedAt
+  }
+
+  const { requestSave, handleSectionFocus } = useStepAutosave(
+    () => {
+      try {
+        persistDraft()
+      } catch (err) {
+        console.error('Job review autosave error:', err)
+      }
+    },
+    draftHydrated && !loadingEdit && !submitting && !submitted,
+  )
 
   useEffect(() => {
     if (isEdit || !user?.uid) return
@@ -135,6 +177,33 @@ export function JobReviewWriteScreen({
           router.replace(hrefForCommunityPost(post, city))
           return
         }
+        const loadedTimeline = post.jobReviewTimeline?.length
+          ? post.jobReviewTimeline
+          : []
+        setExistingTimelineIds(loadedTimeline.map((entry) => entry.id))
+
+        // 제출 전에 자동 저장된 수정본이 글보다 최신이면 그걸 이어서 보여 준다.
+        const editDraftUid = `${user.uid}:edit:${editPostId}`
+        const stored = loadWriteDraft<JobReviewWriteDraft>(
+          'job-review',
+          city,
+          editDraftUid,
+        )
+        if (stored && stored.savedAt > (post.updatedAt || post.createdAt)) {
+          setPostTitle(stored.data.postTitle ?? post.title)
+          setContentHtml(stored.data.contentHtml ?? '')
+          setLocation(stored.data.location ?? post.location)
+          setIndustry(stored.data.industry ?? '')
+          setJobReviewType(stored.data.jobReviewType ?? post.jobReviewType)
+          setTimeline(
+            Array.isArray(stored.data.timeline) ? stored.data.timeline : [],
+          )
+          setDraftSavedAt(stored.savedAt)
+          success('제출 전에 자동 저장된 수정 내용을 불러왔어요')
+          return
+        }
+        if (stored) clearWriteDraft('job-review', city, editDraftUid)
+
         setPostTitle(post.title)
         const bodyPlain = htmlToPlainText(post.contentHtml || '')
         setContentHtml(
@@ -147,11 +216,7 @@ export function JobReviewWriteScreen({
         setLocation(post.location)
         setIndustry(post.jobReviewIndustry?.trim() || '')
         setJobReviewType(post.jobReviewType)
-        const loadedTimeline = post.jobReviewTimeline?.length
-          ? post.jobReviewTimeline
-          : []
-        setExistingTimelineIds(loadedTimeline.map((entry) => entry.id))
-        setTimeline(loadedTimeline.length ? loadedTimeline : [])
+        setTimeline(loadedTimeline)
       } catch (err) {
         if (!cancelled) {
           toastError(getErrorMessage(err, '글을 불러오지 못했어요'))
@@ -164,7 +229,7 @@ export function JobReviewWriteScreen({
     return () => {
       cancelled = true
     }
-  }, [city, editPostId, href, user?.uid, router, toastError])
+  }, [city, editPostId, href, user?.uid, router, success, toastError])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -238,9 +303,8 @@ export function JobReviewWriteScreen({
               authorSchoolName: profile?.verifiedSchoolName ?? null,
             })
 
-      if (!isEdit && user.uid) {
-        clearWriteDraft('job-review', city, user.uid)
-      }
+      setSubmitted(true)
+      if (draftKeyUid) clearWriteDraft('job-review', city, draftKeyUid)
       success(
         isEdit
           ? '진행 기록을 업데이트했어요. 목록 맨 위로 올라갔습니다'
@@ -255,23 +319,9 @@ export function JobReviewWriteScreen({
   }
 
   function handleSaveDraft() {
-    if (!user?.uid) return
     try {
-      const savedAt = saveWriteDraft<JobReviewWriteDraft>(
-        'job-review',
-        city,
-        user.uid,
-        {
-          postTitle,
-          contentHtml,
-          location,
-          industry,
-          jobReviewType,
-          timeline,
-        },
-      )
-      setDraftSavedAt(savedAt)
-      success('임시 저장했어요')
+      if (persistDraft()) success('임시 저장했어요')
+      else toastError('저장할 내용이 아직 없어요')
     } catch {
       toastError('임시 저장에 실패했어요')
     }
@@ -325,20 +375,29 @@ export function JobReviewWriteScreen({
           <CreateHero writeLabel={meta.writeLabel} />
         )}
 
-        <form onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
+        <form
+          onSubmit={(e) => void handleSubmit(e)}
+          onFocus={handleSectionFocus}
+          className='mt-6 space-y-8'
+        >
+          <AutosaveNotice savedAt={draftSavedAt} />
           {isEdit ? (
             <>
-              <section>
+              <section data-autosave-section='timeline'>
                 <JobReviewTimelineEditor
                   value={timeline}
                   onChange={setTimeline}
                   jobReviewType={jobReviewType}
                   mode='update'
                   existingEntryIds={existingTimelineIds}
+                  onEntryCommit={requestSave}
                 />
               </section>
 
-              <section className='overflow-hidden rounded-2xl ring-1 ring-black/[0.06]'>
+              <section
+                data-autosave-section='info'
+                className='overflow-hidden rounded-2xl ring-1 ring-black/[0.06]'
+              >
                 <button
                   type='button'
                   onClick={() => setShowMoreSettings((prev) => !prev)}
@@ -369,7 +428,10 @@ export function JobReviewWriteScreen({
                     </Field>
                     <StatusEmployerSelect
                       value={location}
-                      onChange={setLocation}
+                      onChange={(next) => {
+                        setLocation(next)
+                        requestSave()
+                      }}
                       label={meta.locationLabel}
                     />
                     <div>
@@ -412,7 +474,10 @@ export function JobReviewWriteScreen({
               <CreateSection step={1} title='어떤 유형인가요?'>
                 <JobReviewTypePicker
                   value={jobReviewType}
-                  onChange={setJobReviewType}
+                  onChange={(next) => {
+                    setJobReviewType(next)
+                    requestSave()
+                  }}
                 />
               </CreateSection>
 
@@ -433,7 +498,10 @@ export function JobReviewWriteScreen({
                 <StatusEmployerSelect
                   className='mt-4'
                   value={location}
-                  onChange={setLocation}
+                  onChange={(next) => {
+                    setLocation(next)
+                    requestSave()
+                  }}
                   label={meta.locationLabel}
                 />
               </CreateSection>
@@ -448,6 +516,7 @@ export function JobReviewWriteScreen({
                   onChange={setTimeline}
                   jobReviewType={jobReviewType}
                   mode='create'
+                  onEntryCommit={requestSave}
                 />
               </CreateSection>
 
@@ -593,7 +662,7 @@ function CreateSection({
   children: ReactNode
 }) {
   return (
-    <section>
+    <section data-autosave-section={`step-${step}`}>
       <div className='mb-3 flex items-start gap-3'>
         <span className='inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--foreground)] text-[12px] font-bold text-white'>
           {step}
@@ -636,6 +705,16 @@ function Field({
       </span>
       {children}
     </label>
+  )
+}
+
+function hasJobReviewDraftContent(data: JobReviewWriteDraft) {
+  return Boolean(
+    data.postTitle.trim() ||
+      htmlToPlainText(data.contentHtml) ||
+      data.location.trim() ||
+      data.jobReviewType ||
+      data.timeline.some(isJobReviewTimelineEntryFilled),
   )
 }
 

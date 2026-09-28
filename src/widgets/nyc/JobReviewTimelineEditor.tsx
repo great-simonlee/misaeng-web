@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import type { RefObject } from 'react'
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 
 import { TipTapEditor } from '@components'
 import { cn } from '@lib'
@@ -30,7 +31,34 @@ type JobReviewTimelineEditorProps = {
   jobReviewType?: JobReviewTypeId | null
   mode?: 'create' | 'update'
   existingEntryIds?: string[]
+  /** 기록을 추가·수정·삭제한 직후 (자동 저장 시점) */
+  onEntryCommit?: () => void
   className?: string
+}
+
+/**
+ * 작성칸 안에 있던 포커스가 페이지의 다른 입력에 "도착"하면 onLeave.
+ * blur 기준이면 리치 에디터 클릭·파일 선택창에서 목적지를 알 수 없어 focusin으로 판단한다.
+ */
+function useFocusLeave(rootRef: RefObject<HTMLElement | null>, onLeave: () => void) {
+  const insideRef = useRef(false)
+  const handleLeave = useEffectEvent(onLeave)
+
+  useEffect(() => {
+    const onFocusIn = (e: FocusEvent) => {
+      const root = rootRef.current
+      if (!root) return
+      if (e.target instanceof Node && root.contains(e.target)) {
+        insideRef.current = true
+        return
+      }
+      if (!insideRef.current) return
+      insideRef.current = false
+      handleLeave()
+    }
+    document.addEventListener('focusin', onFocusIn)
+    return () => document.removeEventListener('focusin', onFocusIn)
+  }, [rootRef])
 }
 
 export function JobReviewTimelineEditor({
@@ -39,6 +67,7 @@ export function JobReviewTimelineEditor({
   jobReviewType = null,
   mode = 'create',
   existingEntryIds = [],
+  onEntryCommit,
   className,
 }: JobReviewTimelineEditorProps) {
   const existingIdSet = useMemo(
@@ -53,6 +82,7 @@ export function JobReviewTimelineEditor({
         value={value}
         onChange={onChange}
         jobReviewType={jobReviewType}
+        onEntryCommit={onEntryCommit}
         className={className}
       />
     )
@@ -64,6 +94,7 @@ export function JobReviewTimelineEditor({
       onChange={onChange}
       jobReviewType={jobReviewType}
       existingIdSet={existingIdSet}
+      onEntryCommit={onEntryCommit}
       className={className}
     />
   )
@@ -73,11 +104,13 @@ function CreateTimelineForm({
   value,
   onChange,
   jobReviewType,
+  onEntryCommit,
   className,
 }: {
   value: JobReviewTimelineEntry[]
   onChange: (next: JobReviewTimelineEntry[]) => void
   jobReviewType: JobReviewTypeId | null
+  onEntryCommit?: () => void
   className?: string
 }) {
   const [draftMode, setDraftMode] = useState<DraftMode>('add')
@@ -142,14 +175,28 @@ function CreateTimelineForm({
     setEditSnapshot(null)
     setDraft(createEmptyJobReviewTimelineEntry())
     onChange(nextSaved)
+    onEntryCommit?.()
   }
 
   function startEdit(entry: JobReviewTimelineEntry) {
+    // 작성 중이던 새 기록은 버리지 않고 목록에 먼저 올린다.
+    const keepDraft =
+      draftMode === 'add' && canAddMore && isJobReviewTimelineEntryFilled(draft)
+    const nextSaved = keepDraft
+      ? sortJobReviewTimelineByDate([...savedEntries, draft])
+      : savedEntries
+    if (keepDraft) setCommittedIds(nextSaved.map((item) => item.id))
     setDraftMode('edit')
     setEditSnapshot(entry)
     setDraft({ ...entry })
-    onChange(savedEntries)
+    onChange(nextSaved)
+    if (keepDraft) onEntryCommit?.()
   }
+
+  const rootRef = useRef<HTMLDivElement>(null)
+  useFocusLeave(rootRef, () => {
+    if (draftComplete && (isEditing || canAddMore)) commitCurrentDraft()
+  })
 
   function cancelDraft() {
     if (draftMode === 'edit' && editSnapshot) {
@@ -173,6 +220,7 @@ function CreateTimelineForm({
       setEditSnapshot(null)
       setDraft(createEmptyJobReviewTimelineEntry())
       onChange(nextSaved)
+      onEntryCommit?.()
       return
     }
 
@@ -181,6 +229,7 @@ function CreateTimelineForm({
         ? [...nextSaved, draft]
         : nextSaved,
     )
+    onEntryCommit?.()
   }
 
   function handleDraftChange(patch: Partial<JobReviewTimelineEntry>) {
@@ -190,7 +239,7 @@ function CreateTimelineForm({
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div ref={rootRef} className={cn('space-y-4', className)}>
       {savedEntries.length > 0 ? (
         <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
           <SectionHeading
@@ -259,6 +308,7 @@ function CreateTimelineForm({
                 </button>
               ) : null}
             </div>
+            <AutoCommitHint />
           </>
         ) : (
           <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-3 text-[12px] text-[var(--muted)] ring-1 ring-black/[0.04]'>
@@ -276,12 +326,14 @@ function UpdateTimelineForm({
   onChange,
   jobReviewType,
   existingIdSet,
+  onEntryCommit,
   className,
 }: {
   value: JobReviewTimelineEntry[]
   onChange: (next: JobReviewTimelineEntry[]) => void
   jobReviewType: JobReviewTypeId | null
   existingIdSet: Set<string>
+  onEntryCommit?: () => void
   className?: string
 }) {
   const [draftMode, setDraftMode] = useState<DraftMode>('add')
@@ -289,7 +341,15 @@ function UpdateTimelineForm({
   const [editSnapshot, setEditSnapshot] = useState<JobReviewTimelineEntry | null>(
     null,
   )
-  const [sessionCommittedIds, setSessionCommittedIds] = useState<string[]>([])
+  // 자동 저장본에서 복원된 새 기록도 목록에 보이도록 처음부터 포함
+  const [sessionCommittedIds, setSessionCommittedIds] = useState<string[]>(() =>
+    value
+      .filter(
+        (entry) =>
+          !existingIdSet.has(entry.id) && isJobReviewTimelineEntryFilled(entry),
+      )
+      .map((entry) => entry.id),
+  )
 
   const savedIdSet = useMemo(() => {
     const next = new Set(existingIdSet)
@@ -353,14 +413,34 @@ function UpdateTimelineForm({
     setEditSnapshot(null)
     setDraft(createEmptyJobReviewTimelineEntry())
     onChange(nextSaved)
+    onEntryCommit?.()
   }
 
   function startEdit(entry: JobReviewTimelineEntry) {
+    // 작성 중이던 새 기록은 버리지 않고 목록에 먼저 올린다.
+    const keepDraft =
+      draftMode === 'add' && canAddMore && isJobReviewTimelineEntryFilled(draft)
+    const nextSaved = keepDraft
+      ? sortJobReviewTimelineByDate([...savedEntries, draft])
+      : savedEntries
+    if (keepDraft) {
+      setSessionCommittedIds(
+        nextSaved
+          .map((item) => item.id)
+          .filter((id) => !existingIdSet.has(id)),
+      )
+    }
     setDraftMode('edit')
     setEditSnapshot(entry)
     setDraft({ ...entry })
-    onChange(savedEntries)
+    onChange(nextSaved)
+    if (keepDraft) onEntryCommit?.()
   }
+
+  const rootRef = useRef<HTMLDivElement>(null)
+  useFocusLeave(rootRef, () => {
+    if (draftComplete && (isEditing || canAddMore)) commitCurrentDraft()
+  })
 
   function cancelDraft() {
     if (draftMode === 'edit' && editSnapshot) {
@@ -388,6 +468,7 @@ function UpdateTimelineForm({
       setEditSnapshot(null)
       setDraft(createEmptyJobReviewTimelineEntry())
       onChange(nextSaved)
+      onEntryCommit?.()
       return
     }
 
@@ -396,6 +477,7 @@ function UpdateTimelineForm({
         ? [...nextSaved, draft]
         : nextSaved,
     )
+    onEntryCommit?.()
   }
 
   function handleDraftChange(patch: Partial<JobReviewTimelineEntry>) {
@@ -405,7 +487,7 @@ function UpdateTimelineForm({
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div ref={rootRef} className={cn('space-y-4', className)}>
       <GuideBox
         tone='update'
         title={isEditing ? '기존 기록 수정 중' : '진행 기록 추가'}
@@ -498,6 +580,7 @@ function UpdateTimelineForm({
                 </button>
               ) : null}
             </div>
+            <AutoCommitHint />
           </>
         ) : (
           <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-3 text-[12px] text-[var(--muted)] ring-1 ring-black/[0.04]'>
@@ -507,6 +590,15 @@ function UpdateTimelineForm({
         )}
       </section>
     </div>
+  )
+}
+
+function AutoCommitHint() {
+  return (
+    <p className='text-[11px] leading-relaxed text-[var(--muted)]'>
+      날짜와 내용을 적고 다음 칸으로 넘어가면, 버튼을 누르지 않아도 기록이 자동으로
+      추가·저장돼요.
+    </p>
   )
 }
 
