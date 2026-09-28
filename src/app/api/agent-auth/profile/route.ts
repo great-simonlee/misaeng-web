@@ -7,6 +7,12 @@ import {
   isProfileOccupationType,
 } from '@lib/constants/profile'
 import {
+  claimNickname,
+  NicknameTakenError,
+  releaseNickname,
+  toNicknameKey,
+} from '@lib/supabase/nicknameIndex.server'
+import {
   getSupabaseProfile,
   isSupabaseProfileConfigured,
   upsertSupabaseProfile,
@@ -52,12 +58,18 @@ export async function PATCH(request: Request) {
   const body = (await request.json()) as ProfilePatchBody
   const patch: Record<string, unknown> = { email: user.email }
 
+  let previousNickname: string | null = null
+  let nicknameChanged = false
   if (body.nickname !== undefined) {
     const nickname = asTrimmedString(body.nickname)
     const nicknameError = getNicknameValidationError(nickname)
     if (nicknameError) {
       return NextResponse.json({ error: nicknameError }, { status: 400 })
     }
+    const existing = await getSupabaseProfile(user.uid)
+    previousNickname = existing?.nickname?.trim() || null
+    nicknameChanged =
+      toNicknameKey(previousNickname) !== toNicknameKey(nickname)
     patch.nickname = nickname
   }
   if (body.mbti !== undefined) {
@@ -95,10 +107,38 @@ export async function PATCH(request: Request) {
     patch.occupationType = occupationType || null
   }
 
+  if (nicknameChanged && typeof patch.nickname === 'string') {
+    try {
+      await claimNickname(user.uid, patch.nickname)
+    } catch (error) {
+      if (error instanceof NicknameTakenError) {
+        return NextResponse.json(
+          { error: error.message, code: 'NICKNAME_TAKEN' },
+          { status: 409 },
+        )
+      }
+      return NextResponse.json(
+        {
+          error:
+            error instanceof Error ? error.message : '닉네임 확인에 실패했어요.',
+        },
+        { status: 500 },
+      )
+    }
+  }
+
   try {
     const profile = await upsertSupabaseProfile(user.uid, patch)
+    if (nicknameChanged && previousNickname) {
+      await releaseNickname(user.uid, previousNickname).catch((error) => {
+        console.error('Nickname release error:', error)
+      })
+    }
     return NextResponse.json({ ok: true, profile })
   } catch (error) {
+    if (nicknameChanged && typeof patch.nickname === 'string') {
+      await releaseNickname(user.uid, patch.nickname).catch(() => {})
+    }
     return NextResponse.json(
       {
         error:

@@ -10,4 +10,9 @@ export {
 export { useHousingLikes, useHousingLike } from './useHousingLikes'
 export { usePostLikes, usePostLike } from './usePostLikes'
 export { usePagedGallery } from './usePagedGallery'
+export {
+  useNicknameAvailability,
+  type NicknameAvailability,
+  type NicknameAvailabilityStatus,
+} from './useNicknameAvailability'
 

@@ -5,8 +5,10 @@ import { useEffect, useRef, useState } from 'react'
 
 import { BottomSheet, BottomSheetSelect } from '@components'
 import { MbtiPicker } from '@components/MbtiPicker'
+import { NicknameAvailabilityHint } from '@components/NicknameAvailabilityHint'
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
+import { useNicknameAvailability } from '@hooks/useNicknameAvailability'
 import { cityLoginPath } from '@lib/constants/cities'
 import {
   MAX_NICKNAME_LEN,
@@ -284,8 +286,23 @@ export function MyPageScreen() {
     }
   }
 
+  const nicknameDraftAvailability = useNicknameAvailability(nicknameDraft, {
+    currentNickname: nickname,
+    enabled: editingNickname && isValidNickname(nicknameDraft),
+  })
+  const profileNicknameAvailability = useNicknameAvailability(
+    profileDraft.nickname,
+    {
+      currentNickname: nickname,
+      enabled: completeProfileOpen && isValidNickname(profileDraft.nickname),
+    },
+  )
+  const isNicknameBlocked = (status: string) =>
+    status === 'checking' || status === 'taken'
+
   const canSaveProfileSetup =
     isValidNickname(profileDraft.nickname) &&
+    !isNicknameBlocked(profileNicknameAvailability.status) &&
     profileDraft.firstName.trim().length >= 1 &&
     Boolean(profileDraft.gender) &&
     Boolean(profileDraft.occupationType) &&
@@ -625,6 +642,10 @@ export function MyPageScreen() {
           <p className='text-[12px] leading-relaxed text-[var(--muted)]'>
             {NICKNAME_RULE_HINT}
           </p>
+          <NicknameAvailabilityHint
+            availability={nicknameDraftAvailability}
+            className='-mt-2'
+          />
           <div className='flex items-center justify-between gap-2'>
             <span className='text-[11px] tabular-nums text-[var(--muted)]'>
               {nicknameDraft.trim().length}/{MAX_NICKNAME_LEN}
@@ -646,7 +667,9 @@ export function MyPageScreen() {
                 type='button'
                 onClick={() => void handleSaveNickname()}
                 disabled={
-                  savingNickname || !isValidNickname(nicknameDraft)
+                  savingNickname ||
+                  !isValidNickname(nicknameDraft) ||
+                  isNicknameBlocked(nicknameDraftAvailability.status)
                 }
                 className='h-9 rounded-full bg-[var(--foreground)] px-4 text-[13px] font-semibold text-white touch-manipulation disabled:opacity-40'
               >
@@ -740,6 +763,7 @@ export function MyPageScreen() {
             <p className='text-[12px] leading-relaxed text-[var(--muted)]'>
               {NICKNAME_RULE_HINT}
             </p>
+            <NicknameAvailabilityHint availability={profileNicknameAvailability} />
           </label>
 
           <div className='space-y-2'>

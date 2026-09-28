@@ -716,7 +716,7 @@ function SingleEntryForm({
             <TipTapEditor
               value={entry.stageReviewHtml}
               onChange={(html) => onChange({ stageReviewHtml: html })}
-              placeholder='예: OA는 LC medium 2문제, 90분이었어요. Phone은 resume deep dive + behavioral 위주였습니다.'
+              placeholder='예: Phone은 30분 정도였고, resume deep dive + behavioral 위주였습니다.'
               minHeightClassName='min-h-[160px]'
               contentClassName='!text-[13px] !leading-[1.65]'
               simpleToolbar

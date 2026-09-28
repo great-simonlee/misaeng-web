@@ -34,6 +34,7 @@ import {
   isCommunityStorageConfigured,
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
+import { isNicknameTakenByOther } from '@lib/supabase/nicknameIndex.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import type {
   CommunityPost,
@@ -124,6 +125,14 @@ export async function POST(request: Request) {
     return bad(
       `게시용 닉네임을 ${GUEST_NICKNAME_MIN}~${GUEST_NICKNAME_MAX}자로 입력해 주세요. (이메일 형식 제외)`,
     )
+  }
+  try {
+    if (await isNicknameTakenByOther(nickname, user?.uid)) {
+      return bad('이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요.', 409)
+    }
+  } catch (error) {
+    console.error('Guest nickname check error:', error)
+    return bad('닉네임 확인에 실패했어요. 잠시 후 다시 시도해 주세요.', 500)
   }
   const email = normalizeGuestEmail(guest.email || user?.email || '')
   if (!isValidGuestEmail(email)) {

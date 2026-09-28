@@ -7,8 +7,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { TipTapEditor } from '@components'
 import { useConsentLocale } from '@components/consent/ConsentLocaleProvider'
 import { TermsConsentFields } from '@components/consent/TermsConsentFields'
+import { NicknameAvailabilityHint } from '@components/NicknameAvailabilityHint'
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
+import { useNicknameAvailability } from '@hooks/useNicknameAvailability'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import {
   claimGuestPostsRequest,
@@ -175,6 +177,12 @@ export function JobReviewGuestWriteScreen() {
 
   const draftUid = user?.uid || DRAFT_UID_GUEST
 
+  const nicknameAvailability = useNicknameAvailability(nickname, {
+    scope: 'guest',
+    currentNickname: profile?.nickname,
+    enabled: phase === 'write' && isValidGuestNickname(nickname),
+  })
+
   useEffect(() => {
     if (loading || draftHydrated) return
     const stored = loadWriteDraft<GuestWriteDraft>(BOARD_ID, city, `${draftUid}:share`)
@@ -284,6 +292,10 @@ export function JobReviewGuestWriteScreen() {
       toastError(
         `게시용 닉네임을 ${GUEST_NICKNAME_MIN}~${GUEST_NICKNAME_MAX}자로 입력해 주세요`,
       )
+      return
+    }
+    if (nicknameAvailability.status === 'taken') {
+      toastError('이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요')
       return
     }
     if (!isValidGuestEmail(email)) {
@@ -432,8 +444,12 @@ export function JobReviewGuestWriteScreen() {
                       onChange={(e) => setNickname(e.target.value)}
                       className={inputClass}
                       maxLength={GUEST_NICKNAME_MAX}
-                      placeholder='예: 월가 3년차, Fintech PM'
+                      placeholder='예: 뉴욕직장인'
                       autoComplete='nickname'
+                    />
+                    <NicknameAvailabilityHint
+                      availability={nicknameAvailability}
+                      className='mt-1.5'
                     />
                   </Field>
                   <Field
@@ -556,7 +572,7 @@ export function JobReviewGuestWriteScreen() {
                 <TipTapEditor
                   value={contentHtml}
                   onChange={setContentHtml}
-                  placeholder='예: OA 전에 LC medium 2문제 타입을 연습하세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.'
+                  placeholder='예: 인터뷰 전에 팀의 최근 프로젝트를 꼭 찾아보세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.'
                   minHeightClassName='min-h-[200px]'
                   contentClassName='!text-[13px] !leading-[1.65]'
                   simpleToolbar
@@ -708,7 +724,6 @@ function ChoosePhase({
           </div>
           <ul className='mt-2.5 space-y-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
             <PitchItem>크레딧이 내 계정에 바로 적립돼요</PitchItem>
-            <PitchItem>후배들의 커피챗 요청을 받아볼 수 있어요</PitchItem>
             <PitchItem>등록 후에도 진행 기록을 이어서 추가할 수 있어요</PitchItem>
           </ul>
           <div className='mt-4 space-y-3'>
@@ -761,6 +776,9 @@ function CreditPitch() {
           채용 단계 1개당 {COMMUNITY_CREDIT_TIMELINE_ENTRY} 크레딧 (글당 최대{' '}
           {COMMUNITY_CREDIT_TIMELINE_POST_MAX})
           {FIRST_POST_BONUS > 0 ? ` · 첫 글 +${FIRST_POST_BONUS}` : ''}
+        </PitchItem>
+        <PitchItem accent>
+          자세히 남겨 주신 후기는 미생팀 리뷰 후 추가 크레딧을 드려요
         </PitchItem>
         <PitchItem accent>
           모은 크레딧({COFFEE_CHAT_COST})으로 같은 업계·회사는 물론 다른 업계

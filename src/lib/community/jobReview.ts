@@ -21,7 +21,7 @@ export const JOB_REVIEW_TYPES: {
     id: 'intern',
     label: '인턴',
     description: 'Summer / Winter / 학기',
-    summary: '서류 → OA → 인터뷰 → 오퍼까지의 전형',
+    summary: '서류 → 인터뷰 → 오퍼까지의 전형',
   },
   {
     id: 'new-grad',
@@ -109,7 +109,7 @@ export const JOB_REVIEW_TIMELINE_FIELDS: {
     key: 'stageLabel',
     label: '어떤 단계인지',
     shortLabel: '단계',
-    hint: '서류, OA, Phone, Onsite, Offer 등',
+    hint: '서류, Phone, Onsite, Offer 등',
     rowClass: 'border-l-[3px] border-[#60a5fa] bg-[#f8fbff]',
     labelClass: 'text-[#1d4ed8]',
   },
@@ -154,7 +154,7 @@ const JOB_REVIEW_PLACEHOLDERS: Record<
   Record<JobReviewTimelineFieldKey, string>
 > = {
   intern: {
-    stageLabel: '예: Online Assessment',
+    stageLabel: '예: Phone Screen',
     platform: '예: Handshake → 회사 careers',
     documentsSubmitted: '예: Resume, Transcript, Cover letter',
     interviewRound: '예: 1차 Recruiter screen. 질문: Why this intern role? → 수업에서 ~를 해보고 지원했어요.',
@@ -201,13 +201,6 @@ export const JOB_REVIEW_QUICK_STEPS: Record<
         stageLabel: '서류 지원',
         platform: 'Handshake / LinkedIn',
         documentsSubmitted: 'Resume, Transcript',
-      },
-    },
-    {
-      label: 'OA',
-      patch: {
-        stageLabel: 'Online Assessment',
-        interviewRound: 'OA',
       },
     },
     {

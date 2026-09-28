@@ -383,7 +383,7 @@ export function JobReviewWriteScreen({
                         <TipTapEditor
                           value={contentHtml}
                           onChange={setContentHtml}
-                          placeholder='예: OA 전에 LC medium 2문제 타입을 연습하세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.'
+                          placeholder='예: 인터뷰 전에 팀의 최근 프로젝트를 꼭 찾아보세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.'
                           minHeightClassName='min-h-[160px]'
                           contentClassName='!text-[13px] !leading-[1.65]'
                           simpleToolbar
@@ -459,7 +459,7 @@ export function JobReviewWriteScreen({
                 <TipTapEditor
                   value={contentHtml}
                   onChange={setContentHtml}
-                  placeholder='예: OA 전에 LC medium 2문제 타입을 연습하세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.'
+                  placeholder='예: 인터뷰 전에 팀의 최근 프로젝트를 꼭 찾아보세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.'
                   minHeightClassName='min-h-[200px]'
                   contentClassName='!text-[13px] !leading-[1.65]'
                   simpleToolbar
