@@ -59,13 +59,13 @@ export function TimelineAccordion({
                 className='flex w-full items-start gap-3 px-4 py-3.5 text-left touch-manipulation transition-colors hover:bg-[#fafbfc] sm:px-5 sm:py-4'
               >
                 <span
-                  className='inline-flex size-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold'
+                  className='inline-flex h-7 min-w-7 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-bold tabular-nums'
                   style={{
                     backgroundColor: softColor,
                     color: accentColor,
                   }}
                 >
-                  {item.stepNumber}
+                  {item.stepNumber}단계
                 </span>
                 <div className='min-w-0 flex-1'>
                   <div className='flex flex-wrap items-center gap-2'>

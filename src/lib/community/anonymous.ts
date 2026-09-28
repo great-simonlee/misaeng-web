@@ -1,3 +1,4 @@
+import { sanitizeGuestAuthorForViewer } from '@lib/community/guest'
 import { isAnonymousBoard } from '@lib/constants/nyc'
 import type { CommunityComment, CommunityPost } from '@/types/nyc'
 
@@ -16,17 +17,22 @@ export function maskAnonymousDisplayName(name?: string | null): string {
   return `${first}**`
 }
 
-/** 익명 게시판 글 — 타인에게는 작성자 식별 정보를 숨김 */
+/**
+ * 공개 응답용 글 정리.
+ * - 게스트 글: 이메일·LinkedIn 등 비공개 연락처 제거
+ * - 익명 게시판: 타인에게는 작성자 식별 정보를 숨김
+ */
 export function sanitizeAnonymousCommunityPost(
   post: CommunityPost,
   viewerUid?: string | null,
 ): CommunityPost {
-  if (!isAnonymousBoard(post.categoryId)) return post
+  const base = sanitizeGuestAuthorForViewer(post, viewerUid)
+  if (!isAnonymousBoard(base.categoryId)) return base
 
-  const isAuthor = isViewerAuthor(post.authorUid, viewerUid)
+  const isAuthor = isViewerAuthor(base.authorUid, viewerUid)
 
   return {
-    ...post,
+    ...base,
     authorNickname: null,
     authorPhotoURL: null,
     authorSchoolId: null,

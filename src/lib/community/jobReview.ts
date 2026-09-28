@@ -439,19 +439,59 @@ function normalizeStageReviewHtml(raw: unknown, legacyDetails?: string) {
   )
 }
 
+/** Storage JSON·레거시 필드에서 타임라인 원본 coalesce */
+export function coalesceJobReviewTimelineRaw(
+  data: Record<string, unknown>,
+): unknown {
+  const candidates = [
+    data.jobReviewTimeline,
+    data.job_review_timeline,
+    data.timeline,
+  ]
+  for (const candidate of candidates) {
+    if (candidate !== undefined && candidate !== null) return candidate
+  }
+  return undefined
+}
+
+function parseJobReviewTimelineArray(raw: unknown): unknown[] | null {
+  if (Array.isArray(raw)) return raw
+  if (typeof raw === 'string' && raw.trim()) {
+    try {
+      const parsed = JSON.parse(raw) as unknown
+      return parseJobReviewTimelineArray(parsed)
+    } catch {
+      return null
+    }
+  }
+  if (raw && typeof raw === 'object') {
+    const entries = (raw as Record<string, unknown>).entries
+    if (Array.isArray(entries)) return entries
+  }
+  return null
+}
+
 export function normalizeJobReviewTimeline(raw: unknown): JobReviewTimelineEntry[] {
-  if (!Array.isArray(raw)) return []
-  return raw
+  const items = parseJobReviewTimelineArray(raw)
+  if (!items) return []
+  return items
     .map((item, index) => {
       if (!item || typeof item !== 'object') return null
       const data = item as Record<string, unknown>
       const date = String(data.date || '').trim()
-      const stageLabel = String(data.stageLabel || '').trim()
+      const stageLabel = String(
+        data.stageLabel || data.stage || data.step || data.label || '',
+      ).trim()
       const platform = String(data.platform || '').trim()
       const documentsSubmitted = String(data.documentsSubmitted || '').trim()
-      const interviewRound = String(data.interviewRound || '').trim()
-      const legacyDetails = String(data.details || '').trim()
-      const stageReviewHtml = normalizeStageReviewHtml(data.stageReviewHtml, legacyDetails)
+      const interviewRound = String(
+        data.interviewRound || data.interview || '',
+      ).trim()
+      const legacyDetails = String(data.details || data.detail || '').trim()
+      const stageReviewHtml = normalizeStageReviewHtml(
+        data.stageReviewHtml ?? data.review ?? data.note ?? data.content,
+        legacyDetails,
+      )
       const outcome = String(data.outcome || '').trim()
       if (
         !date &&

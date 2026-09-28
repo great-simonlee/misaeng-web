@@ -94,6 +94,17 @@ export async function GET(request: Request) {
       if (!user?.uid) {
         return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
       }
+      // 같은 이메일로 가입 없이 남긴 후기가 있으면 내 글로 연결 (크레딧 적립 포함)
+      if (user.email) {
+        try {
+          const { claimGuestPostsForAccount } = await import(
+            '@lib/community/guestLink.server'
+          )
+          await claimGuestPostsForAccount({ uid: user.uid, email: user.email })
+        } catch (claimError) {
+          console.error('Guest post auto-claim error:', claimError)
+        }
+      }
       const posts = await listStoredCommunityPostsByAuthor(user.uid)
       return NextResponse.json({
         posts: posts.map((item) =>
@@ -521,6 +532,7 @@ export async function POST(request: Request) {
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
     roommateMoveInDate: isRoommate ? roommateMoveInDate : null,
     roommateMoveOutDate: isRoommate ? roommateMoveOutDate : null,
+    guestAuthor: null,
   }
 
   try {

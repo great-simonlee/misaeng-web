@@ -11,6 +11,12 @@ import {
   normalizeCptOptType,
 } from '@lib/community/cptOpt'
 import {
+  isUnlinkedGuestCommunityPost,
+  normalizeCommunityGuestAuthor,
+  normalizeGuestEmail,
+} from '@lib/community/guest'
+import {
+  coalesceJobReviewTimelineRaw,
   normalizeJobReviewTimeline,
   normalizeJobReviewTips,
   normalizeJobReviewType,
@@ -187,7 +193,9 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       data.jobReviewType,
       String(data.detail || '').trim(),
     ),
-    jobReviewTimeline: normalizeJobReviewTimeline(data.jobReviewTimeline),
+    jobReviewTimeline: normalizeJobReviewTimeline(
+      coalesceJobReviewTimelineRaw(data),
+    ),
     jobReviewTips: (() => {
       const tips = normalizeJobReviewTips(data.jobReviewTips)
       return tips || null
@@ -209,6 +217,7 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       data.roommateMoveOutDate,
       normalizeRoommateMoveInDate(data.roommateMoveInDate),
     ),
+    guestAuthor: normalizeCommunityGuestAuthor(data.guestAuthor),
     city: isStatusCommunityBoard(categoryId)
       ? parseCityId(typeof data.city === 'string' ? data.city : null)
       : isSharedCommunityBoard(categoryId)
@@ -232,17 +241,46 @@ function escapeHtml(value: string) {
     .replace(/"/g, '&quot;')
 }
 
-async function fetchPostJson(
+async function fetchRawPostJson(
   bucket: string,
   path: string,
-): Promise<CommunityPost | null> {
+): Promise<Record<string, unknown> | null> {
   const res = await storageFetch(`/storage/v1/object/${bucket}/${path}`, {
     method: 'GET',
     headers: storageHeaders(),
   })
   if (!res?.ok) return null
   const data = await res.json().catch(() => null)
+  if (!data || typeof data !== 'object') return null
+  return data as Record<string, unknown>
+}
+
+async function fetchPostJson(
+  bucket: string,
+  path: string,
+): Promise<CommunityPost | null> {
+  const data = await fetchRawPostJson(bucket, path)
   return normalizeCommunityPost(data)
+}
+
+async function writeRawPostJson(
+  bucket: string,
+  postId: string,
+  data: Record<string, unknown>,
+): Promise<boolean> {
+  const body = Buffer.from(JSON.stringify(data), 'utf8')
+  const res = await storageFetch(
+    `/storage/v1/object/${bucket}/${objectPath(postId)}`,
+    {
+      method: 'POST',
+      headers: {
+        ...storageHeaders('application/json'),
+        'x-upsert': 'true',
+      },
+      body,
+    },
+  )
+  return Boolean(res?.ok)
 }
 
 async function listAllStoredCommunityPosts(): Promise<CommunityPost[]> {
@@ -326,6 +364,20 @@ export async function listStoredCommunityPosts(
   )
 }
 
+/** 아직 계정에 연결되지 않은 게스트 글 중 이메일이 일치하는 것 (open/closed 모두) */
+export async function listStoredUnlinkedGuestPostsByEmail(
+  email: string,
+): Promise<CommunityPost[]> {
+  const target = normalizeGuestEmail(email)
+  if (!target) return []
+  const posts = await listAllStoredCommunityPosts()
+  return posts.filter(
+    (post) =>
+      isUnlinkedGuestCommunityPost(post) &&
+      normalizeGuestEmail(post.guestAuthor?.email) === target,
+  )
+}
+
 /** 내 글 관리용 — open/closed 모두 포함 */
 export async function listStoredCommunityPostsByAuthor(
   authorUid: string,
@@ -341,6 +393,8 @@ async function enrichCommunityPostAuthor(
   options?: { persist?: boolean },
 ): Promise<CommunityPost> {
   if (isAnonymousBoard(post.categoryId)) return post
+  // 게스트 글(계정 미연결)은 조회할 프로필이 없다.
+  if (!post.authorUid) return post
 
   const profile = await getSupabaseProfile(post.authorUid)
   const profileNickname = profile?.nickname?.trim() || null
@@ -389,7 +443,8 @@ export async function getStoredCommunityPost(
   const bucket = await resolveBucket()
   const post = await fetchPostJson(bucket, objectPath(postId))
   if (!post) return null
-  return enrichCommunityPostAuthor(post)
+  // normalize 실패 시 빈 타임라인으로 storage를 덮어쓰지 않도록 조회만 보강
+  return enrichCommunityPostAuthor(post, { persist: false })
 }
 
 export async function saveStoredCommunityPost(
@@ -432,24 +487,40 @@ export async function saveStoredCommunityPost(
 export async function incrementStoredCommunityViewCount(
   id: string,
 ): Promise<CommunityPost | null> {
-  const existing = await getStoredCommunityPost(id)
-  if (!existing || existing.status === 'closed') return null
-  return saveStoredCommunityPost({
-    ...existing,
-    viewCount: (existing.viewCount || 0) + 1,
+  if (!isCommunityStorageConfigured()) return null
+  const postId = String(id || '').trim()
+  if (!postId) return null
+  const bucket = await resolveBucket()
+  // normalize 없이 raw JSON만 패치해 타임라인 등 필드가 조회 과정에서 지워지지 않게 함
+  const raw = await fetchRawPostJson(bucket, objectPath(postId))
+  if (!raw) return null
+  if (raw.status === 'closed') return null
+  const nextView = Math.max(0, Math.floor(Number(raw.viewCount) || 0)) + 1
+  const ok = await writeRawPostJson(bucket, postId, {
+    ...raw,
+    viewCount: nextView,
   })
+  if (!ok) return null
+  return normalizeCommunityPost({ ...raw, viewCount: nextView })
 }
 
 export async function setStoredCommunityBeenThereCount(
   id: string,
   count: number,
 ): Promise<CommunityPost | null> {
-  const existing = await getStoredCommunityPost(id)
-  if (!existing) return null
-  return saveStoredCommunityPost({
-    ...existing,
-    beenThereCount: Math.max(0, Math.floor(count)),
+  if (!isCommunityStorageConfigured()) return null
+  const postId = String(id || '').trim()
+  if (!postId) return null
+  const bucket = await resolveBucket()
+  const raw = await fetchRawPostJson(bucket, objectPath(postId))
+  if (!raw) return null
+  const beenThereCount = Math.max(0, Math.floor(count))
+  const ok = await writeRawPostJson(bucket, postId, {
+    ...raw,
+    beenThereCount,
   })
+  if (!ok) return null
+  return normalizeCommunityPost({ ...raw, beenThereCount })
 }
 
 export async function deleteStoredCommunityPost(id: string): Promise<boolean> {

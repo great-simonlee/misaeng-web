@@ -191,12 +191,14 @@ export function JobReviewWriteScreen({
       return
     }
 
-    const normalizedTimeline = normalizeJobReviewTimeline(timeline)
+    // 「이 기록 추가」를 누르지 않아도, 작성칸에 완료된 초안은 함께 저장
+    const readyTimeline = timeline.filter(isJobReviewTimelineEntryComplete)
+    const normalizedTimeline = normalizeJobReviewTimeline(readyTimeline)
     if (normalizedTimeline.length === 0) {
       toastError(
         isEdit
-          ? '진행 기록을 최소 1건 남겨 주세요'
-          : '진행 기록(날짜 + 내용)을 최소 1건 입력해 주세요',
+          ? '진행 기록을 최소 1건 남겨 주세요. 날짜와 내용을 입력한 뒤 「이 기록 추가」를 눌러 주세요'
+          : '진행 기록(날짜 + 내용)을 최소 1건 입력한 뒤 「이 기록 추가」를 눌러 주세요',
       )
       return
     }

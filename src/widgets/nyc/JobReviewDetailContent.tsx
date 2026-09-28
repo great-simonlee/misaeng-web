@@ -168,11 +168,33 @@ export function JobReviewDetailContent({
           <TimelineAccordion
             className='mt-4 px-1 sm:px-0'
             items={accordionItems}
+            defaultOpenId={latestEntryId}
             accentColor={typeStyle.accent}
             softColor={typeStyle.soft}
           />
         </section>
-      ) : null}
+      ) : (
+        <section className='mt-8'>
+          <SectionLabel>채용 단계</SectionLabel>
+          <BoardSurface className='mt-4 px-4 py-5 sm:px-5'>
+            <p className='text-[14px] font-semibold text-[var(--foreground)]'>
+              아직 등록된 채용 단계가 없어요
+            </p>
+            <p className='mt-1 text-[13px] leading-relaxed text-[var(--muted)]'>
+              서류·인터뷰·결과처럼 날짜별 진행 기록이 여기에 1단계, 2단계로
+              쌓여요.
+            </p>
+            {isAuthor ? (
+              <Link
+                href={hrefForCommunityPost(post, city, 'edit')}
+                className='mt-4 inline-flex h-10 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)]'
+              >
+                채용 단계 추가하기
+              </Link>
+            ) : null}
+          </BoardSurface>
+        </section>
+      )}
 
       {tipsHtml ? (
         <section className='mt-8'>

@@ -65,6 +65,7 @@ function withLocalCounts(post: CommunityPost): CommunityPost {
     roommateBudgetMax: post.roommateBudgetMax ?? null,
     roommateMoveInDate: post.roommateMoveInDate ?? null,
     roommateMoveOutDate: post.roommateMoveOutDate ?? null,
+    guestAuthor: post.guestAuthor ?? null,
     city: post.city ?? null,
   }
 }
@@ -163,6 +164,73 @@ export async function createCommunityPostRequest(input: {
     throw new Error(data?.error || '등록에 실패했어요')
   }
   return data.post
+}
+
+export type GuestJobReviewCreditInfo = {
+  estimated: number
+  firstPostBonus: number
+  awarded: number
+  linked: boolean
+}
+
+/** 가입 없이(또는 인증 없이) 남기는 면접·취업 후기 */
+export async function createGuestJobReviewRequest(input: {
+  title: string
+  contentHtml: string
+  location: string
+  detail: string
+  jobReviewType: CommunityPost['jobReviewType']
+  jobReviewTimeline: CommunityPost['jobReviewTimeline']
+  jobReviewTips?: CommunityPost['jobReviewTips']
+  jobReviewIndustry?: CommunityPost['jobReviewIndustry'] | null
+  guest: {
+    nickname: string
+    email: string
+    linkedinUrl: string
+    coffeeChatOk: boolean
+    guidelinesAccepted: boolean
+  }
+  /** 허니팟 — 항상 빈 값 */
+  website?: string
+}): Promise<{ post: CommunityPost; credit: GuestJobReviewCreditInfo }> {
+  const res = await fetch('/api/community/guest', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  })
+  const data = (await res.json().catch(() => null)) as
+    | { post?: CommunityPost; credit?: GuestJobReviewCreditInfo; error?: string }
+    | null
+  if (!res.ok || !data?.post) {
+    throw new Error(data?.error || '등록에 실패했어요')
+  }
+  return {
+    post: data.post,
+    credit: data.credit ?? {
+      estimated: 0,
+      firstPostBonus: 0,
+      awarded: 0,
+      linked: false,
+    },
+  }
+}
+
+/** 로그인 계정 이메일과 같은 게스트 글을 내 글로 연결 (가입 직후 호출) */
+export async function claimGuestPostsRequest(): Promise<{
+  posts: CommunityPost[]
+  creditAwarded: number
+}> {
+  const res = await fetch('/api/community/guest/claim', { method: 'POST' })
+  const data = (await res.json().catch(() => null)) as
+    | { posts?: CommunityPost[]; creditAwarded?: number; error?: string }
+    | null
+  if (!res.ok) {
+    throw new Error(data?.error || '게스트 글 연결에 실패했어요')
+  }
+  return {
+    posts: Array.isArray(data?.posts) ? data.posts : [],
+    creditAwarded: Number(data?.creditAwarded) || 0,
+  }
 }
 
 export async function fetchMyCommunityPosts(): Promise<CommunityPost[]> {

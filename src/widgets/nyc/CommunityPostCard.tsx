@@ -23,7 +23,13 @@ import {
   formatCommunityRelativeTime,
 } from '@lib/constants/communityMock'
 import { getCptOptTimelineDateRange } from '@lib/community/cptOpt'
-import { getJobReviewTimelineDateRange } from '@lib/community/jobReview'
+import { htmlToPlainText } from '@lib/community/html'
+import {
+  formatJobReviewDate,
+  getJobReviewTimelineDateRange,
+  getJobReviewTypeStyle,
+  sortJobReviewTimelineByDate,
+} from '@lib/community/jobReview'
 import { getListingContextTag } from '@lib/community/listingMeta'
 import {
   NYC_COMMUNITY_BOARD_META,
@@ -31,7 +37,7 @@ import {
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { cn } from '@lib'
-import type { CommunityPost } from '@/types/nyc'
+import type { CommunityPost, JobReviewTimelineEntry } from '@/types/nyc'
 import { BoardSurface } from '@widgets/nyc/BoardPageShell'
 import { CptOptActivityMeta } from '@widgets/nyc/CptOptActivityMeta'
 import { CptOptTypeBadge } from '@widgets/nyc/CptOptTypeBadge'
@@ -297,8 +303,12 @@ function JobReviewListingCard({
   boardId: NycCommunityBoardId
 }) {
   const postHref = usePostHref(post)
-  const stepCount = post.jobReviewTimeline?.length ?? 0
-  const dateRange = getJobReviewTimelineDateRange(post.jobReviewTimeline)
+  const timeline = sortJobReviewTimelineByDate(post.jobReviewTimeline ?? [])
+  const stepCount = timeline.length
+  const dateRange = getJobReviewTimelineDateRange(timeline)
+  const typeStyle = getJobReviewTypeStyle(post.jobReviewType)
+  const visibleSteps = timeline.slice(0, JOB_REVIEW_LISTING_STEP_LIMIT)
+  const hiddenStepCount = stepCount - visibleSteps.length
   const contextTag = getListingContextTag(
     [post.location, post.jobReviewIndustry],
     post.authorSchoolId,
@@ -336,12 +346,32 @@ function JobReviewListingCard({
           <span className='line-clamp-2'>{post.title}</span>
         </h3>
 
-        <p className='mt-2 line-clamp-2 text-[13px] leading-relaxed text-[var(--muted)] sm:text-[14px]'>
-          {post.jobReviewTips?.trim() || post.description}
-        </p>
+        {visibleSteps.length > 0 ? (
+          <ol className='mt-3 space-y-2'>
+            {visibleSteps.map((entry, index) => (
+              <JobReviewListingStep
+                key={entry.id}
+                entry={entry}
+                stepNumber={index + 1}
+                accentColor={typeStyle.accent}
+                softColor={typeStyle.soft}
+              />
+            ))}
+          </ol>
+        ) : (
+          <p className='mt-2 line-clamp-2 text-[13px] leading-relaxed text-[var(--muted)] sm:text-[14px]'>
+            {post.description}
+          </p>
+        )}
 
         <TimelineSummaryRow
-          label={stepCount > 0 ? `채용 단계 ${stepCount}건` : null}
+          label={
+            stepCount > 0
+              ? hiddenStepCount > 0
+                ? `채용 단계 ${stepCount}건 · ${hiddenStepCount}단계 더 보기`
+                : `채용 단계 ${stepCount}건`
+              : null
+          }
           dateRange={dateRange}
         />
 
@@ -483,6 +513,65 @@ function FoodOverlayChip({
     >
       {children}
     </span>
+  )
+}
+
+/** 취업 후기 목록 카드에 바로 보여줄 최대 단계 수 (나머지는 "n단계 더 보기") */
+const JOB_REVIEW_LISTING_STEP_LIMIT = 3
+
+/** 취업 후기 목록: 단계 번호 · 날짜 · 단계 요약 + 단계 후기 미리보기 */
+function JobReviewListingStep({
+  entry,
+  stepNumber,
+  accentColor,
+  softColor,
+}: {
+  entry: JobReviewTimelineEntry
+  stepNumber: number
+  accentColor: string
+  softColor: string
+}) {
+  const fieldSummary = [
+    entry.stageLabel,
+    entry.platform,
+    entry.interviewRound,
+    entry.outcome,
+  ]
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .join(' · ')
+  const review = htmlToPlainText(entry.stageReviewHtml || '')
+  const description = review || entry.documentsSubmitted.trim()
+  const dateLabel = entry.date
+    ? formatJobReviewDate(entry.date, { compactYear: true })
+    : ''
+
+  return (
+    <li className='flex items-start gap-2.5'>
+      <span
+        className='mt-px inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[9px] font-bold tabular-nums'
+        style={{ backgroundColor: softColor, color: accentColor }}
+      >
+        {stepNumber}단계
+      </span>
+      <div className='min-w-0 flex-1'>
+        <p className='flex min-w-0 items-baseline gap-1.5 text-[13px] leading-snug'>
+          {dateLabel ? (
+            <span className='shrink-0 text-[11px] font-medium tabular-nums text-[var(--muted)]'>
+              {dateLabel}
+            </span>
+          ) : null}
+          <span className='truncate font-semibold text-[var(--foreground)]'>
+            {fieldSummary || (dateLabel ? '' : '단계 정보 없음')}
+          </span>
+        </p>
+        {description ? (
+          <p className='mt-0.5 line-clamp-2 text-[12.5px] leading-relaxed text-[var(--muted)] sm:text-[13px]'>
+            {description}
+          </p>
+        ) : null}
+      </div>
+    </li>
   )
 }
 

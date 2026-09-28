@@ -333,6 +333,33 @@ export interface CommunityPost {
   roommateMoveInDate: string | null
   /** 룸메이트/서블렛: 입주·서블렛 종료일 (YYYY-MM-DD) */
   roommateMoveOutDate: string | null
+  /**
+   * 비회원(게스트) 작성 정보. 가입 없이 남긴 취업 후기에만 존재.
+   * email·linkedinUrl은 비공개 — 공개 API 응답에서는 빈 문자열로 내려간다.
+   * 계정에 연결되면 authorUid가 채워지고 linkedUid/linkedAt이 기록된다.
+   */
+  guestAuthor: CommunityGuestAuthor | null
+}
+
+/** 가입 없이 글을 남긴 작성자 연락처·연결 상태 */
+export interface CommunityGuestAuthor {
+  /** 게시용 닉네임 (공개) */
+  nickname: string
+  /** 기프트카드 발송·계정 연결용 (비공개) */
+  email: string
+  /** 실제 재직 확인용 LinkedIn 프로필 (비공개) */
+  linkedinUrl: string
+  /** 후배들의 커피챗 요청을 받아도 괜찮은지 */
+  coffeeChatOk: boolean
+  /** 작성 시 동의한 커뮤니티 작성 안내 버전 */
+  guidelinesVersion: string | null
+  /** 연결된 계정 uid (연결 전 null) */
+  linkedUid: string | null
+  linkedAt: number | null
+  /** self = 웹에서 본인이 가입·연결, admin = ERP에서 운영자가 연결 */
+  linkedBy: 'self' | 'admin' | null
+  /** ERP에서 연결한 운영자 이메일 */
+  linkedByEmail: string | null
 }
 
 /** CPT / OPT / STEM OPT / 비자 / 영주권 */

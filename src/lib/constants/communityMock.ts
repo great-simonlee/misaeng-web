@@ -83,6 +83,7 @@ function post(
     | 'roommateBudgetMax'
     | 'roommateMoveInDate'
     | 'roommateMoveOutDate'
+    | 'guestAuthor'
     | 'city'
     | 'authorUid'
     | 'authorEmail'
@@ -164,6 +165,7 @@ function post(
     roommateBudgetMax: partial.roommateBudgetMax ?? null,
     roommateMoveInDate: partial.roommateMoveInDate ?? null,
     roommateMoveOutDate: partial.roommateMoveOutDate ?? null,
+    guestAuthor: null,
     city: isSharedCommunityBoard(partial.categoryId)
       ? null
       : resolveCityId(partial.city),
