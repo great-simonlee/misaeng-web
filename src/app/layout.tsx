@@ -1,18 +1,14 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist_Mono } from 'next/font/google'
 
 import { AuthProvider } from '@hooks/useAuth'
+import { pretendard } from '@lib/fonts/pretendard'
 import { ToastProvider } from '@hooks/useToast'
 import { ConsentLocaleProvider } from '@components/consent/ConsentLocaleProvider'
 import { ReconsentGate } from '@components/consent/ReconsentGate'
 import { SiteFooter } from '@widgets/SiteFooter'
 import { SiteHeader } from '@widgets/SiteHeader'
 import './globals.css'
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -58,7 +54,7 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-w-0 overflow-x-hidden antialiased bg-[var(--background)] text-[var(--foreground)]`}
+        className={`${pretendard.variable} ${geistMono.variable} min-w-0 overflow-x-hidden antialiased bg-[var(--background)] text-[var(--foreground)]`}
         suppressHydrationWarning
       >
         <div className='flex min-h-dvh flex-col'>

@@ -41,14 +41,14 @@
   --color-slate-muted: var(--slate-muted);
   --color-accent: var(--accent);
   --color-accent-muted: var(--accent-muted);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-pretendard);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+  font-family: var(--font-pretendard), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
   transition: background-color 0.2s ease, color 0.2s ease;
   -webkit-tap-highlight-color: transparent;

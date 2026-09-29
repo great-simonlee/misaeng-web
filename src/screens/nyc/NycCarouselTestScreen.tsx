@@ -1,24 +1,17 @@
 'use client'
 
 import Link from 'next/link'
-import { Noto_Sans_KR } from 'next/font/google'
-
 import { useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
+import { pretendard } from '@lib/fonts/pretendard'
 import { NycIntroCarousel } from '@widgets/nyc/NycIntroCarousel'
-
-const notoSansKr = Noto_Sans_KR({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '700', '900'],
-  display: 'swap',
-})
 
 export function NycCarouselTestScreen() {
   const href = useCityPath()
   return (
     <div
       className={cn(
-        notoSansKr.className,
+        pretendard.className,
         'min-h-[calc(100dvh-3.5rem)] bg-[#e9e4d9] py-10 sm:min-h-[calc(100dvh-4rem)] sm:py-14',
       )}
     >
