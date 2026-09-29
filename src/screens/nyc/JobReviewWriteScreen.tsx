@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { FormEvent, ReactNode } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { LoadingState, TipTapEditor } from '@components'
 import { useCity, useCityPath } from '@hooks/useCity'
@@ -109,8 +109,22 @@ export function JobReviewWriteScreen({
       : user.uid
     : null
 
+  // 제출이 끝난 뒤 화면 이탈 저장이 지운 초안을 되살리지 않도록 렌더와 무관하게 즉시 막는다.
+  const submittedRef = useRef(false)
+  // 수정 모드: 불러온 글 그대로면 저장하지 않는다 (다음 방문 때 "불러왔어요"가 뜨지 않게).
+  const editBaselineRef = useRef<string | null>(null)
+
+  function applyDraftData(data: JobReviewWriteDraft) {
+    setPostTitle(data.postTitle)
+    setContentHtml(data.contentHtml)
+    setLocation(data.location)
+    setIndustry(data.industry)
+    setJobReviewType(data.jobReviewType)
+    setTimeline(data.timeline)
+  }
+
   function persistDraft(): number | null {
-    if (!draftKeyUid) return null
+    if (!draftKeyUid || submittedRef.current) return null
     const data: JobReviewWriteDraft = {
       postTitle,
       contentHtml,
@@ -119,7 +133,15 @@ export function JobReviewWriteScreen({
       jobReviewType,
       timeline,
     }
-    if (!isEdit && !hasJobReviewDraftContent(data)) return null
+    if (isEdit) {
+      if (JSON.stringify(data) === editBaselineRef.current) {
+        clearWriteDraft('job-review', city, draftKeyUid)
+        setDraftSavedAt(null)
+        return null
+      }
+    } else if (!hasJobReviewDraftContent(data)) {
+      return null
+    }
     const savedAt = saveWriteDraft<JobReviewWriteDraft>(
       'job-review',
       city,
@@ -160,19 +182,18 @@ export function JobReviewWriteScreen({
     setDraftHydrated(true)
   }, [city, isEdit, user?.uid])
 
-  useEffect(() => {
-    if (!editPostId || !user?.uid) return
-    let cancelled = false
-    ;(async () => {
+  // 글 불러오기는 글·사용자가 바뀔 때만 — 다시 실행되면 작성 중인 내용을 서버 값으로 덮어쓴다.
+  const loadEditPost = useEffectEvent(
+    async (postId: string, uid: string, signal: { cancelled: boolean }) => {
       try {
-        const post = await fetchCommunityPost(editPostId)
-        if (cancelled) return
+        const post = await fetchCommunityPost(postId)
+        if (signal.cancelled) return
         if (!post || !isJobReviewBoard(post.categoryId)) {
           toastError('글을 찾을 수 없어요')
           router.replace(href('/me/posts'))
           return
         }
-        if (post.authorUid !== user.uid) {
+        if (post.authorUid !== uid) {
           toastError('수정 권한이 없어요')
           router.replace(hrefForCommunityPost(post, city))
           return
@@ -182,54 +203,65 @@ export function JobReviewWriteScreen({
           : []
         setExistingTimelineIds(loadedTimeline.map((entry) => entry.id))
 
+        const bodyPlain = htmlToPlainText(post.contentHtml || '')
+        const fromPost: JobReviewWriteDraft = {
+          postTitle: post.title,
+          contentHtml: bodyPlain
+            ? post.contentHtml
+            : post.jobReviewTips?.trim()
+              ? `<p>${escapeHtml(post.jobReviewTips.trim())}</p>`
+              : '',
+          location: post.location,
+          industry: post.jobReviewIndustry?.trim() || '',
+          jobReviewType: post.jobReviewType,
+          timeline: loadedTimeline,
+        }
+        editBaselineRef.current = JSON.stringify(fromPost)
+
         // 제출 전에 자동 저장된 수정본이 글보다 최신이면 그걸 이어서 보여 준다.
-        const editDraftUid = `${user.uid}:edit:${editPostId}`
+        const editDraftUid = `${uid}:edit:${postId}`
         const stored = loadWriteDraft<JobReviewWriteDraft>(
           'job-review',
           city,
           editDraftUid,
         )
         if (stored && stored.savedAt > (post.updatedAt || post.createdAt)) {
-          setPostTitle(stored.data.postTitle ?? post.title)
-          setContentHtml(stored.data.contentHtml ?? '')
-          setLocation(stored.data.location ?? post.location)
-          setIndustry(stored.data.industry ?? '')
-          setJobReviewType(stored.data.jobReviewType ?? post.jobReviewType)
-          setTimeline(
-            Array.isArray(stored.data.timeline) ? stored.data.timeline : [],
-          )
+          applyDraftData({
+            postTitle: stored.data.postTitle ?? fromPost.postTitle,
+            contentHtml: stored.data.contentHtml ?? fromPost.contentHtml,
+            location: stored.data.location ?? fromPost.location,
+            industry: stored.data.industry ?? fromPost.industry,
+            jobReviewType: stored.data.jobReviewType ?? fromPost.jobReviewType,
+            timeline: Array.isArray(stored.data.timeline)
+              ? stored.data.timeline
+              : fromPost.timeline,
+          })
           setDraftSavedAt(stored.savedAt)
           success('제출 전에 자동 저장된 수정 내용을 불러왔어요')
           return
         }
         if (stored) clearWriteDraft('job-review', city, editDraftUid)
-
-        setPostTitle(post.title)
-        const bodyPlain = htmlToPlainText(post.contentHtml || '')
-        setContentHtml(
-          bodyPlain
-            ? post.contentHtml
-            : post.jobReviewTips?.trim()
-              ? `<p>${escapeHtml(post.jobReviewTips.trim())}</p>`
-              : '',
-        )
-        setLocation(post.location)
-        setIndustry(post.jobReviewIndustry?.trim() || '')
-        setJobReviewType(post.jobReviewType)
-        setTimeline(loadedTimeline)
+        applyDraftData(fromPost)
       } catch (err) {
-        if (!cancelled) {
+        if (!signal.cancelled) {
           toastError(getErrorMessage(err, '글을 불러오지 못했어요'))
           router.replace(href('/me/posts'))
         }
       } finally {
-        if (!cancelled) setLoadingEdit(false)
+        if (!signal.cancelled) setLoadingEdit(false)
       }
-    })()
+    },
+  )
+
+  const editUid = user?.uid
+  useEffect(() => {
+    if (!editPostId || !editUid) return
+    const signal = { cancelled: false }
+    void loadEditPost(editPostId, editUid, signal)
     return () => {
-      cancelled = true
+      signal.cancelled = true
     }
-  }, [city, editPostId, href, user?.uid, router, success, toastError])
+  }, [editPostId, editUid])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -303,6 +335,7 @@ export function JobReviewWriteScreen({
               authorSchoolName: profile?.verifiedSchoolName ?? null,
             })
 
+      submittedRef.current = true
       setSubmitted(true)
       if (draftKeyUid) clearWriteDraft('job-review', city, draftKeyUid)
       success(

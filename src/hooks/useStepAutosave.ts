@@ -15,7 +15,7 @@ function sectionOf(node: EventTarget | null): Element | null {
  * 주기 저장 대신 "단계 전환" 시점에만 저장한다.
  * - `requestSave()`: 기록 추가·삭제 등 명시적 시점
  * - `handleSectionFocus`: 폼의 onFocus에 연결하면, 포커스가 다른 구역에 들어갈 때 저장
- * - 탭을 숨기거나 페이지를 떠날 때도 한 번 저장
+ * - 탭을 숨기거나 페이지를 떠날 때, 화면이 사라질 때도 한 번 저장
  * 저장은 상태가 반영된 다음 렌더 이후에 실행돼 최신 값이 들어간다.
  */
 export function useStepAutosave(save: () => void, enabled = true) {
@@ -44,6 +44,9 @@ export function useStepAutosave(save: () => void, enabled = true) {
       window.removeEventListener('pagehide', onPageHide)
     }
   }, [enabled])
+
+  // 앱 안의 링크·뒤로가기(클라이언트 이동)는 pagehide가 없어서, 화면이 사라질 때 한 번 더 저장한다.
+  useEffect(() => () => persist(), [])
 
   const requestSave = useCallback(() => setRequestId((n) => n + 1), [])
 

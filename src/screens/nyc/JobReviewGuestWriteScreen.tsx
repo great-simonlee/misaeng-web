@@ -4,7 +4,7 @@ import Link from 'next/link'
 import type { FormEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { TipTapEditor } from '@components'
+import { LoadingState, TipTapEditor } from '@components'
 import { useConsentLocale } from '@components/consent/ConsentLocaleProvider'
 import { TermsConsentFields } from '@components/consent/TermsConsentFields'
 import { NicknameAvailabilityHint } from '@components/NicknameAvailabilityHint'
@@ -382,7 +382,9 @@ export function JobReviewGuestWriteScreen() {
         },
         website: honeypot,
       })
+      // 작성 도중 로그인했다면 게스트 키에도 예전 초안이 남아 있다.
       clearWriteDraft(BOARD_ID, city, `${draftUid}:share`)
+      clearWriteDraft(BOARD_ID, city, `${DRAFT_UID_GUEST}:share`)
       setResult(created)
       setPhase('done')
       setAcceptedTerms(false)
@@ -432,7 +434,11 @@ export function JobReviewGuestWriteScreen() {
           />
         ) : null}
 
-        {phase === 'write' ? (
+        {phase === 'write' && !draftHydrated ? (
+          <LoadingState label='작성 중이던 내용을 확인하는 중…' />
+        ) : null}
+
+        {phase === 'write' && draftHydrated ? (
           <>
             <WriteHero mode={mode} writeLabel={meta.writeLabel} />
             <form
