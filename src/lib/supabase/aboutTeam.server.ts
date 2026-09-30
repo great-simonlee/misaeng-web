@@ -1,5 +1,6 @@
 import {
   DEFAULT_ABOUT_TEAM,
+  isHiddenAboutTeamMember,
   type AboutTeamMember,
 } from '@lib/about/team'
 
@@ -110,6 +111,7 @@ export async function getAboutTeamMembers(): Promise<AboutTeamMember[]> {
   return rawList
     .map((item: unknown, index: number) => normalizeMember(item, index))
     .filter((item): item is AboutTeamMember => Boolean(item))
+    .filter((item) => !isHiddenAboutTeamMember(item))
     .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name))
     .map((member, index) => ({ ...member, sortOrder: index }))
 }

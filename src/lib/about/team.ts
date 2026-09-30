@@ -24,18 +24,6 @@ export const DEFAULT_ABOUT_TEAM: AboutTeamMember[] = [
     sortOrder: 0,
   },
   {
-    id: 'laura',
-    name: 'Laura Fanelli',
-    position: 'Sales & Operations Manager',
-    role: 'Team Lead of Business Operations & Talent Management',
-    description:
-      'As the Operations Manager at Misaeng, I oversee hiring, client relations, and on-site property tours for interested renters. I strive to find the right properties to match tenant preferences and that ultimately feel like home.\n\nAt Misaeng, we find people looking for the same things in a home and help bring them together to make the hassle of finding a living situation in NYC smoother. It is my job to make sure you are not alone in the renting process, which can be vast and overwhelming. I\'ve lived in the city for over 10 years and bring that lived knowledge to finding you a spot that works best for you.',
-    email: 'laura@misaeng.com',
-    photoURL: '/img/laura.png',
-    agentId: null,
-    sortOrder: 1,
-  },
-  {
     id: 'mimi',
     name: 'Mimi Nguyen',
     position: 'Sales Associate',
@@ -45,7 +33,7 @@ export const DEFAULT_ABOUT_TEAM: AboutTeamMember[] = [
     email: 'mimi@misaeng.com',
     photoURL: '/img/mimi.png',
     agentId: null,
-    sortOrder: 2,
+    sortOrder: 1,
   },
   {
     id: 'dalston',
@@ -57,7 +45,7 @@ export const DEFAULT_ABOUT_TEAM: AboutTeamMember[] = [
     email: 'dalston@misaeng.com',
     photoURL: '/img/dalston.png',
     agentId: null,
-    sortOrder: 3,
+    sortOrder: 2,
   },
   {
     id: 'eunice',
@@ -69,9 +57,22 @@ export const DEFAULT_ABOUT_TEAM: AboutTeamMember[] = [
     email: 'eunice@misaeng.com',
     photoURL: '/img/eunice.png',
     agentId: null,
-    sortOrder: 4,
+    sortOrder: 3,
   },
 ]
+
+/** 더 이상 사이트에 노출하지 않는 팀원 (저장소에 남아 있어도 숨김) */
+export function isHiddenAboutTeamMember(member: Pick<AboutTeamMember, 'id' | 'name' | 'email'>) {
+  const id = member.id.trim().toLowerCase()
+  const name = member.name.trim().toLowerCase()
+  const email = member.email.trim().toLowerCase()
+  return (
+    id === 'laura' ||
+    email === 'laura@misaeng.com' ||
+    name === 'laura fanelli' ||
+    name.startsWith('laura fanelli')
+  )
+}
 
 export function descriptionParagraphs(text: string): string[] {
   return String(text || '')

@@ -330,10 +330,10 @@ export function CareersScreen() {
                 Email
               </span>
               <a
-                href='mailto:laura@misaeng.com'
+                href='mailto:info@misaeng.com'
                 className='font-mono text-sm font-medium text-[var(--foreground)] underline decoration-[var(--border)] underline-offset-2 transition hover:decoration-[#F64310]/50 hover:text-[#F64310]'
               >
-                laura@misaeng.com
+                info@misaeng.com
               </a>
             </div>
             <div className='flex flex-col gap-0.5 sm:gap-1'>

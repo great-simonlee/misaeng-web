@@ -566,7 +566,7 @@ function JobReviewListingStep({
           </span>
         </p>
         {description ? (
-          <p className='mt-0.5 line-clamp-2 text-[12.5px] leading-relaxed text-[var(--muted)] sm:text-[13px]'>
+          <p className='mt-0.5 truncate text-[12.5px] leading-relaxed text-[var(--muted)] sm:text-[13px]'>
             {description}
           </p>
         ) : null}

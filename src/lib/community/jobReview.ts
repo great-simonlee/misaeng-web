@@ -402,10 +402,13 @@ export function getJobReviewTimelinePlaceholder(
 export function getJobReviewTimelineDateRange(
   timeline: JobReviewTimelineEntry[] | null | undefined
 ) {
-  const dates = (timeline ?? [])
-    .map((entry) => entry.date.trim())
-    .filter(Boolean)
-    .sort()
+  const dates = [
+    ...new Set(
+      (timeline ?? [])
+        .map((entry) => entry.date.trim())
+        .filter(Boolean),
+    ),
+  ].sort()
   if (dates.length === 0) return null
   if (dates.length === 1) return formatJobReviewDate(dates[0], { compactYear: true })
   return `${formatJobReviewDate(dates[0], { compactYear: true })} – ${formatJobReviewDate(dates[dates.length - 1], { compactYear: true })}`
