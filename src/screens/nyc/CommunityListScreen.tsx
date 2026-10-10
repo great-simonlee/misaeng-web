@@ -72,6 +72,7 @@ import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CommunityPostCard } from '@widgets/nyc/CommunityPostCard'
+import { CompanyDirectoryBanner } from '@widgets/nyc/CompanyDirectoryBanner'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { RoommateListScreen } from '@screens/nyc/RoommateListScreen'
@@ -568,7 +569,9 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
         showFilter={!isFoodBoard}
         onFilterClick={isFoodBoard ? undefined : openFilters}
         filterCount={isFoodBoard ? 0 : activeFilterCount}
-      />
+      >
+        {boardId === 'job-review' ? <CompanyDirectoryBanner /> : null}
+      </BoardListToolbar>
 
       {isFoodBoard ? (
         <FoodCategoryStickyBar

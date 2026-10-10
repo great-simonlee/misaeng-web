@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
+import { applyReviewBodyAccess } from '@lib/community/reviewAccess'
+import { resolveReviewCompanyId } from '@lib/supabase/companies.server'
 import { accountSuspendedResponse } from '@lib/supabase/profile.server'
 import {
   normalizeCptOptTimeline,
@@ -87,6 +89,7 @@ type UpdateBody = {
   jobReviewTimeline?: JobReviewTimelineEntry[] | null
   jobReviewTips?: string | null
   jobReviewIndustry?: string | null
+  companyId?: string | null
   roommateLookingFor?: RoommateLookingFor | null
   roommateBudgetMax?: number | null
   roommateMoveInDate?: string | null
@@ -109,7 +112,10 @@ export async function GET(_request: Request, context: RouteContext) {
     }
     const user = await resolveAuthenticatedUser()
     return NextResponse.json({
-      post: sanitizeAnonymousCommunityPost(post, user?.uid),
+      post: applyReviewBodyAccess(
+        sanitizeAnonymousCommunityPost(post, user?.uid),
+        user,
+      ),
     })
   } catch (error) {
     console.error('Community get error:', error)
@@ -422,6 +428,13 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
   }
 
+  const companyResult = isJobReview
+    ? await resolveReviewCompanyId(body.companyId)
+    : ({ ok: true, companyId: undefined } as const)
+  if (!companyResult.ok) {
+    return NextResponse.json({ error: companyResult.error }, { status: 400 })
+  }
+
   const next = {
     ...existing,
     ...(isCptOpt ? { categoryId: 'status' as const } : {}),
@@ -456,6 +469,11 @@ export async function PATCH(request: Request, context: RouteContext) {
     jobReviewTimeline: isJobReview ? jobReviewTimeline : [],
     jobReviewTips: isJobReview ? jobReviewTips || null : null,
     jobReviewIndustry: isJobReview ? jobReviewIndustry : null,
+    companyId: isJobReview
+      ? companyResult.companyId === undefined
+        ? (existing.companyId ?? null)
+        : companyResult.companyId
+      : (existing.companyId ?? null),
     roommateLookingFor: isRoommate ? roommateLookingFor : null,
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
     roommateMoveInDate: isRoommate ? roommateMoveInDate : null,

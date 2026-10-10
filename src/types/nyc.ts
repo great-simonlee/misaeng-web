@@ -325,6 +325,8 @@ export interface CommunityPost {
   jobReviewTips: string | null
   /** 취업 후기: 업계 (테크, 금융 등) */
   jobReviewIndustry: string | null
+  /** 면접/취업 후기 → companies/index.json 회사 id. 없으면 location 텍스트만 있음 */
+  companyId?: string | null
   /** 룸메이트/서블렛: 구하는 유형 */
   roommateLookingFor: RoommateLookingFor | null
   /** 룸메이트/서블렛: 월 예산·월세 (USD) */

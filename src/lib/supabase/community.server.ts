@@ -205,6 +205,10 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       data.jobReviewIndustry.trim()
         ? data.jobReviewIndustry.trim()
         : null,
+    companyId:
+      typeof data.companyId === 'string' && data.companyId.trim()
+        ? data.companyId.trim()
+        : null,
     roommateLookingFor: normalizeRoommateLookingFor(
       data.roommateLookingFor,
       String(data.detail || '').trim(),
@@ -361,6 +365,20 @@ export async function listStoredCommunityPosts(
     withCounts.map((item) =>
       enrichCommunityPostAuthor(item, { persist: false }),
     ),
+  )
+}
+
+/** 한 게시판의 공개 글 — 작성자 프로필 보강 없이 (회사별 후기 수·목록용) */
+export async function listStoredOpenBoardPosts(
+  boardId: string,
+  city?: CityId,
+): Promise<CommunityPost[]> {
+  const posts = await listAllStoredCommunityPosts()
+  return posts.filter(
+    (post) =>
+      post.status === 'open' &&
+      post.categoryId === boardId &&
+      (!city || communityPostMatchesCity(post, city)),
   )
 }
 

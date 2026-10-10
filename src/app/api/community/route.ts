@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../agent-auth/lib/authHelpers'
+import { applyReviewBodyAccess } from '@lib/community/reviewAccess'
+import { resolveReviewCompanyId } from '@lib/supabase/companies.server'
 import {
   normalizeCptOptTimeline,
   normalizeCptOptTips,
@@ -108,7 +110,10 @@ export async function GET(request: Request) {
       const posts = await listStoredCommunityPostsByAuthor(user.uid)
       return NextResponse.json({
         posts: posts.map((item) =>
-          sanitizeAnonymousCommunityPost(item, user.uid),
+          applyReviewBodyAccess(
+            sanitizeAnonymousCommunityPost(item, user.uid),
+            user,
+          ),
         ),
       })
     }
@@ -118,7 +123,10 @@ export async function GET(request: Request) {
     const posts = await listStoredCommunityPosts(board, city)
     return NextResponse.json({
       posts: posts.map((item) =>
-        sanitizeAnonymousCommunityPost(item, user?.uid),
+        applyReviewBodyAccess(
+          sanitizeAnonymousCommunityPost(item, user?.uid),
+          user,
+        ),
       ),
     })
   } catch (error) {
@@ -160,6 +168,7 @@ type CreateBody = {
   jobReviewTimeline?: JobReviewTimelineEntry[] | null
   jobReviewTips?: string | null
   jobReviewIndustry?: string | null
+  companyId?: string | null
   roommateLookingFor?: RoommateLookingFor | null
   roommateBudgetMax?: number | null
   roommateMoveInDate?: string | null
@@ -481,6 +490,13 @@ export async function POST(request: Request) {
     )
   }
 
+  const companyResult = isJobReview
+    ? await resolveReviewCompanyId(body?.companyId)
+    : ({ ok: true, companyId: null } as const)
+  if (!companyResult.ok) {
+    return NextResponse.json({ error: companyResult.error }, { status: 400 })
+  }
+
   const post: CommunityPost = {
     id,
     categoryId,
@@ -528,6 +544,7 @@ export async function POST(request: Request) {
     jobReviewTimeline: isJobReview ? jobReviewTimeline : [],
     jobReviewTips: isJobReview ? jobReviewTips || null : null,
     jobReviewIndustry: isJobReview ? jobReviewIndustry : null,
+    companyId: isJobReview ? (companyResult.companyId ?? null) : null,
     roommateLookingFor: isRoommate ? roommateLookingFor : null,
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
     roommateMoveInDate: isRoommate ? roommateMoveInDate : null,

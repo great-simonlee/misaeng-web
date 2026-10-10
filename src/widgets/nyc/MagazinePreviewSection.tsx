@@ -33,6 +33,8 @@ export function MagazinePreviewSection() {
                 src={item.image}
                 alt=''
                 fill
+                // 데스크톱 첫 화면에 보이는 LCP 후보라 지연 로딩하지 않는다 (4장뿐)
+                loading='eager'
                 className='object-cover'
                 sizes='(max-width: 640px) 68vw, 25vw'
               />

@@ -36,6 +36,7 @@ import {
 } from '@lib/supabase/community.server'
 import { isNicknameTakenByOther } from '@lib/supabase/nicknameIndex.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
+import { resolveReviewCompanyId } from '@lib/supabase/companies.server'
 import type {
   CommunityPost,
   JobReviewTimelineEntry,
@@ -62,6 +63,7 @@ type GuestCreateBody = {
   jobReviewTimeline?: JobReviewTimelineEntry[] | null
   jobReviewTips?: string | null
   jobReviewIndustry?: string | null
+  companyId?: string | null
   guest?: {
     nickname?: string
     email?: string
@@ -174,6 +176,10 @@ export async function POST(request: Request) {
   }
   const jobReviewTips = normalizeJobReviewTips(body.jobReviewTips) || null
   const jobReviewIndustry = String(body.jobReviewIndustry || '').trim() || null
+  const companyResult = await resolveReviewCompanyId(body.companyId)
+  if (!companyResult.ok) {
+    return NextResponse.json({ error: companyResult.error }, { status: 400 })
+  }
 
   if (!user && isRateLimited(getClientIp(request))) {
     return bad('잠시 후 다시 시도해 주세요. (짧은 시간에 너무 많은 요청)', 429)
@@ -234,6 +240,7 @@ export async function POST(request: Request) {
     jobReviewTimeline,
     jobReviewTips,
     jobReviewIndustry,
+    companyId: companyResult.companyId ?? null,
     roommateLookingFor: null,
     roommateBudgetMax: null,
     roommateMoveInDate: null,
