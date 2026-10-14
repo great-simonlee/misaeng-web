@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server'
 import { resolveCityId } from '@lib/constants/cities'
-import { isCompanyIndustry } from '@lib/constants/company'
 import { companyMatchesQuery } from '@lib/company/companyRules'
 import {
   countReviewsByCompany,
+  industryLabelFrom,
   isCompanyStorageConfigured,
   listActiveCompanies,
+  listIndustries,
 } from '@lib/supabase/companies.server'
+import { listPublicPostings } from '@lib/supabase/jobPostings.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -22,26 +24,33 @@ export async function GET(request: Request) {
     const q = searchParams.get('q')?.trim() || ''
     const city = searchParams.get('city') ? resolveCityId(searchParams.get('city')) : undefined
 
-    const [companies, counts] = await Promise.all([
+    const [companies, counts, industries, postings] = await Promise.all([
       listActiveCompanies(),
       countReviewsByCompany(city),
+      listIndustries(),
+      listPublicPostings().catch(() => []),
     ])
+    const postingCounts: Record<string, number> = {}
+    for (const p of postings) postingCounts[p.company.id] = (postingCounts[p.company.id] || 0) + 1
+    const knownIndustry = industries.some((i) => i.code === industry)
     const filtered = companies.filter(
-      (c) =>
-        (!isCompanyIndustry(industry) || c.industry === industry) && companyMatchesQuery(c, q),
+      (c) => (!knownIndustry || c.industry === industry) && companyMatchesQuery(c, q),
     )
     return NextResponse.json({
+      industries,
       companies: filtered.map((c) => ({
         slug: c.slug,
         name: c.name,
         aliases: c.aliases,
         industry: c.industry,
+        industryLabel: industryLabelFrom(industries, c.industry),
         logoUrl: c.logoUrl,
         careersUrl: c.careersUrl,
         studentsUrl: c.studentsUrl,
         isFeatured: c.isFeatured,
         country: c.country,
         reviewCount: counts[c.id] || 0,
+        postingCount: postingCounts[c.id] || 0,
       })),
     })
   } catch (error) {

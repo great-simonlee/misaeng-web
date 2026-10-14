@@ -53,8 +53,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
+      {/* overflow-x-clip (not hidden): hidden turns <body> into a scroll container and breaks position: sticky.
+          Horizontal scroll is still blocked by html { overflow-x: hidden } in globals.css. */}
       <body
-        className={`${pretendard.variable} ${geistMono.variable} min-w-0 overflow-x-hidden antialiased bg-[var(--background)] text-[var(--foreground)]`}
+        className={`${pretendard.variable} ${geistMono.variable} min-w-0 overflow-x-clip antialiased bg-[var(--background)] text-[var(--foreground)]`}
         suppressHydrationWarning
       >
         <div className='flex min-h-dvh flex-col'>

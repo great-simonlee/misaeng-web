@@ -7,24 +7,33 @@ export type CompanyListItem = {
   name: string
   aliases: string[]
   industry: string
+  industryLabel: string
   logoUrl: string | null
   careersUrl: string
   studentsUrl: string | null
   isFeatured: boolean
   country: string | null
   reviewCount: number
+  /** 사이트에 보이는 인턴·신입 공고 수 */
+  postingCount: number
 }
 
 export type CompanyVisaInfo = {
   h1bSponsor: VisaStatus | null
   eVerify: VisaStatus | null
   optCpt: VisaStatus | null
+  /** 공개 비자 안내 (예: "비자 지원 언급 있음"), 안내문, 근거 링크, 확인일 */
+  summary?: string | null
+  notice?: string | null
+  sourceUrl?: string | null
+  checkedAt?: string | null
 }
 
 export type CompanySummary = {
   slug: string
   name: string
   industry: string
+  industryLabel: string
   logoUrl: string | null
   reviewCount: number
 }
@@ -77,11 +86,16 @@ async function getJson<T>(url: string): Promise<T> {
   return data
 }
 
-export async function fetchCompanies(city: CityId): Promise<CompanyListItem[]> {
-  const data = await getJson<{ companies: CompanyListItem[] }>(
+/** 업계 코드와 한국어 이름 (관리자가 정한 순서) */
+export type CompanyIndustryOption = { code: string; label: string }
+
+export async function fetchCompanies(
+  city: CityId,
+): Promise<{ companies: CompanyListItem[]; industries: CompanyIndustryOption[] }> {
+  const data = await getJson<{ companies: CompanyListItem[]; industries?: CompanyIndustryOption[] }>(
     `/api/companies?city=${encodeURIComponent(city)}`,
   )
-  return data.companies ?? []
+  return { companies: data.companies ?? [], industries: data.industries ?? [] }
 }
 
 export function fetchCompany(slug: string, city: CityId): Promise<CompanyDetail> {

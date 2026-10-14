@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
 import { LoadingState, PullToRefresh, SchoolBadge } from '@components'
@@ -65,6 +65,12 @@ export function CommunityDetailScreen({
   const { user } = useAuth()
   const { error: toastError, success } = useToast()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  // 회사 페이지에서 들어왔으면 뒤로가기를 그 회사 페이지로
+  const fromCompany = parseFromCompany(
+    searchParams.get('company'),
+    searchParams.get('companyName'),
+  )
   const [post, setPost] = useState<CommunityPost | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -134,10 +140,13 @@ export function CommunityDetailScreen({
     }
   }
 
+  // 면접·취업 후기는 회사 페이지와 같은 넓은 폭
+  const shellWidth = boardId === 'job-review' ? 'wide' : 'narrow'
+
   if (loading) {
     return (
       <PullToRefresh onRefresh={refreshPost}>
-        <BoardPageShell width='narrow'>
+        <BoardPageShell width={shellWidth}>
           <LoadingState fullPage label='글을 불러오는 중이에요…' />
         </BoardPageShell>
       </PullToRefresh>
@@ -161,7 +170,7 @@ export function CommunityDetailScreen({
   ) {
     return (
       <PullToRefresh onRefresh={refreshPost}>
-        <BoardPageShell width='narrow' className='py-12'>
+        <BoardPageShell width={shellWidth} className='py-12'>
           <EmptyState
             title='게시글을 찾을 수 없습니다'
             description={error ?? '삭제된 글일 수 있습니다.'}
@@ -210,7 +219,7 @@ export function CommunityDetailScreen({
 
   return (
     <PullToRefresh onRefresh={refreshPost}>
-      <BoardPageShell width='narrow'>
+      <BoardPageShell width={shellWidth}>
         <div
           className={
             isFood
@@ -223,8 +232,12 @@ export function CommunityDetailScreen({
           {/* 맛집은 히어로 위 뒤로가기가 있어 상단 링크는 생략 */}
           {!isFood ? (
             <BoardBackLink
-              href={href(`/${boardId}`)}
-              label={`${title} 목록`}
+              href={
+                fromCompany
+                  ? href(`/companies/${fromCompany.slug}`)
+                  : href(`/${boardId}`)
+              }
+              label={fromCompany ? fromCompany.name : `${title} 목록`}
               className={isCptOpt || isJobReview ? 'mb-4 px-1 sm:px-0' : 'mb-4'}
             />
           ) : null}
@@ -321,4 +334,9 @@ export function CommunityDetailScreen({
       </BoardPageShell>
     </PullToRefresh>
   )
+}
+
+function parseFromCompany(slug: string | null, name: string | null) {
+  if (!slug || !/^[a-z0-9-]+$/.test(slug)) return null
+  return { slug, name: name?.trim() || '회사 페이지' }
 }
