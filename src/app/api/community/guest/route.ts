@@ -19,6 +19,8 @@ import {
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
 import {
   getJobReviewTypeLabel,
+  isJobReviewOutcomeId,
+  parseJobReviewSourceInput,
   isJobReviewTypeId,
   normalizeJobReviewTimeline,
   normalizeJobReviewTips,
@@ -63,6 +65,9 @@ type GuestCreateBody = {
   jobReviewTimeline?: JobReviewTimelineEntry[] | null
   jobReviewTips?: string | null
   jobReviewIndustry?: string | null
+  jobReviewSource?: string | null
+  jobReviewSourceOrgId?: string | null
+  jobReviewOutcome?: string | null
   companyId?: string | null
   guest?: {
     nickname?: string
@@ -176,6 +181,19 @@ export async function POST(request: Request) {
   }
   const jobReviewTips = normalizeJobReviewTips(body.jobReviewTips) || null
   const jobReviewIndustry = String(body.jobReviewIndustry || '').trim() || null
+  const jobReviewSource = parseJobReviewSourceInput(
+    body.jobReviewSource,
+    body.jobReviewSourceOrgId,
+  )
+  if (!jobReviewSource) {
+    return bad('어떻게 연락이 닿았는지 선택해 주세요. 학생회를 골랐다면 어느 학생회인지도 선택해 주세요.')
+  }
+  const jobReviewOutcome = isJobReviewOutcomeId(body.jobReviewOutcome)
+    ? body.jobReviewOutcome
+    : null
+  if (!jobReviewOutcome) {
+    return bad('최종 결과를 선택해 주세요.')
+  }
   const companyResult = await resolveReviewCompanyId(body.companyId)
   if (!companyResult.ok) {
     return NextResponse.json({ error: companyResult.error }, { status: 400 })
@@ -240,6 +258,7 @@ export async function POST(request: Request) {
     jobReviewTimeline,
     jobReviewTips,
     jobReviewIndustry,
+    jobReviewOutcome,
     companyId: companyResult.companyId ?? null,
     roommateLookingFor: null,
     roommateBudgetMax: null,
@@ -259,7 +278,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const saved = await saveStoredCommunityPost(post)
+    const saved = await saveStoredCommunityPost(post, {
+      jobReviewSource: jobReviewSource.source,
+      jobReviewSourceOrgId: jobReviewSource.orgId,
+    })
 
     const estimated = estimateTimelinePostCredit(jobReviewTimeline.length)
     let awarded = 0

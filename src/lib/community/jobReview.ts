@@ -1,4 +1,10 @@
-import type { JobReviewTimelineEntry, JobReviewTypeId } from '@/types/nyc'
+import { PARTNER_ORGS } from '@lib/constants/partners'
+import type {
+  JobReviewOutcomeId,
+  JobReviewSourceId,
+  JobReviewTimelineEntry,
+  JobReviewTypeId,
+} from '@/types/nyc'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
 
@@ -576,6 +582,64 @@ export function isJobReviewTimelineEntryComplete(entry: JobReviewTimelineEntry) 
     hasStageReviewContent(entry) ||
     entry.outcome.trim()
   )
+}
+
+/** 후기를 남기게 된 경로. 작성 시 필수, 공개되지 않음 (ellieo-erp에서 관리) */
+export type { JobReviewOutcomeId, JobReviewSourceId }
+
+export const JOB_REVIEW_SOURCES: readonly {
+  id: JobReviewSourceId
+  label: string
+  description: string
+}[] = [
+  { id: 'misaeng', label: 'Misaeng을 통해', description: 'Misaeng 사이트·SNS를 보고 왔어요' },
+  { id: 'student-org', label: '학생회를 통해', description: '학교 학생회에서 연락을 받았어요' },
+  { id: 'referral', label: '지인을 통해', description: '아는 사람에게 소개받았어요' },
+  { id: 'other', label: '기타', description: '그 외 다른 경로' },
+]
+
+export function isJobReviewSourceId(value: unknown): value is JobReviewSourceId {
+  return JOB_REVIEW_SOURCES.some((item) => item.id === value)
+}
+
+export function isPartnerOrgId(value: unknown): value is string {
+  return PARTNER_ORGS.some((org) => org.id === value)
+}
+
+/** storage 값 → {source, orgId}. 예전 'kiso'는 NYU 한인학생회(nyu-kiso)로 읽는다. */
+export function normalizeJobReviewSource(
+  source: unknown,
+  orgId: unknown,
+): { source: JobReviewSourceId | null; orgId: string | null } {
+  if (source === 'kiso') return { source: 'student-org', orgId: 'nyu-kiso' }
+  if (!isJobReviewSourceId(source)) return { source: null, orgId: null }
+  if (source !== 'student-org') return { source, orgId: null }
+  return { source, orgId: isPartnerOrgId(orgId) ? orgId : null }
+}
+
+/** 작성 요청 검증: student-org면 학생회 선택까지 필수 */
+export function parseJobReviewSourceInput(
+  source: unknown,
+  orgId: unknown,
+): { source: JobReviewSourceId; orgId: string | null } | null {
+  if (!isJobReviewSourceId(source)) return null
+  if (source !== 'student-org') return { source, orgId: null }
+  return isPartnerOrgId(orgId) ? { source, orgId } : null
+}
+
+export const JOB_REVIEW_OUTCOMES: readonly {
+  id: JobReviewOutcomeId
+  label: string
+  description: string
+}[] = [
+  { id: 'offer', label: '오퍼 받음', description: '최종 합격·오퍼를 받았어요' },
+  { id: 'rejected', label: '불합격', description: '중간 또는 최종에서 떨어졌어요' },
+  { id: 'in-progress', label: '진행 중', description: '아직 결과를 기다리고 있어요' },
+  { id: 'withdrew', label: '중도 포기', description: '제가 지원을 그만뒀어요' },
+]
+
+export function isJobReviewOutcomeId(value: unknown): value is JobReviewOutcomeId {
+  return JOB_REVIEW_OUTCOMES.some((item) => item.id === value)
 }
 
 export function isJobReviewBoard(id: string) {

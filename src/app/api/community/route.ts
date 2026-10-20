@@ -12,6 +12,8 @@ import {
 } from '@lib/community/cptOpt'
 import {
   getJobReviewTypeLabel,
+  isJobReviewOutcomeId,
+  parseJobReviewSourceInput,
   isJobReviewTypeId,
   normalizeJobReviewTimeline,
   normalizeJobReviewTips,
@@ -168,6 +170,9 @@ type CreateBody = {
   jobReviewTimeline?: JobReviewTimelineEntry[] | null
   jobReviewTips?: string | null
   jobReviewIndustry?: string | null
+  jobReviewSource?: string | null
+  jobReviewSourceOrgId?: string | null
+  jobReviewOutcome?: string | null
   companyId?: string | null
   roommateLookingFor?: RoommateLookingFor | null
   roommateBudgetMax?: number | null
@@ -297,6 +302,13 @@ export async function POST(request: Request) {
   const jobReviewIndustry = isJobReview
     ? String(body?.jobReviewIndustry || '').trim() || null
     : null
+  const jobReviewSource = isJobReview
+    ? parseJobReviewSourceInput(body?.jobReviewSource, body?.jobReviewSourceOrgId)
+    : null
+  const jobReviewOutcome =
+    isJobReview && isJobReviewOutcomeId(body?.jobReviewOutcome)
+      ? body!.jobReviewOutcome
+      : null
 
   const roommateLookingFor = isRoommate
     ? isRoommateLookingFor(body?.roommateLookingFor)
@@ -449,6 +461,15 @@ export async function POST(request: Request) {
         { status: 400 },
       )
     }
+    if (!jobReviewSource) {
+      return NextResponse.json(
+        { error: '어떻게 연락이 닿았는지 선택해 주세요. 학생회를 골랐다면 어느 학생회인지도 선택해 주세요.' },
+        { status: 400 },
+      )
+    }
+    if (!jobReviewOutcome) {
+      return NextResponse.json({ error: '최종 결과를 선택해 주세요.' }, { status: 400 })
+    }
   }
 
   const authorNickname = isAnonymous
@@ -544,6 +565,7 @@ export async function POST(request: Request) {
     jobReviewTimeline: isJobReview ? jobReviewTimeline : [],
     jobReviewTips: isJobReview ? jobReviewTips || null : null,
     jobReviewIndustry: isJobReview ? jobReviewIndustry : null,
+    jobReviewOutcome,
     companyId: isJobReview ? (companyResult.companyId ?? null) : null,
     roommateLookingFor: isRoommate ? roommateLookingFor : null,
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
@@ -553,7 +575,15 @@ export async function POST(request: Request) {
   }
 
   try {
-    const saved = await saveStoredCommunityPost(post)
+    const saved = await saveStoredCommunityPost(
+      post,
+      jobReviewSource
+        ? {
+            jobReviewSource: jobReviewSource.source,
+            jobReviewSourceOrgId: jobReviewSource.orgId,
+          }
+        : undefined,
+    )
     try {
       const { awardPostCredit } = await import('@lib/community/creditLedger')
       await awardPostCredit({

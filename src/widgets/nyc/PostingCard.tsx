@@ -125,7 +125,8 @@ function ApplyGuide({ posting }: { posting: PublicPosting }) {
   const notes = earlyApply && !applyNotes.some((n) => /빨리|일찍|수시/.test(n))
     ? [postingCopy.earlyApplyNote, ...applyNotes]
     : applyNotes
-  if (!posting.applyBy && !notes.length) return null
+  const { alwaysOpen } = posting.summary
+  if (!posting.applyBy && !alwaysOpen && !notes.length) return null
   return (
     <div className='rounded-xl bg-[#f0fdf4] px-3.5 py-3 ring-1 ring-[#bbf7d0]'>
       <p className='flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] font-bold text-[#14532d]'>
@@ -134,6 +135,8 @@ function ApplyGuide({ posting }: { posting: PublicPosting }) {
           <span className='text-[12px] font-semibold'>
             <DeadlineText applyBy={posting.applyBy} />
           </span>
+        ) : alwaysOpen ? (
+          <span className='text-[12px] font-semibold'>{postingCopy.alwaysOpen}</span>
         ) : null}
       </p>
       {notes.length ? (
@@ -226,19 +229,22 @@ export function PostingRow({
             <span className='mt-1.5 block text-[15px] font-semibold leading-snug tracking-tight text-[var(--foreground)]'>
               {posting.title}
             </span>
-            {posting.applyBy || summary.earlyApply || posting.noSponsorship ? (
-              <span className='mt-1.5 flex flex-wrap items-center gap-1.5 text-[12px]'>
-                {posting.applyBy ? <DeadlineText applyBy={posting.applyBy} /> : null}
-                {summary.earlyApply ? (
-                  <span className='rounded bg-[#dcfce7] px-1.5 py-[2px] text-[10px] font-bold leading-none text-[#15803d]'>
-                    {postingCopy.earlyApply}
-                  </span>
-                ) : null}
-                {posting.noSponsorship ? (
-                  <span className='rounded bg-[#fff7ed] px-1.5 py-[2px] text-[10px] font-bold leading-none text-[#c2410c]'>
-                    {postingCopy.noSponsorshipShort}
-                  </span>
-                ) : null}
+            {posting.applyBy || summary.alwaysOpen || summary.earlyApply || posting.noSponsorship ? (
+              // 마감일과 같은 글자 모양으로 "마감 11월 7일 · 조기 지원 유리 · 스폰서십 불가"
+              <span className='mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[12px] text-[var(--muted-foreground)]'>
+                {[
+                  posting.applyBy ? <DeadlineText key='deadline' applyBy={posting.applyBy} /> : null,
+                  !posting.applyBy && summary.alwaysOpen ? <span key='always'>{postingCopy.alwaysOpen}</span> : null,
+                  summary.earlyApply ? <span key='early'>{postingCopy.earlyApply}</span> : null,
+                  posting.noSponsorship ? <span key='sponsor'>{postingCopy.noSponsorshipShort}</span> : null,
+                ]
+                  .filter(Boolean)
+                  .map((node, i) => (
+                    <span key={i} className='inline-flex items-center gap-1.5'>
+                      {i > 0 ? <span aria-hidden>·</span> : null}
+                      {node}
+                    </span>
+                  ))}
               </span>
             ) : null}
             <MetaLine

@@ -2,6 +2,12 @@ import type { CityId } from '@lib/constants/cities'
 
 export type PostStatus = 'open' | 'closed'
 
+/** 면접/취업 후기: 연락 경로 (JOB_REVIEW_SOURCES). 예전 값 'kiso'는 student-org + nyu-kiso로 읽음 */
+export type JobReviewSourceId = 'misaeng' | 'student-org' | 'referral' | 'other'
+
+/** 면접/취업 후기: 최종 결과 (JOB_REVIEW_OUTCOMES) */
+export type JobReviewOutcomeId = 'offer' | 'rejected' | 'in-progress' | 'withdrew'
+
 /** 유닛(아파트) 타입 */
 export type HousingUnitType =
   | 'studio'
@@ -327,6 +333,15 @@ export interface CommunityPost {
   jobReviewIndustry: string | null
   /** 면접/취업 후기 → companies/index.json 회사 id. 없으면 location 텍스트만 있음 */
   companyId?: string | null
+  /**
+   * 면접/취업 후기: 어떻게 연락이 닿았는지 (비공개). 작성자 본인이 단건 조회할 때만 채워지고
+   * 목록·다른 사람 조회에는 없음. storage에는 항상 저장됨 (ellieo-erp에서 관리)
+   */
+  jobReviewSource?: JobReviewSourceId | null
+  /** 면접/취업 후기: 연락 경로가 student-org일 때 학생회 id (PARTNER_ORGS). jobReviewSource와 같은 규칙으로 비공개 */
+  jobReviewSourceOrgId?: string | null
+  /** 면접/취업 후기: 최종 결과 (공개) */
+  jobReviewOutcome?: JobReviewOutcomeId | null
   /** 룸메이트/서블렛: 구하는 유형 */
   roommateLookingFor: RoommateLookingFor | null
   /** 룸메이트/서블렛: 월 예산·월세 (USD) */

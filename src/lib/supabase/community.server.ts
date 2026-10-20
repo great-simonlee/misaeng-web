@@ -17,6 +17,8 @@ import {
 } from '@lib/community/guest'
 import {
   coalesceJobReviewTimelineRaw,
+  isJobReviewOutcomeId,
+  normalizeJobReviewSource,
   normalizeJobReviewTimeline,
   normalizeJobReviewTips,
   normalizeJobReviewType,
@@ -36,7 +38,7 @@ import {
 } from '@lib/constants/cities'
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
-import type { CommunityPost } from '@/types/nyc'
+import type { CommunityPost, JobReviewSourceId } from '@/types/nyc'
 import { listStoredCommunityComments } from '@lib/supabase/communityComments.server'
 import { listStoredRecommends } from '@lib/supabase/communityEngagement.server'
 
@@ -98,6 +100,10 @@ async function resolveBucket() {
   }
   return preferred
 }
+
+// 비공개 필드 (jobReviewSource = 유입 경로, jobReviewSourceOrgId = 학생회). normalize에서 빠지고
+// 클라이언트로 내보내지 않으므로, 웹에서 글을 다시 저장할 때 storage 값을 그대로 이어 붙임
+const ADMIN_ONLY_POST_KEYS = ['jobReviewSource', 'jobReviewSourceOrgId'] as const
 
 function objectPath(id: string) {
   return `community/${id}.json`
@@ -200,6 +206,9 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       const tips = normalizeJobReviewTips(data.jobReviewTips)
       return tips || null
     })(),
+    jobReviewOutcome: isJobReviewOutcomeId(data.jobReviewOutcome)
+      ? data.jobReviewOutcome
+      : null,
     jobReviewIndustry:
       typeof data.jobReviewIndustry === 'string' &&
       data.jobReviewIndustry.trim()
@@ -465,8 +474,24 @@ export async function getStoredCommunityPost(
   return enrichCommunityPostAuthor(post, { persist: false })
 }
 
+/** 면접/취업 후기 연락 경로 (비공개 필드). 작성자 본인 조회에만 붙여서 내보낼 것 */
+export async function getStoredJobReviewSource(
+  id: string,
+): Promise<{ source: JobReviewSourceId | null; orgId: string | null }> {
+  const empty = { source: null, orgId: null }
+  if (!isCommunityStorageConfigured()) return empty
+  const postId = String(id || '').trim()
+  if (!postId) return empty
+  const bucket = await resolveBucket()
+  const raw = await fetchRawPostJson(bucket, objectPath(postId))
+  if (!raw) return empty
+  return normalizeJobReviewSource(raw.jobReviewSource, raw.jobReviewSourceOrgId)
+}
+
 export async function saveStoredCommunityPost(
   post: CommunityPost,
+  /** CommunityPost 밖에 저장하는 관리자용 필드 (예: 새 글의 jobReviewSource) */
+  adminFields?: Partial<Record<(typeof ADMIN_ONLY_POST_KEYS)[number], unknown>>,
 ): Promise<CommunityPost> {
   if (!isCommunityStorageConfigured()) {
     throw new Error(
@@ -475,7 +500,15 @@ export async function saveStoredCommunityPost(
   }
 
   const bucket = await resolveBucket()
-  const body = Buffer.from(JSON.stringify(post), 'utf8')
+  const existingRaw = await fetchRawPostJson(bucket, objectPath(post.id))
+  const adminOnly: Record<string, unknown> = {}
+  for (const key of ADMIN_ONLY_POST_KEYS) {
+    if (existingRaw && key in existingRaw) adminOnly[key] = existingRaw[key]
+  }
+  const body = Buffer.from(
+    JSON.stringify({ ...post, ...adminOnly, ...adminFields }),
+    'utf8',
+  )
   const res = await storageFetch(
     `/storage/v1/object/${bucket}/${objectPath(post.id)}`,
     {

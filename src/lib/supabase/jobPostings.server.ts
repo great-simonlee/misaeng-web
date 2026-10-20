@@ -48,6 +48,7 @@ type PostingRow = {
     location?: unknown
     applyNotes?: unknown
     earlyApply?: unknown
+    alwaysOpen?: unknown
     degree?: unknown
   } | null
   visa_sponsorship: string | null
@@ -174,6 +175,8 @@ export async function listPublicPostings(): Promise<PublicPosting[]> {
         location: text(row.summary?.location),
         applyNotes: lines(row.summary?.applyNotes),
         earlyApply: row.summary?.earlyApply === true,
+        // 마감일이 있으면 마감일이 우선
+        alwaysOpen: row.summary?.alwaysOpen === true && !row.apply_by,
         degree: postingDegree(row.summary?.degree, qualifications),
       },
       noSponsorship: row.visa_sponsorship === 'no',

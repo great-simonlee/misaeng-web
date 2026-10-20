@@ -11,6 +11,10 @@ import {
 } from '@lib/constants/communityMock'
 import { applyLocalViewCount } from '@lib/community/engagement.client'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
+import type {
+  JobReviewOutcomeId,
+  JobReviewSourceId,
+} from '@lib/community/jobReview'
 import {
   listLocalBeenThere,
   listLocalRecommendsForTarget,
@@ -61,6 +65,9 @@ function withLocalCounts(post: CommunityPost): CommunityPost {
       : [],
     jobReviewTips: post.jobReviewTips ?? null,
     jobReviewIndustry: post.jobReviewIndustry ?? null,
+    jobReviewSource: post.jobReviewSource ?? null,
+    jobReviewSourceOrgId: post.jobReviewSourceOrgId ?? null,
+    jobReviewOutcome: post.jobReviewOutcome ?? null,
     roommateLookingFor: post.roommateLookingFor ?? null,
     roommateBudgetMax: post.roommateBudgetMax ?? null,
     roommateMoveInDate: post.roommateMoveInDate ?? null,
@@ -147,6 +154,9 @@ export async function createCommunityPostRequest(input: {
   jobReviewTimeline?: CommunityPost['jobReviewTimeline']
   jobReviewTips?: CommunityPost['jobReviewTips']
   jobReviewIndustry?: CommunityPost['jobReviewIndustry'] | null
+  jobReviewSource?: JobReviewSourceId | null
+  jobReviewSourceOrgId?: string | null
+  jobReviewOutcome?: JobReviewOutcomeId | null
   roommateLookingFor?: CommunityPost['roommateLookingFor'] | null
   roommateBudgetMax?: CommunityPost['roommateBudgetMax'] | null
   roommateMoveInDate?: CommunityPost['roommateMoveInDate'] | null
@@ -183,6 +193,9 @@ export async function createGuestJobReviewRequest(input: {
   jobReviewTimeline: CommunityPost['jobReviewTimeline']
   jobReviewTips?: CommunityPost['jobReviewTips']
   jobReviewIndustry?: CommunityPost['jobReviewIndustry'] | null
+  jobReviewSource: JobReviewSourceId
+  jobReviewSourceOrgId: string | null
+  jobReviewOutcome: JobReviewOutcomeId
   guest: {
     nickname: string
     email: string
@@ -270,6 +283,9 @@ export async function updateCommunityPostRequest(
     jobReviewTimeline?: CommunityPost['jobReviewTimeline']
     jobReviewTips?: CommunityPost['jobReviewTips']
     jobReviewIndustry?: CommunityPost['jobReviewIndustry'] | null
+    jobReviewSource?: JobReviewSourceId | null
+    jobReviewSourceOrgId?: string | null
+    jobReviewOutcome?: JobReviewOutcomeId | null
     roommateLookingFor?: CommunityPost['roommateLookingFor'] | null
     roommateBudgetMax?: CommunityPost['roommateBudgetMax'] | null
     roommateMoveInDate?: CommunityPost['roommateMoveInDate'] | null

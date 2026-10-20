@@ -13,6 +13,8 @@ import {
 } from '@lib/community/cptOpt'
 import {
   getJobReviewTypeLabel,
+  isJobReviewOutcomeId,
+  parseJobReviewSourceInput,
   isJobReviewTypeId,
   normalizeJobReviewTimeline,
   normalizeJobReviewTips,
@@ -44,6 +46,7 @@ import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import {
   deleteStoredCommunityPost,
   getStoredCommunityPost,
+  getStoredJobReviewSource,
   isCommunityStorageConfigured,
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
@@ -89,12 +92,20 @@ type UpdateBody = {
   jobReviewTimeline?: JobReviewTimelineEntry[] | null
   jobReviewTips?: string | null
   jobReviewIndustry?: string | null
+  jobReviewSource?: string | null
+  jobReviewSourceOrgId?: string | null
+  jobReviewOutcome?: string | null
   companyId?: string | null
   roommateLookingFor?: RoommateLookingFor | null
   roommateBudgetMax?: number | null
   roommateMoveInDate?: string | null
   roommateMoveOutDate?: string | null
   city?: string | null
+}
+
+async function withPrivateJobReviewSource<T extends object>(post: T, id: string) {
+  const { source, orgId } = await getStoredJobReviewSource(id)
+  return { ...post, jobReviewSource: source, jobReviewSourceOrgId: orgId }
 }
 
 export async function GET(_request: Request, context: RouteContext) {
@@ -111,11 +122,17 @@ export async function GET(_request: Request, context: RouteContext) {
       }
     }
     const user = await resolveAuthenticatedUser()
+    const visible = applyReviewBodyAccess(
+      sanitizeAnonymousCommunityPost(post, user?.uid),
+      user,
+    )
+    // 연락 경로는 비공개 — 수정 화면을 위해 작성자 본인에게만 내려준다.
+    const isAuthor = Boolean(user?.uid && user.uid === post.authorUid)
     return NextResponse.json({
-      post: applyReviewBodyAccess(
-        sanitizeAnonymousCommunityPost(post, user?.uid),
-        user,
-      ),
+      post:
+        isAuthor && post.categoryId === 'job-review'
+          ? await withPrivateJobReviewSource(visible, id)
+          : visible,
     })
   } catch (error) {
     console.error('Community get error:', error)
@@ -274,6 +291,13 @@ export async function PATCH(request: Request, context: RouteContext) {
     ? String(body.jobReviewIndustry ?? existing.jobReviewIndustry ?? '').trim() ||
       null
     : null
+  const jobReviewSource = isJobReview
+    ? parseJobReviewSourceInput(body.jobReviewSource, body.jobReviewSourceOrgId)
+    : null
+  const jobReviewOutcome =
+    isJobReview && isJobReviewOutcomeId(body.jobReviewOutcome)
+      ? body.jobReviewOutcome
+      : null
 
   const roommateLookingFor = isRoommate
     ? isRoommateLookingFor(body.roommateLookingFor)
@@ -426,6 +450,15 @@ export async function PATCH(request: Request, context: RouteContext) {
         { status: 400 },
       )
     }
+    if (!jobReviewSource) {
+      return NextResponse.json(
+        { error: '어떻게 연락이 닿았는지 선택해 주세요. 학생회를 골랐다면 어느 학생회인지도 선택해 주세요.' },
+        { status: 400 },
+      )
+    }
+    if (!jobReviewOutcome) {
+      return NextResponse.json({ error: '최종 결과를 선택해 주세요.' }, { status: 400 })
+    }
   }
 
   const companyResult = isJobReview
@@ -469,6 +502,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     jobReviewTimeline: isJobReview ? jobReviewTimeline : [],
     jobReviewTips: isJobReview ? jobReviewTips || null : null,
     jobReviewIndustry: isJobReview ? jobReviewIndustry : null,
+    jobReviewOutcome: isJobReview ? jobReviewOutcome : null,
     companyId: isJobReview
       ? companyResult.companyId === undefined
         ? (existing.companyId ?? null)
@@ -484,7 +518,15 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   try {
-    const saved = await saveStoredCommunityPost(next)
+    const saved = await saveStoredCommunityPost(
+      next,
+      jobReviewSource
+        ? {
+            jobReviewSource: jobReviewSource.source,
+            jobReviewSourceOrgId: jobReviewSource.orgId,
+          }
+        : undefined,
+    )
     try {
       const { awardPostCredit } = await import('@lib/community/creditLedger')
       await awardPostCredit({

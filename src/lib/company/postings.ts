@@ -23,6 +23,8 @@ export type PublicPosting = {
     applyNotes: string[]
     /** 빨리 지원할수록 유리 (수시 심사 등) */
     earlyApply: boolean
+    /** 상시 모집 (마감일 없이 채용될 때까지) — 마감일을 모르는 것과는 다르다 */
+    alwaysOpen: boolean
     /** 지원 대상: 학부생 / 대학원생 / 둘 다 / 공고에 없음 */
     degree: DegreeLevel
   }

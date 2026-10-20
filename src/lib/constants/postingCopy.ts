@@ -33,6 +33,7 @@ export const POSTING_COPY = {
     deadlineLabel: '지원 마감',
     applyGuideTitle: '지원 안내',
     earlyApply: '조기 지원 유리',
+    alwaysOpen: '상시 모집',
     earlyApplyNote: '수시로 심사해서 빨리 지원할수록 유리해요.',
     deadline: (date: string) => `마감 ${date}`,
     dDay: (days: number) => (days === 0 ? '오늘 마감' : `D-${days}`),

@@ -47,6 +47,12 @@ import {
 import { JobReviewTimelineEditor } from '@widgets/nyc/JobReviewTimelineEditor'
 import { JobReviewTypeBadge, JobReviewTypePicker } from '@widgets/nyc/JobReviewTypeBadge'
 import {
+  isJobReviewSourceComplete,
+  JobReviewOutcomePicker,
+  JobReviewSourcePicker,
+} from '@widgets/nyc/JobReviewSourcePicker'
+import type { JobReviewOutcomeId, JobReviewSourceId } from '@lib/community/jobReview'
+import {
   JobReviewWriteOrientationModal,
   useJobReviewWriteOrientation,
 } from '@widgets/nyc/CptOptWriteOrientationModal'
@@ -94,6 +100,10 @@ export function JobReviewWriteScreen({
   const [location, setLocation] = useState('')
   const [industry, setIndustry] = useState('')
   const [jobReviewType, setJobReviewType] = useState<JobReviewTypeId | null>(null)
+  const [jobReviewSource, setJobReviewSource] = useState<JobReviewSourceId | null>(null)
+  const [jobReviewSourceOrgId, setJobReviewSourceOrgId] = useState<string | null>(null)
+  const [jobReviewOutcome, setJobReviewOutcome] = useState<JobReviewOutcomeId | null>(null)
+  const sourceComplete = isJobReviewSourceComplete(jobReviewSource, jobReviewSourceOrgId)
   const [timeline, setTimeline] = useState<JobReviewTimelineEntry[]>([])
   const [existingTimelineIds, setExistingTimelineIds] = useState<string[]>([])
   const [showMoreSettings, setShowMoreSettings] = useState(false)
@@ -202,6 +212,9 @@ export function JobReviewWriteScreen({
           ? post.jobReviewTimeline
           : []
         setExistingTimelineIds(loadedTimeline.map((entry) => entry.id))
+        setJobReviewSource(post.jobReviewSource ?? null)
+        setJobReviewSourceOrgId(post.jobReviewSourceOrgId ?? null)
+        setJobReviewOutcome(post.jobReviewOutcome ?? null)
 
         const bodyPlain = htmlToPlainText(post.contentHtml || '')
         const fromPost: JobReviewWriteDraft = {
@@ -308,6 +321,18 @@ export function JobReviewWriteScreen({
       toastError('작성 중인 기록에 날짜와 내용을 함께 입력해 주세요')
       return
     }
+    if (!jobReviewOutcome) {
+      toastError('최종 결과를 선택해 주세요')
+      return
+    }
+    if (!jobReviewSource || !sourceComplete) {
+      toastError(
+        jobReviewSource === 'student-org'
+          ? '어느 학생회를 통해 연락이 닿았는지 선택해 주세요'
+          : '어떻게 연락이 닿았는지 선택해 주세요',
+      )
+      return
+    }
 
     setSubmitting(true)
     try {
@@ -320,6 +345,9 @@ export function JobReviewWriteScreen({
         jobReviewType,
         jobReviewTimeline: normalizedTimeline,
         jobReviewTips: plain.slice(0, JOB_REVIEW_TIPS_MAX) || null,
+        jobReviewSource,
+        jobReviewSourceOrgId,
+        jobReviewOutcome,
       }
 
       const post =
@@ -490,12 +518,55 @@ export function JobReviewWriteScreen({
                 ) : null}
               </section>
 
+              <section
+                data-autosave-section='outcome'
+                className='rounded-2xl p-4 ring-1 ring-black/[0.06] sm:p-5'
+              >
+                <p className='text-[14px] font-semibold text-[var(--foreground)]'>
+                  최종 결과는 어떻게 됐나요?
+                  <span className='text-[var(--brand)]'> *</span>
+                </p>
+                <p className='mb-3 mt-0.5 text-[11px] text-[var(--muted)]'>
+                  진행 상황이 바뀌면 여기서 함께 바꿔 주세요
+                </p>
+                <JobReviewOutcomePicker value={jobReviewOutcome} onChange={setJobReviewOutcome} />
+              </section>
+
+              <section
+                data-autosave-section='source'
+                className='rounded-2xl p-4 ring-1 ring-black/[0.06] sm:p-5'
+              >
+                <p className='text-[14px] font-semibold text-[var(--foreground)]'>
+                  어떻게 연락이 닿았나요?
+                  <span className='text-[var(--brand)]'> *</span>
+                </p>
+                <p className='mb-3 mt-0.5 text-[11px] text-[var(--muted)]'>
+                  후기를 남기게 된 경로를 알려주세요. 다른 사람에게는 보이지 않아요
+                </p>
+                <JobReviewSourcePicker
+                  value={jobReviewSource}
+                  orgId={jobReviewSourceOrgId}
+                  onChange={(source, orgId) => {
+                    setJobReviewSource(source)
+                    setJobReviewSourceOrgId(orgId)
+                  }}
+                />
+              </section>
+
               <button
                 type='submit'
-                disabled={submitting || !postTitle.trim() || !jobReviewType}
+                disabled={
+                  submitting || !postTitle.trim() || !jobReviewType || !jobReviewOutcome || !sourceComplete
+                }
                 className='inline-flex h-12 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[15px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-50'
               >
-                {submitting ? '업데이트 중…' : '진행 기록 업데이트'}
+                {submitting
+                  ? '업데이트 중…'
+                  : !jobReviewOutcome
+                    ? '최종 결과를 선택해 주세요'
+                    : !sourceComplete
+                      ? '연락 경로를 선택해 주세요'
+                      : '진행 기록 업데이트'}
               </button>
               <p className='text-center text-[12px] leading-relaxed text-[var(--muted)]'>
                 저장하면 목록 맨 위로 올라가고, 다른 사람에게도 최신 진행
@@ -569,6 +640,29 @@ export function JobReviewWriteScreen({
                 />
               </CreateSection>
 
+              <CreateSection
+                step={5}
+                title='최종 결과는 어떻게 됐나요?'
+                description='아직 진행 중이면 「진행 중」을 골라 주세요. 나중에 바꿀 수 있어요'
+              >
+                <JobReviewOutcomePicker value={jobReviewOutcome} onChange={setJobReviewOutcome} />
+              </CreateSection>
+
+              <CreateSection
+                step={6}
+                title='어떻게 연락이 닿았나요?'
+                description='후기를 남기게 된 경로를 알려주세요. 다른 사람에게는 보이지 않아요'
+              >
+                <JobReviewSourcePicker
+                  value={jobReviewSource}
+                  orgId={jobReviewSourceOrgId}
+                  onChange={(source, orgId) => {
+                    setJobReviewSource(source)
+                    setJobReviewSourceOrgId(orgId)
+                  }}
+                />
+              </CreateSection>
+
               <WriteDraftActions
                 onSave={handleSaveDraft}
                 savedAt={draftSavedAt}
@@ -576,14 +670,20 @@ export function JobReviewWriteScreen({
               >
                 <button
                   type='submit'
-                  disabled={submitting || !postTitle.trim() || !jobReviewType}
+                  disabled={
+                    submitting || !postTitle.trim() || !jobReviewType || !jobReviewOutcome || !sourceComplete
+                  }
                   className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
                 >
                   {submitting
                     ? '등록 중…'
                     : !jobReviewType
                       ? '유형을 선택해 주세요'
-                      : '후기 등록하기'}
+                      : !jobReviewOutcome
+                        ? '최종 결과를 선택해 주세요'
+                        : !sourceComplete
+                          ? '연락 경로를 선택해 주세요'
+                          : '후기 등록하기'}
                 </button>
               </WriteDraftActions>
               <p className='text-center text-[12px] text-[var(--muted)]'>
