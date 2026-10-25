@@ -1,5 +1,7 @@
 import { listActiveCompanies } from '@lib/supabase/companies.server'
 import { todayInNewYork, type PostingLevel, type PublicPosting, type WorkArrangement } from '@lib/company/postings'
+import { freshSummaryTranslations, type PostingSummaryTranslation } from '@lib/translations/postings'
+import type { Locale } from '@lib/i18n/locales'
 import { DEGREE_LABELS, JOB_FUNCTIONS, type DegreeLevel, type JobFunction } from '@lib/constants/postingCopy'
 
 /*
@@ -28,6 +30,7 @@ const PUBLIC_COLUMNS = [
   'summary',
   'visa_sponsorship',
   'created_at',
+  'summary_translations',
 ].join(',')
 
 type PostingRow = {
@@ -53,6 +56,8 @@ type PostingRow = {
   } | null
   visa_sponsorship: string | null
   created_at: string
+  /** 다른 언어 요약 (ellieo-erp/supabase/job_posting_translations.sql) */
+  summary_translations?: unknown
 }
 
 function getSupabaseUrl() {
@@ -64,7 +69,7 @@ function getSupabaseSecretKey() {
 }
 
 /** ellieo-erp/supabase/job_posting_function.sql, job_posting_deadline.sql 로 추가되는 컬럼 */
-const OPTIONAL_COLUMNS = ['job_function', 'apply_by', 'tags']
+const OPTIONAL_COLUMNS = ['job_function', 'apply_by', 'tags', 'summary_translations']
 
 const LEVELS: PostingLevel[] = ['intern', 'new_grad']
 
@@ -102,10 +107,15 @@ function isHttpsUrl(value: unknown): value is string {
   }
 }
 
-let cache: { at: number; value: PublicPosting[] } | null = null
+/** 서버 안에서만 쓰는 공고 (언어별 요약 포함). API는 localizePosting으로 한 언어만 내보낸다. */
+export type StoredPosting = PublicPosting & {
+  summaryTranslations: Partial<Record<Locale, PostingSummaryTranslation>>
+}
+
+let cache: { at: number; value: StoredPosting[] } | null = null
 
 /** 사용자에게 보이는 공고 전체 (최근 등록순). 60초 캐시. */
-export async function listPublicPostings(): Promise<PublicPosting[]> {
+export async function listPublicPostings(): Promise<StoredPosting[]> {
   if (cache && Date.now() - cache.at < CACHE_TTL_MS) return cache.value
   const url = getSupabaseUrl()
   const key = getSupabaseSecretKey()
@@ -140,7 +150,7 @@ export async function listPublicPostings(): Promise<PublicPosting[]> {
 
   const companyById = new Map(companies.map((c) => [c.id, c]))
   const rows = ((await res.json().catch(() => null)) as PostingRow[] | null) ?? []
-  const value: PublicPosting[] = []
+  const value: StoredPosting[] = []
   const today = todayInNewYork()
   for (const row of rows) {
     // 지원 마감일이 지난 공고는 숨긴다 (마감일 당일까지는 보인다).
@@ -178,7 +188,10 @@ export async function listPublicPostings(): Promise<PublicPosting[]> {
         // 마감일이 있으면 마감일이 우선
         alwaysOpen: row.summary?.alwaysOpen === true && !row.apply_by,
         degree: postingDegree(row.summary?.degree, qualifications),
+        // 한국어 지원 팁에 "빨리 지원" 내용이 이미 있는지 (번역문으로는 판단할 수 없어 원문에서 미리 본다)
+        earlyApplyMentioned: lines(row.summary?.applyNotes).some((n) => /빨리|일찍|수시/.test(n)),
       },
+      summaryTranslations: freshSummaryTranslations(row.summary, row.summary_translations),
       noSponsorship: row.visa_sponsorship === 'no',
       applyBy: row.apply_by || null,
       tags: Array.isArray(row.tags) ? row.tags.filter((t) => typeof t === 'string') : [],
@@ -232,7 +245,7 @@ export async function getCompanyMoreUrl(companyId: string): Promise<string | nul
   return isHttpsUrl(rows[0]?.url) ? rows[0]!.url! : null
 }
 
-export async function listPublicPostingsForCompany(slug: string): Promise<PublicPosting[]> {
+export async function listPublicPostingsForCompany(slug: string): Promise<StoredPosting[]> {
   const key = String(slug || '').trim().toLowerCase()
   return (await listPublicPostings()).filter((p) => p.company.slug === key)
 }

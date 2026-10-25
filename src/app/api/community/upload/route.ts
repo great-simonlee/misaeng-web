@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
+
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import { accountSuspendedResponse } from '@lib/supabase/profile.server'
 import {
@@ -11,12 +14,12 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
     if (!isCommunityImageStorageConfigured()) {
       return NextResponse.json(
         {
-          error:
-            'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+          error: t('common.supabaseNotConfiguredDetail'),
           code: 'STORAGE_UNAVAILABLE',
         },
         { status: 503 },
@@ -25,16 +28,16 @@ export async function POST(request: Request) {
 
     const user = await resolveAuthenticatedUser()
     if (!user?.uid) {
-      return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+      return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
     }
-    const suspended = await accountSuspendedResponse(user.uid)
+    const suspended = await accountSuspendedResponse(user.uid, t)
     if (suspended) return suspended
 
     const formData = await request.formData()
     const file = formData.get('file')
     if (!(file instanceof File)) {
       return NextResponse.json(
-        { error: '업로드할 파일이 필요해요.' },
+        { error: t('upload.fileRequired') },
         { status: 400 },
       )
     }
@@ -49,10 +52,7 @@ export async function POST(request: Request) {
     console.error('Community image upload error:', error)
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : '이미지 업로드에 실패했어요.',
+        error: apiErrorMessage(t, error, 'upload.imageUploadFailed'),
       },
       { status: 500 },
     )

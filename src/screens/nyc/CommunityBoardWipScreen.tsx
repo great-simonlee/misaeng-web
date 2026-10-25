@@ -3,7 +3,9 @@
 import Link from 'next/link'
 
 import { useCity, useCityPath } from '@hooks/useCity'
-import { getCommunityBoardMeta, type NycCommunityBoardId } from '@lib/constants/nyc'
+import { getCity } from '@lib/constants/cities'
+import { communityBoardKey, type NycCommunityBoardId } from '@lib/constants/nyc'
+import { useT } from '@lib/i18n/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 
@@ -16,9 +18,19 @@ export function CommunityBoardWipScreen({
   boardId,
   title,
 }: CommunityBoardWipScreenProps) {
+  const t = useT('community')
   const city = useCity()
   const href = useCityPath()
-  const intro = getCommunityBoardMeta(boardId, city)?.listIntro
+  const intro = t(communityBoardKey(boardId, 'listIntro'), {
+    city: getCity(city).name,
+  })
+  // 문장 가운데 링크가 들어가서 {link} 앞뒤로 나눠 그린다
+  const otherBoards = t('wip.otherBoards')
+  const linkAt = otherBoards.indexOf('{link}')
+  const [otherBefore, otherAfter] =
+    linkAt < 0
+      ? [`${otherBoards} `, '']
+      : [otherBoards.slice(0, linkAt), otherBoards.slice(linkAt + '{link}'.length)]
 
   return (
     <BoardPageShell>
@@ -35,17 +47,17 @@ export function CommunityBoardWipScreen({
 
       <section className='pb-14 pt-6 sm:pb-16 sm:pt-8'>
         <EmptyState
-          title='준비 중이에요'
-          description={`${title} 게시판은 지금 만들고 있어요. 조금만 기다려 주세요.`}
+          title={t('wip.title')}
+          description={t('wip.description', { board: title })}
           actionHref={href()}
-          actionLabel='커뮤니티 홈으로'
+          actionLabel={t('wip.homeAction')}
         />
         <p className='mt-6 text-center text-[13px] text-[var(--muted)]'>
-          다른 게시판이 궁금하시면{' '}
+          {otherBefore}
           <Link href={href('/food')} className='font-semibold text-[var(--brand)]'>
-            맛집
+            {t('categories.food.title')}
           </Link>
-          을 먼저 둘러보세요.
+          {otherAfter}
         </p>
       </section>
     </BoardPageShell>

@@ -18,6 +18,8 @@ function supabaseImagePattern() {
 }
 
 const nextConfig: NextConfig = {
+  // 두 브랜드 개발 서버를 동시에 띄울 때 빌드 폴더가 겹치지 않게 (npm run dev:ellieo)
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   images: {
     remotePatterns: [
       {

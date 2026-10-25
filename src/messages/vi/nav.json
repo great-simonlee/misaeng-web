@@ -1,0 +1,54 @@
+{
+  "brandCity": "{brand} {city}",
+  "links": {
+    "housing": "Nhà ở",
+    "food": "Ăn uống",
+    "marketplace": "Mua bán",
+    "status": "CPT·OPT·Visa·Thẻ xanh",
+    "jobReview": "Phỏng vấn·Việc làm",
+    "roommate": "Bạn cùng phòng·Sublet",
+    "anonymous": "Ẩn danh"
+  },
+  "account": {
+    "me": "Trang của tôi",
+    "myPosts": "Bài viết của tôi",
+    "myLikes": "Bài viết đã thích",
+    "creditReviews": "Xét duyệt credit"
+  },
+  "accountMenu": "Menu tài khoản",
+  "openAccountMenu": "Mở menu tài khoản",
+  "closeAccountMenu": "Đóng menu tài khoản",
+  "openMenu": "Mở menu",
+  "closeMenu": "Đóng menu",
+  "menuAria": "Menu {city}",
+  "mobileMenuAria": "Menu di động {city}",
+  "homeAria": "Trang chủ cộng đồng {city}",
+  "communityHome": "Trang chủ cộng đồng",
+  "login": "Đăng nhập",
+  "selectCity": "Chọn thành phố",
+  "currentCity": "Hiện tại",
+  "profileAlt": "Hồ sơ của {name}",
+  "profileAltFallback": "Hồ sơ",
+  "footer": {
+    "tagline": "Cộng đồng du học sinh và người đi làm quốc tế tại {city}",
+    "groups": {
+      "community": "Cộng đồng",
+      "company": "Công ty",
+      "support": "Hỗ trợ"
+    },
+    "links": {
+      "housing": "Nhà ở",
+      "credit": "Credit",
+      "partners": "Đối tác",
+      "companySite": "Trang công ty",
+      "about": "Về chúng tôi",
+      "service": "Dịch vụ",
+      "careers": "Tuyển dụng",
+      "contact": "Liên hệ",
+      "me": "Trang của tôi",
+      "terms": "Điều khoản sử dụng",
+      "privacy": "Chính sách quyền riêng tư",
+      "ads": "Quảng cáo & hợp tác"
+    }
+  }
+}

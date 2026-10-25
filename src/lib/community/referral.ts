@@ -70,7 +70,14 @@ export function buildReferralShareUrl(
   return `${base}/${city}?${REFERRAL_QUERY_KEY}=${encodeURIComponent(next)}`
 }
 
-export async function bindReferralCodeRequest(code: string) {
+/**
+ * @param fallbackError 서버가 에러 문구를 주지 않을 때 보여 줄 문구.
+ *   화면에서는 `useT('credit')('referral.bindFailed')`를 넘긴다 (안 넘기면 화면에 안 보이는 호출 — 개발용 영어).
+ */
+export async function bindReferralCodeRequest(
+  code: string,
+  fallbackError = 'Referral bind failed',
+) {
   const response = await fetch('/api/community/referral', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -83,7 +90,7 @@ export async function bindReferralCodeRequest(code: string) {
     usedCount?: number
   } | null
   if (!response.ok) {
-    throw new Error(data?.error || '추천인 연결에 실패했어요')
+    throw new Error(data?.error || fallbackError)
   }
   return data
 }

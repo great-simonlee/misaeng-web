@@ -4,14 +4,13 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useBodyScrollLock } from '@hooks/useBodyScrollLock'
-import { CONSENT_COPY } from '@lib/consent/copy'
-import { PRIVACY_HREF, TERMS_HREF } from '@lib/consent/copy'
+import { useCityPath } from '@hooks/useCity'
+import { BRAND_CONFIG } from '@lib/brand'
+import { PRIVACY_PATH, TERMS_PATH } from '@lib/consent/copy'
 import type { ConsentStatus } from '@lib/consent/types'
+import { useLocale, useT } from '@lib/i18n/client'
 
-import {
-  ConsentLocaleToggle,
-  useConsentLocale,
-} from './ConsentLocaleProvider'
+import { ConsentLocaleToggle } from './ConsentLocaleProvider'
 import { TermsConsentFields } from './TermsConsentFields'
 
 type ReconsentModalProps = {
@@ -20,8 +19,9 @@ type ReconsentModalProps = {
 }
 
 export function ReconsentModal({ status, onAgreed }: ReconsentModalProps) {
-  const { locale } = useConsentLocale()
-  const copy = CONSENT_COPY[locale]
+  const locale = useLocale()
+  const t = useT('consent')
+  const href = useCityPath()
   const [accepted, setAccepted] = useState(false)
   const [error, setError] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -44,10 +44,15 @@ export function ReconsentModal({ status, onAgreed }: ReconsentModalProps) {
     }
   }
 
+  // ERP는 영문·한국어 요약만 저장한다. 다른 언어는 번역된 기본 안내 + 영문 요약을 보여 준다.
   const summary =
     locale === 'ko'
-      ? status.policy.summaryKo || CONSENT_COPY.ko.reconsentBody
-      : status.policy.summaryEn || CONSENT_COPY.en.reconsentBody
+      ? status.policy.summaryKo || t('reconsentBody', { brand: BRAND_CONFIG.name })
+      : locale === 'en'
+        ? status.policy.summaryEn || t('reconsentBody', { brand: BRAND_CONFIG.name })
+        : t('reconsentBody', { brand: BRAND_CONFIG.name })
+  const englishSummary =
+    locale !== 'ko' && locale !== 'en' ? status.policy.summaryEn : ''
 
   return (
     <div
@@ -69,13 +74,13 @@ export function ReconsentModal({ status, onAgreed }: ReconsentModalProps) {
         <div className='flex items-start justify-between gap-3'>
           <div className='min-w-0'>
             <p className='text-[11px] font-medium tracking-[0.18em] text-[#8b95a7]'>
-              MISAENG NYC
+              {BRAND_CONFIG.name.toUpperCase()} NYC
             </p>
             <h2
               id='reconsent-title'
               className='mt-1 text-[1.25rem] font-semibold tracking-[-0.02em] text-[var(--foreground)]'
             >
-              {copy.reconsentTitle}
+              {t('reconsentTitle')}
             </h2>
           </div>
           <ConsentLocaleToggle className='shrink-0' />
@@ -84,28 +89,35 @@ export function ReconsentModal({ status, onAgreed }: ReconsentModalProps) {
         <p className='mt-4 text-[13px] leading-relaxed text-[var(--foreground)]'>
           {summary}
         </p>
+        {englishSummary ? (
+          <p lang='en' className='mt-2 text-[12px] leading-relaxed text-[var(--muted-foreground)]'>
+            {englishSummary}
+          </p>
+        ) : null}
 
         <p className='mt-3 text-[12px] text-[#98a2b3]'>
-          Terms {status.policy.termsVersion} · Privacy{' '}
-          {status.policy.privacyVersion}
+          {t('reconsentVersions', {
+            terms: status.policy.termsVersion,
+            privacy: status.policy.privacyVersion,
+          })}
         </p>
 
         <div className='mt-3 flex gap-3 text-[13px]'>
           <Link
-            href={TERMS_HREF}
+            href={href(TERMS_PATH)}
             target='_blank'
             rel='noopener noreferrer'
-            className='font-semibold text-[#F64310] underline-offset-2 hover:underline'
+            className='font-semibold text-brand underline-offset-2 hover:underline'
           >
-            {copy.termsLink}
+            {t('termsLink')}
           </Link>
           <Link
-            href={PRIVACY_HREF}
+            href={href(PRIVACY_PATH)}
             target='_blank'
             rel='noopener noreferrer'
-            className='font-semibold text-[#F64310] underline-offset-2 hover:underline'
+            className='font-semibold text-brand underline-offset-2 hover:underline'
           >
-            {copy.privacyLink}
+            {t('privacyLink')}
           </Link>
         </div>
 
@@ -125,9 +137,9 @@ export function ReconsentModal({ status, onAgreed }: ReconsentModalProps) {
           type='button'
           onClick={() => void handleContinue()}
           disabled={saving || !accepted}
-          className='mt-4 min-h-[48px] w-full rounded-full bg-[linear-gradient(135deg,#ff4c14_0%,#f64310_50%,#df390e_100%)] text-[15px] font-semibold text-white shadow-[0_10px_20px_rgba(246,67,16,0.24)] transition hover:brightness-[1.03] disabled:cursor-not-allowed disabled:opacity-50'
+          className='mt-4 min-h-[48px] w-full rounded-full bg-[linear-gradient(135deg,var(--brand-bright)_0%,var(--brand)_50%,var(--brand-deep)_100%)] text-[15px] font-semibold text-white shadow-[0_10px_20px_rgb(var(--brand-rgb)/0.24)] transition hover:brightness-[1.03] disabled:cursor-not-allowed disabled:opacity-50'
         >
-          {saving ? copy.saving : copy.reconsentConfirm}
+          {saving ? t('saving') : t('reconsentConfirm')}
         </button>
       </div>
     </div>

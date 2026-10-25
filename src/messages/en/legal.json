@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "privacyDescription": "{brand} NYC Privacy Policy: what we collect, how we use, keep, and share it, anonymous boards, cookies, your rights, and how to contact us.",
+    "termsDescription": "{brand} NYC Terms of Use: community rules, anonymous boards, housing and roommates, accounts, limits of liability, and other terms of service."
+  },
+  "view": {
+    "reference": "Reference translation",
+    "versionLine": "Version {version} · Updated {updated} · Effective {effective}",
+    "translationIncomplete": "Some paragraphs are not translated yet, so only the English original is shown.",
+    "tableOfContents": "Table of contents",
+    "note": "Note.",
+    "back": "← Back to {city}",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of Use"
+  }
+}

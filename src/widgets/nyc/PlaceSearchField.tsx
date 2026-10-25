@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 
 import { useAnchoredPosition } from '@hooks/useAnchoredPosition'
 import { cn } from '@lib'
+import { useLocale, useT } from '@lib/i18n/client'
 import type { PlaceSearchResult } from '@/types/nyc'
 
 type PlaceSearchFieldProps = {
@@ -21,6 +22,8 @@ export function PlaceSearchField({
   className,
   mode = 'place',
 }: PlaceSearchFieldProps) {
+  const t = useT('food')
+  const locale = useLocale()
   const listId = useId()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<PlaceSearchResult[]>([])
@@ -33,8 +36,18 @@ export function PlaceSearchField({
   const inputWrapRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const settleRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const requestIdRef = useRef(0)
+  // Google 자동완성 세션 — 입력부터 장소 선택(상세 조회)까지를 한 번으로 과금받는다
+  const sessionRef = useRef<string | null>(null)
+  const sessionToken = () => {
+    sessionRef.current ??=
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`
+    return sessionRef.current
+  }
 
   const listOpen = open && results.length > 0 && !value
   const listPosition = useAnchoredPosition(inputWrapRef, listOpen)
@@ -61,6 +74,7 @@ export function PlaceSearchField({
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (settleRef.current) clearTimeout(settleRef.current)
 
     const q = query.trim()
     if (q.length < 2) {
@@ -73,8 +87,12 @@ export function PlaceSearchField({
       return
     }
 
-    setLoading(true)
-    debounceRef.current = setTimeout(() => {
+    /**
+     * 두 단계로 검색한다 (비용 절감, 결과 품질은 그대로):
+     * 1) 타이핑 중 (250ms 멈춤) — 자동완성만 (세션 과금, 저렴)
+     * 2) 입력을 멈춤 (900ms) — 상호명 검색(Text Search)까지 합친 전체 결과로 바꾼다 (검색어별 캐시)
+     */
+    const run = (settled: boolean) => {
       abortRef.current?.abort()
       const controller = new AbortController()
       abortRef.current = controller
@@ -82,10 +100,16 @@ export function PlaceSearchField({
 
       void (async () => {
         try {
-          const res = await fetch(
-            `/api/places/search?q=${encodeURIComponent(q)}&mode=${mode}`,
-            { cache: 'no-store', signal: controller.signal },
-          )
+          const params = new URLSearchParams({
+            q,
+            mode,
+            session: sessionToken(),
+            settled: settled ? '1' : '0',
+          })
+          const res = await fetch(`/api/places/search?${params}`, {
+            cache: 'no-store',
+            signal: controller.signal,
+          })
           if (requestId !== requestIdRef.current) return
 
           const data = (await res.json().catch(() => null)) as {
@@ -95,10 +119,12 @@ export function PlaceSearchField({
           if (requestId !== requestIdRef.current) return
 
           if (!res.ok) {
-            throw new Error(data?.error || '검색에 실패했어요')
+            throw new Error(data?.error || t('placeSearch.errors.searchFailed'))
           }
 
           const next = data?.results || []
+          // 빠른 자동완성 결과가 없더라도 전체 검색 결과를 기다리는 동안 목록을 닫지 않는다
+          if (!settled && next.length === 0) return
           setResults(next)
           setOpen(next.length > 0)
           setError(null)
@@ -108,20 +134,25 @@ export function PlaceSearchField({
           setResults([])
           setOpen(false)
           setError(
-            err instanceof Error ? err.message : '검색에 실패했어요',
+            err instanceof Error ? err.message : t('placeSearch.errors.searchFailed'),
           )
         } finally {
-          if (requestId === requestIdRef.current) {
+          if (requestId === requestIdRef.current && settled) {
             setLoading(false)
           }
         }
       })()
-    }, 220)
+    }
+
+    setLoading(true)
+    debounceRef.current = setTimeout(() => run(false), 250)
+    settleRef.current = setTimeout(() => run(true), 900)
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
+      if (settleRef.current) clearTimeout(settleRef.current)
     }
-  }, [query, mode])
+  }, [query, mode, t])
 
   useEffect(() => {
     return () => {
@@ -136,6 +167,9 @@ export function PlaceSearchField({
     abortRef.current?.abort()
     requestIdRef.current += 1
     setLoading(false)
+    // 선택으로 자동완성 세션이 끝난다. 다음 검색은 새 세션
+    const session = sessionRef.current
+    sessionRef.current = null
 
     if (item.latitude != null && item.longitude != null) {
       onChange(item)
@@ -147,7 +181,9 @@ export function PlaceSearchField({
     setError(null)
     try {
       const res = await fetch(
-        `/api/places/details?placeId=${encodeURIComponent(item.placeId)}`,
+        `/api/places/details?placeId=${encodeURIComponent(item.placeId)}${
+          session ? `&session=${encodeURIComponent(session)}` : ''
+        }`,
         { cache: 'no-store' },
       )
       const data = (await res.json().catch(() => null)) as {
@@ -155,15 +191,15 @@ export function PlaceSearchField({
         error?: string
       } | null
       if (!res.ok || !data?.place) {
-        throw new Error(data?.error || '장소 정보를 불러오지 못했어요')
+        throw new Error(data?.error || t('placeSearch.errors.detailsFailed'))
       }
       if (data.place.latitude == null || data.place.longitude == null) {
-        throw new Error('선택한 장소의 좌표를 확인하지 못했어요')
+        throw new Error(t('placeSearch.errors.noCoordinates'))
       }
       onChange(data.place)
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : '장소 정보를 불러오지 못했어요',
+        err instanceof Error ? err.message : t('placeSearch.errors.detailsFailed'),
       )
     } finally {
       setResolving(false)
@@ -174,7 +210,7 @@ export function PlaceSearchField({
     value?.latitude != null && value?.longitude != null
       ? `https://maps.google.com/maps?q=${encodeURIComponent(
           `${value.latitude},${value.longitude}`,
-        )}&z=16&hl=ko&output=embed&iwloc=near`
+        )}&z=16&hl=${locale}&output=embed&iwloc=near`
       : null
 
   const dropdown =
@@ -211,7 +247,7 @@ export function PlaceSearchField({
                     {mode === 'address'
                       ? item.name !== item.address
                         ? item.name
-                        : '정확한 주소로 선택해 주세요'
+                        : t('placeSearch.pickExactAddress')
                       : item.address}
                   </span>
                 </button>
@@ -229,7 +265,7 @@ export function PlaceSearchField({
           {mapSrc ? (
             <div className='relative aspect-[2/1] overflow-hidden bg-[#eceef1]'>
               <iframe
-                title={`${value.name} 위치`}
+                title={t('placeSearch.mapTitle', { name: value.name })}
                 src={mapSrc}
                 className='pointer-events-none absolute left-0 top-[-48px] h-[calc(100%+88px)] w-full border-0'
                 loading='lazy'
@@ -269,7 +305,7 @@ export function PlaceSearchField({
               }}
               className='shrink-0 rounded-full px-3 py-1.5 text-[12px] font-semibold text-[var(--muted-foreground)] ring-1 ring-black/[0.08] touch-manipulation transition hover:bg-[#f8f9fb] hover:text-[var(--foreground)]'
             >
-              변경
+              {t('placeSearch.change')}
             </button>
           </div>
         </div>
@@ -285,8 +321,8 @@ export function PlaceSearchField({
               }}
               placeholder={
                 mode === 'address'
-                  ? '예: 53 W 53rd St, New York'
-                  : '예: Halal Guys, 플러싱 칼국수, West 53rd St'
+                  ? t('placeSearch.addressPlaceholder')
+                  : t('placeSearch.placePlaceholder')
               }
               className='h-11 w-full rounded-xl border-0 bg-white py-2.5 pl-10 pr-3.5 text-[15px] outline-none ring-1 ring-black/[0.08] transition placeholder:text-[var(--muted)] focus:ring-black/20'
               autoComplete='off'
@@ -299,7 +335,7 @@ export function PlaceSearchField({
             />
             {(loading || resolving) && (
               <span className='absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] text-[var(--muted)]'>
-                {resolving ? '확인 중…' : '검색 중…'}
+                {resolving ? t('placeSearch.resolving') : t('placeSearch.searching')}
               </span>
             )}
           </div>
@@ -310,13 +346,13 @@ export function PlaceSearchField({
           results.length === 0 &&
           !error ? (
             <p className='mt-2 text-[12px] text-[var(--muted)]'>
-              검색 결과가 없어요. 영어 주소나 거리명을 더 자세히 넣어 보세요.
+              {t('placeSearch.noResults')}
             </p>
           ) : null}
           <p className='mt-2 text-[12px] text-[var(--muted)]'>
             {mode === 'address'
-              ? '주소를 선택하면 위치가 저장돼요.'
-              : '목록에서 장소를 선택해야 글을 올릴 수 있어요.'}
+              ? t('placeSearch.addressHint')
+              : t('placeSearch.placeHint')}
           </p>
         </>
       )}

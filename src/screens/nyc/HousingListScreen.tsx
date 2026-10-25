@@ -4,12 +4,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { BottomSheet, PullToRefresh, RangeSlider, Skeleton } from '@components'
 import {
-  formatHousingPriceFilterLabel,
   getHousingPriceBounds,
   getHousingPricePresetId,
   getHousingPricePresets,
-  getHousingRoomTypeLabel,
-  getHousingUnitTypeLabel,
   getListingArea,
   getListingUnitType,
   housingMatchesPerk,
@@ -27,7 +24,10 @@ import {
   type HousingListingKind,
 } from '@lib/constants/housingMock'
 import { useCity } from '@hooks/useCity'
+import { BRAND_CONFIG } from '@lib/brand'
 import { fetchHousingListings } from '@lib/housing/fetchListings'
+import { useT } from '@lib/i18n/client'
+import type { Translate } from '@lib/i18n/translate'
 import { cn } from '@lib'
 import type {
   HousingListing,
@@ -45,6 +45,25 @@ type RoomTypeFilter = 'all' | HousingRoomType
 type NeighborhoodFilter = 'all' | string
 type ListingKindFilter = 'all' | HousingListingKind
 
+function formatMoney(value: number) {
+  return value.toLocaleString('en-US')
+}
+
+/** `$3,500 이하` / `$4,000+` / `$1,500 – $2,000` */
+function formatPriceRangeLabel(
+  t: Translate,
+  kind: HousingListingKind,
+  min: number,
+  max: number,
+) {
+  const bounds = getHousingPriceBounds(kind)
+  if (min <= bounds.min) return t('list.price.upTo', { amount: formatMoney(max) })
+  if (max >= bounds.max) {
+    return t('list.price.atLeast', { amount: formatMoney(min) })
+  }
+  return t('list.price.range', { min: formatMoney(min), max: formatMoney(max) })
+}
+
 function defaultPriceRange(kind: ListingKindFilter) {
   if (kind === 'all') {
     const bounds = getHousingPriceBounds('unit')
@@ -55,6 +74,7 @@ function defaultPriceRange(kind: ListingKindFilter) {
 }
 
 export function HousingListScreen() {
+  const t = useT('housing')
   const city = useCity()
   const [listingKind, setListingKind] = useState<ListingKindFilter>('all')
   const [unitType, setUnitType] = useState<UnitTypeFilter>('all')
@@ -230,28 +250,36 @@ export function HousingListScreen() {
 
   const summaryLabel = useMemo(() => {
     const parts: string[] = []
-    if (listingKind === 'unit') parts.push('전체 유닛')
-    if (listingKind === 'room') parts.push('개인 방')
+    if (listingKind !== 'all') {
+      parts.push(t(`listingKinds.${listingKind}.label`))
+    }
     if (listingKind === 'unit' && unitType !== 'all') {
-      parts.push(getHousingUnitTypeLabel(unitType))
+      parts.push(t(`unitTypes.${unitType}`))
     }
     if (listingKind === 'room' && roomType !== 'all') {
-      parts.push(getHousingRoomTypeLabel(roomType))
+      parts.push(t(`roomTypes.${roomType}`))
     }
     if (neighborhood !== 'all') parts.push(neighborhood)
-    const priceLabel = formatHousingPriceFilterLabel(
-      listingKind,
-      priceMin,
-      priceMax,
-    )
-    if (priceLabel) parts.push(priceLabel)
-    for (const perk of perks) {
-      const label = HOUSING_PERKS.find((item) => item.id === perk)?.label
-      if (label) parts.push(label)
+    if (
+      listingKind !== 'all' &&
+      isHousingPriceFilterActive(listingKind, priceMin, priceMax)
+    ) {
+      parts.push(formatPriceRangeLabel(t, listingKind, priceMin, priceMax))
     }
-    if (parts.length === 0) return `등록 매물 ${filteredPosts.length}개`
-    return `${parts.join(' · ')} · ${filteredPosts.length}개`
+    for (const perk of perks) {
+      if (HOUSING_PERKS.some((item) => item.id === perk)) {
+        parts.push(t(`perks.${perk}`))
+      }
+    }
+    if (parts.length === 0) {
+      return t('list.summaryAll', { count: filteredPosts.length })
+    }
+    return t('list.summaryFiltered', {
+      count: filteredPosts.length,
+      filters: parts.join(' · '),
+    })
   }, [
+    t,
     listingKind,
     unitType,
     roomType,
@@ -402,10 +430,10 @@ export function HousingListScreen() {
     <BoardPageShell width='wide' className='flex flex-1 flex-col'>
       <header className='pt-5 sm:pt-8 lg:pt-10'>
         <h1 className='text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]'>
-          하우징
+          {t('list.title')}
         </h1>
         <p className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>
-          Misaeng이 엄선한 NYC 매물 · 유닛과 개인 방을 한곳에서 찾아보세요.
+          {t('list.subtitle', { brand: BRAND_CONFIG.name })}
         </p>
 
         {/* 필터 + 빠른 태그 (예전 디자인) */}
@@ -421,7 +449,7 @@ export function HousingListScreen() {
             )}
           >
             <FiltersIcon className='size-3.5' />
-            필터
+            {t('list.filters')}
             {activeFilterCount > 0 && (
               <span className='inline-flex min-w-4.5 items-center justify-center rounded-full bg-[var(--foreground)] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white'>
                 {activeFilterCount}
@@ -443,12 +471,21 @@ export function HousingListScreen() {
               <div
                 className='flex w-max items-center gap-1.5 pr-12'
                 role='listbox'
-                aria-label='빠른 필터'
+                aria-label={t('list.quickFilters')}
               >
                 {pricePresets.map((preset) => (
                   <QuickChip
                     key={preset.id}
-                    label={preset.label}
+                    label={
+                      listingKind === 'all'
+                        ? preset.label
+                        : formatPriceRangeLabel(
+                            t,
+                            listingKind,
+                            preset.min,
+                            preset.max,
+                          )
+                    }
                     active={activePricePreset === preset.id}
                     onClick={() => toggleQuickPrice(preset.min, preset.max)}
                   />
@@ -456,7 +493,7 @@ export function HousingListScreen() {
                 {HOUSING_PERKS.map((perk) => (
                   <QuickChip
                     key={perk.id}
-                    label={perk.label}
+                    label={t(`perks.${perk.id}`)}
                     active={perks.includes(perk.id)}
                     onClick={() => toggleQuickPerk(perk.id)}
                   />
@@ -476,7 +513,7 @@ export function HousingListScreen() {
                 />
                 <button
                   type='button'
-                  aria-label='이전 필터 보기'
+                  aria-label={t('list.previousFilters')}
                   onClick={() => scrollChips('left')}
                   className='pointer-events-auto relative ml-0.5 inline-flex size-6 items-center justify-center rounded-full border border-[#dddddd] bg-white text-[var(--foreground)] shadow-sm'
                 >
@@ -497,7 +534,7 @@ export function HousingListScreen() {
                 />
                 <button
                   type='button'
-                  aria-label='더 많은 필터 보기'
+                  aria-label={t('list.moreFilters')}
                   onClick={() => scrollChips('right')}
                   className='pointer-events-auto relative mr-0.5 inline-flex size-6 items-center justify-center rounded-full border border-[#dddddd] bg-white text-[var(--foreground)] shadow-sm'
                 >
@@ -517,9 +554,9 @@ export function HousingListScreen() {
           </>
         ) : filteredPosts.length === 0 ? (
           <EmptyState
-            title='조건에 맞는 매물이 없어요'
-            description='필터를 바꿔 다시 검색해 보세요.'
-            actionLabel='필터 초기화'
+            title={t('list.empty.title')}
+            description={t('list.empty.description')}
+            actionLabel={t('list.empty.action')}
             onAction={clearAllFilters}
           />
         ) : (
@@ -545,7 +582,7 @@ export function HousingListScreen() {
       <BottomSheet
         open={filtersOpen}
         onClose={() => setFiltersOpen(false)}
-        title='필터'
+        title={t('list.filters')}
         maxHeightClassName='max-h-[min(85dvh,720px)]'
         footer={
           <div className='flex items-center justify-between gap-3 px-5 py-4'>
@@ -562,14 +599,14 @@ export function HousingListScreen() {
               }}
               className='text-[14px] font-semibold text-[var(--foreground)] underline underline-offset-2 touch-manipulation'
             >
-              전체 해제
+              {t('list.sheet.clearAll')}
             </button>
             <button
               type='button'
               onClick={applyFilters}
               className='inline-flex h-11 min-w-[140px] items-center justify-center rounded-full bg-[var(--foreground)] px-5 text-[14px] font-semibold text-white touch-manipulation hover:bg-[var(--navy-light)]'
             >
-              매물 {draftResultCount}개 보기
+              {t('list.sheet.showResults', { count: draftResultCount })}
             </button>
           </div>
         }
@@ -577,7 +614,7 @@ export function HousingListScreen() {
         <div className='space-y-7 overflow-x-hidden px-3 pb-2'>
             <section>
               <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                무엇을 찾으세요?
+                {t('list.sheet.lookingFor')}
               </h4>
               <div className='mt-3 grid grid-cols-2 gap-2'>
                 {HOUSING_LISTING_KINDS.map((kind) => {
@@ -600,10 +637,10 @@ export function HousingListScreen() {
                       )}
                     >
                       <span className='block text-[13px] font-semibold text-[var(--foreground)]'>
-                        {kind.label}
+                        {t(`listingKinds.${kind.id}.label`)}
                       </span>
                       <span className='mt-0.5 block text-[11px] leading-snug text-[var(--muted)]'>
-                        {kind.description}
+                        {t(`listingKinds.${kind.id}.description`)}
                       </span>
                     </button>
                   )
@@ -615,18 +652,18 @@ export function HousingListScreen() {
               <>
                 <section>
                   <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                    유닛 타입
+                    {t('list.sheet.unitType')}
                   </h4>
                   <div className='mt-3 flex flex-wrap gap-2'>
                     <SheetChip
-                      label='전체'
+                      label={t('list.sheet.all')}
                       active={draftUnitType === 'all'}
                       onClick={() => setDraftUnitType('all')}
                     />
                     {HOUSING_UNIT_TYPES.map((type) => (
                       <SheetChip
                         key={type.id}
-                        label={type.label}
+                        label={t(`unitTypes.${type.id}`)}
                         active={draftUnitType === type.id}
                         onClick={() => setDraftUnitType(type.id)}
                       />
@@ -636,10 +673,10 @@ export function HousingListScreen() {
 
                 <section>
                   <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                    가격
+                    {t('list.sheet.price')}
                   </h4>
                   <p className='mt-1 text-[12px] text-[var(--muted)]'>
-                    유닛 전체 월세
+                    {t('list.sheet.unitRent')}
                   </p>
                   <RangeSlider
                     className='mt-4 px-1'
@@ -662,7 +699,12 @@ export function HousingListScreen() {
                     {draftPricePresets.map((preset) => (
                       <SheetChip
                         key={preset.id}
-                        label={preset.label}
+                        label={formatPriceRangeLabel(
+                          t,
+                          draftListingKind,
+                          preset.min,
+                          preset.max,
+                        )}
                         active={draftPricePreset === preset.id}
                         onClick={() => {
                           if (draftPricePreset === preset.id) {
@@ -684,18 +726,18 @@ export function HousingListScreen() {
               <>
                 <section>
                   <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                    룸 타입
+                    {t('list.sheet.roomType')}
                   </h4>
                   <div className='mt-3 flex flex-wrap gap-2'>
                     <SheetChip
-                      label='전체'
+                      label={t('list.sheet.all')}
                       active={draftRoomType === 'all'}
                       onClick={() => setDraftRoomType('all')}
                     />
                     {HOUSING_ROOM_TYPES.map((type) => (
                       <SheetChip
                         key={type.id}
-                        label={type.label}
+                        label={t(`roomTypes.${type.id}`)}
                         active={draftRoomType === type.id}
                         onClick={() => setDraftRoomType(type.id)}
                       />
@@ -705,10 +747,10 @@ export function HousingListScreen() {
 
                 <section>
                   <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                    가격
+                    {t('list.sheet.price')}
                   </h4>
                   <p className='mt-1 text-[12px] text-[var(--muted)]'>
-                    룸 월세
+                    {t('list.sheet.roomRent')}
                   </p>
                   <RangeSlider
                     className='mt-4 px-1'
@@ -731,7 +773,12 @@ export function HousingListScreen() {
                     {draftPricePresets.map((preset) => (
                       <SheetChip
                         key={preset.id}
-                        label={preset.label}
+                        label={formatPriceRangeLabel(
+                          t,
+                          draftListingKind,
+                          preset.min,
+                          preset.max,
+                        )}
                         active={draftPricePreset === preset.id}
                         onClick={() => {
                           if (draftPricePreset === preset.id) {
@@ -751,7 +798,7 @@ export function HousingListScreen() {
 
             <section>
               <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                혜택
+                {t('list.sheet.benefits')}
               </h4>
               <div className='mt-3 flex flex-wrap gap-2'>
                 {HOUSING_BENEFIT_PERKS.map((perkId) => {
@@ -760,7 +807,7 @@ export function HousingListScreen() {
                   return (
                     <SheetChip
                       key={perk.id}
-                      label={perk.label}
+                      label={t(`perks.${perk.id}`)}
                       active={draftPerks.includes(perk.id)}
                       onClick={() => toggleDraftPerk(perk.id)}
                     />
@@ -771,7 +818,7 @@ export function HousingListScreen() {
 
             <section>
               <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                어메니티
+                {t('list.sheet.amenities')}
               </h4>
               <div className='mt-3 flex flex-wrap gap-2'>
                 {HOUSING_AMENITY_PERKS.map((perkId) => {
@@ -780,7 +827,7 @@ export function HousingListScreen() {
                   return (
                     <SheetChip
                       key={perk.id}
-                      label={perk.label}
+                      label={t(`perks.${perk.id}`)}
                       active={draftPerks.includes(perk.id)}
                       onClick={() => toggleDraftPerk(perk.id)}
                     />
@@ -791,11 +838,11 @@ export function HousingListScreen() {
 
             <section>
               <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                지역
+                {t('list.sheet.area')}
               </h4>
               <div className='mt-3 flex flex-wrap gap-2'>
                 <SheetChip
-                  label='전체'
+                  label={t('list.sheet.all')}
                   active={draftNeighborhood === 'all'}
                   onClick={() => setDraftNeighborhood('all')}
                 />

@@ -18,10 +18,6 @@ import {
   normalizeFoodCuisine,
   resolveCommunityThumbnail,
 } from '@lib/community/food'
-import {
-  formatCommunityCount,
-  formatCommunityRelativeTime,
-} from '@lib/constants/communityMock'
 import { getCptOptTimelineDateRange } from '@lib/community/cptOpt'
 import { htmlToPlainText } from '@lib/community/html'
 import {
@@ -36,6 +32,7 @@ import {
   isAnonymousBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
+import { useFormat, useLocale, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import type { CommunityPost, JobReviewTimelineEntry } from '@/types/nyc'
 import { BoardSurface } from '@widgets/nyc/BoardPageShell'
@@ -58,6 +55,26 @@ import {
 interface CommunityPostCardProps {
   post: CommunityPost
   boardId: NycCommunityBoardId
+}
+
+const MINUTE_MS = 60_000
+const DAY_MS = 24 * 60 * MINUTE_MS
+
+/**
+ * 커뮤니티 목록·상세 공통 표시: 상대 시간(일주일 이내) / 날짜, 조회수 등 숫자 (축약 표기).
+ */
+export function useCommunityFormat() {
+  const fmt = useFormat()
+  return {
+    relativeTime: (timestamp: number) =>
+      Date.now() - timestamp < 7 * DAY_MS
+        ? fmt.relative(timestamp)
+        : fmt.date(timestamp, { month: 'short', day: 'numeric' }),
+    count: (value: number) =>
+      fmt.number(Math.max(0, Math.floor(Number(value) || 0)), {
+        notation: 'compact',
+      }),
+  }
 }
 
 function usePostHref(post: CommunityPost) {
@@ -86,23 +103,30 @@ function FoodListingCard({
   post: CommunityPost
   boardId: NycCommunityBoardId
 }) {
+  const t = useT('community')
+  const tFood = useT('food')
+  const format = useCommunityFormat()
   const postHref = usePostHref(post)
   const anonymous = isAnonymousBoard(boardId)
   const thumbnail = resolveCommunityThumbnail(post)
   const foodCategory = getFoodCategory(post.foodCategory)
-  const cuisineLabel = getFoodCuisineLabel(normalizeFoodCuisine(post.detail))
+  const cuisineLabel = getFoodCuisineLabel(
+    normalizeFoodCuisine(post.detail),
+    tFood,
+  )
   const foodSpend = formatFoodPartySpend(
     post.partySize,
     post.totalSpend,
     post.tipIncluded,
+    tFood,
   )
-  const foodWait = formatFoodWait(post.waitMinutes)
+  const foodWait = formatFoodWait(post.waitMinutes, tFood)
   const metaChips = [
     cuisineLabel ? (
       <FoodOverlayChip key='cuisine'>{cuisineLabel}</FoodOverlayChip>
     ) : null,
     anonymous ? (
-      <FoodOverlayChip key='anon'>익명</FoodOverlayChip>
+      <FoodOverlayChip key='anon'>{t('author.anonymous')}</FoodOverlayChip>
     ) : null,
     foodSpend ? (
       <FoodOverlayChip key='spend' className='tabular-nums'>
@@ -133,7 +157,7 @@ function FoodListingCard({
             />
           ) : (
             <div className='flex h-full items-center justify-center text-[13px] text-[var(--muted)]'>
-              사진 없음
+              {t('card.noPhoto')}
             </div>
           )}
           {foodCategory ? (
@@ -173,7 +197,7 @@ function FoodListingCard({
               <span className='line-clamp-2'>{post.title}</span>
             </h3>
             <time className='shrink-0 pt-1 text-[11px] font-medium tabular-nums text-[var(--muted)]'>
-              {formatCommunityRelativeTime(post.createdAt)}
+              {format.relativeTime(post.createdAt)}
             </time>
           </div>
 
@@ -192,7 +216,7 @@ function FoodListingCard({
             <span className='inline-flex items-center gap-1.5'>
               <EyeIcon className='size-3.5' />
               <span className='tabular-nums'>
-                {formatCommunityCount(post.viewCount)}
+                {format.count(post.viewCount)}
               </span>
             </span>
             <FoodCardRecommendStat
@@ -203,10 +227,10 @@ function FoodListingCard({
             <span className='inline-flex items-center gap-1.5'>
               <PinIcon className='size-3.5' />
               <span>
-                <span className='tabular-nums'>
-                  {formatCommunityCount(post.beenThereCount)}
-                </span>
-                명이 가봤어요
+                {t('card.beenThereCount', {
+                  count: post.beenThereCount,
+                  n: format.count(post.beenThereCount),
+                })}
               </span>
             </span>
           </div>
@@ -224,10 +248,12 @@ function CptOptListingCard({
   post: CommunityPost
   boardId: NycCommunityBoardId
 }) {
+  const t = useT('community')
+  const locale = useLocale()
   const postHref = usePostHref(post)
   const postCity = parseCityId(post.city)
   const stepCount = post.cptOptTimeline?.length ?? 0
-  const dateRange = getCptOptTimelineDateRange(post.cptOptTimeline)
+  const dateRange = getCptOptTimelineDateRange(post.cptOptTimeline, locale)
   const contextTag = getListingContextTag(
     [post.location],
     post.authorSchoolId,
@@ -275,7 +301,11 @@ function CptOptListingCard({
         </p>
 
         <TimelineSummaryRow
-          label={stepCount > 0 ? `타임라인 ${stepCount}단계` : null}
+          label={
+            stepCount > 0
+              ? t('card.timelineSteps', { count: stepCount })
+              : null
+          }
           dateRange={dateRange}
         />
 
@@ -302,10 +332,12 @@ function JobReviewListingCard({
   post: CommunityPost
   boardId: NycCommunityBoardId
 }) {
+  const t = useT('community')
+  const locale = useLocale()
   const postHref = usePostHref(post)
   const timeline = sortJobReviewTimelineByDate(post.jobReviewTimeline ?? [])
   const stepCount = timeline.length
-  const dateRange = getJobReviewTimelineDateRange(timeline)
+  const dateRange = getJobReviewTimelineDateRange(timeline, locale)
   const typeStyle = getJobReviewTypeStyle(post.jobReviewType)
   const visibleSteps = timeline.slice(0, JOB_REVIEW_LISTING_STEP_LIMIT)
   const hiddenStepCount = stepCount - visibleSteps.length
@@ -368,8 +400,11 @@ function JobReviewListingCard({
           label={
             stepCount > 0
               ? hiddenStepCount > 0
-                ? `채용 단계 ${stepCount}건 · ${hiddenStepCount}단계 더 보기`
-                : `채용 단계 ${stepCount}건`
+                ? t('card.hiringStepsWithMore', {
+                    count: stepCount,
+                    hidden: hiddenStepCount,
+                  })
+                : t('card.hiringSteps', { count: stepCount })
               : null
           }
           dateRange={dateRange}
@@ -398,13 +433,16 @@ function TextListingCard({
   post: CommunityPost
   boardId: NycCommunityBoardId
 }) {
+  const t = useT('community')
+  const tHousing = useT('housing')
+  const format = useCommunityFormat()
   const postHref = usePostHref(post)
   const anonymous = isAnonymousBoard(boardId)
   const boardMeta = NYC_COMMUNITY_BOARD_META[boardId]
   const isMarket = boardId === 'marketplace'
   const isRoommate = boardId === 'roommate'
   const roommateLabel = isRoommate
-    ? getRoommateLookingForLabel(post.roommateLookingFor)
+    ? getRoommateLookingForLabel(post.roommateLookingFor, tHousing)
     : null
   const roommateStyle = getRoommateLookingForStyle(post.roommateLookingFor)
   const budgetLabel = isRoommate
@@ -421,7 +459,7 @@ function TextListingCard({
   const metaLine = [
     post.location,
     !isMarket && !isRoommate && post.detail ? post.detail : null,
-    moveInLabel ? `기간 ${moveInLabel}` : null,
+    moveInLabel ? t('card.period', { period: moveInLabel }) : null,
   ]
     .filter(Boolean)
     .join(' · ')
@@ -439,7 +477,7 @@ function TextListingCard({
           <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
             {anonymous ? (
               <span className='rounded-full bg-[#f1f2f4] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted)]'>
-                익명
+                {t('author.anonymous')}
               </span>
             ) : (
               <SchoolBadge schoolId={post.authorSchoolId} />
@@ -461,7 +499,7 @@ function TextListingCard({
             ) : null}
           </div>
           <time className='shrink-0 text-[11px] font-medium tabular-nums text-[var(--muted)]'>
-            {formatCommunityRelativeTime(post.createdAt)}
+            {format.relativeTime(post.createdAt)}
           </time>
         </div>
 
@@ -472,7 +510,7 @@ function TextListingCard({
           {budgetLabel ? (
             <span className='shrink-0 rounded-full bg-[#eef4ff] px-2.5 py-1 text-[14px] font-semibold tabular-nums text-[#3b5bdb]'>
               {budgetLabel}
-              {isRoommate ? <span className='text-[11px] font-medium'>/월</span> : null}
+              {isRoommate ? <span className='text-[11px] font-medium'>{t('card.perMonth')}</span> : null}
             </span>
           ) : null}
         </div>
@@ -485,10 +523,10 @@ function TextListingCard({
           <span className='inline-flex items-center gap-1.5'>
             <EyeIcon className='size-3.5' />
             <span className='tabular-nums'>
-              {formatCommunityCount(post.viewCount)}
+              {format.count(post.viewCount)}
             </span>
           </span>
-          {boardMeta.detailLabel && !isMarket && post.detail ? (
+          {boardMeta.hasDetail && !isMarket && post.detail ? (
             <span className='truncate text-[11px]'>{post.detail}</span>
           ) : null}
         </div>
@@ -531,6 +569,8 @@ function JobReviewListingStep({
   accentColor: string
   softColor: string
 }) {
+  const t = useT('community')
+  const locale = useLocale()
   const fieldSummary = [
     entry.stageLabel,
     entry.platform,
@@ -543,7 +583,7 @@ function JobReviewListingStep({
   const review = htmlToPlainText(entry.stageReviewHtml || '')
   const description = review || entry.documentsSubmitted.trim()
   const dateLabel = entry.date
-    ? formatJobReviewDate(entry.date, { compactYear: true })
+    ? formatJobReviewDate(entry.date, { compactYear: true, locale })
     : ''
 
   return (
@@ -552,7 +592,7 @@ function JobReviewListingStep({
         className='mt-px inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[9px] font-bold tabular-nums'
         style={{ backgroundColor: softColor, color: accentColor }}
       >
-        {stepNumber}단계
+        {t('card.stepNumber', { n: stepNumber })}
       </span>
       <div className='min-w-0 flex-1'>
         <p className='flex min-w-0 items-baseline gap-1.5 text-[13px] leading-snug'>
@@ -562,7 +602,7 @@ function JobReviewListingStep({
             </span>
           ) : null}
           <span className='truncate font-semibold text-[var(--foreground)]'>
-            {fieldSummary || (dateLabel ? '' : '단계 정보 없음')}
+            {fieldSummary || (dateLabel ? '' : t('card.noStepInfo'))}
           </span>
         </p>
         {description ? (
@@ -629,24 +669,26 @@ function ListingEngagementCounts({
   /** 서버 집계 전 — 개인 찜만 있어 기본 0 */
   likeCount?: number
 }) {
+  const t = useT('community')
+  const format = useCommunityFormat()
   return (
     <span className='inline-flex items-center gap-2.5'>
-      <span className='inline-flex items-center gap-1' title='조회수'>
+      <span className='inline-flex items-center gap-1' title={t('card.views')}>
         <EyeIcon className='size-3.5 shrink-0' />
         <span className='tabular-nums'>
-          {formatCommunityCount(viewCount)}
+          {format.count(viewCount)}
         </span>
       </span>
-      <span className='inline-flex items-center gap-1' title='추천'>
+      <span className='inline-flex items-center gap-1' title={t('engagement.recommend')}>
         <RecommendIcon className='size-3.5 shrink-0' />
         <span className='tabular-nums'>
-          {formatCommunityCount(recommendCount)}
+          {format.count(recommendCount)}
         </span>
       </span>
-      <span className='inline-flex items-center gap-1' title='좋아요'>
+      <span className='inline-flex items-center gap-1' title={t('like.like')}>
         <HeartIcon className='size-3.5 shrink-0' />
         <span className='tabular-nums'>
-          {formatCommunityCount(likeCount)}
+          {format.count(likeCount)}
         </span>
       </span>
     </span>

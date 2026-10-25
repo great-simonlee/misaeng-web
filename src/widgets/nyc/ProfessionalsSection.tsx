@@ -8,35 +8,34 @@ import {
   type NycProfessionalCategoryId,
 } from '@lib/constants/nyc'
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 export function ProfessionalsSection() {
+  const t = useT('hub')
   const [activeId, setActiveId] = useState<NycProfessionalCategoryId>(
     NYC_PROFESSIONAL_CATEGORIES[0].id,
   )
 
-  const activeCategory = NYC_PROFESSIONAL_CATEGORIES.find(
-    (category) => category.id === activeId,
-  )
   const activePros = NYC_PROFESSIONALS.filter(
     (item) => item.categoryId === activeId,
   )
 
   return (
-    <section aria-label='전문가'>
+    <section aria-label={t('professionals.kicker')}>
       <div className='mb-5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-4'>
         <div className='min-w-0'>
           <p className='text-[11px] font-medium tracking-[0.2em] text-[var(--muted)]'>
-            전문가
+            {t('professionals.kicker')}
           </p>
           <h2 className='mt-1.5 text-base font-bold tracking-tight text-[var(--foreground)] sm:text-lg'>
-            생활 파트너
+            {t('professionals.title')}
           </h2>
           <p className='mt-1 max-w-xl text-sm leading-relaxed text-[var(--muted-foreground)]'>
-            부동산, 변호사, 이사, 회계 — NYC에서 자주 찾는 전문가예요.
+            {t('professionals.description')}
           </p>
         </div>
-        <p className='shrink-0 text-xs font-medium text-[#F64310]'>
-          곧 공개됩니다
+        <p className='shrink-0 text-xs font-medium text-brand'>
+          {t('comingSoon')}
         </p>
       </div>
 
@@ -45,7 +44,7 @@ export function ProfessionalsSection() {
         <div
           className='flex gap-2 overflow-x-auto py-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
           role='tablist'
-          aria-label='전문가 분야'
+          aria-label={t('professionals.categoriesAria')}
         >
           {NYC_PROFESSIONAL_CATEGORIES.map((category) => {
             const selected = category.id === activeId
@@ -63,24 +62,24 @@ export function ProfessionalsSection() {
                     : 'border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)]',
                 )}
               >
-                {category.title}
+                {t(`professionals.categories.${category.id}.title`)}
               </button>
             )
           })}
         </div>
 
         <p className='mt-2.5 text-xs text-[var(--muted)]'>
-          {activeCategory?.description}
+          {t(`professionals.categories.${activeId}.description`)}
         </p>
 
         <ul className='mt-3 divide-y divide-[var(--border)] border-y border-[var(--border)]'>
           {activePros.map((pro) => (
             <li key={pro.id} className='py-3'>
               <p className='truncate text-sm font-semibold text-[var(--foreground)]'>
-                {pro.name}
+                {t(`professionals.items.${pro.id}.name`)}
               </p>
               <p className='mt-0.5 truncate text-xs text-[var(--muted-foreground)]'>
-                {pro.specialty}
+                {t(`professionals.items.${pro.id}.specialty`)}
               </p>
             </li>
           ))}
@@ -100,19 +99,19 @@ export function ProfessionalsSection() {
               className='rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4'
             >
               <h3 className='text-sm font-semibold text-[var(--foreground)]'>
-                {category.title}
+                {t(`professionals.categories.${category.id}.title`)}
               </h3>
               <p className='mt-1 text-xs leading-relaxed text-[var(--muted)]'>
-                {category.description}
+                {t(`professionals.categories.${category.id}.description`)}
               </p>
               <ul className='mt-3 space-y-2.5 border-t border-[var(--border)] pt-3'>
                 {pros.map((pro) => (
                   <li key={pro.id} className='min-w-0'>
                     <p className='truncate text-sm font-medium text-[var(--foreground)]'>
-                      {pro.name}
+                      {t(`professionals.items.${pro.id}.name`)}
                     </p>
                     <p className='mt-0.5 truncate text-xs text-[var(--muted-foreground)]'>
-                      {pro.specialty}
+                      {t(`professionals.items.${pro.id}.specialty`)}
                     </p>
                   </li>
                 ))}

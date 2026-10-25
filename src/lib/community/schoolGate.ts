@@ -2,6 +2,7 @@ import {
   cityPath,
   DEFAULT_CITY_ID,
   getCityFromPathname,
+  localePrefixOf,
 } from '@lib/constants/cities'
 
 /** 글·댓글 작성에 필요한 학생/직장인 인증 게이트 */
@@ -43,21 +44,7 @@ export function isAccountSuspended(
 
 export const ACCOUNT_SUSPENDED_CODE = 'ACCOUNT_SUSPENDED'
 
-export const ACCOUNT_SUSPENDED_MESSAGE =
-  'This account is suspended. / 이 계정은 이용 정지되었습니다.'
-
 export const SCHOOL_VERIFY_REQUIRED_CODE = 'SCHOOL_VERIFICATION_REQUIRED'
-
-export const SCHOOL_VERIFY_REQUIRED_MESSAGE =
-  '글과 댓글을 작성하려면 학생 또는 직장인 인증이 필요해요.'
-
-export function getIdentityVerifyCtaLabel(): string {
-  return '인증하기'
-}
-
-export function getIdentityVerifyLinkLabel(): string {
-  return '학생 또는 직장인 인증'
-}
 
 /** 마이페이지에서 인증 시트를 여는 URL */
 export function getSchoolVerifyHref(nextPath?: string): string {
@@ -73,5 +60,5 @@ export function getIdentityVerifyHref(nextPath?: string): string {
   const city = nextPath?.trim()
     ? getCityFromPathname(nextPath)
     : DEFAULT_CITY_ID
-  return `${cityPath(city, '/me')}?${params.toString()}`
+  return `${localePrefixOf(nextPath)}${cityPath(city, '/me')}?${params.toString()}`
 }

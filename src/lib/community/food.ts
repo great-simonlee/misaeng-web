@@ -1,9 +1,16 @@
+import type { Translate } from '@lib/i18n/translate'
 import type { FoodCategoryId, FoodMenuItem, FoodGalleryPhoto, CommunityPost } from '@/types/nyc'
+
+/**
+ * 화면 표시 문구는 `food` 네임스페이스에 있다 (`const t = useT('food')`).
+ * - 카테고리 이름: `t(`categories.${id}`)`, 설명: `t(`categoryDescriptions.${id}`)`
+ * - 음식 종류: `t(`cuisines.${id}`)`
+ * FOOD_CUISINES의 한국어 label은 글의 detail 저장값(예전 데이터 매칭·새 글 저장)이라 번역하지 않는다.
+ */
 
 export type FoodCategoryMeta = {
   id: FoodCategoryId
-  label: string
-  description: string
+  /** 문구: food `categories.<id>` / `categoryDescriptions.<id>` */
   /** 비활성/연한 칩 */
   softClass: string
   /** 활성 칩·강조 */
@@ -18,19 +25,15 @@ export type FoodCategoryMeta = {
 export const FOOD_CATEGORIES: FoodCategoryMeta[] = [
   {
     id: 'restaurant',
-    label: '맛집',
-    description: '꼭 가볼 만한 맛집',
-    softClass: 'bg-[#fff1ed] text-[#c2410c] ring-1 ring-[#fdba74]/55',
+    softClass: 'bg-brand-subtle text-[#c2410c] ring-1 ring-[#fdba74]/55',
     solidClass: 'bg-[#ea580c] text-white shadow-sm shadow-orange-500/25',
     badgeClass:
       'bg-[#ea580c]/95 text-white shadow-sm backdrop-blur-sm',
     selectClass: 'border-[#fed7aa] bg-[#fff7ed]',
-    selectActiveClass: 'border-[#ea580c] bg-[#fff1ed] ring-1 ring-[#ea580c]/25',
+    selectActiveClass: 'border-[#ea580c] bg-brand-subtle ring-1 ring-[#ea580c]/25',
   },
   {
     id: 'value',
-    label: '가성비',
-    description: '가격 대비 만족',
     softClass: 'bg-[#ecfdf5] text-[#047857] ring-1 ring-[#6ee7b7]/45',
     solidClass: 'bg-[#059669] text-white shadow-sm shadow-emerald-500/25',
     badgeClass:
@@ -40,8 +43,6 @@ export const FOOD_CATEGORIES: FoodCategoryMeta[] = [
   },
   {
     id: 'vibe',
-    label: '느좋',
-    description: '분위기 좋은 곳',
     softClass: 'bg-[#fff7ed] text-[#b45309] ring-1 ring-[#fcd34d]/50',
     solidClass: 'bg-[#d97706] text-white shadow-sm shadow-amber-500/25',
     badgeClass:
@@ -51,8 +52,6 @@ export const FOOD_CATEGORIES: FoodCategoryMeta[] = [
   },
   {
     id: 'study',
-    label: '카공',
-    description: '공부·작업하기 좋은 카페',
     softClass: 'bg-[#eff6ff] text-[#1d4ed8] ring-1 ring-[#93c5fd]/50',
     solidClass: 'bg-[#2563eb] text-white shadow-sm shadow-blue-500/25',
     badgeClass:
@@ -78,10 +77,14 @@ export function getFoodCategory(
   return FOOD_CATEGORIES.find((item) => item.id === id) ?? null
 }
 
+/** t는 `useT('food')` / `getT(locale, 'food')` */
 export function getFoodCategoryLabel(
   id: FoodCategoryId | null | undefined,
+  t: Translate,
 ): string | null {
-  return getFoodCategory(id)?.label ?? null
+  const meta = getFoodCategory(id)
+  if (!meta) return null
+  return t(`categories.${meta.id}`)
 }
 
 export function normalizeFoodCategory(raw: unknown): FoodCategoryId | null {
@@ -106,6 +109,7 @@ export type FoodCuisineId =
 
 export type FoodCuisineMeta = {
   id: FoodCuisineId
+  /** 예전 글은 detail에 이 한글 라벨이 저장돼 있다 (정규화용). 표시는 `t(`cuisines.${id}`)` */
   label: string
 }
 
@@ -135,14 +139,18 @@ export function getFoodCuisine(
   return FOOD_CUISINES.find((item) => item.id === id) ?? null
 }
 
+/** t는 `useT('food')` / `getT(locale, 'food')`. 없으면 한국어 원문 */
 export function getFoodCuisineLabel(
   idOrLabel: string | null | undefined,
+  t?: Translate,
 ): string | null {
   const value = String(idOrLabel || '').trim()
   if (!value) return null
-  if (isFoodCuisineId(value)) return getFoodCuisine(value)?.label ?? value
-  const byLabel = FOOD_CUISINES.find((item) => item.label === value)
-  return byLabel?.label ?? value
+  const meta = isFoodCuisineId(value)
+    ? getFoodCuisine(value)
+    : FOOD_CUISINES.find((item) => item.label === value) ?? null
+  if (!meta) return value
+  return t ? t(`cuisines.${meta.id}`) : meta.label
 }
 
 export function normalizeFoodCuisine(raw: unknown): FoodCuisineId | null {
@@ -198,34 +206,35 @@ export function parseFoodInt(
   return Math.min(max, Math.max(min, n))
 }
 
-/** 맛집: "2인 총 $45 · 팁 포함" */
+/**
+ * 맛집: "2인 총 $45 · 팁 포함"
+ * t는 `useT('food')` / `getT(locale, 'food')`
+ */
 export function formatFoodPartySpend(
   partySize: number | null | undefined,
   totalSpend: number | null | undefined,
-  tipIncluded?: boolean | null,
+  tipIncluded: boolean | null | undefined,
+  t: Translate,
 ): string | null {
   const people = Math.floor(Number(partySize) || 0)
   const spend = Number(totalSpend)
   if (people <= 0 && !(spend > 0)) return null
-  const parts: string[] = []
-  if (people > 0) parts.push(`${people}인`)
-  if (spend > 0) {
-    const tipLabel =
-      tipIncluded === true
-        ? ' · 팁 포함'
-        : tipIncluded === false
-          ? ' · 팁 제외'
-          : ''
-    parts.push(`총 $${formatUsd(spend)}${tipLabel}`)
-  }
-  return parts.join(' ')
+  if (!(spend > 0)) return t('spend.people', { count: people })
+  const tip =
+    tipIncluded === true ? 'WithTip' : tipIncluded === false ? 'WithoutTip' : ''
+  const amount = formatUsd(spend)
+  return people > 0
+    ? t(`spend.peopleTotal${tip}`, { count: people, amount })
+    : t(`spend.total${tip}`, { amount })
 }
 
+/** t는 `useT('food')` */
 export function formatFoodTipIncluded(
   tipIncluded: boolean | null | undefined,
+  t: Translate,
 ): string | null {
-  if (tipIncluded === true) return '팁 포함'
-  if (tipIncluded === false) return '팁 제외'
+  if (tipIncluded === true) return t('spend.tipIncluded')
+  if (tipIncluded === false) return t('spend.tipExcluded')
   return null
 }
 
@@ -236,18 +245,19 @@ export function normalizeTipIncluded(raw: unknown): boolean | null {
   return null
 }
 
-/** 맛집: "웨이팅 25분" | "웨이팅 없음" */
+/** 맛집: "웨이팅 25분" | "웨이팅 없음". t는 `useT('food')` */
 export function formatFoodWait(
   waitMinutes: number | null | undefined,
+  t: Translate,
 ): string | null {
   if (waitMinutes == null || !Number.isFinite(Number(waitMinutes))) return null
   const minutes = Math.max(0, Math.floor(Number(waitMinutes)))
-  if (minutes === 0) return '웨이팅 없음'
-  if (minutes < 60) return `웨이팅 ${minutes}분`
+  if (minutes === 0) return t('wait.none')
+  if (minutes < 60) return t('wait.minutes', { minutes })
   const hours = Math.floor(minutes / 60)
   const rest = minutes % 60
-  if (rest === 0) return `웨이팅 ${hours}시간`
-  return `웨이팅 ${hours}시간 ${rest}분`
+  if (rest === 0) return t('wait.hours', { hours })
+  return t('wait.hoursMinutes', { hours, minutes: rest })
 }
 
 export function normalizeWaitMinutes(raw: unknown): number | null {
@@ -311,7 +321,7 @@ export function formatFoodMenuDisplay(
 /** 메뉴 이름 (없으면 캡션·기본값) */
 export function getFoodMenuName(
   item: Pick<FoodMenuItem, 'name' | 'caption'>,
-  fallback = '메뉴',
+  fallback: string,
 ): string {
   return item.name?.trim() || item.caption?.trim() || fallback
 }
@@ -335,17 +345,18 @@ export function normalizeFoodGalleryPhotos(raw: unknown): FoodGalleryPhoto[] {
     .filter((item): item is FoodGalleryPhoto => Boolean(item))
 }
 
-/** 상세 상단 캐러셀: 대표 → 메뉴 → 분위기 순, URL 중복 제거 */
+/** 상세 상단 캐러셀: 대표 → 메뉴 → 분위기 순, URL 중복 제거. t는 `useT('food')` */
 export function buildFoodDetailCarouselSlides(
   post: Pick<
     CommunityPost,
     'thumbnailUrl' | 'menuItems' | 'galleryPhotos'
   >,
+  t: Translate,
 ): FoodCarouselSlide[] {
   const slides: FoodCarouselSlide[] = []
   const thumb = post.thumbnailUrl?.trim()
   if (thumb) {
-    slides.push({ id: 'thumbnail', imageUrl: thumb, label: '대표' })
+    slides.push({ id: 'thumbnail', imageUrl: thumb, label: t('carousel.cover') })
   }
 
   for (const item of post.menuItems || []) {
@@ -354,7 +365,7 @@ export function buildFoodDetailCarouselSlides(
     slides.push({
       id: `menu-${item.id}`,
       imageUrl,
-      label: getFoodMenuName(item),
+      label: getFoodMenuName(item, t('carousel.menu')),
     })
   }
 
@@ -364,7 +375,7 @@ export function buildFoodDetailCarouselSlides(
     slides.push({
       id: `gallery-${photo.id}`,
       imageUrl,
-      label: photo.caption?.trim() || '분위기',
+      label: photo.caption?.trim() || t('carousel.vibe'),
     })
   }
 

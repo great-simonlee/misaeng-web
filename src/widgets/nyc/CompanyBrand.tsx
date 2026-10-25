@@ -1,4 +1,8 @@
+import { useCallback } from 'react'
+
 import { cn } from '@lib'
+import { isCompanyIndustry } from '@lib/constants/company'
+import { useT } from '@lib/i18n/client'
 import { CompanyLogo } from '@widgets/nyc/CompanyLogo'
 
 /** 회사 목록·상세가 같이 쓰는 업계 색, 로고 타일, 업계 태그, 히어로 배경 */
@@ -6,7 +10,7 @@ import { CompanyLogo } from '@widgets/nyc/CompanyLogo'
 export type Tint = { from: string; to: string; dot: string }
 
 const TINTS: Tint[] = [
-  { from: '#ff7a45', to: '#f64310', dot: '#f97316' },
+  { from: 'var(--brand-bright)', to: 'var(--brand)', dot: '#f97316' },
   { from: '#7c6cff', to: '#4f46e5', dot: '#6366f1' },
   { from: '#34d399', to: '#059669', dot: '#10b981' },
   { from: '#38bdf8', to: '#0369a1', dot: '#0ea5e9' },
@@ -54,7 +58,20 @@ export function CompanyMark({
   )
 }
 
-/** 업계 색 그라데이션 점 + 업계 이름. dark 는 어두운 히어로 위 */
+/**
+ * 업계 코드 → 현재 언어 이름 (`companies.industries.<code>`).
+ * 관리자가 추가한 모르는 코드는 API가 준 이름(fallback)을 그대로 쓴다.
+ */
+export function useIndustryLabel(): (code: string, fallback: string) => string {
+  const t = useT('companies')
+  return useCallback(
+    (code: string, fallback: string) =>
+      isCompanyIndustry(code) ? t(`industries.${code}`) : fallback,
+    [t],
+  )
+}
+
+/** 업계 색 그라데이션 점 + 업계 이름 (코드로 번역, 모르는 코드는 label). dark 는 어두운 히어로 위 */
 export function IndustryTag({
   label,
   industry,
@@ -66,6 +83,7 @@ export function IndustryTag({
   tone?: 'light' | 'dark'
   className?: string
 }) {
+  const industryLabel = useIndustryLabel()
   return (
     <span
       className={cn(
@@ -81,7 +99,7 @@ export function IndustryTag({
         className='size-2 shrink-0 rounded-[3px] shadow-[inset_0_0_0_0.5px_rgba(0,0,0,0.08)]'
         style={{ backgroundImage: tintGradient(tintFor(industry)) }}
       />
-      <span className='truncate'>{label}</span>
+      <span className='truncate'>{industryLabel(industry, label)}</span>
     </span>
   )
 }

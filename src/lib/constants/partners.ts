@@ -1,104 +1,93 @@
 /** 모든 도시가 같은 목록을 보는 파트너 학생회·인플루언서 */
 
+/** 문구 키 `orgs.<id>.name` (partners 네임스페이스) */
 export const PARTNER_ORGS = [
   {
     id: 'nyu-kiso',
-    name: '뉴욕대 한인학생회',
     shortName: 'NYU',
     handle: 'nyu_kiso',
     logoSrc: '/img/school/kiso.png',
   },
   {
     id: 'fit-ksof',
-    name: 'FIT 한인학생회',
     shortName: 'FIT',
     handle: 'ksof_fit',
     logoSrc: '/img/school/fit.png',
   },
   {
     id: 'baruch-ksa',
-    name: '버룩 한인학생회',
     shortName: 'BC',
     handle: 'ksabaruch',
     logoSrc: '/img/school/baruch.png',
   },
   {
     id: 'parsons-ksa',
-    name: '파슨스 한인학생회',
     shortName: 'PAR',
     handle: 'parsons.kisp',
     logoSrc: '/img/school/parsons.png',
   },
 ] as const
 
+/** 문구 키 `influencerPlatforms.<id>.title` / `.description` (partners 네임스페이스) */
 export const INFLUENCER_PLATFORMS = [
-  {
-    id: 'instagram',
-    title: '인스타그램',
-    description: '라이프·로컬 인스타그램',
-  },
-  {
-    id: 'youtube',
-    title: '유튜버',
-    description: '브이로그·정보 유튜브',
-  },
-  {
-    id: 'tiktok',
-    title: '틱토커',
-    description: '숏폼으로 보는 로컬 소식',
-  },
+  { id: 'instagram' },
+  { id: 'youtube' },
+  { id: 'tiktok' },
 ] as const
 
 export type InfluencerPlatformId =
   (typeof INFLUENCER_PLATFORMS)[number]['id']
 
-/** 협력 인플루언서. handle이 있으면 플랫폼 프로필로 연결. */
+/**
+ * 협력 인플루언서. handle이 있으면 플랫폼 프로필로 연결.
+ * 모집 중 자리는 `nameKey` 문구(`influencers.<nameKey>`, partners 네임스페이스)를 보여 준다.
+ */
 export const PARTNER_INFLUENCERS = [
   {
     id: 'ig-recruiting-1',
-    name: '협력 인플루언서를 찾습니다!',
+    nameKey: 'recruitingTitle',
     shortName: 'IG',
     handle: null,
     platform: 'instagram',
   },
   {
     id: 'ig-recruiting-2',
-    name: '현재 협력 인플루언서 찾는 중',
+    nameKey: 'searching',
     shortName: 'IG',
     handle: null,
     platform: 'instagram',
   },
   {
     id: 'yt-recruiting-1',
-    name: '협력 인플루언서를 찾습니다!',
+    nameKey: 'recruitingTitle',
     shortName: 'YT',
     handle: null,
     platform: 'youtube',
   },
   {
     id: 'yt-recruiting-2',
-    name: '현재 협력 인플루언서 찾는 중',
+    nameKey: 'searching',
     shortName: 'YT',
     handle: null,
     platform: 'youtube',
   },
   {
     id: 'tt-recruiting-1',
-    name: '협력 인플루언서를 찾습니다!',
+    nameKey: 'recruitingTitle',
     shortName: 'TT',
     handle: null,
     platform: 'tiktok',
   },
   {
     id: 'tt-recruiting-2',
-    name: '현재 협력 인플루언서 찾는 중',
+    nameKey: 'searching',
     shortName: 'TT',
     handle: null,
     platform: 'tiktok',
   },
 ] as const satisfies ReadonlyArray<{
   id: string
-  name: string
+  nameKey: 'recruitingTitle' | 'searching'
   shortName: string
   handle: string | null
   platform: InfluencerPlatformId

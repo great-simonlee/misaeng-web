@@ -12,8 +12,10 @@ import { createPortal } from 'react-dom'
 import { useAnchoredPosition } from '@hooks/useAnchoredPosition'
 import {
   ANONYMOUS_TOPICS,
+  anonymousTopicKey,
   isAnonymousTopic,
 } from '@lib/constants/anonymousTopics'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 
 type AnonymousTopicSelectProps = {
@@ -27,9 +29,15 @@ type AnonymousTopicSelectProps = {
 export function AnonymousTopicSelect({
   value,
   onChange,
-  placeholder = '주제를 선택해 주세요',
+  placeholder: placeholderProp,
   className,
 }: AnonymousTopicSelectProps) {
+  const t = useT('community')
+  const placeholder = placeholderProp ?? t('anonymous.topicPlaceholder')
+  const topicLabel = (topic: string) => {
+    const key = anonymousTopicKey(topic)
+    return key ? t(key) : topic
+  }
   const listId = useId()
   const triggerRef = useRef<HTMLButtonElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
@@ -41,7 +49,7 @@ export function AnonymousTopicSelect({
     ...(value && !isAnonymousTopic(value) ? [value] : []),
   ]
   const hasValue = Boolean(value.trim())
-  const displayLabel = hasValue ? value : placeholder
+  const displayLabel = hasValue ? topicLabel(value) : placeholder
 
   useEffect(() => {
     if (!open) return
@@ -87,7 +95,7 @@ export function AnonymousTopicSelect({
             ref={listRef}
             id={listId}
             role='listbox'
-            aria-label='주제'
+            aria-label={t('anonymous.topicAria')}
             className='fixed z-[10050] overflow-auto rounded-2xl bg-white py-1.5 shadow-[0_8px_28px_rgba(15,23,42,0.12),0_2px_8px_rgba(15,23,42,0.06)] ring-1 ring-black/[0.06]'
             style={{
               top: position.top,
@@ -106,7 +114,7 @@ export function AnonymousTopicSelect({
                 className={cn(
                   'flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left touch-manipulation transition',
                   !hasValue
-                    ? 'bg-[#fff8f5] text-[var(--brand)]'
+                    ? 'bg-brand-soft text-[var(--brand)]'
                     : 'text-[var(--muted)] hover:bg-[#f8f9fb]',
                 )}
               >
@@ -130,7 +138,7 @@ export function AnonymousTopicSelect({
                     className={cn(
                       'flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left touch-manipulation transition',
                       selected
-                        ? 'bg-[#fff8f5] text-[var(--foreground)]'
+                        ? 'bg-brand-soft text-[var(--foreground)]'
                         : 'text-[var(--foreground)] hover:bg-[#f8f9fb]',
                     )}
                   >
@@ -154,7 +162,7 @@ export function AnonymousTopicSelect({
                         selected ? 'font-semibold' : 'font-medium',
                       )}
                     >
-                      {topic}
+                      {topicLabel(topic)}
                     </span>
                   </button>
                 </li>
@@ -178,7 +186,7 @@ export function AnonymousTopicSelect({
         className={cn(
           'mt-1.5 flex h-11 w-full items-center justify-between gap-2 rounded-xl bg-white px-3.5 text-left text-[15px] outline-none ring-1 transition touch-manipulation',
           open
-            ? 'ring-[var(--brand)]/35 shadow-[0_0_0_3px_rgba(246,67,16,0.08)]'
+            ? 'ring-[var(--brand)]/35 shadow-[0_0_0_3px_rgb(var(--brand-rgb)/0.08)]'
             : 'ring-black/[0.08] hover:ring-black/15 focus:ring-black/20',
         )}
       >

@@ -1,0 +1,333 @@
+{
+  "nickname": {
+    "checkFailed": "無法確認這個暱稱。",
+    "available": "這個暱稱可以使用",
+    "taken": "這個暱稱已經有人使用。",
+    "ruleHint": "只能使用英文字母和「.」",
+    "errors": {
+      "tooShort": "暱稱至少需要 {min} 個字元",
+      "tooLong": "暱稱最多 {max} 個字元",
+      "invalidChars": "只能使用英文字母和「.」"
+    }
+  },
+  "profile": {
+    "gender": {
+      "male": "男性",
+      "female": "女性",
+      "other": "其他"
+    },
+    "occupation": {
+      "student": "學生",
+      "professional": "上班族",
+      "other": "其他"
+    },
+    "changePhotoAria": "更換大頭貼",
+    "title": "個人檔案",
+    "nicknameLabel": "暱稱",
+    "notSet": "尚未設定",
+    "edit": "編輯",
+    "set": "設定",
+    "saving": "儲存中…",
+    "genderLabel": "性別",
+    "occupationLabel": "職業",
+    "nicknamePlaceholder": "例：food.hunter",
+    "photoAlt": "{name} 的個人檔案"
+  },
+  "statusEmployer": {
+    "fieldLabel": "學校／公司／機構（選填）",
+    "modeName": "輸入公司名稱",
+    "modeCategory": "選擇公司類別",
+    "namePlaceholder": "請輸入公司名稱",
+    "categoryTitle": "公司類別",
+    "categoryPlaceholder": "請選擇類別",
+    "noSelection": "不選",
+    "option": "{origin}{industry}公司",
+    "other": "其他",
+    "origins": {
+      "korean": "韓商",
+      "us": "美商",
+      "foreign": "外商"
+    },
+    "industries": {
+      "tech": "IT 與軟體",
+      "finance": "金融與金融科技",
+      "consulting": "顧問",
+      "healthcare": "醫療與生技",
+      "accounting": "會計與稅務",
+      "engineering": "製造與工程",
+      "marketing": "行銷"
+    }
+  },
+  "verification": {
+    "errors": {
+      "sendFailed": "認證信寄送失敗",
+      "confirmFailed": "認證失敗",
+      "emailNotConfigured": "尚未設定 Email，請檢查 {envVar}。"
+    },
+    "phone": {
+      "errors": {
+        "required": "請輸入手機號碼",
+        "invalidFormat": "手機號碼格式好像不對",
+        "unsupportedCountry": "請輸入美國（+1）或韓國（+82）號碼",
+        "sendFailed": "認證簡訊寄送失敗",
+        "confirmFailed": "手機認證失敗"
+      },
+      "smsDisabledShort": "簡訊已關閉",
+      "afterSchool": "完成學校認證後",
+      "rowLabel": "手機",
+      "rowHint": "用手機號碼認證",
+      "smsDisabled": "手機簡訊認證目前已關閉。",
+      "verifiedToast": "手機認證完成",
+      "unavailable": "連接 Supabase 後即可使用",
+      "title": "手機認證",
+      "description": "使用美國（+1）或韓國（+82）號碼透過簡訊認證。每個帳號每天最多 {max} 次，間隔 {seconds} 秒。",
+      "testOnly": "目前僅限已核准的測試號碼。",
+      "getCode": "傳送簡訊認證碼",
+      "codeSentTo": "請輸入我們傳送到 {phone} 的認證碼。",
+      "codePlaceholder": "6 位數認證碼",
+      "resendCode": "重新傳送簡訊"
+    },
+    "workplace": {
+      "errors": {
+        "required": "請輸入公司信箱。",
+        "invalidFormat": "請輸入有效的 Email 地址。",
+        "personalDomain": "無法使用 Gmail 等個人信箱，請輸入你在公司使用的 Email。",
+        "companyRequired": "請輸入公司名稱"
+      },
+      "pendingDetail": "Email 已認證 · 等待 Misaeng 團隊審核",
+      "retry": "請重新認證",
+      "rowHint": "用公司信箱與公司名稱認證",
+      "rowLabel": "公司認證",
+      "submittedToast": "Email 已認證。Misaeng 團隊審核後即完成公司認證。",
+      "approvedTitle": "公司認證完成",
+      "pendingTitle": "公司認證審核中",
+      "approvedDescription": "Misaeng 團隊已確認你的公司認證。",
+      "pendingDescription": "你的公司信箱已認證，Misaeng 團隊正在審核你的公司資訊。",
+      "formDescription": "即使與註冊時的 Email 不同，公司信箱也會連結到你目前登入的帳號。輸入認證碼後，Misaeng 團隊會再次確認你的公司資訊。",
+      "companyLabel": "公司名稱",
+      "companyPlaceholder": "例：Misaeng LLC",
+      "emailLabel": "公司信箱",
+      "confirmButton": "認證 Email",
+      "editForm": "更改公司或 Email"
+    },
+    "verifiedShort": "已認證",
+    "school": {
+      "rowLabel": "學校信箱",
+      "rowHint": "用學校信箱認證學生身分",
+      "verifiedWithSchool": "已透過 {school} 認證",
+      "verifiedToast": "學校信箱認證完成",
+      "registrationSentToast": "已收到你的學校登錄申請，審核後會再通知你。",
+      "errors": {
+        "eduRequired": "請輸入 .edu 學校信箱",
+        "unsupported": "目前尚未支援這所學校，請送出新增申請。",
+        "nameRequired": "請輸入學校名稱",
+        "invalidDomain": "請輸入有效的 Email 網域（例：monroeu.com）",
+        "registrationFailed": "學校登錄申請送出失敗"
+      },
+      "registerTitle": "申請新增學校",
+      "registerDescription": "如果清單裡沒有你的學校，可以請 Misaeng 團隊新增。告訴我們學校名稱和 Email 網域，我們會新增到 {brand} 和 App。",
+      "nameLabel": "學校名稱",
+      "domainLabel": "學校信箱網域",
+      "domainHint": "只填網域，不含 @（例：monroeu.com）",
+      "registerSubmit": "送出申請給 Misaeng 團隊",
+      "backToVerify": "返回學校信箱認證",
+      "verifyTitle": "學校信箱認證",
+      "formDescription": "即使與註冊時的 Email 不同，學校信箱也會連結到你目前登入的帳號。我們會寄 6 位數認證碼到你的學校信箱。",
+      "notFoundRequest": "找不到你的學校？申請新增"
+    },
+    "instagram": {
+      "rowLabel": "Instagram",
+      "rowHint": "連結你的帳號"
+    },
+    "title": "認證",
+    "description": "即使與註冊時的 Email 不同，學校或公司信箱也會連結到這個帳號。",
+    "status": {
+      "soon": "即將推出",
+      "verified": "已認證",
+      "inReview": "審核中",
+      "verify": "認證"
+    },
+    "chooser": {
+      "title": "身分認證",
+      "description": "用學校或公司信箱認證，哪個方便就用哪個。即使與註冊時的 Email 不同，也會連結到這個帳號。",
+      "school": "用學校信箱認證學生身分",
+      "workplace": "用公司信箱認證上班族身分"
+    },
+    "clearInputAria": "清除輸入",
+    "sending": "傳送中…",
+    "getCode": "取得認證碼",
+    "codeSentTo": "請輸入我們寄到{br}{email} 的 6 位數認證碼",
+    "checking": "確認中…",
+    "resendIn": "{seconds} 秒後可重新傳送",
+    "resendCode": "重新傳送認證碼",
+    "confirmButton": "認證",
+    "digitAria": "認證碼第 {position} 位"
+  },
+  "toasts": {
+    "loggedOut": "已登出",
+    "photoSaved": "大頭貼已更新",
+    "photoFailed": "照片上傳失敗",
+    "nicknameSaved": "暱稱已儲存",
+    "nicknameFailed": "暱稱儲存失敗",
+    "mbtiSaved": "MBTI 已儲存",
+    "mbtiCleared": "MBTI 已移除",
+    "mbtiFailed": "MBTI 儲存失敗",
+    "genderSaved": "性別已儲存",
+    "genderFailed": "性別儲存失敗",
+    "occupationSaved": "職業已儲存",
+    "occupationFailed": "職業儲存失敗",
+    "profileSaved": "個人資料已儲存",
+    "profileFailed": "個人資料儲存失敗"
+  },
+  "title": "我的頁面",
+  "suspendedNotice": "此帳號已被停權。你仍可瀏覽內容，但無法發文、留言或申請積分。",
+  "nicknameSheet": {
+    "title": "設定暱稱",
+    "minLength": "至少 {min} 個字元"
+  },
+  "actions": {
+    "cancel": "取消",
+    "save": "儲存"
+  },
+  "setupSheet": {
+    "title": "完成個人檔案",
+    "description": "填寫在社群中顯示的個人資料。姓名（名／姓）僅用於帳號，社群其他人看到的是你的暱稱。",
+    "firstNameLabel": "名字",
+    "lastNameLabel": "姓氏",
+    "nicknameLabel": "暱稱（在社群中顯示）",
+    "later": "稍後再說",
+    "save": "儲存"
+  },
+  "logout": {
+    "title": "登出",
+    "descriptionMobile": "在這台裝置上登出帳號",
+    "descriptionDesktop": "登出帳號"
+  },
+  "loadingAria": "正在載入我的頁面",
+  "suspended": {
+    "title": "你的帳號已被停權",
+    "toMyPage": "前往我的頁面"
+  },
+  "verificationRequired": {
+    "title": "需要認證",
+    "toCommunityHome": "返回社群首頁"
+  },
+  "cardAction": {
+    "profile": {
+      "title": "完成個人檔案",
+      "description": "設定暱稱、MBTI、性別和職業",
+      "descriptionDesktop": "設定基本資料"
+    },
+    "identity": {
+      "title": "身分認證",
+      "description": "用學校或公司信箱認證",
+      "descriptionDesktop": "用學校或公司信箱認證"
+    },
+    "school": {
+      "title": "認證學校信箱",
+      "description": "用學校信箱完成學生認證",
+      "descriptionDesktop": "認證學生身分"
+    },
+    "workplace": {
+      "title": "認證公司",
+      "description": "用公司信箱與公司名稱認證",
+      "descriptionDesktop": "認證上班族身分"
+    },
+    "workplacePending": {
+      "title": "公司認證審核中",
+      "description": "Email 已認證，請等待 Misaeng 團隊審核",
+      "descriptionDesktop": "等待 Misaeng 團隊審核"
+    }
+  },
+  "credit": {
+    "loadFailed": "無法載入你的積分",
+    "ledgerLoadFailed": "無法載入積分紀錄",
+    "redeemComingSoon": "兌換申請將分階段開放，詳情請參閱積分指南。",
+    "loadFailedRetry": "無法載入積分 · 重試",
+    "pillAria_other": "社群積分 {count} 點，查看紀錄",
+    "unit": "積分",
+    "history": "紀錄",
+    "requestTitle": "使用積分",
+    "balanceLabel": "我的積分",
+    "requestDescription": "選擇要兌換的獎勵。送出申請後，Misaeng 會審核並為你媒合。",
+    "optionMeta_other": "{duration} · 每月 {count} 次",
+    "needMore_other": "還差 {count} 點積分",
+    "redeemGuideLink": "了解更多獎勵資訊",
+    "submit": "申請",
+    "historyTitle": "積分紀錄",
+    "guideLink": "查看指南",
+    "retry": "再試一次",
+    "emptyTitle": "還沒有紀錄",
+    "emptyDescription": "分享美食、撰寫評價或留言都能賺積分。",
+    "writeFoodReview": "撰寫美食評價",
+    "kinds": {
+      "earn": "獲得",
+      "revoke": "收回",
+      "spend": "使用",
+      "restore": "恢復",
+      "other": "其他"
+    }
+  },
+  "referral": {
+    "linkCopied": "已複製推薦連結",
+    "copyFailed": "連結複製失敗，請直接分享你的推薦碼。",
+    "errors": {
+      "invalidCode": "請輸入 8 碼推薦碼",
+      "ownCode": "不能使用自己的推薦碼"
+    },
+    "bound": "已連結推薦人",
+    "title": "推薦",
+    "description": "每當有人使用你的推薦碼，你就能獲得 {credits}。最多 {max} 人，不能推薦自己。",
+    "creditsAmount_other": "{count} 點積分",
+    "copying": "複製中…",
+    "shareButton": "邀請朋友",
+    "myCode": "我的推薦碼",
+    "loading": "載入中…",
+    "usedCount": "已有 {used}/{max} 人使用",
+    "enterReferrer": "輸入推薦人",
+    "boundTo": "已連結推薦碼 {code}。",
+    "codePlaceholder": "8 碼推薦碼",
+    "binding": "連結中…",
+    "bind": "連結"
+  },
+  "posts": {
+    "loadFailed": "無法載入你的貼文",
+    "deleteConfirm": "要刪除「{title}」嗎？\n刪除後無法復原。",
+    "deleted": "貼文已刪除",
+    "deleteFailed": "貼文刪除失敗",
+    "title": "我的貼文",
+    "description": "依分類查看你的社群貼文，並編輯或刪除",
+    "categoryAria": "貼文分類",
+    "emptyAll": "你還沒有發過貼文",
+    "emptyCategory": "{category}中沒有貼文",
+    "emptyAllHint": "你在任何看板發的貼文都會顯示在這裡",
+    "emptyCategoryHint": "你在這個看板發的貼文會顯示在這裡",
+    "browseBoards": "瀏覽看板",
+    "edit": "編輯",
+    "deleting": "刪除中…",
+    "delete": "刪除"
+  },
+  "list": {
+    "redirectingToLogin": "正在前往登入…",
+    "totalCount_other": "全部 {count}",
+    "count_other": "{count} 篇貼文",
+    "categoryHeading": "分類",
+    "all": "全部",
+    "loading": "正在載入貼文…",
+    "thisCategory": "這個分類",
+    "viewBoard": "查看{board}",
+    "viewDetail": "查看詳情"
+  },
+  "likes": {
+    "title": "我按讚的貼文",
+    "description": "一次查看你在租屋、美食、OPT/簽證中收藏的貼文",
+    "categoryAria": "按讚貼文分類",
+    "emptyAll": "你還沒有按讚任何貼文",
+    "emptyCategory": "{category}中沒有按讚的貼文",
+    "emptyAllHint": "在喜歡的貼文上點愛心，就會顯示在這裡",
+    "emptyCategoryHint": "在這個看板的貼文上點愛心，就會顯示在這裡",
+    "browseHousing": "瀏覽租屋",
+    "rent": "{amount}/月",
+    "rentWithNet": "{gross} / {net}/月"
+  }
+}

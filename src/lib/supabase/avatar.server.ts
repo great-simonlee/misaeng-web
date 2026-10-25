@@ -1,5 +1,7 @@
 import { lookup } from 'node:dns/promises'
 
+import { ApiMessageError } from '@lib/i18n/apiError'
+
 function getSupabaseUrl() {
   return process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || null
 }
@@ -28,8 +30,9 @@ export async function assertSupabaseReachable() {
   const secretKey = getSupabaseSecretKey()
 
   if (!url || !secretKey) {
-    throw new Error(
-      'Supabase 스토리지 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase storage is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.storageNotConfigured',
     )
   }
 
@@ -37,16 +40,19 @@ export async function assertSupabaseReachable() {
   try {
     hostname = new URL(url).hostname
   } catch {
-    throw new Error(
-      'NEXT_PUBLIC_SUPABASE_URL 형식이 올바르지 않아요. 예: https://your-project.supabase.co',
+    throw new ApiMessageError(
+      'NEXT_PUBLIC_SUPABASE_URL is not a valid URL (e.g. https://your-project.supabase.co).',
+      'common.supabaseUrlInvalid',
     )
   }
 
   try {
     await lookup(hostname)
   } catch {
-    throw new Error(
-      `Supabase 프로젝트(${hostname})에 연결할 수 없어요. Dashboard → Project Settings → API에서 Project URL을 확인하고 .env.local을 업데이트해 주세요.`,
+    throw new ApiMessageError(
+      `Cannot resolve Supabase project host (${hostname}).`,
+      'common.supabaseHostUnreachable',
+      { hostname },
     )
   }
 
@@ -64,8 +70,10 @@ export async function assertSupabaseReachable() {
       error instanceof Error ? error.message.toLowerCase() : String(error)
 
     if (message.includes('fetch failed') || message.includes('enotfound')) {
-      throw new Error(
-        `Supabase(${hostname})에 연결하지 못했어요. Project URL·API 키·네트워크를 확인해 주세요.`,
+      throw new ApiMessageError(
+        `Failed to connect to Supabase (${hostname}).`,
+        'common.supabaseConnectFailed',
+        { hostname },
       )
     }
 
@@ -82,8 +90,9 @@ export async function uploadAvatarToSupabase(args: {
   const secretKey = getSupabaseSecretKey()
 
   if (!url || !secretKey) {
-    throw new Error(
-      'Supabase 스토리지 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase storage is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.storageNotConfigured',
     )
   }
 
@@ -121,12 +130,16 @@ export async function uploadAvatarToSupabase(args: {
       `HTTP ${uploadResponse.status}`
 
     if (uploadResponse.status === 404) {
-      throw new Error(
-        `Supabase 버킷 "${args.bucket}"을 찾을 수 없어요. Storage에서 public 버킷을 만들어 주세요.`,
+      throw new ApiMessageError(
+        `Supabase bucket "${args.bucket}" not found.`,
+        'upload.avatarBucketMissing',
+        { bucket: args.bucket },
       )
     }
 
-    throw new Error(`스토리지 업로드 실패: ${detail}`)
+    throw new ApiMessageError(`Storage upload failed: ${detail}`, 'upload.storageUploadFailed', {
+      detail,
+    })
   }
 
   return `${url}/storage/v1/object/public/${args.bucket}/${filePath}`

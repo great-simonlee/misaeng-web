@@ -1,0 +1,116 @@
+{
+  "categories": {
+    "restaurant": "맛집",
+    "value": "가성비",
+    "vibe": "느좋",
+    "study": "카공"
+  },
+  "categoryDescriptions": {
+    "restaurant": "꼭 가볼 만한 맛집",
+    "value": "가격 대비 만족",
+    "vibe": "분위기 좋은 곳",
+    "study": "공부·작업하기 좋은 카페"
+  },
+  "cuisines": {
+    "brunch": "브런치",
+    "korean": "한식",
+    "japanese": "일식",
+    "chinese": "중식",
+    "american": "양식",
+    "french": "프랑스",
+    "italian": "이탈리안",
+    "mexican": "멕시칸",
+    "thai": "태국",
+    "vietnamese": "베트남",
+    "indian": "인도",
+    "other": "기타"
+  },
+  "spend": {
+    "people_other": "{count}인",
+    "total": "총 ${amount}",
+    "totalWithTip": "총 ${amount} · 팁 포함",
+    "totalWithoutTip": "총 ${amount} · 팁 제외",
+    "peopleTotal_other": "{count}인 총 ${amount}",
+    "peopleTotalWithTip_other": "{count}인 총 ${amount} · 팁 포함",
+    "peopleTotalWithoutTip_other": "{count}인 총 ${amount} · 팁 제외",
+    "tipIncluded": "팁 포함",
+    "tipExcluded": "팁 제외"
+  },
+  "wait": {
+    "none": "웨이팅 없음",
+    "minutes": "웨이팅 {minutes}분",
+    "hours": "웨이팅 {hours}시간",
+    "hoursMinutes": "웨이팅 {hours}시간 {minutes}분"
+  },
+  "carousel": {
+    "cover": "대표",
+    "menu": "메뉴",
+    "vibe": "분위기",
+    "backToList": "목록",
+    "photosLabel": "맛집 사진",
+    "previous": "이전 사진",
+    "next": "다음 사진",
+    "photoNumber": "{number}번째 사진"
+  },
+  "map": {
+    "postsMapLabel": "맛집 지도",
+    "emptyTitle": "지도에 표시할 위치가 없어요",
+    "emptyDescription": "주소·위치가 저장된 맛집 후기만 핀으로 보여 줍니다",
+    "unnamedPlace": "맛집",
+    "reviewCount_other": "후기 {count}개",
+    "close": "닫기",
+    "viewReview": "후기 보기",
+    "placeMapLabel": "{name} 위치 지도",
+    "directions": "길찾기"
+  },
+  "detail": {
+    "menu": "메뉴",
+    "interior": "가게 내부",
+    "backToList": "{board} 목록",
+    "views_other": "조회 {views}",
+    "metrics": {
+      "party": "인원",
+      "totalSpend": "총 금액",
+      "spend": "${amount}",
+      "spendWithTip": "${amount} · 팁 포함",
+      "spendWithoutTip": "${amount} · 팁 제외",
+      "wait": "웨이팅",
+      "waitNone": "없음",
+      "waitMinutes": "{minutes}분"
+    },
+    "location": "위치",
+    "viewMenuPhoto": "메뉴 사진 크게 보기",
+    "interiorAndVibe": "가게 내부 · 분위기",
+    "viewVibePhoto": "분위기 사진 크게 보기",
+    "review": "후기"
+  },
+  "placeSearch": {
+    "errors": {
+      "searchFailed": "검색에 실패했어요",
+      "detailsFailed": "장소 정보를 불러오지 못했어요",
+      "noCoordinates": "선택한 장소의 좌표를 확인하지 못했어요"
+    },
+    "pickExactAddress": "정확한 주소로 선택해 주세요",
+    "mapTitle": "{name} 위치",
+    "change": "변경",
+    "addressPlaceholder": "예: 53 W 53rd St, New York",
+    "placePlaceholder": "예: Halal Guys, 플러싱 칼국수, West 53rd St",
+    "resolving": "확인 중…",
+    "searching": "검색 중…",
+    "noResults": "검색 결과가 없어요. 영어 주소나 거리명을 더 자세히 넣어 보세요.",
+    "addressHint": "주소를 선택하면 위치가 저장돼요.",
+    "placeHint": "목록에서 장소를 선택해야 글을 올릴 수 있어요."
+  },
+  "restaurantName": {
+    "placeholder": "음식점 이름",
+    "reviewCount_other": "후기 {count}",
+    "checking": "이 위치의 기존 음식점을 확인하는 중…",
+    "existing_other": "이 위치에서 등록된 음식점 {count}곳 · 아래에서 고르거나 새로 입력하세요",
+    "none": "이 위치에 등록된 음식점이 없어요. 새 이름을 입력해 주세요",
+    "hint": "목록·상세 페이지에 표시되는 이름이에요"
+  },
+  "card": {
+    "comments": "댓글",
+    "recommends": "추천"
+  }
+}

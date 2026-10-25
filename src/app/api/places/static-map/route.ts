@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
 
 import { buildStaticMapUrl } from '@lib/community/places.server'
+import { getRequestT } from '@lib/i18n/server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
     const { searchParams } = new URL(request.url)
     const lat = Number(searchParams.get('lat'))
@@ -16,7 +18,7 @@ export async function GET(request: Request) {
       Math.abs(lat) > 90 ||
       Math.abs(lng) > 180
     ) {
-      return NextResponse.json({ error: '잘못된 좌표예요.' }, { status: 400 })
+      return NextResponse.json({ error: t('places.invalidCoordinates') }, { status: 400 })
     }
 
     const map = buildStaticMapUrl(lat, lng)
@@ -42,7 +44,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Static map error:', error)
     return NextResponse.json(
-      { error: '지도를 불러오지 못했어요.' },
+      { error: t('places.mapLoadFailed') },
       { status: 500 },
     )
   }

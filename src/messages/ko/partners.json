@@ -1,0 +1,50 @@
+{
+  "schoolsLabel": "협력 학교 한인 학생회",
+  "influencersLabel": "협력 인플루언서",
+  "more": "더보기",
+  "backToHome": "커뮤니티 홈으로",
+  "schools": {
+    "title": "파트너 학생회",
+    "intro": "한인 학생회와 함께하는 소식을 모아 볼 예정이에요.",
+    "profilePending": "프로필 준비 중",
+    "logoPending": "로고 준비 중",
+    "dmMessage": "파트너 학생회 문의는 인스타그램"
+  },
+  "influencers": {
+    "title": "인플루언서 콘텐츠",
+    "intro": "현재 협력 인플루언서를 찾고 있어요. 인스타그램 · 유튜브 · 틱톡 크리에이터와 함께할 예정이에요.",
+    "recruitingTitle": "협력 인플루언서를 찾습니다!",
+    "searching": "현재 협력 인플루언서 찾는 중",
+    "recruitingBody": "현재 협력 인플루언서 찾는 중이에요. 곧 이곳에서 콘텐츠를 모아 볼 수 있어요.",
+    "recruitingHandle": "협력 인플루언서 모집 중",
+    "dmMessage": "협력 인플루언서 문의는 인스타그램"
+  },
+  "influencerPlatforms": {
+    "instagram": {
+      "title": "인스타그램",
+      "description": "라이프·로컬 인스타그램"
+    },
+    "youtube": {
+      "title": "유튜버",
+      "description": "브이로그·정보 유튜브"
+    },
+    "tiktok": {
+      "title": "틱토커",
+      "description": "숏폼으로 보는 로컬 소식"
+    }
+  },
+  "orgs": {
+    "nyu-kiso": {
+      "name": "뉴욕대 한인학생회"
+    },
+    "fit-ksof": {
+      "name": "FIT 한인학생회"
+    },
+    "baruch-ksa": {
+      "name": "버룩 한인학생회"
+    },
+    "parsons-ksa": {
+      "name": "파슨스 한인학생회"
+    }
+  }
+}

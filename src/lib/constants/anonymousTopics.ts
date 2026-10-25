@@ -21,6 +21,33 @@ export const ANONYMOUS_TOPICS = [
 
 export type AnonymousTopic = (typeof ANONYMOUS_TOPICS)[number]
 
+/**
+ * 주제 값(글에 저장되는 한국어)은 그대로 두고, 화면 표시는 `t('community.anonymousTopics.<key>')`.
+ */
+const ANONYMOUS_TOPIC_KEYS: Record<AnonymousTopic, string> = {
+  'OPT·CPT·STEM OPT': 'opt',
+  '비자·신분': 'visa',
+  '취업·인턴': 'jobs',
+  '주거·룸메': 'housing',
+  학교생활: 'campusLife',
+  '학업·수업': 'classes',
+  '재정·세금·보험': 'finance',
+  인간관계: 'relationships',
+  '멘탈·고민': 'mentalHealth',
+  '운전·교통': 'transportation',
+  생활팁: 'lifeTips',
+  '중고·나눔': 'secondhand',
+  일상: 'daily',
+  기타: 'other',
+}
+
+/** 주제 번역 키 (`community` 네임스페이스 기준). 목록에 없는 옛 주제는 null → 원래 값을 그대로 보여 준다. */
+export function anonymousTopicKey(topic: string): string | null {
+  return isAnonymousTopic(topic)
+    ? `anonymousTopics.${ANONYMOUS_TOPIC_KEYS[topic]}`
+    : null
+}
+
 export function isAnonymousTopic(value: string): value is AnonymousTopic {
   return (ANONYMOUS_TOPICS as readonly string[]).includes(value)
 }

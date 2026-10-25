@@ -1,3 +1,4 @@
+import { ApiMessageError } from '@lib/i18n/apiError'
 import type { CommunityCreditAccount } from '@lib/constants/communityCredit'
 
 const DEFAULT_BUCKET = 'housing'
@@ -166,13 +167,14 @@ export async function saveStoredCommunityCreditAccount(
   account: CommunityCreditAccount,
 ): Promise<CommunityCreditAccount> {
   if (!isCommunityCreditStorageConfigured()) {
-    throw new Error(
-      'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.supabaseNotConfiguredDetail',
     )
   }
 
   const uid = String(account.uid || '').trim()
-  if (!uid) throw new Error('잘못된 사용자예요.')
+  if (!uid) throw new ApiMessageError('Invalid user id', 'credit.invalidUser')
 
   const next: CommunityCreditAccount = {
     ...account,
@@ -199,10 +201,12 @@ export async function saveStoredCommunityCreditAccount(
     const payload = (await res?.json().catch(() => null)) as
       | { message?: string; error?: string }
       | null
-    throw new Error(
-      payload?.message ||
-        payload?.error ||
-        `크레딧 저장 실패 (HTTP ${res?.status ?? 'unknown'})`,
+    const detail = payload?.message || payload?.error
+    if (detail) throw new Error(detail)
+    throw new ApiMessageError(
+      `Credit account save failed (HTTP ${res?.status ?? 'unknown'})`,
+      'credit.saveFailed',
+      { status: res?.status ?? 'unknown' },
     )
   }
 

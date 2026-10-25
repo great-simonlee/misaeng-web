@@ -9,7 +9,6 @@ import { usePagedGallery } from '@hooks/usePagedGallery'
 import {
   formatHousingAvailableDate,
   formatListingBedBath,
-  getHousingPerkLabel,
   getHousingRoomLabel,
   getHousingRoomNet,
   getHousingUnitRent,
@@ -25,6 +24,8 @@ import {
   sortHousingRooms,
 } from '@lib/constants/housingMock'
 import { shouldUnoptimizeHousingImage } from '@lib/housing/fetchListings'
+import { translateListingCardBadges } from '@lib/housing/listing'
+import { useT } from '@lib/i18n/client'
 import type {
   HousingListing,
   HousingPerkId,
@@ -43,6 +44,7 @@ export function HousingPostCard({
   listing,
   highlightRoomType = 'all',
 }: HousingPostCardProps) {
+  const t = useT('housing')
   const images = getListingImages(listing)
   const displayAddress = getListingDisplayAddress(listing)
   const area = getListingArea(listing)
@@ -51,7 +53,11 @@ export function HousingPostCard({
   const availableDate = getListingAvailableDate(listing)
   const roomRows = sortHousingRooms(getPricedRooms(listing))
   const showOptionRows = shouldShowListingRoomRows(listing)
-  const badgeLabels = getListingCardBadges(listing)
+  const badgeLabels = translateListingCardBadges(
+    listing,
+    getListingCardBadges(listing),
+    t,
+  )
   const {
     ref: galleryRef,
     index: activeIndex,
@@ -79,7 +85,10 @@ export function HousingPostCard({
                   }
                 }}
                 className='relative h-full w-full min-w-full shrink-0 overflow-hidden snap-start snap-always'
-                aria-label={`${displayAddress} 사진 ${index + 1}`}
+                aria-label={t('card.photoLabel', {
+                  address: displayAddress,
+                  number: index + 1,
+                })}
               >
                 <Image
                   src={src}
@@ -96,7 +105,7 @@ export function HousingPostCard({
           </div>
         ) : (
           <div className='flex h-full items-center justify-center text-[14px] text-[var(--muted)] sm:text-[12px]'>
-            사진 없음
+            {t('card.noPhoto')}
           </div>
         )}
 
@@ -161,7 +170,9 @@ export function HousingPostCard({
             <span className='mx-1 text-[#d0d4db]'>·</span>
             {formatListingBedBath(listing)}
             <span className='mx-1 text-[#d0d4db]'>·</span>
-            입주 {formatHousingAvailableDate(availableDate) || '미정'}
+            {t('card.moveIn', {
+              date: formatHousingAvailableDate(availableDate) || t('card.moveInTbd'),
+            })}
           </p>
         </Link>
 
@@ -201,6 +212,7 @@ function RoomOptionRow({
   highlighted: boolean
   href: string
 }) {
+  const t = useT('housing')
   return (
     <li>
       <Link
@@ -212,7 +224,7 @@ function RoomOptionRow({
         }`}
       >
         <span className='min-w-0 truncate text-[13px] font-medium text-[var(--foreground)] sm:text-[12px]'>
-          {getHousingRoomLabel(room)}
+          {getHousingRoomLabel(room, t)}
         </span>
         <HousingPricePair
           gross={room.price}
@@ -234,7 +246,8 @@ export function PerkBadge({
   size?: 'sm' | 'md'
   label?: string
 }) {
-  const text = label ?? (perk ? getHousingPerkLabel(perk) : '')
+  const t = useT('housing')
+  const text = label ?? (perk ? t(`perks.${perk}`) : '')
   return <CardBadge label={text} size={size} />
 }
 
@@ -245,9 +258,14 @@ export function RoommateCompositionBadge({
   composition: HousingRoommateComposition
   compact?: boolean
 }) {
+  const t = useT('housing')
   const aria = [
-    composition.male > 0 ? `남 ${composition.male}` : null,
-    composition.female > 0 ? `여 ${composition.female}` : null,
+    composition.male > 0
+      ? t('card.composition.male', { count: composition.male })
+      : null,
+    composition.female > 0
+      ? t('card.composition.female', { count: composition.female })
+      : null,
   ]
     .filter(Boolean)
     .join(' ')

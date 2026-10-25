@@ -10,7 +10,7 @@ export function getSupabaseBrowserClient() {
 
   if (!url || !anonKey) {
     throw new Error(
-      'Supabase 브라우저 클라이언트 설정이 없습니다. NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY를 확인해 주세요.',
+      'Supabase browser client is not configured. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.',
     )
   }
 

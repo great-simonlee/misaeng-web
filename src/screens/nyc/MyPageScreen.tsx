@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
 import { BottomSheet, BottomSheetSelect } from '@components'
@@ -13,12 +13,15 @@ import { cityLoginPath } from '@lib/constants/cities'
 import {
   MAX_NICKNAME_LEN,
   MIN_NICKNAME_LEN,
-  NICKNAME_RULE_HINT,
-  PROFILE_GENDER_OPTIONS,
-  PROFILE_OCCUPATION_OPTIONS,
+  PROFILE_GENDER_VALUES,
+  PROFILE_OCCUPATION_VALUES,
   isValidNickname,
   sanitizeNicknameInput,
 } from '@lib/constants/profile'
+import { useLocale, useSwitchLocale, useT } from '@lib/i18n/client'
+import { LOCALE_NATIVE_NAMES, type Locale } from '@lib/i18n/locales'
+import { savePreferredLocale } from '@lib/i18n/preference.client'
+import { LanguagePicker } from '@widgets/LanguagePicker'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { getVerifiedSchool, resolveSchoolFromEmail } from '@lib/constants/schools'
 import { cn } from '@lib'
@@ -102,10 +105,26 @@ export function MyPageScreen() {
     saveGender,
     saveOccupationType,
   } = useAuth()
+  const t = useT('me')
   const { success, error: toastError } = useToast()
   const city = useCity()
+  const genderOptions = PROFILE_GENDER_VALUES.map((value) => ({
+    value,
+    label: t(`profile.gender.${value}`),
+  }))
+  const occupationOptions = PROFILE_OCCUPATION_VALUES.map((value) => ({
+    value,
+    label: t(`profile.occupation.${value}`),
+  }))
   const href = useCityPath()
   const router = useRouter()
+  const pathname = usePathname()
+  const locale = useLocale()
+  const switchLocale = useSwitchLocale()
+  const tLanguage = useT('common.language')
+  const [languageOpen, setLanguageOpen] = useState(false)
+  const [savingLanguage, setSavingLanguage] = useState(false)
+  const [setupLocale, setSetupLocale] = useState<Locale>(locale)
   const searchParams = useSearchParams()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
@@ -172,6 +191,16 @@ export function MyPageScreen() {
     profile?.workplaceStatus,
   ])
 
+  // 가입 직후 (?setup=1): 프로필이 비어 있으면 설정 시트를 한 번 연다
+  const setupPrompted = useRef(false)
+  const afterSetupHref = searchParams.get('setup') === '1' ? searchParams.get('next') : null
+  useEffect(() => {
+    if (setupPrompted.current || searchParams.get('setup') !== '1' || !profile) return
+    setupPrompted.current = true
+    if (!isProfileSetupComplete(profile)) openCompleteProfile()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 가입 직후 한 번만
+  }, [searchParams, profile])
+
   useEffect(() => {
     if (!editingNickname) {
       setNicknameDraft(nickname ?? '')
@@ -180,7 +209,7 @@ export function MyPageScreen() {
 
   async function handleLogout() {
     await logout()
-    success('로그아웃했어요')
+    success(t('toasts.loggedOut'))
     router.push(href())
   }
 
@@ -189,9 +218,9 @@ export function MyPageScreen() {
     setUploading(true)
     try {
       await uploadAvatar(file)
-      success('프로필 사진을 등록했어요')
+      success(t('toasts.photoSaved'))
     } catch (err) {
-      toastError(getErrorMessage(err, '사진 업로드에 실패했어요'))
+      toastError(getErrorMessage(err, t('toasts.photoFailed')))
     } finally {
       setUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -203,9 +232,9 @@ export function MyPageScreen() {
     try {
       await saveNickname(nicknameDraft)
       setEditingNickname(false)
-      success('닉네임을 저장했어요')
+      success(t('toasts.nicknameSaved'))
     } catch (err) {
-      toastError(getErrorMessage(err, '닉네임 저장에 실패했어요'))
+      toastError(getErrorMessage(err, t('toasts.nicknameFailed')))
     } finally {
       setSavingNickname(false)
     }
@@ -216,9 +245,9 @@ export function MyPageScreen() {
     setSavingMbti(true)
     try {
       await saveMbti(next || null)
-      success(next ? 'MBTI를 저장했어요' : 'MBTI를 삭제했어요')
+      success(next ? t('toasts.mbtiSaved') : t('toasts.mbtiCleared'))
     } catch (err) {
-      toastError(getErrorMessage(err, 'MBTI 저장에 실패했어요'))
+      toastError(getErrorMessage(err, t('toasts.mbtiFailed')))
     } finally {
       setSavingMbti(false)
     }
@@ -229,9 +258,9 @@ export function MyPageScreen() {
     setSavingGender(true)
     try {
       await saveGender(next)
-      success('성별을 저장했어요')
+      success(t('toasts.genderSaved'))
     } catch (err) {
-      toastError(getErrorMessage(err, '성별 저장에 실패했어요'))
+      toastError(getErrorMessage(err, t('toasts.genderFailed')))
     } finally {
       setSavingGender(false)
     }
@@ -242,9 +271,9 @@ export function MyPageScreen() {
     setSavingOccupation(true)
     try {
       await saveOccupationType(next)
-      success('직업을 저장했어요')
+      success(t('toasts.occupationSaved'))
     } catch (err) {
-      toastError(getErrorMessage(err, '직업 저장에 실패했어요'))
+      toastError(getErrorMessage(err, t('toasts.occupationFailed')))
     } finally {
       setSavingOccupation(false)
     }
@@ -263,7 +292,23 @@ export function MyPageScreen() {
       gender: profile?.gender ?? '',
       occupationType: profile?.occupationType ?? '',
     })
+    setSetupLocale(profile?.preferredLocale ?? locale)
     setCompleteProfileOpen(true)
+  }
+
+  /** 마이페이지 언어 설정: 프로필에 저장하고 같은 페이지를 그 언어로 연다 */
+  async function handleSelectLanguage(next: Locale) {
+    setSavingLanguage(true)
+    try {
+      if (!(await savePreferredLocale(next))) throw new Error(tLanguage('saveFailed'))
+      setLanguageOpen(false)
+      const target = switchLocale(next, pathname)
+      if (target) router.push(target)
+    } catch (err) {
+      toastError(getErrorMessage(err, tLanguage('saveFailed')))
+    } finally {
+      setSavingLanguage(false)
+    }
   }
 
   async function handleSaveProfileSetup() {
@@ -276,11 +321,16 @@ export function MyPageScreen() {
         mbti: profileDraft.mbti.trim().toUpperCase() || null,
         gender: profileDraft.gender,
         occupationType: profileDraft.occupationType,
+        preferredLocale: setupLocale,
       })
       setCompleteProfileOpen(false)
-      success('프로필을 저장했어요')
+      success(t('toasts.profileSaved'))
+      // 가입 직후면 원래 가려던 페이지로, 아니면 이 페이지를 고른 언어로 연다
+      const target = switchLocale(setupLocale, afterSetupHref || pathname)
+      if (target) router.push(target)
+      else if (afterSetupHref) router.push(afterSetupHref)
     } catch (err) {
-      toastError(getErrorMessage(err, '프로필 저장에 실패했어요'))
+      toastError(getErrorMessage(err, t('toasts.profileFailed')))
     } finally {
       setSavingProfileSetup(false)
     }
@@ -329,13 +379,11 @@ export function MyPageScreen() {
             ACCOUNT
           </p>
           <h1 className='mt-1.5 text-[1.5rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] lg:text-[1.75rem]'>
-            마이페이지
+            {t('title')}
           </h1>
           {profile?.status === 'suspended' ? (
             <p className='mt-3 rounded-2xl bg-red-50 px-4 py-3 text-[13px] leading-relaxed text-red-700 ring-1 ring-red-100'>
-              This account is suspended. You can still browse, but posting,
-              comments, and credit requests are blocked. / 이 계정은 이용
-              정지되었습니다. 글·댓글·크레딧 요청을 할 수 없습니다.
+              {t('suspendedNotice')}
             </p>
           ) : null}
         </div>
@@ -343,7 +391,7 @@ export function MyPageScreen() {
         <div className='grid gap-6 lg:grid-cols-[minmax(260px,300px)_minmax(0,1fr)] lg:items-start lg:gap-8'>
           <div className='flex flex-col gap-2 lg:sticky lg:top-24'>
             <aside className='overflow-hidden rounded-[1.5rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_rgba(15,23,42,0.05)] ring-1 ring-black/[0.04]'>
-            <div className='relative h-20 bg-[linear-gradient(135deg,#1e293b_0%,#0f172a_55%,#F64310_160%)] lg:h-24' />
+            <div className='relative h-20 bg-[linear-gradient(135deg,#1e293b_0%,#0f172a_55%,var(--brand)_160%)] lg:h-24' />
             <div className='relative px-5 pb-6 pt-0 sm:px-6 lg:px-4 lg:pb-5'>
               <div className='text-center'>
                 <div className='flex justify-center'>
@@ -352,7 +400,7 @@ export function MyPageScreen() {
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
                     className='group relative -mt-10 inline-flex touch-manipulation disabled:opacity-60 lg:-mt-12'
-                    aria-label='프로필 사진 변경'
+                    aria-label={t('profile.changePhotoAria')}
                   >
                     <ProfileImage photoURL={avatarURL} displayName={displayName} />
                     <span className='absolute -bottom-0.5 -right-0.5 flex size-8 items-center justify-center rounded-full border-[3px] border-white bg-[var(--foreground)] text-white shadow-sm transition group-active:scale-95'>
@@ -421,7 +469,7 @@ export function MyPageScreen() {
           <div className='min-w-0 space-y-6 lg:space-y-7'>
             <section>
               <h3 className='mb-3 px-0.5 text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
-                프로필
+                {t('profile.title')}
               </h3>
               <div className='overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04] lg:grid lg:grid-cols-2 lg:divide-x lg:divide-[#f0f1f3]'>
                 <div className='px-5 py-4'>
@@ -436,18 +484,18 @@ export function MyPageScreen() {
                   >
                     <div className='min-w-0 flex-1'>
                       <p className='text-[12px] font-medium text-[var(--muted)]'>
-                        닉네임
+                        {t('profile.nicknameLabel')}
                       </p>
                       <p className='mt-1 truncate text-[15px] font-medium tracking-tight text-[var(--foreground)]'>
                         {nickname ?? (
                           <span className='font-normal text-[var(--muted)]'>
-                            아직 없어요
+                            {t('profile.notSet')}
                           </span>
                         )}
                       </p>
                     </div>
                     <span className='shrink-0 text-[12px] font-medium text-[var(--muted)]'>
-                      {nickname ? '수정' : '설정'}
+                      {nickname ? t('profile.edit') : t('profile.set')}
                     </span>
                     <ChevronIcon />
                   </button>
@@ -486,17 +534,17 @@ export function MyPageScreen() {
                                 </>
                               ) : (
                                 <span className='font-normal text-[var(--muted)]'>
-                                  아직 없어요
+                                  {t('profile.notSet')}
                                 </span>
                               )}
                             </p>
                           </div>
                           <span className='shrink-0 text-[12px] font-medium text-[var(--muted)]'>
                             {savingMbti
-                              ? '저장 중…'
+                              ? t('profile.saving')
                               : selected
-                                ? '수정'
-                                : '설정'}
+                                ? t('profile.edit')
+                                : t('profile.set')}
                           </span>
                           <ChevronIcon />
                         </button>
@@ -508,10 +556,10 @@ export function MyPageScreen() {
                 <div className='border-t border-[#f0f1f3] lg:border-t-0'>
                   <div className='px-5 py-4'>
                     <BottomSheetSelect
-                      title='성별'
+                      title={t('profile.genderLabel')}
                       value={profile?.gender ?? ''}
                       onChange={(next) => void handleSelectGender(next)}
-                      options={[...PROFILE_GENDER_OPTIONS]}
+                      options={genderOptions}
                       disabled={savingGender}
                     >
                       {({ open, displayLabel, selected }) => (
@@ -523,24 +571,24 @@ export function MyPageScreen() {
                         >
                           <div className='min-w-0 flex-1'>
                             <p className='text-[12px] font-medium text-[var(--muted)]'>
-                              성별
+                              {t('profile.genderLabel')}
                             </p>
                             <p className='mt-1 truncate text-[15px] font-medium tracking-tight text-[var(--foreground)]'>
                               {selected ? (
                                 displayLabel
                               ) : (
                                 <span className='font-normal text-[var(--muted)]'>
-                                  아직 없어요
+                                  {t('profile.notSet')}
                                 </span>
                               )}
                             </p>
                           </div>
                           <span className='shrink-0 text-[12px] font-medium text-[var(--muted)]'>
                             {savingGender
-                              ? '저장 중…'
+                              ? t('profile.saving')
                               : selected
-                                ? '수정'
-                                : '설정'}
+                                ? t('profile.edit')
+                                : t('profile.set')}
                           </span>
                           <ChevronIcon />
                         </button>
@@ -552,10 +600,10 @@ export function MyPageScreen() {
                 <div className='border-t border-[#f0f1f3] lg:border-t-0'>
                   <div className='px-5 py-4'>
                     <BottomSheetSelect
-                      title='직업'
+                      title={t('profile.occupationLabel')}
                       value={profile?.occupationType ?? ''}
                       onChange={(next) => void handleSelectOccupation(next)}
-                      options={[...PROFILE_OCCUPATION_OPTIONS]}
+                      options={occupationOptions}
                       disabled={savingOccupation}
                     >
                       {({ open, displayLabel, selected }) => (
@@ -567,24 +615,24 @@ export function MyPageScreen() {
                         >
                           <div className='min-w-0 flex-1'>
                             <p className='text-[12px] font-medium text-[var(--muted)]'>
-                              직업
+                              {t('profile.occupationLabel')}
                             </p>
                             <p className='mt-1 truncate text-[15px] font-medium tracking-tight text-[var(--foreground)]'>
                               {selected ? (
                                 displayLabel
                               ) : (
                                 <span className='font-normal text-[var(--muted)]'>
-                                  아직 없어요
+                                  {t('profile.notSet')}
                                 </span>
                               )}
                             </p>
                           </div>
                           <span className='shrink-0 text-[12px] font-medium text-[var(--muted)]'>
                             {savingOccupation
-                              ? '저장 중…'
+                              ? t('profile.saving')
                               : selected
-                                ? '수정'
-                                : '설정'}
+                                ? t('profile.edit')
+                                : t('profile.set')}
                           </span>
                           <ChevronIcon />
                         </button>
@@ -592,6 +640,33 @@ export function MyPageScreen() {
                     </BottomSheetSelect>
                   </div>
                 </div>
+              </div>
+            </section>
+
+            <section>
+              <h3 className='mb-3 px-0.5 text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
+                {tLanguage('settingLabel')}
+              </h3>
+              <div className='overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>
+                <button
+                  type='button'
+                  onClick={() => setLanguageOpen(true)}
+                  disabled={savingLanguage}
+                  className='flex w-full items-center gap-3 px-5 py-4 text-left touch-manipulation disabled:opacity-50'
+                >
+                  <div className='min-w-0 flex-1'>
+                    <p className='text-[12px] font-medium text-[var(--muted)]'>
+                      {tLanguage('settingHint')}
+                    </p>
+                    <p lang={locale} className='mt-1 truncate text-[15px] font-medium tracking-tight text-[var(--foreground)]'>
+                      {LOCALE_NATIVE_NAMES[locale]}
+                    </p>
+                  </div>
+                  <span className='shrink-0 text-[12px] font-medium text-[var(--muted)]'>
+                    {savingLanguage ? t('profile.saving') : t('profile.edit')}
+                  </span>
+                  <ChevronIcon />
+                </button>
               </div>
             </section>
 
@@ -622,7 +697,7 @@ export function MyPageScreen() {
           setEditingNickname(false)
           setNicknameDraft(nickname ?? '')
         }}
-        title='닉네임 설정'
+        title={t('nicknameSheet.title')}
         maxHeightClassName='max-h-[min(50dvh,420px)]'
       >
         <div className='space-y-4 px-3 pb-2 pt-1'>
@@ -631,7 +706,7 @@ export function MyPageScreen() {
             value={nicknameDraft}
             maxLength={MAX_NICKNAME_LEN}
             onChange={(e) => setNicknameDraft(sanitizeNicknameInput(e.target.value))}
-            placeholder='예: food.hunter'
+            placeholder={t('profile.nicknamePlaceholder')}
             inputMode='text'
             autoCapitalize='off'
             autoCorrect='off'
@@ -640,7 +715,7 @@ export function MyPageScreen() {
             autoFocus
           />
           <p className='text-[12px] leading-relaxed text-[var(--muted)]'>
-            {NICKNAME_RULE_HINT}
+            {t('nickname.ruleHint')}
           </p>
           <NicknameAvailabilityHint
             availability={nicknameDraftAvailability}
@@ -649,7 +724,9 @@ export function MyPageScreen() {
           <div className='flex items-center justify-between gap-2'>
             <span className='text-[11px] tabular-nums text-[var(--muted)]'>
               {nicknameDraft.trim().length}/{MAX_NICKNAME_LEN}
-              <span className='ml-1.5'>· 최소 {MIN_NICKNAME_LEN}자</span>
+              <span className='ml-1.5'>
+                · {t('nicknameSheet.minLength', { min: MIN_NICKNAME_LEN })}
+              </span>
             </span>
             <div className='flex gap-2'>
               <button
@@ -661,7 +738,7 @@ export function MyPageScreen() {
                 disabled={savingNickname}
                 className='h-9 rounded-full px-3.5 text-[13px] font-medium text-[var(--muted-foreground)] touch-manipulation'
               >
-                취소
+                {t('actions.cancel')}
               </button>
               <button
                 type='button'
@@ -673,10 +750,30 @@ export function MyPageScreen() {
                 }
                 className='h-9 rounded-full bg-[var(--foreground)] px-4 text-[13px] font-semibold text-white touch-manipulation disabled:opacity-40'
               >
-                {savingNickname ? '저장 중…' : '저장'}
+                {savingNickname ? t('profile.saving') : t('actions.save')}
               </button>
             </div>
           </div>
+        </div>
+      </BottomSheet>
+
+      <BottomSheet
+        open={languageOpen}
+        onClose={() => {
+          if (savingLanguage) return
+          setLanguageOpen(false)
+        }}
+        title={tLanguage('sheetTitle')}
+      >
+        <div className='space-y-3 px-3 pb-3 pt-1'>
+          <p className='text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
+            {tLanguage('settingHint')}
+          </p>
+          <LanguagePicker
+            value={locale}
+            onChange={(next) => void handleSelectLanguage(next)}
+            disabled={savingLanguage}
+          />
         </div>
       </BottomSheet>
 
@@ -686,20 +783,26 @@ export function MyPageScreen() {
           if (savingProfileSetup) return
           setCompleteProfileOpen(false)
         }}
-        title='프로필 완성'
+        title={t('setupSheet.title')}
         maxHeightClassName='max-h-[min(88dvh,720px)]'
       >
         <div className='space-y-5 px-3 pb-2 pt-1'>
           <p className='text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-            커뮤니티에 표시할 프로필 정보를 입력해 주세요.
-            이름(firstName/lastName)은 계정 정보용이고, 닉네임은 커뮤니티에
-            표시돼요.
+            {t('setupSheet.description')}
           </p>
+
+          <div className='space-y-2'>
+            <span className='text-[12px] font-medium text-[var(--muted)]'>
+              {tLanguage('setupLabel')}
+            </span>
+            <LanguagePicker value={setupLocale} onChange={setSetupLocale} />
+            <p className='text-[11px] leading-relaxed text-[var(--muted)]'>{tLanguage('setupHint')}</p>
+          </div>
 
           <div className='grid gap-3 sm:grid-cols-2'>
             <label className='block space-y-2'>
               <span className='text-[12px] font-medium text-[var(--muted)]'>
-                이름 (First name)
+                {t('setupSheet.firstNameLabel')}
               </span>
               <input
                 type='text'
@@ -717,7 +820,7 @@ export function MyPageScreen() {
 
             <label className='block space-y-2'>
               <span className='text-[12px] font-medium text-[var(--muted)]'>
-                성 (Last name)
+                {t('setupSheet.lastNameLabel')}
               </span>
               <input
                 type='text'
@@ -737,7 +840,7 @@ export function MyPageScreen() {
           <label className='block space-y-2'>
             <div className='flex items-baseline justify-between gap-2'>
               <span className='text-[12px] font-medium text-[var(--muted)]'>
-                닉네임 (커뮤니티 표시명)
+                {t('setupSheet.nicknameLabel')}
               </span>
               <span className='shrink-0 text-[11px] tabular-nums text-[var(--muted)]'>
                 {profileDraft.nickname.trim().length}/{MAX_NICKNAME_LEN}
@@ -753,7 +856,7 @@ export function MyPageScreen() {
                   nickname: sanitizeNicknameInput(e.target.value),
                 }))
               }
-              placeholder='예: food.hunter'
+              placeholder={t('profile.nicknamePlaceholder')}
               inputMode='text'
               autoCapitalize='off'
               autoCorrect='off'
@@ -761,17 +864,17 @@ export function MyPageScreen() {
               className='h-11 w-full rounded-xl bg-[#f4f5f7] px-3.5 text-sm text-[var(--foreground)] outline-none ring-1 ring-transparent transition placeholder:text-[var(--muted)] focus:bg-white focus:ring-[var(--brand)]/30'
             />
             <p className='text-[12px] leading-relaxed text-[var(--muted)]'>
-              {NICKNAME_RULE_HINT}
+              {t('nickname.ruleHint')}
             </p>
             <NicknameAvailabilityHint availability={profileNicknameAvailability} />
           </label>
 
           <div className='space-y-2'>
             <span className='text-[12px] font-medium text-[var(--muted)]'>
-              성별
+              {t('profile.genderLabel')}
             </span>
             <ProfileOptionChips
-              options={PROFILE_GENDER_OPTIONS}
+              options={genderOptions}
               value={profileDraft.gender}
               onChange={(next) =>
                 setProfileDraft((prev) => ({ ...prev, gender: next }))
@@ -781,10 +884,10 @@ export function MyPageScreen() {
 
           <div className='space-y-2'>
             <span className='text-[12px] font-medium text-[var(--muted)]'>
-              직업
+              {t('profile.occupationLabel')}
             </span>
             <ProfileOptionChips
-              options={PROFILE_OCCUPATION_OPTIONS}
+              options={occupationOptions}
               value={profileDraft.occupationType}
               onChange={(next) =>
                 setProfileDraft((prev) => ({ ...prev, occupationType: next }))
@@ -807,11 +910,14 @@ export function MyPageScreen() {
           <div className='flex items-center justify-end gap-2 pt-1'>
             <button
               type='button'
-              onClick={() => setCompleteProfileOpen(false)}
+              onClick={() => {
+                setCompleteProfileOpen(false)
+                if (afterSetupHref) router.push(afterSetupHref)
+              }}
               disabled={savingProfileSetup}
               className='h-9 rounded-full px-3.5 text-[13px] font-medium text-[var(--muted-foreground)] touch-manipulation'
             >
-              나중에
+              {t('setupSheet.later')}
             </button>
             <button
               type='button'
@@ -819,7 +925,7 @@ export function MyPageScreen() {
               disabled={savingProfileSetup || !canSaveProfileSetup}
               className='h-9 rounded-full bg-[var(--foreground)] px-4 text-[13px] font-semibold text-white touch-manipulation disabled:opacity-40'
             >
-              {savingProfileSetup ? '저장 중…' : '저장하기'}
+              {savingProfileSetup ? t('profile.saving') : t('setupSheet.save')}
             </button>
           </div>
         </div>
@@ -868,6 +974,7 @@ function ProfileImage({
   photoURL: string | null
   displayName: string
 }) {
+  const t = useT('me')
   const [failedSrc, setFailedSrc] = useState<string | null>(null)
   const show = Boolean(photoURL) && failedSrc !== photoURL
 
@@ -877,7 +984,7 @@ function ProfileImage({
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={photoURL!}
-          alt={`${displayName} 프로필`}
+          alt={t('profile.photoAlt', { name: displayName })}
           className='size-full object-cover'
           onError={() => setFailedSrc(photoURL)}
           referrerPolicy='no-referrer'
@@ -925,6 +1032,7 @@ function LogoutSection({
   onLogout: () => void
   className?: string
 }) {
+  const t = useT('me')
   return (
     <section className={cn(className)}>
       <button
@@ -938,11 +1046,11 @@ function LogoutSection({
           </span>
           <span className='min-w-0'>
             <span className='block text-[15px] font-semibold tracking-tight text-[var(--foreground)]'>
-              로그아웃
+              {t('logout.title')}
             </span>
             <span className='mt-0.5 block text-[13px] leading-snug text-[var(--muted-foreground)] lg:text-[12px]'>
-              <span className='lg:hidden'>이 기기에서 계정 연결을 해제해요</span>
-              <span className='hidden lg:inline'>계정 연결을 해제해요</span>
+              <span className='lg:hidden'>{t('logout.descriptionMobile')}</span>
+              <span className='hidden lg:inline'>{t('logout.descriptionDesktop')}</span>
             </span>
           </span>
         </span>

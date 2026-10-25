@@ -10,6 +10,7 @@ import { getErrorMessage, useToast } from '@hooks/useToast'
 import { cityLoginPath, hrefForCommunityPost } from '@lib/constants/cities'
 import { COMMUNITY_CREDIT_REVIEW_BONUS } from '@lib/constants/communityCredit'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
+import { useFormat, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import { MyPageSkeleton } from '@widgets/nyc/MyPageSkeleton'
 
@@ -26,13 +27,11 @@ type ReviewRequest = {
   rejectReason: string | null
 }
 
-function formatTime(ts: number) {
-  return new Intl.DateTimeFormat('ko-KR', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(ts))
+const TIME_FORMAT: Intl.DateTimeFormatOptions = {
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
 }
 
 export function CreditReviewsScreen() {
@@ -41,6 +40,9 @@ export function CreditReviewsScreen() {
   const href = useCityPath()
   const router = useRouter()
   const { success, error: toastError } = useToast()
+  const t = useT('credit')
+  const format = useFormat()
+  const bonus = format.number(COMMUNITY_CREDIT_REVIEW_BONUS)
   const [requests, setRequests] = useState<ReviewRequest[]>([])
   const [listLoading, setListLoading] = useState(true)
   const [filter, setFilter] = useState<'pending' | 'all'>('pending')
@@ -59,16 +61,16 @@ export function CreditReviewsScreen() {
         error?: string
       } | null
       if (!res.ok) {
-        throw new Error(data?.error || '목록을 불러오지 못했어요')
+        throw new Error(data?.error || t('reviews.loadFailed'))
       }
       setRequests(Array.isArray(data?.requests) ? data.requests : [])
     } catch (err) {
-      toastError(getErrorMessage(err, '목록을 불러오지 못했어요'))
+      toastError(getErrorMessage(err, t('reviews.loadFailed')))
       setRequests([])
     } finally {
       setListLoading(false)
     }
-  }, [filter, toastError])
+  }, [filter, toastError, t])
 
   useEffect(() => {
     if (loading || sessionLoading) return
@@ -89,12 +91,12 @@ export function CreditReviewsScreen() {
   async function decide(requestId: string, action: 'approve' | 'reject') {
     let rejectReason: string | undefined
     if (action === 'reject') {
-      const input = window.prompt('반려 사유 (선택)')
+      const input = window.prompt(t('reviews.rejectPrompt'))
       if (input === null) return
       rejectReason = input.trim() || undefined
     } else {
       const ok = window.confirm(
-        `이 글을 승인하고 +${COMMUNITY_CREDIT_REVIEW_BONUS} 크레딧을 지급할까요?`,
+        t('reviews.approveConfirm', { amount: bonus }),
       )
       if (!ok) return
     }
@@ -111,12 +113,12 @@ export function CreditReviewsScreen() {
         error?: string
       } | null
       if (!res.ok) {
-        throw new Error(data?.error || '처리에 실패했어요')
+        throw new Error(data?.error || t('reviews.actionFailed'))
       }
-      success(action === 'approve' ? '승인 · 크레딧 지급 완료' : '반려 처리했어요')
+      success(action === 'approve' ? t('reviews.approved') : t('reviews.rejected'))
       await load()
     } catch (err) {
-      toastError(getErrorMessage(err, '처리에 실패했어요'))
+      toastError(getErrorMessage(err, t('reviews.actionFailed')))
     } finally {
       setActingId(null)
     }
@@ -133,11 +135,10 @@ export function CreditReviewsScreen() {
           TEAM
         </p>
         <h1 className='mt-1.5 text-[1.5rem] font-semibold tracking-tight text-[var(--foreground)]'>
-          크레딧 리뷰
+          {t('reviews.title')}
         </h1>
         <p className='mt-2 max-w-xl text-[14px] text-[var(--muted-foreground)]'>
-          최종 결과가 담긴 OPT·취업 후기를 검토한 뒤 추가 +
-          {COMMUNITY_CREDIT_REVIEW_BONUS} 크레딧을 지급합니다.
+          {t('reviews.description', { amount: bonus })}
         </p>
 
         <div className='mt-6 flex gap-2'>
@@ -151,7 +152,7 @@ export function CreditReviewsScreen() {
                 : 'bg-white text-[var(--muted)] ring-1 ring-black/[0.06]',
             )}
           >
-            대기
+            {t('reviews.filterPending')}
           </button>
           <button
             type='button'
@@ -163,7 +164,7 @@ export function CreditReviewsScreen() {
                 : 'bg-white text-[var(--muted)] ring-1 ring-black/[0.06]',
             )}
           >
-            전체
+            {t('reviews.filterAll')}
           </button>
         </div>
 
@@ -180,8 +181,8 @@ export function CreditReviewsScreen() {
           ) : requests.length === 0 ? (
             <p className='rounded-2xl bg-white px-5 py-10 text-center text-[14px] text-[var(--muted)] ring-1 ring-black/[0.04]'>
               {filter === 'pending'
-                ? '대기 중인 요청이 없어요.'
-                : '요청 내역이 없어요.'}
+                ? t('reviews.emptyPending')
+                : t('reviews.emptyAll')}
             </p>
           ) : (
             requests.map((item) => (
@@ -204,15 +205,15 @@ export function CreditReviewsScreen() {
                       )}
                       className='mt-1 block text-[15px] font-semibold text-[var(--foreground)] hover:underline'
                     >
-                      {item.postTitle}
+                      {item.postTitle || t('reviews.untitled')}
                     </Link>
                     <p className='mt-1 text-[12px] text-[var(--muted)]'>
                       {item.authorNickname || item.authorEmail} ·{' '}
-                      {formatTime(item.createdAt)}
+                      {format.date(item.createdAt, TIME_FORMAT)}
                     </p>
                     {item.rejectReason ? (
                       <p className='mt-1 text-[12px] text-[var(--muted)]'>
-                        반려: {item.rejectReason}
+                        {t('reviews.rejectReasonLabel', { reason: item.rejectReason })}
                       </p>
                     ) : null}
                   </div>
@@ -224,7 +225,7 @@ export function CreditReviewsScreen() {
                         onClick={() => void decide(item.id, 'approve')}
                         className='h-9 rounded-full bg-[var(--brand)] px-3.5 text-[12px] font-semibold text-white disabled:opacity-50'
                       >
-                        승인 +{COMMUNITY_CREDIT_REVIEW_BONUS}
+                        {t('reviews.approveButton', { amount: bonus })}
                       </button>
                       <button
                         type='button'
@@ -232,7 +233,7 @@ export function CreditReviewsScreen() {
                         onClick={() => void decide(item.id, 'reject')}
                         className='h-9 rounded-full border border-[var(--border)] bg-white px-3.5 text-[12px] font-semibold text-[var(--foreground)] disabled:opacity-50'
                       >
-                        반려
+                        {t('reviews.rejectButton')}
                       </button>
                     </div>
                   ) : null}

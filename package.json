@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:ellieo": "NEXT_PUBLIC_BRAND=ellieo NEXT_DIST_DIR=.next-ellieo next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
     "lint": "eslint",

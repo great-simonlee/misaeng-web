@@ -1,8 +1,7 @@
-import {
-  getHousingRoommateAffiliationLabel,
-  getHousingRoommateComposition,
-  getHousingRoommateRoomPreferenceLabel,
-} from '@lib/constants/housingMock'
+'use client'
+
+import { getHousingRoommateComposition } from '@lib/constants/housingMock'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import type { HousingRoommateWaiting } from '@/types/nyc'
 import { RoommateCompositionBadge } from '@widgets/nyc/HousingPostCard'
@@ -17,6 +16,7 @@ export function HousingRoommateIntro({
   roommate,
   className,
 }: HousingRoommateIntroProps) {
+  const t = useT('housing')
   const profiles = roommate.profiles
   if (profiles.length === 0) return null
 
@@ -29,7 +29,7 @@ export function HousingRoommateIntro({
     >
       <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
         <h2 className='text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
-          기다리는 룸메이트
+          {t('roommateIntro.title')}
         </h2>
         <RoommateCompositionBadge composition={composition} compact />
       </div>
@@ -38,13 +38,17 @@ export function HousingRoommateIntro({
         {profiles.map((profile) => {
           const intro =
             profile.intro.trim() ||
-            '자세한 소개는 문의 시 안내해 드려요.'
-          const genderLabel = profile.gender === 'male' ? '남성' : '여성'
-          const affiliationLabel = getHousingRoommateAffiliationLabel(
-            profile.affiliation,
-          )
+            t('roommateIntro.introFallback')
+          const genderLabel =
+            profile.gender === 'male'
+              ? t('roommateIntro.male')
+              : t('roommateIntro.female')
+          const affiliationLabel =
+            profile.affiliation.kind === 'student'
+              ? profile.affiliation.school
+              : t('roommateIntro.worker')
           const preferences = profile.preferredRoomTypes
-            .map(getHousingRoommateRoomPreferenceLabel)
+            .map((id) => t(`roommatePreferences.${id}`))
             .join(' · ')
 
           return (

@@ -1,4 +1,7 @@
-export async function sendSchoolEmailVerification(email: string) {
+import type { Translate } from '@lib/i18n/translate'
+
+/** t는 네임스페이스 없는 번역기(`useT()`)다. 서버가 error를 주지 않을 때만 기본 문구를 쓴다. */
+export async function sendSchoolEmailVerification(email: string, t: Translate) {
   const response = await fetch('/api/agent-auth/school-email', {
     method: 'POST',
     credentials: 'include',
@@ -14,7 +17,9 @@ export async function sendSchoolEmailVerification(email: string) {
     | null
 
   if (!response.ok) {
-    const error = new Error(data?.error || '인증 메일 전송에 실패했어요') as Error & {
+    const error = new Error(
+      data?.error || t('me.verification.errors.sendFailed'),
+    ) as Error & {
       code?: string
     }
     if (data?.code) error.code = data.code
@@ -25,6 +30,7 @@ export async function sendSchoolEmailVerification(email: string) {
 export async function confirmSchoolEmailVerification(
   email: string,
   code: string,
+  t: Translate,
 ) {
   const response = await fetch('/api/agent-auth/school-email', {
     method: 'POST',
@@ -46,7 +52,7 @@ export async function confirmSchoolEmailVerification(
     | null
 
   if (!response.ok) {
-    throw new Error(data?.error || '인증에 실패했어요')
+    throw new Error(data?.error || t('me.verification.errors.confirmFailed'))
   }
 
   return {

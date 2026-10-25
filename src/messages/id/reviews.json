@@ -1,0 +1,686 @@
+{
+  "activity": {
+    "updated": "Diperbarui {time}",
+    "posted": "Diposting {time}",
+    "firstPosted": "Pertama diposting {time}"
+  },
+  "cptOpt": {
+    "types": {
+      "cpt": {
+        "label": "CPT",
+        "description": "Izin kerja selama masih kuliah",
+        "summary": "Ajukan lewat OGS dan dapatkan I-20 baru"
+      },
+      "opt": {
+        "label": "OPT",
+        "description": "Izin kerja 1 tahun setelah lulus",
+        "summary": "Rekomendasi OGS, lalu I-765 ke USCIS dan EAD kamu"
+      },
+      "stem-opt": {
+        "label": "STEM OPT",
+        "description": "Perpanjangan STEM OPT",
+        "summary": "I-983 dan peninjauan OGS, lalu laporan validasi SEVP"
+      },
+      "visa": {
+        "label": "Visa",
+        "description": "F-1, H-1B, O-1, dan lainnya",
+        "summary": "Dari dokumen dan interview sampai approval"
+      },
+      "green-card": {
+        "label": "Green card",
+        "description": "Jalur kerja, pernikahan, dan lainnya",
+        "summary": "Petisi, interview, approval, sampai kartu diterima"
+      }
+    },
+    "fields": {
+      "prepared": {
+        "label": "Yang kamu siapkan",
+        "shortLabel": "Persiapan",
+        "hint": "Dokumen yang kamu kumpulkan dan syarat yang kamu cek"
+      },
+      "submitted": {
+        "label": "Cara kamu mengajukan",
+        "shortLabel": "Pengajuan",
+        "hint": "Di mana dan bagaimana kamu mengirimnya"
+      },
+      "resultReceived": {
+        "label": "Cara kamu menerima hasil",
+        "shortLabel": "Hasil",
+        "hint": "Email, pos, portal: bagaimana hasilnya datang dan apa isinya"
+      },
+      "nextStep": {
+        "label": "Langkah selanjutnya",
+        "shortLabel": "Selanjutnya",
+        "hint": "Yang masih harus kamu lakukan atau sedang kamu tunggu"
+      }
+    },
+    "placeholders": {
+      "cpt": {
+        "prepared": "mis. Selesai modul CPT, offer letter, checklist OGS",
+        "submitted": "mis. Unggah formulir CPT dan offer letter ke portal OGS",
+        "resultReceived": "mis. Dapat PDF I-20 baru lewat email kampus",
+        "nextStep": "mis. Cetak dan tanda tangani I-20, sesuaikan tanggal mulai kerja"
+      },
+      "opt": {
+        "prepared": "mis. Workshop OPT dari OGS, I-765, pas foto, bukti kelulusan",
+        "submitted": "mis. Ajukan I-765 online ke USCIS setelah rekomendasi OGS, bayar biayanya",
+        "resultReceived": "mis. Kartu EAD datang lewat pos, approval muncul di akun",
+        "nextStep": "mis. Catat tanggal kedaluwarsa EAD dan syarat perpanjangan STEM di kalender"
+      },
+      "stem-opt": {
+        "prepared": "mis. I-983, info perusahaan, menghubungi OGS/DSO",
+        "submitted": "mis. Ajukan perpanjangan STEM OPT setelah ditinjau OGS",
+        "resultReceived": "mis. Dapat approval notice I-797 lewat email/pos",
+        "nextStep": "mis. Jadwalkan laporan validasi bulan ke-6/12/18"
+      },
+      "visa": {
+        "prepared": "mis. DS-160, dokumen keuangan, latihan pertanyaan interview",
+        "submitted": "mis. Booking interview kedutaan dan menyerahkan dokumen",
+        "resultReceived": "mis. Visa disetujui, paspor sudah kembali",
+        "nextStep": "mis. Masuk ke AS, cek I-94, registrasi SEVIS/kampus"
+      },
+      "green-card": {
+        "prepared": "mis. Dokumen I-140/I-485, medical check-up, bertemu pengacara",
+        "submitted": "mis. Ajukan petisi USCIS online/lewat pos, hadiri interview",
+        "resultReceived": "mis. Approval notice, lalu green card datang lewat pos",
+        "nextStep": "mis. Cek kartu, cek tanggal re-entry dan perpanjangan"
+      }
+    },
+    "quickSteps": {
+      "cpt": {
+        "module": {
+          "label": "Selesai modul CPT",
+          "prepared": "Menyelesaikan modul CPT (orientasi)",
+          "nextStep": "Tunggu offer letter, cek checklist"
+        },
+        "offerLetter": {
+          "label": "Dapat offer letter",
+          "prepared": "Menerima offer letter kerja",
+          "nextStep": "Isi aplikasi CPT di OGS"
+        },
+        "apply": {
+          "label": "Ajukan aplikasi CPT",
+          "prepared": "Offer letter, aplikasi CPT",
+          "submitted": "Mengajukan aplikasi di portal OGS",
+          "nextStep": "Tunggu I-20 baru"
+        },
+        "newI20": {
+          "label": "Dapat I-20 baru",
+          "resultReceived": "Menerima I-20 baru lewat email",
+          "nextStep": "Tanda tangani dan mulai kerja"
+        }
+      },
+      "opt": {
+        "recommendation": {
+          "label": "Rekomendasi OGS",
+          "prepared": "Mengecek dokumen OPT dan syarat kelulusan",
+          "submitted": "Meminta rekomendasi OPT dari OGS",
+          "nextStep": "Siap-siap mengajukan I-765"
+        },
+        "i765": {
+          "label": "Ajukan I-765",
+          "prepared": "I-765, foto, biaya",
+          "submitted": "Mengajukan online ke USCIS",
+          "nextStep": "Cek status kasus secara rutin"
+        },
+        "ead": {
+          "label": "Dapat EAD",
+          "resultReceived": "Kartu EAD datang lewat pos",
+          "nextStep": "Mulai kerja, cek syarat perpanjangan STEM"
+        }
+      },
+      "stem-opt": {
+        "i983": {
+          "label": "Ajukan I-983",
+          "prepared": "I-983, info perusahaan",
+          "submitted": "Mengajukan I-983 ke OGS",
+          "nextStep": "Cek approval dan tanggal laporan validasi"
+        },
+        "approved": {
+          "label": "Perpanjangan disetujui",
+          "resultReceived": "Perpanjangan STEM OPT disetujui",
+          "nextStep": "Pasang pengingat tenggat laporan"
+        }
+      },
+      "visa": {
+        "interview": {
+          "label": "Booking interview",
+          "prepared": "DS-160, berkas dokumen",
+          "submitted": "Booking interview di kedutaan",
+          "nextStep": "Persiapan interview, cek dokumen terakhir"
+        },
+        "approved": {
+          "label": "Visa disetujui",
+          "resultReceived": "Visa disetujui, paspor sudah kembali",
+          "nextStep": "Masuk ke AS, registrasi ke kampus/perusahaan"
+        }
+      },
+      "green-card": {
+        "petition": {
+          "label": "Ajukan petisi",
+          "prepared": "Paket dokumen petisi",
+          "submitted": "Mengajukan petisi ke USCIS",
+          "nextStep": "Tunggu receipt dan jadwal interview"
+        },
+        "card": {
+          "label": "Dapat kartu",
+          "resultReceived": "Menerima green card",
+          "nextStep": "Cek dokumen perpanjangan dan re-entry"
+        }
+      }
+    },
+    "detail": {
+      "authorTitle": "Ini catatan yang masih berjalan",
+      "authorBody": "Kalau ada tanggal baru, cukup tambahkan satu entri di layar update. Setelah disimpan, postingan kamu akan naik ke atas daftar.",
+      "addEntry": "Tambah entri baru",
+      "timelineTitle_other": "{count} entri progres",
+      "tipsTitle": "Hal yang perlu diwaspadai"
+    },
+    "write": {
+      "errors": {
+        "typeRequired": "Pilih jenis: CPT, OPT, STEM OPT, Visa, atau Green card",
+        "tipsEmptyEdit": "\"Hal yang perlu diwaspadai\" masih kosong. Cek di detail postingan",
+        "tipsRequired": "Isi \"Hal yang perlu diwaspadai\"",
+        "tipsTooLong": "\"Hal yang perlu diwaspadai\" maksimal {max} karakter",
+        "timelineRequiredEdit": "Simpan minimal 1 entri progres",
+        "timelineRequired": "Tambahkan minimal 1 entri progres (tanggal + detail)"
+      },
+      "updated": "Progres kamu sudah diperbarui dan sekarang ada di atas daftar",
+      "created": "Ulasan kamu sudah diposting. Kamu bisa terus menambah progres nanti",
+      "moreSettingsTitle": "Edit detail postingan",
+      "moreSettingsHint": "Buka ini hanya kalau ingin mengubah judul, tempat, atau \"Hal yang perlu diwaspadai\"",
+      "tipsTitle": "Hal yang perlu diwaspadai",
+      "tipsDescription": "Tips yang benar-benar ingin kamu sampaikan ke orang berikutnya supaya tidak mengulang kesalahan yang sama",
+      "tipsPlaceholder": "mis. Kirim dokumen ke OGS 2–3 minggu sebelum tanggal mulai kerja. Portal tiap kampus beda-beda, jadi cek checklist OGS dulu.",
+      "updateSubmit": "Perbarui progres",
+      "typeSection": "Jenisnya apa?",
+      "basicSection": "Info dasar",
+      "basicSectionDescription": "Tambahkan judul dan perusahaan atau organisasi",
+      "timelineSection": "Progres",
+      "createFootnote": "Kamu bisa terus menambah dan mengedit progres setelah memposting.",
+      "createIntro": "Pilih jenis dan catat progres kamu per tanggal. Kamu bisa terus menambahkan setelah memposting.",
+      "updateEyebrow": "Update progres",
+      "updateTitle": "Tambah entri progres baru"
+    },
+    "timeline": {
+      "editingDescription": "Edit Persiapan, Pengajuan, Hasil, atau Selanjutnya, lalu ketuk \"Selesai edit\".",
+      "stageReviewHint": "Ceritakan yang terjadi hari itu: waktu tunggu, tips, kesalahan, apa saja.",
+      "stageReviewPlaceholder": "mis. Upload di portal OGS gagal terus, jadi aku kompres PDF-nya lalu coba lagi. Menyamakan tanggal di offer letter makan waktu sehari."
+    }
+  },
+  "jobReview": {
+    "types": {
+      "intern": {
+        "label": "Magang",
+        "description": "Summer / Winter / per semester",
+        "summary": "Dari lamaran, interview, sampai offer"
+      },
+      "new-grad": {
+        "label": "New grad",
+        "description": "Full-time setelah lulus",
+        "summary": "Campus recruiting dan lamaran online"
+      },
+      "experienced": {
+        "label": "Berpengalaman",
+        "description": "Rekrutmen Mid / Senior",
+        "summary": "Dari dihubungi recruiter sampai interview beberapa ronde"
+      },
+      "job-change": {
+        "label": "Pindah kerja",
+        "description": "Pindah kerja, sambil bekerja atau sedang jeda",
+        "summary": "Melamar sambil bekerja, sampai negosiasi offer"
+      },
+      "contract": {
+        "label": "Kontrak",
+        "description": "Kontrak · Freelance",
+        "summary": "Rekrutmen jangka pendek dan berbasis proyek"
+      }
+    },
+    "fields": {
+      "stageLabel": {
+        "label": "Tahap apa",
+        "shortLabel": "Tahap",
+        "hint": "Application, Phone, Onsite, Offer, dll."
+      },
+      "platform": {
+        "label": "Tempat kamu melamar",
+        "shortLabel": "Platform",
+        "hint": "LinkedIn, Handshake, Referral, halaman karier perusahaan"
+      },
+      "documentsSubmitted": {
+        "label": "Yang kamu kirim",
+        "shortLabel": "Dokumen",
+        "hint": "Resume, Cover letter, Portofolio, Transkrip"
+      },
+      "interviewRound": {
+        "label": "Interview ronde ke berapa",
+        "shortLabel": "Interview",
+        "hint": "Ronde 1 Recruiter, ronde 2 Tech, Panel, HM, dll.",
+        "guide": "Catatan interview: selain rondenya, ceritakan apa yang ditanyakan dan bagaimana kamu menjawab. Pertanyaan dan jawaban spesifik yang kamu ingat sangat membantu orang berikutnya."
+      },
+      "outcome": {
+        "label": "Hasilnya bagaimana",
+        "shortLabel": "Hasil",
+        "hint": "Lolos, Ditolak, Menunggu, Offer, dll."
+      }
+    },
+    "placeholders": {
+      "intern": {
+        "stageLabel": "mis. Phone Screen",
+        "platform": "mis. Handshake → halaman karier perusahaan",
+        "documentsSubmitted": "mis. Resume, Transkrip, Cover letter",
+        "interviewRound": "mis. Ronde 1 Recruiter screen. T: Kenapa posisi magang ini? → Aku bilang pernah mencoba ~ di kelas dan ingin mendalaminya.",
+        "outcome": "mis. Lolos → ronde berikutnya sudah dijadwalkan"
+      },
+      "new-grad": {
+        "stageLabel": "mis. Application",
+        "platform": "mis. LinkedIn Easy Apply",
+        "documentsSubmitted": "mis. PDF resume, link GitHub",
+        "interviewRound": "mis. Ronde 2 Tech. T. Di mana kamu sempat buntu di proyek terakhir? J. … begini jawabanku.",
+        "outcome": "mis. Ditolak (email 2 minggu kemudian)"
+      },
+      "experienced": {
+        "stageLabel": "mis. Dihubungi recruiter",
+        "platform": "mis. LinkedIn InMail",
+        "documentsSubmitted": "mis. Resume terbaru",
+        "interviewRound": "mis. HM 1:1. T. Kenapa posisi ini? J. Karena timnya sedang menuju ~ …",
+        "outcome": "mis. Undangan onsite"
+      },
+      "job-change": {
+        "stageLabel": "mis. Recruiter screen",
+        "platform": "mis. LinkedIn / Referral",
+        "documentsSubmitted": "mis. Resume, LinkedIn",
+        "interviewRound": "mis. Ronde 2 HM + Tim. T. Bagaimana kamu menangani konflik? J. …",
+        "outcome": "mis. Offer · negosiasi gaji"
+      },
+      "contract": {
+        "stageLabel": "mis. Melamar lewat agensi",
+        "platform": "mis. Referral dari recruiter",
+        "documentsSubmitted": "mis. Resume, rate card",
+        "interviewRound": "mis. Intro dengan klien. T. Kapan bisa mulai? J. 2 minggu lagi.",
+        "outcome": "mis. Offer kontrak"
+      }
+    },
+    "quickSteps": {
+      "intern": {
+        "apply": {
+          "label": "Melamar",
+          "stageLabel": "Application",
+          "platform": "Handshake / LinkedIn",
+          "documentsSubmitted": "Resume, Transkrip"
+        },
+        "interview": {
+          "label": "Interview",
+          "stageLabel": "Technical Interview",
+          "interviewRound": "Ronde 1 Tech"
+        },
+        "offer": {
+          "label": "Offer",
+          "stageLabel": "Offer",
+          "outcome": "Dapat offer"
+        }
+      },
+      "new-grad": {
+        "apply": {
+          "label": "Melamar",
+          "stageLabel": "Application",
+          "platform": "Portal karier perusahaan",
+          "documentsSubmitted": "Resume, Cover letter"
+        },
+        "phone": {
+          "label": "Phone",
+          "stageLabel": "Phone Screen",
+          "interviewRound": "Ronde 1 HR"
+        },
+        "onsite": {
+          "label": "Onsite",
+          "stageLabel": "Onsite / Virtual onsite",
+          "interviewRound": "Ronde final"
+        }
+      },
+      "experienced": {
+        "recruiter": {
+          "label": "Recruiter",
+          "stageLabel": "Recruiter screen",
+          "platform": "LinkedIn InMail"
+        },
+        "hm": {
+          "label": "HM",
+          "stageLabel": "Hiring Manager",
+          "interviewRound": "HM 1:1"
+        },
+        "panel": {
+          "label": "Panel",
+          "stageLabel": "Panel interview",
+          "interviewRound": "Panel tim"
+        }
+      },
+      "job-change": {
+        "apply": {
+          "label": "Melamar",
+          "stageLabel": "Application",
+          "platform": "LinkedIn / Referral",
+          "documentsSubmitted": "Resume"
+        },
+        "interview": {
+          "label": "Interview",
+          "stageLabel": "Hiring Manager",
+          "interviewRound": "HM + Tim"
+        },
+        "offer": {
+          "label": "Offer",
+          "stageLabel": "Offer · Negosiasi",
+          "outcome": "Dapat offer"
+        }
+      },
+      "contract": {
+        "documents": {
+          "label": "Dokumen",
+          "stageLabel": "Dokumen dikirim",
+          "documentsSubmitted": "Resume"
+        },
+        "client": {
+          "label": "Klien",
+          "stageLabel": "Interview klien",
+          "interviewRound": "Intro call"
+        }
+      }
+    },
+    "sources": {
+      "misaeng": {
+        "label": "Lewat {brand}",
+        "description": "Aku melihat situs atau media sosial {brand}"
+      },
+      "student-org": {
+        "label": "Lewat organisasi mahasiswa",
+        "description": "Organisasi mahasiswa di kampusku menghubungiku"
+      },
+      "referral": {
+        "label": "Lewat kenalan",
+        "description": "Ada kenalan yang memperkenalkanku"
+      },
+      "other": {
+        "label": "Lainnya",
+        "description": "Dengan cara lain"
+      }
+    },
+    "sourcePicker": {
+      "orgQuestion": "Organisasi mahasiswa yang mana?"
+    },
+    "outcomes": {
+      "offer": {
+        "label": "Dapat offer",
+        "description": "Aku lolos dan dapat offer"
+      },
+      "rejected": {
+        "label": "Ditolak",
+        "description": "Aku tidak lolos, di tengah atau di akhir"
+      },
+      "in-progress": {
+        "label": "Sedang berjalan",
+        "description": "Aku masih menunggu hasilnya"
+      },
+      "withdrew": {
+        "label": "Mengundurkan diri",
+        "description": "Aku menghentikan prosesnya sendiri"
+      }
+    },
+    "detail": {
+      "authorTitle": "Ini catatan rekrutmen yang masih berjalan",
+      "authorBody": "Kalau ada tahap baru, cukup tambahkan satu entri di layar update. Setelah disimpan, postingan kamu akan naik ke atas daftar.",
+      "addEntry": "Tambah tahap baru",
+      "timelineTitle_other": "{count} tahap rekrutmen",
+      "emptySection": "Tahap rekrutmen",
+      "emptyTitle": "Belum ada tahap rekrutmen",
+      "emptyBody": "Progres kamu per tanggal, seperti lamaran, interview, dan hasilnya, akan tersusun di sini sebagai Tahap 1, Tahap 2, dan seterusnya.",
+      "emptyCta": "Tambah tahap rekrutmen",
+      "tipsTitle": "Untuk pelamar berikutnya"
+    },
+    "timeline": {
+      "editingDescription": "Edit Tahap, Platform, Dokumen, Interview, atau Hasil, lalu ketuk \"Selesai edit\".",
+      "stageReviewHint": "Ceritakan yang kamu alami di tahap ini: pertanyaan, suasana, tips persiapan, feedback, apa saja.",
+      "stageReviewPlaceholder": "mis. Phone screen-nya sekitar 30 menit, kebanyakan bedah resume + pertanyaan behavioral.",
+      "autoCommitHint": "Begitu kamu mengisi tanggal dan detail lalu pindah ke kolom berikutnya, entri otomatis ditambahkan dan disimpan. Tidak perlu tombol."
+    },
+    "write": {
+      "errors": {
+        "typeRequired": "Pilih jenis: Magang, New grad, Berpengalaman, Pindah kerja, atau Kontrak",
+        "tipsEmptyEdit": "\"Hal yang perlu diwaspadai\" masih kosong. Cek di detail postingan",
+        "tipsRequired": "Isi \"Hal yang perlu diwaspadai\"",
+        "tipsTooLong": "\"Hal yang perlu diwaspadai\" maksimal {max} karakter",
+        "timelineRequiredEdit": "Simpan minimal 1 entri progres. Isi tanggal dan detail, lalu ketuk \"Tambahkan entri ini\"",
+        "timelineRequired": "Tambahkan minimal 1 entri progres (tanggal + detail), lalu ketuk \"Tambahkan entri ini\"",
+        "outcomeRequired": "Pilih hasil akhirnya",
+        "orgRequired": "Pilih organisasi mahasiswa yang menghubungkanmu",
+        "sourceRequired": "Pilih dari mana kamu terhubung"
+      },
+      "updated": "Progres kamu sudah diperbarui dan sekarang ada di atas daftar",
+      "created": "Ulasan kamu sudah diposting. Kamu bisa terus menambah progres nanti",
+      "moreSettingsTitle": "Edit detail postingan",
+      "moreSettingsHint": "Buka ini hanya kalau ingin mengubah judul, perusahaan, atau \"Hal yang perlu diwaspadai\"",
+      "tipsTitle": "Hal yang perlu diwaspadai",
+      "tipsDescription": "Tips yang benar-benar ingin kamu sampaikan ke orang berikutnya supaya tidak mengulang kesalahan yang sama",
+      "tipsPlaceholder": "mis. Cari tahu proyek terbaru tim sebelum interview. Referral lewat LinkedIn dapat respons jauh lebih baik daripada Handshake.",
+      "outcomeSection": "Apa hasil akhirnya?",
+      "outcomeEditHint": "Kalau ada perubahan, perbarui di sini juga",
+      "outcomeSectionDescription": "Kalau masih berjalan, pilih \"Sedang berjalan\". Kamu bisa mengubahnya nanti",
+      "sourceSection": "Dari mana kamu terhubung?",
+      "sourceSectionDescription": "Beri tahu kami bagaimana kamu sampai menulis ulasan ini. Orang lain tidak akan melihatnya",
+      "selectSourceFirst": "Pilih dari mana kamu terhubung",
+      "updateSubmit": "Perbarui progres",
+      "typeSection": "Jenisnya apa?",
+      "basicSection": "Info dasar",
+      "basicSectionDescription": "Tambahkan judul dan perusahaan",
+      "timelineSection": "Progres",
+      "createFootnote": "Kamu bisa terus menambah dan mengedit progres setelah memposting.",
+      "createIntro": "Pilih jenis dan catat progres kamu per tanggal. Kamu bisa terus menambahkan setelah memposting.",
+      "updateEyebrow": "Update progres",
+      "updateTitle": "Tambah entri progres baru"
+    }
+  },
+  "detail": {
+    "noDate": "Tanpa tanggal",
+    "stageReview": "Catatan tahap",
+    "views": "{views} kali dilihat",
+    "accordionHint": "Ketuk tahap untuk membuka atau menutupnya. Hanya satu yang terbuka sekaligus.",
+    "editLabel": "Update"
+  },
+  "orientation": {
+    "defaultEyebrow": "Tulis ulasan",
+    "title": "Sebelum mulai",
+    "subtitleWithGuide": "Baca panduan menulis dan pedoman komunitas, lalu setujui.",
+    "subtitle": "Baca pedoman komunitas, lalu setujui.",
+    "guideTitle": "Panduan menulis",
+    "communityTitle": "Pedoman komunitas",
+    "saving": "Menyimpan…",
+    "agree": "Setuju dan mulai menulis",
+    "backToList": "Kembali ke daftar",
+    "saveFailed": "Gagal menyimpan persetujuan kamu. Coba lagi.",
+    "roommateEyebrow": "Roommate · Sublet",
+    "anonymousEyebrow": "Forum anonim",
+    "cptOpt": {
+      "step1": {
+        "title": "Ulasan yang dicatat per tanggal",
+        "body": "Catat progres CPT, OPT, STEM OPT, visa, atau green card kamu satu tanggal demi satu tanggal, supaya orang lain bisa mengikutinya tahap demi tahap nanti."
+      },
+      "step2": {
+        "title": "Tanggal → kolom → detail",
+        "body": "Di formulir bawah, pilih tanggal, pilih hanya kolom yang kamu perlukan (Persiapan, Pengajuan, Hasil, Selanjutnya), lalu tulis detailnya."
+      },
+      "step3": {
+        "title": "\"Tambahkan entri ini\" menumpuknya di atas",
+        "body": "Kalau sudah selesai, ketuk \"Tambahkan entri ini\" dan entri akan pindah ke daftar di atas formulir. Lanjutkan dengan tanggal berikutnya di formulir bawah."
+      }
+    },
+    "jobReview": {
+      "step1": {
+        "title": "Ulasan yang dicatat per tanggal",
+        "body": "Catat proses rekrutmen magang, new grad, berpengalaman, pindah kerja, atau kontrak kamu satu tanggal demi satu tanggal, supaya orang lain bisa mengikutinya dari lamaran sampai offer."
+      },
+      "step2": {
+        "title": "Tanggal → kolom → detail",
+        "body": "Di formulir bawah, pilih tanggal, pilih hanya kolom yang kamu perlukan (Tahap, Platform, Dokumen, Interview, Hasil), lalu tulis detailnya."
+      },
+      "step3": {
+        "title": "\"Tambahkan entri ini\" menumpuknya di atas",
+        "body": "Kalau sudah selesai, ketuk \"Tambahkan entri ini\" dan entri akan pindah ke daftar di atas formulir. Lanjutkan dengan tanggal berikutnya di formulir bawah."
+      }
+    }
+  },
+  "write": {
+    "notFound": "Postingan ini tidak ditemukan",
+    "noPermission": "Kamu tidak punya izin untuk mengedit ini",
+    "loadFailed": "Gagal memuat postingan",
+    "errors": {
+      "timelineIncomplete": "Isi tanggal dan detail pada entri yang sedang kamu tulis"
+    },
+    "saveFailed": "Gagal menyimpan",
+    "draftSaved": "Draf disimpan",
+    "draftSaveFailed": "Gagal menyimpan draf kamu",
+    "checkingLogin": "Mengecek status login kamu…",
+    "loadingPost": "Memuat postingan…",
+    "backToPost": "Kembali ke postingan",
+    "boardList": "Daftar {board}",
+    "collapse": "Tutup",
+    "expand": "Buka",
+    "titleLabel": "Judul",
+    "updating": "Memperbarui…",
+    "updateFootnote": "Setelah disimpan, postingan kamu naik ke atas daftar dan semua orang bisa melihat progres terbarumu.",
+    "timelineSectionDescription": "Tambah, edit, atau hapus entri per tanggal sebanyak yang kamu mau",
+    "submitting": "Memposting…",
+    "selectTypeFirst": "Pilih jenisnya",
+    "submit": "Posting ulasan",
+    "backToList": "Kembali ke daftar",
+    "createEyebrow": "Postingan baru",
+    "updateIntro": "Untuk sekarang cukup tambahkan tanggal dan detailnya. Setelah disimpan, postingan kamu naik ke atas daftar.",
+    "untitled": "Tanpa judul",
+    "existingCount_other": "{count} entri sejauh ini",
+    "restoredAutosave": "Editan yang tersimpan otomatis sebelum dikirim sudah kami pulihkan",
+    "draftEmpty": "Belum ada yang bisa disimpan"
+  },
+  "timeline": {
+    "addedTitle_other": "{count} entri ditambahkan",
+    "savedTitle_other": "{count} entri tersimpan",
+    "savedDescription": "Entri tersusun di atas formulir. Edit atau hapus untuk mengatur tiap tanggal",
+    "editingSelected": "Edit entri yang dipilih",
+    "cancel": "Batal",
+    "finishEdit": "Selesai edit",
+    "addEntry": "Tambahkan entri ini",
+    "clearDraft": "Kosongkan formulir",
+    "limitReached": "Kamu sudah mencapai batas entri. Hapus satu entri untuk menambah yang baru.",
+    "updateGuide": {
+      "editingTitle": "Mengedit entri yang ada",
+      "addTitle": "Tambah progres",
+      "addDescription": "Pilih tanggal baru, tulis detailnya, lalu ketuk \"Tambahkan entri ini\". Kamu bisa menambah beberapa sekaligus berturut-turut."
+    },
+    "newEntry": "Entri progres baru",
+    "editHint": "Ketuk \"Selesai edit\" kalau sudah selesai",
+    "maxCanAdd": "Kamu bisa menambahkan maksimal {max} entri",
+    "maxReached": "Batasnya {max} entri",
+    "noDate": "Tanpa tanggal",
+    "edit": "Edit",
+    "editing": "Sedang diedit",
+    "delete": "Hapus",
+    "date": "Tanggal",
+    "selectFields": "Pilih yang ingin dicatat",
+    "selectFieldsHint": "Pilih yang relevan saja. Boleh lebih dari satu.",
+    "incompleteEmpty": "Isi tanggal dan salah satu kolom yang dipilih atau catatan tahap",
+    "incompleteDate": "Isi tanggal dan detailnya",
+    "quickInput": "Isi cepat",
+    "removeField": "Hapus"
+  },
+  "guest": {
+    "signedIn": "Kamu sudah masuk. Ulasan kamu akan langsung masuk ke akun ini",
+    "claimLinked": "Pendaftaran berhasil! Ulasan yang baru kamu tulis sekarang tertaut ke akunmu",
+    "claimDone": "Pendaftaran berhasil",
+    "claimFailed": "Gagal menautkan ulasan kamu",
+    "googleFailed": "Login Google tidak berhasil",
+    "errors": {
+      "nicknameLength": "Masukkan nama panggilan tampilan {min}–{max} karakter",
+      "nicknameTaken": "Nama panggilan itu sudah dipakai. Coba yang lain",
+      "emailInvalid": "Masukkan email yang valid",
+      "linkedinInvalid": "Periksa URL profil LinkedIn kamu (mis. linkedin.com/in/your-name)",
+      "titleRequired": "Masukkan judul",
+      "guidelinesRequired": "Setujui pedoman komunitas"
+    },
+    "created": "Ulasan kamu sudah diposting. Terima kasih!",
+    "createFailed": "Gagal memposting ulasan kamu",
+    "backToList": "Ulasan interview & kerja",
+    "checkingDraft": "Mengecek draf yang tersimpan…",
+    "authorSection": "Tentang kamu",
+    "authorSectionMember": "Nama panggilan kamu bersifat publik. LinkedIn hanya dipakai untuk memastikan tempat kerjamu",
+    "authorSectionGuest": "Hanya nama panggilan yang publik. Email dan LinkedIn hanya dilihat tim kami dan tidak pernah diposting",
+    "nicknameLabel": "Nama panggilan",
+    "nicknameHint": "Tampil di postingan · Publik",
+    "nicknamePlaceholder": "mis. NYCWorker",
+    "emailLabel": "Email",
+    "emailHintMember": "Email akun · Privat",
+    "emailHintGuest": "Untuk info gift card dan kredit · Privat",
+    "linkedinLabel": "URL profil LinkedIn",
+    "linkedinHint": "Untuk memastikan tempat kerjamu · Privat",
+    "coffeeChatLabel": "Aku terbuka untuk permintaan coffee chat dari orang yang baru mulai",
+    "optional": "(opsional)",
+    "coffeeChatHint": "Info kontakmu tetap privat meskipun kamu mencentang ini. Saat ada permintaan, tim kami akan mengecek ke kamu dulu sebelum menghubungkan.",
+    "guidelinesAgree": "Aku sudah membaca pedoman komunitas di atas, dan ulasan ini berdasarkan pengalaman nyataku.",
+    "submitGuest": "Posting ulasan tanpa daftar",
+    "footnoteBefore": "Tanpa perlu daftar.",
+    "footnoteLink": "Daftar dengan Google dan posting",
+    "footnoteAfter": " untuk langsung dapat kredit di akunmu.",
+    "footnoteMember": "Setelah memposting, kamu bisa terus menambah dan mengedit progres dari Postingan saya.",
+    "choose": {
+      "eyebrow": "Bagikan pengalamanmu",
+      "title": "Kamu bisa posting ulasan tanpa daftar",
+      "intro": "Ceritakan tiap tahap, dari lamaran, interview, sampai hasilnya. Ini sangat membantu orang yang sedang menyiapkan jalur yang sama. Cuma butuh 5 menit.",
+      "recommended": "Direkomendasikan",
+      "googleTitle": "Daftar dengan Google dan posting",
+      "googlePitch1": "Kredit langsung masuk ke akunmu",
+      "googlePitch2": "Kamu bisa terus menambah progres setelah memposting",
+      "guestTitle": "Posting tanpa daftar",
+      "guestPitch1": "Cukup nama panggilan, email, dan URL LinkedIn",
+      "guestPitch2": "Kredit kamu kami simpan dan otomatis ditambahkan saat kamu mendaftar nanti dengan email yang sama",
+      "guestCta": "Posting ulasan tanpa daftar"
+    },
+    "creditPitch": {
+      "title": "Dapatkan kredit untuk ulasanmu",
+      "perStep": "{perStep} kredit per tahap rekrutmen (maksimal {max} per postingan)",
+      "perStepWithBonus": "{perStep} kredit per tahap rekrutmen (maksimal {max} per postingan) · Postingan pertama +{bonus}",
+      "review": "Ulasan yang detail mendapat kredit tambahan setelah ditinjau tim Misaeng",
+      "coffeeChat": "Pakai kreditmu ({cost}) untuk coffee chat 1:1 dengan orang di industri atau perusahaanmu, atau di industri lain juga",
+      "optionalSignup": "Pendaftaran opsional. Setelah mendaftar, kamu bisa memakai kredit dan menerima permintaan coffee chat"
+    },
+    "hero": {
+      "memberEyebrow": "Posting dengan akunku",
+      "memberIntro": "Kredit masuk ke akun ini begitu kamu memposting. Kamu juga bisa menerima permintaan coffee chat.",
+      "guestIntro": "Tanpa perlu daftar. Kredit kamu kami simpan dan otomatis ditambahkan saat kamu mendaftar nanti dengan email yang sama."
+    },
+    "preview": {
+      "count_other": "{count} tahap rekrutmen sudah ditambahkan",
+      "member": "Kamu akan mendapat {credit} kredit",
+      "memberWithBonus": "Kamu akan mendapat {credit} kredit (+{bonus} postingan pertama)",
+      "guest": "{credit} kredit saat kamu mendaftar",
+      "guestWithBonus": "{credit} kredit saat kamu mendaftar (+{bonus} postingan pertama)"
+    },
+    "done": {
+      "eyebrow": "Terposting",
+      "title": "Terima kasih sudah berbagi ulasan",
+      "body_other": "\"{title}\" sekarang ada di forum Ulasan interview & kerja. {count} tahap rekrutmennya akan membantu orang-orang setelahmu.",
+      "awarded": "{credit} kredit sudah ditambahkan ke akunmu",
+      "linked": "Ulasan kamu sudah tertaut ke akunmu",
+      "coffeeChat": "Pakai kredit untuk coffee chat ({cost} kredit) dengan orang di industri atau perusahaanmu, atau di industri lain juga.",
+      "pending": "Daftar dan langsung dapat {credit} kredit",
+      "breakdown_other": "{count} tahap rekrutmen = {credit} kredit. Daftar dengan akun Google yang sama dengan email di ulasanmu, dan semuanya otomatis tertaut.",
+      "breakdownWithBonus_other": "{count} tahap rekrutmen = {credit} kredit + {bonus} bonus postingan pertama. Daftar dengan akun Google yang sama dengan email di ulasanmu, dan semuanya otomatis tertaut.",
+      "viewPost": "Lihat ulasanku",
+      "viewCredit": "Lihat kreditku",
+      "toList": "Kembali ke daftar",
+      "optional": "Opsional",
+      "signupTitle": "Daftar ke {brand} untuk menerima permintaan coffee chat dari orang yang baru mulai",
+      "signupPitch1": "Ulasan yang baru kamu tulis dan {credit} kredit langsung tertaut ke akunmu",
+      "signupPitch2": "Pakai kredit untuk coffee chat 1:1 dengan orang di industri atau perusahaanmu, atau di industri lain",
+      "signupPitch3": "Kamu bisa terus menambah dan mengedit progres",
+      "emailMismatch": "Email akunmu berbeda dengan email di ulasan, jadi tidak bisa ditautkan otomatis. Tim kami akan mengecek LinkedIn dan email kamu, lalu menautkannya ke akunmu.",
+      "skipNote": "Ulasan kamu tetap terposting meskipun kamu tidak mendaftar sekarang.",
+      "skip": "Nanti saja"
+    }
+  }
+}

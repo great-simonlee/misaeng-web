@@ -8,6 +8,7 @@ import {
   PARTNER_INFLUENCERS,
   type InfluencerPlatformId,
 } from '@lib/constants/partners'
+import { useT } from '@lib/i18n/client'
 
 function profileUrl(
   platform: InfluencerPlatformId,
@@ -45,6 +46,7 @@ function InfluencerItem({
   handle: string | null
   platform: InfluencerPlatformId
 }) {
+  const t = useT('partners')
   const content = (
     <>
       <InfluencerMark shortName={shortName} />
@@ -53,7 +55,7 @@ function InfluencerItem({
           {name}
         </span>
         <span className='mt-0.5 block text-[11px] leading-none text-[var(--muted)]'>
-          {handle ? `@${handle}` : '협력 인플루언서 모집 중'}
+          {handle ? `@${handle}` : t('influencers.recruitingHandle')}
         </span>
       </span>
     </>
@@ -68,7 +70,7 @@ function InfluencerItem({
         href={profileUrl(platform, handle)}
         target='_blank'
         rel='noopener noreferrer'
-        className={`${className} touch-manipulation transition hover:border-[#F64310]/40 focus-visible:border-[#F64310]/40`}
+        className={`${className} touch-manipulation transition hover:border-brand/40 focus-visible:border-brand/40`}
       >
         {content}
       </a>
@@ -80,17 +82,18 @@ function InfluencerItem({
 
 export function PartnerInfluencersSection() {
   const href = useCityPath()
+  const t = useT('partners')
   return (
-    <section aria-label='협력 인플루언서' className='mt-6'>
+    <section aria-label={t('influencersLabel')} className='mt-6'>
       <div className='mb-2.5 flex items-center justify-between gap-3'>
         <p className='text-[11px] font-medium tracking-[0.2em] text-[var(--muted)]'>
-          협력 인플루언서
+          {t('influencersLabel')}
         </p>
         <Link
           href={href('/influencers')}
-          className='shrink-0 text-[12px] font-medium text-[var(--muted)] touch-manipulation transition hover:text-[#F64310]'
+          className='shrink-0 text-[12px] font-medium text-[var(--muted)] touch-manipulation transition hover:text-brand'
         >
-          더보기
+          {t('more')}
         </Link>
       </div>
 
@@ -98,7 +101,7 @@ export function PartnerInfluencersSection() {
         {PARTNER_INFLUENCERS.map((item) => (
           <InfluencerItem
             key={item.id}
-            name={item.name}
+            name={t(`influencers.${item.nameKey}`)}
             shortName={item.shortName}
             handle={item.handle}
             platform={item.platform}

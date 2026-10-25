@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,19 +23,45 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@components": ["./src/components"],
-      "@components/*": ["./src/components/*"],
-      "@hooks": ["./src/hooks"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@lib": ["./src/lib"],
-      "@lib/*": ["./src/lib/*"],
-      "@types": ["./src/types"],
-      "@types/*": ["./src/types/*"],
-      "@screens": ["./src/screens"],
-      "@screens/*": ["./src/screens/*"],
-      "@widgets": ["./src/widgets"],
-      "@widgets/*": ["./src/widgets/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@components": [
+        "./src/components"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@hooks": [
+        "./src/hooks"
+      ],
+      "@hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@lib": [
+        "./src/lib"
+      ],
+      "@lib/*": [
+        "./src/lib/*"
+      ],
+      "@types": [
+        "./src/types"
+      ],
+      "@types/*": [
+        "./src/types/*"
+      ],
+      "@screens": [
+        "./src/screens"
+      ],
+      "@screens/*": [
+        "./src/screens/*"
+      ],
+      "@widgets": [
+        "./src/widgets"
+      ],
+      "@widgets/*": [
+        "./src/widgets/*"
+      ]
     }
   },
   "include": [
@@ -40,7 +70,13 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    ".next-ellieo/types/**/*.ts",
+    ".next-ellieo/dev/types/**/*.ts",
+    ".next-verify/types/**/*.ts",
+    ".next-verify/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

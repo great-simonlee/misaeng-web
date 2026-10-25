@@ -1,5 +1,7 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
 import Link from 'next/link'
 
 import { useCity } from '@hooks/useCity'
@@ -13,7 +15,7 @@ import {
   summarizeJobReviewTimelineEntry,
 } from '@lib/community/jobReview'
 import { htmlToPlainText } from '@lib/community/html'
-import { formatCommunityCount } from '@lib/constants/communityMock'
+import { useFormat, useLocale, useT } from '@lib/i18n/client'
 import type { CommunityPost } from '@/types/nyc'
 import { BoardSurface } from '@widgets/nyc/BoardPageShell'
 import { JobReviewActivityMeta } from '@widgets/nyc/JobReviewActivityMeta'
@@ -31,6 +33,10 @@ type JobReviewDetailContentProps = {
   boardTitle: string
   isAuthor: boolean
   onDelete: () => void
+  /** 번역 표시 + 원문 보기 (번역된 글일 때만 그려진다) */
+  translationNotice?: ReactNode
+  /** 원문/번역 글자의 언어 (lang 속성) */
+  contentLang?: string
 }
 
 export function JobReviewDetailContent({
@@ -38,8 +44,13 @@ export function JobReviewDetailContent({
   boardId,
   isAuthor,
   onDelete,
+  translationNotice,
+  contentLang,
 }: JobReviewDetailContentProps) {
   const city = useCity()
+  const t = useT('reviews')
+  const locale = useLocale()
+  const format = useFormat()
   const tipsHtml = (() => {
     const html = post.contentHtml?.trim() || ''
     if (html && htmlToPlainText(html)) return html
@@ -59,7 +70,7 @@ export function JobReviewDetailContent({
     const hasReview = Boolean(htmlToPlainText(entry.stageReviewHtml || ''))
     const fieldItems = JOB_REVIEW_TIMELINE_FIELDS.map((field) => ({
       key: field.key,
-      label: field.shortLabel,
+      label: t(`jobReview.fields.${field.key}.shortLabel`),
       value: entry[field.key],
       rowClass: field.rowClass,
       labelClass: field.labelClass,
@@ -67,7 +78,9 @@ export function JobReviewDetailContent({
     return {
       id: entry.id,
       stepNumber: index + 1,
-      title: entry.date ? formatJobReviewDate(entry.date) : '날짜 미입력',
+      title: entry.date
+        ? formatJobReviewDate(entry.date, { locale })
+        : t('detail.noDate'),
       isLatest: entry.id === latestEntryId,
       preview: summarizeJobReviewTimelineEntry(entry) || null,
       hasReview,
@@ -77,7 +90,7 @@ export function JobReviewDetailContent({
           {hasReview ? (
             <div className='mt-3 rounded-xl bg-[#fafbfc] px-3.5 py-3 ring-1 ring-black/[0.05] sm:px-4 sm:py-3.5'>
               <p className='text-[11px] font-semibold text-[var(--muted)]'>
-                단계 후기
+                {t('detail.stageReview')}
               </p>
               <CommunityRichBody
                 html={entry.stageReviewHtml}
@@ -97,18 +110,17 @@ export function JobReviewDetailContent({
           <BoardSurface className='flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5'>
             <div>
               <p className='text-[13px] font-semibold text-[var(--foreground)]'>
-                진행 중인 채용 기록이에요
+                {t('jobReview.detail.authorTitle')}
               </p>
               <p className='mt-0.5 text-[12px] leading-relaxed text-[var(--muted)]'>
-                새 단계가 생기면 업데이트 화면에서 기록 한 건만 추가하면
-                됩니다. 저장하면 목록 맨 위로 올라갑니다.
+                {t('jobReview.detail.authorBody')}
               </p>
             </div>
             <Link
               href={hrefForCommunityPost(post, city, 'edit')}
               className='inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)]'
             >
-              새 단계 추가
+              {t('jobReview.detail.addEntry')}
             </Link>
           </BoardSurface>
         </div>
@@ -124,9 +136,11 @@ export function JobReviewDetailContent({
         </div>
       ) : null}
 
-      <h1 className='px-1 text-[1.55rem] font-semibold leading-[1.25] tracking-[-0.035em] text-[var(--foreground)] sm:px-0 sm:text-[1.9rem]'>
+      <h1 lang={contentLang} className='px-1 text-[1.55rem] font-semibold leading-[1.25] tracking-[-0.035em] text-[var(--foreground)] sm:px-0 sm:text-[1.9rem]'>
         {post.title}
       </h1>
+
+      {translationNotice ? <div className='mt-1.5 px-1 sm:px-0'>{translationNotice}</div> : null}
 
       <div className='mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-1.5 px-1 text-[12px] text-[var(--muted)] sm:px-0'>
         <JobReviewTypeBadge type={post.jobReviewType} />
@@ -151,7 +165,11 @@ export function JobReviewDetailContent({
         <span className='text-black/20' aria-hidden>
           ·
         </span>
-        <span>조회 {formatCommunityCount(post.viewCount)}</span>
+        <span>
+          {t('detail.views', {
+            views: formatViewCount(format.number, post.viewCount),
+          })}
+        </span>
         {post.jobReviewIndustry?.trim() ? (
           <span className='inline-flex rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted-foreground)] ring-1 ring-black/8'>
             {post.jobReviewIndustry.trim()}
@@ -161,9 +179,11 @@ export function JobReviewDetailContent({
 
       {timeline.length > 0 ? (
         <section className='mt-8'>
-          <SectionLabel>채용 단계 {timeline.length}건</SectionLabel>
+          <SectionLabel>
+            {t('jobReview.detail.timelineTitle', { count: timeline.length })}
+          </SectionLabel>
           <p className='mt-1.5 px-1 text-[12px] text-[var(--muted)] sm:px-0'>
-            스텝을 눌러 펼치거나 접을 수 있어요. 한 번에 하나만 열립니다.
+            {t('detail.accordionHint')}
           </p>
           <TimelineAccordion
             className='mt-4 px-1 sm:px-0'
@@ -175,21 +195,20 @@ export function JobReviewDetailContent({
         </section>
       ) : (
         <section className='mt-8'>
-          <SectionLabel>채용 단계</SectionLabel>
+          <SectionLabel>{t('jobReview.detail.emptySection')}</SectionLabel>
           <BoardSurface className='mt-4 px-4 py-5 sm:px-5'>
             <p className='text-[14px] font-semibold text-[var(--foreground)]'>
-              아직 등록된 채용 단계가 없어요
+              {t('jobReview.detail.emptyTitle')}
             </p>
             <p className='mt-1 text-[13px] leading-relaxed text-[var(--muted)]'>
-              서류·인터뷰·결과처럼 날짜별 진행 기록이 여기에 1단계, 2단계로
-              쌓여요.
+              {t('jobReview.detail.emptyBody')}
             </p>
             {isAuthor ? (
               <Link
                 href={hrefForCommunityPost(post, city, 'edit')}
                 className='mt-4 inline-flex h-10 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)]'
               >
-                채용 단계 추가하기
+                {t('jobReview.detail.emptyCta')}
               </Link>
             ) : null}
           </BoardSurface>
@@ -198,7 +217,7 @@ export function JobReviewDetailContent({
 
       {tipsHtml ? (
         <section className='mt-8'>
-          <SectionLabel>다음 지원자에게</SectionLabel>
+          <SectionLabel>{t('jobReview.detail.tipsTitle')}</SectionLabel>
           <BoardSurface className='mt-4 overflow-hidden'>
             <div className='flex gap-3 bg-[#fffbeb] p-4 sm:p-5'>
               <span
@@ -225,12 +244,24 @@ export function JobReviewDetailContent({
           anonymous={false}
           isAuthor={isAuthor}
           loginNext={hrefForCommunityPost(post, city)}
-          editLabel='업데이트'
+          editLabel={t('detail.editLabel')}
           onDelete={onDelete}
         />
       </div>
     </article>
   )
+}
+
+/** 1만 이상은 축약 (10K / 1만) */
+function formatViewCount(
+  formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string,
+  value: number,
+) {
+  const n = Math.max(0, Math.floor(Number(value) || 0))
+  if (n >= 10_000) {
+    return `${formatNumber(n, { notation: 'compact', maximumFractionDigits: 0 })}+`
+  }
+  return formatNumber(n)
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {

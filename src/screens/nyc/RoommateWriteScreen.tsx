@@ -15,11 +15,12 @@ import {
   fetchCommunityPost,
   fetchMyCommunityPosts,
   updateCommunityPostRequest,
+  localizeCommunityError,
 } from '@lib/community/client'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
 import { htmlToPlainText } from '@lib/community/html'
 import {
-  getRoommateFormConfig,
+  getRoommateFormConfigText,
   getRoommateIntent,
   getRoommateLookingForLabel,
   getRoommateLookingForOptionsByIntent,
@@ -40,9 +41,10 @@ import {
 } from '@lib/community/writeDraft'
 import { isAccountSuspended, isIdentityVerified } from '@lib/community/schoolGate'
 import {
-  NYC_COMMUNITY_BOARD_META,
+  communityBoardKey,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import {
   BoardBackLink,
@@ -78,10 +80,11 @@ export function RoommateWriteScreen({
   title,
   editPostId,
 }: RoommateWriteScreenProps) {
+  const t = useT('housing')
+  const tCommunity = useT('community')
   const city = useCity()
   const href = useCityPath()
   const boardId: NycCommunityBoardId = 'roommate'
-  const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const isEdit = Boolean(editPostId)
   const loginNext = editPostId
     ? href(`/${boardId}/${editPostId}/edit`)
@@ -139,8 +142,8 @@ export function RoommateWriteScreen({
   }, [city, isEdit, user?.uid])
 
   const formConfig = useMemo(
-    () => getRoommateFormConfig(lookingFor),
-    [lookingFor],
+    () => getRoommateFormConfigText(lookingFor, t),
+    [lookingFor, t],
   )
   const subtypeOptions = useMemo(
     () => getRoommateLookingForOptionsByIntent(intent),
@@ -169,9 +172,7 @@ export function RoommateWriteScreen({
           (item) => item.categoryId === 'roommate' && item.status === 'open',
         )
         if (existing) {
-          toastError(
-            '이미 올린 룸메이트·서블렛 글이 있어요. 수정 화면으로 이동합니다.',
-          )
+          toastError(t('roommate.write.errors.alreadyPosted'))
           router.replace(href(`/${boardId}/${existing.id}/edit`))
           return
         }
@@ -184,7 +185,7 @@ export function RoommateWriteScreen({
     return () => {
       cancelled = true
     }
-  }, [editPostId, href, user?.uid, boardId, router, toastError])
+  }, [editPostId, href, user?.uid, boardId, router, toastError, t])
 
   useEffect(() => {
     if (!editPostId || !user?.uid) return
@@ -194,12 +195,12 @@ export function RoommateWriteScreen({
         const post = await fetchCommunityPost(editPostId)
         if (cancelled) return
         if (!post) {
-          toastError('글을 찾을 수 없어요')
+          toastError(t('roommate.write.errors.notFound'))
           router.replace(href('/me/posts'))
           return
         }
         if (post.authorUid !== user.uid) {
-          toastError('수정 권한이 없어요')
+          toastError(t('roommate.write.errors.noPermission'))
           router.replace(hrefForCommunityPost(post, city))
           return
         }
@@ -232,7 +233,7 @@ export function RoommateWriteScreen({
         setPhotoUrls([...new Set(photos)].slice(0, ROOMMATE_GALLERY_MAX))
       } catch (err) {
         if (!cancelled) {
-          toastError(getErrorMessage(err, '글을 불러오지 못했어요'))
+          toastError(getErrorMessage(localizeCommunityError(err, tCommunity), t('roommate.write.errors.loadFailed')))
           router.replace(href('/me/posts'))
         }
       } finally {
@@ -242,41 +243,45 @@ export function RoommateWriteScreen({
     return () => {
       cancelled = true
     }
-  }, [city, editPostId, href, user?.uid, boardId, router, toastError])
+  }, [city, editPostId, href, user?.uid, boardId, router, toastError, t, tCommunity])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!user?.email) {
-      toastError('로그인이 필요해요')
+      toastError(t('new.errors.loginRequired'))
       router.replace(cityLoginPath(city, loginNext))
       return
     }
     if (!lookingFor || !formConfig) {
-      toastError('유형을 선택해 주세요')
+      toastError(t('roommate.write.errors.typeRequired'))
       return
     }
     const trimmedTitle = postTitle.trim()
     if (!trimmedTitle) {
-      toastError('제목을 입력해 주세요')
+      toastError(t('roommate.write.errors.titleRequired'))
       return
     }
     if (trimmedTitle.length > ROOMMATE_TITLE_MAX) {
-      toastError(`제목은 ${ROOMMATE_TITLE_MAX}자 이내로 작성해 주세요`)
+      toastError(t('roommate.write.errors.titleTooLong', { max: ROOMMATE_TITLE_MAX }))
       return
     }
     const plain = htmlToPlainText(contentHtml)
     if (!plain) {
-      toastError('본문을 입력해 주세요')
+      toastError(t('roommate.write.errors.bodyRequired'))
       return
     }
     if (plain.length > COMMUNITY_BODY_MAX) {
       toastError(
-        `본문은 ${COMMUNITY_BODY_MAX.toLocaleString('en-US')}자 이내로 작성해 주세요`,
+        t('roommate.write.errors.bodyTooLong', {
+          max: COMMUNITY_BODY_MAX.toLocaleString('en-US'),
+        }),
       )
       return
     }
     if (formConfig.locationRequired && !location.trim()) {
-      toastError(`${formConfig.locationLabel}을(를) 입력해 주세요`)
+      toastError(
+        t('roommate.write.errors.fieldRequired', { field: formConfig.locationLabel }),
+      )
       return
     }
 
@@ -284,7 +289,9 @@ export function RoommateWriteScreen({
       ? Number(budgetMax.replace(/,/g, ''))
       : null
     if (formConfig.budgetRequired && budgetValue == null) {
-      toastError(`${formConfig.budgetLabel}을(를) 입력해 주세요`)
+      toastError(
+        t('roommate.write.errors.fieldRequired', { field: formConfig.budgetLabel }),
+      )
       return
     }
     if (
@@ -294,7 +301,9 @@ export function RoommateWriteScreen({
         budgetValue > ROOMMATE_BUDGET_MAX)
     ) {
       toastError(
-        `금액은 $0~$${ROOMMATE_BUDGET_MAX.toLocaleString('en-US')} 사이로 입력해 주세요`,
+        t('roommate.write.errors.budgetRange', {
+          max: ROOMMATE_BUDGET_MAX.toLocaleString('en-US'),
+        }),
       )
       return
     }
@@ -302,15 +311,19 @@ export function RoommateWriteScreen({
     const start = moveInDate.trim()
     const end = moveOutDate.trim()
     if (formConfig.moveInStartRequired && !start) {
-      toastError(`${formConfig.moveInStartLabel}을(를) 선택해 주세요`)
+      toastError(
+        t('roommate.write.errors.fieldSelect', { field: formConfig.moveInStartLabel }),
+      )
       return
     }
     if (formConfig.moveInEndRequired && !end) {
-      toastError(`${formConfig.moveInEndLabel}을(를) 선택해 주세요`)
+      toastError(
+        t('roommate.write.errors.fieldSelect', { field: formConfig.moveInEndLabel }),
+      )
       return
     }
     if (start && end && end < start) {
-      toastError('종료일은 시작일 이후로 선택해 주세요')
+      toastError(t('roommate.write.errors.endBeforeStart'))
       return
     }
 
@@ -353,11 +366,15 @@ export function RoommateWriteScreen({
       if (!isEdit && user.uid) {
         clearWriteDraft('roommate', city, user.uid)
       }
-      success(isEdit ? '글을 수정했어요' : '글을 등록했어요')
+      success(isEdit ? t('roommate.write.updated') : t('roommate.write.created'))
       router.push(hrefForCommunityPost(post, city))
     } catch (err) {
       toastError(
-        getErrorMessage(err, isEdit ? '수정에 실패했어요' : '등록에 실패했어요'),
+        getErrorMessage(localizeCommunityError(err, tCommunity),
+          isEdit
+            ? t('roommate.write.errors.updateFailed')
+            : t('new.errors.submitFailed'),
+        ),
       )
     } finally {
       setSubmitting(false)
@@ -384,9 +401,9 @@ export function RoommateWriteScreen({
         },
       )
       setDraftSavedAt(savedAt)
-      success('임시 저장했어요')
+      success(t('roommate.write.draftSaved'))
     } catch {
-      toastError('임시 저장에 실패했어요')
+      toastError(t('roommate.write.errors.draftSaveFailed'))
     }
   }
 
@@ -404,9 +421,9 @@ export function RoommateWriteScreen({
           fullPage
           label={
             !loading && !isAuthenticated
-              ? '로그인 페이지로 이동 중…'
+              ? t('new.redirectingToLogin')
               : checkingExisting
-                ? '기존 글 확인 중…'
+                ? t('roommate.write.checkingExisting')
                 : undefined
           }
         />
@@ -422,6 +439,10 @@ export function RoommateWriteScreen({
     return <SchoolVerificationRequired nextPath={loginNext} />
   }
 
+  const [onePostBefore, onePostAfter = ''] = t(
+    'roommate.write.onePostNotice',
+  ).split('{limit}')
+
   return (
     <BoardPageShell width='narrow'>
       <div className='pb-16 pt-4 sm:pt-6'>
@@ -431,7 +452,11 @@ export function RoommateWriteScreen({
               ? href(`/${boardId}/${editPostId}`)
               : href(`/${boardId}`)
           }
-          label={isEdit ? '글로 돌아가기' : `${title} 목록`}
+          label={
+            isEdit
+              ? t('roommate.write.backToPost')
+              : t('roommate.write.backToList', { board: title })
+          }
           className='mb-5'
         />
 
@@ -442,16 +467,17 @@ export function RoommateWriteScreen({
         )}
 
         {!isEdit ? (
-          <div className='mt-4 rounded-xl bg-[#fff8f5] px-4 py-3 text-[13px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--brand)]/15'>
-            룸메이트·서블렛 글은{' '}
-            <strong className='text-[var(--foreground)]'>계정당 1개</strong>만
-            올릴 수 있어요. 상황 바뀌면 기존 글을 수정하거나 삭제한 뒤 다시
-            올려 주세요.
+          <div className='mt-4 rounded-xl bg-brand-soft px-4 py-3 text-[13px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--brand)]/15'>
+            {onePostBefore}
+            <strong className='text-[var(--foreground)]'>
+              {t('roommate.write.onePostLimit')}
+            </strong>
+            {onePostAfter}
           </div>
         ) : null}
 
         <form onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
-          <CreateSection step={1} title='어떤 유형인가요?'>
+          <CreateSection step={1} title={t('roommate.write.steps.type')}>
             <div className='grid grid-cols-2 gap-2'>
               {ROOMMATE_INTENT_OPTIONS.map((option) => {
                 const active = intent === option.id
@@ -463,7 +489,7 @@ export function RoommateWriteScreen({
                     className={cn(
                       'relative rounded-2xl px-3.5 py-3.5 text-left ring-1 touch-manipulation transition',
                       active
-                        ? 'bg-[#fff8f5] ring-[var(--foreground)] shadow-[0_0_0_1px_rgba(15,23,42,0.04)]'
+                        ? 'bg-brand-soft ring-[var(--foreground)] shadow-[0_0_0_1px_rgba(15,23,42,0.04)]'
                         : 'bg-white ring-black/[0.06] hover:ring-black/15',
                     )}
                   >
@@ -476,10 +502,10 @@ export function RoommateWriteScreen({
                       </span>
                     ) : null}
                     <span className='block text-[15px] font-semibold text-[var(--foreground)]'>
-                      {option.label}
+                      {t(`roommate.intents.${option.id}.label`)}
                     </span>
                     <span className='mt-1 block text-[12px] font-light leading-snug text-[var(--muted-foreground)]'>
-                      {option.description}
+                      {t(`roommate.intents.${option.id}.description`)}
                     </span>
                   </button>
                 )
@@ -488,7 +514,7 @@ export function RoommateWriteScreen({
             {intent ? (
               <div className='mt-4'>
                 <p className='text-[13px] font-medium text-[var(--foreground)]'>
-                  세부 유형
+                  {t('roommate.write.subtype')}
                 </p>
                 <div className='mt-2 grid gap-2'>
                   {subtypeOptions.map((option) => {
@@ -519,10 +545,10 @@ export function RoommateWriteScreen({
                           </span>
                         ) : null}
                         <span className='block text-[15px] font-semibold text-[var(--foreground)]'>
-                          {option.label}
+                          {t(`roommate.lookingFor.${option.id}.label`)}
                         </span>
                         <span className='mt-1 block text-[12px] font-light leading-snug text-[var(--muted-foreground)]'>
-                          {option.description}
+                          {t(`roommate.lookingFor.${option.id}.description`)}
                         </span>
                       </button>
                     )
@@ -534,11 +560,11 @@ export function RoommateWriteScreen({
 
           <CreateSection
             step={2}
-            title='기본 정보'
-            description='제목과 위치·예산·기간을 입력해 주세요'
+            title={t('roommate.write.steps.basics')}
+            description={t('roommate.write.steps.basicsDescription')}
           >
             <Field
-              label='제목'
+              label={t('roommate.write.fields.title')}
               required
               hint={`${postTitle.length}/${ROOMMATE_TITLE_MAX}`}
             >
@@ -551,7 +577,7 @@ export function RoommateWriteScreen({
                 }
                 className={inputClass}
                 placeholder={
-                  formConfig?.titlePlaceholder ?? meta.titlePlaceholder
+                  formConfig?.titlePlaceholder ?? tCommunity(communityBoardKey(boardId, 'titlePlaceholder'))
                 }
               />
             </Field>
@@ -624,16 +650,22 @@ export function RoommateWriteScreen({
             ) : (
               <p className='mt-4 rounded-xl bg-[#f7f8fa] px-4 py-3 text-[13px] text-[var(--muted)]'>
                 {intent
-                  ? '세부 유형을 선택하면 위치·예산·입주 기간 입력란이 나타나요.'
-                  : '방 올리기 / 룸메 찾기를 선택해 주세요.'}
+                  ? t('roommate.write.pickSubtypeHint')
+                  : t('roommate.write.pickIntentHint')}
               </p>
             )}
           </CreateSection>
 
           <CreateSection
             step={3}
-            title='사진'
-            description={`${formConfig?.photosHint ?? `최대 ${ROOMMATE_GALLERY_MAX}장 · 첫 장이 대표 사진`} · 눌러 끌어 순서 변경 · ${photoUrls.length}/${ROOMMATE_GALLERY_MAX}`}
+            title={t('roommate.write.steps.photos')}
+            description={t('roommate.write.steps.photosDescription', {
+              hint:
+                formConfig?.photosHint ??
+                t('roommate.write.photosDefaultHint', { max: ROOMMATE_GALLERY_MAX }),
+              current: photoUrls.length,
+              max: ROOMMATE_GALLERY_MAX,
+            })}
           >
             <SortablePhotoGrid
               urls={photoUrls}
@@ -652,7 +684,7 @@ export function RoommateWriteScreen({
                           [...prev, ...urls].slice(0, ROOMMATE_GALLERY_MAX),
                         )
                       }}
-                      emptyLabel='추가'
+                      emptyLabel={t('roommate.write.addPhoto')}
                       emptyHint=''
                       aspectClassName='aspect-square'
                     />
@@ -664,14 +696,14 @@ export function RoommateWriteScreen({
 
           <CreateSection
             step={4}
-            title='상세 내용'
-            description='생활 패턴, 조건을 적어 주세요. 연락은 카카오톡 1:1 오픈채팅을 만들고 링크를 남기는 걸 추천해요.'
+            title={t('roommate.write.steps.details')}
+            description={t('roommate.write.steps.detailsDescription')}
           >
             <TipTapEditor
               value={contentHtml}
               onChange={setContentHtml}
               placeholder={
-                formConfig?.bodyPlaceholder ?? meta.descriptionPlaceholder
+                formConfig?.bodyPlaceholder ?? tCommunity(communityBoardKey(boardId, 'descriptionPlaceholder'))
               }
               minHeightClassName='min-h-[200px]'
               contentClassName='!text-[13px] !leading-[1.65]'
@@ -686,7 +718,7 @@ export function RoommateWriteScreen({
               disabled={submitting || !lookingFor}
               className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
             >
-              {submitting ? '저장 중…' : '수정 완료'}
+              {submitting ? t('roommate.write.saving') : t('roommate.write.saveEdit')}
             </button>
           ) : (
             <WriteDraftActions
@@ -700,10 +732,10 @@ export function RoommateWriteScreen({
                 className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
               >
                 {submitting
-                  ? '등록 중…'
+                  ? t('new.submitting')
                   : !lookingFor
-                    ? '유형을 선택해 주세요'
-                    : '글 등록하기'}
+                    ? t('roommate.write.errors.typeRequired')
+                    : t('roommate.write.submit')}
               </button>
             </WriteDraftActions>
           )}
@@ -716,7 +748,7 @@ export function RoommateWriteScreen({
               }
               className='underline-offset-2 hover:underline'
             >
-              목록으로 돌아가기
+              {t('roommate.write.backToListShort')}
             </Link>
           </p>
         </form>
@@ -736,16 +768,17 @@ export function RoommateWriteScreen({
 }
 
 function CreateHero() {
+  const t = useT('housing')
   return (
     <div>
       <h1 className='text-[1.35rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.55rem]'>
-        룸메이트 · 서블렛 글 올리기
+        {t('roommate.write.createHero.title')}
       </h1>
       <p className='mt-2 text-[13px] leading-relaxed text-[var(--muted)]'>
-        방 올리기 또는 룸메 찾기를 고르고, 위치·기간을 남겨 주세요.
+        {t('roommate.write.createHero.description')}
       </p>
       <p className='mt-1 text-[13px] leading-relaxed text-[var(--muted)]'>
-        사진은 가로 4:3으로 찍은 걸 추천해요.
+        {t('roommate.write.createHero.photoTip')}
       </p>
     </div>
   )
@@ -758,8 +791,9 @@ function UpdateHero({
   title: string
   lookingFor: RoommateLookingFor | null
 }) {
+  const t = useT('housing')
   const style = getRoommateLookingForStyle(lookingFor)
-  const typeLabel = getRoommateLookingForLabel(lookingFor)
+  const typeLabel = getRoommateLookingForLabel(lookingFor, t)
   return (
     <div
       className='overflow-hidden rounded-2xl ring-1 ring-black/[0.06]'
@@ -770,13 +804,13 @@ function UpdateHero({
           className='text-[11px] font-semibold tracking-[0.08em]'
           style={{ color: style.accent }}
         >
-          글 수정
+          {t('roommate.write.updateHero.eyebrow')}
         </p>
         <h1 className='mt-1.5 text-[1.25rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.4rem]'>
-          올린 글 수정하기
+          {t('roommate.write.updateHero.title')}
         </h1>
         <p className='mt-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-          상황 바뀌면 유형·위치·기간을 업데이트해 주세요.
+          {t('roommate.write.updateHero.description')}
         </p>
       </div>
       <div className='flex flex-wrap items-center gap-2 bg-white/75 px-4 py-3 sm:px-5'>
@@ -789,7 +823,7 @@ function UpdateHero({
           </span>
         ) : null}
         <span className='min-w-0 truncate text-[13px] font-medium text-[var(--foreground)]'>
-          {title || '제목 없음'}
+          {title || t('roommate.write.untitled')}
         </span>
       </div>
     </div>

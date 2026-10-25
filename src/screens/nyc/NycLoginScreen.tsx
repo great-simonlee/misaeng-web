@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import type { FormEvent } from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { FormEvent, ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
 import { useCityInfo, useCityPath } from '@hooks/useCity'
@@ -18,6 +18,8 @@ import type { LegalPolicy } from '@lib/consent/types'
 import { AuthConfigBanner } from '@widgets/nyc/AuthConfigBanner'
 import { GoogleSignInButton } from '@widgets/nyc/GoogleSignInButton'
 import { isAppConnectConfigured } from '@lib/constants/appConnect'
+import { BRAND_CONFIG } from '@lib/brand'
+import { useT } from '@lib/i18n/client'
 import { isGoogleSignInConfigured } from '@lib/google/config'
 import {
   bindPersistedReferralIfNeeded,
@@ -27,9 +29,19 @@ import {
 } from '@lib/community/referral'
 
 const inputClass =
-  'mt-2 min-h-[48px] w-full rounded-xl border border-[#dde2ea] bg-white px-3.5 text-[15px] font-normal text-[var(--foreground)] outline-none transition placeholder:text-[#98a2b3] focus:border-[#F64310] focus:shadow-[0_0_0_3px_rgba(246,67,16,0.12)]'
+  'mt-2 min-h-[48px] w-full rounded-xl border border-[#dde2ea] bg-white px-3.5 text-[15px] font-normal text-[var(--foreground)] outline-none transition placeholder:text-[#98a2b3] focus:border-brand focus:shadow-[0_0_0_3px_rgb(var(--brand-rgb)/0.12)]'
+
+/** `{terms}`·`{privacy}` 자리에 링크를 끼운다 (언어마다 어순이 달라서 문장을 쪼개지 않는다) */
+function renderWithSlots(template: string, slots: Record<string, ReactNode>) {
+  return template.split(/(\{\w+\})/g).map((part, index) => {
+    const name = part.match(/^\{(\w+)\}$/)?.[1]
+    if (name && name in slots) return <span key={index}>{slots[name]}</span>
+    return part
+  })
+}
 
 export function NycLoginScreen() {
+  const t = useT('auth')
   const {
     user,
     loading,
@@ -46,6 +58,9 @@ export function NycLoginScreen() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const next = searchParams.get('next') || href()
+  // 새로 가입하면 프로필(선호 언어 포함)부터 입력하도록 마이페이지 설정 시트로 보낸다
+  const afterSignup = `${href('/me')}?setup=1&next=${encodeURIComponent(next)}`
+  const signedUpRef = useRef(false)
 
   const { locale } = useConsentLocale()
   const [mode, setMode] = useState<'signin' | 'signup' | 'reset'>('signin')
@@ -104,7 +119,7 @@ export function NycLoginScreen() {
   }, [])
 
   useEffect(() => {
-    if (!loading && !sessionLoading && user) {
+    if (!loading && !sessionLoading && user && !signedUpRef.current) {
       router.replace(next)
     }
   }, [loading, sessionLoading, user, router, next])
@@ -119,26 +134,28 @@ export function NycLoginScreen() {
     try {
       if (mode === 'reset') {
         await resetPassword(email.trim())
-        success('비밀번호 재설정 메일을 보냈어요')
+        success(t('login.toasts.resetEmailSent'))
         changeMode('signin')
         return
       }
       if (mode === 'signin') {
         await signInEmail(email.trim(), password)
-        success('로그인했어요')
+        success(t('login.toasts.signedIn'))
       } else {
+        signedUpRef.current = true
         await signUpEmail(email.trim(), password, consentPayload)
         await bindPersistedReferralIfNeeded()
-        success('회원가입이 완료되었어요')
+        success(t('login.toasts.signedUp'))
       }
-      router.replace(next)
+      router.replace(mode === 'signup' ? afterSignup : next)
     } catch (err) {
+      signedUpRef.current = false
       toastError(
         getErrorMessage(
           err,
           mode === 'reset'
-            ? '재설정 메일을 보내지 못했어요'
-            : '인증에 실패했어요',
+            ? t('login.errors.resetEmailFailed')
+            : t('login.errors.authFailed'),
         ),
       )
     } finally {
@@ -157,6 +174,7 @@ export function NycLoginScreen() {
         return
       }
       setSubmitting(true)
+      if (mode === 'signup') signedUpRef.current = true
       try {
         await signInGoogle({
           ...credential,
@@ -165,22 +183,29 @@ export function NycLoginScreen() {
         if (mode === 'signup') {
           await bindPersistedReferralIfNeeded()
         }
-        success(mode === 'signup' ? '회원가입이 완료되었어요' : '로그인했어요')
-        router.replace(next)
+        success(
+          mode === 'signup'
+            ? t('login.toasts.signedUp')
+            : t('login.toasts.signedIn'),
+        )
+        router.replace(mode === 'signup' ? afterSignup : next)
       } catch (err) {
-        toastError(getErrorMessage(err, 'Google 로그인에 실패했어요'))
+        signedUpRef.current = false
+        toastError(getErrorMessage(err, t('errors.googleLoginFailed')))
       } finally {
         setSubmitting(false)
       }
     },
     [
       acceptedTerms,
+      afterSignup,
       consentPayload,
       mode,
       next,
       router,
       signInGoogle,
       success,
+      t,
       toastError,
     ],
   )
@@ -194,36 +219,36 @@ export function NycLoginScreen() {
 
   const isResetMode = mode === 'reset'
   const title = isResetMode
-    ? '비밀번호 찾기'
+    ? t('login.resetTitle')
     : mode === 'signup'
-      ? '회원가입'
-      : '로그인'
+      ? t('login.signUpTitle')
+      : t('login.signInTitle')
   const description = isResetMode
-    ? '가입한 이메일을 입력하면 비밀번호 재설정 링크를 보내드려요.'
+    ? t('login.resetDescription')
     : mode === 'signup'
-      ? 'Google 또는 이메일로 빠르게 가입하세요.'
-      : 'Google 또는 이메일로 로그인하세요.'
+      ? t('login.signUpDescription')
+      : t('login.signInDescription')
 
   const submitLabel = submitting
-    ? '잠시만 기다려 주세요…'
+    ? t('login.submitting')
     : mode === 'signin'
-      ? '이메일로 로그인'
+      ? t('login.submitSignIn')
       : mode === 'signup'
-        ? '이메일로 가입하기'
-        : '재설정 메일 보내기'
+        ? t('login.submitSignUp')
+        : t('login.submitReset')
 
   return (
     <div className='relative min-h-[100dvh] bg-[linear-gradient(180deg,#eef1f6_0%,#e8edf4_42%,#f4f6fa_100%)]'>
       <div className='pointer-events-none absolute inset-0 overflow-hidden' aria-hidden>
-        <div className='absolute -left-20 -top-28 h-72 w-72 rounded-full bg-[#F64310]/20 blur-3xl' />
-        <div className='absolute right-[-72px] top-[14%] h-80 w-80 rounded-full bg-[#ff6b3d]/22 blur-3xl' />
+        <div className='absolute -left-20 -top-28 h-72 w-72 rounded-full bg-brand/20 blur-3xl' />
+        <div className='absolute right-[-72px] top-[14%] h-80 w-80 rounded-full bg-brand-bright/22 blur-3xl' />
       </div>
 
       <div className='relative mx-auto flex min-h-[100dvh] max-w-[420px] flex-col justify-center px-4 py-8 sm:px-6 sm:py-10'>
         <div className='rounded-[1.5rem] border border-white/80 bg-white/92 p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_20px_48px_rgba(15,23,42,0.10)] backdrop-blur-sm sm:p-6'>
           <header>
             <p className='text-[11px] font-medium tracking-[0.22em] text-[#8b95a7]'>
-              MISAENG NYC
+              {t('login.eyebrow', { brand: BRAND_CONFIG.name.toUpperCase() })}
             </p>
             <h1 className='mt-1.5 text-[1.5rem] font-semibold leading-tight tracking-[-0.025em] text-[var(--foreground)]'>
               {title}
@@ -237,7 +262,7 @@ export function NycLoginScreen() {
             <div
               className='mt-5 rounded-full bg-[#edf0f5] p-1'
               role='tablist'
-              aria-label='인증 모드'
+              aria-label={t('login.modeTabsAria')}
             >
               <div className='grid grid-cols-2 gap-1'>
                 <button
@@ -251,7 +276,7 @@ export function NycLoginScreen() {
                       : 'font-medium text-[#8b95a7] hover:text-[var(--foreground)]'
                   }`}
                 >
-                  로그인
+                  {t('login.signInTab')}
                 </button>
                 <button
                   type='button'
@@ -264,7 +289,7 @@ export function NycLoginScreen() {
                       : 'font-medium text-[#8b95a7] hover:text-[var(--foreground)]'
                   }`}
                 >
-                  회원가입
+                  {t('login.signUpTab')}
                 </button>
               </div>
             </div>
@@ -302,7 +327,7 @@ export function NycLoginScreen() {
               <div className='flex items-center gap-3 pt-1'>
                 <span className='h-px flex-1 bg-[#e4e7ec]' />
                 <span className='text-[12px] font-medium text-[#98a2b3]'>
-                  또는 이메일로
+                  {t('login.orWithEmail')}
                 </span>
                 <span className='h-px flex-1 bg-[#e4e7ec]' />
               </div>
@@ -316,7 +341,7 @@ export function NycLoginScreen() {
             <div className='space-y-3'>
               <label className='block'>
                 <span className='text-[13px] font-medium text-[#344054]'>
-                  이메일
+                  {t('login.emailLabel')}
                 </span>
                 <input
                   required
@@ -332,7 +357,7 @@ export function NycLoginScreen() {
               {!isResetMode && (
                 <label className='block'>
                   <span className='text-[13px] font-medium text-[#344054]'>
-                    비밀번호
+                    {t('login.passwordLabel')}
                   </span>
                   <input
                     required
@@ -344,7 +369,7 @@ export function NycLoginScreen() {
                     autoComplete={
                       mode === 'signin' ? 'current-password' : 'new-password'
                     }
-                    placeholder='6자 이상'
+                    placeholder={t('login.passwordPlaceholder')}
                   />
                 </label>
               )}
@@ -353,50 +378,31 @@ export function NycLoginScreen() {
             {mode === 'signin' && (
               <div className='-mt-1 flex items-center justify-between gap-3'>
                 <p className='min-w-0 text-[11px] leading-snug text-[#98a2b3]'>
-                  {locale === 'ko' ? (
-                    <>
-                      로그인 시{' '}
+                  {renderWithSlots(t('login.agreeNotice'), {
+                    terms: (
                       <Link
                         href={href('/terms-of-use')}
-                        className='underline-offset-2 hover:text-[#F64310] hover:underline'
+                        className='underline-offset-2 hover:text-brand hover:underline'
                       >
-                        이용약관
+                        {t('login.agreeTerms')}
                       </Link>
-                      ·
+                    ),
+                    privacy: (
                       <Link
                         href={href('/privacy-policy')}
-                        className='underline-offset-2 hover:text-[#F64310] hover:underline'
+                        className='underline-offset-2 hover:text-brand hover:underline'
                       >
-                        개인정보
+                        {t('login.agreePrivacy')}
                       </Link>
-                      에 동의합니다.
-                    </>
-                  ) : (
-                    <>
-                      By signing in you agree to our{' '}
-                      <Link
-                        href={href('/terms-of-use')}
-                        className='underline-offset-2 hover:text-[#F64310] hover:underline'
-                      >
-                        Terms
-                      </Link>
-                      {' & '}
-                      <Link
-                        href={href('/privacy-policy')}
-                        className='underline-offset-2 hover:text-[#F64310] hover:underline'
-                      >
-                        Privacy
-                      </Link>
-                      .
-                    </>
-                  )}
+                    ),
+                  })}
                 </p>
                 <button
                   type='button'
-                  className='shrink-0 text-[13px] font-medium text-[#667085] transition hover:text-[#F64310]'
+                  className='shrink-0 text-[13px] font-medium text-[#667085] transition hover:text-brand'
                   onClick={() => changeMode('reset')}
                 >
-                  비밀번호 찾기
+                  {t('login.forgotPassword')}
                 </button>
               </div>
             )}
@@ -406,7 +412,7 @@ export function NycLoginScreen() {
               disabled={
                 submitting || !isAppConnectConfigured() || !canSubmitAuth
               }
-              className='min-h-[48px] w-full rounded-full bg-[linear-gradient(135deg,#ff4c14_0%,#f64310_50%,#df390e_100%)] text-[15px] font-semibold text-white shadow-[0_10px_20px_rgba(246,67,16,0.24)] transition hover:brightness-[1.03] disabled:cursor-not-allowed disabled:opacity-50'
+              className='min-h-[48px] w-full rounded-full bg-[linear-gradient(135deg,var(--brand-bright)_0%,var(--brand)_50%,var(--brand-deep)_100%)] text-[15px] font-semibold text-white shadow-[0_10px_20px_rgb(var(--brand-rgb)/0.24)] transition hover:brightness-[1.03] disabled:cursor-not-allowed disabled:opacity-50'
             >
               {submitLabel}
             </button>
@@ -417,45 +423,46 @@ export function NycLoginScreen() {
           <p className='text-[14px] font-normal text-[#667085]'>
             {mode === 'signin' ? (
               <>
-                처음이신가요?{' '}
+                {t('login.footer.newHere')}{' '}
                 <button
                   type='button'
-                  className='font-semibold text-[#F64310]'
+                  className='font-semibold text-brand'
                   onClick={() => changeMode('signup')}
                 >
-                  회원가입
+                  {t('login.signUpTab')}
                 </button>
               </>
             ) : mode === 'signup' ? (
               <>
-                이미 계정이 있으신가요?{' '}
+                {t('login.footer.haveAccount')}{' '}
                 <button
                   type='button'
-                  className='font-semibold text-[#F64310]'
+                  className='font-semibold text-brand'
                   onClick={() => changeMode('signin')}
                 >
-                  로그인
+                  {t('login.signInTab')}
                 </button>
               </>
             ) : (
-              <>
-                로그인 화면으로{' '}
-                <button
-                  type='button'
-                  className='font-semibold text-[#F64310]'
-                  onClick={() => changeMode('signin')}
-                >
-                  돌아가기
-                </button>
-              </>
+              renderWithSlots(t('login.footer.backToSignIn'), {
+                action: (
+                  <button
+                    type='button'
+                    className='font-semibold text-brand'
+                    onClick={() => changeMode('signin')}
+                  >
+                    {t('login.footer.backToSignInAction')}
+                  </button>
+                ),
+              })
             )}
           </p>
 
           <Link
             href={href()}
-            className='inline-flex min-h-[36px] items-center text-[13px] font-medium text-[#98a2b3] transition hover:text-[#F64310]'
+            className='inline-flex min-h-[36px] items-center text-[13px] font-medium text-[#98a2b3] transition hover:text-brand'
           >
-            ← {cityInfo.shortLabel}로 돌아가기
+            ← {t('login.backToCity', { city: cityInfo.shortLabel })}
           </Link>
         </footer>
       </div>

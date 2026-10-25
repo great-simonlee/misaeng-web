@@ -31,8 +31,11 @@ export function applyReviewBodyAccess(
   viewer: ReviewViewer,
 ): CommunityPost & { bodyLocked?: boolean } {
   if (canViewReviewBody(viewer, post)) return post
+  // 잠긴 본문은 번역·원문으로도 새지 않게 비운다
+  const { translations: _translations, ...rest } = post
+  void _translations
   return {
-    ...post,
+    ...rest,
     contentHtml: '',
     description: '',
     jobReviewTimeline: [],
@@ -60,6 +63,8 @@ export function splitReviewForViewer(post: CommunityPost, viewer: ReviewViewer) 
     recommendCount: post.recommendCount,
     authorNickname: post.authorNickname,
     authorSchoolName: post.authorSchoolName,
+    // 번역 상태만 (원문 segments는 본문 열람 권한이 있을 때 body에)
+    i18n: post.i18n ? { ...post.i18n, original: undefined } : undefined,
   }
   const body = canViewBody
     ? Object.fromEntries(BODY_FIELDS.map((field) => [field, post[field]]))

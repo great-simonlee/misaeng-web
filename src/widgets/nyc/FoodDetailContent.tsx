@@ -1,21 +1,17 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 
 import { PhotoLightbox, type PhotoLightboxItem } from '@components'
 import {
-  formatCommunityCount,
-  formatCommunityRelativeTime,
-} from '@lib/constants/communityMock'
-import {
   buildFoodDetailCarouselSlides,
   formatFoodMenuDisplay,
-  formatFoodTipIncluded,
   formatUsd,
   getFoodCuisineLabel,
   getFoodMenuName,
 } from '@lib/community/food'
+import { useFormat, useT } from '@lib/i18n/client'
 import { resolveFoodPlacePoint } from '@lib/community/foodMap'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { hrefForCommunityPost } from '@lib/constants/cities'
@@ -43,6 +39,10 @@ type FoodDetailContentProps = {
   boardTitle: string
   isAuthor: boolean
   onDelete: () => void
+  /** 번역 표시 + 원문 보기 (번역된 글일 때만 그려진다) */
+  translationNotice?: ReactNode
+  /** 원문/번역 글자의 언어 (lang 속성) */
+  contentLang?: string
 }
 
 type LightboxState = {
@@ -57,11 +57,15 @@ export function FoodDetailContent({
   boardTitle,
   isAuthor,
   onDelete,
+  translationNotice,
+  contentLang,
 }: FoodDetailContentProps) {
+  const t = useT('food')
+  const format = useFormat()
   const city = useCity()
   const href = useCityPath()
   const anonymous = isAnonymousBoard(boardId)
-  const slides = buildFoodDetailCarouselSlides(post)
+  const slides = buildFoodDetailCarouselSlides(post, t)
   const bodyHtml = post.contentHtml || `<p>${post.description}</p>`
   const menuItems = post.menuItems ?? []
   const [lightbox, setLightbox] = useState<LightboxState | null>(null)
@@ -96,14 +100,13 @@ export function FoodDetailContent({
     post.totalSpend != null && Number.isFinite(post.totalSpend)
       ? Math.floor(post.totalSpend)
       : null
-  const tipLabel = formatFoodTipIncluded(post.tipIncluded)
   const waitMinutes =
     post.waitMinutes != null && Number.isFinite(post.waitMinutes)
       ? Math.max(0, Math.floor(post.waitMinutes))
       : null
 
   const shortAddress = shortenAddress(post.location)
-  const cuisineLabel = getFoodCuisineLabel(post.detail)
+  const cuisineLabel = getFoodCuisineLabel(post.detail, t)
   const locationLine = shortAddress
   const placePoint = useMemo(() => resolveFoodPlacePoint(post), [post])
 
@@ -112,7 +115,7 @@ export function FoodDetailContent({
     setLightbox({
       items: menuLightboxItems,
       index,
-      eyebrow: '메뉴',
+      eyebrow: t('detail.menu'),
     })
   }
 
@@ -121,7 +124,7 @@ export function FoodDetailContent({
     setLightbox({
       items: galleryLightboxItems,
       index,
-      eyebrow: '가게 내부',
+      eyebrow: t('detail.interior'),
     })
   }
 
@@ -131,7 +134,7 @@ export function FoodDetailContent({
         <FoodDetailHeroCarousel
           slides={slides}
           backHref={href(`/${boardId}`)}
-          backLabel={`${boardTitle} 목록`}
+          backLabel={t('detail.backToList', { board: boardTitle })}
         />
       </div>
 
@@ -149,14 +152,19 @@ export function FoodDetailContent({
           ) : null}
         </div>
 
-        <h1 className='mt-2.5 text-[1.7rem] font-bold leading-[1.2] tracking-[-0.04em] text-[var(--foreground)] sm:mt-3 sm:text-[2rem]'>
+        <h1 lang={contentLang} className='mt-2.5 text-[1.7rem] font-bold leading-[1.2] tracking-[-0.04em] text-[var(--foreground)] sm:mt-3 sm:text-[2rem]'>
           {post.title}
         </h1>
 
+        {translationNotice ? <div className='mt-1.5 px-1 sm:px-0'>{translationNotice}</div> : null}
+
         <p className='mt-2 text-[12px] text-[var(--muted)]'>
-          {formatCommunityRelativeTime(post.createdAt)}
+          {format.relative(post.createdAt)}
           <span className='mx-1.5 opacity-40'>·</span>
-          조회 {formatCommunityCount(post.viewCount)}
+          {t('detail.views', {
+            count: post.viewCount,
+            views: format.number(Math.max(0, Math.floor(Number(post.viewCount) || 0)), { notation: 'compact' }),
+          })}
         </p>
 
         {locationLine ? (
@@ -169,28 +177,33 @@ export function FoodDetailContent({
         {(partySize || totalSpend != null || waitMinutes != null) && (
           <div className='mt-5 grid grid-cols-3 overflow-hidden rounded-2xl bg-[#f4f5f7]'>
             <MetricCell
-              label='인원'
-              value={partySize ? `${partySize}인` : '—'}
+              label={t('detail.metrics.party')}
+              value={partySize ? t('spend.people', { count: partySize }) : '—'}
             />
             <MetricCell
-              label='총 금액'
+              label={t('detail.metrics.totalSpend')}
               value={
                 totalSpend != null
-                  ? `$${formatUsd(totalSpend)}${
-                      tipLabel ? ` · ${tipLabel}` : ''
-                    }`
+                  ? t(
+                      post.tipIncluded === true
+                        ? 'detail.metrics.spendWithTip'
+                        : post.tipIncluded === false
+                          ? 'detail.metrics.spendWithoutTip'
+                          : 'detail.metrics.spend',
+                      { amount: formatUsd(totalSpend) },
+                    )
                   : '—'
               }
               emphasize
             />
             <MetricCell
-              label='웨이팅'
+              label={t('detail.metrics.wait')}
               value={
                 waitMinutes == null
                   ? '—'
                   : waitMinutes === 0
-                    ? '없음'
-                    : `${waitMinutes}분`
+                    ? t('detail.metrics.waitNone')
+                    : t('detail.metrics.waitMinutes', { minutes: waitMinutes })
               }
             />
           </div>
@@ -198,7 +211,7 @@ export function FoodDetailContent({
 
         {placePoint ? (
           <section className='mt-8'>
-            <SectionLabel>위치</SectionLabel>
+            <SectionLabel>{t('detail.location')}</SectionLabel>
             <div className='mt-4'>
               <FoodPlaceMap place={placePoint} />
             </div>
@@ -207,7 +220,7 @@ export function FoodDetailContent({
 
         {menuItems.length > 0 ? (
           <section className='mt-8'>
-            <SectionLabel>메뉴</SectionLabel>
+            <SectionLabel>{t('detail.menu')}</SectionLabel>
             <ul className='mt-4 divide-y divide-black/[0.06]'>
               {menuItems.map((item) => {
                 const lightboxIndex = menuLightboxItems.findIndex(
@@ -228,7 +241,7 @@ export function FoodDetailContent({
                         type='button'
                         onClick={openThis}
                         className='flex w-full gap-4 text-left touch-manipulation transition hover:opacity-90'
-                        aria-label='메뉴 사진 크게 보기'
+                        aria-label={t('detail.viewMenuPhoto')}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -238,7 +251,7 @@ export function FoodDetailContent({
                         />
                         <span className='min-w-0 flex-1 self-center'>
                           <span className='block text-[14px] font-semibold text-[var(--foreground)] sm:text-[15px]'>
-                            {getFoodMenuName(item, '메뉴')}
+                            {getFoodMenuName(item, t('detail.menu'))}
                           </span>
                           {item.caption?.trim() ? (
                             <span className='mt-0.5 block text-[13px] leading-[1.5] text-[var(--muted-foreground)] sm:text-[14px]'>
@@ -252,7 +265,7 @@ export function FoodDetailContent({
                         <div className='h-20 w-20 shrink-0 rounded-xl bg-[#e8eaee] sm:h-24 sm:w-24' />
                         <div className='min-w-0 flex-1 self-center'>
                           <p className='text-[14px] font-semibold text-[var(--foreground)] sm:text-[15px]'>
-                            {getFoodMenuName(item, '메뉴')}
+                            {getFoodMenuName(item, t('detail.menu'))}
                           </p>
                           {item.caption?.trim() ? (
                             <p className='mt-0.5 text-[13px] leading-[1.5] text-[var(--muted-foreground)] sm:text-[14px]'>
@@ -271,7 +284,7 @@ export function FoodDetailContent({
 
         {galleryLightboxItems.length > 0 ? (
           <section className='mt-8'>
-            <SectionLabel>가게 내부 · 분위기</SectionLabel>
+            <SectionLabel>{t('detail.interiorAndVibe')}</SectionLabel>
             <div className='mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5'>
               {galleryLightboxItems.map((item, index) => (
                 <button
@@ -279,7 +292,7 @@ export function FoodDetailContent({
                   type='button'
                   onClick={() => openGalleryLightbox(index)}
                   className='aspect-square overflow-hidden rounded-xl bg-[#e8eaee] touch-manipulation transition hover:opacity-90'
-                  aria-label='분위기 사진 크게 보기'
+                  aria-label={t('detail.viewVibePhoto')}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -294,7 +307,7 @@ export function FoodDetailContent({
         ) : null}
 
         <section className='mt-8'>
-          <SectionLabel>후기</SectionLabel>
+          <SectionLabel>{t('detail.review')}</SectionLabel>
           <CommunityRichBody
             html={bodyHtml}
             className='mt-4 text-[15px] leading-[1.75] text-[var(--foreground)]'

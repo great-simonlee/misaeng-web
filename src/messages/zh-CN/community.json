@@ -1,0 +1,485 @@
+{
+  "categories": {
+    "housing": {
+      "title": "租房",
+      "description": "Misaeng 团队发布的{city}房源"
+    },
+    "events": {
+      "title": "活动",
+      "description": "聚会、演出和各类活动"
+    },
+    "food": {
+      "title": "美食",
+      "description": "餐厅和咖啡馆推荐"
+    },
+    "marketplace": {
+      "title": "二手市场",
+      "description": "买卖日常用品"
+    },
+    "status": {
+      "title": "OPT · 签证 · 绿卡",
+      "description": "签证、CPT/OPT 和绿卡相关经历"
+    },
+    "job-review": {
+      "title": "面试 · 求职",
+      "description": "面试、求职和职场经历"
+    },
+    "roommate": {
+      "title": "室友 · 转租",
+      "description": "找室友、找房间和转租"
+    },
+    "anonymous": {
+      "title": "匿名版块",
+      "description": "不用署名，畅所欲言"
+    },
+    "comingSoon": "即将上线"
+  },
+  "boards": {
+    "events": {
+      "writeLabel": "发布活动",
+      "listIntro": "分享{city}正在举办的聚会、演出和活动。",
+      "locationLabel": "地点",
+      "locationPlaceholder": "Manhattan / 线上",
+      "detailLabel": "日期和时间",
+      "titlePlaceholder": "韩国人社交之夜",
+      "descriptionPlaceholder": "时间、参加方式、一句话介绍"
+    },
+    "food": {
+      "writeLabel": "推荐一家店",
+      "listIntro": "分享你去过的餐厅和咖啡馆，照片和经验分享随你发挥。",
+      "locationLabel": "街区",
+      "locationPlaceholder": "Flushing / Koreatown",
+      "detailLabel": "菜系",
+      "titlePlaceholder": "餐厅名称",
+      "descriptionPlaceholder": "菜单、价位、等位时间、最喜欢的地方…"
+    },
+    "marketplace": {
+      "writeLabel": "发布闲置",
+      "listIntro": "用不上的、正需要的，和邻居们交换吧。",
+      "locationLabel": "区域",
+      "locationPlaceholder": "Brooklyn / 可面交",
+      "detailLabel": "售价（$）",
+      "detailPlaceholder": "0",
+      "titlePlaceholder": "IKEA 书架，免费送或出售",
+      "descriptionPlaceholder": "说明物品状况、取货方式和交易方式。"
+    },
+    "status": {
+      "writeLabel": "分享你的经历",
+      "listIntro": "分享你在每个日期准备和提交了什么、如何拿到结果，以及下一步计划。",
+      "locationLabel": "学校 / 公司 / 机构（选填）",
+      "locationPlaceholder": "例：韩国 IT 软件公司",
+      "detailLabel": "类型",
+      "titlePlaceholder": "我在金融公司的 OPT 时间线",
+      "descriptionPlaceholder": "分享需要注意的地方，让后来的人少走弯路。"
+    },
+    "cpt-opt": {
+      "writeLabel": "分享你的经历",
+      "listIntro": "分享你在每个日期准备和提交了什么、如何拿到结果，以及下一步计划。",
+      "locationLabel": "学校 / 公司 / 机构（选填）",
+      "locationPlaceholder": "例：韩国 IT 软件公司",
+      "detailLabel": "类型",
+      "titlePlaceholder": "我在金融公司的 OPT 时间线",
+      "descriptionPlaceholder": "分享需要注意的地方，让后来的人少走弯路。"
+    },
+    "visa": {
+      "writeLabel": "分享你的经历",
+      "listIntro": "分享你的签证准备和面签经历。",
+      "locationLabel": "地点（选填）",
+      "locationPlaceholder": "NY / 大使馆等",
+      "detailLabel": "签证类型",
+      "detailPlaceholder": "F-1 / H-1B / O-1",
+      "titlePlaceholder": "我的 H-1B 申请经历",
+      "descriptionPlaceholder": "时间线、材料、小贴士"
+    },
+    "job-review": {
+      "writeLabel": "分享你的经历",
+      "listIntro": "按日期记录你的申请、面试和结果。发布后也可以继续补充。",
+      "locationLabel": "公司（选填）",
+      "locationPlaceholder": "请输入公司名称",
+      "detailLabel": "类型",
+      "titlePlaceholder": "我申请金融公司实习的经历",
+      "descriptionPlaceholder": "分享需要注意的地方，让后来的人少走弯路。"
+    },
+    "roommate": {
+      "writeLabel": "发帖",
+      "listIntro": "出租房间（找室友或转租），或寻找室友。每个账号只能发一篇帖子。",
+      "locationLabel": "街区 / 位置",
+      "locationPlaceholder": "Flushing / Brooklyn / Manhattan",
+      "detailLabel": "每月预算 / 房租（$）",
+      "detailPlaceholder": "1500",
+      "titlePlaceholder": "在 Brooklyn 找室友",
+      "descriptionPlaceholder": "介绍一下你的生活习惯、预算和入住日期。留下 KakaoTalk 一对一开放聊天链接，方便大家联系你。"
+    },
+    "green-card": {
+      "writeLabel": "分享你的经历",
+      "listIntro": "和社区分享你的绿卡之路。",
+      "locationLabel": "类别（选填）",
+      "locationPlaceholder": "EB-2 / 婚姻等",
+      "detailLabel": "阶段",
+      "detailPlaceholder": "I-140 / 面谈等",
+      "titlePlaceholder": "我的 EB-2 NIW 获批经历",
+      "descriptionPlaceholder": "时间线、律师、小贴士"
+    },
+    "anonymous": {
+      "writeLabel": "匿名发帖",
+      "listIntro": "{city}匿名版块，不用署名，畅所欲言。",
+      "locationLabel": "话题（选填）",
+      "locationPlaceholder": "选择话题",
+      "titlePlaceholder": "用一句话说说你的今天",
+      "descriptionPlaceholder": "想说什么就写什么，你会以匿名身份显示。"
+    }
+  },
+  "errors": {
+    "createFailed": "发布失败，请重试。",
+    "claimGuestFailed": "无法关联你的游客帖子。",
+    "myPostsLoadFailed": "无法加载你的帖子。",
+    "mockEditBlocked": "示例帖子无法编辑。",
+    "mockDeleteBlocked": "示例帖子无法删除。",
+    "updateFailed": "修改保存失败。",
+    "deleteFailed": "帖子删除失败。",
+    "uploadFailed": "图片上传失败。",
+    "commentRequired": "请输入评论内容。",
+    "loginRequired": "请先登录。",
+    "commentVerifyRequired": "需要完成学校邮箱验证才能发帖和评论。",
+    "commentCreateFailed": "评论发布失败。",
+    "replyParentNotFound": "找不到你要回复的评论。",
+    "commentEditTargetMissing": "请选择要编辑的评论。",
+    "commentEditForbidden": "只能编辑自己的评论。",
+    "commentNotFound": "找不到该评论。",
+    "commentUpdateFailed": "评论修改失败。",
+    "commentDeleteTargetMissing": "请选择要删除的评论。",
+    "commentDeleteForbidden": "只能删除自己的评论。",
+    "commentDeleteFailed": "评论删除失败。",
+    "recommendFailed": "点赞保存失败。",
+    "reportReasonRequired": "请选择原因。",
+    "alreadyReported": "你已经举报过了。",
+    "reportFailed": "举报发送失败。",
+    "beenThereFoodOnly": "只有美食帖子可以标记“去过”。",
+    "beenThereFailed": "“去过”保存失败。"
+  },
+  "author": {
+    "member": "会员",
+    "anonymous": "匿名"
+  },
+  "verify": {
+    "required": "需要完成学生或职场人验证才能发帖和评论。",
+    "cta": "去验证",
+    "linkLabel": "学生或职场人验证",
+    "suspended": "该账号已被停用。"
+  },
+  "guidelines": {
+    "common": {
+      "noPersonalInfo": "请勿发布真实姓名、联系方式或任何可识别他人身份的信息。",
+      "noAbuse": "禁止辱骂、仇恨、歧视、威胁或虚假信息。",
+      "noPrivacyViolation": "请避免私人纠纷、侵犯隐私或分享未经同意拍摄的照片。",
+      "violationPenalty": "违反以上规则的帖子可能会被删除，账号也可能被限制。"
+    },
+    "anonymous": {
+      "noTargeting": "即使是匿名，也不允许点名或暗示特定的人，或在背后议论他人。",
+      "stillResponsible": "其他人看不到你的名字、学校或照片，但你仍需对发布的内容承担法律责任。",
+      "loginRequired": "需要登录才能编辑或删除你的帖子。处理举报时，我们的团队可以查看发帖人。"
+    },
+    "commonTitle": "社区规范",
+    "anonymousTitle": "匿名版块规范"
+  },
+  "anonymousTopics": {
+    "opt": "OPT·CPT·STEM OPT",
+    "visa": "签证与身份",
+    "jobs": "求职与实习",
+    "housing": "租房与室友",
+    "campusLife": "校园生活",
+    "classes": "课程与学习",
+    "finance": "理财、税务与保险",
+    "relationships": "感情",
+    "mentalHealth": "心理健康与烦恼",
+    "transportation": "开车与交通",
+    "lifeTips": "生活小贴士",
+    "secondhand": "二手与赠送",
+    "daily": "日常",
+    "other": "其他"
+  },
+  "report": {
+    "reasons": {
+      "spam": {
+        "label": "垃圾信息 · 广告",
+        "description": "推广、刷屏、无关链接"
+      },
+      "abuse": {
+        "label": "辱骂 · 骚扰",
+        "description": "侮辱、仇恨或威胁"
+      },
+      "inappropriate": {
+        "label": "不当内容",
+        "description": "色情或暴力内容，或违反社区规范"
+      },
+      "misinformation": {
+        "label": "虚假信息 · 疑似诈骗",
+        "description": "虚假信息、疑似诈骗或钓鱼"
+      },
+      "privacy": {
+        "label": "泄露个人信息",
+        "description": "未经同意分享联系方式、照片或个人信息"
+      },
+      "other": {
+        "label": "其他",
+        "description": "以上未列出的情况"
+      }
+    },
+    "action": "举报",
+    "title": "举报",
+    "cancel": "取消",
+    "submitting": "发送中…",
+    "submit": "提交举报",
+    "intro": {
+      "post": "你正在举报这篇帖子。管理员会进行审核并处理。",
+      "comment": "你正在举报这条评论。管理员会进行审核并处理。",
+      "generic": "你正在举报该内容。管理员会进行审核并处理。"
+    },
+    "detailLabelRequired": "详细说明（必填）",
+    "detailLabelOptional": "详细说明（选填）",
+    "detailPlaceholder": "请简单说明举报原因",
+    "submitted": "谢谢，我们已收到你的举报，管理员会进行审核。"
+  },
+  "anonymousNotice": {
+    "close": "关闭",
+    "eyebrow": "开始之前",
+    "board": "匿名版块",
+    "title": "一起守护的匿名空间",
+    "body": "为了让 {brand} 保持健康、有帮助的社区氛围，即使在匿名版块，也请遵守规则、互相尊重！",
+    "confirm": "知道了",
+    "snooze24h": "24 小时内不再显示"
+  },
+  "detail": {
+    "edit": "编辑",
+    "delete": "删除",
+    "companyPageFallback": "公司页面",
+    "loadFailed": "无法加载该帖子。",
+    "deleteConfirm": "确定删除“{title}”吗？\n删除后无法恢复。",
+    "deleted": "帖子已删除",
+    "loading": "加载中…",
+    "notFoundTitle": "找不到该帖子",
+    "notFoundDescription": "可能已被删除。",
+    "backToListAction": "返回{board}",
+    "backToList": "{board}",
+    "roommateType": "类型",
+    "roommateBudget": "每月预算 / 房租",
+    "perMonthValue": "{value}/月",
+    "roommateMoveIn": "入住 / 搬出",
+    "views": "{n} 次浏览"
+  },
+  "like": {
+    "like": "点赞",
+    "unlike": "取消点赞"
+  },
+  "engagement": {
+    "recommend": "推荐",
+    "recommended": "已推荐",
+    "recommendCancelled": "已取消推荐",
+    "beenThere": "我去过",
+    "beenThereAdded": "已标记为去过",
+    "beenThereCancelled": "已取消“去过”"
+  },
+  "card": {
+    "noPhoto": "暂无照片",
+    "beenThereCount_other": "{n} 人去过",
+    "timelineSteps_other": "{count} 步时间线",
+    "hiringSteps_other": "{count} 个招聘环节",
+    "hiringStepsWithMore_other": "{count} 个招聘环节 · 还有 {hidden} 个",
+    "period": "日期 {period}",
+    "perMonth": "/月",
+    "stepNumber": "第 {n} 步",
+    "noStepInfo": "暂无步骤详情",
+    "views": "浏览"
+  },
+  "anonymous": {
+    "topicPlaceholder": "选择话题",
+    "topicAria": "话题"
+  },
+  "toolbar": {
+    "filter": "筛选",
+    "filterApplied_other": "已应用 {count} 个筛选"
+  },
+  "comments": {
+    "title": "评论",
+    "loadFailed": "无法加载评论。",
+    "bodyRequired": "请输入评论内容。",
+    "posted": "评论已发布",
+    "replyPosted": "回复已发布",
+    "deleteConfirm": "确定删除这条评论吗？\n它的回复也会一并删除。",
+    "deleted": "评论已删除",
+    "updated": "评论已修改",
+    "loginPrompt": "请{link}后评论。",
+    "loginLink": "登录",
+    "verifyPrompt": "评论前请先完成{link}。",
+    "checkingLogin": "正在确认登录状态…",
+    "placeholder": "发表评论",
+    "submitting": "发布中…",
+    "submit": "发布评论",
+    "loading": "正在加载评论…",
+    "empty": "还没有评论，来抢沙发吧。",
+    "replyPlaceholder": "写回复",
+    "cancel": "取消",
+    "replySubmit": "发布回复",
+    "deleting": "删除中…",
+    "saving": "保存中…",
+    "saveEdit": "保存",
+    "reply": "回复"
+  },
+  "share": {
+    "metaDescription": "无需注册。一步步分享你的申请、面试和结果。每篇经验分享都能获得积分，可用于和业内人士 coffee chat。"
+  },
+  "wip": {
+    "title": "即将上线",
+    "description": "{board}版块正在建设中，敬请期待！",
+    "homeAction": "返回社区首页",
+    "otherBoards": "想看看其他版块？先去{link}看看吧。"
+  },
+  "list": {
+    "mapLoading": "正在加载地图…",
+    "foodVibeAria": "氛围",
+    "all": "全部",
+    "cuisineAria": "菜系",
+    "allCuisines": "全部菜系",
+    "loadFailed": "无法加载帖子。",
+    "login": "登录",
+    "suspended": "已停用",
+    "retry": "重试",
+    "emptyTitle": "{board}还没有帖子",
+    "noMatchTitle": "没有符合筛选条件的帖子",
+    "emptyCanWrite": "来发第一篇帖子，开启讨论吧。",
+    "emptyNeedsVerify": "完成学生或职场人验证后即可发帖。",
+    "emptyNeedsLogin": "登录后即可发帖。",
+    "noMatchFood": "试试其他氛围或菜系。",
+    "noMatchCptOpt": "试试其他类型（CPT/OPT/STEM OPT）。",
+    "noMatchJobReview": "试试其他类型或公司。",
+    "noMatchDefault": "试试调整筛选条件。",
+    "showMap": "显示地图",
+    "showList": "显示列表",
+    "map": "地图",
+    "list": "列表",
+    "clearAll": "全部清除",
+    "apply": "应用",
+    "filterType": "类型",
+    "cptOptTypeAria": "CPT/OPT 类型",
+    "filterCity": "城市",
+    "filterSchool": "学校",
+    "jobReviewTypeAria": "面试和求职类型",
+    "search": "搜索",
+    "searchPlaceholder": "搜索标题、内容或地点",
+    "sort": "排序",
+    "sortRecentlyUpdated": "最近更新",
+    "sortLeastRecentlyUpdated": "最早更新",
+    "sortNewest": "最新",
+    "sortOldest": "最早",
+    "company": "公司",
+    "companyFilterAria": "公司筛选",
+    "companyName": "公司名称",
+    "companyCategory": "公司类别",
+    "companyNamePlaceholder": "按公司名称搜索",
+    "companyCategoryPlaceholder": "选择类别",
+    "none": "无"
+  },
+  "write": {
+    "errors": {
+      "postNotFound": "找不到该帖子。",
+      "noEditPermission": "你没有编辑该帖子的权限。",
+      "titleRequired": "请输入标题。",
+      "titleTooLong": "标题最多 {max} 个字符。",
+      "bodyRequired": "请填写正文。",
+      "bodyTooLong": "正文最多 {max} 个字符。",
+      "titleAndBodyRequired": "请输入标题和正文。"
+    },
+    "updated": "帖子已更新",
+    "created": "帖子已发布",
+    "draftSaved": "草稿已保存",
+    "draftSaveFailed": "草稿保存失败。",
+    "redirectingToLogin": "正在跳转到登录页面…",
+    "backToPost": "返回帖子",
+    "backToList": "返回列表",
+    "titleLabel": "标题",
+    "bodyLabel": "正文",
+    "submit": "发布帖子",
+    "publish": "发布",
+    "editEyebrow": "编辑帖子",
+    "untitled": "无标题",
+    "food": {
+      "menuMaxReached": "最多可添加 {max} 道菜品。",
+      "imagesOnly": "只能选择图片文件。",
+      "menuMaxPartial_other": "最多可添加 {max} 道菜品，只会添加 {count} 张照片。",
+      "uploadPartial": "成功添加 {success} 张，{failed} 张失败。",
+      "menuUploadFailed": "菜品照片上传失败。",
+      "galleryMaxReached": "最多可添加 {max} 张氛围照片。",
+      "galleryMaxPartial_other": "最多可添加 {max} 张氛围照片，只会添加 {count} 张照片。",
+      "galleryUploadFailed": "氛围照片上传失败。",
+      "errors": {
+        "addressRequired": "请在地图上搜索并选择地址。",
+        "coordinatesMissing": "找不到该地址的位置。",
+        "categoryRequired": "请选择分类。",
+        "cuisineRequired": "请选择菜系。",
+        "nameRequired": "请输入餐厅名称。",
+        "partySizeRange": "请输入 {min} 到 {max} 之间的人数。",
+        "spendRange": "请输入 $0 到 {max} 之间的整数总金额。",
+        "tipRequired": "请选择含小费或不含小费。",
+        "waitRange": "请输入 0 到 {max} 分钟之间的等位时间。",
+        "menuIncomplete": "每道菜品都需要照片、名称和一句话点评。"
+      },
+      "whereTitle": "在哪里吃的？",
+      "whereDescription": "请选择准确地址，以便保存位置。",
+      "nameLabel": "餐厅名称",
+      "categoryTitle": "分类",
+      "cuisineTitle": "吃的是什么菜？",
+      "visitTitle": "用餐信息",
+      "partySize": "用餐人数",
+      "partySizeHint": "最多 {max} 人",
+      "partySizeUnit": "人",
+      "totalSpend": "总消费",
+      "totalSpendHint": "$0 ~ {max} · 整数",
+      "tipAria": "含小费",
+      "tipIncluded": "含小费",
+      "tipExcluded": "不含小费",
+      "wait": "等位",
+      "waitHint": "没有等位填 0 · 最多 {max} 分钟",
+      "waitUnit": "分钟",
+      "galleryTitle": "店内 · 氛围",
+      "galleryDescription": "店内、座位和氛围照片 · 最多 {max} 张",
+      "galleryPick": "选择氛围照片",
+      "galleryPickHint": "一次可从相册选择最多 {max} 张照片。",
+      "galleryAddMoreAria_other": "再添加 {count} 张氛围照片",
+      "galleryAddMore_other": "还可加 {count} 张",
+      "uploading": "上传中…",
+      "menuTitle": "菜品照片",
+      "menuDescription": "为每张照片添加菜名和一句话点评。",
+      "coverNoticeTitle": "第一张菜品照片将作为封面",
+      "coverNoticeBody": "它会大图显示在列表卡片和帖子顶部。",
+      "menuPick": "选择菜品照片",
+      "menuPickHint": "最多 {max} 张 · 第一张为封面 · 菜名和点评必填",
+      "menuNumber": "菜品 {n}",
+      "coverPhoto": "封面照片",
+      "photo": "照片",
+      "cover": "封面",
+      "menuNamePlaceholder": "菜名（必填）",
+      "menuNameAria": "菜品 {n} 名称",
+      "menuCaptionPlaceholder": "一句话点评（必填）",
+      "menuCaptionAria": "菜品 {n} 一句话点评",
+      "missingNameAndCaption": "请输入菜名和一句话点评。",
+      "missingName": "请输入菜名。",
+      "missingCaption": "请输入一句话点评。",
+      "menuAddMore_other": "再添加 {count} 张菜品照片",
+      "bodyDescription": "分享你喜欢的地方、怎么去以及小贴士。",
+      "selectAddress": "请选择地址",
+      "checkingCoordinates": "正在确认地址位置…",
+      "selectCuisine": "请选择菜系",
+      "submit": "发布"
+    }
+  },
+  "anonymousWrite": {
+    "topicTitle": "关于什么话题？",
+    "topicDescription": "可以跳过。",
+    "topicAria": "匿名版块话题",
+    "titleDescription": "写一个一眼就能看懂的简短标题。",
+    "bodyDescription": "想说什么就写什么，你会以匿名身份显示。",
+    "createTitle": "在匿名版块发帖",
+    "createDescription": "你的名字、学校和照片都会隐藏，放心分享。",
+    "editTitle": "编辑匿名帖子"
+  }
+}

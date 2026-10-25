@@ -1,0 +1,116 @@
+{
+  "categories": {
+    "restaurant": "必吃",
+    "value": "性价比高",
+    "vibe": "氛围好",
+    "study": "适合学习"
+  },
+  "categoryDescriptions": {
+    "restaurant": "一定要去试试的店",
+    "value": "物超所值",
+    "vibe": "氛围超棒的地方",
+    "study": "适合学习或办公的咖啡馆"
+  },
+  "cuisines": {
+    "brunch": "早午餐",
+    "korean": "韩餐",
+    "japanese": "日料",
+    "chinese": "中餐",
+    "american": "西餐",
+    "french": "法餐",
+    "italian": "意大利菜",
+    "mexican": "墨西哥菜",
+    "thai": "泰国菜",
+    "vietnamese": "越南菜",
+    "indian": "印度菜",
+    "other": "其他"
+  },
+  "spend": {
+    "people_other": "{count} 人",
+    "total": "共 ${amount}",
+    "totalWithTip": "共 ${amount} · 含小费",
+    "totalWithoutTip": "共 ${amount} · 不含小费",
+    "peopleTotal_other": "{count} 人 · 共 ${amount}",
+    "peopleTotalWithTip_other": "{count} 人 · 共 ${amount} · 含小费",
+    "peopleTotalWithoutTip_other": "{count} 人 · 共 ${amount} · 不含小费",
+    "tipIncluded": "含小费",
+    "tipExcluded": "不含小费"
+  },
+  "wait": {
+    "none": "无需等位",
+    "minutes": "等位 {minutes} 分钟",
+    "hours": "等位 {hours} 小时",
+    "hoursMinutes": "等位 {hours} 小时 {minutes} 分钟"
+  },
+  "carousel": {
+    "cover": "封面",
+    "menu": "菜单",
+    "vibe": "氛围",
+    "backToList": "返回列表",
+    "photosLabel": "餐厅照片",
+    "previous": "上一张",
+    "next": "下一张",
+    "photoNumber": "第 {number} 张"
+  },
+  "map": {
+    "postsMapLabel": "美食地图",
+    "emptyTitle": "地图上暂无可显示的地点",
+    "emptyDescription": "只有保存了地址的经验分享才会显示为地图标记",
+    "unnamedPlace": "餐厅",
+    "reviewCount_other": "{count} 篇经验分享",
+    "close": "关闭",
+    "viewReview": "查看经验分享",
+    "placeMapLabel": "{name}的地图",
+    "directions": "导航"
+  },
+  "detail": {
+    "menu": "菜单",
+    "interior": "店内",
+    "backToList": "返回{board}",
+    "views_other": "{views} 次浏览",
+    "metrics": {
+      "party": "人数",
+      "totalSpend": "总消费",
+      "spend": "${amount}",
+      "spendWithTip": "${amount} · 含小费",
+      "spendWithoutTip": "${amount} · 不含小费",
+      "wait": "等位",
+      "waitNone": "无",
+      "waitMinutes": "{minutes} 分钟"
+    },
+    "location": "位置",
+    "viewMenuPhoto": "查看菜单照片",
+    "interiorAndVibe": "店内 · 氛围",
+    "viewVibePhoto": "查看氛围照片",
+    "review": "经验分享"
+  },
+  "placeSearch": {
+    "errors": {
+      "searchFailed": "搜索失败，请重试。",
+      "detailsFailed": "无法加载地点详情",
+      "noCoordinates": "找不到该地点的位置"
+    },
+    "pickExactAddress": "选择准确地址",
+    "mapTitle": "{name}的位置",
+    "change": "更改",
+    "addressPlaceholder": "例：53 W 53rd St, New York",
+    "placePlaceholder": "例：Halal Guys、Joe's Pizza、West 53rd St",
+    "resolving": "确认中…",
+    "searching": "搜索中…",
+    "noResults": "没有结果。请尝试用英文输入更详细的地址或街道名。",
+    "addressHint": "选择地址以保存位置。",
+    "placeHint": "从列表中选择一个地点后发布。"
+  },
+  "restaurantName": {
+    "placeholder": "餐厅名称",
+    "reviewCount_other": "{count} 篇经验分享",
+    "checking": "正在查看该位置的餐厅…",
+    "existing_other": "这里已有 {count} 家餐厅 · 从下方选择或输入新名称",
+    "none": "这里还没有餐厅，请输入新名称。",
+    "hint": "该名称会显示在列表和详情页中"
+  },
+  "card": {
+    "comments": "评论",
+    "recommends": "点赞"
+  }
+}

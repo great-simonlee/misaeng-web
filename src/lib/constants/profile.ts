@@ -5,71 +5,55 @@ export const MAX_NICKNAME_LEN = 20
 export const NICKNAME_ALLOWED_PATTERN = /^[A-Za-z.]+$/
 export const NICKNAME_CHAR_FILTER = /[^A-Za-z.]/g
 
-export const NICKNAME_RULE_HINT =
-  '영문 알파벳과 "." 만 사용할 수 있어요'
-
 export function sanitizeNicknameInput(value: string): string {
   return value.replace(NICKNAME_CHAR_FILTER, '').slice(0, MAX_NICKNAME_LEN)
 }
 
-export function getNicknameValidationError(
+export type NicknameValidationIssue =
+  | { code: 'tooShort'; min: number }
+  | { code: 'tooLong'; max: number }
+  | { code: 'invalidChars' }
+
+/** 형식 오류 코드. 화면은 `me.nickname.errors.<code>`로 번역한다 (min·max를 params로 넘긴다). */
+export function getNicknameValidationIssue(
   value: string,
-): string | null {
+): NicknameValidationIssue | null {
   const nickname = value.trim()
   if (nickname.length < MIN_NICKNAME_LEN) {
-    return `닉네임은 ${MIN_NICKNAME_LEN}자 이상이어야 해요`
+    return { code: 'tooShort', min: MIN_NICKNAME_LEN }
   }
   if (nickname.length > MAX_NICKNAME_LEN) {
-    return `닉네임은 ${MAX_NICKNAME_LEN}자까지예요`
+    return { code: 'tooLong', max: MAX_NICKNAME_LEN }
   }
   if (!NICKNAME_ALLOWED_PATTERN.test(nickname)) {
-    return NICKNAME_RULE_HINT
+    return { code: 'invalidChars' }
   }
   return null
 }
 
 export function isValidNickname(value: string): boolean {
-  return getNicknameValidationError(value) === null
+  return getNicknameValidationIssue(value) === null
 }
 
-export const PROFILE_GENDER_OPTIONS = [
-  { value: 'male', label: '남성' },
-  { value: 'female', label: '여성' },
-  { value: 'other', label: '기타' },
+/** 표시 문구는 `me.profile.gender.<value>` */
+export const PROFILE_GENDER_VALUES = ['male', 'female', 'other'] as const
+
+/** 표시 문구는 `me.profile.occupation.<value>` */
+export const PROFILE_OCCUPATION_VALUES = [
+  'student',
+  'professional',
+  'other',
 ] as const
 
-export const PROFILE_OCCUPATION_OPTIONS = [
-  { value: 'student', label: '학생' },
-  { value: 'professional', label: '직장인' },
-  { value: 'other', label: '기타' },
-] as const
-
-export type ProfileGender = (typeof PROFILE_GENDER_OPTIONS)[number]['value']
-export type ProfileOccupationType =
-  (typeof PROFILE_OCCUPATION_OPTIONS)[number]['value']
-
-export function getProfileGenderLabel(value: string | null | undefined) {
-  if (!value) return null
-  return (
-    PROFILE_GENDER_OPTIONS.find((option) => option.value === value)?.label ??
-    null
-  )
-}
-
-export function getProfileOccupationLabel(value: string | null | undefined) {
-  if (!value) return null
-  return (
-    PROFILE_OCCUPATION_OPTIONS.find((option) => option.value === value)?.label ??
-    null
-  )
-}
+export type ProfileGender = (typeof PROFILE_GENDER_VALUES)[number]
+export type ProfileOccupationType = (typeof PROFILE_OCCUPATION_VALUES)[number]
 
 export function isProfileGender(value: string): value is ProfileGender {
-  return PROFILE_GENDER_OPTIONS.some((option) => option.value === value)
+  return (PROFILE_GENDER_VALUES as readonly string[]).includes(value)
 }
 
 export function isProfileOccupationType(
   value: string,
 ): value is ProfileOccupationType {
-  return PROFILE_OCCUPATION_OPTIONS.some((option) => option.value === value)
+  return (PROFILE_OCCUPATION_VALUES as readonly string[]).includes(value)
 }

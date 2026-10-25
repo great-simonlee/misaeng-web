@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "title": "{brand} NYC | 뉴욕 유학생·직장인 커뮤니티",
+    "description": "뉴욕에서 공부하고 일하는 사람들을 위한 하우징·맛집·CPT/OPT·비자·취업 후기 커뮤니티예요."
+  },
+  "language": {
+    "label": "언어",
+    "menuAria": "언어 선택",
+    "saved": "언어를 {language}(으)로 바꿨어요",
+    "settingLabel": "언어",
+    "settingHint": "화면과 번역된 글을 이 언어로 보여 드려요.",
+    "sheetTitle": "언어 설정",
+    "setupLabel": "선호 언어",
+    "setupHint": "커뮤니티 글과 댓글을 이 언어로 번역해 보여 드려요. 마이페이지에서 언제든 바꿀 수 있어요.",
+    "saveFailed": "언어 설정을 저장하지 못했어요. 잠시 후 다시 시도해 주세요."
+  },
+  "translation": {
+    "translatedFrom": "{language}에서 번역됨",
+    "showOriginal": "원문 보기",
+    "showTranslation": "번역 보기",
+    "original": "원문",
+    "pending": "번역 준비 중",
+    "iconLabel": "번역된 글"
+  },
+  "actions": {
+    "save": "저장",
+    "cancel": "취소",
+    "close": "닫기",
+    "confirm": "확인",
+    "back": "뒤로",
+    "more": "더 보기",
+    "retry": "다시 시도",
+    "loading": "불러오는 중…"
+  },
+  "errors": {
+    "generic": "문제가 생겼어요. 잠시 후 다시 시도해 주세요.",
+    "network": "네트워크 연결을 확인해 주세요."
+  },
+  "ui": {
+    "bottomSheetSelect": {
+      "placeholder": "선택하기"
+    },
+    "imageUpload": {
+      "selectPhoto": "사진 선택",
+      "uploading": "업로드 중…",
+      "failed": "업로드 실패",
+      "remove": "삭제",
+      "change": "바꾸기",
+      "addPhoto": "사진 추가",
+      "tapToUpload": "탭해서 올리기"
+    },
+    "loading": {
+      "aria": "로딩 중이에요",
+      "label": "로딩 중이에요…"
+    },
+    "mbti": {
+      "placeholder": "선택해 주세요",
+      "title": "MBTI 선택",
+      "clear": "선택 안 함",
+      "result": "선택 결과",
+      "selectAll": "4가지를 모두 선택해 주세요",
+      "groups": {
+        "analyst": {
+          "label": "분석형",
+          "subtitle": "직관 · 사고"
+        },
+        "diplomat": {
+          "label": "외교관형",
+          "subtitle": "직관 · 감정"
+        },
+        "sentinel": {
+          "label": "관리자형",
+          "subtitle": "감각 · 사고"
+        },
+        "explorer": {
+          "label": "탐험가형",
+          "subtitle": "감각 · 감정"
+        }
+      },
+      "nicknames": {
+        "INTJ": "용의주도한 전략가",
+        "INTP": "논리적인 사색가",
+        "ENTJ": "대담한 통솔자",
+        "ENTP": "뜨거운 논쟁을 즐기는 변론가",
+        "INFJ": "선의의 옹호자",
+        "INFP": "열정적인 중재자",
+        "ENFJ": "정의로운 사회운동가",
+        "ENFP": "재기발랄한 활동가",
+        "ISTJ": "청렴결백한 논리주의자",
+        "ISFJ": "용감한 수호자",
+        "ESTJ": "엄격한 관리자",
+        "ESFJ": "사교적인 외교관",
+        "ISTP": "만능 재주꾼",
+        "ISFP": "호기심 많은 예술가",
+        "ESTP": "모험을 즐기는 사업가",
+        "ESFP": "자유로운 영혼의 연예인"
+      },
+      "dimensions": {
+        "ei": "에너지",
+        "ns": "인식",
+        "tf": "판단",
+        "jp": "생활"
+      },
+      "options": {
+        "E": "외향",
+        "I": "내향",
+        "N": "직관",
+        "S": "감각",
+        "T": "사고",
+        "F": "감정",
+        "J": "계획",
+        "P": "즉흥"
+      }
+    },
+    "nickname": {
+      "checking": "중복 확인 중…"
+    },
+    "photoLightbox": {
+      "title": "사진 크게 보기",
+      "close": "닫기",
+      "previous": "이전 사진",
+      "next": "다음 사진"
+    },
+    "pullToRefresh": {
+      "refreshing": "{brand} 새로고침 중…",
+      "release": "놓으면 새로고침",
+      "pull": "당겨서 새로고침"
+    },
+    "rangeSlider": {
+      "minPrice": "최소 가격",
+      "maxPrice": "최대 가격"
+    },
+    "schoolBadge": {
+      "title": "{school} · 학교 이메일 인증",
+      "aria": "{school} 인증"
+    },
+    "editor": {
+      "placeholder": "내용을 입력해 주세요",
+      "imageUploadFailed": "이미지 업로드에 실패했어요",
+      "bold": "굵게",
+      "italic": "기울임",
+      "heading": "제목",
+      "bulletList": "목록",
+      "quote": "인용",
+      "linkPrompt": "링크 URL을 입력하세요",
+      "link": "링크",
+      "photo": "사진",
+      "maxLengthReached": "최대 글자 수에 도달했어요",
+      "charCount": "텍스트 기준 글자 수"
+    },
+    "authErrors": {
+      "loginCancelled": "로그인을 취소했어요",
+      "popupBlocked": "팝업이 차단되었어요. 브라우저 설정을 확인해 주세요",
+      "invalidEmail": "이메일 형식이 올바르지 않아요",
+      "userDisabled": "비활성화된 계정이에요",
+      "userNotFound": "등록되지 않은 계정이에요",
+      "wrongPassword": "비밀번호가 올바르지 않아요",
+      "invalidCredential": "이메일 또는 비밀번호를 확인해 주세요",
+      "emailAlreadyInUse": "이미 가입된 이메일이에요",
+      "weakPassword": "비밀번호는 6자 이상으로 설정해 주세요",
+      "tooManyRequests": "시도가 너무 많아요. 잠시 후 다시 시도해 주세요",
+      "networkRequestFailed": "네트워크 연결을 확인해 주세요"
+    },
+    "configBanner": {
+      "loginPage": "로그인 페이지"
+    },
+    "authConfigBanner": {
+      "body": "AppConnect API가 아직 설정되지 않았습니다. ellieo-erp AppConnect와 동일하게 {baseUrl}과 Google Identity Services용 {clientId}를 환경 변수에 넣어 주세요. Google idToken은 Ellieo {endpoint}로 전달됩니다 ({envExample} 참고)."
+    },
+    "supabaseConfigBanner": {
+      "body": "Supabase 연동 환경 변수가 아직 설정되지 않았습니다. {envLocal}에 Supabase 값을 넣어 주세요 ({envExample} 참고). 설정 전에는 화면은 볼 수 있지만 데이터 저장·프로필 사진 업로드는 동작하지 않습니다."
+    },
+    "chipScroll": {
+      "previous": "이전 보기",
+      "next": "더 보기"
+    },
+    "copyLink": {
+      "copiedToast": "링크를 복사했어요",
+      "failedToast": "링크 복사에 실패했어요",
+      "linkCopied": "링크 복사됨",
+      "copyLink": "링크 복사",
+      "copied": "복사됨",
+      "share": "공유"
+    },
+    "photoGrid": {
+      "cover": "대표"
+    },
+    "timeline": {
+      "step": "{step}단계",
+      "latest": "최신",
+      "review": "후기"
+    },
+    "draft": {
+      "save": "임시 저장",
+      "savedAt": "임시 저장됨 · {time}"
+    },
+    "autosave": {
+      "title": "작성 내용은 자동으로 저장돼요",
+      "description": "진행 기록을 추가하거나 다음 항목으로 넘어갈 때마다 이 기기에 저장돼요. 창을 닫았다가 다시 열어도 이어서 쓸 수 있어요.",
+      "savedAt": "저장됨 · {time}"
+    }
+  }
+}

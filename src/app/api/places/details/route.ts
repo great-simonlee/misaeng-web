@@ -1,36 +1,43 @@
 import { NextResponse } from 'next/server'
 
 import { getPlaceDetails } from '@lib/community/places.server'
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
-    const placeId =
-      new URL(request.url).searchParams.get('placeId')?.trim() || ''
+    const params = new URL(request.url).searchParams
+    const placeId = params.get('placeId')?.trim() || ''
+    const sessionToken = params.get('session')?.trim().slice(0, 64) || null
     if (!placeId) {
       return NextResponse.json(
-        { error: 'placeId가 필요해요.' },
+        { error: t('places.placeIdRequired') },
         { status: 400 },
       )
     }
-    const place = await getPlaceDetails(placeId)
+    const place = await getPlaceDetails(placeId, { sessionToken })
     if (!place) {
       return NextResponse.json(
-        { error: '장소 정보를 찾지 못했어요.' },
+        { error: t('places.notFound') },
         { status: 404 },
       )
     }
-    return NextResponse.json({ place })
+    // 이름이 비어 있는 OSM 결과는 기본 이름을 채운다
+    const named = place.name.trim()
+      ? place
+      : place.placeId.startsWith('osm:')
+        ? { ...place, name: t('places.placeFallbackName') }
+        : place
+    return NextResponse.json({ place: named })
   } catch (error) {
     console.error('Places details error:', error)
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : '장소 정보를 불러오지 못했어요.',
+        error: apiErrorMessage(t, error, 'places.detailsFailed'),
       },
       { status: 500 },
     )

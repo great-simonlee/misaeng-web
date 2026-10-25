@@ -1,0 +1,495 @@
+{
+  "categories": {
+    "housing": {
+      "title": "Housing",
+      "description": "{city} listings posted by the Misaeng team"
+    },
+    "events": {
+      "title": "Events",
+      "description": "Meetups, shows, and events"
+    },
+    "food": {
+      "title": "Food",
+      "description": "Restaurant and cafe picks"
+    },
+    "marketplace": {
+      "title": "Marketplace",
+      "description": "Buy and sell everyday items"
+    },
+    "status": {
+      "title": "OPT · Visa · Green Card",
+      "description": "Visa, CPT/OPT, and green card stories"
+    },
+    "job-review": {
+      "title": "Interviews · Jobs",
+      "description": "Interview, job search, and workplace stories"
+    },
+    "roommate": {
+      "title": "Roommates · Sublets",
+      "description": "Find roommates, rooms, and sublets"
+    },
+    "anonymous": {
+      "title": "Anonymous Board",
+      "description": "Talk freely without your name"
+    },
+    "comingSoon": "Coming Soon"
+  },
+  "boards": {
+    "events": {
+      "writeLabel": "Post an event",
+      "listIntro": "Share meetups, shows, and events happening in {city}.",
+      "locationLabel": "Place",
+      "locationPlaceholder": "Manhattan / Online",
+      "detailLabel": "Date & time",
+      "titlePlaceholder": "Korean networking night",
+      "descriptionPlaceholder": "Time, how to join, a one-line intro"
+    },
+    "food": {
+      "writeLabel": "Recommend a spot",
+      "listIntro": "Share restaurants and cafes you've tried. Add photos and reviews however you like.",
+      "locationLabel": "Neighborhood",
+      "locationPlaceholder": "Flushing / Koreatown",
+      "detailLabel": "Cuisine",
+      "titlePlaceholder": "Restaurant name",
+      "descriptionPlaceholder": "Menu, price range, wait time, what you loved…"
+    },
+    "marketplace": {
+      "writeLabel": "List an item",
+      "listIntro": "Things you don't need, things you do — trade with your neighbors.",
+      "locationLabel": "Area",
+      "locationPlaceholder": "Brooklyn / can meet up",
+      "detailLabel": "Asking price ($)",
+      "detailPlaceholder": "0",
+      "titlePlaceholder": "IKEA bookshelf, free or for sale",
+      "descriptionPlaceholder": "Tell us the condition, pickup options, and how you'd like to trade."
+    },
+    "status": {
+      "writeLabel": "Share your story",
+      "listIntro": "Share what you prepared and filed on each date, how you got the result, and what's next.",
+      "locationLabel": "School / company / agency (optional)",
+      "locationPlaceholder": "e.g. Korean IT and software company",
+      "detailLabel": "Type",
+      "titlePlaceholder": "My OPT timeline at a finance company",
+      "descriptionPlaceholder": "Share what to watch out for so the next person doesn't make the same mistakes."
+    },
+    "cpt-opt": {
+      "writeLabel": "Share your story",
+      "listIntro": "Share what you prepared and filed on each date, how you got the result, and what's next.",
+      "locationLabel": "School / company / agency (optional)",
+      "locationPlaceholder": "e.g. Korean IT and software company",
+      "detailLabel": "Type",
+      "titlePlaceholder": "My OPT timeline at a finance company",
+      "descriptionPlaceholder": "Share what to watch out for so the next person doesn't make the same mistakes."
+    },
+    "visa": {
+      "writeLabel": "Share your story",
+      "listIntro": "Share your visa prep and interview experience.",
+      "locationLabel": "Location (optional)",
+      "locationPlaceholder": "NY / embassy, etc.",
+      "detailLabel": "Visa type",
+      "detailPlaceholder": "F-1 / H-1B / O-1",
+      "titlePlaceholder": "My H-1B petition story",
+      "descriptionPlaceholder": "Timeline, documents, tips"
+    },
+    "job-review": {
+      "writeLabel": "Share your story",
+      "listIntro": "Log your applications, interviews, and results by date. You can keep adding after you post.",
+      "locationLabel": "Company (optional)",
+      "locationPlaceholder": "Enter the company name",
+      "detailLabel": "Type",
+      "titlePlaceholder": "My internship applications at a finance company",
+      "descriptionPlaceholder": "Share what to watch out for so the next person doesn't make the same mistakes."
+    },
+    "roommate": {
+      "writeLabel": "Create a post",
+      "listIntro": "Post a room (roommate or sublet) or look for a roommate. You can have one post per account.",
+      "locationLabel": "Neighborhood / location",
+      "locationPlaceholder": "Flushing / Brooklyn / Manhattan",
+      "detailLabel": "Monthly budget / rent ($)",
+      "detailPlaceholder": "1500",
+      "titlePlaceholder": "Looking for a roommate in Brooklyn",
+      "descriptionPlaceholder": "Tell us about your lifestyle, budget, and move-in date. Leave a KakaoTalk 1:1 open chat link so people can reach you."
+    },
+    "green-card": {
+      "writeLabel": "Share your story",
+      "listIntro": "Share your green card journey with the community.",
+      "locationLabel": "Category (optional)",
+      "locationPlaceholder": "EB-2 / marriage, etc.",
+      "detailLabel": "Stage",
+      "detailPlaceholder": "I-140 / interview, etc.",
+      "titlePlaceholder": "My EB-2 NIW approval story",
+      "descriptionPlaceholder": "Timeline, lawyer, tips"
+    },
+    "anonymous": {
+      "writeLabel": "Post anonymously",
+      "listIntro": "The {city} anonymous board, where you can talk freely without your name.",
+      "locationLabel": "Topic (optional)",
+      "locationPlaceholder": "Choose a topic",
+      "titlePlaceholder": "One line about your day",
+      "descriptionPlaceholder": "Write whatever's on your mind. You'll be shown as anonymous."
+    }
+  },
+  "errors": {
+    "createFailed": "Couldn't post. Please try again.",
+    "claimGuestFailed": "Couldn't link your guest posts.",
+    "myPostsLoadFailed": "Couldn't load your posts.",
+    "mockEditBlocked": "Sample posts can't be edited.",
+    "mockDeleteBlocked": "Sample posts can't be deleted.",
+    "updateFailed": "Couldn't save your changes.",
+    "deleteFailed": "Couldn't delete the post.",
+    "uploadFailed": "Couldn't upload the image.",
+    "commentRequired": "Please write a comment.",
+    "loginRequired": "Please log in first.",
+    "commentVerifyRequired": "You need to verify your school email to post and comment.",
+    "commentCreateFailed": "Couldn't post your comment.",
+    "replyParentNotFound": "We couldn't find the comment you're replying to.",
+    "commentEditTargetMissing": "Choose a comment to edit.",
+    "commentEditForbidden": "You can only edit your own comments.",
+    "commentNotFound": "We couldn't find that comment.",
+    "commentUpdateFailed": "Couldn't update your comment.",
+    "commentDeleteTargetMissing": "Choose a comment to delete.",
+    "commentDeleteForbidden": "You can only delete your own comments.",
+    "commentDeleteFailed": "Couldn't delete your comment.",
+    "recommendFailed": "Couldn't save your like.",
+    "reportReasonRequired": "Please choose a reason.",
+    "alreadyReported": "You've already reported this.",
+    "reportFailed": "Couldn't send your report.",
+    "beenThereFoodOnly": "You can only mark \"Been there\" on food posts.",
+    "beenThereFailed": "Couldn't save \"Been there\"."
+  },
+  "author": {
+    "member": "Member",
+    "anonymous": "Anonymous"
+  },
+  "verify": {
+    "required": "You need to verify as a student or professional to post and comment.",
+    "cta": "Verify",
+    "linkLabel": "student or professional verification",
+    "suspended": "This account is suspended."
+  },
+  "guidelines": {
+    "common": {
+      "noPersonalInfo": "Don't post real names, contact info, or anything that could identify someone.",
+      "noAbuse": "No insults, hate, discrimination, threats, or false information.",
+      "noPrivacyViolation": "Please avoid personal disputes, invading privacy, or sharing photos taken without consent.",
+      "violationPenalty": "Posts that break these rules may be removed, and your account may be restricted."
+    },
+    "anonymous": {
+      "noTargeting": "Even anonymously, posts that name or hint at a specific person, or talk behind their back, aren't allowed.",
+      "stillResponsible": "Others can't see your name, school, or photo, but you're still legally responsible for what you post.",
+      "loginRequired": "You need to log in so you can edit or delete your posts. Our team can check who posted when handling reports."
+    },
+    "commonTitle": "Community guidelines",
+    "anonymousTitle": "Anonymous board guidelines"
+  },
+  "anonymousTopics": {
+    "opt": "OPT·CPT·STEM OPT",
+    "visa": "Visa & status",
+    "jobs": "Jobs & internships",
+    "housing": "Housing & roommates",
+    "campusLife": "Campus life",
+    "classes": "Classes & studies",
+    "finance": "Money, taxes & insurance",
+    "relationships": "Relationships",
+    "mentalHealth": "Mental health & worries",
+    "transportation": "Driving & transit",
+    "lifeTips": "Life tips",
+    "secondhand": "Secondhand & giveaways",
+    "daily": "Daily life",
+    "other": "Other"
+  },
+  "report": {
+    "reasons": {
+      "spam": {
+        "label": "Spam · Ads",
+        "description": "Promotions, flooding, unrelated links"
+      },
+      "abuse": {
+        "label": "Abuse · Harassment",
+        "description": "Insults, hate, or threats"
+      },
+      "inappropriate": {
+        "label": "Inappropriate content",
+        "description": "Sexual or violent content, or breaks community guidelines"
+      },
+      "misinformation": {
+        "label": "False info · Possible scam",
+        "description": "False information, suspected scam or phishing"
+      },
+      "privacy": {
+        "label": "Personal info exposed",
+        "description": "Contact info, photos, or personal details shared without consent"
+      },
+      "other": {
+        "label": "Other",
+        "description": "Something not listed above"
+      }
+    },
+    "action": "Report",
+    "title": "Report",
+    "cancel": "Cancel",
+    "submitting": "Sending…",
+    "submit": "Submit report",
+    "intro": {
+      "post": "You're reporting this post. Our admins will review it and take action.",
+      "comment": "You're reporting this comment. Our admins will review it and take action.",
+      "generic": "You're reporting this content. Our admins will review it and take action."
+    },
+    "detailLabelRequired": "Details (required)",
+    "detailLabelOptional": "Details (optional)",
+    "detailPlaceholder": "Tell us a bit more about why you're reporting this",
+    "submitted": "Thanks, we got your report. Our admins will review it."
+  },
+  "anonymousNotice": {
+    "close": "Close",
+    "eyebrow": "Before you start",
+    "board": "Anonymous Board",
+    "title": "An anonymous space we keep safe together",
+    "body": "To keep {brand} a healthy, helpful community, please follow the rules and treat each other with respect, even on the anonymous board!",
+    "confirm": "Got it",
+    "snooze24h": "Don't show for 24 hours"
+  },
+  "detail": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "companyPageFallback": "Company page",
+    "loadFailed": "Couldn't load this post.",
+    "deleteConfirm": "Delete \"{title}\"?\nThis can't be undone.",
+    "deleted": "Post deleted",
+    "loading": "Loading…",
+    "notFoundTitle": "Post not found",
+    "notFoundDescription": "It may have been deleted.",
+    "backToListAction": "Back to {board}",
+    "backToList": "{board}",
+    "roommateType": "Type",
+    "roommateBudget": "Monthly budget / rent",
+    "perMonthValue": "{value}/mo",
+    "roommateMoveIn": "Move-in / move-out",
+    "views": "{n} views"
+  },
+  "like": {
+    "like": "Like",
+    "unlike": "Unlike"
+  },
+  "engagement": {
+    "recommend": "Recommend",
+    "recommended": "Recommended",
+    "recommendCancelled": "Recommendation removed",
+    "beenThere": "I've been there",
+    "beenThereAdded": "Marked as been there",
+    "beenThereCancelled": "Removed \"been there\""
+  },
+  "card": {
+    "noPhoto": "No photo",
+    "beenThereCount_one": "{n} person has been here",
+    "beenThereCount_other": "{n} people have been here",
+    "timelineSteps_one": "{count}-step timeline",
+    "timelineSteps_other": "{count}-step timeline",
+    "hiringSteps_one": "{count} hiring step",
+    "hiringSteps_other": "{count} hiring steps",
+    "hiringStepsWithMore_one": "{count} hiring step · {hidden} more",
+    "hiringStepsWithMore_other": "{count} hiring steps · {hidden} more",
+    "period": "Dates {period}",
+    "perMonth": "/mo",
+    "stepNumber": "Step {n}",
+    "noStepInfo": "No step details",
+    "views": "Views"
+  },
+  "anonymous": {
+    "topicPlaceholder": "Choose a topic",
+    "topicAria": "Topic"
+  },
+  "toolbar": {
+    "filter": "Filter",
+    "filterApplied_one": "{count} filter applied",
+    "filterApplied_other": "{count} filters applied"
+  },
+  "comments": {
+    "title": "Comments",
+    "loadFailed": "Couldn't load comments.",
+    "bodyRequired": "Please write a comment.",
+    "posted": "Comment posted",
+    "replyPosted": "Reply posted",
+    "deleteConfirm": "Delete this comment?\nIts replies will be deleted too.",
+    "deleted": "Comment deleted",
+    "updated": "Comment updated",
+    "loginPrompt": "Please {link} to comment.",
+    "loginLink": "log in",
+    "verifyPrompt": "To comment, please complete {link}.",
+    "checkingLogin": "Checking your login…",
+    "placeholder": "Leave a comment",
+    "submitting": "Posting…",
+    "submit": "Post comment",
+    "loading": "Loading comments…",
+    "empty": "No comments yet. Be the first to comment.",
+    "replyPlaceholder": "Write a reply",
+    "cancel": "Cancel",
+    "replySubmit": "Post reply",
+    "deleting": "Deleting…",
+    "saving": "Saving…",
+    "saveEdit": "Save",
+    "reply": "Reply"
+  },
+  "share": {
+    "metaDescription": "No sign-up needed. Share your applications, interviews, and results step by step. Each review earns you credits you can use for coffee chats with people in the industry."
+  },
+  "wip": {
+    "title": "Coming soon",
+    "description": "We're building the {board} board right now. Hang tight!",
+    "homeAction": "Back to community home",
+    "otherBoards": "Curious about other boards? Check out {link} first."
+  },
+  "list": {
+    "mapLoading": "Loading map…",
+    "foodVibeAria": "Vibe",
+    "all": "All",
+    "cuisineAria": "Cuisine",
+    "allCuisines": "All cuisines",
+    "loadFailed": "Couldn't load posts.",
+    "login": "Log in",
+    "suspended": "Suspended",
+    "retry": "Try again",
+    "emptyTitle": "No {board} posts yet",
+    "noMatchTitle": "No posts match your filters",
+    "emptyCanWrite": "Be the first to post and get the conversation started.",
+    "emptyNeedsVerify": "Verify as a student or professional to post.",
+    "emptyNeedsLogin": "Log in to post.",
+    "noMatchFood": "Try a different vibe or cuisine.",
+    "noMatchCptOpt": "Try a different type (CPT/OPT/STEM OPT).",
+    "noMatchJobReview": "Try a different type or company.",
+    "noMatchDefault": "Try changing your filters.",
+    "showMap": "Show map",
+    "showList": "Show list",
+    "map": "Map",
+    "list": "List",
+    "clearAll": "Clear all",
+    "apply": "Apply",
+    "filterType": "Type",
+    "cptOptTypeAria": "CPT/OPT type",
+    "filterCity": "City",
+    "filterSchool": "School",
+    "jobReviewTypeAria": "Interview and job type",
+    "search": "Search",
+    "searchPlaceholder": "Search titles, content, or location",
+    "sort": "Sort",
+    "sortRecentlyUpdated": "Recently updated",
+    "sortLeastRecentlyUpdated": "Least recently updated",
+    "sortNewest": "Newest",
+    "sortOldest": "Oldest",
+    "company": "Company",
+    "companyFilterAria": "Company filter",
+    "companyName": "Company name",
+    "companyCategory": "Company category",
+    "companyNamePlaceholder": "Search by company name",
+    "companyCategoryPlaceholder": "Choose a category",
+    "none": "None"
+  },
+  "write": {
+    "errors": {
+      "postNotFound": "We couldn't find this post.",
+      "noEditPermission": "You don't have permission to edit this post.",
+      "titleRequired": "Please enter a title.",
+      "titleTooLong": "Titles can be up to {max} characters.",
+      "bodyRequired": "Please write something in the body.",
+      "bodyTooLong": "The body can be up to {max} characters.",
+      "titleAndBodyRequired": "Please enter a title and body."
+    },
+    "updated": "Post updated",
+    "created": "Post published",
+    "draftSaved": "Draft saved",
+    "draftSaveFailed": "Couldn't save your draft.",
+    "redirectingToLogin": "Taking you to the login page…",
+    "backToPost": "Back to post",
+    "backToList": "Back to list",
+    "titleLabel": "Title",
+    "bodyLabel": "Body",
+    "submit": "Publish post",
+    "publish": "Publish",
+    "editEyebrow": "Edit post",
+    "untitled": "Untitled",
+    "food": {
+      "menuMaxReached": "You can add up to {max} menu items.",
+      "imagesOnly": "Only image files can be selected.",
+      "menuMaxPartial_one": "You can add up to {max} menu items. Only {count} photo will be added.",
+      "menuMaxPartial_other": "You can add up to {max} menu items. Only {count} photos will be added.",
+      "uploadPartial": "{success} added, {failed} failed.",
+      "menuUploadFailed": "Couldn't upload the menu photos.",
+      "galleryMaxReached": "You can add up to {max} vibe photos.",
+      "galleryMaxPartial_one": "You can add up to {max} vibe photos. Only {count} photo will be added.",
+      "galleryMaxPartial_other": "You can add up to {max} vibe photos. Only {count} photos will be added.",
+      "galleryUploadFailed": "Couldn't upload the vibe photos.",
+      "errors": {
+        "addressRequired": "Search for the address on the map and select it.",
+        "coordinatesMissing": "We couldn't find the location for that address.",
+        "categoryRequired": "Please choose a category.",
+        "cuisineRequired": "Please choose the type of food.",
+        "nameRequired": "Please enter the restaurant name.",
+        "partySizeRange": "Enter a party size between {min} and {max}.",
+        "spendRange": "Enter a whole number total between $0 and {max}.",
+        "tipRequired": "Please choose tip included or tip not included.",
+        "waitRange": "Enter a wait time between 0 and {max} minutes.",
+        "menuIncomplete": "Each menu item needs a photo, a name, and a one-line review."
+      },
+      "whereTitle": "Where did you eat?",
+      "whereDescription": "Pick the exact address so we can save the location.",
+      "nameLabel": "Restaurant name",
+      "categoryTitle": "Category",
+      "cuisineTitle": "What kind of food?",
+      "visitTitle": "Visit details",
+      "partySize": "Party size",
+      "partySizeHint": "Up to {max} people",
+      "partySizeUnit": "people",
+      "totalSpend": "Total spent",
+      "totalSpendHint": "$0 ~ {max} · whole numbers",
+      "tipAria": "Tip included",
+      "tipIncluded": "Tip incl.",
+      "tipExcluded": "No tip",
+      "wait": "Wait",
+      "waitHint": "0 if none · up to {max} min",
+      "waitUnit": "min",
+      "galleryTitle": "Interior · Vibe",
+      "galleryDescription": "Interior, seating, and vibe photos · up to {max}",
+      "galleryPick": "Choose vibe photos",
+      "galleryPickHint": "Pick up to {max} photos from your gallery at once.",
+      "galleryAddMoreAria_one": "Add {count} more vibe photo",
+      "galleryAddMoreAria_other": "Add {count} more vibe photos",
+      "galleryAddMore_one": "{count} more",
+      "galleryAddMore_other": "{count} more",
+      "uploading": "Uploading…",
+      "menuTitle": "Menu photos",
+      "menuDescription": "Add a menu name and a one-line review for each photo.",
+      "coverNoticeTitle": "Your first menu photo becomes the cover photo",
+      "coverNoticeBody": "It shows up large on list cards and at the top of your post.",
+      "menuPick": "Choose menu photos",
+      "menuPickHint": "Up to {max} · first photo is the cover · name and review required",
+      "menuNumber": "Menu {n}",
+      "coverPhoto": "Cover photo",
+      "photo": "Photo",
+      "cover": "Cover",
+      "menuNamePlaceholder": "Menu name (required)",
+      "menuNameAria": "Menu {n} name",
+      "menuCaptionPlaceholder": "One-line review (required)",
+      "menuCaptionAria": "Menu {n} one-line review",
+      "missingNameAndCaption": "Please enter a menu name and a one-line review.",
+      "missingName": "Please enter a menu name.",
+      "missingCaption": "Please enter a one-line review.",
+      "menuAddMore_one": "Add {count} more menu photo",
+      "menuAddMore_other": "Add {count} more menu photos",
+      "bodyDescription": "Share what you loved, how to get there, and any tips.",
+      "selectAddress": "Please choose an address",
+      "checkingCoordinates": "Checking the address location…",
+      "selectCuisine": "Please choose the food type",
+      "submit": "Post"
+    }
+  },
+  "anonymousWrite": {
+    "topicTitle": "What's it about?",
+    "topicDescription": "You can skip this.",
+    "topicAria": "Anonymous board topic",
+    "titleDescription": "Write a short title people can read at a glance.",
+    "bodyDescription": "Write whatever's on your mind. You'll be shown as anonymous.",
+    "createTitle": "Post on the anonymous board",
+    "createDescription": "Your name, school, and photo stay hidden. Share freely.",
+    "editTitle": "Edit anonymous post"
+  }
+}

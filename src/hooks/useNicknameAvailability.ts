@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
+import { useT } from '@lib/i18n/client'
+
 export type NicknameAvailabilityStatus =
   | 'idle'
   | 'checking'
@@ -36,6 +38,7 @@ export function useNicknameAvailability(
     debounceMs = 400,
   }: UseNicknameAvailabilityOptions = {},
 ): NicknameAvailability {
+  const t = useT('me')
   const [result, setResult] = useState<NicknameAvailability>(IDLE)
   const [checkedKey, setCheckedKey] = useState<string>('')
 
@@ -63,21 +66,21 @@ export function useNicknameAvailability(
         if (!response.ok) {
           setResult({
             status: 'error',
-            message: data?.error || '닉네임 확인에 실패했어요.',
+            message: data?.error || t('nickname.checkFailed'),
           })
         } else if (data?.available) {
-          setResult({ status: 'available', message: '사용할 수 있는 닉네임이에요' })
+          setResult({ status: 'available', message: t('nickname.available') })
         } else {
           setResult({
             status: 'taken',
-            message: data?.error || '이미 사용 중인 닉네임이에요.',
+            message: data?.error || t('nickname.taken'),
           })
         }
         setCheckedKey(requestKey)
       } catch (error) {
         if (controller.signal.aborted) return
         console.error('Nickname availability error:', error)
-        setResult({ status: 'error', message: '닉네임 확인에 실패했어요.' })
+        setResult({ status: 'error', message: t('nickname.checkFailed') })
         setCheckedKey(requestKey)
       }
     }, debounceMs)
@@ -86,7 +89,7 @@ export function useNicknameAvailability(
       controller.abort()
       window.clearTimeout(timer)
     }
-  }, [shouldCheck, trimmed, scope, debounceMs, requestKey])
+  }, [shouldCheck, trimmed, scope, debounceMs, requestKey, t])
 
   if (!shouldCheck) return IDLE
   if (checkedKey !== requestKey) return { status: 'checking', message: null }

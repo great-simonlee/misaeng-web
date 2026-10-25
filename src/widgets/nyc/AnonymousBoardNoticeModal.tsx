@@ -5,18 +5,22 @@ import { createPortal } from 'react-dom'
 
 import { useBodyScrollLock } from '@hooks/useBodyScrollLock'
 import {
-  ANONYMOUS_WRITING_GUIDELINES,
-  COMMUNITY_WRITING_GUIDELINES,
+  ANONYMOUS_WRITING_GUIDELINE_KEYS,
+  COMMUNITY_WRITING_GUIDELINE_KEYS,
 } from '@lib/constants/communityGuidelines'
+import { BRAND_CONFIG } from '@lib/brand'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 
 const SNOOZE_STORAGE_KEY = 'misaeng.nyc.anonymousBoardNotice.snoozeUntil'
 const DAY_MS = 24 * 60 * 60 * 1000
 
-const NOTICE_BULLETS = [
-  ...ANONYMOUS_WRITING_GUIDELINES,
-  ...COMMUNITY_WRITING_GUIDELINES.slice(0, 2),
-] as const
+const NOTICE_BULLET_KEYS = [
+  ...ANONYMOUS_WRITING_GUIDELINE_KEYS.map((key) => `guidelines.anonymous.${key}`),
+  ...COMMUNITY_WRITING_GUIDELINE_KEYS.slice(0, 2).map(
+    (key) => `guidelines.common.${key}`,
+  ),
+]
 
 function readSnoozeUntil(): number {
   try {
@@ -60,6 +64,7 @@ export function AnonymousBoardNoticeModal({
   onClose,
   onSnooze24h,
 }: AnonymousBoardNoticeModalProps) {
+  const t = useT('community')
   useBodyScrollLock(open)
 
   if (!open || typeof document === 'undefined') return null
@@ -73,7 +78,7 @@ export function AnonymousBoardNoticeModal({
     >
       <button
         type='button'
-        aria-label='닫기'
+        aria-label={t('anonymousNotice.close')}
         className='absolute inset-0 touch-none bg-black/45 backdrop-blur-[2px]'
         onClick={onClose}
       />
@@ -85,34 +90,33 @@ export function AnonymousBoardNoticeModal({
           />
           <div className='mt-3 flex w-full items-center justify-between gap-3 px-5'>
             <p className='text-[11px] font-semibold tracking-[0.14em] text-[var(--muted)]'>
-              이용 주의사항
+              {t('anonymousNotice.eyebrow')}
             </p>
             <button
               type='button'
               onClick={onClose}
               className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
             >
-              닫기
+              {t('anonymousNotice.close')}
             </button>
           </div>
         </div>
 
         <div className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-2 pt-4'>
           <p className='text-[11px] font-semibold tracking-[0.12em] text-[var(--brand)]'>
-            익명게시판
+            {t('anonymousNotice.board')}
           </p>
           <h2
             id='anonymous-board-notice-title'
             className='mt-1.5 text-[1.35rem] font-semibold tracking-[-0.03em] text-[var(--foreground)]'
           >
-            함께 지키는 익명 공간
+            {t('anonymousNotice.title')}
           </h2>
           <p className='mt-3 text-[14px] leading-relaxed text-[var(--muted)]'>
-            미생의 건강하고 생산적인 커뮤니티의 발전을 위해, 익명게시판에서도
-            서로를 존중하는 이용 규칙을 지켜 주세요!
+            {t('anonymousNotice.body', { brand: BRAND_CONFIG.name })}
           </p>
           <ul className='mt-4 space-y-2'>
-            {NOTICE_BULLETS.map((item) => (
+            {NOTICE_BULLET_KEYS.map((item) => (
               <li
                 key={item}
                 className='flex gap-2.5 rounded-xl bg-[#f7f8fa] px-3.5 py-3 text-[13px] leading-relaxed text-[var(--foreground)] ring-1 ring-black/[0.04]'
@@ -121,7 +125,7 @@ export function AnonymousBoardNoticeModal({
                   className='mt-1.5 size-1.5 shrink-0 rounded-full bg-[var(--brand)]'
                   aria-hidden
                 />
-                <span>{item}</span>
+                <span>{t(item)}</span>
               </li>
             ))}
           </ul>
@@ -133,7 +137,7 @@ export function AnonymousBoardNoticeModal({
             onClick={onClose}
             className='h-11 w-full rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white touch-manipulation hover:bg-[var(--brand-hover)]'
           >
-            확인했어요
+            {t('anonymousNotice.confirm')}
           </button>
           <button
             type='button'
@@ -143,7 +147,7 @@ export function AnonymousBoardNoticeModal({
               'hover:bg-[#eceef1]',
             )}
           >
-            24시간 동안 보지 않기
+            {t('anonymousNotice.snooze24h')}
           </button>
         </div>
       </div>

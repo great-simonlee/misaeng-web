@@ -1,14 +1,31 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 
 import { useCity } from '@hooks/useCity'
 import { hrefForCommunityPost } from '@lib/constants/cities'
-import { COMMUNITY_CREDIT_REVIEW_BONUS } from '@lib/constants/communityCredit'
+import {
+  COMMUNITY_CREDIT_POST_TOTAL_MAX,
+  COMMUNITY_CREDIT_REVIEW_BONUS,
+} from '@lib/constants/communityCredit'
 import { postHasFinalResultForCreditReview } from '@lib/community/creditFinalResult'
+import { useFormat, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import type { CommunityPost } from '@/types/nyc'
+
+/** `{token}` 자리에 React 노드(강조)를 넣는다 */
+function withNode(text: string, token: string, node: ReactNode): ReactNode {
+  const [before, ...rest] = text.split(`{${token}}`)
+  if (rest.length === 0) return text
+  return (
+    <>
+      {before}
+      {node}
+      {rest.join(`{${token}}`)}
+    </>
+  )
+}
 
 type ReviewRequest = {
   id: string
@@ -29,6 +46,9 @@ export function CreditReviewRequestCard({
   className,
 }: Props) {
   const city = useCity()
+  const t = useT('credit')
+  const format = useFormat()
+  const bonus = format.number(COMMUNITY_CREDIT_REVIEW_BONUS)
   const [request, setRequest] = useState<ReviewRequest | null>(null)
   const [eligible, setEligible] = useState(() =>
     postHasFinalResultForCreditReview(post),
@@ -53,16 +73,16 @@ export function CreditReviewRequestCard({
         error?: string
       } | null
       if (!res.ok) {
-        throw new Error(data?.error || '상태를 불러오지 못했어요')
+        throw new Error(data?.error || t('reviewCard.loadFailed'))
       }
       setEligible(Boolean(data?.eligible))
       setRequest(data?.request ?? null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : '상태를 불러오지 못했어요')
+      setError(err instanceof Error ? err.message : t('reviewCard.loadFailed'))
     } finally {
       setLoading(false)
     }
-  }, [isAuthor, post.id])
+  }, [isAuthor, post.id, t])
 
   useEffect(() => {
     setEligible(postHasFinalResultForCreditReview(post))
@@ -87,11 +107,11 @@ export function CreditReviewRequestCard({
         error?: string
       } | null
       if (!res.ok) {
-        throw new Error(data?.error || '요청에 실패했어요')
+        throw new Error(data?.error || t('reviewCard.requestFailed'))
       }
       setRequest(data?.request ?? null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : '요청에 실패했어요')
+      setError(err instanceof Error ? err.message : t('reviewCard.requestFailed'))
     } finally {
       setSubmitting(false)
     }
@@ -106,44 +126,46 @@ export function CreditReviewRequestCard({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-[#F64310]/15 bg-[linear-gradient(135deg,#fffaf8_0%,#ffffff_60%)] px-4 py-4 ring-1 ring-[#F64310]/8 sm:px-5',
+        'rounded-2xl border border-brand/15 bg-[linear-gradient(135deg,var(--brand-soft)_0%,#ffffff_60%)] px-4 py-4 ring-1 ring-brand/8 sm:px-5',
         className,
       )}
     >
       <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
         <div className='min-w-0'>
           <p className='text-[13px] font-semibold text-[var(--foreground)]'>
-            최종 결과 리뷰 보너스
+            {t('reviewCard.title')}
           </p>
           <p className='mt-1 text-[12px] leading-relaxed text-[var(--muted-foreground)]'>
-            최종 결과까지 적힌 후기는 미생 팀이 내용을 검토한 뒤 추가{' '}
-            <strong className='font-semibold text-[var(--brand)]'>
-              +{COMMUNITY_CREDIT_REVIEW_BONUS}
-            </strong>{' '}
-            크레딧을 지급할 수 있어요. (자동 적립과 합쳐 글당 최대 50)
+            {withNode(
+              t('reviewCard.description', {
+                totalMax: format.number(COMMUNITY_CREDIT_POST_TOTAL_MAX),
+              }),
+              'bonus',
+              <strong className='font-semibold text-[var(--brand)]'>
+                {t('reviewCard.bonusAmount', { amount: bonus })}
+              </strong>,
+            )}
           </p>
           {!eligible ? (
             <p className='mt-2 text-[12px] text-[var(--muted)]'>
-              타임라인에 최종 결과(승인·카드 수령·Offer·거절 등)를 추가한 뒤
-              요청할 수 있어요.
+              {t('reviewCard.notEligible')}
             </p>
           ) : null}
           {status === 'pending' ? (
             <p className='mt-2 text-[12px] font-medium text-amber-700'>
-              검토 대기 중 · 미생 팀이 글을 확인한 뒤 지급합니다.
+              {t('reviewCard.pending')}
             </p>
           ) : null}
           {status === 'approved' ? (
             <p className='mt-2 text-[12px] font-medium text-emerald-700'>
-              승인됨 · 추가 +{COMMUNITY_CREDIT_REVIEW_BONUS} 크레딧이
-              지급되었어요.
+              {t('reviewCard.approved', { amount: bonus })}
             </p>
           ) : null}
           {status === 'rejected' ? (
             <p className='mt-2 text-[12px] font-medium text-[var(--muted)]'>
-              반려됨
-              {request?.rejectReason ? ` · ${request.rejectReason}` : null}
-              . 내용을 보완한 뒤 다시 요청할 수 있어요.
+              {request?.rejectReason
+                ? t('reviewCard.rejectedWithReason', { reason: request.rejectReason })
+                : t('reviewCard.rejected')}
             </p>
           ) : null}
           {error ? (
@@ -159,7 +181,7 @@ export function CreditReviewRequestCard({
               disabled={submitting || loading}
               className='inline-flex h-10 items-center justify-center rounded-full bg-[var(--foreground)] px-4 text-[13px] font-semibold text-white touch-manipulation disabled:opacity-50'
             >
-              {submitting ? '요청 중…' : '추가 크레딧 요청'}
+              {submitting ? t('reviewCard.requesting') : t('reviewCard.requestButton')}
             </button>
           ) : null}
           {!eligible ? (
@@ -167,7 +189,7 @@ export function CreditReviewRequestCard({
               href={hrefForCommunityPost(post, city, 'edit')}
               className='inline-flex h-10 items-center justify-center rounded-full border border-[var(--border)] bg-white px-4 text-[13px] font-semibold text-[var(--foreground)] touch-manipulation'
             >
-              타임라인 수정
+              {t('reviewCard.editTimeline')}
             </Link>
           ) : null}
         </div>

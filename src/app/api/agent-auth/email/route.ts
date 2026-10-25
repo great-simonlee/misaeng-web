@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { persistConsentRecord, assertAcceptedCurrentPolicy } from '@lib/consent/recordConsent'
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
 import { getEllieoBaseUrl, ellieoUpstreamFetch } from '../lib/ellieoServer'
 import {
   getAuthErrorMessage,
@@ -16,14 +18,15 @@ type EmailAuthBody = {
   acceptedTerms?: boolean
   termsVersion?: string
   privacyVersion?: string
-  uiLanguage?: 'en' | 'ko'
+  uiLanguage?: string
 }
 
 export async function POST(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
     if (!getEllieoBaseUrl()) {
       return NextResponse.json(
-        { error: 'APP_CONNECT_API_BASE_URL 환경 변수가 필요해요.' },
+        { error: t('auth.appConnectMissing') },
         { status: 503 },
       )
     }
@@ -35,7 +38,7 @@ export async function POST(request: Request) {
 
     if (!email) {
       return NextResponse.json(
-        { error: '이메일을 입력해 주세요.' },
+        { error: t('auth.emailRequired') },
         { status: 400 },
       )
     }
@@ -51,7 +54,7 @@ export async function POST(request: Request) {
 
       if (!res.ok) {
         return NextResponse.json(
-          { error: getAuthErrorMessage(data, '비밀번호 재설정 요청에 실패했어요.') },
+          { error: getAuthErrorMessage(t, data, t('auth.passwordResetFailed')) },
           { status: res.status || 400 },
         )
       }
@@ -61,13 +64,13 @@ export async function POST(request: Request) {
 
     if (!password) {
       return NextResponse.json(
-        { error: '비밀번호를 입력해 주세요.' },
+        { error: t('auth.passwordRequired') },
         { status: 400 },
       )
     }
 
     if (mode === 'login') {
-      const result = await loginWithEmail(email, password)
+      const result = await loginWithEmail(t, email, password)
       if (!result.ok) {
         return NextResponse.json({ error: result.error }, { status: 401 })
       }
@@ -83,12 +86,13 @@ export async function POST(request: Request) {
       acceptedTerms: body.acceptedTerms,
       termsVersion: body.termsVersion,
       privacyVersion: body.privacyVersion,
+      t,
     })
     if (!consentCheck.ok) {
       return NextResponse.json(consentCheck.body, { status: consentCheck.status })
     }
 
-    const result = await registerWithEmail(email, password, body.name)
+    const result = await registerWithEmail(t, email, password, body.name)
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 401 })
     }
@@ -103,6 +107,7 @@ export async function POST(request: Request) {
         privacyVersion: body.privacyVersion,
         uiLanguage: body.uiLanguage,
         method: 'signup_checkbox',
+        t,
       })
       if (!consent.ok) {
         return NextResponse.json(consent.body, { status: consent.status })
@@ -117,10 +122,7 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : '이메일 인증 중 오류가 발생했어요.',
+        error: apiErrorMessage(t, error, 'auth.emailAuthError'),
       },
       { status: 500 },
     )

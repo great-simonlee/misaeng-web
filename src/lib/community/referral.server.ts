@@ -1,4 +1,5 @@
 import { COMMUNITY_CREDIT_REFERRAL_MAX } from '@lib/constants/communityCredit'
+import { ApiMessageError } from '@lib/i18n/apiError'
 import {
   createReferralCode,
   isValidReferralCode,
@@ -15,7 +16,7 @@ import {
 
 export async function ensureUserReferralCode(uid: string): Promise<string> {
   const userId = String(uid || '').trim()
-  if (!userId) throw new Error('로그인이 필요해요.')
+  if (!userId) throw new ApiMessageError('Login required', 'common.loginRequired')
 
   const profile = await getSupabaseProfile(userId)
   const existing = normalizeReferralCode(profile?.referralCode)
@@ -46,7 +47,7 @@ export async function ensureUserReferralCode(uid: string): Promise<string> {
     return code
   }
 
-  throw new Error('추천 코드를 만들지 못했어요. 잠시 후 다시 시도해 주세요.')
+  throw new ApiMessageError('Could not allocate a referral code', 'referral.codeCreateFailed')
 }
 
 export async function bindUserReferrer(args: {
@@ -59,39 +60,39 @@ export async function bindUserReferrer(args: {
 }> {
   const userId = String(args.uid || '').trim()
   const code = normalizeReferralCode(args.code)
-  if (!userId) throw new Error('로그인이 필요해요.')
+  if (!userId) throw new ApiMessageError('Login required', 'common.loginRequired')
   if (!isValidReferralCode(code)) {
-    throw new Error('추천인 코드 8자리를 확인해 주세요.')
+    throw new ApiMessageError('Invalid referral code format', 'referral.codeInvalid')
   }
 
   const profile = await getSupabaseProfile(userId)
   if (profile?.referredByUid) {
-    throw new Error('이미 추천인이 연결되어 있어요.')
+    throw new ApiMessageError('Referrer already bound', 'referral.alreadyBound')
   }
 
   const ownCode = normalizeReferralCode(profile?.referralCode)
   if (ownCode && ownCode === code) {
-    throw new Error('본인 코드로는 추천할 수 없어요.')
+    throw new ApiMessageError('Cannot use own referral code', 'referral.ownCode')
   }
 
   const indexed = await getReferralIndex(code)
   if (!indexed) {
-    throw new Error('없는 추천인 코드예요.')
+    throw new ApiMessageError('Referral code not found', 'referral.codeNotFound')
   }
   if (indexed.uid === userId) {
-    throw new Error('본인 코드로는 추천할 수 없어요.')
+    throw new ApiMessageError('Cannot use own referral code', 'referral.ownCode')
   }
 
   const referrer = await getSupabaseProfile(indexed.uid)
   if (!referrer) {
-    throw new Error('추천인을 찾을 수 없어요.')
+    throw new ApiMessageError('Referrer profile not found', 'referral.referrerNotFound')
   }
 
   const referredUids = indexed.referredUids.filter((id) => id !== userId)
   if (referredUids.length >= COMMUNITY_CREDIT_REFERRAL_MAX) {
-    throw new Error(
-      `이 추천 코드는 최대 ${COMMUNITY_CREDIT_REFERRAL_MAX}명까지 사용할 수 있어요.`,
-    )
+    throw new ApiMessageError('Referral code use limit reached', 'referral.maxUsesReached', {
+      max: COMMUNITY_CREDIT_REFERRAL_MAX,
+    })
   }
 
   const nextReferredUids = [...referredUids, userId]

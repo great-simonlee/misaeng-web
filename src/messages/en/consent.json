@@ -1,0 +1,19 @@
+{
+  "agreeTerms": "I have read and agree to the {terms}.",
+  "agreePrivacy": "I have read and agree to the {privacy}.",
+  "agreeTermsAria": "Terms of Use checkbox",
+  "agreePrivacyAria": "Privacy Policy checkbox",
+  "termsLink": "Terms of Use",
+  "privacyLink": "Privacy Policy",
+  "arbitrationNotice": "The Terms include an arbitration clause, and you can opt out within 30 days. Details are in the {terms}.",
+  "languageNotice": "The English versions of the Terms of Use and Privacy Policy are the official and controlling versions. Translations into other languages are for reference only; if they differ, the English version prevails.",
+  "agreeError": "Please agree to the Terms of Use and Privacy Policy to continue.",
+  "signUp": "Sign up",
+  "reconsentTitle": "Updated terms require your agreement",
+  "reconsentBody": "Our Terms of Use and Privacy Policy have changed. Please agree to keep using {brand}.",
+  "reconsentConfirm": "I agree, continue",
+  "reconsentVersions": "Terms {terms} · Privacy {privacy}",
+  "optOutHint": "Arbitration opt-out: email info@misaeng.com within 30 days of agreeing, with the subject line “Arbitration Opt-Out”.",
+  "saving": "Saving…",
+  "defaultSummary": "Please review the Terms of Use and Privacy Policy. These Terms include a binding individual arbitration agreement and class-action waiver."
+}

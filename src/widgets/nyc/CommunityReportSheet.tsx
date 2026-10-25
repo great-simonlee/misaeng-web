@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { BottomSheet } from '@components'
 import { COMMUNITY_REPORT_REASONS } from '@lib/constants/communityEngagement'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import type {
   CommunityEngagementTargetType,
@@ -13,7 +14,8 @@ import type {
 type CommunityReportSheetProps = {
   open: boolean
   onClose: () => void
-  targetLabel?: string
+  /** 안내 문구의 신고 대상 (이 게시글 / 이 댓글 / 이 글) */
+  target?: 'post' | 'comment' | 'generic'
   submitting?: boolean
   onSubmit: (input: {
     reason: CommunityReportReason
@@ -24,10 +26,11 @@ type CommunityReportSheetProps = {
 export function CommunityReportSheet({
   open,
   onClose,
-  targetLabel = '이 글',
+  target = 'generic',
   submitting = false,
   onSubmit,
 }: CommunityReportSheetProps) {
+  const t = useT('community')
   const [reason, setReason] = useState<CommunityReportReason | null>(null)
   const [detail, setDetail] = useState('')
 
@@ -49,7 +52,7 @@ export function CommunityReportSheet({
     <BottomSheet
       open={open}
       onClose={handleClose}
-      title='신고하기'
+      title={t('report.title')}
       maxHeightClassName='max-h-[min(85dvh,640px)]'
       footer={
         <div className='flex gap-2'>
@@ -59,7 +62,7 @@ export function CommunityReportSheet({
             disabled={submitting}
             className='h-11 flex-1 rounded-xl border border-black/10 bg-white text-[14px] font-medium text-[var(--muted-foreground)] touch-manipulation disabled:opacity-50'
           >
-            취소
+            {t('report.cancel')}
           </button>
           <button
             type='button'
@@ -69,16 +72,15 @@ export function CommunityReportSheet({
               !reason ||
               (reason === 'other' && !detail.trim())
             }
-            className='h-11 flex-1 rounded-xl bg-[#F64310] text-[14px] font-semibold text-white touch-manipulation disabled:opacity-50'
+            className='h-11 flex-1 rounded-xl bg-brand text-[14px] font-semibold text-white touch-manipulation disabled:opacity-50'
           >
-            {submitting ? '접수 중…' : '신고 접수'}
+            {submitting ? t('report.submitting') : t('report.submit')}
           </button>
         </div>
       }
     >
       <p className='text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-        {targetLabel}을(를) 신고합니다. 접수된 신고는 관리자(ellieo-erp)에서
-        확인 후 조치됩니다.
+        {t(`report.intro.${target}`)}
       </p>
 
       <div className='mt-4 space-y-2'>
@@ -92,15 +94,15 @@ export function CommunityReportSheet({
               className={cn(
                 'w-full rounded-xl border px-3.5 py-3 text-left touch-manipulation transition',
                 selected
-                  ? 'border-[#F64310]/40 bg-[#F64310]/[0.06]'
+                  ? 'border-brand/40 bg-brand/[0.06]'
                   : 'border-black/[0.08] bg-[#fafbfc] hover:border-black/15',
               )}
             >
               <span className='block text-[14px] font-semibold text-[var(--foreground)]'>
-                {item.label}
+                {t(`report.reasons.${item.value}.label`)}
               </span>
               <span className='mt-0.5 block text-[12px] text-[var(--muted)]'>
-                {item.description}
+                {t(`report.reasons.${item.value}.description`)}
               </span>
             </button>
           )
@@ -109,14 +111,16 @@ export function CommunityReportSheet({
 
       <label className='mt-4 block'>
         <span className='text-[12px] font-medium text-[var(--muted)]'>
-          상세 내용{reason === 'other' ? ' (필수)' : ' (선택)'}
+          {reason === 'other'
+            ? t('report.detailLabelRequired')
+            : t('report.detailLabelOptional')}
         </span>
         <textarea
           value={detail}
           onChange={(e) => setDetail(e.target.value)}
           rows={3}
           maxLength={1000}
-          placeholder='신고 사유를 조금 더 알려 주세요'
+          placeholder={t('report.detailPlaceholder')}
           className='mt-1.5 w-full resize-none rounded-xl border border-black/[0.08] bg-[#fafbfc] px-3.5 py-3 text-[14px] outline-none focus:border-black/20 focus:bg-white'
         />
       </label>

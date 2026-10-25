@@ -13,6 +13,8 @@ import {
   toggleBeenThereRequest,
   togglePostRecommendRequest,
 } from '@lib/community/engagement.client'
+import { localizeCommunityError } from '@lib/community/client'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 
 type CommunityEngagementBarProps = {
@@ -28,6 +30,7 @@ export function CommunityEngagementBar({
   loginNext,
   className,
 }: CommunityEngagementBarProps) {
+  const t = useT('community')
   const city = useCity()
   const href = useCityPath()
   const { user, loading: authLoading } = useAuth()
@@ -78,9 +81,18 @@ export function CommunityEngagementBar({
       })
       setCount(summary.count)
       setRecommendedByMe(summary.recommendedByMe)
-      success(summary.recommendedByMe ? '추천했어요' : '추천을 취소했어요')
+      success(
+        summary.recommendedByMe
+          ? t('engagement.recommended')
+          : t('engagement.recommendCancelled'),
+      )
     } catch (err) {
-      toastError(getErrorMessage(err, '추천에 실패했어요'))
+      toastError(
+        getErrorMessage(
+          localizeCommunityError(err, t),
+          t('errors.recommendFailed'),
+        ),
+      )
     } finally {
       setBusy(false)
     }
@@ -99,11 +111,16 @@ export function CommunityEngagementBar({
       setBeenThereByMe(summary.beenThereByMe)
       success(
         summary.beenThereByMe
-          ? '가봤어요를 남겼어요'
-          : '가봤어요를 취소했어요',
+          ? t('engagement.beenThereAdded')
+          : t('engagement.beenThereCancelled'),
       )
     } catch (err) {
-      toastError(getErrorMessage(err, '가봤어요에 실패했어요'))
+      toastError(
+        getErrorMessage(
+          localizeCommunityError(err, t),
+          t('errors.beenThereFailed'),
+        ),
+      )
     } finally {
       setBeenThereBusy(false)
     }
@@ -124,7 +141,7 @@ export function CommunityEngagementBar({
             )}
           >
             <RecommendIcon filled={false} />
-            추천
+            {t('engagement.recommend')}
           </Link>
         ) : (
           <button
@@ -140,7 +157,7 @@ export function CommunityEngagementBar({
             )}
           >
             <RecommendIcon filled={recommendedByMe} />
-            추천
+            {t('engagement.recommend')}
             <span className='tabular-nums text-[var(--muted)]'>{count}</span>
           </button>
         )}
@@ -155,7 +172,7 @@ export function CommunityEngagementBar({
               )}
             >
               <BeenThereIcon filled={false} />
-              나도 가봤어요
+              {t('engagement.beenThere')}
             </Link>
           ) : (
             <button
@@ -171,7 +188,7 @@ export function CommunityEngagementBar({
               )}
             >
               <BeenThereIcon filled={beenThereByMe} />
-              나도 가봤어요
+              {t('engagement.beenThere')}
               <span className='tabular-nums text-[var(--muted)]'>
                 {beenThereCount}
               </span>

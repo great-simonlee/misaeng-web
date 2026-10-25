@@ -1,0 +1,240 @@
+{
+  "places": {
+    "searchFailed": "無法搜尋地點。",
+    "detailsFailed": "無法載入地點資訊。",
+    "placeIdRequired": "必須提供 placeId。",
+    "notFound": "找不到這個地點。",
+    "invalidCoordinates": "座標無效。",
+    "mapLoadFailed": "無法載入地圖。",
+    "placeFallbackName": "地點",
+    "addressFallbackName": "地址",
+    "locationFallbackName": "位置",
+    "venuesCoordinatesRequired": "必須提供經緯度。",
+    "venuesLoadFailed": "無法載入餐廳列表。"
+  },
+  "common": {
+    "loginRequired": "請先登入。",
+    "supabaseNotConfigured": "尚未設定 Supabase。",
+    "supabaseNotConfiguredDetail": "尚未設定 Supabase。請檢查 NEXT_PUBLIC_SUPABASE_URL 和 SUPABASE_SERVICE_ROLE_KEY。",
+    "supabaseNotConfiguredLocal": "尚未設定 Supabase。在本機環境中，目前會先儲存在你的瀏覽器。",
+    "storageNotConfigured": "尚未設定 Supabase Storage。請檢查 NEXT_PUBLIC_SUPABASE_URL 和 SUPABASE_SERVICE_ROLE_KEY。",
+    "supabaseUrlInvalid": "NEXT_PUBLIC_SUPABASE_URL 不是有效的網址。範例：https://your-project.supabase.co",
+    "supabaseHostUnreachable": "無法連線到 Supabase 專案（{hostname}）。請在 Dashboard → Project Settings → API 確認 Project URL，並更新 .env.local。",
+    "supabaseConnectFailed": "無法連線到 Supabase（{hostname}）。請確認 Project URL、API 金鑰和網路連線。",
+    "forbidden": "你沒有執行此操作的權限。",
+    "badRequest": "請求無效。",
+    "postNotFound": "找不到這篇貼文。",
+    "accountSuspended": "此帳號已被停權。",
+    "identityVerificationRequired": "要發文或留言，請先完成學校或公司認證。"
+  },
+  "auth": {
+    "ellieoUnavailable": "目前無法連線到 Ellieo 伺服器，請稍後再試。",
+    "noAccessToken": "未收到存取權杖（access token）。",
+    "loginFailed": "登入失敗。",
+    "signupFailed": "註冊失敗。",
+    "googleLoginFailed": "Google 登入失敗。",
+    "googleSignupFailed": "Google 註冊失敗。",
+    "agentGoogleSignupFailed": "Google 註冊失敗。",
+    "appConnectMissing": "必須設定 APP_CONNECT_API_BASE_URL 環境變數。",
+    "appConnectMissingLogin": "缺少 APP_CONNECT_API_BASE_URL 環境變數，因此無法登入。",
+    "googleIdTokenRequired": "必須提供 Google idToken。",
+    "googleAccountHint": "需要已在 Ellieo 註冊的 Google 帳號。",
+    "googleAuthError": "Google 登入時發生錯誤。",
+    "emailRequired": "請輸入 Email。",
+    "passwordRequired": "請輸入密碼。",
+    "passwordResetFailed": "無法送出密碼重設請求。",
+    "emailAuthError": "Email 登入時發生錯誤。",
+    "sessionExpired": "登入狀態已過期，請重新登入。",
+    "userInfoUnavailable": "你已登入，但無法載入帳號資訊。"
+  },
+  "profile": {
+    "nickname": {
+      "tooShort": "暱稱至少需要 {min} 個字元",
+      "tooLong": "暱稱最多 {max} 個字元",
+      "invalidChars": "只能使用英文字母和「.」"
+    },
+    "nicknameTaken": "這個暱稱已經有人使用，請換一個試試。",
+    "nicknameTakenShort": "這個暱稱已經有人使用。",
+    "nicknameCheckFailed": "無法確認暱稱。",
+    "nicknameCheckFailedRetry": "無法確認暱稱，請稍後再試。",
+    "nicknameCheckFailedStatus": "無法確認暱稱。（HTTP {status}）",
+    "listFailed": "無法載入個人資料列表（HTTP {status}）",
+    "invalidGender": "請選擇有效的性別。",
+    "invalidOccupationType": "請選擇有效的職業類型。",
+    "saveFailed": "個人資料儲存失敗。",
+    "saveFailedDetail": "個人資料儲存失敗：{detail}"
+  },
+  "upload": {
+    "photoUrlRequired": "必須提供 photoURL。",
+    "fileRequired": "請選擇要上傳的檔案。",
+    "avatarUploadError": "上傳大頭貼時發生錯誤。",
+    "avatarBucketMissing": "找不到 Supabase bucket「{bucket}」。請在 Storage 中建立公開的 bucket。",
+    "storageUploadFailed": "Storage 上傳失敗：{detail}",
+    "imageTypeUnsupported": "只能上傳 JPG、PNG、WEBP 或 GIF 圖片。",
+    "imageTooLarge": "圖片大小不能超過 {max}。",
+    "imageBucketMissing": "找不到 Supabase bucket「{bucket}」。請檢查 Storage 中的 bucket。",
+    "imageUploadFailedDetail": "圖片上傳失敗：{detail}",
+    "imageUploadFailed": "圖片上傳失敗。"
+  },
+  "verification": {
+    "codeSendFailed": "無法寄送認證碼。",
+    "schoolDomainUnsupported": "目前尚未支援這個學校信箱網域。請聯絡 Misaeng 團隊新增你的學校。",
+    "codeInvalid": "認證碼錯誤或已過期。",
+    "schoolOtpDisabled": "學校信箱認證暫時無法使用。",
+    "schoolEmailRequired": "請輸入學校信箱（.edu 或已登錄的網域）。",
+    "codeRequired": "請輸入認證碼。",
+    "schoolEmailError": "認證學校信箱時發生錯誤。",
+    "companyNameRequired": "請輸入公司名稱。",
+    "companyNameTooLong": "公司名稱最多 {max} 個字元。",
+    "workEmail": {
+      "required": "請輸入公司信箱。",
+      "invalidFormat": "請輸入有效的 Email 地址。",
+      "personalDomain": "無法使用 Gmail 等個人信箱，請輸入你在公司使用的 Email。"
+    },
+    "workplaceAlreadyApproved": "你的公司已完成認證。",
+    "workplacePending": "Misaeng 團隊正在審核你的公司認證。",
+    "workplaceStorageMissing": "尚未設定公司認證的儲存空間。",
+    "workplaceSaveFailed": "無法儲存公司認證申請（HTTP {status}）",
+    "workEmailError": "認證公司信箱時發生錯誤。"
+  },
+  "consent": {
+    "termsRequired": "請同意條款後再繼續。",
+    "storageNotConfigured": "尚未設定同意紀錄的儲存空間。",
+    "policyOutdated": "使用條款或隱私權政策已更新，請重新整理後再次同意。"
+  },
+  "referral": {
+    "featureStorageMissing": "推薦功能需要先設定儲存空間。",
+    "loadFailed": "無法載入你的推薦資訊。",
+    "bindFailed": "無法連結推薦人。",
+    "storageNotConfigured": "尚未設定推薦碼的儲存空間。",
+    "saveFailed": "推薦碼儲存失敗。",
+    "codeCreateFailed": "無法建立推薦碼，請稍後再試。",
+    "codeInvalid": "請確認 8 碼推薦碼。",
+    "alreadyBound": "你已經有推薦人了。",
+    "ownCode": "不能使用自己的推薦碼。",
+    "codeNotFound": "這個推薦碼不存在。",
+    "referrerNotFound": "找不到這位推薦人。",
+    "maxUsesReached": "這個推薦碼最多只能讓 {max} 人使用。"
+  },
+  "credit": {
+    "loadFailed": "無法載入你的積分資訊。",
+    "invalidUser": "使用者無效。",
+    "saveFailed": "積分儲存失敗（HTTP {status}）",
+    "reviewListLoadFailed": "無法載入審核列表。",
+    "reviewRequestNotFound": "找不到這筆申請。",
+    "reviewAlreadyProcessed": "這筆申請已經處理過了。",
+    "reviewPostMissing": "貼文不存在或已被刪除。",
+    "awardFailed": "無法發放積分，請檢查儲存空間設定。",
+    "processFailed": "無法完成此操作。",
+    "reviewSaveFailed": "無法儲存審核申請（HTTP {status}）",
+    "reviewStatusLoadFailed": "無法載入審核申請狀態。",
+    "reviewBoardIneligible": "這個看板的貼文無法申請額外積分。",
+    "reviewFinalResultRequired": "請先在時間軸加上最終結果（核准、收到卡片、offer、未錄取等）。",
+    "reviewAlreadyAwarded": "這篇貼文已經獲得審核獎勵。",
+    "reviewAlreadyPending": "已在等待審核中。",
+    "reviewRequestFailed": "無法申請額外積分。"
+  },
+  "postings": {
+    "loadFailed": "無法載入職缺。"
+  },
+  "comments": {
+    "bodyRequired": "請輸入留言。",
+    "bodyTooLong": "留言最多 {max} 個字元。",
+    "parentNotFound": "找不到你要回覆的留言。",
+    "createFailed": "留言發布失敗。",
+    "editTargetRequired": "請選擇要編輯的留言。",
+    "notFound": "找不到這則留言。",
+    "editOwnOnly": "只能編輯自己的留言。",
+    "updateFailed": "留言更新失敗。",
+    "deleteTargetRequired": "請選擇要刪除的留言。",
+    "deleteOwnOnly": "只能刪除自己的留言。",
+    "deleteFailed": "留言刪除失敗。",
+    "saveFailedRetry": "留言儲存失敗，請稍後再試。"
+  },
+  "community": {
+    "invalidBoard": "這個看板不存在。",
+    "invalidPost": "貼文無效。",
+    "companyReselect": "請重新選擇公司。",
+    "saveFailed": "貼文儲存失敗。",
+    "saveFailedRetry": "貼文儲存失敗，請稍後再試。",
+    "updateFailed": "無法儲存變更。",
+    "deleteFailed": "刪除失敗。",
+    "recommendFailed": "無法更新按讚。",
+    "recommendSaveFailed": "按讚儲存失敗，請稍後再試。",
+    "beenThereFoodOnly": "只有美食貼文可以標記「去過」。",
+    "beenThereFailed": "無法更新「去過」。",
+    "beenThereSaveFailed": "「去過」儲存失敗，請稍後再試。",
+    "reportSaveFailed": "檢舉儲存失敗，請稍後再試。",
+    "notGuestPost": "這不是訪客貼文。",
+    "guestPostLinkedElsewhere": "這篇貼文已連結到其他帳號。",
+    "guestClaimFailed": "無法連結你的訪客貼文。",
+    "report": {
+      "reasonRequired": "請選擇檢舉原因。",
+      "detailTooLong": "詳細說明最多 {max} 個字元。",
+      "otherDetailRequired": "選擇「其他」時，請說明原因。",
+      "alreadyReported": "你已經檢舉過這篇貼文或留言了。",
+      "failed": "檢舉送出失敗。"
+    },
+    "write": {
+      "titleBodyRequired": "請輸入標題和內文。",
+      "bodyTooLong": "內文最多 {max} 個字元。",
+      "roommateTypeRequired": "請選擇類型。",
+      "roommateTitleTooLong": "標題最多 {max} 個字元。",
+      "roommateOnePerAccount": "每個帳號只能有一篇室友或轉租貼文。請先編輯或刪除現有貼文後再試。",
+      "endDateAfterStart": "結束日期必須晚於開始日期。",
+      "partySizeRequired": "請輸入用餐人數。",
+      "totalSpendRequired": "請輸入總消費金額。",
+      "tipIncludedRequired": "請選擇是否含小費。",
+      "waitMinutesRequired": "請輸入等候時間（沒有等候請填 0）。",
+      "foodCategoryRequired": "請選擇分類（必吃、高CP值、氣氛好、讀書好去處）。",
+      "placeRequired": "請確認地址和餐廳名稱。",
+      "cptOptTypeRequired": "請選擇類型：CPT、OPT、STEM OPT、簽證或綠卡。",
+      "cptOptTimelineRequired": "請至少新增一個時間軸步驟。",
+      "jobReviewTypeRequired": "請選擇類型：實習、新鮮人、有經驗或約聘。",
+      "jobReviewTimelineRequired": "請至少新增一個招募步驟。",
+      "jobReviewSourceRequired": "請選擇你是透過什麼管道。如果選擇學生會，也請選擇是哪一個。",
+      "jobReviewOutcomeRequired": "請選擇最終結果。",
+      "cityRequired": "請確認城市。"
+    },
+    "roommate": {
+      "required": {
+        "has-room": {
+          "location": "請輸入你目前的區域／位置。",
+          "budget": "請輸入室友的每月房租（$）。",
+          "moveInStart": "請選擇入住日期。",
+          "moveInEnd": "請選擇搬出日期。"
+        },
+        "together": {
+          "location": "請輸入你偏好的區域。",
+          "budget": "請輸入你的每月預算上限（$）。",
+          "moveInStart": "請選擇你希望的入住日期。",
+          "moveInEnd": "請選擇搬出日期。"
+        },
+        "room": {
+          "location": "請輸入你偏好的區域。",
+          "budget": "請輸入你的每月預算上限（$）。",
+          "moveInStart": "請選擇你希望的入住日期。",
+          "moveInEnd": "請選擇搬出日期。"
+        },
+        "sublet": {
+          "location": "請輸入轉租地點。",
+          "budget": "請輸入每月房租（$）。",
+          "moveInStart": "請選擇轉租開始日期。",
+          "moveInEnd": "請選擇轉租結束日期。"
+        }
+      }
+    }
+  },
+  "guest": {
+    "invalidRequest": "請確認你的請求內容。",
+    "nicknameInvalid": "請輸入 {min}–{max} 個字元的顯示暱稱（不可為 Email 地址）。",
+    "emailInvalid": "請輸入有效的 Email，以便我們寄送禮物卡和積分相關通知。",
+    "linkedinRequired": "請輸入你的 LinkedIn 個人檔案網址。範例：linkedin.com/in/your-name",
+    "guidelinesRequired": "請同意社群發文規範。",
+    "titleRequired": "請輸入標題。",
+    "bodyRequired": "請分享其他人需要注意的地方。",
+    "bodyTooLong": "「注意事項」最多 {max} 個字元。",
+    "jobReviewTypeRequired": "請選擇類型：實習、新鮮人、有經驗、轉職或約聘。",
+    "rateLimited": "請稍後再試。（短時間內請求次數過多）"
+  }
+}

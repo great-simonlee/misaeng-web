@@ -1,0 +1,445 @@
+{
+  "amenities": {
+    "24HourAttendedLobby": "Doorman 24 jam",
+    "conciergeService": "Concierge",
+    "elevator": "Lift",
+    "fitnessCenter": "Gym",
+    "mailRoom": "Ruang surat",
+    "laundryRoom": "Ruang laundry",
+    "residentLounge": "Lounge",
+    "rooftopOutdoorSpace": "Area terbuka rooftop",
+    "rooftopLounge": "Lounge rooftop",
+    "petFriendly": "Ramah hewan peliharaan",
+    "garageParking": "Garasi parkir",
+    "sauna": "Sauna",
+    "pool": "Kolam renang",
+    "swimmingPool": "Kolam renang",
+    "indoorPool": "Kolam renang indoor",
+    "outdoorPool": "Kolam renang outdoor",
+    "workingSpace": "Ruang belajar/kerja",
+    "businessMeetingRoom": "Ruang rapat",
+    "pilatesStudio": "Studio pilates",
+    "yogaStudio": "Ruang yoga",
+    "recoveryRoom": "Ruang pemulihan",
+    "indoorBasketballCourt": "Lapangan basket indoor",
+    "indoorPickleballCourt": "Pickleball indoor",
+    "indoorGolfSimulator": "Simulator golf",
+    "bowlingAlley": "Arena bowling",
+    "pokerRoom": "Ruang poker",
+    "billiardsRoom": "Ruang biliar",
+    "arcadeRoom": "Ruang game",
+    "pingPongTable": "Meja pingpong",
+    "tennisCourts": "Lapangan tenis",
+    "bbqGrills": "Panggangan BBQ",
+    "bbqGrill": "Panggangan BBQ",
+    "sundeck": "Area outdoor",
+    "dogRun": "Area bermain anjing",
+    "childrensPlayroom": "Ruang bermain anak",
+    "mediaRoom": "Ruang menonton",
+    "garden": "Taman",
+    "bikeRoom": "Tempat simpan sepeda",
+    "storageSpace": "Gudang",
+    "valetService": "Valet parking",
+    "liveInSuper": "Super tinggal di gedung",
+    "wheelchairAccess": "Akses kursi roda",
+    "indoorSquashCourt": "Squash indoor"
+  },
+  "utilities": {
+    "heat": "Termasuk pemanas",
+    "hotWater": "Termasuk air panas",
+    "gas": "Termasuk gas",
+    "electricity": "Termasuk listrik",
+    "water": "Termasuk air",
+    "sewer": "Termasuk saluran pembuangan"
+  },
+  "appliances": {
+    "dishwasher": "Mesin cuci piring",
+    "microwave": "Microwave",
+    "oven": "Oven",
+    "refrigerator": "Kulkas",
+    "washer": "Mesin cuci",
+    "dryer": "Pengering",
+    "airConditioning": "AC",
+    "inUnitWasher": "Mesin cuci"
+  },
+  "perks": {
+    "roommate-waiting": "Roommate sudah menunggu",
+    "no-broker-fee": "No broker fee",
+    "no-guarantor": "Tidak perlu guarantor",
+    "free-credit": "Kredit gratis",
+    "doorman-24h": "Doorman 24 jam",
+    "washer-dryer": "Mesin cuci/pengering",
+    "terrace": "Teras",
+    "gym": "Gym",
+    "pool": "Kolam renang",
+    "wall-ok": "Boleh flex wall",
+    "package-storage": "Ruang paket",
+    "mail-room": "Ruang surat",
+    "rooftop": "Rooftop",
+    "bbq-grill": "Panggangan BBQ",
+    "work-study": "Ruang kerja & belajar",
+    "sauna": "Sauna"
+  },
+  "roomTypes": {
+    "master-w-bath": "Master w/ Bath",
+    "master-wo-bath": "Master w/o Bath",
+    "regular-bedroom": "Regular",
+    "flexroom": "Flex",
+    "entire": "Seluruh unit",
+    "studio": "Studio"
+  },
+  "unitTypes": {
+    "studio": "Studio",
+    "1b1b": "1B1B",
+    "2b1b": "2B1B",
+    "2b2b": "2B2B",
+    "3b1b": "3B1B",
+    "3b2b": "3B2B",
+    "4-plus": "4+ kamar tidur",
+    "unknown": "Tipe belum pasti"
+  },
+  "credit": {
+    "monthsFree_other": "Gratis {count} bulan",
+    "dollarCredit": "Kredit ${amount}"
+  },
+  "amenityFee": {
+    "unknown": "Belum diketahui",
+    "free": "Gratis",
+    "mandatoryPersonMonthly": "Wajib · ${amount}/bln per orang",
+    "mandatoryPersonYearly": "Wajib · ${amount}/thn per orang",
+    "mandatoryUnitMonthly": "Wajib · ${amount}/bln per unit",
+    "mandatoryUnitYearly": "Wajib · ${amount}/thn per unit",
+    "optionalPersonMonthly": "Opsional · ${amount}/bln per orang",
+    "optionalPersonYearly": "Opsional · ${amount}/thn per orang",
+    "optionalUnitMonthly": "Opsional · ${amount}/bln per unit",
+    "optionalUnitYearly": "Opsional · ${amount}/thn per unit"
+  },
+  "partWall": {
+    "fullWall": "Dinding penuh",
+    "regularWall": "Dinding biasa",
+    "curtainOnly": "Hanya tirai"
+  },
+  "income": {
+    "personal": "Penghasilan {multiple}x",
+    "guarantor": "Guarantor {multiple}x",
+    "guarantorCompany": "Boleh perusahaan guarantor"
+  },
+  "roommatePreferences": {
+    "master-w-bath": "Ingin kamar Master",
+    "master-wo-bath": "Ingin kamar Master w/o Bath",
+    "regular-bedroom": "Ingin kamar Regular",
+    "flexroom": "Ingin kamar Flex",
+    "any": "Kamar apa saja"
+  },
+  "price": {
+    "gross": "Gross",
+    "net": "Net"
+  },
+  "card": {
+    "photoLabel": "Foto {number} {address}",
+    "noPhoto": "Tidak ada foto",
+    "moveIn": "Masuk {date}",
+    "moveInTbd": "Belum pasti",
+    "composition": {
+      "male_other": "{count} pria",
+      "female_other": "{count} wanita"
+    },
+    "loadingLabel": "Memuat listing",
+    "loadingDescription": "Memuat listing…"
+  },
+  "roommateIntro": {
+    "title": "Roommate yang menunggu",
+    "introFallback": "Detail lebih lanjut akan kami bagikan saat kamu menghubungi kami.",
+    "male": "Pria",
+    "female": "Wanita",
+    "worker": "Profesional"
+  },
+  "map": {
+    "location": "Lokasi",
+    "directions": "Petunjuk arah",
+    "openInGoogleMaps": "Lihat {name} di Google Maps",
+    "viewInGoogleMaps": "Lihat lokasi di Google Maps"
+  },
+  "detail": {
+    "toasts": {
+      "notAvailableYet": "Fitur ini akan segera tersedia",
+      "kakaoNotReady": "Link pertanyaan KakaoTalk belum siap",
+      "linkCopied": "Link disalin",
+      "linkCopyFailed": "Gagal menyalin link"
+    },
+    "notFound": {
+      "title": "Listing tidak ditemukan",
+      "description": "Mungkin sudah ditutup atau dihapus.",
+      "action": "Kembali ke hunian"
+    },
+    "mailSubject": "[{brand} Hunian] {address}",
+    "backToList": "Hunian",
+    "noPhotos": "Belum ada foto",
+    "previousPhoto": "Foto sebelumnya",
+    "nextPhoto": "Foto berikutnya",
+    "layout": "Denah",
+    "watchVideo": "Tonton video",
+    "photoNumber": "Foto {number}",
+    "previousThumbnails": "Tampilkan thumbnail sebelumnya",
+    "moreThumbnails": "Tampilkan thumbnail lainnya",
+    "benefits": "Keuntungan",
+    "roomOptions": "Pilihan kamar",
+    "amenities": "Fasilitas",
+    "utilities": "Utilitas",
+    "appliances": "Peralatan",
+    "emailInquiry": "Kirim email",
+    "kakaoInquiry": "Tanya lewat KakaoTalk",
+    "share": "Bagikan",
+    "closeListing": "Tutup listing",
+    "description": "Detail",
+    "property": {
+      "title": "Info gedung",
+      "zipcode": "Kode ZIP",
+      "wall": "Pilihan dinding",
+      "amenityFee": "Biaya fasilitas",
+      "income": "Syarat penghasilan",
+      "subway": "Subway"
+    }
+  },
+  "listingKinds": {
+    "unit": {
+      "label": "Seluruh unit",
+      "description": "Mencari satu apartemen utuh"
+    },
+    "room": {
+      "label": "Kamar pribadi",
+      "description": "Mencari satu kamar saja"
+    }
+  },
+  "list": {
+    "title": "Hunian",
+    "subtitle": "Listing NYC pilihan {brand} · Cari unit utuh dan kamar pribadi di satu tempat.",
+    "filters": "Filter",
+    "quickFilters": "Filter cepat",
+    "previousFilters": "Tampilkan filter sebelumnya",
+    "moreFilters": "Tampilkan filter lainnya",
+    "price": {
+      "upTo": "Hingga ${amount}",
+      "atLeast": "${amount}+",
+      "range": "${min} – ${max}"
+    },
+    "summaryAll_other": "{count} listing",
+    "summaryFiltered_other": "{filters} · {count} listing",
+    "empty": {
+      "title": "Tidak ada listing yang cocok dengan filter kamu",
+      "description": "Coba ubah filter lalu cari lagi.",
+      "action": "Reset filter"
+    },
+    "sheet": {
+      "clearAll": "Hapus semua",
+      "showResults_other": "Tampilkan {count} listing",
+      "lookingFor": "Kamu sedang cari apa?",
+      "unitType": "Tipe unit",
+      "roomType": "Tipe kamar",
+      "all": "Semua",
+      "price": "Harga",
+      "unitRent": "Sewa bulanan untuk seluruh unit",
+      "roomRent": "Sewa bulanan per kamar",
+      "benefits": "Keuntungan",
+      "amenities": "Fasilitas",
+      "area": "Lingkungan"
+    }
+  },
+  "new": {
+    "errors": {
+      "loginRequired": "Silakan masuk dulu",
+      "submitFailed": "Gagal memposting listing kamu"
+    },
+    "redirectingToLogin": "Mengarahkan ke halaman masuk…",
+    "teamOnly": {
+      "title": "Khusus akun tim",
+      "description": "Listing hunian hanya bisa diposting dengan email {domain}. Kamu masuk sebagai: {email}",
+      "unknownEmail": "tidak diketahui"
+    },
+    "breadcrumb": "Baru",
+    "title": "Listing hunian baru",
+    "signedInAs": "Masuk sebagai {email}",
+    "fields": {
+      "streetAddress": "Alamat jalan",
+      "neighborhood": "Lingkungan",
+      "unitRent": "Sewa bulanan untuk seluruh unit ($)",
+      "unitRentPlaceholder": "Total harga untuk semua kamar",
+      "roomRent": "Sewa bulanan per kamar ($)",
+      "bedrooms": "Kamar tidur",
+      "availableFrom": "Tanggal masuk",
+      "availableTo": "Tanggal keluar",
+      "contactEmail": "Email kontak",
+      "description": "Deskripsi",
+      "descriptionPlaceholder": "Ketentuan lease, fasilitas, cocok untuk siapa, dll."
+    },
+    "submitting": "Memposting…",
+    "submit": "Posting"
+  },
+  "roommate": {
+    "intents": {
+      "offer-room": {
+        "label": "Tawarkan kamar",
+        "description": "Cari roommate untuk tempat kamu atau posting sublet"
+      },
+      "seek": {
+        "label": "Cari roommate",
+        "description": "Cari teman untuk mencari tempat bersama, atau kamar untuk ditinggali"
+      }
+    },
+    "lookingFor": {
+      "has-room": {
+        "label": "Mencari roommate untuk tinggal di tempat kami",
+        "shortLabel": "Punya kamar",
+        "description": "Kamu sudah punya tempat dan butuh teman tinggal"
+      },
+      "sublet": {
+        "label": "Menyewakan kamar saya sementara (sublet)",
+        "shortLabel": "Sublet",
+        "description": "Sewakan kamar kamu jangka pendek sebagai sublet"
+      },
+      "together": {
+        "label": "Mencari roommate untuk cari tempat bareng",
+        "shortLabel": "Cari bareng",
+        "description": "Belum punya tempat; cari roommate untuk mencari bersama"
+      },
+      "room": {
+        "label": "Hanya mencari kamar untuk ditinggali",
+        "shortLabel": "Butuh kamar",
+        "description": "Cari kamar atau apartemen tanpa roommate"
+      }
+    },
+    "form": {
+      "has-room": {
+        "locationLabel": "Lingkungan / lokasi saat ini",
+        "locationPlaceholder": "mis. Brooklyn Bushwick",
+        "budgetLabel": "Sewa bulanan untuk roommate ($)",
+        "budgetPlaceholder": "mis. 1400",
+        "moveInStartLabel": "Tersedia mulai",
+        "moveInEndLabel": "Tanggal keluar",
+        "photosHint": "Disarankan foto kamar/apartemen · Maksimal 6 · Foto pertama jadi sampul",
+        "titlePlaceholder": "mis. Cari roommate untuk 2-bed di Bushwick",
+        "bodyPlaceholder": "Jelaskan denah, gaya hidup kamu, utilitas, dan deposit. Tinggalkan link open chat 1:1 KakaoTalk supaya orang bisa menghubungimu."
+      },
+      "together": {
+        "locationLabel": "Lingkungan yang diinginkan",
+        "locationPlaceholder": "mis. Queens Astoria / Brooklyn",
+        "budgetLabel": "Budget bulanan maksimal ($)",
+        "budgetPlaceholder": "mis. 1600",
+        "moveInStartLabel": "Tanggal masuk yang diinginkan",
+        "moveInEndLabel": "Tanggal keluar",
+        "photosHint": "Tambahkan foto referensi kalau ada · Maksimal 6",
+        "titlePlaceholder": "mis. Masuk September, cari bareng di Astoria",
+        "bodyPlaceholder": "Ceritakan budget, lingkungan yang diinginkan, dan gaya hidup kamu. Tinggalkan link open chat 1:1 KakaoTalk supaya orang bisa menghubungimu."
+      },
+      "room": {
+        "locationLabel": "Lingkungan yang diinginkan",
+        "locationPlaceholder": "mis. Manhattan UES / Jersey City",
+        "budgetLabel": "Budget bulanan maksimal ($)",
+        "budgetPlaceholder": "mis. 1800",
+        "moveInStartLabel": "Tanggal masuk yang diinginkan",
+        "moveInEndLabel": "Tanggal keluar",
+        "photosHint": "Tambahkan foto referensi kalau ada · Maksimal 6",
+        "titlePlaceholder": "mis. Cari kamar dekat Midtown",
+        "bodyPlaceholder": "Ceritakan budget, lokasi yang diinginkan, dan waktu masuk. Tinggalkan link open chat 1:1 KakaoTalk supaya orang bisa menghubungimu."
+      },
+      "sublet": {
+        "locationLabel": "Lokasi sublet",
+        "locationPlaceholder": "mis. Upper East Side",
+        "budgetLabel": "Sewa bulanan ($)",
+        "budgetPlaceholder": "mis. 2200",
+        "moveInStartLabel": "Tanggal mulai sublet",
+        "moveInEndLabel": "Tanggal selesai sublet",
+        "photosHint": "Disarankan foto kamar/apartemen · Maksimal 6 · Foto pertama jadi sampul",
+        "titlePlaceholder": "mis. Sublet studio UES, Sep–Nov",
+        "bodyPlaceholder": "Jelaskan tanggal, apakah sudah furnished, transportasi, utilitas, dan deposit. Tinggalkan link open chat 1:1 KakaoTalk supaya orang bisa menghubungimu."
+      }
+    },
+    "card": {
+      "pricePerMonth": "{price}/bln"
+    },
+    "list": {
+      "budgetPresets": {
+        "under-1500": "Hingga $1.500",
+        "1500-2000": "$1.500–2.000",
+        "2000-2500": "$2.000–2.500",
+        "2500-plus": "$2.500+"
+      },
+      "loadFailed": "Gagal memuat postingan",
+      "summaryAll_other": "{count} postingan",
+      "summaryFiltered_other": "{filters} · {count} postingan",
+      "login": "Masuk",
+      "suspended": "Akun ditangguhkan",
+      "breadcrumb": "Roommate · Sublet",
+      "empty": {
+        "noPostsTitle": "Belum ada postingan roommate atau sublet",
+        "noMatchTitle": "Tidak ada postingan yang cocok dengan filter kamu",
+        "firstPost": "Jadilah yang pertama memposting dan mulai ramaikan.",
+        "verifyToPost": "Verifikasi sebagai pelajar atau profesional untuk memposting.",
+        "loginToPost": "Masuk untuk memposting."
+      },
+      "showResults_other": "Tampilkan {count} postingan",
+      "category": "Kategori",
+      "monthlyBudget": "Budget bulanan",
+      "neighborhood": "Lingkungan"
+    },
+    "write": {
+      "errors": {
+        "alreadyPosted": "Kamu sudah punya postingan roommate/sublet. Mengarahkan untuk mengeditnya.",
+        "notFound": "Postingan tidak ditemukan",
+        "noPermission": "Kamu tidak punya izin untuk mengedit postingan ini",
+        "loadFailed": "Gagal memuat postingan",
+        "typeRequired": "Pilih jenisnya",
+        "titleRequired": "Masukkan judul",
+        "titleTooLong": "Judul maksimal {max} karakter",
+        "bodyRequired": "Tulis sesuatu di isi postingan",
+        "bodyTooLong": "Isi maksimal {max} karakter",
+        "fieldRequired": "Harap isi: {field}",
+        "fieldSelect": "Harap pilih: {field}",
+        "budgetRange": "Masukkan jumlah antara $0 dan ${max}",
+        "endBeforeStart": "Tanggal selesai harus setelah tanggal mulai",
+        "updateFailed": "Gagal menyimpan perubahan kamu",
+        "draftSaveFailed": "Gagal menyimpan draf"
+      },
+      "updated": "Postingan diperbarui",
+      "created": "Postingan dipublikasikan",
+      "draftSaved": "Draf disimpan",
+      "checkingExisting": "Mengecek postingan yang sudah ada…",
+      "backToPost": "Kembali ke postingan",
+      "backToList": "Kembali ke {board}",
+      "onePostNotice": "Kamu bisa membuat {limit} di Roommate · Sublet. Kalau ada perubahan, edit atau hapus postingan yang ada lalu posting lagi.",
+      "onePostLimit": "satu postingan per akun",
+      "steps": {
+        "type": "Postingan jenis apa?",
+        "basics": "Info dasar",
+        "basicsDescription": "Tambahkan judul, lokasi, budget, dan tanggal",
+        "photos": "Foto",
+        "photosDescription": "{hint} · Tekan dan seret untuk mengatur urutan · {current}/{max}",
+        "details": "Detail",
+        "detailsDescription": "Ceritakan gaya hidup dan ketentuan kamu. Sebaiknya buat open chat 1:1 KakaoTalk dan tinggalkan link-nya supaya orang bisa menghubungimu."
+      },
+      "subtype": "Detail jenis",
+      "fields": {
+        "title": "Judul"
+      },
+      "pickSubtypeHint": "Pilih jenis untuk melihat kolom lokasi, budget, dan tanggal masuk.",
+      "pickIntentHint": "Pilih Tawarkan kamar atau Cari roommate.",
+      "photosDefaultHint": "Maksimal {max} · Foto pertama jadi sampul",
+      "addPhoto": "Tambah",
+      "saving": "Menyimpan…",
+      "saveEdit": "Simpan perubahan",
+      "submit": "Publikasikan postingan",
+      "backToListShort": "Kembali ke daftar",
+      "createHero": {
+        "title": "Posting di Roommate · Sublet",
+        "description": "Pilih Tawarkan kamar atau Cari roommate, lalu tambahkan lokasi dan tanggal.",
+        "photoTip": "Foto landscape 4:3 paling bagus hasilnya."
+      },
+      "updateHero": {
+        "eyebrow": "Edit postingan",
+        "title": "Edit postingan kamu",
+        "description": "Kalau ada perubahan, perbarui jenis, lokasi, atau tanggal."
+      },
+      "untitled": "Tanpa judul"
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { ApiMessageError } from '@lib/i18n/apiError'
 import type { CommunityCreditEarnReason } from '@lib/constants/communityCredit'
 
 export type CommunityCreditReviewStatus =
@@ -101,7 +102,7 @@ function normalizeRequest(raw: unknown): CommunityCreditReviewRequest | null {
     id,
     postId,
     boardId: String(data.boardId || '').trim(),
-    postTitle: String(data.postTitle || '').trim() || '제목 없음',
+    postTitle: String(data.postTitle || '').trim(),
     authorUid,
     authorEmail: String(data.authorEmail || '').trim(),
     authorNickname:
@@ -150,7 +151,7 @@ export async function saveStoredCreditReviewRequest(
   request: CommunityCreditReviewRequest,
 ): Promise<CommunityCreditReviewRequest> {
   if (!isCreditReviewStorageConfigured()) {
-    throw new Error('Supabase 설정이 필요해요.')
+    throw new ApiMessageError('Supabase is not configured.', 'common.supabaseNotConfigured')
   }
   const next = { ...request, updatedAt: Date.now() }
   const bucket = await resolveBucket()
@@ -167,7 +168,11 @@ export async function saveStoredCreditReviewRequest(
     },
   )
   if (!res?.ok) {
-    throw new Error(`리뷰 요청 저장 실패 (HTTP ${res?.status ?? 'unknown'})`)
+    throw new ApiMessageError(
+      `Credit review request save failed (HTTP ${res?.status ?? 'unknown'})`,
+      'credit.reviewSaveFailed',
+      { status: res?.status ?? 'unknown' },
+    )
   }
   return next
 }

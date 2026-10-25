@@ -15,8 +15,6 @@ import {
   type CityId,
 } from '@lib/constants/cities'
 import { fetchCommunityPost } from '@lib/community/client'
-import { getCptOptTypeLabel } from '@lib/community/cptOpt'
-import { getJobReviewTypeLabel } from '@lib/community/jobReview'
 import {
   getHousingUnitRent,
   getListingArea,
@@ -32,6 +30,9 @@ import {
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { fetchHousingListing } from '@lib/housing/fetchListings'
+import { translateStatusEmployerLocation } from '@lib/constants/statusEmployer'
+import { useFormat, useT } from '@lib/i18n/client'
+import type { Translate } from '@lib/i18n/translate'
 import { cn } from '@lib'
 import type { PostLikeEntry } from '@lib/utils/postLikes'
 import type { CommunityPost, HousingPost } from '@/types/nyc'
@@ -47,8 +48,13 @@ type LikedItem = {
   meta: string
   href: string
   categoryId: NycCategoryId
-  boardLabel: string
   authorSchoolId: string | null
+}
+
+/** 목록 문구를 만들 때 쓰는 번역기(네임스페이스 없음)와 달러 표시 */
+type LikedItemContext = {
+  t: Translate
+  usd: (value: number) => string
 }
 
 type CategoryFilter = 'all' | NycCategoryId
@@ -62,6 +68,10 @@ const LIKEABLE_CATEGORY_IDS: NycCategoryId[] = [
 ]
 
 export function MyLikesScreen() {
+  const t = useT('me')
+  const tRoot = useT()
+  const format = useFormat()
+  const boardTitle = (id: string) => tRoot(`community.categories.${id}.title`)
   const { user, loading } = useAuth()
   const city = useCity()
   const href = useCityPath()
@@ -102,7 +112,9 @@ export function MyLikesScreen() {
 
     ;(async () => {
       const results = await Promise.all(
-        likedEntries.map((entry) => resolveLikedItem(entry, city)),
+        likedEntries.map((entry) =>
+          resolveLikedItem(entry, city, { t: tRoot, usd: (value) => format.usd(value) }),
+        ),
       )
       if (cancelled) return
       setItems(results.filter((item): item is LikedItem => item != null))
@@ -114,7 +126,7 @@ export function MyLikesScreen() {
     }
     // likedKey로 직렬화된 변경만 추적
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, likedKey, city])
+  }, [user, likedKey, city, tRoot, format])
 
   const likeableCategories = useMemo(
     () =>
@@ -175,18 +187,18 @@ export function MyLikesScreen() {
               ACCOUNT
             </p>
             <h1 className='mt-1.5 text-[1.5rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] lg:text-[1.75rem]'>
-              내가 좋아요 누른 글
+              {t('likes.title')}
             </h1>
             <p className='mt-1.5 text-[14px] text-[var(--muted-foreground)]'>
-              하우징 · 맛집 · OPT/비자에서 찜해 둔 글을 모아 볼 수 있어요
+              {t('likes.description')}
             </p>
           </div>
           <span className='rounded-full bg-white px-3 py-1.5 text-[13px] tabular-nums text-[var(--muted)] ring-1 ring-black/[0.06]'>
             {loadingItems
               ? '…'
               : category === 'all'
-                ? `전체 ${items.length}`
-                : `${filteredItems.length}개`}
+                ? t('list.totalCount', { count: items.length })
+                : t('list.count', { count: filteredItems.length })}
           </span>
         </div>
 
@@ -194,11 +206,11 @@ export function MyLikesScreen() {
           <aside className='hidden lg:block'>
             <div className='sticky top-24 overflow-hidden rounded-[1.25rem] bg-white p-2 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>
               <p className='px-3 pb-2 pt-2.5 text-[11px] font-medium tracking-[0.14em] text-[var(--muted)]'>
-                카테고리
+                {t('list.categoryHeading')}
               </p>
-              <nav className='flex flex-col gap-0.5' aria-label='좋아요 카테고리'>
+              <nav className='flex flex-col gap-0.5' aria-label={t('likes.categoryAria')}>
                 <AccountCategorySideItem
-                  label='전체'
+                  label={t('list.all')}
                   count={items.length}
                   active={category === 'all'}
                   onClick={() => setCategory('all')}
@@ -206,7 +218,7 @@ export function MyLikesScreen() {
                 {sortedBoards.map((board) => (
                   <AccountCategorySideItem
                     key={board.id}
-                    label={board.title}
+                    label={boardTitle(board.id)}
                     count={counts[board.id]}
                     active={category === board.id}
                     onClick={() => setCategory(board.id)}
@@ -220,11 +232,11 @@ export function MyLikesScreen() {
             {!loadingItems && (
               <div className='mb-5 shrink-0 lg:hidden'>
                 <ChipScrollRow
-                  ariaLabel='좋아요 카테고리'
+                  ariaLabel={t('likes.categoryAria')}
                   leading={
                     <AccountCategoryChip
                       variant='lead'
-                      label='전체'
+                      label={t('list.all')}
                       active={category === 'all'}
                       count={items.length}
                       onClick={() => setCategory('all')}
@@ -234,7 +246,7 @@ export function MyLikesScreen() {
                   {sortedBoards.map((board) => (
                     <AccountCategoryChip
                       key={board.id}
-                      label={board.title}
+                      label={boardTitle(board.id)}
                       active={category === board.id}
                       count={counts[board.id]}
                       onClick={() => setCategory(board.id)}
@@ -247,27 +259,31 @@ export function MyLikesScreen() {
             {loadingItems ? (
               <LoadingState
                 className='flex-1 py-16'
-                label='글을 불러오는 중이에요…'
+                label={t('list.loading')}
               />
             ) : filteredItems.length === 0 ? (
               <div className='flex flex-1 flex-col items-center justify-center rounded-[1.25rem] bg-white px-6 py-14 text-center shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04] lg:py-20'>
                 <p className='text-[15px] font-semibold tracking-tight text-[var(--foreground)] lg:text-base'>
                   {category === 'all'
-                    ? '아직 좋아요한 글이 없어요'
-                    : `${selectedBoard?.title ?? '이 카테고리'}에 좋아요한 글이 없어요`}
+                    ? t('likes.emptyAll')
+                    : t('likes.emptyCategory', {
+                        category: selectedBoard
+                          ? boardTitle(selectedBoard.id)
+                          : t('list.thisCategory'),
+                      })}
                 </p>
                 <p className='mt-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
                   {category === 'all'
-                    ? '관심 있는 글의 하트를 누르면 여기에 모여요'
-                    : '해당 게시판에서 하트를 누르면 여기에 보여요'}
+                    ? t('likes.emptyAllHint')
+                    : t('likes.emptyCategoryHint')}
                 </p>
                 <Link
                   href={selectedBoard?.href ?? href('/housing')}
                   className='mt-5 inline-flex h-10 items-center rounded-full bg-[var(--foreground)] px-5 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--navy-light)]'
                 >
                   {selectedBoard
-                    ? `${selectedBoard.title} 게시판 보기`
-                    : '하우징 둘러보기'}
+                    ? t('list.viewBoard', { board: boardTitle(selectedBoard.id) })
+                    : t('likes.browseHousing')}
                 </Link>
               </div>
             ) : (
@@ -286,7 +302,7 @@ export function MyLikesScreen() {
                         <div className='min-w-0 flex-1'>
                           {category === 'all' && (
                             <p className='text-[11px] font-medium tracking-wide text-[var(--brand)]'>
-                              {item.boardLabel}
+                              {boardTitle(item.categoryId)}
                             </p>
                           )}
                           <div
@@ -334,34 +350,35 @@ export function MyLikesScreen() {
 async function resolveLikedItem(
   entry: PostLikeEntry,
   city: CityId,
+  ctx: LikedItemContext,
 ): Promise<LikedItem | null> {
   if (entry.kind === 'housing') {
     const listing = await fetchHousingListing(entry.id)
     if (!listing || listing.status !== 'open') return null
-    return mapHousing(listing)
+    return mapHousing(listing, ctx)
   }
 
   const post = await fetchCommunityPost(entry.id)
   if (!post || post.status === 'closed') return null
-  return mapCommunity(post, city, entry.boardId)
+  return mapCommunity(post, city, ctx, entry.boardId)
 }
 
-function formatHousingRentMeta(post: HousingPost): string {
+function formatHousingRentMeta(post: HousingPost, { t, usd }: LikedItemContext): string {
   const gross = getHousingUnitRent(post)
   const net = getListingUnitNet(post)
-  if (net != null)
-    return `$${gross.toLocaleString()} / $${net.toLocaleString()}/월`
-  return `$${gross.toLocaleString()}/월`
+  if (net != null) {
+    return t('me.likes.rentWithNet', { gross: usd(gross), net: usd(net) })
+  }
+  return t('me.likes.rent', { amount: usd(gross) })
 }
 
-function mapHousing(post: HousingPost): LikedItem {
+function mapHousing(post: HousingPost, ctx: LikedItemContext): LikedItem {
   return {
     id: post.id,
     title: getListingDisplayAddress(post),
-    meta: `${getListingArea(post)} · ${formatHousingRentMeta(post)}`,
+    meta: `${getListingArea(post)} · ${formatHousingRentMeta(post, ctx)}`,
     href: hrefForHousingListing(post),
     categoryId: 'housing',
-    boardLabel: '하우징',
     authorSchoolId: post.authorSchoolId,
   }
 }
@@ -369,6 +386,7 @@ function mapHousing(post: HousingPost): LikedItem {
 function mapCommunity(
   post: CommunityPost,
   city: CityId,
+  { t }: LikedItemContext,
   preferredBoardId?: string,
 ): LikedItem | null {
   const rawBoardId = preferredBoardId || post.categoryId
@@ -380,19 +398,23 @@ function mapCommunity(
 
   const boardId = (category?.id ?? mergedId) as NycCommunityBoardId
   const typeLabel =
-    boardId === 'status'
-      ? getCptOptTypeLabel(post.cptOptType)
-      : boardId === 'job-review'
-        ? getJobReviewTypeLabel(post.jobReviewType)
+    boardId === 'status' && post.cptOptType
+      ? t(`reviews.cptOpt.types.${post.cptOptType}.label`)
+      : boardId === 'job-review' && post.jobReviewType
+        ? t(`reviews.jobReview.types.${post.jobReviewType}.label`)
         : null
+  const location =
+    post.location && (boardId === 'status' || boardId === 'job-review')
+      ? translateStatusEmployerLocation(t, post.location)
+      : post.location
   const meta =
     [
       typeLabel,
-      post.location,
+      location,
       boardId === 'job-review' ? post.jobReviewIndustry : post.detail,
     ]
       .filter(Boolean)
-      .join(' · ') || '상세 보기'
+      .join(' · ') || t('me.list.viewDetail')
 
   return {
     id: post.id,
@@ -400,7 +422,6 @@ function mapCommunity(
     meta,
     href: hrefForCommunityPost(post, city),
     categoryId,
-    boardLabel: category?.title ?? boardId,
     authorSchoolId: post.authorSchoolId,
   }
 }

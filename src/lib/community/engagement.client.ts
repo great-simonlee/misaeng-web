@@ -22,6 +22,10 @@ import {
   upsertLocalRecommend,
   upsertLocalReport,
 } from '@lib/community/engagement.local'
+import {
+  CommunityClientError,
+  throwCommunityRequestError,
+} from '@lib/community/client'
 
 export async function fetchPostRecommendSummary(
   postId: string,
@@ -69,7 +73,7 @@ export async function togglePostRecommendRequest(input: {
   boardId: string
   authorUid: string
 }): Promise<CommunityRecommendSummary> {
-  if (!input.authorUid) throw new Error('로그인이 필요해요.')
+  if (!input.authorUid) throw new CommunityClientError('errors.loginRequired')
 
   try {
     const res = await fetch(
@@ -104,7 +108,7 @@ export async function togglePostRecommendRequest(input: {
       return toggleLocalPostRecommend(input)
     }
 
-    throw new Error(data?.error || '추천에 실패했어요')
+    throwCommunityRequestError(data?.error, 'errors.recommendFailed')
   } catch (error) {
     if (input.postId.startsWith('mock-') || error instanceof TypeError) {
       return toggleLocalPostRecommend(input)
@@ -152,9 +156,9 @@ export async function createCommunityReportRequest(input: {
 }): Promise<CommunityReport> {
   const { report, reporterUid, reporterEmail } = input
   if (!reporterUid || !reporterEmail) {
-    throw new Error('로그인이 필요해요.')
+    throw new CommunityClientError('errors.loginRequired')
   }
-  if (!report.reason) throw new Error('신고 사유를 선택해 주세요.')
+  if (!report.reason) throw new CommunityClientError('errors.reportReasonRequired')
 
   if (
     hasLocalReport({
@@ -163,7 +167,7 @@ export async function createCommunityReportRequest(input: {
       reporterUid,
     })
   ) {
-    throw new Error('이미 신고한 글/댓글이에요.')
+    throw new CommunityClientError('errors.alreadyReported')
   }
 
   try {
@@ -198,7 +202,7 @@ export async function createCommunityReportRequest(input: {
       return createLocalReport(report, reporterUid, reporterEmail)
     }
 
-    throw new Error(data?.error || '신고에 실패했어요')
+    throwCommunityRequestError(data?.error, 'errors.reportFailed')
   } catch (error) {
     if (report.postId.startsWith('mock-') || error instanceof TypeError) {
       return createLocalReport(report, reporterUid, reporterEmail)
@@ -329,9 +333,9 @@ export async function toggleBeenThereRequest(input: {
   boardId: string
   authorUid: string
 }): Promise<CommunityBeenThereSummary> {
-  if (!input.authorUid) throw new Error('로그인이 필요해요.')
+  if (!input.authorUid) throw new CommunityClientError('errors.loginRequired')
   if (input.boardId !== 'food') {
-    throw new Error('맛집 게시글만 가봤어요를 표시할 수 있어요.')
+    throw new CommunityClientError('errors.beenThereFoodOnly')
   }
 
   try {
@@ -365,7 +369,7 @@ export async function toggleBeenThereRequest(input: {
       return toggleLocalBeenThere(input)
     }
 
-    throw new Error(data?.error || '가봤어요에 실패했어요')
+    throwCommunityRequestError(data?.error, 'errors.beenThereFailed')
   } catch (error) {
     if (input.postId.startsWith('mock-') || error instanceof TypeError) {
       return toggleLocalBeenThere(input)

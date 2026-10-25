@@ -13,7 +13,10 @@ create table if not exists public.consent_logs (
   ip_address text,
   user_agent text,
   consent_method text not null,
-  ui_language text not null check (ui_language in ('en', 'ko')),
+  -- Language the consent screen was shown in (the English version is always the legal one).
+  ui_language text not null check (ui_language in ('en', 'ko', 'vi', 'ja', 'zh-CN', 'zh-TW', 'id')),
+  -- Site the user agreed on (one account works on both).
+  brand text not null default 'misaeng' check (brand in ('misaeng', 'ellieo')),
   created_at timestamptz not null default timezone('utc', now())
 );
 
@@ -35,3 +38,12 @@ create table if not exists public.legal_policy (
 revoke update, delete on public.consent_logs from anon, authenticated;
 alter table public.consent_logs enable row level security;
 alter table public.legal_policy enable row level security;
+
+-- 2026-10: Ellieo + 7 languages. For a table created before this change:
+alter table public.consent_logs drop constraint if exists consent_logs_ui_language_check;
+alter table public.consent_logs
+  add constraint consent_logs_ui_language_check
+  check (ui_language in ('en', 'ko', 'vi', 'ja', 'zh-CN', 'zh-TW', 'id'));
+alter table public.consent_logs
+  add column if not exists brand text not null default 'misaeng'
+  check (brand in ('misaeng', 'ellieo'));

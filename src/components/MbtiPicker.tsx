@@ -6,12 +6,14 @@ import { BottomSheet } from './BottomSheet'
 import {
   MBTI_DIMENSIONS,
   composeMbtiFromDimensions,
-  getMbtiGroupLabel,
-  getMbtiNickname,
+  getMbtiGroupId,
+  normalizeMbti,
   parseMbtiDimensions,
   type MbtiDimensionValue,
 } from '@lib/constants/mbti'
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
+import type { Translate } from '@lib/i18n/translate'
 
 type MbtiPickerProps = {
   value: string
@@ -28,8 +30,13 @@ type MbtiPickerProps = {
   }) => ReactNode
 }
 
-function formatMbtiDisplay(type: string) {
-  const nickname = getMbtiNickname(type)
+function getMbtiNickname(t: Translate, type: string): string | null {
+  const normalized = normalizeMbti(type)
+  return normalized ? t(`ui.mbti.nicknames.${normalized}`) : null
+}
+
+function formatMbtiDisplay(t: Translate, type: string) {
+  const nickname = getMbtiNickname(t, type)
   return nickname ? `${type} · ${nickname}` : type
 }
 
@@ -41,6 +48,7 @@ export function MbtiPicker({
   allowClear = false,
   children,
 }: MbtiPickerProps) {
+  const t = useT('common')
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<(MbtiDimensionValue | null)[]>(() =>
     parseMbtiDimensions(value),
@@ -49,9 +57,14 @@ export function MbtiPicker({
   const selected = value.trim().toUpperCase()
   const hasValue = Boolean(selected)
   const composed = composeMbtiFromDimensions(draft)
-  const composedNickname = composed ? getMbtiNickname(composed) : null
-  const composedGroup = composed ? getMbtiGroupLabel(composed) : null
-  const displayLabel = hasValue ? formatMbtiDisplay(selected) : '선택해 주세요'
+  const composedNickname = composed ? getMbtiNickname(t, composed) : null
+  const composedGroupId = composed ? getMbtiGroupId(composed) : null
+  const composedGroup = composedGroupId
+    ? t(`ui.mbti.groups.${composedGroupId}.label`)
+    : null
+  const displayLabel = hasValue
+    ? formatMbtiDisplay(t, selected)
+    : t('ui.mbti.placeholder')
 
   function handleOpen() {
     if (disabled) return
@@ -104,7 +117,7 @@ export function MbtiPicker({
       <BottomSheet
         open={open}
         onClose={() => setOpen(false)}
-        title='MBTI 선택'
+        title={t('ui.mbti.title')}
         scrollable={false}
         footer={
           <div className='flex items-center justify-between gap-3 px-4 py-2.5'>
@@ -114,7 +127,7 @@ export function MbtiPicker({
                 onClick={handleClear}
                 className='text-[13px] font-medium text-[var(--muted)] touch-manipulation'
               >
-                선택 안 함
+                {t('ui.mbti.clear')}
               </button>
             ) : (
               <span />
@@ -125,7 +138,7 @@ export function MbtiPicker({
               disabled={!composed}
               className='h-9 rounded-full bg-[var(--foreground)] px-5 text-[13px] font-semibold text-white touch-manipulation disabled:opacity-40'
             >
-              확인
+              {t('actions.confirm')}
             </button>
           </div>
         }
@@ -135,12 +148,12 @@ export function MbtiPicker({
             className={cn(
               'rounded-xl px-3 py-2.5 text-center ring-1 transition',
               composed
-                ? 'bg-[linear-gradient(135deg,#fff8f6_0%,#f8fafc_100%)] ring-[#F64310]/15'
+                ? 'bg-[linear-gradient(135deg,#fff8f6_0%,#f8fafc_100%)] ring-brand/15'
                 : 'bg-[#f8fafc] ring-[#e8eaee]',
             )}
           >
             <p className='text-[10px] font-medium text-[var(--muted)]'>
-              {composed ? '선택 결과' : '4가지를 모두 선택해 주세요'}
+              {composed ? t('ui.mbti.result') : t('ui.mbti.selectAll')}
             </p>
             <p
               className={cn(
@@ -166,7 +179,7 @@ export function MbtiPicker({
             {MBTI_DIMENSIONS.map((dimension, index) => (
               <DimensionRow
                 key={dimension.id}
-                label={dimension.label}
+                label={t(`ui.mbti.dimensions.${dimension.id}`)}
                 options={dimension.options}
                 value={draft[index] ?? null}
                 onChange={(next) => {
@@ -189,7 +202,6 @@ type DimensionRowProps = {
   label: string
   options: readonly {
     value: MbtiDimensionValue
-    label: string
     hint: string
   }[]
   value: MbtiDimensionValue | null
@@ -197,6 +209,7 @@ type DimensionRowProps = {
 }
 
 function DimensionRow({ label, options, value, onChange }: DimensionRowProps) {
+  const t = useT('common')
   return (
     <div className='flex items-center gap-2'>
       <span className='w-8 shrink-0 text-[11px] font-medium text-[var(--muted)]'>
@@ -218,7 +231,7 @@ function DimensionRow({ label, options, value, onChange }: DimensionRowProps) {
                   : 'bg-[#f4f5f7] font-medium text-[var(--foreground)] active:scale-[0.98]',
               )}
             >
-              <span>{option.label}</span>
+              <span>{t(`ui.mbti.options.${option.value}`)}</span>
               <span
                 className={cn(
                   'text-[10px] font-semibold tracking-wider',

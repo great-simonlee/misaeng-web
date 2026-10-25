@@ -7,6 +7,18 @@ import {
   getGoogleClientId,
   isGoogleSignInConfigured,
 } from '@lib/google/config'
+import { useT } from '@lib/i18n/client'
+
+/** 화면에서 `auth.google.<key>`로 번역해 보여 주는 오류 */
+class GoogleSignInError extends Error {
+  readonly key: string
+
+  constructor(message: string, key: string) {
+    super(message)
+    this.name = 'GoogleSignInError'
+    this.key = key
+  }
+}
 
 interface GoogleSignInButtonProps {
   disabled?: boolean
@@ -57,7 +69,10 @@ async function ensureGoogleIdentityInitialized(clientId: string) {
 function loadGoogleIdentityScript() {
   if (typeof window === 'undefined') {
     return Promise.reject(
-      new Error('Google 로그인은 브라우저에서만 사용할 수 있어요.'),
+      new GoogleSignInError(
+        'Google sign-in is only available in the browser.',
+        'browserOnly',
+      ),
     )
   }
 
@@ -78,7 +93,13 @@ function loadGoogleIdentityScript() {
       existing.addEventListener('load', () => resolve(), { once: true })
       existing.addEventListener(
         'error',
-        () => reject(new Error('Google 로그인 스크립트를 불러오지 못했어요.')),
+        () =>
+          reject(
+            new GoogleSignInError(
+              'Failed to load the Google sign-in script.',
+              'scriptLoadFailed',
+            ),
+          ),
         { once: true },
       )
       return
@@ -90,7 +111,12 @@ function loadGoogleIdentityScript() {
     script.defer = true
     script.onload = () => resolve()
     script.onerror = () =>
-      reject(new Error('Google 로그인 스크립트를 불러오지 못했어요.'))
+      reject(
+        new GoogleSignInError(
+          'Failed to load the Google sign-in script.',
+          'scriptLoadFailed',
+        ),
+      )
     document.head.appendChild(script)
   })
 
@@ -125,6 +151,7 @@ function GoogleSignInInner({
   onCredential,
   onError,
 }: GoogleSignInButtonProps) {
+  const t = useT('auth')
   const clientId = getGoogleClientId()
   const containerRef = useRef<HTMLDivElement>(null)
   const googleRef = useRef<HTMLDivElement>(null)
@@ -135,7 +162,7 @@ function GoogleSignInInner({
   const handleCredential = useCallback(
     (response: GoogleCredentialResponse) => {
       if (!response.credential) {
-        onError('Google 로그인에 실패했어요.')
+        onError(t('google.failed'))
         return
       }
 
@@ -151,7 +178,7 @@ function GoogleSignInInner({
         setSubmitting(false)
       }
     },
-    [onCredential, onError],
+    [onCredential, onError, t],
   )
 
   useEffect(() => {
@@ -208,9 +235,11 @@ function GoogleSignInInner({
       .catch((error) => {
         if (!cancelled) {
           onError(
-            error instanceof Error
-              ? error.message
-              : 'Google 로그인을 준비하지 못했어요.',
+            error instanceof GoogleSignInError
+              ? t(`google.${error.key}`)
+              : error instanceof Error
+                ? error.message
+                : t('google.prepareFailed'),
           )
         }
       })
@@ -219,14 +248,14 @@ function GoogleSignInInner({
       cancelled = true
       setReady(false)
     }
-  }, [buttonWidth, clientId, onError])
+  }, [buttonWidth, clientId, onError, t])
 
   const isDisabled = disabled || submitting || !ready
   const label = submitting
-    ? 'Google 계정 연결 중…'
+    ? t('google.connecting')
     : !ready
-      ? 'Google 로그인 준비 중…'
-      : 'Google로 계속하기'
+      ? t('google.preparing')
+      : t('google.continue')
 
   return (
     <div ref={containerRef} className='relative w-full min-h-[48px]'>
@@ -242,7 +271,7 @@ function GoogleSignInInner({
 
       <div
         ref={googleRef}
-        aria-label='Google로 계속하기'
+        aria-label={t('google.continue')}
         className={`absolute inset-0 z-10 overflow-hidden rounded-full [&>div]:!h-full [&>div]:!w-full [&_iframe]:!h-full [&_iframe]:!w-full ${
           isDisabled
             ? 'pointer-events-none invisible'
@@ -253,17 +282,23 @@ function GoogleSignInInner({
   )
 }
 
+function GoogleSignInNotConfigured() {
+  const t = useT('auth')
+  const [before, after = ''] = t('google.notConfigured').split('{envVar}')
+  return (
+    <p className='rounded-full border border-[#dde2ea] bg-[#f9fafb] px-4 py-3 text-center text-[13px] font-normal leading-relaxed text-[#667085]'>
+      {before}
+      <code className='font-mono text-[11px]'>
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID
+      </code>
+      {after}
+    </p>
+  )
+}
+
 export function GoogleSignInButton(props: GoogleSignInButtonProps) {
   if (!isGoogleSignInConfigured()) {
-    return (
-      <p className='rounded-full border border-[#dde2ea] bg-[#f9fafb] px-4 py-3 text-center text-[13px] font-normal leading-relaxed text-[#667085]'>
-        Google 로그인 설정이 필요해요.{' '}
-        <code className='font-mono text-[11px]'>
-          NEXT_PUBLIC_GOOGLE_CLIENT_ID
-        </code>
-        를 확인해 주세요.
-      </p>
-    )
+    return <GoogleSignInNotConfigured />
   }
 
   return <GoogleSignInInner {...props} />

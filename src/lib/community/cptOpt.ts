@@ -1,6 +1,8 @@
 import type { CptOptTimelineEntry, CptOptTypeId } from '@/types/nyc'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
+import { formatDate } from '@lib/i18n/format'
+import type { Locale } from '@lib/i18n/locales'
 
 export type { CptOptTimelineEntry, CptOptTypeId } from '@/types/nyc'
 
@@ -10,42 +12,19 @@ export type CptOptTimelineFieldKey =
   | 'resultReceived'
   | 'nextStep'
 
+/**
+ * `label`은 화면 문구가 아니라 저장값이다 (글의 `detail` 컬럼에 그대로 저장됨).
+ * 화면에는 `t('reviews.cptOpt.types.<id>.label')`을 쓴다.
+ */
 export const CPT_OPT_TYPES: {
   id: CptOptTypeId
   label: string
-  description: string
-  summary: string
 }[] = [
-  {
-    id: 'cpt',
-    label: 'CPT',
-    description: '재학 중 인턴·취업 허가',
-    summary: 'OGS에 신청하고 새 I-20을 받는 과정',
-  },
-  {
-    id: 'opt',
-    label: 'OPT',
-    description: '졸업 후 1년 취업 허가',
-    summary: 'OGS 추천 후 USCIS I-765 · EAD 수령',
-  },
-  {
-    id: 'stem-opt',
-    label: 'STEM OPT',
-    description: 'STEM OPT 연장',
-    summary: 'I-983·OGS 확인 후 SEVP 검증 보고',
-  },
-  {
-    id: 'visa',
-    label: '비자',
-    description: 'F-1 · H-1B · O-1 등',
-    summary: '서류 준비, 인터뷰, 승인까지의 과정',
-  },
-  {
-    id: 'green-card',
-    label: '영주권',
-    description: 'EB · 결혼 · 기타 경로',
-    summary: '청원, 인터뷰, 승인·카드 수령 과정',
-  },
+  { id: 'cpt', label: 'CPT' },
+  { id: 'opt', label: 'OPT' },
+  { id: 'stem-opt', label: 'STEM OPT' },
+  { id: 'visa', label: '비자' },
+  { id: 'green-card', label: '영주권' },
 ]
 
 export const CPT_OPT_TYPE_STYLES: Record<
@@ -102,192 +81,61 @@ export const CPT_OPT_TYPE_STYLES: Record<
 
 export const CPT_OPT_TIMELINE_FIELDS: {
   key: CptOptTimelineFieldKey
-  label: string
-  shortLabel: string
-  hint: string
   rowClass: string
   labelClass: string
 }[] = [
   {
     key: 'prepared',
-    label: '뭘 준비했는지',
-    shortLabel: '준비',
-    hint: '그날까지 모은 서류·체크한 요건',
     rowClass: 'border-l-[3px] border-[#60a5fa] bg-[#f8fbff]',
     labelClass: 'text-[#1d4ed8]',
   },
   {
     key: 'submitted',
-    label: '어떻게 제출했는지',
-    shortLabel: '제출',
-    hint: '어디에, 어떤 방식으로 올렸는지',
     rowClass: 'border-l-[3px] border-[#fbbf24] bg-[#fffdf5]',
     labelClass: 'text-[#b45309]',
   },
   {
     key: 'resultReceived',
-    label: '결과를 어떻게 받았는지',
-    shortLabel: '결과',
-    hint: '이메일·우편·포털 등 수령 방법과 내용',
     rowClass: 'border-l-[3px] border-[#34d399] bg-[#f6fffb]',
     labelClass: 'text-[#047857]',
   },
   {
     key: 'nextStep',
-    label: '다음 스텝은 뭔지',
-    shortLabel: '다음 스텝',
-    hint: '앞으로 해야 할 일·기다리는 일정',
     rowClass: 'border-l-[3px] border-[#a78bfa] bg-[#faf8ff]',
     labelClass: 'text-[#6d28d9]',
   },
 ]
 
-const CPT_OPT_PLACEHOLDERS: Record<
-  CptOptTypeId,
-  Record<CptOptTimelineFieldKey, string>
-> = {
-  cpt: {
-    prepared: '예: CPT 모듈 수료, 오퍼레터, OGS 체크리스트',
-    submitted: '예: OGS 포털에 CPT 신청서·오퍼레터 업로드',
-    resultReceived: '예: 학교 이메일로 새 I-20 PDF 수령',
-    nextStep: '예: I-20 출력·서명 후 근무 시작일 맞추기',
-  },
-  opt: {
-    prepared: '예: OGS OPT 워크숍, I-765, 여권 사진, 졸업 증명',
-    submitted: '예: OGS 추천 후 USCIS 온라인 I-765 제출·수수료 결제',
-    resultReceived: '예: EAD 카드 우편 수령, 계정에서 승인 확인',
-    nextStep: '예: EAD 유효기간·STEM 연장 요건 캘린더에 넣기',
-  },
-  'stem-opt': {
-    prepared: '예: I-983, 회사 정보, OGS/DSO 연락',
-    submitted: '예: OGS 확인 후 STEM OPT 연장 신청서 제출',
-    resultReceived: '예: I-797 승인 통지 이메일/우편 수령',
-    nextStep: '예: 6·12·18개월 validation report 일정 잡기',
-  },
-  visa: {
-    prepared: '예: DS-160, 재정 증빙, 면접 질문 정리',
-    submitted: '예: 대사관 면접 예약·서류 제출',
-    resultReceived: '예: 비자 승인 후 여권 수령',
-    nextStep: '예: 입국·I-94 확인, SEVIS/학교 등록',
-  },
-  'green-card': {
-    prepared: '예: I-140/I-485 서류, 의료검사, 변호사 미팅',
-    submitted: '예: USCIS 청원 온라인/우편 제출, 인터뷰 출석',
-    resultReceived: '예: 승인 통지 후 영주권 카드 우편 수령',
-    nextStep: '예: 카드 수령 확인, 재입국·갱신 일정 체크',
-  },
-}
-
+/**
+ * 단계 빠른 입력. 버튼 이름은 `reviews.cptOpt.quickSteps.<type>.<id>.label`,
+ * 채워 넣는 값은 `reviews.cptOpt.quickSteps.<type>.<id>.<field>`.
+ */
 export const CPT_OPT_QUICK_STEPS: Record<
   CptOptTypeId,
-  { label: string; patch: Partial<CptOptTimelineEntry> }[]
+  { id: string; fields: CptOptTimelineFieldKey[] }[]
 > = {
   cpt: [
-    {
-      label: 'CPT 모듈 수료',
-      patch: {
-        prepared: 'CPT 모듈(오리엔테이션) 완료',
-        nextStep: '오퍼레터 대기·체크리스트 확인',
-      },
-    },
-    {
-      label: 'Job offer letter 수령',
-      patch: {
-        prepared: 'Job offer letter 수령',
-        nextStep: 'OGS CPT 신청서 작성',
-      },
-    },
-    {
-      label: 'CPT 신청서 제출',
-      patch: {
-        prepared: '오퍼레터, CPT 신청서',
-        submitted: 'OGS 포털에 신청서 제출',
-        nextStep: '새 I-20 수령 대기',
-      },
-    },
-    {
-      label: '새 I-20 수령',
-      patch: {
-        resultReceived: '새 I-20 이메일 수령',
-        nextStep: '서명 후 근무 시작',
-      },
-    },
+    { id: 'module', fields: ['prepared', 'nextStep'] },
+    { id: 'offerLetter', fields: ['prepared', 'nextStep'] },
+    { id: 'apply', fields: ['prepared', 'submitted', 'nextStep'] },
+    { id: 'newI20', fields: ['resultReceived', 'nextStep'] },
   ],
   opt: [
-    {
-      label: 'OGS 추천',
-      patch: {
-        prepared: 'OPT 서류·졸업 요건 확인',
-        submitted: 'OGS에 OPT 추천 요청',
-        nextStep: 'I-765 제출 준비',
-      },
-    },
-    {
-      label: 'I-765 제출',
-      patch: {
-        prepared: 'I-765, 사진, 수수료',
-        submitted: 'USCIS 온라인 제출',
-        nextStep: '케이스 상태 주기적으로 확인',
-      },
-    },
-    {
-      label: 'EAD 수령',
-      patch: {
-        resultReceived: 'EAD 카드 우편 수령',
-        nextStep: '근무 시작·STEM 연장 요건 확인',
-      },
-    },
+    { id: 'recommendation', fields: ['prepared', 'submitted', 'nextStep'] },
+    { id: 'i765', fields: ['prepared', 'submitted', 'nextStep'] },
+    { id: 'ead', fields: ['resultReceived', 'nextStep'] },
   ],
   'stem-opt': [
-    {
-      label: 'I-983 제출',
-      patch: {
-        prepared: 'I-983, 회사 정보',
-        submitted: 'OGS에 I-983 제출',
-        nextStep: '승인·validation report 일정 확인',
-      },
-    },
-    {
-      label: '연장 승인',
-      patch: {
-        resultReceived: 'STEM OPT 연장 승인',
-        nextStep: '보고 마감일 알림 설정',
-      },
-    },
+    { id: 'i983', fields: ['prepared', 'submitted', 'nextStep'] },
+    { id: 'approved', fields: ['resultReceived', 'nextStep'] },
   ],
   visa: [
-    {
-      label: '면접 예약',
-      patch: {
-        prepared: 'DS-160, 서류 묶음',
-        submitted: '대사관 면접 예약',
-        nextStep: '면접 준비·서류 최종 점검',
-      },
-    },
-    {
-      label: '비자 승인',
-      patch: {
-        resultReceived: '비자 승인·여권 수령',
-        nextStep: '입국·학교/회사 등록',
-      },
-    },
+    { id: 'interview', fields: ['prepared', 'submitted', 'nextStep'] },
+    { id: 'approved', fields: ['resultReceived', 'nextStep'] },
   ],
   'green-card': [
-    {
-      label: '청원 제출',
-      patch: {
-        prepared: '청원 서류 패키지',
-        submitted: 'USCIS 청원 제출',
-        nextStep: '영수증·인터뷰 일정 대기',
-      },
-    },
-    {
-      label: '카드 수령',
-      patch: {
-        resultReceived: '영주권 카드 수령',
-        nextStep: '갱신·재입국 서류 확인',
-      },
-    },
+    { id: 'petition', fields: ['prepared', 'submitted', 'nextStep'] },
+    { id: 'card', fields: ['resultReceived', 'nextStep'] },
   ],
 }
 
@@ -397,6 +245,7 @@ export function getLatestTimelineEntryId(
   return null
 }
 
+/** 저장용 유형 이름 (`detail` 컬럼). 화면 표시는 `t('reviews.cptOpt.types.<id>.label')` */
 export function getCptOptTypeLabel(type: CptOptTypeId | null | undefined) {
   return CPT_OPT_TYPES.find((item) => item.id === type)?.label ?? ''
 }
@@ -406,24 +255,17 @@ export function getCptOptTypeStyle(type: CptOptTypeId | null | undefined) {
   return CPT_OPT_TYPE_STYLES.cpt
 }
 
-export function getCptOptTimelinePlaceholder(
-  type: CptOptTypeId | null | undefined,
-  field: CptOptTimelineFieldKey,
-) {
-  if (type) return CPT_OPT_PLACEHOLDERS[type][field]
-  return CPT_OPT_PLACEHOLDERS.cpt[field]
-}
-
 export function getCptOptTimelineDateRange(
   timeline: CptOptTimelineEntry[] | null | undefined,
+  locale: Locale = 'ko',
 ) {
   const dates = (timeline ?? [])
     .map((entry) => entry.date.trim())
     .filter(Boolean)
     .sort()
   if (dates.length === 0) return null
-  if (dates.length === 1) return formatCptOptDate(dates[0], { compactYear: true })
-  return `${formatCptOptDate(dates[0], { compactYear: true })} – ${formatCptOptDate(dates[dates.length - 1], { compactYear: true })}`
+  if (dates.length === 1) return formatCptOptDate(dates[0], { compactYear: true, locale })
+  return `${formatCptOptDate(dates[0], { compactYear: true, locale })} – ${formatCptOptDate(dates[dates.length - 1], { compactYear: true, locale })}`
 }
 
 export function normalizeCptOptTimeline(raw: unknown): CptOptTimelineEntry[] {
@@ -480,14 +322,14 @@ export function normalizeCptOptTips(raw: unknown) {
 
 export function formatCptOptDate(
   value: string,
-  options?: { compactYear?: boolean },
+  options?: { compactYear?: boolean; locale?: Locale },
 ) {
   const trimmed = value.trim()
   if (!trimmed) return ''
   if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
     const date = new Date(`${trimmed}T12:00:00`)
     if (!Number.isNaN(date.getTime())) {
-      return date.toLocaleDateString('ko-KR', {
+      return formatDate(options?.locale ?? 'ko', date, {
         year: options?.compactYear ? '2-digit' : 'numeric',
         month: 'short',
         day: 'numeric',

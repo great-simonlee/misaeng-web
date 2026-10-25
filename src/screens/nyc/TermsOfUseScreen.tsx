@@ -1,17 +1,21 @@
 'use client'
 
 import { useCityPath } from '@hooks/useCity'
-import { NYC_TERMS_OF_USE } from '@lib/constants/nycTermsOfUse'
+import type { LegalViewDocument } from '@lib/constants/legalDocument'
+import { useT } from '@lib/i18n/client'
 import { LegalDocumentView } from '@widgets/nyc/LegalDocumentView'
 
-export function TermsOfUseScreen() {
+/** doc은 page가 서버에서 보는 언어만 남겨 넘긴다 (toLegalViewDocument) */
+export function TermsOfUseScreen({ doc }: { doc: LegalViewDocument }) {
   const href = useCityPath()
+  const t = useT('legal.view')
   return (
     <LegalDocumentView
-      doc={NYC_TERMS_OF_USE}
-      relatedHref={href('/privacy-policy')}
-      relatedLabel='Privacy Policy →'
-      relatedLabelKo='개인정보처리방침'
+      doc={doc}
+      related={{
+        href: href('/privacy-policy'),
+        label: { en: 'Privacy Policy', ref: doc.refLocale ? t('privacyPolicy') : undefined },
+      }}
     />
   )
 }

@@ -3,13 +3,12 @@
 import Link from 'next/link'
 import { useId, useState, type ReactNode } from 'react'
 
-import { CONSENT_COPY } from '@lib/consent/copy'
-import { PRIVACY_HREF, TERMS_HREF } from '@lib/consent/copy'
+import { useCityPath } from '@hooks/useCity'
+import { PRIVACY_PATH, TERMS_PATH } from '@lib/consent/copy'
+import { useT } from '@lib/i18n/client'
+import { rich } from '@lib/i18n/rich'
 
-import {
-  ConsentLocaleToggle,
-  useConsentLocale,
-} from './ConsentLocaleProvider'
+import { ConsentLocaleToggle } from './ConsentLocaleProvider'
 
 type TermsConsentFieldsProps = {
   checked: boolean
@@ -30,8 +29,10 @@ export function TermsConsentFields({
   const baseId = id || generatedId
   const termsId = `${baseId}-terms`
   const privacyId = `${baseId}-privacy`
-  const { locale } = useConsentLocale()
-  const copy = CONSENT_COPY[locale]
+  const t = useT('consent')
+  const href = useCityPath()
+  const termsHref = href(TERMS_PATH)
+  const privacyHref = href(PRIVACY_PATH)
   const [acceptedTerms, setAcceptedTerms] = useState(checked)
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(checked)
   const [prevChecked, setPrevChecked] = useState(checked)
@@ -72,22 +73,14 @@ export function TermsConsentFields({
           checked={acceptedTerms}
           onChange={updateTerms}
           error={error}
-          ariaLabel={copy.agreeTermsAria}
+          ariaLabel={t('agreeTermsAria')}
           describedBy={`${baseId}-arbitration ${baseId}-notice${
             error ? ` ${baseId}-error` : ''
           }`}
         >
-          {locale === 'en' ? (
-            <>
-              I have read and agree to the{' '}
-              <PolicyLink href={TERMS_HREF}>{copy.termsLink}</PolicyLink>.
-            </>
-          ) : (
-            <>
-              <PolicyLink href={TERMS_HREF}>{copy.termsLink}</PolicyLink>을
-              읽었으며 이에 동의합니다.
-            </>
-          )}
+          {rich(t('agreeTerms'), {
+            terms: <PolicyLink href={termsHref}>{t('termsLink')}</PolicyLink>,
+          })}
         </ConsentCheckbox>
 
         <ConsentCheckbox
@@ -95,22 +88,14 @@ export function TermsConsentFields({
           checked={acceptedPrivacy}
           onChange={updatePrivacy}
           error={error}
-          ariaLabel={copy.agreePrivacyAria}
+          ariaLabel={t('agreePrivacyAria')}
           describedBy={`${baseId}-arbitration ${baseId}-notice${
             error ? ` ${baseId}-error` : ''
           }`}
         >
-          {locale === 'en' ? (
-            <>
-              I have read and agree to the{' '}
-              <PolicyLink href={PRIVACY_HREF}>{copy.privacyLink}</PolicyLink>.
-            </>
-          ) : (
-            <>
-              <PolicyLink href={PRIVACY_HREF}>{copy.privacyLink}</PolicyLink>을
-              읽었으며 이에 동의합니다.
-            </>
-          )}
+          {rich(t('agreePrivacy'), {
+            privacy: <PolicyLink href={privacyHref}>{t('privacyLink')}</PolicyLink>,
+          })}
         </ConsentCheckbox>
 
         <div
@@ -118,16 +103,18 @@ export function TermsConsentFields({
           className='border-t border-black/[0.06] pt-2.5'
         >
           <p className='text-[12px] leading-relaxed text-[#667085]'>
-            {copy.arbitrationNotice}{' '}
-            <Link
-              href={TERMS_HREF}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='font-medium text-[#475467] underline-offset-2 hover:underline'
+            {rich(t('arbitrationNotice'), {
+              terms: (
+                <Link
+                  href={termsHref}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='font-medium text-[#475467] underline-offset-2 hover:underline'
             >
-              {copy.termsLink}
-            </Link>
-            {locale === 'en' ? '.' : '에서 확인하세요.'}
+                  {t('termsLink')}
+                </Link>
+              ),
+            })}
           </p>
         </div>
       </div>
@@ -138,7 +125,7 @@ export function TermsConsentFields({
           role='alert'
           className='text-[12px] font-medium text-red-600'
         >
-          {copy.agreeError}
+          {t('agreeError')}
         </p>
       ) : null}
 
@@ -146,7 +133,7 @@ export function TermsConsentFields({
         id={`${baseId}-notice`}
         className='text-[10px] leading-relaxed text-[#98a2b3]'
       >
-        {copy.languageNotice}
+        {t('languageNotice')}
       </p>
     </div>
   )
@@ -176,7 +163,7 @@ function ConsentCheckbox({
         type='checkbox'
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className='mt-1 size-4 shrink-0 accent-[#F64310]'
+        className='mt-1 size-4 shrink-0 accent-brand'
         aria-label={ariaLabel}
         aria-invalid={error}
         aria-describedby={describedBy}
@@ -202,7 +189,7 @@ function PolicyLink({
       href={href}
       target='_blank'
       rel='noopener noreferrer'
-      className='font-semibold text-[#F64310] underline-offset-2 hover:underline'
+      className='font-semibold text-brand underline-offset-2 hover:underline'
     >
       {children}
     </Link>

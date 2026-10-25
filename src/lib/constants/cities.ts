@@ -1,10 +1,13 @@
-/** 도시 사이트 슬러그. URL 첫 세그먼트와 동일하다. */
+import { isLocale } from '@lib/i18n/locales'
+
+/** 도시 사이트 슬러그. URL 첫 세그먼트(언어 접두사 다음)와 동일하다. */
 export const CITY_IDS = ['nyc', 'boston'] as const
 
 export type CityId = (typeof CITY_IDS)[number]
 
 export const DEFAULT_CITY_ID: CityId = 'nyc'
 
+/** 화면 문구(헤드라인·소개)는 hub.cities.<id>.headline / description */
 export const CITIES: Record<
   CityId,
   {
@@ -12,8 +15,6 @@ export const CITIES: Record<
     name: string
     shortLabel: string
     brand: string
-    headline: string
-    description: string
   }
 > = {
   nyc: {
@@ -21,17 +22,12 @@ export const CITIES: Record<
     name: 'New York',
     shortLabel: 'NYC',
     brand: 'MISAENG NYC',
-    headline: '뉴욕에서 함께 살아가는 이야기',
-    description:
-      '유학생 · 직장인을 위한 New York City 정보 공유 공간이에요.',
   },
   boston: {
     id: 'boston',
     name: 'Boston',
     shortLabel: 'Boston',
     brand: 'MISAENG BOSTON',
-    headline: '보스턴에서 함께 살아가는 이야기',
-    description: '유학생 · 직장인을 위한 Boston 정보 공유 공간이에요.',
   },
 }
 
@@ -74,19 +70,28 @@ export function getCity(city: CityId) {
   return CITIES[city]
 }
 
+/** 언어 접두사(`/vi`)를 건너뛴 경로 세그먼트 */
+function pathSegments(pathname: string): string[] {
+  const parts = pathname.split('/').filter(Boolean)
+  return isLocale(parts[0]) ? parts.slice(1) : parts
+}
+
 export function getCityFromPathname(pathname: string): CityId {
-  const first = pathname.split('/').filter(Boolean)[0]
-  return resolveCityId(first)
+  return resolveCityId(pathSegments(pathname)[0])
+}
+
+/** Pages shown inside the native app (no site header/footer): /{city}/app-view/… */
+export function isAppViewPathname(pathname: string): boolean {
+  return pathSegments(pathname)[1] === 'app-view'
 }
 
 export function isCitySitePathname(pathname: string): boolean {
-  const first = pathname.split('/').filter(Boolean)[0]
-  return isCityId(first)
+  return isCityId(pathSegments(pathname)[0])
 }
 
-/** `/boston/food` + nyc → `/nyc/food` */
+/** `/boston/food` + nyc → `/nyc/food` (언어 접두사는 떼고 돌려준다) */
 export function replaceCityInPath(pathname: string, nextCity: CityId): string {
-  const parts = pathname.split('/').filter(Boolean)
+  const parts = pathSegments(pathname)
   if (parts[0] && isCityId(parts[0])) {
     const rest = parts.slice(1).join('/')
     return rest ? cityPath(nextCity, `/${rest}`) : cityPath(nextCity)
@@ -104,10 +109,19 @@ export function cityPath(city: CityId, suffix = ''): string {
   return `/${city}${path}`
 }
 
+/**
+ * 로그인 페이지 경로. next가 언어 접두사로 시작하면(`/vi/nyc/...`) 로그인 페이지도 같은 언어로 연다.
+ */
 export function cityLoginPath(city: CityId, next?: string): string {
-  const base = cityPath(city, '/login')
+  const base = `${localePrefixOf(next)}${cityPath(city, '/login')}`
   if (!next) return base
   return `${base}?next=${encodeURIComponent(next)}`
+}
+
+/** `/vi/nyc/food` → `/vi`, 접두사 없으면 '' */
+export function localePrefixOf(path: string | null | undefined): string {
+  const first = String(path || '').split('?')[0].split('/').filter(Boolean)[0]
+  return isLocale(first) ? `/${first}` : ''
 }
 
 /** 레거시 OPT·비자·영주권 id 포함 */

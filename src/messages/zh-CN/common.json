@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "title": "{brand} NYC | 纽约留学生与职场人社区",
+    "description": "来自纽约学习和工作的人分享的租房、美食、CPT/OPT、签证和面试经验。"
+  },
+  "language": {
+    "label": "语言",
+    "menuAria": "选择语言",
+    "saved": "语言已切换为{language}",
+    "settingLabel": "语言",
+    "settingHint": "网站和翻译后的帖子将以该语言显示。",
+    "sheetTitle": "语言",
+    "setupLabel": "首选语言",
+    "setupHint": "社区帖子和评论会被翻译成该语言。你可以随时在“个人中心”中更改。",
+    "saveFailed": "语言保存失败，请稍后再试。"
+  },
+  "translation": {
+    "translatedFrom": "译自{language}",
+    "showOriginal": "查看原文",
+    "showTranslation": "查看译文",
+    "original": "原文",
+    "pending": "翻译即将上线",
+    "iconLabel": "已翻译的帖子"
+  },
+  "actions": {
+    "save": "保存",
+    "cancel": "取消",
+    "close": "关闭",
+    "confirm": "确定",
+    "back": "返回",
+    "more": "查看更多",
+    "retry": "重试",
+    "loading": "加载中…"
+  },
+  "errors": {
+    "generic": "出错了，请稍后再试。",
+    "network": "请检查网络连接。"
+  },
+  "ui": {
+    "bottomSheetSelect": {
+      "placeholder": "请选择"
+    },
+    "imageUpload": {
+      "selectPhoto": "选择照片",
+      "uploading": "上传中…",
+      "failed": "上传失败",
+      "remove": "删除",
+      "change": "更换",
+      "addPhoto": "添加照片",
+      "tapToUpload": "点击上传"
+    },
+    "loading": {
+      "aria": "加载中",
+      "label": "加载中…"
+    },
+    "mbti": {
+      "placeholder": "请选择",
+      "title": "选择 MBTI",
+      "clear": "不选",
+      "result": "你的类型",
+      "selectAll": "四项都要选",
+      "groups": {
+        "analyst": {
+          "label": "分析家",
+          "subtitle": "直觉 · 思考"
+        },
+        "diplomat": {
+          "label": "外交家",
+          "subtitle": "直觉 · 情感"
+        },
+        "sentinel": {
+          "label": "守护者",
+          "subtitle": "实感 · 思考"
+        },
+        "explorer": {
+          "label": "探险家",
+          "subtitle": "实感 · 情感"
+        }
+      },
+      "nicknames": {
+        "INTJ": "建筑师",
+        "INTP": "逻辑学家",
+        "ENTJ": "指挥官",
+        "ENTP": "辩论家",
+        "INFJ": "提倡者",
+        "INFP": "调停者",
+        "ENFJ": "主人公",
+        "ENFP": "竞选者",
+        "ISTJ": "物流师",
+        "ISFJ": "守卫者",
+        "ESTJ": "总经理",
+        "ESFJ": "执政官",
+        "ISTP": "鉴赏家",
+        "ISFP": "探险家",
+        "ESTP": "企业家",
+        "ESFP": "表演者"
+      },
+      "dimensions": {
+        "ei": "能量",
+        "ns": "心智",
+        "tf": "天性",
+        "jp": "策略"
+      },
+      "options": {
+        "E": "外向",
+        "I": "内向",
+        "N": "直觉",
+        "S": "实感",
+        "T": "思考",
+        "F": "情感",
+        "J": "判断",
+        "P": "展望"
+      }
+    },
+    "nickname": {
+      "checking": "正在检查是否可用…"
+    },
+    "photoLightbox": {
+      "title": "查看照片",
+      "close": "关闭",
+      "previous": "上一张",
+      "next": "下一张"
+    },
+    "pullToRefresh": {
+      "refreshing": "正在刷新 {brand}…",
+      "release": "松开刷新",
+      "pull": "下拉刷新"
+    },
+    "rangeSlider": {
+      "minPrice": "最低价格",
+      "maxPrice": "最高价格"
+    },
+    "schoolBadge": {
+      "title": "{school} · 学校邮箱已验证",
+      "aria": "{school} 已验证"
+    },
+    "editor": {
+      "placeholder": "写点什么吧",
+      "imageUploadFailed": "图片上传失败",
+      "bold": "粗体",
+      "italic": "斜体",
+      "heading": "标题",
+      "bulletList": "列表",
+      "quote": "引用",
+      "linkPrompt": "请输入链接 URL",
+      "link": "链接",
+      "photo": "照片",
+      "maxLengthReached": "已达到字数上限",
+      "charCount": "字数（仅文字）"
+    },
+    "authErrors": {
+      "loginCancelled": "登录已取消",
+      "popupBlocked": "弹出窗口被拦截，请检查浏览器设置",
+      "invalidEmail": "邮箱地址无效",
+      "userDisabled": "该账号已被停用",
+      "userNotFound": "找不到该账号",
+      "wrongPassword": "密码错误",
+      "invalidCredential": "请检查邮箱或密码",
+      "emailAlreadyInUse": "该邮箱已被注册",
+      "weakPassword": "密码至少需要 6 个字符",
+      "tooManyRequests": "尝试次数过多，请稍后再试",
+      "networkRequestFailed": "请检查网络连接"
+    },
+    "configBanner": {
+      "loginPage": "登录页面"
+    },
+    "authConfigBanner": {
+      "body": "AppConnect API 尚未配置。请参照 ellieo-erp AppConnect，将 {baseUrl} 和 {clientId}（用于 Google Identity Services）添加到环境变量中。Google idToken 会发送到 Ellieo {endpoint}（参见 {envExample}）。"
+    },
+    "supabaseConfigBanner": {
+      "body": "Supabase 环境变量尚未配置。请将 Supabase 的值添加到 {envLocal}（参见 {envExample}）。在此之前你可以浏览页面，但无法保存数据或上传头像。"
+    },
+    "chipScroll": {
+      "previous": "显示上一组",
+      "next": "显示更多"
+    },
+    "copyLink": {
+      "copiedToast": "链接已复制",
+      "failedToast": "链接复制失败",
+      "linkCopied": "链接已复制",
+      "copyLink": "复制链接",
+      "copied": "已复制",
+      "share": "分享"
+    },
+    "photoGrid": {
+      "cover": "封面"
+    },
+    "timeline": {
+      "step": "第 {step} 步",
+      "latest": "最新",
+      "review": "经验分享"
+    },
+    "draft": {
+      "save": "保存草稿",
+      "savedAt": "草稿已保存 · {time}"
+    },
+    "autosave": {
+      "title": "内容会自动保存",
+      "description": "每次添加进度或进入下一项时，内容都会保存在这台设备上。关闭窗口后也可以从上次的地方继续写。",
+      "savedAt": "已保存 · {time}"
+    }
+  }
+}

@@ -1,0 +1,454 @@
+{
+  "amenities": {
+    "24HourAttendedLobby": "24-hour doorman",
+    "conciergeService": "Concierge",
+    "elevator": "Elevator",
+    "fitnessCenter": "Gym",
+    "mailRoom": "Mail room",
+    "laundryRoom": "Laundry room",
+    "residentLounge": "Lounge",
+    "rooftopOutdoorSpace": "Rooftop outdoor space",
+    "rooftopLounge": "Rooftop lounge",
+    "petFriendly": "Pet friendly",
+    "garageParking": "Parking garage",
+    "sauna": "Sauna",
+    "pool": "Pool",
+    "swimmingPool": "Pool",
+    "indoorPool": "Indoor pool",
+    "outdoorPool": "Outdoor pool",
+    "workingSpace": "Study/work space",
+    "businessMeetingRoom": "Meeting room",
+    "pilatesStudio": "Pilates studio",
+    "yogaStudio": "Yoga room",
+    "recoveryRoom": "Recovery room",
+    "indoorBasketballCourt": "Indoor basketball court",
+    "indoorPickleballCourt": "Indoor pickleball",
+    "indoorGolfSimulator": "Golf simulator",
+    "bowlingAlley": "Bowling alley",
+    "pokerRoom": "Poker room",
+    "billiardsRoom": "Billiards room",
+    "arcadeRoom": "Game room",
+    "pingPongTable": "Ping pong table",
+    "tennisCourts": "Tennis courts",
+    "bbqGrills": "BBQ grills",
+    "bbqGrill": "BBQ grills",
+    "sundeck": "Outdoor space",
+    "dogRun": "Dog run",
+    "childrensPlayroom": "Playroom",
+    "mediaRoom": "Screening room",
+    "garden": "Garden",
+    "bikeRoom": "Bike storage",
+    "storageSpace": "Storage",
+    "valetService": "Valet parking",
+    "liveInSuper": "Live-in super",
+    "wheelchairAccess": "Wheelchair accessible",
+    "indoorSquashCourt": "Indoor squash"
+  },
+  "utilities": {
+    "heat": "Heat included",
+    "hotWater": "Hot water included",
+    "gas": "Gas included",
+    "electricity": "Electricity included",
+    "water": "Water included",
+    "sewer": "Sewer included"
+  },
+  "appliances": {
+    "dishwasher": "Dishwasher",
+    "microwave": "Microwave",
+    "oven": "Oven",
+    "refrigerator": "Refrigerator",
+    "washer": "Washer",
+    "dryer": "Dryer",
+    "airConditioning": "Air conditioning",
+    "inUnitWasher": "Washer"
+  },
+  "perks": {
+    "roommate-waiting": "Roommate waiting",
+    "no-broker-fee": "No broker fee",
+    "no-guarantor": "No guarantor needed",
+    "free-credit": "Free credit",
+    "doorman-24h": "24-hour doorman",
+    "washer-dryer": "Washer/dryer",
+    "terrace": "Terrace",
+    "gym": "Gym",
+    "pool": "Pool",
+    "wall-ok": "Flex wall OK",
+    "package-storage": "Package room",
+    "mail-room": "Mail room",
+    "rooftop": "Rooftop",
+    "bbq-grill": "BBQ grill",
+    "work-study": "Work & study space",
+    "sauna": "Sauna"
+  },
+  "roomTypes": {
+    "master-w-bath": "Master w/ Bath",
+    "master-wo-bath": "Master w/o Bath",
+    "regular-bedroom": "Regular",
+    "flexroom": "Flex",
+    "entire": "Entire unit",
+    "studio": "Studio"
+  },
+  "unitTypes": {
+    "studio": "Studio",
+    "1b1b": "1B1B",
+    "2b1b": "2B1B",
+    "2b2b": "2B2B",
+    "3b1b": "3B1B",
+    "3b2b": "3B2B",
+    "4-plus": "4+ Bedrooms",
+    "unknown": "Type TBD"
+  },
+  "credit": {
+    "monthsFree_one": "{count} month free",
+    "monthsFree_other": "{count} months free",
+    "dollarCredit": "${amount} credit"
+  },
+  "amenityFee": {
+    "unknown": "Not known yet",
+    "free": "Free",
+    "mandatoryPersonMonthly": "Required · ${amount}/mo per person",
+    "mandatoryPersonYearly": "Required · ${amount}/yr per person",
+    "mandatoryUnitMonthly": "Required · ${amount}/mo per unit",
+    "mandatoryUnitYearly": "Required · ${amount}/yr per unit",
+    "optionalPersonMonthly": "Optional · ${amount}/mo per person",
+    "optionalPersonYearly": "Optional · ${amount}/yr per person",
+    "optionalUnitMonthly": "Optional · ${amount}/mo per unit",
+    "optionalUnitYearly": "Optional · ${amount}/yr per unit"
+  },
+  "partWall": {
+    "fullWall": "Full wall",
+    "regularWall": "Regular wall",
+    "curtainOnly": "Curtain only"
+  },
+  "income": {
+    "personal": "Income {multiple}x",
+    "guarantor": "Guarantor {multiple}x",
+    "guarantorCompany": "Guarantor company OK"
+  },
+  "roommatePreferences": {
+    "master-w-bath": "Wants Master",
+    "master-wo-bath": "Wants Master w/o Bath",
+    "regular-bedroom": "Wants Regular",
+    "flexroom": "Wants Flex",
+    "any": "Any room"
+  },
+  "price": {
+    "gross": "Gross",
+    "net": "Net"
+  },
+  "card": {
+    "photoLabel": "{address} photo {number}",
+    "noPhoto": "No photos",
+    "moveIn": "Move-in {date}",
+    "moveInTbd": "TBD",
+    "composition": {
+      "male_one": "{count} man",
+      "male_other": "{count} men",
+      "female_one": "{count} woman",
+      "female_other": "{count} women"
+    },
+    "loadingLabel": "Loading listings",
+    "loadingDescription": "Loading listings…"
+  },
+  "roommateIntro": {
+    "title": "Roommates waiting",
+    "introFallback": "We'll share more details when you reach out.",
+    "male": "Male",
+    "female": "Female",
+    "worker": "Working professional"
+  },
+  "map": {
+    "location": "Location",
+    "directions": "Directions",
+    "openInGoogleMaps": "View {name} in Google Maps",
+    "viewInGoogleMaps": "View location in Google Maps"
+  },
+  "detail": {
+    "toasts": {
+      "notAvailableYet": "This will be available soon",
+      "kakaoNotReady": "The KakaoTalk inquiry link isn't ready yet",
+      "linkCopied": "Link copied",
+      "linkCopyFailed": "Couldn't copy the link"
+    },
+    "notFound": {
+      "title": "Listing not found",
+      "description": "It may have been closed or deleted.",
+      "action": "Back to housing"
+    },
+    "mailSubject": "[{brand} Housing] {address}",
+    "backToList": "Housing",
+    "noPhotos": "No photos yet",
+    "previousPhoto": "Previous photo",
+    "nextPhoto": "Next photo",
+    "layout": "Layout",
+    "watchVideo": "Watch video",
+    "photoNumber": "Photo {number}",
+    "previousThumbnails": "Show previous thumbnails",
+    "moreThumbnails": "Show more thumbnails",
+    "benefits": "Perks",
+    "roomOptions": "Room options",
+    "amenities": "Amenities",
+    "utilities": "Utilities",
+    "appliances": "Appliances",
+    "emailInquiry": "Email us",
+    "kakaoInquiry": "Ask on KakaoTalk",
+    "share": "Share",
+    "closeListing": "Close listing",
+    "description": "Details",
+    "property": {
+      "title": "Building info",
+      "zipcode": "ZIP code",
+      "wall": "Wall options",
+      "amenityFee": "Amenity fee",
+      "income": "Income requirements",
+      "subway": "Subway"
+    }
+  },
+  "listingKinds": {
+    "unit": {
+      "label": "Entire unit",
+      "description": "Looking for a whole apartment"
+    },
+    "room": {
+      "label": "Private room",
+      "description": "Looking for just one room"
+    }
+  },
+  "list": {
+    "title": "Housing",
+    "subtitle": "NYC listings hand-picked by {brand} · Find whole units and private rooms in one place.",
+    "filters": "Filters",
+    "quickFilters": "Quick filters",
+    "previousFilters": "Show previous filters",
+    "moreFilters": "Show more filters",
+    "price": {
+      "upTo": "Up to ${amount}",
+      "atLeast": "${amount}+",
+      "range": "${min} – ${max}"
+    },
+    "summaryAll_one": "{count} listing",
+    "summaryAll_other": "{count} listings",
+    "summaryFiltered_one": "{filters} · {count} listing",
+    "summaryFiltered_other": "{filters} · {count} listings",
+    "empty": {
+      "title": "No listings match your filters",
+      "description": "Try changing your filters and search again.",
+      "action": "Reset filters"
+    },
+    "sheet": {
+      "clearAll": "Clear all",
+      "showResults_one": "Show {count} listing",
+      "showResults_other": "Show {count} listings",
+      "lookingFor": "What are you looking for?",
+      "unitType": "Unit type",
+      "roomType": "Room type",
+      "all": "All",
+      "price": "Price",
+      "unitRent": "Monthly rent for the whole unit",
+      "roomRent": "Monthly rent per room",
+      "benefits": "Perks",
+      "amenities": "Amenities",
+      "area": "Neighborhood"
+    }
+  },
+  "new": {
+    "errors": {
+      "loginRequired": "Please log in first",
+      "submitFailed": "Couldn't post your listing"
+    },
+    "redirectingToLogin": "Taking you to the login page…",
+    "teamOnly": {
+      "title": "Team accounts only",
+      "description": "Housing listings can only be posted with a {domain} email. You're logged in as: {email}",
+      "unknownEmail": "unknown"
+    },
+    "breadcrumb": "New",
+    "title": "New housing listing",
+    "signedInAs": "Logged in as {email}",
+    "fields": {
+      "streetAddress": "Street address",
+      "neighborhood": "Neighborhood",
+      "unitRent": "Monthly rent for the whole unit ($)",
+      "unitRentPlaceholder": "Total price for all rooms",
+      "roomRent": "Monthly rent per room ($)",
+      "bedrooms": "Bedrooms",
+      "availableFrom": "Move-in date",
+      "availableTo": "Move-out date",
+      "contactEmail": "Contact email",
+      "description": "Description",
+      "descriptionPlaceholder": "Lease terms, amenities, who it's a good fit for, etc."
+    },
+    "submitting": "Posting…",
+    "submit": "Post"
+  },
+  "roommate": {
+    "intents": {
+      "offer-room": {
+        "label": "Offer a room",
+        "description": "Find a roommate for your place or post a sublet"
+      },
+      "seek": {
+        "label": "Find a roommate",
+        "description": "Find someone to search with, or a room to move into"
+      }
+    },
+    "lookingFor": {
+      "has-room": {
+        "label": "Looking for a roommate to join our place",
+        "shortLabel": "Has a room",
+        "description": "You already have a place and need someone to live with"
+      },
+      "sublet": {
+        "label": "Subletting my room for a while",
+        "shortLabel": "Sublet",
+        "description": "Rent out your room short-term as a sublet"
+      },
+      "together": {
+        "label": "Looking for a roommate to find a place with",
+        "shortLabel": "Searching together",
+        "description": "No place yet; find a roommate to search with"
+      },
+      "room": {
+        "label": "Just looking for a room to move into",
+        "shortLabel": "Needs a room",
+        "description": "Find a room or apartment without a roommate"
+      }
+    },
+    "form": {
+      "has-room": {
+        "locationLabel": "Current neighborhood / location",
+        "locationPlaceholder": "e.g. Brooklyn Bushwick",
+        "budgetLabel": "Roommate's monthly rent ($)",
+        "budgetPlaceholder": "e.g. 1400",
+        "moveInStartLabel": "Available from",
+        "moveInEndLabel": "Move-out date",
+        "photosHint": "Room/apartment photos recommended · Up to 6 · The first one is the cover",
+        "titlePlaceholder": "e.g. Looking for a roommate for a Bushwick 2-bed",
+        "bodyPlaceholder": "Describe the layout, your lifestyle, utilities and deposit. Leave a KakaoTalk 1:1 open chat link so people can reach you."
+      },
+      "together": {
+        "locationLabel": "Preferred neighborhood",
+        "locationPlaceholder": "e.g. Queens Astoria / Brooklyn",
+        "budgetLabel": "Max monthly budget ($)",
+        "budgetPlaceholder": "e.g. 1600",
+        "moveInStartLabel": "Preferred move-in date",
+        "moveInEndLabel": "Move-out date",
+        "photosHint": "Add reference photos if you have any · Up to 6",
+        "titlePlaceholder": "e.g. September move-in, looking together in Astoria",
+        "bodyPlaceholder": "Share your budget, preferred neighborhood and lifestyle. Leave a KakaoTalk 1:1 open chat link so people can reach you."
+      },
+      "room": {
+        "locationLabel": "Preferred neighborhood",
+        "locationPlaceholder": "e.g. Manhattan UES / Jersey City",
+        "budgetLabel": "Max monthly budget ($)",
+        "budgetPlaceholder": "e.g. 1800",
+        "moveInStartLabel": "Preferred move-in date",
+        "moveInEndLabel": "Move-out date",
+        "photosHint": "Add reference photos if you have any · Up to 6",
+        "titlePlaceholder": "e.g. Looking for a room near Midtown",
+        "bodyPlaceholder": "Share your budget, preferred location and move-in timing. Leave a KakaoTalk 1:1 open chat link so people can reach you."
+      },
+      "sublet": {
+        "locationLabel": "Sublet location",
+        "locationPlaceholder": "e.g. Upper East Side",
+        "budgetLabel": "Monthly rent ($)",
+        "budgetPlaceholder": "e.g. 2200",
+        "moveInStartLabel": "Sublet start date",
+        "moveInEndLabel": "Sublet end date",
+        "photosHint": "Room/apartment photos recommended · Up to 6 · The first one is the cover",
+        "titlePlaceholder": "e.g. UES studio sublet, Sep–Nov",
+        "bodyPlaceholder": "Describe the dates, whether it's furnished, transit, utilities and deposit. Leave a KakaoTalk 1:1 open chat link so people can reach you."
+      }
+    },
+    "card": {
+      "pricePerMonth": "{price}/mo"
+    },
+    "list": {
+      "budgetPresets": {
+        "under-1500": "Up to $1,500",
+        "1500-2000": "$1,500–2,000",
+        "2000-2500": "$2,000–2,500",
+        "2500-plus": "$2,500+"
+      },
+      "loadFailed": "Couldn't load posts",
+      "summaryAll_one": "{count} post",
+      "summaryAll_other": "{count} posts",
+      "summaryFiltered_one": "{filters} · {count} post",
+      "summaryFiltered_other": "{filters} · {count} posts",
+      "login": "Log in",
+      "suspended": "Account suspended",
+      "breadcrumb": "Roommates · Sublets",
+      "empty": {
+        "noPostsTitle": "No roommate or sublet posts yet",
+        "noMatchTitle": "No posts match your filters",
+        "firstPost": "Be the first to post and get things started.",
+        "verifyToPost": "Verify as a student or professional to post.",
+        "loginToPost": "Log in to post."
+      },
+      "showResults_one": "Show {count} post",
+      "showResults_other": "Show {count} posts",
+      "category": "Category",
+      "monthlyBudget": "Monthly budget",
+      "neighborhood": "Neighborhood"
+    },
+    "write": {
+      "errors": {
+        "alreadyPosted": "You already have a roommate/sublet post. Taking you to edit it.",
+        "notFound": "Post not found",
+        "noPermission": "You don't have permission to edit this post",
+        "loadFailed": "Couldn't load the post",
+        "typeRequired": "Please choose a type",
+        "titleRequired": "Please enter a title",
+        "titleTooLong": "Titles can be up to {max} characters",
+        "bodyRequired": "Please write something in the body",
+        "bodyTooLong": "The body can be up to {max} characters",
+        "fieldRequired": "Please fill in: {field}",
+        "fieldSelect": "Please choose: {field}",
+        "budgetRange": "Please enter an amount between $0 and ${max}",
+        "endBeforeStart": "The end date must be after the start date",
+        "updateFailed": "Couldn't save your changes",
+        "draftSaveFailed": "Couldn't save the draft"
+      },
+      "updated": "Post updated",
+      "created": "Post published",
+      "draftSaved": "Draft saved",
+      "checkingExisting": "Checking for an existing post…",
+      "backToPost": "Back to post",
+      "backToList": "Back to {board}",
+      "onePostNotice": "You can post {limit} in Roommates · Sublets. If things change, edit or delete your existing post and post again.",
+      "onePostLimit": "one post per account",
+      "steps": {
+        "type": "What kind of post is it?",
+        "basics": "Basic info",
+        "basicsDescription": "Add a title, location, budget and dates",
+        "photos": "Photos",
+        "photosDescription": "{hint} · Press and drag to reorder · {current}/{max}",
+        "details": "Details",
+        "detailsDescription": "Share your lifestyle and terms. We recommend creating a KakaoTalk 1:1 open chat and leaving the link so people can reach you."
+      },
+      "subtype": "Type details",
+      "fields": {
+        "title": "Title"
+      },
+      "pickSubtypeHint": "Pick a type to see the location, budget and move-in fields.",
+      "pickIntentHint": "Choose Offer a room or Find a roommate.",
+      "photosDefaultHint": "Up to {max} · The first one is the cover",
+      "addPhoto": "Add",
+      "saving": "Saving…",
+      "saveEdit": "Save changes",
+      "submit": "Publish post",
+      "backToListShort": "Back to list",
+      "createHero": {
+        "title": "Post in Roommates · Sublets",
+        "description": "Choose Offer a room or Find a roommate, then add a location and dates.",
+        "photoTip": "Landscape 4:3 photos look best."
+      },
+      "updateHero": {
+        "eyebrow": "Edit post",
+        "title": "Edit your post",
+        "description": "If things change, update the type, location or dates."
+      },
+      "untitled": "Untitled"
+    }
+  }
+}

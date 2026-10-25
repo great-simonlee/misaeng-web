@@ -9,25 +9,30 @@ import { createPortal } from 'react-dom'
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
+import { BRAND_CONFIG } from '@lib/brand'
 import { cityLoginPath } from '@lib/constants/cities'
+import { useT } from '@lib/i18n/client'
+import { LanguageMenu } from '@widgets/LanguageMenu'
 import { CitySelectModal } from '@widgets/nyc/CitySelectModal'
 
+/** 문구: nav.links.<key> */
 const NAV_LINKS = [
-  { path: '/housing', label: '하우징' },
-  { path: '/food', label: '맛집' },
-  { path: '/marketplace', label: '중고거래' },
-  { path: '/status', label: 'CPT·OPT·비자·영주권' },
-  { path: '/job-review', label: '면접·취업' },
-  { path: '/roommate', label: '룸메이트·서블렛' },
-  { path: '/anonymous', label: '익명게시판' },
+  { path: '/housing', key: 'housing' },
+  { path: '/food', key: 'food' },
+  { path: '/marketplace', key: 'marketplace' },
+  { path: '/status', key: 'status' },
+  { path: '/job-review', key: 'jobReview' },
+  { path: '/roommate', key: 'roommate' },
+  { path: '/anonymous', key: 'anonymous' },
 ] as const
 
+/** 문구: nav.account.<key> */
 const ACCOUNT_LINKS = [
-  { path: '/me', label: '마이페이지', match: 'exact' as const },
-  { path: '/me/posts', label: '내가 올린 글', match: 'prefix' as const },
+  { path: '/me', key: 'me', match: 'exact' as const },
+  { path: '/me/posts', key: 'myPosts', match: 'prefix' as const },
   {
     path: '/me/likes',
-    label: '내가 좋아요 누른 글',
+    key: 'myLikes',
     match: 'prefix' as const,
   },
 ] as const
@@ -35,7 +40,7 @@ const ACCOUNT_LINKS = [
 const TEAM_ACCOUNT_LINKS = [
   {
     path: '/team/credit-reviews',
-    label: '크레딧 리뷰',
+    key: 'creditReviews',
     match: 'prefix' as const,
   },
 ] as const
@@ -58,8 +63,10 @@ export function NycNavbar() {
   const cityInfo = useCityInfo()
   const href = useCityPath()
   const { user, loading, avatarURL, displayName, isMisaengUser } = useAuth()
+  const t = useT('nav')
   const navLinks = NAV_LINKS.map((item) => ({
     ...item,
+    label: t(`links.${item.key}`),
     href: href(item.path),
   }))
   const accountMenuLinks = (
@@ -68,6 +75,7 @@ export function NycNavbar() {
       : [...ACCOUNT_LINKS]
   ).map((item) => ({
     ...item,
+    label: t(`account.${item.key}`),
     href: href(item.path),
   }))
   const [navPath, setNavPath] = useState(pathname)
@@ -155,7 +163,7 @@ export function NycNavbar() {
       <div
         id='nyc-account-menu'
         role='menu'
-        aria-label='계정 메뉴'
+        aria-label={t('accountMenu')}
         style={{
           position: 'fixed',
           top: accountMenuStyle.top,
@@ -173,7 +181,7 @@ export function NycNavbar() {
             className={cn(
               'flex h-10 items-center whitespace-nowrap px-3.5 text-sm font-medium transition hover:bg-[var(--surface)]',
               isAccountActive(href, match)
-                ? 'bg-[#F64310]/[0.08] font-semibold text-[#F64310]'
+                ? 'bg-brand/[0.08] font-semibold text-brand'
                 : 'text-[var(--foreground)]',
             )}
           >
@@ -192,7 +200,7 @@ export function NycNavbar() {
         <>
           <button
             type='button'
-            aria-label='메뉴 닫기'
+            aria-label={t('closeMenu')}
             className={cn(
               'fixed inset-x-0 bottom-0 z-[9998] bg-black/60 xl:hidden',
               MOBILE_HEADER_HEIGHT_CLASS,
@@ -205,11 +213,11 @@ export function NycNavbar() {
               MOBILE_HEADER_HEIGHT_CLASS,
             )}
             style={{ zIndex: 9999 }}
-            aria-label={`${cityInfo.shortLabel} 모바일 메뉴`}
+            aria-label={t('mobileMenuAria', { city: cityInfo.shortLabel })}
           >
             <nav
               className='flex flex-col px-2 py-2 pb-4'
-              aria-label={`${cityInfo.shortLabel} 모바일 메뉴`}
+              aria-label={t('mobileMenuAria', { city: cityInfo.shortLabel })}
             >
               <div className='flex flex-col px-1'>
                 <Link
@@ -218,11 +226,11 @@ export function NycNavbar() {
                   className={cn(
                     'flex h-11 items-center rounded-xl px-3 text-[15px] font-medium touch-manipulation active:bg-[var(--surface)]',
                     pathname === href()
-                      ? 'bg-[#F64310]/[0.08] font-semibold text-[#F64310]'
+                      ? 'bg-brand/[0.08] font-semibold text-brand'
                       : 'text-[var(--foreground)]',
                   )}
                 >
-                  커뮤니티 홈
+                  {t('communityHome')}
                 </Link>
                 {navLinks.map(({ href: itemHref, label }) => (
                   <Link
@@ -232,7 +240,7 @@ export function NycNavbar() {
                     className={cn(
                       'flex h-11 items-center rounded-xl px-3 text-[15px] font-medium touch-manipulation active:bg-[var(--surface)]',
                       isActive(itemHref)
-                        ? 'bg-[#F64310]/[0.08] font-semibold text-[#F64310]'
+                        ? 'bg-brand/[0.08] font-semibold text-brand'
                         : 'text-[var(--foreground)]',
                     )}
                   >
@@ -240,6 +248,11 @@ export function NycNavbar() {
                   </Link>
                 ))}
               </div>
+
+              <LanguageMenu
+                variant='list'
+                className='mx-1 mt-2 border-t border-[var(--border)] pt-2 sm:hidden'
+              />
 
               <div className='mx-1 mt-2 border-t border-[var(--border)] pt-2'>
                 {!loading && user ? (
@@ -251,7 +264,7 @@ export function NycNavbar() {
                       className={cn(
                         'flex h-11 items-center rounded-xl px-3 text-[15px] font-medium touch-manipulation active:bg-[var(--surface)]',
                         isAccountActive(href, match)
-                          ? 'bg-[#F64310]/[0.08] font-semibold text-[#F64310]'
+                          ? 'bg-brand/[0.08] font-semibold text-brand'
                           : 'text-[var(--foreground)]',
                       )}
                     >
@@ -264,7 +277,7 @@ export function NycNavbar() {
                     onClick={() => setMobileOpen(false)}
                     className='flex h-11 w-full items-center justify-center rounded-xl border border-[var(--border)] text-[15px] font-semibold text-[var(--foreground)] touch-manipulation active:bg-[var(--surface)]'
                   >
-                    로그인
+                    {t('login')}
                   </Link>
                 )}
               </div>
@@ -290,11 +303,14 @@ export function NycNavbar() {
             <Link
               href={href()}
               className='flex items-center transition-opacity active:opacity-80'
-              aria-label={`${cityInfo.shortLabel} 커뮤니티 홈`}
+              aria-label={t('homeAria', { city: cityInfo.shortLabel })}
             >
               <Image
-                src='/banner.png'
-                alt={cityInfo.brand}
+                src={BRAND_CONFIG.assets.banner.src}
+                alt={t('brandCity', {
+                  brand: BRAND_CONFIG.name,
+                  city: cityInfo.shortLabel,
+                })}
                 width={126}
                 height={36}
                 className='h-6 w-auto max-w-[96px] object-contain sm:h-[2.025rem] sm:max-w-none'
@@ -304,10 +320,10 @@ export function NycNavbar() {
             <button
               type='button'
               onClick={() => setCityOpen(true)}
-              className='inline-flex items-center gap-0.5 whitespace-nowrap rounded-full bg-[#F64310]/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-[#F64310] touch-manipulation transition hover:bg-[#F64310]/15 sm:px-2 sm:text-[10px]'
+              className='inline-flex items-center gap-0.5 whitespace-nowrap rounded-full bg-brand/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-brand touch-manipulation transition hover:bg-brand/15 sm:px-2 sm:text-[10px]'
               aria-haspopup='dialog'
               aria-expanded={cityOpen}
-              aria-label='도시 선택'
+              aria-label={t('selectCity')}
             >
               {cityInfo.name}
               <ChevronIcon className='size-2.5 sm:size-3' />
@@ -316,7 +332,7 @@ export function NycNavbar() {
 
           <nav
             className='hidden min-w-0 items-center justify-center gap-4 overflow-hidden xl:flex 2xl:gap-6'
-            aria-label={`${cityInfo.shortLabel} 메뉴`}
+            aria-label={t('menuAria', { city: cityInfo.shortLabel })}
           >
             {navLinks.map(({ href: itemHref, label }) => (
               <Link
@@ -337,6 +353,7 @@ export function NycNavbar() {
           <span className='xl:hidden' aria-hidden />
 
           <div className='flex shrink-0 items-center justify-end gap-2 justify-self-end'>
+            {!mobileOpen ? <LanguageMenu className='hidden sm:block' /> : null}
             {!loading && !user && (
               <>
                 {!mobileOpen && (
@@ -344,7 +361,7 @@ export function NycNavbar() {
                     href={cityLoginPath(city, pathname)}
                     className='inline-flex h-9 items-center rounded-full border border-[var(--border)] px-3.5 text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--surface)]'
                   >
-                    로그인
+                    {t('login')}
                   </Link>
                 )}
                 <button
@@ -352,7 +369,7 @@ export function NycNavbar() {
                   onClick={() => setMobileOpen((o) => !o)}
                   className='inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--muted-foreground)] touch-manipulation transition hover:bg-[var(--surface)] xl:hidden'
                   aria-expanded={mobileOpen}
-                  aria-label={mobileOpen ? '메뉴 닫기' : '메뉴 열기'}
+                  aria-label={mobileOpen ? t('closeMenu') : t('openMenu')}
                 >
                   {mobileOpen ? <CloseIcon /> : <MenuIcon />}
                 </button>
@@ -362,7 +379,7 @@ export function NycNavbar() {
             {!loading && user && (
               <>
                 {isMisaengUser && (
-                  <span className='text-[13px] font-semibold tracking-wide text-[#F64310] sm:text-sm'>
+                  <span className='text-[13px] font-semibold tracking-wide text-brand sm:text-sm'>
                     Agent
                   </span>
                 )}
@@ -373,7 +390,7 @@ export function NycNavbar() {
                   onClick={() => setMobileOpen((o) => !o)}
                   className='inline-flex h-9 shrink-0 cursor-pointer items-center gap-0.5 rounded-full border border-[var(--border)] bg-white p-0.5 touch-manipulation transition hover:bg-[var(--surface)] xl:hidden'
                   aria-expanded={mobileOpen}
-                  aria-label={mobileOpen ? '메뉴 닫기' : '메뉴 열기'}
+                  aria-label={mobileOpen ? t('closeMenu') : t('openMenu')}
                 >
                   <ProfileAvatar
                     photoURL={avatarURL}
@@ -394,7 +411,7 @@ export function NycNavbar() {
                     aria-expanded={accountOpen}
                     aria-haspopup='menu'
                     aria-label={
-                      accountOpen ? '계정 메뉴 닫기' : '계정 메뉴 열기'
+                      accountOpen ? t('closeAccountMenu') : t('openAccountMenu')
                     }
                   >
                     <ProfileAvatar
@@ -473,6 +490,7 @@ function ProfileAvatar({
   photoURL?: string | null
   displayName?: string | null
 }) {
+  const t = useT('nav')
   const [failedSrc, setFailedSrc] = useState<string | null>(null)
   const showPhoto = Boolean(photoURL) && failedSrc !== photoURL
 
@@ -482,7 +500,11 @@ function ProfileAvatar({
         // eslint-disable-next-line @next/next/no-img-element -- 외부 프로필 URL (Google 등)
         <img
           src={photoURL!}
-          alt={displayName ? `${displayName} 프로필` : '프로필'}
+          alt={
+            displayName
+              ? t('profileAlt', { name: displayName })
+              : t('profileAltFallback')
+          }
           width={28}
           height={28}
           className='size-full object-cover'

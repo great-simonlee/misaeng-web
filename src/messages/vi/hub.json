@@ -1,0 +1,153 @@
+{
+  "loading": "Đang tải…",
+  "brandCity": "{brand} {city}",
+  "comingSoon": "Sắp ra mắt",
+  "cities": {
+    "nyc": {
+      "headline": "Cùng nhau sống tốt ở New York",
+      "description": "Nơi du học sinh và người đi làm quốc tế chia sẻ kinh nghiệm sống ở New York City."
+    },
+    "boston": {
+      "headline": "Cùng nhau sống tốt ở Boston",
+      "description": "Nơi du học sinh và người đi làm quốc tế chia sẻ kinh nghiệm sống ở Boston."
+    }
+  },
+  "magazine": {
+    "kicker": "NYC Magazine",
+    "title": "Cuộc sống New York do ban biên tập chọn lọc",
+    "description": "Những bài đọc ngắn về ăn uống, sự kiện và địa điểm vui chơi, tách riêng khỏi các bảng tin.",
+    "items": {
+      "mag-1": {
+        "tag": "Ăn uống",
+        "title": "Quán kalguksu ở Flushing lúc nào cũng xếp hàng dài",
+        "excerpt": "Bữa ăn chắc bụng hơn brunch cuối tuần, nơi người Hàn địa phương hay lui tới."
+      },
+      "mag-2": {
+        "tag": "Sự kiện",
+        "title": "Buổi networking của cộng đồng Hàn Quốc ở Manhattan tuần này",
+        "excerpt": "Buổi gặp gỡ buổi tối thoải mái dành cho sinh viên và người mới đi làm."
+      },
+      "mag-3": {
+        "tag": "Vui chơi",
+        "title": "Lộ trình trong nhà cho ngày mưa",
+        "excerpt": "Từ bảo tàng đến quán cà phê, gói gọn trong một ngày."
+      },
+      "mag-4": {
+        "tag": "Khu phố",
+        "title": "Dạo bộ giữa trưa ở Astoria",
+        "excerpt": "Từ phố cà phê đến công viên, một lộ trình đi bộ cuối tuần tuyệt vời."
+      }
+    }
+  },
+  "professionals": {
+    "kicker": "Chuyên gia",
+    "title": "Đối tác cuộc sống",
+    "description": "Bất động sản, luật sư, chuyển nhà, kế toán: những chuyên gia được tìm nhiều nhất ở NYC.",
+    "categoriesAria": "Danh mục chuyên gia",
+    "categories": {
+      "real-estate": {
+        "title": "Bất động sản",
+        "description": "Thuê nhà, mua bán và tư vấn broker"
+      },
+      "lawyer": {
+        "title": "Luật sư",
+        "description": "Luật visa, di trú và hợp đồng"
+      },
+      "moving": {
+        "title": "Chuyển nhà",
+        "description": "Chuyển nhà và vận chuyển ở NYC"
+      },
+      "accountant": {
+        "title": "Kế toán",
+        "description": "Dịch vụ thuế và CPA"
+      }
+    },
+    "items": {
+      "re-1": {
+        "name": "Sample Realty",
+        "specialty": "Thuê nhà Manhattan · Brooklyn"
+      },
+      "re-2": {
+        "name": "Sample Broker",
+        "specialty": "Nhà ở cho sinh viên và người đi làm"
+      },
+      "law-1": {
+        "name": "Sample Law Office",
+        "specialty": "Luật visa · di trú"
+      },
+      "law-2": {
+        "name": "Sample Attorney",
+        "specialty": "Hợp đồng thuê nhà · Hợp đồng"
+      },
+      "mv-1": {
+        "name": "Sample Movers",
+        "specialty": "Chuyển nhà nội thành và khu lân cận"
+      },
+      "mv-2": {
+        "name": "Sample Moving",
+        "specialty": "Studio · 1 phòng ngủ"
+      },
+      "acc-1": {
+        "name": "Sample Accounting",
+        "specialty": "Thuế cá nhân và freelancer"
+      },
+      "acc-2": {
+        "name": "Sample CPA",
+        "specialty": "OPT · ITIN · Khai thuế"
+      }
+    }
+  },
+  "introCarousel": {
+    "intro": {
+      "kicker": "{brand} NYC",
+      "headline": "Nơi mọi sinh viên ở New York nên biết",
+      "body": "Chúng tôi hợp tác với hội sinh viên Hàn Quốc ở từng trường để tập hợp thông tin visa, việc làm, ăn uống và sự kiện vào một nơi. Kèm theo kết nối với chuyên gia."
+    },
+    "status": {
+      "kicker": "Visa · Tình trạng",
+      "headline": "Mình làm vậy có đúng không?",
+      "body": "Chuẩn bị với các review thực tế từng bước từ những người đã trải qua OPT, CPT, visa và thẻ xanh."
+    },
+    "food": {
+      "kicker": "Ăn uống",
+      "headline": "Không còn phải đắn đo hôm nay ăn gì",
+      "body": "Danh sách quán ăn được sắp xếp theo món chứ không theo khu vực, nên thèm gì là bạn có thể tìm và đi ngay."
+    },
+    "housing": {
+      "kicker": "Nhà ở · Bạn cùng phòng",
+      "headline": "Không còn phải tự mình tìm nhà nữa",
+      "body": "So sánh tin đăng đã xác minh và bạn cùng phòng có lối sống hợp với bạn, tất cả ở một nơi."
+    },
+    "anonymous": {
+      "kicker": "Bảng tin ẩn danh",
+      "headline": "Những câu hỏi bạn không muốn ghi tên",
+      "body": "Dù là visa hay chuyện tình cảm, ẩn danh thì dễ thành thật hơn."
+    },
+    "credit": {
+      "kicker": "Credit giới thiệu",
+      "headline": "Mời bạn bè và chia sẻ review",
+      "body": "Viết review chi tiết về OPT, CPT hoặc visa, cả bạn và người bạn đã mời bạn đều nhận được credit."
+    },
+    "expert": {
+      "kicker": "Kết nối chuyên gia",
+      "headline": "Dùng credit để gặp chuyên gia",
+      "body": "Dùng credit để coffee chat với người đang làm trong lĩnh vực bạn nhắm tới, hoặc đặt lịch tư vấn với chuyên gia."
+    },
+    "cta": {
+      "kicker": "Bắt đầu",
+      "headline": "Tìm thông tin ở đây, nhận câu trả lời từ chuyên gia",
+      "body": "Xem các hội sinh viên đối tác và tin đăng đã xác minh tại {siteHost}/nyc."
+    }
+  },
+  "carouselTest": {
+    "kicker": "{brand} NYC · Bản nháp carousel",
+    "title": "Carousel giới thiệu",
+    "description": "Nền ảnh tràn viền · 1080×1080 · vuốt trái phải. Mỗi slide có lớp phủ màu riêng theo chủ đề.",
+    "photoNote": "Ảnh nền là ảnh New York và đời sống từ Unsplash. Nên thay bằng ảnh thương hiệu độ phân giải cao trước khi đăng.",
+    "backHome": "Về trang chủ cộng đồng"
+  },
+  "instagramDm": {
+    "body": "{message}: nhắn DM cho chúng tôi tại {handle}.",
+    "button": "Gửi DM Instagram"
+  }
+}

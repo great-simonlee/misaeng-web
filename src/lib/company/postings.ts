@@ -1,3 +1,4 @@
+import type { ContentI18n } from '@lib/translations/content'
 import type { CityId } from '@lib/constants/cities'
 import type { DegreeLevel, JobFunction } from '@lib/constants/postingCopy'
 
@@ -27,6 +28,8 @@ export type PublicPosting = {
     alwaysOpen: boolean
     /** 지원 대상: 학부생 / 대학원생 / 둘 다 / 공고에 없음 */
     degree: DegreeLevel
+    /** 지원 팁에 "빨리 지원할수록 유리" 내용이 이미 있음 (같은 말을 두 번 하지 않게) */
+    earlyApplyMentioned?: boolean
   }
   /** 공고에 "비자 스폰서십 불가" 문구가 있음 */
   noSponsorship: boolean
@@ -36,6 +39,8 @@ export type PublicPosting = {
   applyBy: string | null
   applyUrl: string
   postedAt: number
+  /** 요약을 보는 언어로 바꾼 상태 (API 응답에만 있음, src/lib/translations/postings.ts) */
+  i18n?: ContentI18n
 }
 
 /** 도시 사이트별로 먼저 보여 줄 지역 (영문 "New York, NY"와 한국어 "뉴욕 (New York, NY)" 모두) */
@@ -100,7 +105,8 @@ export async function fetchPostingsWithMore(
     moreUrl?: string | null
     error?: string
   }
-  if (!res.ok) throw new Error(data.error || '공고를 불러오지 못했어요.')
+  // 서버 메시지가 없으면 빈 메시지 — 화면이 현재 언어의 기본 문구를 보여 준다
+  if (!res.ok) throw new Error(data.error || '')
   return { postings: data.postings ?? [], moreUrl: data.moreUrl ?? null }
 }
 

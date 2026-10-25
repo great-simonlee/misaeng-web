@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "title": "{brand} NYC | Komunitas Pelajar & Profesional Internasional di New York",
+    "description": "Ulasan hunian, kuliner, CPT/OPT, visa, dan interview kerja dari orang-orang yang kuliah dan bekerja di New York."
+  },
+  "language": {
+    "label": "Bahasa",
+    "menuAria": "Pilih bahasa",
+    "saved": "Bahasa diubah ke {language}",
+    "settingLabel": "Bahasa",
+    "settingHint": "Situs dan postingan terjemahan akan ditampilkan dalam bahasa ini.",
+    "sheetTitle": "Bahasa",
+    "setupLabel": "Bahasa pilihan",
+    "setupHint": "Postingan dan komentar komunitas akan kami terjemahkan ke bahasa ini. Kamu bisa mengubahnya kapan saja di Halaman Saya.",
+    "saveFailed": "Gagal menyimpan bahasa. Coba lagi sebentar lagi."
+  },
+  "translation": {
+    "translatedFrom": "Diterjemahkan dari {language}",
+    "showOriginal": "Lihat teks asli",
+    "showTranslation": "Lihat terjemahan",
+    "original": "Asli",
+    "pending": "Terjemahan segera hadir",
+    "iconLabel": "Postingan terjemahan"
+  },
+  "actions": {
+    "save": "Simpan",
+    "cancel": "Batal",
+    "close": "Tutup",
+    "confirm": "OK",
+    "back": "Kembali",
+    "more": "Lihat lainnya",
+    "retry": "Coba lagi",
+    "loading": "Memuat…"
+  },
+  "errors": {
+    "generic": "Terjadi kesalahan. Coba lagi sebentar lagi.",
+    "network": "Periksa koneksi internet kamu."
+  },
+  "ui": {
+    "bottomSheetSelect": {
+      "placeholder": "Pilih"
+    },
+    "imageUpload": {
+      "selectPhoto": "Pilih foto",
+      "uploading": "Mengunggah…",
+      "failed": "Gagal mengunggah",
+      "remove": "Hapus",
+      "change": "Ganti",
+      "addPhoto": "Tambah foto",
+      "tapToUpload": "Ketuk untuk mengunggah"
+    },
+    "loading": {
+      "aria": "Memuat",
+      "label": "Memuat…"
+    },
+    "mbti": {
+      "placeholder": "Silakan pilih",
+      "title": "Pilih MBTI",
+      "clear": "Tidak ada",
+      "result": "Tipe kamu",
+      "selectAll": "Pilih keempatnya",
+      "groups": {
+        "analyst": {
+          "label": "Analis",
+          "subtitle": "Intuisi · Pemikiran"
+        },
+        "diplomat": {
+          "label": "Diplomat",
+          "subtitle": "Intuisi · Perasaan"
+        },
+        "sentinel": {
+          "label": "Penjaga",
+          "subtitle": "Penginderaan · Pemikiran"
+        },
+        "explorer": {
+          "label": "Penjelajah",
+          "subtitle": "Penginderaan · Perasaan"
+        }
+      },
+      "nicknames": {
+        "INTJ": "Arsitek",
+        "INTP": "Ahli Logika",
+        "ENTJ": "Komandan",
+        "ENTP": "Pendebat",
+        "INFJ": "Advokat",
+        "INFP": "Mediator",
+        "ENFJ": "Protagonis",
+        "ENFP": "Juru Kampanye",
+        "ISTJ": "Ahli Logistik",
+        "ISFJ": "Pembela",
+        "ESTJ": "Eksekutif",
+        "ESFJ": "Konsul",
+        "ISTP": "Virtuoso",
+        "ISFP": "Petualang",
+        "ESTP": "Pengusaha",
+        "ESFP": "Penghibur"
+      },
+      "dimensions": {
+        "ei": "Energi",
+        "ns": "Pikiran",
+        "tf": "Sifat",
+        "jp": "Taktik"
+      },
+      "options": {
+        "E": "Ekstrovert",
+        "I": "Introvert",
+        "N": "Intuitif",
+        "S": "Penginderaan",
+        "T": "Pemikiran",
+        "F": "Perasaan",
+        "J": "Menilai",
+        "P": "Mengamati"
+      }
+    },
+    "nickname": {
+      "checking": "Mengecek ketersediaan…"
+    },
+    "photoLightbox": {
+      "title": "Penampil foto",
+      "close": "Tutup",
+      "previous": "Foto sebelumnya",
+      "next": "Foto berikutnya"
+    },
+    "pullToRefresh": {
+      "refreshing": "Memuat ulang {brand}…",
+      "release": "Lepas untuk memuat ulang",
+      "pull": "Tarik untuk memuat ulang"
+    },
+    "rangeSlider": {
+      "minPrice": "Harga minimum",
+      "maxPrice": "Harga maksimum"
+    },
+    "schoolBadge": {
+      "title": "{school} · Email kampus terverifikasi",
+      "aria": "{school} terverifikasi"
+    },
+    "editor": {
+      "placeholder": "Tulis sesuatu",
+      "imageUploadFailed": "Gagal mengunggah gambar",
+      "bold": "Tebal",
+      "italic": "Miring",
+      "heading": "Judul",
+      "bulletList": "Daftar",
+      "quote": "Kutipan",
+      "linkPrompt": "Masukkan URL link",
+      "link": "Link",
+      "photo": "Foto",
+      "maxLengthReached": "Kamu sudah mencapai batas karakter",
+      "charCount": "Karakter (hanya teks)"
+    },
+    "authErrors": {
+      "loginCancelled": "Login dibatalkan",
+      "popupBlocked": "Pop-up diblokir. Periksa pengaturan browser kamu",
+      "invalidEmail": "Alamat email tidak valid",
+      "userDisabled": "Akun ini telah dinonaktifkan",
+      "userNotFound": "Akun tidak ditemukan",
+      "wrongPassword": "Kata sandi salah",
+      "invalidCredential": "Periksa email atau kata sandi kamu",
+      "emailAlreadyInUse": "Email ini sudah terdaftar",
+      "weakPassword": "Gunakan kata sandi minimal 6 karakter",
+      "tooManyRequests": "Terlalu banyak percobaan. Coba lagi sebentar lagi",
+      "networkRequestFailed": "Periksa koneksi internet kamu"
+    },
+    "configBanner": {
+      "loginPage": "Halaman login"
+    },
+    "authConfigBanner": {
+      "body": "API AppConnect belum diatur. Seperti AppConnect di ellieo-erp, tambahkan {baseUrl} dan {clientId} (untuk Google Identity Services) ke environment variable kamu. idToken Google dikirim ke Ellieo {endpoint} (lihat {envExample})."
+    },
+    "supabaseConfigBanner": {
+      "body": "Environment variable Supabase belum diatur. Tambahkan nilai Supabase kamu ke {envLocal} (lihat {envExample}). Sampai saat itu kamu bisa melihat-lihat tampilan, tapi menyimpan data dan mengunggah foto profil belum bisa."
+    },
+    "chipScroll": {
+      "previous": "Tampilkan sebelumnya",
+      "next": "Tampilkan lainnya"
+    },
+    "copyLink": {
+      "copiedToast": "Link disalin",
+      "failedToast": "Gagal menyalin link",
+      "linkCopied": "Link disalin",
+      "copyLink": "Salin link",
+      "copied": "Disalin",
+      "share": "Bagikan"
+    },
+    "photoGrid": {
+      "cover": "Sampul"
+    },
+    "timeline": {
+      "step": "Tahap {step}",
+      "latest": "Terbaru",
+      "review": "Ulasan"
+    },
+    "draft": {
+      "save": "Simpan draf",
+      "savedAt": "Draf disimpan · {time}"
+    },
+    "autosave": {
+      "title": "Tulisan kamu tersimpan otomatis",
+      "description": "Tulisan disimpan di perangkat ini setiap kali kamu menambah update progres atau pindah ke item berikutnya. Kamu bisa menutup jendela dan melanjutkan dari bagian terakhir.",
+      "savedAt": "Tersimpan · {time}"
+    }
+  }
+}

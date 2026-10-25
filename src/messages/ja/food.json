@@ -1,0 +1,116 @@
+{
+  "categories": {
+    "restaurant": "必食",
+    "value": "コスパ最強",
+    "vibe": "雰囲気◎",
+    "study": "勉強スポット"
+  },
+  "categoryDescriptions": {
+    "restaurant": "絶対に行くべきお店",
+    "value": "払った分以上の満足感",
+    "vibe": "雰囲気がいいお店",
+    "study": "勉強や作業にぴったりのカフェ"
+  },
+  "cuisines": {
+    "brunch": "ブランチ",
+    "korean": "韓国料理",
+    "japanese": "日本料理",
+    "chinese": "中華料理",
+    "american": "洋食",
+    "french": "フランス料理",
+    "italian": "イタリアン",
+    "mexican": "メキシコ料理",
+    "thai": "タイ料理",
+    "vietnamese": "ベトナム料理",
+    "indian": "インド料理",
+    "other": "その他"
+  },
+  "spend": {
+    "people_other": "{count}人",
+    "total": "合計${amount}",
+    "totalWithTip": "合計${amount} · チップ込み",
+    "totalWithoutTip": "合計${amount} · チップ別",
+    "peopleTotal_other": "{count}人 · 合計${amount}",
+    "peopleTotalWithTip_other": "{count}人 · 合計${amount} · チップ込み",
+    "peopleTotalWithoutTip_other": "{count}人 · 合計${amount} · チップ別",
+    "tipIncluded": "チップ込み",
+    "tipExcluded": "チップ別"
+  },
+  "wait": {
+    "none": "待ち時間なし",
+    "minutes": "{minutes}分待ち",
+    "hours": "{hours}時間待ち",
+    "hoursMinutes": "{hours}時間{minutes}分待ち"
+  },
+  "carousel": {
+    "cover": "カバー",
+    "menu": "メニュー",
+    "vibe": "雰囲気",
+    "backToList": "一覧に戻る",
+    "photosLabel": "お店の写真",
+    "previous": "前の写真",
+    "next": "次の写真",
+    "photoNumber": "写真{number}"
+  },
+  "map": {
+    "postsMapLabel": "グルメマップ",
+    "emptyTitle": "地図に表示できるお店がありません",
+    "emptyDescription": "住所が登録されたレビューのみピンで表示されます",
+    "unnamedPlace": "レストラン",
+    "reviewCount_other": "レビュー{count}件",
+    "close": "閉じる",
+    "viewReview": "レビューを見る",
+    "placeMapLabel": "{name}の地図",
+    "directions": "経路"
+  },
+  "detail": {
+    "menu": "メニュー",
+    "interior": "店内",
+    "backToList": "{board}に戻る",
+    "views_other": "{views}回閲覧",
+    "metrics": {
+      "party": "人数",
+      "totalSpend": "合計",
+      "spend": "${amount}",
+      "spendWithTip": "${amount} · チップ込み",
+      "spendWithoutTip": "${amount} · チップ別",
+      "wait": "待ち時間",
+      "waitNone": "なし",
+      "waitMinutes": "{minutes}分"
+    },
+    "location": "場所",
+    "viewMenuPhoto": "メニューの写真を見る",
+    "interiorAndVibe": "店内 · 雰囲気",
+    "viewVibePhoto": "雰囲気の写真を見る",
+    "review": "レビュー"
+  },
+  "placeSearch": {
+    "errors": {
+      "searchFailed": "検索に失敗しました。もう一度お試しください。",
+      "detailsFailed": "お店の詳細を読み込めませんでした",
+      "noCoordinates": "その場所の位置情報が見つかりませんでした"
+    },
+    "pickExactAddress": "正確な住所を選択してください",
+    "mapTitle": "{name}の場所",
+    "change": "変更",
+    "addressPlaceholder": "例：53 W 53rd St, New York",
+    "placePlaceholder": "例：Halal Guys、Joe's Pizza、West 53rd St",
+    "resolving": "確認しています…",
+    "searching": "検索しています…",
+    "noResults": "結果がありません。より詳しい住所や英語の通り名でお試しください。",
+    "addressHint": "住所を選択すると位置情報が保存されます。",
+    "placeHint": "リストからお店を選んで投稿してください。"
+  },
+  "restaurantName": {
+    "placeholder": "お店の名前",
+    "reviewCount_other": "レビュー{count}件",
+    "checking": "この場所のお店を確認しています…",
+    "existing_other": "この場所にはすでに{count}件のお店が登録されています · 下から選ぶか、新しく入力してください",
+    "none": "この場所にはまだお店が登録されていません。新しい名前を入力してください。",
+    "hint": "この名前が一覧と詳細ページに表示されます"
+  },
+  "card": {
+    "comments": "コメント",
+    "recommends": "いいね"
+  }
+}

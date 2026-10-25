@@ -1,13 +1,15 @@
+/** 표시 문구는 `me.profile.gender.<value>` */
 export const ELLIEO_GENDER_OPTIONS = [
-  { value: 'male', label: '남성' },
-  { value: 'female', label: '여성' },
-  { value: 'other', label: '기타' },
+  { value: 'male' },
+  { value: 'female' },
+  { value: 'other' },
 ] as const
 
+/** 표시 문구는 `me.profile.occupation.<value>` */
 export const ELLIEO_OCCUPATION_OPTIONS = [
-  { value: 'student', label: '학생' },
-  { value: 'professional', label: '직장인' },
-  { value: 'other', label: '기타' },
+  { value: 'student' },
+  { value: 'professional' },
+  { value: 'other' },
 ] as const
 
 export type EllieoGender = (typeof ELLIEO_GENDER_OPTIONS)[number]['value']

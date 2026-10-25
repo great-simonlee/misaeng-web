@@ -98,13 +98,13 @@ export function ContactScreen() {
         style={{ background: 'linear-gradient(165deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)' }}
       >
         <div
-          className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(246,67,16,0.15),transparent_50%)]"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgb(var(--brand-rgb)/0.15),transparent_50%)]"
           aria-hidden
         />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem]" aria-hidden />
         <div className="relative mx-auto max-w-xl min-w-0 px-4 sm:px-6 lg:px-8">
           {/* Contact · Reach out first · 문단 · 알약 */}
-          <p className="text-center text-[10px] font-semibold uppercase tracking-[0.25em] text-[#F64310] sm:tracking-[0.3em]">
+          <p className="text-center text-[10px] font-semibold uppercase tracking-[0.25em] text-brand sm:tracking-[0.3em]">
             Contact
           </p>
           <h1 className="mt-3 text-center text-2xl font-bold leading-tight tracking-tight text-white sm:mt-4 sm:text-3xl sm:text-4xl lg:text-[2.75rem]">
@@ -119,7 +119,7 @@ export function ContactScreen() {
               (label) => (
                 <span
                   key={label}
-                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-medium text-white/95 transition hover:border-[#F64310]/50 hover:bg-white/15 sm:text-sm"
+                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-medium text-white/95 transition hover:border-brand/50 hover:bg-white/15 sm:text-sm"
                 >
                   {label}
                 </span>
@@ -143,7 +143,7 @@ export function ContactScreen() {
                     name="name"
                     type="text"
                     placeholder="Your name"
-                    className="mt-1.5 w-full min-h-[48px] rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-base text-white outline-none placeholder:text-white/35 transition focus:border-[#F64310]/60 focus:bg-white/10 focus:ring-2 focus:ring-[#F64310]/20"
+                    className="mt-1.5 w-full min-h-[48px] rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-base text-white outline-none placeholder:text-white/35 transition focus:border-brand/60 focus:bg-white/10 focus:ring-2 focus:ring-brand/20"
                   />
                 </div>
                 <div>
@@ -155,7 +155,7 @@ export function ContactScreen() {
                     name="email"
                     type="email"
                     placeholder="your@email.com"
-                    className="mt-1.5 w-full min-h-[48px] rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-base text-white outline-none placeholder:text-white/35 transition focus:border-[#F64310]/60 focus:bg-white/10 focus:ring-2 focus:ring-[#F64310]/20"
+                    className="mt-1.5 w-full min-h-[48px] rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-base text-white outline-none placeholder:text-white/35 transition focus:border-brand/60 focus:bg-white/10 focus:ring-2 focus:ring-brand/20"
                   />
                 </div>
                 <div>
@@ -170,7 +170,7 @@ export function ContactScreen() {
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     placeholder="Partnership idea, job interest, or question…"
-                    className="mt-1.5 w-full min-h-[120px] resize-none rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-base text-white outline-none placeholder:text-white/35 transition focus:border-[#F64310]/60 focus:bg-white/10 focus:ring-2 focus:ring-[#F64310]/20"
+                    className="mt-1.5 w-full min-h-[120px] resize-none rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-base text-white outline-none placeholder:text-white/35 transition focus:border-brand/60 focus:bg-white/10 focus:ring-2 focus:ring-brand/20"
                   />
                   <p className="mt-1 text-right text-[10px] text-white/40" aria-live="polite">
                     {messageText.length} / {MESSAGE_MAX_LENGTH}
@@ -180,7 +180,7 @@ export function ContactScreen() {
                   <button
                     type="submit"
                     disabled={isSubmitDisabled}
-                    className="animate-shimmer mt-1 w-full min-h-[48px] cursor-pointer rounded-lg px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#F64310]/25 transition duration-300 hover:shadow-[#F64310]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F64310] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1e293b] disabled:cursor-not-allowed disabled:opacity-70 sm:text-sm"
+                    className="animate-shimmer mt-1 w-full min-h-[48px] cursor-pointer rounded-lg px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-brand/25 transition duration-300 hover:shadow-brand/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-[#1e293b] disabled:cursor-not-allowed disabled:opacity-70 sm:text-sm"
                   >
                     {status === 'sending' ? 'Sending…' : 'Send message →'}
                   </button>
@@ -229,7 +229,7 @@ export function ContactScreen() {
               </p>
               <p className="mt-3 text-center text-xs text-white/40">
                 Or email us at{' '}
-                <a href="mailto:info@misaeng.com" className="text-white/70 underline hover:text-[#F64310]">
+                <a href="mailto:info@misaeng.com" className="text-white/70 underline hover:text-brand">
                   info@misaeng.com
                 </a>
               </p>

@@ -14,6 +14,7 @@ import {
   normalizeWriteConsentSource,
 } from '@lib/supabase/legalConsent.server'
 import { upsertSupabaseProfile } from '@lib/supabase/profile.server'
+import { getRequestT } from '@lib/i18n/server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -22,10 +23,11 @@ function parseSource(value: unknown) {
   return normalizeWriteConsentSource(value)
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const user = await resolveAuthenticatedUser()
   if (!user?.uid) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    const t = await getRequestT(request, 'api')
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
   const status = await getWriteConsentStatus(user.uid, WRITE_GUIDELINES_VERSION)
   return NextResponse.json(status)
@@ -34,7 +36,8 @@ export async function GET() {
 export async function POST(request: Request) {
   const user = await resolveAuthenticatedUser()
   if (!user?.uid) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    const t = await getRequestT(request, 'api')
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
 
   const body = (await request.json().catch(() => null)) as Record<

@@ -1,0 +1,240 @@
+{
+  "places": {
+    "searchFailed": "地点搜索失败。",
+    "detailsFailed": "无法加载地点详情。",
+    "placeIdRequired": "缺少 placeId。",
+    "notFound": "找不到该地点。",
+    "invalidCoordinates": "坐标无效。",
+    "mapLoadFailed": "地图加载失败。",
+    "placeFallbackName": "地点",
+    "addressFallbackName": "地址",
+    "locationFallbackName": "位置",
+    "venuesCoordinatesRequired": "需要提供经纬度。",
+    "venuesLoadFailed": "无法加载餐厅列表。"
+  },
+  "common": {
+    "loginRequired": "请先登录。",
+    "supabaseNotConfigured": "Supabase 尚未配置。",
+    "supabaseNotConfiguredDetail": "Supabase 尚未配置。请检查 NEXT_PUBLIC_SUPABASE_URL 和 SUPABASE_SERVICE_ROLE_KEY。",
+    "supabaseNotConfiguredLocal": "Supabase 尚未配置。本地环境下暂时保存在浏览器中。",
+    "storageNotConfigured": "Supabase Storage 尚未配置。请检查 NEXT_PUBLIC_SUPABASE_URL 和 SUPABASE_SERVICE_ROLE_KEY。",
+    "supabaseUrlInvalid": "NEXT_PUBLIC_SUPABASE_URL 不是有效的 URL。示例：https://your-project.supabase.co",
+    "supabaseHostUnreachable": "无法访问 Supabase 项目（{hostname}）。请在 Dashboard → Project Settings → API 中确认 Project URL，并更新 .env.local。",
+    "supabaseConnectFailed": "无法连接到 Supabase（{hostname}）。请检查 Project URL、API 密钥和网络。",
+    "forbidden": "你没有执行此操作的权限。",
+    "badRequest": "请求无效。",
+    "postNotFound": "找不到该帖子。",
+    "accountSuspended": "该账号已被停用。",
+    "identityVerificationRequired": "发帖和评论前，请先完成学校或公司验证。"
+  },
+  "auth": {
+    "ellieoUnavailable": "无法连接 Ellieo 服务器，请稍后再试。",
+    "noAccessToken": "未收到 access token。",
+    "loginFailed": "登录失败。",
+    "signupFailed": "注册失败。",
+    "googleLoginFailed": "Google 登录失败。",
+    "googleSignupFailed": "Google 注册失败。",
+    "agentGoogleSignupFailed": "Google 注册失败。",
+    "appConnectMissing": "需要设置 APP_CONNECT_API_BASE_URL 环境变量。",
+    "appConnectMissingLogin": "缺少 APP_CONNECT_API_BASE_URL 环境变量，暂时无法登录。",
+    "googleIdTokenRequired": "需要 Google idToken。",
+    "googleAccountHint": "需要使用已在 Ellieo 注册的 Google 账号。",
+    "googleAuthError": "Google 登录时出错了。",
+    "emailRequired": "请输入邮箱。",
+    "passwordRequired": "请输入密码。",
+    "passwordResetFailed": "密码重置请求发送失败。",
+    "emailAuthError": "邮箱登录时出错了。",
+    "sessionExpired": "登录已过期，请重新登录。",
+    "userInfoUnavailable": "已登录，但无法加载账号信息。"
+  },
+  "profile": {
+    "nickname": {
+      "tooShort": "昵称至少需要 {min} 个字符",
+      "tooLong": "昵称最多 {max} 个字符",
+      "invalidChars": "只能使用英文字母和“.”"
+    },
+    "nicknameTaken": "该昵称已被使用，请换一个。",
+    "nicknameTakenShort": "该昵称已被使用。",
+    "nicknameCheckFailed": "无法检查昵称。",
+    "nicknameCheckFailedRetry": "无法检查昵称，请稍后再试。",
+    "nicknameCheckFailedStatus": "无法检查昵称。（HTTP {status}）",
+    "listFailed": "无法加载资料列表（HTTP {status}）",
+    "invalidGender": "请选择有效的性别。",
+    "invalidOccupationType": "请选择有效的职业类型。",
+    "saveFailed": "个人资料保存失败。",
+    "saveFailedDetail": "个人资料保存失败：{detail}"
+  },
+  "upload": {
+    "photoUrlRequired": "缺少 photoURL。",
+    "fileRequired": "请选择要上传的文件。",
+    "avatarUploadError": "上传头像时出错了。",
+    "avatarBucketMissing": "找不到 Supabase bucket “{bucket}”。请在 Storage 中创建一个 public bucket。",
+    "storageUploadFailed": "Storage 上传失败：{detail}",
+    "imageTypeUnsupported": "仅支持上传 JPG、PNG、WEBP 或 GIF 图片。",
+    "imageTooLarge": "图片大小不能超过 {max}。",
+    "imageBucketMissing": "找不到 Supabase bucket “{bucket}”。请在 Storage 中检查 bucket。",
+    "imageUploadFailedDetail": "图片上传失败：{detail}",
+    "imageUploadFailed": "图片上传失败。"
+  },
+  "verification": {
+    "codeSendFailed": "验证码发送失败。",
+    "schoolDomainUnsupported": "暂不支持该学校邮箱域名。请联系 Misaeng 团队添加你的学校。",
+    "codeInvalid": "验证码错误或已过期。",
+    "schoolOtpDisabled": "学校邮箱验证暂时不可用。",
+    "schoolEmailRequired": "请输入学校邮箱（.edu 或已登记的域名）。",
+    "codeRequired": "请输入验证码。",
+    "schoolEmailError": "学校邮箱验证时出错了。",
+    "companyNameRequired": "请输入公司名称。",
+    "companyNameTooLong": "公司名称最多 {max} 个字符。",
+    "workEmail": {
+      "required": "请输入工作邮箱。",
+      "invalidFormat": "请输入有效的邮箱地址。",
+      "personalDomain": "不能使用 Gmail 等个人邮箱，请输入你在公司使用的邮箱。"
+    },
+    "workplaceAlreadyApproved": "你的公司已完成验证。",
+    "workplacePending": "Misaeng 团队正在审核你的公司验证。",
+    "workplaceStorageMissing": "公司验证存储尚未配置。",
+    "workplaceSaveFailed": "公司验证申请保存失败（HTTP {status}）",
+    "workEmailError": "工作邮箱验证时出错了。"
+  },
+  "consent": {
+    "termsRequired": "请同意条款后继续。",
+    "storageNotConfigured": "同意记录存储尚未配置。",
+    "policyOutdated": "使用条款或隐私政策已更新。请刷新页面后重新同意。"
+  },
+  "referral": {
+    "featureStorageMissing": "推荐功能需要先配置存储。",
+    "loadFailed": "无法加载推荐信息。",
+    "bindFailed": "无法绑定推荐人。",
+    "storageNotConfigured": "推荐码存储尚未配置。",
+    "saveFailed": "推荐码保存失败。",
+    "codeCreateFailed": "推荐码生成失败，请稍后再试。",
+    "codeInvalid": "请检查 8 位推荐码。",
+    "alreadyBound": "你已经有推荐人了。",
+    "ownCode": "不能使用自己的推荐码。",
+    "codeNotFound": "该推荐码不存在。",
+    "referrerNotFound": "找不到该推荐人。",
+    "maxUsesReached": "该推荐码最多可供 {max} 人使用。"
+  },
+  "credit": {
+    "loadFailed": "无法加载积分信息。",
+    "invalidUser": "用户无效。",
+    "saveFailed": "积分保存失败（HTTP {status}）",
+    "reviewListLoadFailed": "无法加载审核列表。",
+    "reviewRequestNotFound": "找不到该申请。",
+    "reviewAlreadyProcessed": "该申请已处理。",
+    "reviewPostMissing": "帖子不存在或已被删除。",
+    "awardFailed": "积分发放失败，请检查存储设置。",
+    "processFailed": "操作未能完成。",
+    "reviewSaveFailed": "审核申请保存失败（HTTP {status}）",
+    "reviewStatusLoadFailed": "无法加载审核申请状态。",
+    "reviewBoardIneligible": "该版块的帖子不能申请额外积分。",
+    "reviewFinalResultRequired": "请先在时间线中添加最终结果（获批、收到卡、拿到 offer、被拒等）。",
+    "reviewAlreadyAwarded": "该帖子已获得审核奖励。",
+    "reviewAlreadyPending": "已在等待审核中。",
+    "reviewRequestFailed": "额外积分申请失败。"
+  },
+  "postings": {
+    "loadFailed": "无法加载招聘信息。"
+  },
+  "comments": {
+    "bodyRequired": "请输入评论内容。",
+    "bodyTooLong": "评论最多 {max} 个字符。",
+    "parentNotFound": "找不到你要回复的评论。",
+    "createFailed": "评论发布失败。",
+    "editTargetRequired": "请选择要编辑的评论。",
+    "notFound": "找不到该评论。",
+    "editOwnOnly": "只能编辑自己的评论。",
+    "updateFailed": "评论修改失败。",
+    "deleteTargetRequired": "请选择要删除的评论。",
+    "deleteOwnOnly": "只能删除自己的评论。",
+    "deleteFailed": "评论删除失败。",
+    "saveFailedRetry": "评论保存失败，请稍后再试。"
+  },
+  "community": {
+    "invalidBoard": "该版块不存在。",
+    "invalidPost": "帖子无效。",
+    "companyReselect": "请重新选择公司。",
+    "saveFailed": "帖子保存失败。",
+    "saveFailedRetry": "帖子保存失败，请稍后再试。",
+    "updateFailed": "修改保存失败。",
+    "deleteFailed": "删除失败。",
+    "recommendFailed": "点赞更新失败。",
+    "recommendSaveFailed": "点赞保存失败，请稍后再试。",
+    "beenThereFoodOnly": "只有美食帖子可以标记“去过”。",
+    "beenThereFailed": "“去过”更新失败。",
+    "beenThereSaveFailed": "“去过”保存失败，请稍后再试。",
+    "reportSaveFailed": "举报保存失败，请稍后再试。",
+    "notGuestPost": "这不是游客帖子。",
+    "guestPostLinkedElsewhere": "该帖子已关联到其他账号。",
+    "guestClaimFailed": "无法关联你的游客帖子。",
+    "report": {
+      "reasonRequired": "请选择举报原因。",
+      "detailTooLong": "详细说明最多 {max} 个字符。",
+      "otherDetailRequired": "选择“其他”时，请说明原因。",
+      "alreadyReported": "你已经举报过该帖子或评论。",
+      "failed": "举报提交失败。"
+    },
+    "write": {
+      "titleBodyRequired": "请输入标题和正文。",
+      "bodyTooLong": "正文最多 {max} 个字符。",
+      "roommateTypeRequired": "请选择类型。",
+      "roommateTitleTooLong": "标题最多 {max} 个字符。",
+      "roommateOnePerAccount": "每个账号只能发布一个室友或转租帖子。请编辑或删除现有帖子后再试。",
+      "endDateAfterStart": "结束日期需晚于开始日期。",
+      "partySizeRequired": "请输入用餐人数。",
+      "totalSpendRequired": "请输入总消费金额。",
+      "tipIncludedRequired": "请选择是否含小费。",
+      "waitMinutesRequired": "请输入等位时间（没有等位请填 0）。",
+      "foodCategoryRequired": "请选择分类（必吃、性价比高、氛围好、适合学习）。",
+      "placeRequired": "请确认地址和餐厅名称。",
+      "cptOptTypeRequired": "请选择类型：CPT、OPT、STEM OPT、签证或绿卡。",
+      "cptOptTimelineRequired": "请至少添加一个时间线步骤。",
+      "jobReviewTypeRequired": "请选择类型：实习、应届、社招或合同工。",
+      "jobReviewTimelineRequired": "请至少添加一个招聘环节。",
+      "jobReviewSourceRequired": "请选择求职渠道。如果选择了学生会，请同时选择具体是哪个。",
+      "jobReviewOutcomeRequired": "请选择最终结果。",
+      "cityRequired": "请确认城市。"
+    },
+    "roommate": {
+      "required": {
+        "has-room": {
+          "location": "请输入你目前所在的街区/位置。",
+          "budget": "请输入室友每月房租（$）。",
+          "moveInStart": "请选择入住日期。",
+          "moveInEnd": "请选择搬出日期。"
+        },
+        "together": {
+          "location": "请输入期望的街区。",
+          "budget": "请输入每月最高预算（$）。",
+          "moveInStart": "请选择期望的入住日期。",
+          "moveInEnd": "请选择搬出日期。"
+        },
+        "room": {
+          "location": "请输入期望的街区。",
+          "budget": "请输入每月最高预算（$）。",
+          "moveInStart": "请选择期望的入住日期。",
+          "moveInEnd": "请选择搬出日期。"
+        },
+        "sublet": {
+          "location": "请输入转租位置。",
+          "budget": "请输入每月房租（$）。",
+          "moveInStart": "请选择转租开始日期。",
+          "moveInEnd": "请选择转租结束日期。"
+        }
+      }
+    }
+  },
+  "guest": {
+    "invalidRequest": "请检查你的请求。",
+    "nicknameInvalid": "请输入 {min}–{max} 个字符的显示昵称（不能是邮箱地址）。",
+    "emailInvalid": "请输入有效的邮箱，方便我们向你发送礼品卡和积分相关通知。",
+    "linkedinRequired": "请输入你的 LinkedIn 个人主页链接。示例：linkedin.com/in/your-name",
+    "guidelinesRequired": "请同意社区发帖规范。",
+    "titleRequired": "请输入标题。",
+    "bodyRequired": "请分享大家需要注意的地方。",
+    "bodyTooLong": "“注意事项”最多 {max} 个字符。",
+    "jobReviewTypeRequired": "请选择类型：实习、应届、社招、跳槽或合同工。",
+    "rateLimited": "请稍后再试。（短时间内请求过多）"
+  }
+}

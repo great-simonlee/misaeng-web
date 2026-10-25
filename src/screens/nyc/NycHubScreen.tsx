@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 
 import { LoadingState } from '@components'
 import { useCityInfo } from '@hooks/useCity'
+import { BRAND_CONFIG } from '@lib/brand'
 import { captureReferralFromLocation } from '@lib/community/referral'
+import { useT } from '@lib/i18n/client'
 import { BoardHighlightCards } from '@widgets/nyc/BoardHighlightCards'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
 import { MagazinePreviewSection } from '@widgets/nyc/MagazinePreviewSection'
@@ -18,6 +20,7 @@ const TEMP_SPLASH_MS = 1200
 export function NycHubScreen() {
   // const { configured } = useAuth()
   const cityInfo = useCityInfo()
+  const t = useT('hub')
   const [showSplash, setShowSplash] = useState(true)
 
   useEffect(() => {
@@ -27,7 +30,7 @@ export function NycHubScreen() {
   }, [])
 
   if (showSplash) {
-    return <LoadingState fullPage label='로딩 중이에요…' />
+    return <LoadingState fullPage label={t('loading')} />
   }
 
   return (
@@ -36,13 +39,16 @@ export function NycHubScreen() {
         <div className='mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8'>
           <div className='min-w-0'>
             <p className='text-[11px] font-medium tracking-[0.2em] text-[var(--muted)]'>
-              {cityInfo.brand}
+              {t('brandCity', {
+                brand: BRAND_CONFIG.name.toUpperCase(),
+                city: cityInfo.shortLabel.toUpperCase(),
+              })}
             </p>
             <h1 className='mt-1.5 text-[1.375rem] font-bold tracking-tight text-[var(--foreground)] sm:text-2xl'>
-              {cityInfo.headline}
+              {t(`cities.${cityInfo.id}.headline`)}
             </h1>
             <p className='mt-1.5 max-w-lg text-sm leading-relaxed text-[var(--muted-foreground)]'>
-              {cityInfo.description}
+              {t(`cities.${cityInfo.id}.description`)}
             </p>
           </div>
 

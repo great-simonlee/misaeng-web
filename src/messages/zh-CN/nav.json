@@ -1,0 +1,54 @@
+{
+  "brandCity": "{brand} {city}",
+  "links": {
+    "housing": "租房",
+    "food": "美食",
+    "marketplace": "二手市场",
+    "status": "CPT·OPT·签证·绿卡",
+    "jobReview": "面试·求职",
+    "roommate": "室友·转租",
+    "anonymous": "匿名"
+  },
+  "account": {
+    "me": "个人中心",
+    "myPosts": "我的帖子",
+    "myLikes": "我点赞的帖子",
+    "creditReviews": "积分审核"
+  },
+  "accountMenu": "账号菜单",
+  "openAccountMenu": "打开账号菜单",
+  "closeAccountMenu": "关闭账号菜单",
+  "openMenu": "打开菜单",
+  "closeMenu": "关闭菜单",
+  "menuAria": "{city} 菜单",
+  "mobileMenuAria": "{city} 移动端菜单",
+  "homeAria": "{city} 社区首页",
+  "communityHome": "社区首页",
+  "login": "登录",
+  "selectCity": "选择城市",
+  "currentCity": "当前",
+  "profileAlt": "{name}的头像",
+  "profileAltFallback": "头像",
+  "footer": {
+    "tagline": "面向留学生和职场人的{city}社区",
+    "groups": {
+      "community": "社区",
+      "company": "公司",
+      "support": "支持"
+    },
+    "links": {
+      "housing": "租房",
+      "credit": "积分",
+      "partners": "合作伙伴",
+      "companySite": "公司官网",
+      "about": "关于我们",
+      "service": "服务",
+      "careers": "加入我们",
+      "contact": "联系我们",
+      "me": "个人中心",
+      "terms": "使用条款",
+      "privacy": "隐私政策",
+      "ads": "广告与合作"
+    }
+  }
+}

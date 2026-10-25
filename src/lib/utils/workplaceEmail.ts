@@ -25,14 +25,13 @@ export function isWorkplaceEmail(email: string) {
   return !isPersonalEmailDomain(getEmailDomain(normalized))
 }
 
-export function getWorkplaceEmailError(email: string) {
+export type WorkplaceEmailErrorCode = 'required' | 'invalidFormat' | 'personalDomain'
+
+/** 형식 오류 코드. 화면은 `me.verification.workplace.errors.<code>`로 번역한다. */
+export function getWorkplaceEmailErrorCode(email: string): WorkplaceEmailErrorCode | null {
   const normalized = normalizeWorkEmail(email)
-  if (!normalized) return '직장 이메일을 입력해 주세요.'
-  if (!isValidEmailFormat(normalized)) {
-    return '올바른 이메일 형식을 입력해 주세요.'
-  }
-  if (isPersonalEmailDomain(getEmailDomain(normalized))) {
-    return 'Gmail 등 개인 메일은 사용할 수 없어요. 직장에서 쓰는 이메일을 입력해 주세요.'
-  }
+  if (!normalized) return 'required'
+  if (!isValidEmailFormat(normalized)) return 'invalidFormat'
+  if (isPersonalEmailDomain(getEmailDomain(normalized))) return 'personalDomain'
   return null
 }

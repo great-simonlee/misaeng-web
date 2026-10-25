@@ -1,18 +1,19 @@
 import { NYC_PRIVACY_POLICY } from '@lib/constants/nycPrivacyPolicy'
 import { NYC_TERMS_OF_USE } from '@lib/constants/nycTermsOfUse'
 
-import en from './en.json'
-import ko from './ko.json'
+import { isLocale, parseLocale } from '@lib/i18n/locales'
+
 import type { ConsentUiLanguage, LegalPolicy } from './types'
 
-export const CONSENT_COPY = { en, ko } as const
+/* 화면 문구는 src/messages/{locale}/consent.json (useT('consent')) */
 
 export const DEFAULT_TERMS_VERSION = NYC_TERMS_OF_USE.version
 export const DEFAULT_PRIVACY_VERSION = NYC_PRIVACY_POLICY.version
 
-export const TERMS_HREF = '/nyc/terms-of-use'
-export const PRIVACY_HREF = '/nyc/privacy-policy'
-export const TERMS_ARBITRATION_HREF = '/nyc/terms-of-use#governing-law'
+/** 도시 경로 기준. 화면에서는 useCityPath()로 언어 접두사를 붙인다 */
+export const TERMS_PATH = '/terms-of-use'
+export const PRIVACY_PATH = '/privacy-policy'
+export const TERMS_ARBITRATION_PATH = '/terms-of-use#governing-law'
 export const ARBITRATION_OPT_OUT_EMAIL = 'info@misaeng.com'
 
 export const DEFAULT_POLICY: LegalPolicy = {
@@ -28,18 +29,12 @@ export const DEFAULT_POLICY: LegalPolicy = {
   publishedBy: 'system',
 }
 
-export function copyFor(locale: ConsentUiLanguage) {
-  return CONSENT_COPY[locale]
-}
-
 export function isConsentUiLanguage(value: unknown): value is ConsentUiLanguage {
-  return value === 'en' || value === 'ko'
+  return isLocale(value)
 }
 
 export function detectConsentLocale(
   language?: string | null,
 ): ConsentUiLanguage {
-  const raw = String(language || '').trim().toLowerCase()
-  if (raw.startsWith('ko')) return 'ko'
-  return 'en'
+  return parseLocale(String(language || '').split(',')[0]) ?? 'en'
 }

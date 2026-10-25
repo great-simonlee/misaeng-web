@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "title": "{brand} NYC | ニューヨークの留学生・社会人コミュニティ",
+    "description": "ニューヨークで学び、働く人たちによる住まい、グルメ、CPT/OPT、ビザ、就職面接のレビュー。"
+  },
+  "language": {
+    "label": "言語",
+    "menuAria": "言語を選択",
+    "saved": "言語を{language}に変更しました",
+    "settingLabel": "言語",
+    "settingHint": "サイトと翻訳された投稿をこの言語で表示します。",
+    "sheetTitle": "言語",
+    "setupLabel": "使用する言語",
+    "setupHint": "コミュニティの投稿やコメントをこの言語に翻訳します。マイページからいつでも変更できます。",
+    "saveFailed": "言語を保存できませんでした。しばらくしてからもう一度お試しください。"
+  },
+  "translation": {
+    "translatedFrom": "{language}から翻訳",
+    "showOriginal": "原文を見る",
+    "showTranslation": "翻訳を見る",
+    "original": "原文",
+    "pending": "翻訳準備中",
+    "iconLabel": "翻訳された投稿"
+  },
+  "actions": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "confirm": "OK",
+    "back": "戻る",
+    "more": "もっと見る",
+    "retry": "再試行",
+    "loading": "読み込み中…"
+  },
+  "errors": {
+    "generic": "問題が発生しました。しばらくしてからもう一度お試しください。",
+    "network": "ネットワーク接続を確認してください。"
+  },
+  "ui": {
+    "bottomSheetSelect": {
+      "placeholder": "選択"
+    },
+    "imageUpload": {
+      "selectPhoto": "写真を選択",
+      "uploading": "アップロード中…",
+      "failed": "アップロードに失敗しました",
+      "remove": "削除",
+      "change": "変更",
+      "addPhoto": "写真を追加",
+      "tapToUpload": "タップしてアップロード"
+    },
+    "loading": {
+      "aria": "読み込み中",
+      "label": "読み込み中…"
+    },
+    "mbti": {
+      "placeholder": "選択してください",
+      "title": "MBTIを選択",
+      "clear": "選択しない",
+      "result": "あなたのタイプ",
+      "selectAll": "4つすべて選んでください",
+      "groups": {
+        "analyst": {
+          "label": "分析家",
+          "subtitle": "直観 · 思考"
+        },
+        "diplomat": {
+          "label": "外交官",
+          "subtitle": "直観 · 感情"
+        },
+        "sentinel": {
+          "label": "番人",
+          "subtitle": "感覚 · 思考"
+        },
+        "explorer": {
+          "label": "探検家",
+          "subtitle": "感覚 · 感情"
+        }
+      },
+      "nicknames": {
+        "INTJ": "建築家",
+        "INTP": "論理学者",
+        "ENTJ": "指揮官",
+        "ENTP": "討論者",
+        "INFJ": "提唱者",
+        "INFP": "仲介者",
+        "ENFJ": "主人公",
+        "ENFP": "運動家",
+        "ISTJ": "管理者",
+        "ISFJ": "擁護者",
+        "ESTJ": "幹部",
+        "ESFJ": "領事",
+        "ISTP": "巨匠",
+        "ISFP": "冒険家",
+        "ESTP": "起業家",
+        "ESFP": "エンターテイナー"
+      },
+      "dimensions": {
+        "ei": "エネルギー",
+        "ns": "視点",
+        "tf": "気質",
+        "jp": "戦術"
+      },
+      "options": {
+        "E": "外向型",
+        "I": "内向型",
+        "N": "直観型",
+        "S": "感覚型",
+        "T": "思考型",
+        "F": "感情型",
+        "J": "判断型",
+        "P": "探索型"
+      }
+    },
+    "nickname": {
+      "checking": "使用可能か確認しています…"
+    },
+    "photoLightbox": {
+      "title": "写真ビューア",
+      "close": "閉じる",
+      "previous": "前の写真",
+      "next": "次の写真"
+    },
+    "pullToRefresh": {
+      "refreshing": "{brand}を更新しています…",
+      "release": "指を離して更新",
+      "pull": "引っ張って更新"
+    },
+    "rangeSlider": {
+      "minPrice": "最低価格",
+      "maxPrice": "最高価格"
+    },
+    "schoolBadge": {
+      "title": "{school} · 学校メール認証済み",
+      "aria": "{school} 認証済み"
+    },
+    "editor": {
+      "placeholder": "内容を入力してください",
+      "imageUploadFailed": "画像をアップロードできませんでした",
+      "bold": "太字",
+      "italic": "斜体",
+      "heading": "見出し",
+      "bulletList": "リスト",
+      "quote": "引用",
+      "linkPrompt": "リンクのURLを入力してください",
+      "link": "リンク",
+      "photo": "写真",
+      "maxLengthReached": "文字数の上限に達しました",
+      "charCount": "文字数（本文のみ）"
+    },
+    "authErrors": {
+      "loginCancelled": "ログインがキャンセルされました",
+      "popupBlocked": "ポップアップがブロックされました。ブラウザの設定を確認してください",
+      "invalidEmail": "メールアドレスが正しくありません",
+      "userDisabled": "このアカウントは無効になっています",
+      "userNotFound": "アカウントが見つかりませんでした",
+      "wrongPassword": "パスワードが正しくありません",
+      "invalidCredential": "メールアドレスまたはパスワードを確認してください",
+      "emailAlreadyInUse": "このメールアドレスはすでに登録されています",
+      "weakPassword": "パスワードは6文字以上にしてください",
+      "tooManyRequests": "試行回数が多すぎます。しばらくしてからもう一度お試しください",
+      "networkRequestFailed": "ネットワーク接続を確認してください"
+    },
+    "configBanner": {
+      "loginPage": "ログインページ"
+    },
+    "authConfigBanner": {
+      "body": "AppConnect APIがまだ設定されていません。ellieo-erp AppConnectと同様に、{baseUrl}と{clientId}（Google Identity Services用）を環境変数に追加してください。GoogleのidTokenはEllieoの{endpoint}に送信されます（{envExample}を参照）。"
+    },
+    "supabaseConfigBanner": {
+      "body": "Supabaseの環境変数がまだ設定されていません。{envLocal}にSupabaseの値を追加してください（{envExample}を参照）。それまでは画面の閲覧はできますが、データの保存やプロフィール写真のアップロードはできません。"
+    },
+    "chipScroll": {
+      "previous": "前を表示",
+      "next": "さらに表示"
+    },
+    "copyLink": {
+      "copiedToast": "リンクをコピーしました",
+      "failedToast": "リンクをコピーできませんでした",
+      "linkCopied": "リンクをコピーしました",
+      "copyLink": "リンクをコピー",
+      "copied": "コピーしました",
+      "share": "共有"
+    },
+    "photoGrid": {
+      "cover": "カバー"
+    },
+    "timeline": {
+      "step": "ステップ {step}",
+      "latest": "最新",
+      "review": "レビュー"
+    },
+    "draft": {
+      "save": "下書き保存",
+      "savedAt": "下書き保存済み · {time}"
+    },
+    "autosave": {
+      "title": "入力内容は自動で保存されます",
+      "description": "進捗を追加したり次の項目に進んだりするたびに、この端末に保存されます。ウィンドウを閉じても、続きから再開できます。",
+      "savedAt": "保存済み · {time}"
+    }
+  }
+}

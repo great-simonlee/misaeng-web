@@ -1,5 +1,6 @@
 'use client'
 
+import type { ConsentUiLanguage } from '@lib/consent/types'
 import {
   createContext,
   useCallback,
@@ -10,7 +11,10 @@ import {
   type ReactNode,
 } from 'react'
 
+import { BRAND_CONFIG } from '@lib/brand'
 import { isMisaengEmail } from '@lib/constants/nyc'
+import { useT } from '@lib/i18n/client'
+import { parseLocale, type Locale } from '@lib/i18n/locales'
 import type { AuthUser } from '@/types/auth'
 import type { NycUserProfile } from '@/types/nyc'
 
@@ -35,7 +39,7 @@ interface AuthContextValue {
       acceptedTerms: boolean
       termsVersion: string
       privacyVersion: string
-      uiLanguage: 'en' | 'ko'
+      uiLanguage: ConsentUiLanguage
     },
   ) => Promise<void>
   signInGoogle: (params: {
@@ -46,7 +50,7 @@ interface AuthContextValue {
       acceptedTerms: boolean
       termsVersion: string
       privacyVersion: string
-      uiLanguage: 'en' | 'ko'
+      uiLanguage: ConsentUiLanguage
     }
   }) => Promise<void>
   resetPassword: (email: string) => Promise<void>
@@ -61,6 +65,7 @@ interface AuthContextValue {
     mbti: string | null
     gender: string
     occupationType: string
+    preferredLocale?: Locale | null
   }) => Promise<void>
   saveGender: (gender: string) => Promise<string>
   saveOccupationType: (occupationType: string) => Promise<string>
@@ -101,6 +106,9 @@ function mapProfile(uid: string, email: string, raw: Record<string, unknown> | n
     gender: typeof raw?.gender === 'string' ? raw.gender : null,
     occupationType:
       typeof raw?.occupationType === 'string' ? raw.occupationType : null,
+    preferredLocale: parseLocale(
+      typeof raw?.preferredLocale === 'string' ? raw.preferredLocale : null,
+    ),
     photoURL:
       typeof raw?.photoURL === 'string'
         ? raw.photoURL
@@ -162,6 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [sessionLoading, setSessionLoading] = useState(false)
   const [configured, setConfigured] = useState(true)
+  const t = useT('auth')
 
   const loadSession = useCallback(async (options?: { silent?: boolean }) => {
     if (!options?.silent) {
@@ -294,11 +303,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       | null
 
     if (!response.ok) {
-      throw new Error(data?.error || '로그인에 실패했어요')
+      throw new Error(data?.error || t('errors.loginFailed'))
     }
 
     await loadSession()
-  }, [loadSession])
+  }, [loadSession, t])
 
   const signUpEmailFn = useCallback(async (
     email: string,
@@ -307,7 +316,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       acceptedTerms: boolean
       termsVersion: string
       privacyVersion: string
-      uiLanguage: 'en' | 'ko'
+      uiLanguage: ConsentUiLanguage
     },
   ) => {
     const response = await fetch('/api/agent-auth/email', {
@@ -332,11 +341,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       | null
 
     if (!response.ok) {
-      throw new Error(data?.error || '회원가입에 실패했어요')
+      throw new Error(data?.error || t('errors.signUpFailed'))
     }
 
     await loadSession()
-  }, [loadSession])
+  }, [loadSession, t])
 
   const signInGoogleFn = useCallback(
     async (params: {
@@ -347,7 +356,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         acceptedTerms: boolean
         termsVersion: string
         privacyVersion: string
-        uiLanguage: 'en' | 'ko'
+        uiLanguage: ConsentUiLanguage
       }
     }) => {
       const response = await fetch('/api/agent-auth/google', {
@@ -372,14 +381,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(
           data?.error ||
             (response.status >= 500
-              ? 'Ellieo 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.'
-              : 'Google 로그인에 실패했어요'),
+              ? t('errors.serverUnavailable', { brand: BRAND_CONFIG.name })
+              : t('errors.googleLoginFailed')),
         )
       }
 
       await loadSession()
     },
-    [loadSession],
+    [loadSession, t],
   )
 
   const resetPasswordFn = useCallback(async (email: string) => {
@@ -398,9 +407,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = (await response.json().catch(() => null)) as
         | { error?: string }
         | null
-      throw new Error(data?.error || '비밀번호 재설정 요청에 실패했어요')
+      throw new Error(data?.error || t('errors.resetPasswordFailed'))
     }
-  }, [])
+  }, [t])
 
   const logout = useCallback(async () => {
     await fetch('/api/agent-auth/session', {
@@ -413,7 +422,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const uploadAvatar = useCallback(
     async (_file: File) => {
-      if (!user) throw new Error('로그인이 필요해요')
+      if (!user) throw new Error(t('errors.loginRequired'))
 
       const { compressImageForUpload } = await import('@lib/utils/compressImage')
       const optimized = await compressImageForUpload(_file)
@@ -431,7 +440,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         | null
 
       if (!response.ok || !data?.photoURL) {
-        throw new Error(data?.error || '프로필 사진 업로드에 실패했어요')
+        throw new Error(data?.error || t('errors.avatarUploadFailed'))
       }
 
       setProfile((prev) => {
@@ -445,12 +454,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return data.photoURL
     },
-    [user],
+    [user, t],
   )
 
   const saveNickname = useCallback(
     async (_nickname: string) => {
-      if (!user) throw new Error('로그인이 필요해요')
+      if (!user) throw new Error(t('errors.loginRequired'))
       const response = await fetch('/api/agent-auth/profile', {
         method: 'PATCH',
         credentials: 'include',
@@ -461,17 +470,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         | { error?: string; profile?: Record<string, unknown> }
         | null
       if (!response.ok) {
-        throw new Error(data?.error || '닉네임 저장에 실패했어요')
+        throw new Error(data?.error || t('errors.nicknameSaveFailed'))
       }
       setProfile(mapProfile(user.uid, user.email, data?.profile ?? null))
       return _nickname.trim()
     },
-    [user],
+    [user, t],
   )
 
   const saveMbti = useCallback(
     async (_mbti: string | null) => {
-      if (!user) throw new Error('로그인이 필요해요')
+      if (!user) throw new Error(t('errors.loginRequired'))
       const response = await fetch('/api/agent-auth/profile', {
         method: 'PATCH',
         credentials: 'include',
@@ -482,12 +491,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         | { error?: string; profile?: Record<string, unknown> }
         | null
       if (!response.ok) {
-        throw new Error(data?.error || 'MBTI 저장에 실패했어요')
+        throw new Error(data?.error || t('errors.mbtiSaveFailed'))
       }
       setProfile(mapProfile(user.uid, user.email, data?.profile ?? null))
       return _mbti?.trim().toUpperCase() || null
     },
-    [user],
+    [user, t],
   )
 
   const saveProfileSetup = useCallback(
@@ -498,8 +507,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mbti: string | null
       gender: string
       occupationType: string
+      preferredLocale?: Locale | null
     }) => {
-      if (!user) throw new Error('로그인이 필요해요')
+      if (!user) throw new Error(t('errors.loginRequired'))
       const response = await fetch('/api/agent-auth/profile', {
         method: 'PATCH',
         credentials: 'include',
@@ -511,22 +521,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           mbti: data.mbti,
           gender: data.gender,
           occupationType: data.occupationType,
+          ...(data.preferredLocale ? { preferredLocale: data.preferredLocale } : {}),
         }),
       })
       const result = (await response.json().catch(() => null)) as
         | { error?: string; profile?: Record<string, unknown> }
         | null
       if (!response.ok) {
-        throw new Error(result?.error || '프로필 저장에 실패했어요')
+        throw new Error(result?.error || t('errors.profileSaveFailed'))
       }
       setProfile(mapProfile(user.uid, user.email, result?.profile ?? null))
     },
-    [user],
+    [user, t],
   )
 
   const saveGender = useCallback(
     async (_gender: string) => {
-      if (!user) throw new Error('로그인이 필요해요')
+      if (!user) throw new Error(t('errors.loginRequired'))
       const response = await fetch('/api/agent-auth/profile', {
         method: 'PATCH',
         credentials: 'include',
@@ -537,17 +548,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         | { error?: string; profile?: Record<string, unknown> }
         | null
       if (!response.ok) {
-        throw new Error(data?.error || '성별 저장에 실패했어요')
+        throw new Error(data?.error || t('errors.genderSaveFailed'))
       }
       setProfile(mapProfile(user.uid, user.email, data?.profile ?? null))
       return _gender.trim()
     },
-    [user],
+    [user, t],
   )
 
   const saveOccupationType = useCallback(
     async (_occupationType: string) => {
-      if (!user) throw new Error('로그인이 필요해요')
+      if (!user) throw new Error(t('errors.loginRequired'))
       const response = await fetch('/api/agent-auth/profile', {
         method: 'PATCH',
         credentials: 'include',
@@ -558,12 +569,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         | { error?: string; profile?: Record<string, unknown> }
         | null
       if (!response.ok) {
-        throw new Error(data?.error || '직업 저장에 실패했어요')
+        throw new Error(data?.error || t('errors.occupationSaveFailed'))
       }
       setProfile(mapProfile(user.uid, user.email, data?.profile ?? null))
       return _occupationType.trim()
     },
-    [user],
+    [user, t],
   )
 
   const displayName =
@@ -571,7 +582,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile?.displayName?.trim() ||
     user?.displayName?.trim() ||
     user?.email?.split('@')[0] ||
-    '회원'
+    t('memberFallbackName')
 
   const value = useMemo<AuthContextValue>(
     () => ({

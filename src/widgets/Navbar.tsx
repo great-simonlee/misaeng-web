@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: '/our-service', label: 'Our Service' },
   { href: '/careers', label: 'Careers' },
   { href: '/roadmap', label: 'Roadmap' },
+  { href: '/mobile-app', label: 'Mobile App' },
   { href: '/contact', label: 'Contact' },
 ] as const
 
@@ -77,7 +78,7 @@ export function Navbar() {
               <Link
                 href='/contact'
                 onClick={() => setMobileOpen(false)}
-                className='mx-4 mb-3 mt-2 flex min-h-[48px] items-center justify-center rounded-xl bg-[#F64310] text-sm font-semibold text-white active:bg-[#d93a0e]'
+                className='mx-4 mb-3 mt-2 flex min-h-[48px] items-center justify-center rounded-xl bg-brand text-sm font-semibold text-white active:bg-brand-hover'
               >
                 Partner Inquiry
               </Link>
@@ -134,7 +135,7 @@ export function Navbar() {
           <div className='flex items-center gap-1'>
             <Link
               href='/contact'
-              className='hidden rounded-full bg-[#F64310] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-[#F64310]/25 transition hover:bg-[#d93a0e] hover:shadow-[#F64310]/35 sm:inline-block'
+              className='hidden rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-md shadow-brand/25 transition hover:bg-brand-hover hover:shadow-brand/35 sm:inline-block'
             >
               Partner Inquiry
             </Link>

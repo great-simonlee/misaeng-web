@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { useAuth } from '@hooks/useAuth'
 import { fetchPostRecommendSummary } from '@lib/community/engagement.client'
-import { formatCommunityCount } from '@lib/constants/communityMock'
+import { useFormat, useT } from '@lib/i18n/client'
 
 type FoodCardRecommendStatProps = {
   postId: string
@@ -16,6 +16,8 @@ export function FoodCardRecommendStat({
   postId,
   count: countProp,
 }: FoodCardRecommendStatProps) {
+  const t = useT('food')
+  const format = useFormat()
   const { user } = useAuth()
   const [fetchedCount, setFetchedCount] = useState<number | null>(null)
   const count = countProp != null ? countProp : fetchedCount
@@ -36,9 +38,9 @@ export function FoodCardRecommendStat({
     <span className='inline-flex items-center gap-1.5'>
       <RecommendIcon className='size-3.5' />
       <span>
-        추천{' '}
+        {t('card.recommends')}{' '}
         <span className='tabular-nums'>
-          {count == null ? '…' : formatCommunityCount(count)}
+          {count == null ? '…' : format.number(Math.max(0, Math.floor(Number(count) || 0)), { notation: 'compact' })}
         </span>
       </span>
     </span>

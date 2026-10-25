@@ -1,0 +1,153 @@
+{
+  "loading": "載入中…",
+  "brandCity": "{brand} {city}",
+  "comingSoon": "即將推出",
+  "cities": {
+    "nyc": {
+      "headline": "一起打造紐約生活",
+      "description": "留學生與上班族分享紐約生活大小事的地方。"
+    },
+    "boston": {
+      "headline": "一起打造波士頓生活",
+      "description": "留學生與上班族分享波士頓生活大小事的地方。"
+    }
+  },
+  "magazine": {
+    "kicker": "NYC 雜誌",
+    "title": "編輯精選的紐約生活",
+    "description": "美食、活動、好去處的短篇文章，與看板內容分開。",
+    "items": {
+      "mag-1": {
+        "tag": "美食",
+        "title": "Flushing 那間排隊排到門外的刀削麵店",
+        "excerpt": "比週末早午餐更有飽足感，在地韓國人都會去的店。"
+      },
+      "mag-2": {
+        "tag": "活動",
+        "title": "本週 Manhattan 韓國人交流聚會",
+        "excerpt": "適合學生與新鮮人的輕鬆晚間聚會。"
+      },
+      "mag-3": {
+        "tag": "好去處",
+        "title": "雨天也能逛的室內路線",
+        "excerpt": "從博物館到咖啡廳，一天全部搞定。"
+      },
+      "mag-4": {
+        "tag": "街區",
+        "title": "Astoria 午間散步",
+        "excerpt": "從咖啡街到公園，超適合週末的散步路線。"
+      }
+    }
+  },
+  "professionals": {
+    "kicker": "專家",
+    "title": "生活好夥伴",
+    "description": "房地產、律師、搬家、會計師：在 NYC 最常需要的專家。",
+    "categoriesAria": "專家分類",
+    "categories": {
+      "real-estate": {
+        "title": "房地產",
+        "description": "租屋、買賣與仲介諮詢"
+      },
+      "lawyer": {
+        "title": "律師",
+        "description": "簽證、移民與合約法律"
+      },
+      "moving": {
+        "title": "搬家",
+        "description": "NYC 搬家與貨運"
+      },
+      "accountant": {
+        "title": "會計師",
+        "description": "報稅與 CPA 服務"
+      }
+    },
+    "items": {
+      "re-1": {
+        "name": "範例房地產",
+        "specialty": "Manhattan · Brooklyn 租屋"
+      },
+      "re-2": {
+        "name": "範例仲介",
+        "specialty": "學生與上班族租屋"
+      },
+      "law-1": {
+        "name": "範例律師事務所",
+        "specialty": "簽證 · 移民法"
+      },
+      "law-2": {
+        "name": "範例律師",
+        "specialty": "租約 · 合約"
+      },
+      "mv-1": {
+        "name": "範例搬家公司",
+        "specialty": "市內及近郊搬家"
+      },
+      "mv-2": {
+        "name": "範例搬家",
+        "specialty": "Studio · 1BR"
+      },
+      "acc-1": {
+        "name": "範例會計",
+        "specialty": "個人與自由工作者報稅"
+      },
+      "acc-2": {
+        "name": "範例 CPA",
+        "specialty": "OPT · ITIN · 報稅"
+      }
+    }
+  },
+  "introCarousel": {
+    "intro": {
+      "kicker": "{brand} NYC",
+      "headline": "在紐約的學生都該知道的地方",
+      "body": "我們與各校韓國學生會合作，把簽證、求職、美食、活動資訊整合在一起，還能連結專家。"
+    },
+    "status": {
+      "kicker": "簽證 · 身分",
+      "headline": "我這樣做對嗎？",
+      "body": "看看走過 OPT、CPT、簽證、綠卡的人分享的真實步驟評價，提前做好準備。"
+    },
+    "food": {
+      "kicker": "美食",
+      "headline": "再也不用煩惱今天吃什麼",
+      "body": "美食清單依菜色而不是地區分類，想吃什麼馬上搜尋、馬上出發。"
+    },
+    "housing": {
+      "kicker": "租屋 · 室友",
+      "headline": "找房子不用再自己一個人",
+      "body": "一次比較已認證的房源，以及生活習慣合得來的室友。"
+    },
+    "anonymous": {
+      "kicker": "匿名看板",
+      "headline": "那些不想具名問的問題",
+      "body": "不管是簽證還是感情，匿名比較敢說真心話。"
+    },
+    "credit": {
+      "kicker": "推薦積分",
+      "headline": "邀請朋友、分享評價",
+      "body": "寫一篇詳細的 OPT、CPT 或簽證評價，你和邀請你的朋友都能獲得積分。"
+    },
+    "expert": {
+      "kicker": "專家媒合",
+      "headline": "用積分認識專家",
+      "body": "用積分和目標產業的在職者來場 coffee chat，或預約專家諮詢。"
+    },
+    "cta": {
+      "kicker": "開始使用",
+      "headline": "在這裡找資訊，向專家問答案",
+      "body": "到 {siteHost}/nyc 看看合作學生會與已認證房源。"
+    }
+  },
+  "carouselTest": {
+    "kicker": "{brand} NYC · 輪播草稿",
+    "title": "介紹輪播",
+    "description": "滿版照片背景 · 1080×1080 · 左右滑動。每張投影片都依主題搭配不同氛圍的疊色。",
+    "photoNote": "背景使用 Unsplash 的紐約與生活風格照片，建議發布前換成高解析度的品牌照片。",
+    "backHome": "返回社群首頁"
+  },
+  "instagramDm": {
+    "body": "{message}：請私訊 {handle}。",
+    "button": "傳送 Instagram 私訊"
+  }
+}

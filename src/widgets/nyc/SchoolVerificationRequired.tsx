@@ -3,11 +3,8 @@
 import Link from 'next/link'
 
 import { useCityPath } from '@hooks/useCity'
-import {
-  getIdentityVerifyCtaLabel,
-  getIdentityVerifyHref,
-  SCHOOL_VERIFY_REQUIRED_MESSAGE,
-} from '@lib/community/schoolGate'
+import { getIdentityVerifyHref } from '@lib/community/schoolGate'
+import { useT } from '@lib/i18n/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 
 type SchoolVerificationRequiredProps = {
@@ -22,6 +19,7 @@ export function SchoolVerificationRequired({
   withShell = true,
 }: SchoolVerificationRequiredProps) {
   const cityHref = useCityPath()
+  const t = useT()
   const href = getIdentityVerifyHref(nextPath)
 
   const body = (
@@ -30,23 +28,23 @@ export function SchoolVerificationRequired({
         Verification
       </p>
       <h1 className='mt-3 text-[1.35rem] font-semibold tracking-tight text-[var(--foreground)] sm:text-[1.5rem]'>
-        인증이 필요해요
+        {t('me.verificationRequired.title')}
       </h1>
       <p className='mt-3 text-[14px] leading-relaxed text-[var(--muted-foreground)]'>
-        {SCHOOL_VERIFY_REQUIRED_MESSAGE}
+        {t('community.verify.required')}
       </p>
       <Link
         href={href}
-        className='mt-8 inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand)] px-6 text-[14px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)]'
+        className='mt-8 inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand)] px-6 text-[14px] font-semibold text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)]'
       >
-        {getIdentityVerifyCtaLabel()}
+        {t('community.verify.cta')}
       </Link>
       <p className='mt-4'>
         <Link
           href={cityHref()}
           className='text-[13px] font-medium text-[var(--muted)] underline-offset-2 hover:text-[var(--foreground)] hover:underline'
         >
-          커뮤니티 홈으로
+          {t('me.verificationRequired.toCommunityHome')}
         </Link>
       </p>
     </div>

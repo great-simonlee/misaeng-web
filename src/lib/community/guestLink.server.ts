@@ -9,6 +9,7 @@ import {
   listStoredUnlinkedGuestPostsByEmail,
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
+import { ApiMessageError } from '@lib/i18n/apiError'
 import {
   getStoredCommunityCreditAccount,
   isCommunityCreditStorageConfigured,
@@ -59,10 +60,10 @@ export async function linkGuestPostToAccount(
   options: { linkedBy: 'self' | 'admin'; linkedByEmail?: string | null },
 ): Promise<{ post: CommunityPost; creditAwarded: number }> {
   if (!post.guestAuthor) {
-    throw new Error('게스트 글이 아니에요.')
+    throw new ApiMessageError('Not a guest post', 'community.notGuestPost')
   }
   if (post.authorUid && post.authorUid !== actor.uid) {
-    throw new Error('이미 다른 계정에 연결된 글이에요.')
+    throw new ApiMessageError('Guest post is linked to another account', 'community.guestPostLinkedElsewhere')
   }
 
   const profile = await getSupabaseProfile(actor.uid).catch(() => null)

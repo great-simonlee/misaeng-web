@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server'
 
+import { getRequestT } from '@lib/i18n/server'
+
 import { refreshEllieoAccessToken } from '../lib/ellieoServer'
 
-export async function POST() {
+export async function POST(request: Request) {
   const accessToken = await refreshEllieoAccessToken()
   if (!accessToken) {
+    const t = await getRequestT(request, 'api')
     return NextResponse.json(
-      { error: '세션이 만료되었어요. 다시 로그인해 주세요.' },
+      { error: t('auth.sessionExpired') },
       { status: 401 },
     )
   }

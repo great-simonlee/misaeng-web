@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { persistConsentRecord, assertAcceptedCurrentPolicy } from '@lib/consent/recordConsent'
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
 import {
   buildAuthUserFromHints,
   getAuthErrorMessage,
@@ -25,7 +27,7 @@ type GoogleAuthBody = {
   acceptedTerms?: boolean
   termsVersion?: string
   privacyVersion?: string
-  uiLanguage?: 'en' | 'ko'
+  uiLanguage?: string
 }
 
 const ELLIEO_LOGIN_BODIES = (idToken: string) => [
@@ -37,12 +39,12 @@ const ELLIEO_LOGIN_BODIES = (idToken: string) => [
 ]
 
 export async function POST(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
     if (!getEllieoBaseUrl()) {
       return NextResponse.json(
         {
-          error:
-            'APP_CONNECT_API_BASE_URL 환경 변수가 없어 로그인을 연결할 수 없어요.',
+          error: t('auth.appConnectMissingLogin'),
         },
         { status: 503 },
       )
@@ -54,13 +56,13 @@ export async function POST(request: Request) {
 
     if (!idToken) {
       return NextResponse.json(
-        { error: 'Google idToken이 필요해요.' },
+        { error: t('auth.googleIdTokenRequired') },
         { status: 400 },
       )
     }
 
     const deviceId = await getOrCreateDeviceId()
-    let lastError = 'Google 로그인에 실패했어요.'
+    let lastError = t('auth.googleLoginFailed')
     let lastStatus = 401
     let loginData: unknown = null
     let tokens: ReturnType<typeof extractEllieoTokens> | null = null
@@ -78,7 +80,7 @@ export async function POST(request: Request) {
         if (tokens.accessToken) break
       } else {
         lastStatus = res.status
-        lastError = getAuthErrorMessage(data, lastError)
+        lastError = getAuthErrorMessage(t, data, lastError)
         if (isUpstreamUnavailable(res.status)) {
           return NextResponse.json({ error: lastError }, { status: 503 })
         }
@@ -109,12 +111,14 @@ export async function POST(request: Request) {
       acceptedTerms: body.acceptedTerms,
       termsVersion: body.termsVersion,
       privacyVersion: body.privacyVersion,
+      t,
     })
     if (!consentCheck.ok) {
       return NextResponse.json(consentCheck.body, { status: consentCheck.status })
     }
 
     const registerResult = await loginOrRegisterWithGoogle(
+      t,
       idToken,
       body.email,
       body.name,
@@ -132,6 +136,7 @@ export async function POST(request: Request) {
           privacyVersion: body.privacyVersion,
           uiLanguage: body.uiLanguage,
           method: 'google_signup_checkbox',
+          t,
         })
         if (!consent.ok) {
           return NextResponse.json(consent.body, { status: consent.status })
@@ -160,7 +165,7 @@ export async function POST(request: Request) {
         error: registerResult.error || lastError,
         ...(status === 401
           ? {
-              hint: 'Ellieo에 등록된 Google 계정이 필요해요.',
+              hint: t('auth.googleAccountHint'),
             }
           : {}),
       },
@@ -171,10 +176,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : 'Google 인증 중 오류가 발생했어요.',
+        error: apiErrorMessage(t, error, 'auth.googleAuthError'),
       },
       { status: 500 },
     )

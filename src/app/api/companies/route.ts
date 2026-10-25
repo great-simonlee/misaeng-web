@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getRequestT } from '@lib/i18n/server'
 import { resolveCityId } from '@lib/constants/cities'
 import { companyMatchesQuery } from '@lib/company/companyRules'
 import {
@@ -17,7 +18,8 @@ export const dynamic = 'force-dynamic'
 export async function GET(request: Request) {
   try {
     if (!isCompanyStorageConfigured()) {
-      return NextResponse.json({ error: 'Supabase 설정이 필요해요.' }, { status: 503 })
+      const t = await getRequestT(request, 'api')
+      return NextResponse.json({ error: t('common.supabaseNotConfigured') }, { status: 503 })
     }
     const { searchParams } = new URL(request.url)
     const industry = searchParams.get('industry')?.trim() || ''

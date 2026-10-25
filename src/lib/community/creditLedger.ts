@@ -1,3 +1,4 @@
+import { notifyUsers } from '@lib/push/notify.server'
 import {
   COMMUNITY_CREDIT_BONUS_RULES,
   COMMUNITY_CREDIT_EARN_RULES,
@@ -8,6 +9,7 @@ import {
   COMMUNITY_CREDIT_TIMELINE_POST_MAX,
   type CommunityCreditAccount,
   type CommunityCreditEarnReason,
+  communityCreditEntryLabel,
   type CommunityCreditEntry,
 } from '@lib/constants/communityCredit'
 import { isAnonymousBoard, isStatusCommunityBoard } from '@lib/constants/nyc'
@@ -18,6 +20,8 @@ import {
   saveStoredCommunityCreditAccount,
 } from '@lib/supabase/communityCredit.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
+import { createTranslator, type Translate } from '@lib/i18n/translate'
+import koCreditMessages from '@/messages/ko/credit.json'
 
 function dayKeyAmericaNy(ts: number = Date.now()): string {
   return new Intl.DateTimeFormat('en-CA', {
@@ -47,23 +51,18 @@ function earnAmountForReason(reason: CommunityCreditEarnReason): number {
   return rule?.amount ?? 0
 }
 
-function earnLabelForReason(reason: CommunityCreditEarnReason): string {
-  if (reason === 'school-verify' || reason === 'first-post') {
-    return (
-      COMMUNITY_CREDIT_BONUS_RULES.find((item) => item.id === reason)?.label ??
-      '보너스'
-    )
-  }
-  if (reason === 'review-bonus') {
-    return '최종 결과 리뷰 보너스'
-  }
-  if (reason === 'referral') {
-    return '추천 코드 사용'
-  }
-  return (
-    COMMUNITY_CREDIT_EARN_RULES.find((item) => item.id === reason)?.label ??
-    '적립'
-  )
+/**
+ * 내역에 저장하는 label. 저장 데이터라서 언어와 상관없이 기존처럼 한국어 문구로 남긴다.
+ * 화면은 `communityCreditEntryLabel(entry, t)`로 현재 언어 문구를 보여 준다.
+ */
+const storedLabelT = createTranslator({ credit: koCreditMessages }, 'ko')
+const storedCreditT: Translate = (key, params) => storedLabelT(`credit.${key}`, params)
+
+function storedEntryLabel(
+  kind: CommunityCreditEntry['kind'],
+  reason: CommunityCreditEarnReason,
+): string {
+  return communityCreditEntryLabel({ kind, reason, label: '' }, storedCreditT)
 }
 
 /** 게시판 → 적립 reason (대상이 아니면 null) */
@@ -150,11 +149,37 @@ async function mutateAccount(
     const current = await getStoredCommunityCreditAccount(userId)
     const next = mutator(current)
     if (next === current) return current
-    return await saveStoredCommunityCreditAccount(next)
+    const saved = await saveStoredCommunityCreditAccount(next)
+    notifyCreditEarned(current, saved)
+    return saved
   } catch (error) {
     console.error('Community credit mutate error:', error)
     return null
   }
+}
+
+/** App push when the balance went up (one notification per award, with the newest entry's reason). */
+function notifyCreditEarned(before: CommunityCreditAccount, after: CommunityCreditAccount) {
+  const amount = after.balance - before.balance
+  if (amount <= 0) return
+  const entry = after.entries[0]
+  notifyUsers({
+    type: 'credit',
+    userIds: [after.uid],
+    build: (t) => {
+      const reasonKey = `credit.ledger.reasons.${entry?.reason ?? ''}`
+      const reason = entry?.reason ? t(reasonKey) : ''
+      return {
+        title: t('api.push.credit.title', { amount }),
+        body: t('api.push.credit.body', {
+          label: reason && reason !== reasonKey ? reason : entry?.label || '',
+          balance: after.balance,
+        }),
+        data: { type: 'credit' },
+        threadId: 'credit',
+      }
+    },
+  })
 }
 
 function claimBonus(
@@ -171,7 +196,7 @@ function claimBonus(
     kind: 'earn',
     reason: bonusId,
     amount,
-    label: earnLabelForReason(bonusId),
+    label: storedEntryLabel('earn', bonusId),
     sourceId: sourceId ?? null,
     createdAt: Date.now(),
   }
@@ -240,7 +265,7 @@ export async function awardPostCredit(args: {
         kind: 'earn',
         reason,
         amount: delta,
-        label: `${earnLabelForReason(reason)} (타임라인)`,
+        label: storedEntryLabel('earn', reason),
         sourceId: args.postId,
         createdAt: Date.now(),
       })
@@ -261,7 +286,7 @@ export async function awardPostCredit(args: {
       kind: 'earn',
       reason,
       amount,
-      label: earnLabelForReason(reason),
+      label: storedEntryLabel('earn', reason),
       sourceId: args.postId,
       createdAt: Date.now(),
     })
@@ -301,7 +326,7 @@ export async function awardCommentCredit(args: {
       kind: 'earn',
       reason: 'comment',
       amount: granted,
-      label: earnLabelForReason('comment'),
+      label: storedEntryLabel('earn', 'comment'),
       sourceId: args.commentId,
       createdAt: Date.now(),
     })
@@ -338,7 +363,7 @@ export async function awardReferralBindCredit(args: {
       kind: 'earn',
       reason: 'referral',
       amount,
-      label: earnLabelForReason('referral'),
+      label: storedEntryLabel('earn', 'referral'),
       sourceId,
       createdAt: Date.now(),
     })
@@ -363,7 +388,7 @@ export async function awardReviewBonusCredit(args: {
       kind: 'earn',
       reason: 'review-bonus',
       amount,
-      label: earnLabelForReason('review-bonus'),
+      label: storedEntryLabel('earn', 'review-bonus'),
       sourceId: args.postId,
       createdAt: Date.now(),
     })
@@ -413,7 +438,7 @@ export async function revokeSourceCredit(args: {
         kind: 'revoke',
         reason,
         amount: -remaining,
-        label: `${earnLabelForReason(reason)} 회수`,
+        label: storedEntryLabel('revoke', reason),
         sourceId: args.sourceId,
         createdAt: Date.now(),
       })
@@ -482,7 +507,7 @@ export async function ensureCreditBackfill(
           kind: 'earn',
           reason,
           amount: delta,
-          label: `${earnLabelForReason(reason)} (타임라인)`,
+          label: storedEntryLabel('earn', reason),
           sourceId: post.id,
           createdAt: post.createdAt,
         })
@@ -500,7 +525,7 @@ export async function ensureCreditBackfill(
         kind: 'earn',
         reason,
         amount,
-        label: earnLabelForReason(reason),
+        label: storedEntryLabel('earn', reason),
         sourceId: post.id,
         createdAt: post.createdAt,
       })

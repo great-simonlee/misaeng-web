@@ -1,0 +1,50 @@
+{
+  "schoolsLabel": "Partner Korean student associations",
+  "influencersLabel": "Partner influencers",
+  "more": "See more",
+  "backToHome": "Back to community home",
+  "schools": {
+    "title": "Partner student associations",
+    "intro": "We'll share news from the Korean student associations we work with here.",
+    "profilePending": "Profile coming soon",
+    "logoPending": "Logo coming soon",
+    "dmMessage": "Partner student association inquiries"
+  },
+  "influencers": {
+    "title": "Influencer content",
+    "intro": "We're looking for partner influencers. We'll be teaming up with creators on Instagram, YouTube and TikTok.",
+    "recruitingTitle": "We're looking for partner influencers!",
+    "searching": "Now looking for partner influencers",
+    "recruitingBody": "We're looking for partner influencers right now. Soon you'll be able to see their content here.",
+    "recruitingHandle": "Recruiting partner influencers",
+    "dmMessage": "Partner influencer inquiries"
+  },
+  "influencerPlatforms": {
+    "instagram": {
+      "title": "Instagram",
+      "description": "Lifestyle and local Instagram"
+    },
+    "youtube": {
+      "title": "YouTubers",
+      "description": "Vlogs and info on YouTube"
+    },
+    "tiktok": {
+      "title": "TikTokers",
+      "description": "Local news in short videos"
+    }
+  },
+  "orgs": {
+    "nyu-kiso": {
+      "name": "NYU Korean Student Association"
+    },
+    "fit-ksof": {
+      "name": "FIT Korean Student Association"
+    },
+    "baruch-ksa": {
+      "name": "Baruch Korean Student Association"
+    },
+    "parsons-ksa": {
+      "name": "Parsons Korean Student Association"
+    }
+  }
+}

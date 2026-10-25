@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import { buildReferralShareUrl } from '@lib/community/referral'
 import { COMMUNITY_CREDIT_REFERRAL_MAX } from '@lib/constants/communityCredit'
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
 import {
   bindUserReferrer,
   ensureUserReferralCode,
@@ -14,16 +16,17 @@ import {
 } from '@lib/supabase/profile.server'
 
 export async function GET(request: Request) {
+  const t = await getRequestT(request, 'api')
   if (!isSupabaseProfileConfigured()) {
     return NextResponse.json(
-      { error: '추천 기능을 쓰려면 저장소 설정이 필요해요.' },
+      { error: t('referral.featureStorageMissing') },
       { status: 503 },
     )
   }
 
   const user = await resolveAuthenticatedUser()
   if (!user?.uid) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
 
   try {
@@ -43,10 +46,7 @@ export async function GET(request: Request) {
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : '추천 정보를 불러오지 못했어요.',
+        error: apiErrorMessage(t, error, 'referral.loadFailed'),
       },
       { status: 500 },
     )
@@ -54,16 +54,17 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const t = await getRequestT(request, 'api')
   if (!isSupabaseProfileConfigured()) {
     return NextResponse.json(
-      { error: '추천 기능을 쓰려면 저장소 설정이 필요해요.' },
+      { error: t('referral.featureStorageMissing') },
       { status: 503 },
     )
   }
 
   const user = await resolveAuthenticatedUser()
   if (!user?.uid) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
 
   const body = (await request.json().catch(() => null)) as
@@ -80,10 +81,7 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : '추천인 연결에 실패했어요.',
+        error: apiErrorMessage(t, error, 'referral.bindFailed'),
       },
       { status: 400 },
     )

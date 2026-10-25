@@ -1,0 +1,686 @@
+{
+  "activity": {
+    "updated": "{time}に更新",
+    "posted": "{time}に投稿",
+    "firstPosted": "{time}に初回投稿"
+  },
+  "cptOpt": {
+    "types": {
+      "cpt": {
+        "label": "CPT",
+        "description": "在学中の就労許可",
+        "summary": "OGSに申請して新しいI-20を受け取る"
+      },
+      "opt": {
+        "label": "OPT",
+        "description": "卒業後1年間の就労許可",
+        "summary": "OGSの推薦、USCISへのI-765申請、EADの受け取り"
+      },
+      "stem-opt": {
+        "label": "STEM OPT",
+        "description": "STEM OPTの延長",
+        "summary": "I-983とOGSの審査、その後のSEVPバリデーションレポート"
+      },
+      "visa": {
+        "label": "ビザ",
+        "description": "F-1、H-1B、O-1など",
+        "summary": "書類準備・面接から承認まで"
+      },
+      "green-card": {
+        "label": "グリーンカード",
+        "description": "就労、結婚などのルート",
+        "summary": "申請、面接、承認、カードの受け取りまで"
+      }
+    },
+    "fields": {
+      "prepared": {
+        "label": "準備したこと",
+        "shortLabel": "準備",
+        "hint": "集めた書類や確認した要件"
+      },
+      "submitted": {
+        "label": "提出の方法",
+        "shortLabel": "提出",
+        "hint": "どこに、どうやって提出したか"
+      },
+      "resultReceived": {
+        "label": "結果の受け取り方",
+        "shortLabel": "結果",
+        "hint": "メール、郵送、ポータルなど、どう届いて何と書かれていたか"
+      },
+      "nextStep": {
+        "label": "次にやること",
+        "shortLabel": "次のステップ",
+        "hint": "まだやるべきことや、待っていること"
+      }
+    },
+    "placeholders": {
+      "cpt": {
+        "prepared": "例：CPTモジュールの受講完了、オファーレター、OGSのチェックリスト",
+        "submitted": "例：OGSのポータルにCPTフォームとオファーレターをアップロード",
+        "resultReceived": "例：学校のメールで新しいI-20のPDFを受け取った",
+        "nextStep": "例：I-20を印刷して署名、勤務開始日を合わせる"
+      },
+      "opt": {
+        "prepared": "例：OGSのOPTワークショップ、I-765、パスポート写真、卒業証明",
+        "submitted": "例：OGSの推薦後、USCISにI-765をオンライン申請し、費用を支払った",
+        "resultReceived": "例：EADカードが郵送で届き、アカウントに承認が表示された",
+        "nextStep": "例：EADの有効期限とSTEM延長の要件をカレンダーに登録"
+      },
+      "stem-opt": {
+        "prepared": "例：I-983、会社情報、OGS/DSOへの連絡",
+        "submitted": "例：OGSの審査後にSTEM OPT延長を申請",
+        "resultReceived": "例：I-797の承認通知をメール/郵送で受け取った",
+        "nextStep": "例：6/12/18か月のバリデーションレポートの予定を立てる"
+      },
+      "visa": {
+        "prepared": "例：DS-160、財政証明書類、面接の質問練習",
+        "submitted": "例：大使館の面接を予約して書類を提出",
+        "resultReceived": "例：ビザが承認され、パスポートが返ってきた",
+        "nextStep": "例：米国に入国、I-94を確認、SEVIS/学校に登録"
+      },
+      "green-card": {
+        "prepared": "例：I-140/I-485の書類、健康診断、弁護士との面談",
+        "submitted": "例：USCISにオンライン/郵送で申請し、面接に出席",
+        "resultReceived": "例：承認通知のあと、グリーンカードが郵送で届いた",
+        "nextStep": "例：カードの内容を確認、再入国と更新の日付をチェック"
+      }
+    },
+    "quickSteps": {
+      "cpt": {
+        "module": {
+          "label": "CPTモジュール完了",
+          "prepared": "CPTモジュール（オリエンテーション）を修了",
+          "nextStep": "オファーレターを待ち、チェックリストを確認"
+        },
+        "offerLetter": {
+          "label": "オファーレター受領",
+          "prepared": "オファーレターを受け取った",
+          "nextStep": "OGSのCPT申請書を記入"
+        },
+        "apply": {
+          "label": "CPT申請を提出",
+          "prepared": "オファーレター、CPT申請書",
+          "submitted": "OGSのポータルで申請を提出",
+          "nextStep": "新しいI-20を待つ"
+        },
+        "newI20": {
+          "label": "新しいI-20を受領",
+          "resultReceived": "新しいI-20をメールで受け取った",
+          "nextStep": "署名して勤務開始"
+        }
+      },
+      "opt": {
+        "recommendation": {
+          "label": "OGSの推薦",
+          "prepared": "OPTの書類と卒業要件を確認",
+          "submitted": "OGSにOPTの推薦をリクエスト",
+          "nextStep": "I-765申請の準備"
+        },
+        "i765": {
+          "label": "I-765を申請",
+          "prepared": "I-765、写真、申請費用",
+          "submitted": "USCISにオンラインで申請",
+          "nextStep": "ケースのステータスを定期的に確認"
+        },
+        "ead": {
+          "label": "EADを受領",
+          "resultReceived": "EADカードが郵送で届いた",
+          "nextStep": "勤務開始、STEM延長の要件を確認"
+        }
+      },
+      "stem-opt": {
+        "i983": {
+          "label": "I-983を提出",
+          "prepared": "I-983、会社情報",
+          "submitted": "OGSにI-983を提出",
+          "nextStep": "承認とバリデーションレポートの日程を確認"
+        },
+        "approved": {
+          "label": "延長が承認",
+          "resultReceived": "STEM OPTの延長が承認された",
+          "nextStep": "レポートの締切のリマインダーを設定"
+        }
+      },
+      "visa": {
+        "interview": {
+          "label": "面接を予約",
+          "prepared": "DS-160、書類一式",
+          "submitted": "大使館の面接を予約",
+          "nextStep": "面接の準備、書類の最終確認"
+        },
+        "approved": {
+          "label": "ビザが承認",
+          "resultReceived": "ビザが承認され、パスポートが返ってきた",
+          "nextStep": "米国に入国、学校/勤務先に登録"
+        }
+      },
+      "green-card": {
+        "petition": {
+          "label": "申請を提出",
+          "prepared": "申請書類一式",
+          "submitted": "USCISに申請を提出",
+          "nextStep": "受理通知と面接日を待つ"
+        },
+        "card": {
+          "label": "カードを受領",
+          "resultReceived": "グリーンカードを受け取った",
+          "nextStep": "更新と再入国の書類を確認"
+        }
+      }
+    },
+    "detail": {
+      "authorTitle": "進行中の記録です",
+      "authorBody": "新しい日付ができたら、更新画面で1件追加するだけでOKです。保存すると、投稿が一覧のいちばん上に表示されます。",
+      "addEntry": "新しい記録を追加",
+      "timelineTitle_other": "進捗の記録{count}件",
+      "tipsTitle": "注意点"
+    },
+    "write": {
+      "errors": {
+        "typeRequired": "種類を選択してください：CPT、OPT、STEM OPT、ビザ、グリーンカード",
+        "tipsEmptyEdit": "「注意点」が空欄です。投稿の詳細で確認してください",
+        "tipsRequired": "「注意点」を入力してください",
+        "tipsTooLong": "「注意点」は{max}文字以内にしてください",
+        "timelineRequiredEdit": "進捗の記録を1件以上残してください",
+        "timelineRequired": "進捗の記録（日付＋内容）を1件以上追加してください"
+      },
+      "updated": "進捗を更新しました。一覧のいちばん上に表示されています",
+      "created": "レビューを投稿しました。進捗はあとからいつでも追加できます",
+      "moreSettingsTitle": "投稿の詳細を編集",
+      "moreSettingsHint": "タイトル、場所、「注意点」を変更したいときだけ開いてください",
+      "tipsTitle": "注意点",
+      "tipsDescription": "次の人が同じ失敗をしないよう、ぜひ知っておいてほしいコツ",
+      "tipsPlaceholder": "例：書類は開始日の2〜3週間前までにOGSに送りましょう。ポータルは学校ごとに違うので、まずOGSのチェックリストを確認してください。",
+      "updateSubmit": "進捗を更新",
+      "typeSection": "どの種類ですか？",
+      "basicSection": "基本情報",
+      "basicSectionDescription": "タイトルと会社・機関を入力してください",
+      "timelineSection": "進捗",
+      "createFootnote": "投稿したあとも、進捗の追加や編集ができます。",
+      "createIntro": "種類を選んで、日付ごとに進捗を記録しましょう。投稿したあとも追加できます。",
+      "updateEyebrow": "進捗の更新",
+      "updateTitle": "新しい進捗を追加"
+    },
+    "timeline": {
+      "editingDescription": "準備、提出、結果、次のステップを編集したら、「編集完了」をタップしてください。",
+      "stageReviewHint": "その日にあったことをシェアしてください。待ち時間、コツ、失敗など、なんでもOKです。",
+      "stageReviewPlaceholder": "例：OGSのポータルでアップロードが何度も失敗したので、PDFを圧縮して再挑戦しました。オファーレターの日付を合わせるのに1日かかりました。"
+    }
+  },
+  "jobReview": {
+    "types": {
+      "intern": {
+        "label": "インターン",
+        "description": "サマー / ウィンター / 学期中",
+        "summary": "応募から面接、オファーまで"
+      },
+      "new-grad": {
+        "label": "新卒",
+        "description": "卒業後のフルタイム",
+        "summary": "キャンパスリクルーティングとオンライン応募"
+      },
+      "experienced": {
+        "label": "経験者",
+        "description": "ミドル / シニア採用",
+        "summary": "リクルーターからの連絡から複数回の面接まで"
+      },
+      "job-change": {
+        "label": "転職",
+        "description": "在職中または離職中の転職",
+        "summary": "働きながらの応募からオファー交渉まで"
+      },
+      "contract": {
+        "label": "契約",
+        "description": "契約 · フリーランス",
+        "summary": "短期・プロジェクト単位の採用"
+      }
+    },
+    "fields": {
+      "stageLabel": {
+        "label": "どの段階か",
+        "shortLabel": "段階",
+        "hint": "Application、Phone、Onsite、Offerなど"
+      },
+      "platform": {
+        "label": "応募した場所",
+        "shortLabel": "プラットフォーム",
+        "hint": "LinkedIn、Handshake、リファラル、企業の採用ページ"
+      },
+      "documentsSubmitted": {
+        "label": "提出したもの",
+        "shortLabel": "書類",
+        "hint": "履歴書、カバーレター、ポートフォリオ、成績証明書"
+      },
+      "interviewRound": {
+        "label": "何次面接か",
+        "shortLabel": "面接",
+        "hint": "1次 Recruiter、2次 Tech、Panel、HMなど",
+        "guide": "面接メモ：何次面接かに加えて、聞かれたことと答えた内容もシェアしてください。覚えている具体的な質問と答えが、次の人の大きな助けになります。"
+      },
+      "outcome": {
+        "label": "結果",
+        "shortLabel": "結果",
+        "hint": "通過、不合格、結果待ち、オファーなど"
+      }
+    },
+    "placeholders": {
+      "intern": {
+        "stageLabel": "例：Phone Screen",
+        "platform": "例：Handshake → 企業の採用ページ",
+        "documentsSubmitted": "例：履歴書、成績証明書、カバーレター",
+        "interviewRound": "例：1次 Recruiter screen。Q：なぜこのインターンに？ → 授業で〜に取り組んでみて、もっとやりたいと思ったと答えた。",
+        "outcome": "例：通過 → 次の面接が決定"
+      },
+      "new-grad": {
+        "stageLabel": "例：Application",
+        "platform": "例：LinkedIn Easy Apply",
+        "documentsSubmitted": "例：履歴書PDF、GitHubのリンク",
+        "interviewRound": "例：2次 Tech。Q. 最近のプロジェクトで行き詰まったところは？ A. …こう答えました。",
+        "outcome": "例：不合格（2週間後にメール）"
+      },
+      "experienced": {
+        "stageLabel": "例：Recruiter reach-out",
+        "platform": "例：LinkedIn InMail",
+        "documentsSubmitted": "例：更新した履歴書",
+        "interviewRound": "例：HM 1:1。Q. なぜこのポジションに？ A. チームが〜に向かっているので…",
+        "outcome": "例：Onsiteの案内"
+      },
+      "job-change": {
+        "stageLabel": "例：Recruiter screen",
+        "platform": "例：LinkedIn / リファラル",
+        "documentsSubmitted": "例：履歴書、LinkedIn",
+        "interviewRound": "例：2次 HM + Team。Q. 対立をどう解決しますか？ A. …",
+        "outcome": "例：オファー · 給与交渉"
+      },
+      "contract": {
+        "stageLabel": "例：エージェンシー経由で応募",
+        "platform": "例：リクルーターの紹介",
+        "documentsSubmitted": "例：履歴書、料金表",
+        "interviewRound": "例：Client intro。Q. いつから始められますか？ A. 2週間後です。",
+        "outcome": "例：契約オファー"
+      }
+    },
+    "quickSteps": {
+      "intern": {
+        "apply": {
+          "label": "応募",
+          "stageLabel": "Application",
+          "platform": "Handshake / LinkedIn",
+          "documentsSubmitted": "履歴書、成績証明書"
+        },
+        "interview": {
+          "label": "面接",
+          "stageLabel": "Technical Interview",
+          "interviewRound": "1次 Tech"
+        },
+        "offer": {
+          "label": "オファー",
+          "stageLabel": "Offer",
+          "outcome": "オファーを受け取った"
+        }
+      },
+      "new-grad": {
+        "apply": {
+          "label": "応募",
+          "stageLabel": "Application",
+          "platform": "企業の採用ポータル",
+          "documentsSubmitted": "履歴書、カバーレター"
+        },
+        "phone": {
+          "label": "電話面接",
+          "stageLabel": "Phone Screen",
+          "interviewRound": "1次 HR"
+        },
+        "onsite": {
+          "label": "Onsite",
+          "stageLabel": "Onsite / Virtual onsite",
+          "interviewRound": "最終面接"
+        }
+      },
+      "experienced": {
+        "recruiter": {
+          "label": "リクルーター",
+          "stageLabel": "Recruiter screen",
+          "platform": "LinkedIn InMail"
+        },
+        "hm": {
+          "label": "HM",
+          "stageLabel": "Hiring Manager",
+          "interviewRound": "HM 1:1"
+        },
+        "panel": {
+          "label": "Panel",
+          "stageLabel": "Panel interview",
+          "interviewRound": "Team panel"
+        }
+      },
+      "job-change": {
+        "apply": {
+          "label": "応募",
+          "stageLabel": "Application",
+          "platform": "LinkedIn / リファラル",
+          "documentsSubmitted": "履歴書"
+        },
+        "interview": {
+          "label": "面接",
+          "stageLabel": "Hiring Manager",
+          "interviewRound": "HM + Team"
+        },
+        "offer": {
+          "label": "オファー",
+          "stageLabel": "Offer · 交渉",
+          "outcome": "オファーを受け取った"
+        }
+      },
+      "contract": {
+        "documents": {
+          "label": "書類",
+          "stageLabel": "書類提出",
+          "documentsSubmitted": "履歴書"
+        },
+        "client": {
+          "label": "クライアント",
+          "stageLabel": "クライアント面接",
+          "interviewRound": "Intro call"
+        }
+      }
+    },
+    "sources": {
+      "misaeng": {
+        "label": "{brand}を通じて",
+        "description": "{brand}のサイトやSNSを見た"
+      },
+      "student-org": {
+        "label": "学生団体を通じて",
+        "description": "学校の学生団体から連絡があった"
+      },
+      "referral": {
+        "label": "知り合いを通じて",
+        "description": "知り合いに紹介してもらった"
+      },
+      "other": {
+        "label": "その他",
+        "description": "そのほかの方法"
+      }
+    },
+    "sourcePicker": {
+      "orgQuestion": "どの学生団体ですか？"
+    },
+    "outcomes": {
+      "offer": {
+        "label": "オファー獲得",
+        "description": "合格してオファーをもらった"
+      },
+      "rejected": {
+        "label": "不合格",
+        "description": "途中または最終で不合格だった"
+      },
+      "in-progress": {
+        "label": "選考中",
+        "description": "まだ結果を待っている"
+      },
+      "withdrew": {
+        "label": "辞退",
+        "description": "自分から選考を辞退した"
+      }
+    },
+    "detail": {
+      "authorTitle": "進行中の選考記録です",
+      "authorBody": "新しい段階に進んだら、更新画面で1件追加するだけでOKです。保存すると、投稿が一覧のいちばん上に表示されます。",
+      "addEntry": "新しい段階を追加",
+      "timelineTitle_other": "選考ステップ{count}件",
+      "emptySection": "選考ステップ",
+      "emptyTitle": "まだ選考ステップがありません",
+      "emptyBody": "応募、面接、結果など、日付ごとの進捗がステップ1、ステップ2…とここに積み重なっていきます。",
+      "emptyCta": "選考ステップを追加",
+      "tipsTitle": "次の応募者へ"
+    },
+    "timeline": {
+      "editingDescription": "段階、プラットフォーム、書類、面接、結果を編集したら、「編集完了」をタップしてください。",
+      "stageReviewHint": "この段階で経験したことをシェアしてください。質問、雰囲気、準備のコツ、フィードバックなど、なんでもOKです。",
+      "stageReviewPlaceholder": "例：Phone screenは約30分で、ほとんどが履歴書の深掘り＋行動面接の質問でした。",
+      "autoCommitHint": "日付と内容を入力して次の項目に移ると、記録が自動で追加・保存されます。ボタンを押す必要はありません。"
+    },
+    "write": {
+      "errors": {
+        "typeRequired": "種類を選択してください：インターン、新卒、経験者、転職、契約",
+        "tipsEmptyEdit": "「注意点」が空欄です。投稿の詳細で確認してください",
+        "tipsRequired": "「注意点」を入力してください",
+        "tipsTooLong": "「注意点」は{max}文字以内にしてください",
+        "timelineRequiredEdit": "進捗の記録を1件以上残してください。日付と内容を入力して「この記録を追加」をタップしてください",
+        "timelineRequired": "進捗の記録（日付＋内容）を1件以上入力して、「この記録を追加」をタップしてください",
+        "outcomeRequired": "最終結果を選択してください",
+        "orgRequired": "どの学生団体から紹介されたかを選択してください",
+        "sourceRequired": "応募経路を選択してください"
+      },
+      "updated": "進捗を更新しました。一覧のいちばん上に表示されています",
+      "created": "レビューを投稿しました。進捗はあとからいつでも追加できます",
+      "moreSettingsTitle": "投稿の詳細を編集",
+      "moreSettingsHint": "タイトル、会社、「注意点」を変更したいときだけ開いてください",
+      "tipsTitle": "注意点",
+      "tipsDescription": "次の人が同じ失敗をしないよう、ぜひ知っておいてほしいコツ",
+      "tipsPlaceholder": "例：面接前にチームの最近のプロジェクトを調べておきましょう。HandshakeよりLinkedInのリファラルのほうが、ずっと反応がよかったです。",
+      "outcomeSection": "最終結果はどうでしたか？",
+      "outcomeEditHint": "状況が変わったら、ここも更新してください",
+      "outcomeSectionDescription": "まだ選考中なら「選考中」を選んでください。あとから変更できます",
+      "sourceSection": "応募のきっかけは？",
+      "sourceSectionDescription": "このレビューを書くことになった経緯を教えてください。ほかの人には表示されません",
+      "selectSourceFirst": "応募経路を選択してください",
+      "updateSubmit": "進捗を更新",
+      "typeSection": "どの種類ですか？",
+      "basicSection": "基本情報",
+      "basicSectionDescription": "タイトルと会社を入力してください",
+      "timelineSection": "進捗",
+      "createFootnote": "投稿したあとも、進捗の追加や編集ができます。",
+      "createIntro": "種類を選んで、日付ごとに進捗を記録しましょう。投稿したあとも追加できます。",
+      "updateEyebrow": "進捗の更新",
+      "updateTitle": "新しい進捗を追加"
+    }
+  },
+  "detail": {
+    "noDate": "日付なし",
+    "stageReview": "ステップのメモ",
+    "views": "{views}回閲覧",
+    "accordionHint": "ステップをタップすると開閉できます。一度に開けるのは1つだけです。",
+    "editLabel": "更新"
+  },
+  "orientation": {
+    "defaultEyebrow": "レビューを書く",
+    "title": "はじめる前に",
+    "subtitleWithGuide": "書き方ガイドとコミュニティガイドラインを読んで、同意してください。",
+    "subtitle": "コミュニティガイドラインを読んで、同意してください。",
+    "guideTitle": "書き方ガイド",
+    "communityTitle": "コミュニティガイドライン",
+    "saving": "保存しています…",
+    "agree": "同意して書きはじめる",
+    "backToList": "一覧に戻る",
+    "saveFailed": "同意を保存できませんでした。もう一度お試しください。",
+    "roommateEyebrow": "ルームメイト · サブレット",
+    "anonymousEyebrow": "匿名掲示板",
+    "cptOpt": {
+      "step1": {
+        "title": "日付ごとに記録するレビュー",
+        "body": "CPT、OPT、STEM OPT、ビザ、グリーンカードの進捗を日付ごとに記録すると、あとからほかの人がステップごとにたどれます。"
+      },
+      "step2": {
+        "title": "日付 → 項目 → 内容",
+        "body": "下のフォームで日付を選び、必要な項目（準備、提出、結果、次のステップ）だけを選んで、内容を書いてください。"
+      },
+      "step3": {
+        "title": "「この記録を追加」で上に積み重なる",
+        "body": "書き終えたら「この記録を追加」をタップすると、フォームの上のリストに移動します。続けて下のフォームで次の日付を記録しましょう。"
+      }
+    },
+    "jobReview": {
+      "step1": {
+        "title": "日付ごとに記録するレビュー",
+        "body": "インターン、新卒、経験者、転職、契約の選考過程を日付ごとに記録すると、ほかの人が応募からオファーまでたどれます。"
+      },
+      "step2": {
+        "title": "日付 → 項目 → 内容",
+        "body": "下のフォームで日付を選び、必要な項目（段階、プラットフォーム、書類、面接、結果）だけを選んで、内容を書いてください。"
+      },
+      "step3": {
+        "title": "「この記録を追加」で上に積み重なる",
+        "body": "書き終えたら「この記録を追加」をタップすると、フォームの上のリストに移動します。続けて下のフォームで次の日付を記録しましょう。"
+      }
+    }
+  },
+  "write": {
+    "notFound": "この投稿が見つかりませんでした",
+    "noPermission": "編集する権限がありません",
+    "loadFailed": "投稿を読み込めませんでした",
+    "errors": {
+      "timelineIncomplete": "入力中の記録に日付と内容の両方を入力してください"
+    },
+    "saveFailed": "保存できませんでした",
+    "draftSaved": "下書きを保存しました",
+    "draftSaveFailed": "下書きを保存できませんでした",
+    "checkingLogin": "ログイン状態を確認しています…",
+    "loadingPost": "投稿を読み込んでいます…",
+    "backToPost": "投稿に戻る",
+    "boardList": "{board}の一覧",
+    "collapse": "閉じる",
+    "expand": "開く",
+    "titleLabel": "タイトル",
+    "updating": "更新しています…",
+    "updateFootnote": "保存すると投稿が一覧のいちばん上に表示され、みんなが最新の進捗を見られるようになります。",
+    "timelineSectionDescription": "日付ごとの記録は、いくつでも追加・編集・削除できます",
+    "submitting": "投稿しています…",
+    "selectTypeFirst": "種類を選択してください",
+    "submit": "レビューを投稿",
+    "backToList": "一覧に戻る",
+    "createEyebrow": "新規投稿",
+    "updateIntro": "今は日付と内容を追加するだけでOKです。保存すると、投稿が一覧のいちばん上に表示されます。",
+    "untitled": "無題",
+    "existingCount_other": "これまでの記録{count}件",
+    "restoredAutosave": "送信前に自動保存された編集内容を復元しました",
+    "draftEmpty": "まだ保存する内容がありません"
+  },
+  "timeline": {
+    "addedTitle_other": "{count}件の記録を追加済み",
+    "savedTitle_other": "保存済みの記録{count}件",
+    "savedDescription": "フォームの上に積み重なります。日付ごとに編集・削除できます",
+    "editingSelected": "選択した記録を編集",
+    "cancel": "キャンセル",
+    "finishEdit": "編集完了",
+    "addEntry": "この記録を追加",
+    "clearDraft": "フォームをクリア",
+    "limitReached": "記録の上限に達しました。新しく追加するには、記録を削除してください。",
+    "updateGuide": {
+      "editingTitle": "既存の記録を編集中",
+      "addTitle": "進捗を追加",
+      "addDescription": "新しい日付を選んで内容を書き、「この記録を追加」をタップしてください。続けて複数追加できます。"
+    },
+    "newEntry": "新しい進捗の記録",
+    "editHint": "終わったら「編集完了」をタップしてください",
+    "maxCanAdd": "記録は最大{max}件まで追加できます",
+    "maxReached": "記録の上限は{max}件です",
+    "noDate": "日付なし",
+    "edit": "編集",
+    "editing": "編集中",
+    "delete": "削除",
+    "date": "日付",
+    "selectFields": "記録する項目を選択",
+    "selectFieldsHint": "当てはまるものだけを選んでください。複数選択できます。",
+    "incompleteEmpty": "日付と、選択した項目またはステップのメモを入力してください",
+    "incompleteDate": "日付と内容の両方を入力してください",
+    "quickInput": "クイック入力",
+    "removeField": "削除"
+  },
+  "guest": {
+    "signedIn": "ログインしています。レビューはこのアカウントに直接投稿されます",
+    "claimLinked": "登録が完了しました！書いたばかりのレビューがアカウントに紐づけられました",
+    "claimDone": "登録が完了しました",
+    "claimFailed": "レビューを紐づけできませんでした",
+    "googleFailed": "Googleログインがうまくいきませんでした",
+    "errors": {
+      "nicknameLength": "表示用のニックネームを{min}〜{max}文字で入力してください",
+      "nicknameTaken": "このニックネームは使われています。別のニックネームをお試しください",
+      "emailInvalid": "有効なメールアドレスを入力してください",
+      "linkedinInvalid": "LinkedInのプロフィールURLを確認してください（例：linkedin.com/in/your-name）",
+      "titleRequired": "タイトルを入力してください",
+      "guidelinesRequired": "コミュニティガイドラインに同意してください"
+    },
+    "created": "レビューを投稿しました。ありがとうございます！",
+    "createFailed": "レビューを投稿できませんでした",
+    "backToList": "面接・就職レビュー",
+    "checkingDraft": "保存された下書きを確認しています…",
+    "authorSection": "あなたについて",
+    "authorSectionMember": "ニックネームは公開されます。LinkedInは勤務先の確認にのみ使用します",
+    "authorSectionGuest": "公開されるのはニックネームのみです。メールアドレスとLinkedInは運営チームだけが確認し、投稿には表示されません",
+    "nicknameLabel": "ニックネーム",
+    "nicknameHint": "投稿に表示 · 公開",
+    "nicknamePlaceholder": "例：NYCWorker",
+    "emailLabel": "メールアドレス",
+    "emailHintMember": "アカウントのメール · 非公開",
+    "emailHintGuest": "ギフトカードやクレジットのお知らせ用 · 非公開",
+    "linkedinLabel": "LinkedInのプロフィールURL",
+    "linkedinHint": "勤務先の確認用 · 非公開",
+    "coffeeChatLabel": "これからキャリアを始める人からのコーヒーチャットのリクエストを受け付けます",
+    "optional": "（任意）",
+    "coffeeChatHint": "チェックを入れても連絡先は公開されません。リクエストが届いたら、運営チームがまずあなたに確認してからおつなぎします。",
+    "guidelinesAgree": "上記のコミュニティガイドラインを読みました。このレビューは私の実際の経験にもとづいています。",
+    "submitGuest": "登録せずにレビューを投稿",
+    "footnoteBefore": "登録は不要です。",
+    "footnoteLink": "Googleで登録して投稿",
+    "footnoteAfter": "すると、すぐにアカウントにクレジットが付与されます。",
+    "footnoteMember": "投稿したあとも、「自分の投稿」から進捗の追加や編集ができます。",
+    "choose": {
+      "eyebrow": "経験をシェア",
+      "title": "登録しなくてもレビューを投稿できます",
+      "intro": "応募から面接、結果まで、ステップごとに振り返ってみてください。同じ道を目指す人にとって大きな助けになります。所要時間はわずか5分です。",
+      "recommended": "おすすめ",
+      "googleTitle": "Googleで登録して投稿",
+      "googlePitch1": "クレジットがすぐにアカウントに付与されます",
+      "googlePitch2": "投稿したあとも進捗を追加できます",
+      "guestTitle": "登録せずに投稿",
+      "guestPitch1": "ニックネーム、メールアドレス、LinkedInのURLだけでOK",
+      "guestPitch2": "クレジットはお預かりし、あとで同じメールアドレスで登録すると自動で付与されます",
+      "guestCta": "登録せずにレビューを投稿"
+    },
+    "creditPitch": {
+      "title": "レビューでクレジットを獲得",
+      "perStep": "選考ステップ1つにつき{perStep}クレジット（1投稿あたり最大{max}）",
+      "perStepWithBonus": "選考ステップ1つにつき{perStep}クレジット（1投稿あたり最大{max}） · 初投稿+{bonus}",
+      "review": "詳しいレビューは、Misaengチームの審査後に追加クレジットがもらえます",
+      "coffeeChat": "クレジット（{cost}）を使って、同じ業界や会社、または別の業界の人と1:1のコーヒーチャットができます",
+      "optionalSignup": "登録は任意です。登録すると、クレジットを使ったりコーヒーチャットのリクエストを受け取ったりできます"
+    },
+    "hero": {
+      "memberEyebrow": "自分のアカウントで投稿",
+      "memberIntro": "投稿するとすぐに、このアカウントにクレジットが付与されます。コーヒーチャットのリクエストも受け取れます。",
+      "guestIntro": "登録は不要です。クレジットはお預かりし、あとで同じメールアドレスで登録すると自動で付与されます。"
+    },
+    "preview": {
+      "count_other": "これまでに選考ステップを{count}件追加",
+      "member": "{credit}クレジットを獲得できます",
+      "memberWithBonus": "{credit}クレジットを獲得できます（初投稿+{bonus}）",
+      "guest": "登録すると{credit}クレジット",
+      "guestWithBonus": "登録すると{credit}クレジット（初投稿+{bonus}）"
+    },
+    "done": {
+      "eyebrow": "投稿完了",
+      "title": "レビューをシェアしていただき、ありがとうございます",
+      "body_other": "「{title}」が面接・就職レビューの掲示板に掲載されました。{count}件の選考ステップが、あとに続く人の助けになります。",
+      "awarded": "アカウントに{credit}クレジットが付与されました",
+      "linked": "レビューがアカウントに紐づけられました",
+      "coffeeChat": "クレジットを使って、同じ業界や会社、または別の業界の人とコーヒーチャット（{cost}クレジット）ができます。",
+      "pending": "登録すると、すぐに{credit}クレジットがもらえます",
+      "breakdown_other": "選考ステップ{count}件 = {credit}クレジット。レビューに入力したメールアドレスと同じGoogleアカウントで登録すると、自動で紐づけられます。",
+      "breakdownWithBonus_other": "選考ステップ{count}件 = {credit}クレジット + 初投稿ボーナス{bonus}。レビューに入力したメールアドレスと同じGoogleアカウントで登録すると、自動で紐づけられます。",
+      "viewPost": "自分のレビューを見る",
+      "viewCredit": "自分のクレジットを見る",
+      "toList": "一覧に戻る",
+      "optional": "任意",
+      "signupTitle": "{brand}に登録して、これからキャリアを始める人からのコーヒーチャットのリクエストを受け取りましょう",
+      "signupPitch1": "書いたばかりのレビューと{credit}クレジットが、すぐにアカウントに紐づけられます",
+      "signupPitch2": "クレジットを使って、同じ業界や会社、または別の業界の人と1:1のコーヒーチャットができます",
+      "signupPitch3": "進捗の追加や編集をいつでもできます",
+      "emailMismatch": "アカウントのメールアドレスがレビューに入力したものと異なるため、自動で紐づけられませんでした。運営チームがLinkedInとメールアドレスを確認したうえで、アカウントに紐づけます。",
+      "skipNote": "今すぐ登録しなくても、レビューは掲載されたままです。",
+      "skip": "あとで"
+    }
+  }
+}

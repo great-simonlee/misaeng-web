@@ -1,0 +1,485 @@
+{
+  "categories": {
+    "housing": {
+      "title": "Hunian",
+      "description": "Listing {city} yang diposting tim Misaeng"
+    },
+    "events": {
+      "title": "Acara",
+      "description": "Meetup, pertunjukan, dan acara"
+    },
+    "food": {
+      "title": "Kuliner",
+      "description": "Rekomendasi restoran dan kafe"
+    },
+    "marketplace": {
+      "title": "Jual Beli",
+      "description": "Jual beli barang sehari-hari"
+    },
+    "status": {
+      "title": "OPT · Visa · Green Card",
+      "description": "Cerita seputar visa, CPT/OPT, dan green card"
+    },
+    "job-review": {
+      "title": "Interview · Kerja",
+      "description": "Cerita interview, cari kerja, dan dunia kerja"
+    },
+    "roommate": {
+      "title": "Roommate · Sublet",
+      "description": "Cari roommate, kamar, dan sublet"
+    },
+    "anonymous": {
+      "title": "Forum Anonim",
+      "description": "Ngobrol bebas tanpa nama"
+    },
+    "comingSoon": "Segera Hadir"
+  },
+  "boards": {
+    "events": {
+      "writeLabel": "Posting acara",
+      "listIntro": "Bagikan meetup, pertunjukan, dan acara yang ada di {city}.",
+      "locationLabel": "Tempat",
+      "locationPlaceholder": "Manhattan / Online",
+      "detailLabel": "Tanggal & waktu",
+      "titlePlaceholder": "Malam networking Korea",
+      "descriptionPlaceholder": "Waktu, cara ikut, intro singkat"
+    },
+    "food": {
+      "writeLabel": "Rekomendasikan tempat",
+      "listIntro": "Bagikan restoran dan kafe yang pernah kamu coba. Tambahkan foto dan ulasan sesukamu.",
+      "locationLabel": "Lingkungan",
+      "locationPlaceholder": "Flushing / Koreatown",
+      "detailLabel": "Jenis masakan",
+      "titlePlaceholder": "Nama restoran",
+      "descriptionPlaceholder": "Menu, kisaran harga, waktu antre, yang kamu suka…"
+    },
+    "marketplace": {
+      "writeLabel": "Jual barang",
+      "listIntro": "Barang yang tidak kamu butuhkan, barang yang kamu cari — tukarkan dengan tetangga.",
+      "locationLabel": "Area",
+      "locationPlaceholder": "Brooklyn / bisa ketemuan",
+      "detailLabel": "Harga ($)",
+      "detailPlaceholder": "0",
+      "titlePlaceholder": "Rak buku IKEA, gratis atau dijual",
+      "descriptionPlaceholder": "Ceritakan kondisi barang, opsi pengambilan, dan cara transaksi yang kamu mau."
+    },
+    "status": {
+      "writeLabel": "Bagikan ceritamu",
+      "listIntro": "Bagikan apa yang kamu siapkan dan ajukan di tiap tanggal, bagaimana hasilnya, dan langkah selanjutnya.",
+      "locationLabel": "Sekolah / perusahaan / instansi (opsional)",
+      "locationPlaceholder": "mis. Perusahaan IT dan software Korea",
+      "detailLabel": "Jenis",
+      "titlePlaceholder": "Timeline OPT saya di perusahaan keuangan",
+      "descriptionPlaceholder": "Bagikan hal yang perlu diwaspadai supaya orang berikutnya tidak mengulang kesalahan yang sama."
+    },
+    "cpt-opt": {
+      "writeLabel": "Bagikan ceritamu",
+      "listIntro": "Bagikan apa yang kamu siapkan dan ajukan di tiap tanggal, bagaimana hasilnya, dan langkah selanjutnya.",
+      "locationLabel": "Sekolah / perusahaan / instansi (opsional)",
+      "locationPlaceholder": "mis. Perusahaan IT dan software Korea",
+      "detailLabel": "Jenis",
+      "titlePlaceholder": "Timeline OPT saya di perusahaan keuangan",
+      "descriptionPlaceholder": "Bagikan hal yang perlu diwaspadai supaya orang berikutnya tidak mengulang kesalahan yang sama."
+    },
+    "visa": {
+      "writeLabel": "Bagikan ceritamu",
+      "listIntro": "Bagikan pengalaman persiapan dan interview visa kamu.",
+      "locationLabel": "Lokasi (opsional)",
+      "locationPlaceholder": "NY / kedutaan, dll.",
+      "detailLabel": "Jenis visa",
+      "detailPlaceholder": "F-1 / H-1B / O-1",
+      "titlePlaceholder": "Cerita petisi H-1B saya",
+      "descriptionPlaceholder": "Timeline, dokumen, tips"
+    },
+    "job-review": {
+      "writeLabel": "Bagikan ceritamu",
+      "listIntro": "Catat lamaran, interview, dan hasilnya per tanggal. Kamu bisa terus menambahkan setelah memposting.",
+      "locationLabel": "Perusahaan (opsional)",
+      "locationPlaceholder": "Masukkan nama perusahaan",
+      "detailLabel": "Jenis",
+      "titlePlaceholder": "Lamaran magang saya di perusahaan keuangan",
+      "descriptionPlaceholder": "Bagikan hal yang perlu diwaspadai supaya orang berikutnya tidak mengulang kesalahan yang sama."
+    },
+    "roommate": {
+      "writeLabel": "Buat postingan",
+      "listIntro": "Posting kamar (roommate atau sublet) atau cari roommate. Satu akun hanya bisa punya satu postingan.",
+      "locationLabel": "Lingkungan / lokasi",
+      "locationPlaceholder": "Flushing / Brooklyn / Manhattan",
+      "detailLabel": "Budget / sewa bulanan ($)",
+      "detailPlaceholder": "1500",
+      "titlePlaceholder": "Cari roommate di Brooklyn",
+      "descriptionPlaceholder": "Ceritakan gaya hidup, budget, dan tanggal masuk kamu. Tinggalkan link open chat 1:1 KakaoTalk supaya orang bisa menghubungimu."
+    },
+    "green-card": {
+      "writeLabel": "Bagikan ceritamu",
+      "listIntro": "Bagikan perjalanan green card kamu dengan komunitas.",
+      "locationLabel": "Kategori (opsional)",
+      "locationPlaceholder": "EB-2 / pernikahan, dll.",
+      "detailLabel": "Tahap",
+      "detailPlaceholder": "I-140 / interview, dll.",
+      "titlePlaceholder": "Cerita approval EB-2 NIW saya",
+      "descriptionPlaceholder": "Timeline, pengacara, tips"
+    },
+    "anonymous": {
+      "writeLabel": "Posting anonim",
+      "listIntro": "Forum anonim {city}, tempat kamu bisa ngobrol bebas tanpa nama.",
+      "locationLabel": "Topik (opsional)",
+      "locationPlaceholder": "Pilih topik",
+      "titlePlaceholder": "Satu kalimat tentang harimu",
+      "descriptionPlaceholder": "Tulis apa pun yang ada di pikiranmu. Kamu akan tampil sebagai anonim."
+    }
+  },
+  "errors": {
+    "createFailed": "Gagal memposting. Coba lagi.",
+    "claimGuestFailed": "Gagal menautkan postingan tamu kamu.",
+    "myPostsLoadFailed": "Gagal memuat postingan kamu.",
+    "mockEditBlocked": "Postingan contoh tidak bisa diedit.",
+    "mockDeleteBlocked": "Postingan contoh tidak bisa dihapus.",
+    "updateFailed": "Gagal menyimpan perubahan kamu.",
+    "deleteFailed": "Gagal menghapus postingan.",
+    "uploadFailed": "Gagal mengunggah gambar.",
+    "commentRequired": "Tulis komentar dulu.",
+    "loginRequired": "Silakan masuk dulu.",
+    "commentVerifyRequired": "Kamu perlu verifikasi email kampus untuk memposting dan berkomentar.",
+    "commentCreateFailed": "Gagal mengirim komentar kamu.",
+    "replyParentNotFound": "Komentar yang ingin kamu balas tidak ditemukan.",
+    "commentEditTargetMissing": "Pilih komentar yang ingin diedit.",
+    "commentEditForbidden": "Kamu hanya bisa mengedit komentar sendiri.",
+    "commentNotFound": "Komentar itu tidak ditemukan.",
+    "commentUpdateFailed": "Gagal memperbarui komentar kamu.",
+    "commentDeleteTargetMissing": "Pilih komentar yang ingin dihapus.",
+    "commentDeleteForbidden": "Kamu hanya bisa menghapus komentar sendiri.",
+    "commentDeleteFailed": "Gagal menghapus komentar kamu.",
+    "recommendFailed": "Gagal menyimpan suka kamu.",
+    "reportReasonRequired": "Pilih alasannya.",
+    "alreadyReported": "Kamu sudah melaporkan ini.",
+    "reportFailed": "Gagal mengirim laporan kamu.",
+    "beenThereFoodOnly": "Tanda \"Pernah ke sini\" hanya bisa di postingan kuliner.",
+    "beenThereFailed": "Gagal menyimpan \"Pernah ke sini\"."
+  },
+  "author": {
+    "member": "Member",
+    "anonymous": "Anonim"
+  },
+  "verify": {
+    "required": "Kamu perlu verifikasi sebagai pelajar atau profesional untuk memposting dan berkomentar.",
+    "cta": "Verifikasi",
+    "linkLabel": "verifikasi pelajar atau profesional",
+    "suspended": "Akun ini sedang ditangguhkan."
+  },
+  "guidelines": {
+    "common": {
+      "noPersonalInfo": "Jangan posting nama asli, info kontak, atau apa pun yang bisa mengidentifikasi seseorang.",
+      "noAbuse": "Dilarang menghina, ujaran kebencian, diskriminasi, ancaman, atau informasi palsu.",
+      "noPrivacyViolation": "Hindari perselisihan pribadi, pelanggaran privasi, atau membagikan foto yang diambil tanpa izin.",
+      "violationPenalty": "Postingan yang melanggar aturan ini bisa dihapus, dan akun kamu bisa dibatasi."
+    },
+    "anonymous": {
+      "noTargeting": "Meskipun anonim, postingan yang menyebut atau menyindir orang tertentu, atau membicarakan orang di belakangnya, tidak diperbolehkan.",
+      "stillResponsible": "Orang lain tidak bisa melihat nama, kampus, atau foto kamu, tapi kamu tetap bertanggung jawab secara hukum atas apa yang kamu posting.",
+      "loginRequired": "Kamu perlu masuk agar bisa mengedit atau menghapus postingan. Tim kami bisa mengecek siapa yang memposting saat menangani laporan."
+    },
+    "commonTitle": "Pedoman komunitas",
+    "anonymousTitle": "Pedoman forum anonim"
+  },
+  "anonymousTopics": {
+    "opt": "OPT·CPT·STEM OPT",
+    "visa": "Visa & status",
+    "jobs": "Kerja & magang",
+    "housing": "Hunian & roommate",
+    "campusLife": "Kehidupan kampus",
+    "classes": "Kuliah & belajar",
+    "finance": "Uang, pajak & asuransi",
+    "relationships": "Hubungan",
+    "mentalHealth": "Kesehatan mental & keresahan",
+    "transportation": "Menyetir & transportasi",
+    "lifeTips": "Tips hidup",
+    "secondhand": "Barang bekas & gratisan",
+    "daily": "Keseharian",
+    "other": "Lainnya"
+  },
+  "report": {
+    "reasons": {
+      "spam": {
+        "label": "Spam · Iklan",
+        "description": "Promosi, flooding, link yang tidak relevan"
+      },
+      "abuse": {
+        "label": "Kasar · Pelecehan",
+        "description": "Hinaan, ujaran kebencian, atau ancaman"
+      },
+      "inappropriate": {
+        "label": "Konten tidak pantas",
+        "description": "Konten seksual atau kekerasan, atau melanggar pedoman komunitas"
+      },
+      "misinformation": {
+        "label": "Info palsu · Dugaan penipuan",
+        "description": "Informasi palsu, dugaan penipuan atau phishing"
+      },
+      "privacy": {
+        "label": "Info pribadi terekspos",
+        "description": "Info kontak, foto, atau detail pribadi yang dibagikan tanpa izin"
+      },
+      "other": {
+        "label": "Lainnya",
+        "description": "Hal yang tidak ada di atas"
+      }
+    },
+    "action": "Laporkan",
+    "title": "Laporkan",
+    "cancel": "Batal",
+    "submitting": "Mengirim…",
+    "submit": "Kirim laporan",
+    "intro": {
+      "post": "Kamu melaporkan postingan ini. Admin kami akan meninjau dan menindaklanjutinya.",
+      "comment": "Kamu melaporkan komentar ini. Admin kami akan meninjau dan menindaklanjutinya.",
+      "generic": "Kamu melaporkan konten ini. Admin kami akan meninjau dan menindaklanjutinya."
+    },
+    "detailLabelRequired": "Detail (wajib)",
+    "detailLabelOptional": "Detail (opsional)",
+    "detailPlaceholder": "Ceritakan sedikit alasan kamu melaporkan ini",
+    "submitted": "Terima kasih, laporan kamu sudah kami terima. Admin kami akan meninjaunya."
+  },
+  "anonymousNotice": {
+    "close": "Tutup",
+    "eyebrow": "Sebelum mulai",
+    "board": "Forum Anonim",
+    "title": "Ruang anonim yang kita jaga bersama",
+    "body": "Supaya {brand} tetap jadi komunitas yang sehat dan bermanfaat, ikuti aturan dan saling menghormati ya, bahkan di forum anonim!",
+    "confirm": "Oke, paham",
+    "snooze24h": "Jangan tampilkan selama 24 jam"
+  },
+  "detail": {
+    "edit": "Edit",
+    "delete": "Hapus",
+    "companyPageFallback": "Halaman perusahaan",
+    "loadFailed": "Gagal memuat postingan ini.",
+    "deleteConfirm": "Hapus \"{title}\"?\nTindakan ini tidak bisa dibatalkan.",
+    "deleted": "Postingan dihapus",
+    "loading": "Memuat…",
+    "notFoundTitle": "Postingan tidak ditemukan",
+    "notFoundDescription": "Mungkin sudah dihapus.",
+    "backToListAction": "Kembali ke {board}",
+    "backToList": "{board}",
+    "roommateType": "Jenis",
+    "roommateBudget": "Budget / sewa bulanan",
+    "perMonthValue": "{value}/bln",
+    "roommateMoveIn": "Masuk / keluar",
+    "views": "{n} kali dilihat"
+  },
+  "like": {
+    "like": "Suka",
+    "unlike": "Batal suka"
+  },
+  "engagement": {
+    "recommend": "Rekomendasikan",
+    "recommended": "Direkomendasikan",
+    "recommendCancelled": "Rekomendasi dibatalkan",
+    "beenThere": "Pernah ke sini",
+    "beenThereAdded": "Ditandai pernah ke sini",
+    "beenThereCancelled": "Tanda \"pernah ke sini\" dihapus"
+  },
+  "card": {
+    "noPhoto": "Tidak ada foto",
+    "beenThereCount_other": "{n} orang pernah ke sini",
+    "timelineSteps_other": "Timeline {count} tahap",
+    "hiringSteps_other": "{count} tahap rekrutmen",
+    "hiringStepsWithMore_other": "{count} tahap rekrutmen · {hidden} lainnya",
+    "period": "Periode {period}",
+    "perMonth": "/bln",
+    "stepNumber": "Tahap {n}",
+    "noStepInfo": "Tidak ada detail tahap",
+    "views": "Dilihat"
+  },
+  "anonymous": {
+    "topicPlaceholder": "Pilih topik",
+    "topicAria": "Topik"
+  },
+  "toolbar": {
+    "filter": "Filter",
+    "filterApplied_other": "{count} filter diterapkan"
+  },
+  "comments": {
+    "title": "Komentar",
+    "loadFailed": "Gagal memuat komentar.",
+    "bodyRequired": "Tulis komentar dulu.",
+    "posted": "Komentar terkirim",
+    "replyPosted": "Balasan terkirim",
+    "deleteConfirm": "Hapus komentar ini?\nBalasannya juga akan ikut terhapus.",
+    "deleted": "Komentar dihapus",
+    "updated": "Komentar diperbarui",
+    "loginPrompt": "Silakan {link} untuk berkomentar.",
+    "loginLink": "masuk",
+    "verifyPrompt": "Untuk berkomentar, selesaikan {link} dulu.",
+    "checkingLogin": "Mengecek status login kamu…",
+    "placeholder": "Tulis komentar",
+    "submitting": "Mengirim…",
+    "submit": "Kirim komentar",
+    "loading": "Memuat komentar…",
+    "empty": "Belum ada komentar. Jadilah yang pertama berkomentar.",
+    "replyPlaceholder": "Tulis balasan",
+    "cancel": "Batal",
+    "replySubmit": "Kirim balasan",
+    "deleting": "Menghapus…",
+    "saving": "Menyimpan…",
+    "saveEdit": "Simpan",
+    "reply": "Balas"
+  },
+  "share": {
+    "metaDescription": "Tanpa perlu daftar. Bagikan lamaran, interview, dan hasilnya tahap demi tahap. Setiap ulasan memberimu kredit yang bisa dipakai untuk coffee chat dengan orang-orang di industri."
+  },
+  "wip": {
+    "title": "Segera hadir",
+    "description": "Forum {board} sedang kami siapkan. Tunggu sebentar ya!",
+    "homeAction": "Kembali ke beranda komunitas",
+    "otherBoards": "Penasaran dengan forum lain? Cek {link} dulu."
+  },
+  "list": {
+    "mapLoading": "Memuat peta…",
+    "foodVibeAria": "Suasana",
+    "all": "Semua",
+    "cuisineAria": "Jenis masakan",
+    "allCuisines": "Semua masakan",
+    "loadFailed": "Gagal memuat postingan.",
+    "login": "Masuk",
+    "suspended": "Ditangguhkan",
+    "retry": "Coba lagi",
+    "emptyTitle": "Belum ada postingan {board}",
+    "noMatchTitle": "Tidak ada postingan yang cocok dengan filter kamu",
+    "emptyCanWrite": "Jadilah yang pertama memposting dan mulai obrolannya.",
+    "emptyNeedsVerify": "Verifikasi sebagai pelajar atau profesional untuk memposting.",
+    "emptyNeedsLogin": "Masuk untuk memposting.",
+    "noMatchFood": "Coba suasana atau jenis masakan lain.",
+    "noMatchCptOpt": "Coba jenis lain (CPT/OPT/STEM OPT).",
+    "noMatchJobReview": "Coba jenis atau perusahaan lain.",
+    "noMatchDefault": "Coba ubah filter kamu.",
+    "showMap": "Tampilkan peta",
+    "showList": "Tampilkan daftar",
+    "map": "Peta",
+    "list": "Daftar",
+    "clearAll": "Hapus semua",
+    "apply": "Terapkan",
+    "filterType": "Jenis",
+    "cptOptTypeAria": "Jenis CPT/OPT",
+    "filterCity": "Kota",
+    "filterSchool": "Kampus",
+    "jobReviewTypeAria": "Jenis interview dan kerja",
+    "search": "Cari",
+    "searchPlaceholder": "Cari judul, isi, atau lokasi",
+    "sort": "Urutkan",
+    "sortRecentlyUpdated": "Terakhir diperbarui",
+    "sortLeastRecentlyUpdated": "Paling lama diperbarui",
+    "sortNewest": "Terbaru",
+    "sortOldest": "Terlama",
+    "company": "Perusahaan",
+    "companyFilterAria": "Filter perusahaan",
+    "companyName": "Nama perusahaan",
+    "companyCategory": "Kategori perusahaan",
+    "companyNamePlaceholder": "Cari berdasarkan nama perusahaan",
+    "companyCategoryPlaceholder": "Pilih kategori",
+    "none": "Tidak ada"
+  },
+  "write": {
+    "errors": {
+      "postNotFound": "Postingan ini tidak ditemukan.",
+      "noEditPermission": "Kamu tidak punya izin untuk mengedit postingan ini.",
+      "titleRequired": "Masukkan judul.",
+      "titleTooLong": "Judul maksimal {max} karakter.",
+      "bodyRequired": "Tulis sesuatu di isi postingan.",
+      "bodyTooLong": "Isi maksimal {max} karakter.",
+      "titleAndBodyRequired": "Masukkan judul dan isi."
+    },
+    "updated": "Postingan diperbarui",
+    "created": "Postingan dipublikasikan",
+    "draftSaved": "Draf disimpan",
+    "draftSaveFailed": "Gagal menyimpan draf kamu.",
+    "redirectingToLogin": "Mengarahkan ke halaman masuk…",
+    "backToPost": "Kembali ke postingan",
+    "backToList": "Kembali ke daftar",
+    "titleLabel": "Judul",
+    "bodyLabel": "Isi",
+    "submit": "Publikasikan postingan",
+    "publish": "Publikasikan",
+    "editEyebrow": "Edit postingan",
+    "untitled": "Tanpa judul",
+    "food": {
+      "menuMaxReached": "Kamu bisa menambahkan maksimal {max} menu.",
+      "imagesOnly": "Hanya file gambar yang bisa dipilih.",
+      "menuMaxPartial_other": "Kamu bisa menambahkan maksimal {max} menu. Hanya {count} foto yang akan ditambahkan.",
+      "uploadPartial": "{success} berhasil ditambahkan, {failed} gagal.",
+      "menuUploadFailed": "Gagal mengunggah foto menu.",
+      "galleryMaxReached": "Kamu bisa menambahkan maksimal {max} foto suasana.",
+      "galleryMaxPartial_other": "Kamu bisa menambahkan maksimal {max} foto suasana. Hanya {count} foto yang akan ditambahkan.",
+      "galleryUploadFailed": "Gagal mengunggah foto suasana.",
+      "errors": {
+        "addressRequired": "Cari alamat di peta lalu pilih.",
+        "coordinatesMissing": "Lokasi untuk alamat itu tidak ditemukan.",
+        "categoryRequired": "Pilih kategori.",
+        "cuisineRequired": "Pilih jenis makanan.",
+        "nameRequired": "Masukkan nama restoran.",
+        "partySizeRange": "Masukkan jumlah orang antara {min} dan {max}.",
+        "spendRange": "Masukkan total berupa bilangan bulat antara $0 dan {max}.",
+        "tipRequired": "Pilih termasuk tip atau belum termasuk tip.",
+        "waitRange": "Masukkan waktu antre antara 0 dan {max} menit.",
+        "menuIncomplete": "Setiap menu perlu foto, nama, dan ulasan satu kalimat."
+      },
+      "whereTitle": "Kamu makan di mana?",
+      "whereDescription": "Pilih alamat yang tepat supaya lokasinya bisa kami simpan.",
+      "nameLabel": "Nama restoran",
+      "categoryTitle": "Kategori",
+      "cuisineTitle": "Makanan jenis apa?",
+      "visitTitle": "Detail kunjungan",
+      "partySize": "Jumlah orang",
+      "partySizeHint": "Maksimal {max} orang",
+      "partySizeUnit": "orang",
+      "totalSpend": "Total pengeluaran",
+      "totalSpendHint": "$0 ~ {max} · bilangan bulat",
+      "tipAria": "Termasuk tip",
+      "tipIncluded": "Termasuk tip",
+      "tipExcluded": "Tanpa tip",
+      "wait": "Antre",
+      "waitHint": "0 kalau tidak antre · maks. {max} mnt",
+      "waitUnit": "mnt",
+      "galleryTitle": "Interior · Suasana",
+      "galleryDescription": "Foto interior, tempat duduk, dan suasana · maksimal {max}",
+      "galleryPick": "Pilih foto suasana",
+      "galleryPickHint": "Pilih hingga {max} foto dari galeri sekaligus.",
+      "galleryAddMoreAria_other": "Tambah {count} foto suasana lagi",
+      "galleryAddMore_other": "{count} lagi",
+      "uploading": "Mengunggah…",
+      "menuTitle": "Foto menu",
+      "menuDescription": "Tambahkan nama menu dan ulasan satu kalimat untuk tiap foto.",
+      "coverNoticeTitle": "Foto menu pertama akan jadi foto sampul",
+      "coverNoticeBody": "Foto ini tampil besar di kartu daftar dan di bagian atas postingan kamu.",
+      "menuPick": "Pilih foto menu",
+      "menuPickHint": "Maksimal {max} · foto pertama jadi sampul · nama dan ulasan wajib diisi",
+      "menuNumber": "Menu {n}",
+      "coverPhoto": "Foto sampul",
+      "photo": "Foto",
+      "cover": "Sampul",
+      "menuNamePlaceholder": "Nama menu (wajib)",
+      "menuNameAria": "Nama menu {n}",
+      "menuCaptionPlaceholder": "Ulasan satu kalimat (wajib)",
+      "menuCaptionAria": "Ulasan satu kalimat menu {n}",
+      "missingNameAndCaption": "Masukkan nama menu dan ulasan satu kalimat.",
+      "missingName": "Masukkan nama menu.",
+      "missingCaption": "Masukkan ulasan satu kalimat.",
+      "menuAddMore_other": "Tambah {count} foto menu lagi",
+      "bodyDescription": "Ceritakan yang kamu suka, cara ke sana, dan tips lainnya.",
+      "selectAddress": "Pilih alamat",
+      "checkingCoordinates": "Mengecek lokasi alamat…",
+      "selectCuisine": "Pilih jenis makanan",
+      "submit": "Posting"
+    }
+  },
+  "anonymousWrite": {
+    "topicTitle": "Tentang apa?",
+    "topicDescription": "Boleh dilewati.",
+    "topicAria": "Topik forum anonim",
+    "titleDescription": "Tulis judul singkat yang bisa dipahami sekilas.",
+    "bodyDescription": "Tulis apa pun yang ada di pikiranmu. Kamu akan tampil sebagai anonim.",
+    "createTitle": "Posting di forum anonim",
+    "createDescription": "Nama, kampus, dan foto kamu tetap tersembunyi. Bebas berbagi.",
+    "editTitle": "Edit postingan anonim"
+  }
+}

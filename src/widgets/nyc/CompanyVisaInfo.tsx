@@ -1,12 +1,13 @@
 import { cn } from '@lib'
 import type { CompanyVisaInfo as VisaInfo } from '@lib/company/client'
-import { visaStatusLabel, type VisaStatus } from '@lib/constants/company'
-import { companyCopy } from '@lib/constants/companyCopy'
+import { visaStatusLabelKey, type VisaStatus } from '@lib/constants/company'
+import { useFormat, useT } from '@lib/i18n/client'
 
-const VISA_ROWS: { key: 'h1bSponsor' | 'eVerify' | 'optCpt'; label: string }[] = [
-  { key: 'h1bSponsor', label: companyCopy.visaH1b },
-  { key: 'eVerify', label: companyCopy.visaEVerify },
-  { key: 'optCpt', label: companyCopy.visaOptCpt },
+/** labelKey: companies 문구 키 */
+const VISA_ROWS: { key: 'h1bSponsor' | 'eVerify' | 'optCpt'; labelKey: string }[] = [
+  { key: 'h1bSponsor', labelKey: 'visa.h1b' },
+  { key: 'eVerify', labelKey: 'visa.eVerify' },
+  { key: 'optCpt', labelKey: 'visa.optCpt' },
 ]
 
 const BADGE_TONE: Record<VisaStatus, string> = {
@@ -16,6 +17,7 @@ const BADGE_TONE: Record<VisaStatus, string> = {
 }
 
 export function VisaStatusBadge({ status }: { status: VisaStatus }) {
+  const t = useT('companies')
   return (
     <span
       className={cn(
@@ -23,7 +25,7 @@ export function VisaStatusBadge({ status }: { status: VisaStatus }) {
         BADGE_TONE[status]
       )}
     >
-      {visaStatusLabel(status)}
+      {t(visaStatusLabelKey(status))}
     </span>
   )
 }
@@ -33,6 +35,7 @@ export function VisaStatusBadge({ status }: { status: VisaStatus }) {
  * 하나라도 있으면 항목별 배지 (없는 항목은 "-").
  */
 export function CompanyVisaInfo({ visa }: { visa: VisaInfo }) {
+  const t = useT('companies')
   const hasAny = VISA_ROWS.some(({ key }) => visa[key])
   return (
     <section className='overflow-hidden rounded-[1.25rem] bg-white ring-1 ring-black/[0.06]'>
@@ -43,20 +46,20 @@ export function CompanyVisaInfo({ visa }: { visa: VisaInfo }) {
         >
           <PassportIcon className='size-4' />
         </span>
-        {companyCopy.visaTitle}
+        {t('visa.title')}
       </h2>
       {visa.summary ? <VisaPolicySummary visa={visa} /> : null}
       {hasAny ? (
         <>
           <dl className='divide-y divide-black/[0.05]'>
-            {VISA_ROWS.map(({ key, label }) => {
+            {VISA_ROWS.map(({ key, labelKey }) => {
               const status = visa[key]
               return (
                 <div
                   key={key}
                   className='flex items-center justify-between gap-3 px-4 py-3 sm:px-5'
                 >
-                  <dt className='text-[14px] font-medium text-[var(--foreground)]'>{label}</dt>
+                  <dt className='text-[14px] font-medium text-[var(--foreground)]'>{t(labelKey)}</dt>
                   <dd>
                     {status ? (
                       <VisaStatusBadge status={status} />
@@ -69,13 +72,13 @@ export function CompanyVisaInfo({ visa }: { visa: VisaInfo }) {
             })}
           </dl>
           <p className='bg-[#f8fafc] px-4 py-3 text-[12px] leading-relaxed text-[var(--muted)] sm:px-5'>
-            {companyCopy.visaNotice}
+            {t('visa.notice')}
           </p>
         </>
       ) : visa.summary ? null : (
         <p className='flex items-center gap-2 px-4 py-4 text-[13px] text-[var(--muted)] sm:px-5'>
           <ClockIcon className='size-4 shrink-0' />
-          {companyCopy.visaPending}
+          {t('visa.pending')}
         </p>
       )}
     </section>
@@ -84,7 +87,17 @@ export function CompanyVisaInfo({ visa }: { visa: VisaInfo }) {
 
 /** 회사 공개 비자 안내 (예: "비자 지원 언급 있음") + 안내문 + 근거 링크·확인일 */
 function VisaPolicySummary({ visa }: { visa: VisaInfo }) {
-  const checked = visa.checkedAt ? visa.checkedAt.slice(0, 10).replace(/-/g, '.') : null
+  const t = useT('companies')
+  const format = useFormat()
+  // 확인일은 달력 날짜라 시간대 변환 없이 (UTC 자정으로 읽어 UTC로 표시)
+  const checked = visa.checkedAt
+    ? format.date(`${visa.checkedAt.slice(0, 10)}T00:00:00Z`, {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        timeZone: 'UTC',
+      }) || null
+    : null
   return (
     <div className='border-b border-black/[0.05] px-4 py-3.5 sm:px-5'>
       <p className='text-[14px] font-semibold text-[var(--foreground)]'>{visa.summary}</p>
@@ -98,7 +111,7 @@ function VisaPolicySummary({ visa }: { visa: VisaInfo }) {
           rel='noopener noreferrer'
           className='mt-1.5 inline-block text-[11px] font-medium text-[var(--muted)] underline underline-offset-2 hover:text-[var(--foreground)]'
         >
-          근거 보기{checked ? ` (${checked} 확인)` : ''}
+          {checked ? t('visa.sourceChecked', { date: checked }) : t('visa.source')}
         </a>
       ) : null}
     </div>

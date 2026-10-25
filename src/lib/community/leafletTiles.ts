@@ -21,14 +21,19 @@ function getCartoApiKey(): string {
   return process.env.NEXT_PUBLIC_CARTO_API_KEY?.trim() || ''
 }
 
-/** CARTO 키가 있으면 light_all, 없으면 OSM 표준 타일 */
+/**
+ * CARTO 키가 있으면 light_all(밝은 지도), 없으면 OSM 표준 타일.
+ * CARTO 무료 키는 월 타일 요청 수로 한도가 있다 (2026-12부터 월 100만) — 지도는 화면에 보일 때만
+ * 만들도록(useInView) 하고, 타일 1장 = 요청 1건이다. 사용량: carto.com/basemaps/apikey
+ */
 export function getLeafletTileConfig(): LeafletTileConfig {
   const key = getCartoApiKey()
   if (key) {
     return {
-      url: `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(key)}`,
+      url: `https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(key)}`,
       attribution: CARTO_ATTRIBUTION,
-      subdomains: 'abcd',
+      // URL에 {s}가 없어 쓰이지 않지만, 지도 컴포넌트가 이 값을 그대로 넘기므로 비워 두면 Leaflet이 멈춘다
+      subdomains: 'a',
       maxZoom: 20,
     }
   }

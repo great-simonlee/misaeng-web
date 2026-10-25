@@ -1,0 +1,116 @@
+{
+  "categories": {
+    "restaurant": "Phải thử",
+    "value": "Đáng tiền",
+    "vibe": "Không gian đẹp",
+    "study": "Chỗ học bài"
+  },
+  "categoryDescriptions": {
+    "restaurant": "Những quán nhất định phải thử",
+    "value": "Đáng từng đồng đô",
+    "vibe": "Những nơi có không gian tuyệt vời",
+    "study": "Quán cà phê hợp để học bài hay làm việc"
+  },
+  "cuisines": {
+    "brunch": "Brunch",
+    "korean": "Hàn Quốc",
+    "japanese": "Nhật Bản",
+    "chinese": "Trung Quốc",
+    "american": "Món Âu",
+    "french": "Pháp",
+    "italian": "Ý",
+    "mexican": "Mexico",
+    "thai": "Thái",
+    "vietnamese": "Việt Nam",
+    "indian": "Ấn Độ",
+    "other": "Khác"
+  },
+  "spend": {
+    "people_other": "{count} người",
+    "total": "Tổng ${amount}",
+    "totalWithTip": "Tổng ${amount} · đã gồm tip",
+    "totalWithoutTip": "Tổng ${amount} · chưa gồm tip",
+    "peopleTotal_other": "{count} người · tổng ${amount}",
+    "peopleTotalWithTip_other": "{count} người · tổng ${amount} · đã gồm tip",
+    "peopleTotalWithoutTip_other": "{count} người · tổng ${amount} · chưa gồm tip",
+    "tipIncluded": "Đã gồm tip",
+    "tipExcluded": "Chưa gồm tip"
+  },
+  "wait": {
+    "none": "Không phải chờ",
+    "minutes": "Chờ {minutes} phút",
+    "hours": "Chờ {hours} giờ",
+    "hoursMinutes": "Chờ {hours} giờ {minutes} phút"
+  },
+  "carousel": {
+    "cover": "Ảnh bìa",
+    "menu": "Menu",
+    "vibe": "Không gian",
+    "backToList": "Quay lại danh sách",
+    "photosLabel": "Ảnh nhà hàng",
+    "previous": "Ảnh trước",
+    "next": "Ảnh tiếp theo",
+    "photoNumber": "Ảnh {number}"
+  },
+  "map": {
+    "postsMapLabel": "Bản đồ ăn uống",
+    "emptyTitle": "Không có địa điểm nào để hiển thị trên bản đồ",
+    "emptyDescription": "Chỉ những review có lưu địa chỉ mới hiện ghim trên bản đồ",
+    "unnamedPlace": "Nhà hàng",
+    "reviewCount_other": "{count} review",
+    "close": "Đóng",
+    "viewReview": "Xem review",
+    "placeMapLabel": "Bản đồ {name}",
+    "directions": "Chỉ đường"
+  },
+  "detail": {
+    "menu": "Menu",
+    "interior": "Bên trong",
+    "backToList": "Quay lại {board}",
+    "views_other": "{views} lượt xem",
+    "metrics": {
+      "party": "Số người",
+      "totalSpend": "Tổng",
+      "spend": "${amount}",
+      "spendWithTip": "${amount} · gồm tip",
+      "spendWithoutTip": "${amount} · chưa gồm tip",
+      "wait": "Thời gian chờ",
+      "waitNone": "Không",
+      "waitMinutes": "{minutes} phút"
+    },
+    "location": "Vị trí",
+    "viewMenuPhoto": "Xem ảnh menu",
+    "interiorAndVibe": "Bên trong · Không gian",
+    "viewVibePhoto": "Xem ảnh không gian",
+    "review": "Review"
+  },
+  "placeSearch": {
+    "errors": {
+      "searchFailed": "Tìm kiếm thất bại. Vui lòng thử lại.",
+      "detailsFailed": "Không thể tải thông tin địa điểm",
+      "noCoordinates": "Không tìm được vị trí của địa điểm này"
+    },
+    "pickExactAddress": "Chọn địa chỉ chính xác",
+    "mapTitle": "Vị trí của {name}",
+    "change": "Đổi",
+    "addressPlaceholder": "VD: 53 W 53rd St, New York",
+    "placePlaceholder": "VD: Halal Guys, Joe's Pizza, West 53rd St",
+    "resolving": "Đang kiểm tra…",
+    "searching": "Đang tìm…",
+    "noResults": "Không có kết quả. Hãy thử nhập địa chỉ chi tiết hơn hoặc tên đường bằng tiếng Anh.",
+    "addressHint": "Chọn một địa chỉ để lưu vị trí.",
+    "placeHint": "Chọn một địa điểm trong danh sách để đăng bài."
+  },
+  "restaurantName": {
+    "placeholder": "Tên nhà hàng",
+    "reviewCount_other": "{count} review",
+    "checking": "Đang kiểm tra các nhà hàng tại vị trí này…",
+    "existing_other": "Đã có {count} nhà hàng tại đây · Chọn bên dưới hoặc nhập tên mới",
+    "none": "Chưa có nhà hàng nào tại đây. Hãy nhập tên mới.",
+    "hint": "Tên này sẽ hiển thị trên trang danh sách và trang chi tiết"
+  },
+  "card": {
+    "comments": "Bình luận",
+    "recommends": "Lượt thích"
+  }
+}

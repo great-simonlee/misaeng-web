@@ -12,6 +12,7 @@ import {
 import { createPortal } from 'react-dom'
 
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 export type PhotoLightboxItem = {
   id: string
@@ -42,6 +43,7 @@ export function PhotoLightbox({
   onIndexChange,
   eyebrow,
 }: PhotoLightboxProps) {
+  const t = useT('common')
   const count = items.length
   const looping = count > 1
   const safeIndex = count > 0 ? Math.min(Math.max(index, 0), count - 1) : 0
@@ -276,7 +278,7 @@ export function PhotoLightbox({
       className='fixed inset-0 z-[10050] flex flex-col bg-black'
       role='dialog'
       aria-modal
-      aria-label='사진 크게 보기'
+      aria-label={t('ui.photoLightbox.title')}
       onClick={onClose}
     >
       <div
@@ -290,7 +292,7 @@ export function PhotoLightbox({
           type='button'
           onClick={onClose}
           className='inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white touch-manipulation transition hover:bg-white/20'
-          aria-label='닫기'
+          aria-label={t('ui.photoLightbox.close')}
         >
           <CloseIcon className='size-5' />
         </button>
@@ -352,10 +354,10 @@ export function PhotoLightbox({
 
         {count > 1 ? (
           <div className='pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+3rem+min(14vh,6rem))] z-10 mx-auto flex h-[min(42dvh,420px)] w-full max-w-3xl items-center justify-between px-1 sm:top-[calc(env(safe-area-inset-top)+3rem+min(16vh,7rem))] sm:px-8'>
-            <NavButton ariaLabel='이전 사진' onClick={goPrev}>
+            <NavButton ariaLabel={t('ui.photoLightbox.previous')} onClick={goPrev}>
               <ChevronIcon className='size-5 rotate-180' />
             </NavButton>
-            <NavButton ariaLabel='다음 사진' onClick={goNext}>
+            <NavButton ariaLabel={t('ui.photoLightbox.next')} onClick={goNext}>
               <ChevronIcon className='size-5' />
             </NavButton>
           </div>

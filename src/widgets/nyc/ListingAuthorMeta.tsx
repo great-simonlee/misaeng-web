@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 
 import { SchoolBadge, UserAvatar } from '@components'
 import { getCommunityAuthorDisplayName } from '@lib/community/author'
+import { useT } from '@lib/i18n/client'
 import type { CommunityPost } from '@/types/nyc'
 
 type ListingAuthorMetaProps = {
@@ -20,7 +21,8 @@ export function ListingAuthorMeta({
   showSchool = false,
   children,
 }: ListingAuthorMetaProps) {
-  const authorName = getCommunityAuthorDisplayName(post)
+  const t = useT('community')
+  const authorName = getCommunityAuthorDisplayName(post, null, t)
   const authorInitial = authorName.charAt(0).toUpperCase()
   const authorPhoto = post.authorPhotoURL?.trim() || null
 

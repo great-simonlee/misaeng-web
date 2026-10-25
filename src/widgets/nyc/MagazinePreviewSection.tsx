@@ -1,24 +1,28 @@
+'use client'
+
 import Image from 'next/image'
 
 import { NYC_MAGAZINE_PREVIEWS } from '@lib/constants/nyc'
+import { useT } from '@lib/i18n/client'
 
 export function MagazinePreviewSection() {
+  const t = useT('hub')
   return (
-    <section aria-label='NYC 매거진'>
+    <section aria-label={t('magazine.kicker')}>
       <div className='mb-5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-4'>
         <div className='min-w-0'>
           <p className='text-[11px] font-medium tracking-[0.2em] text-[var(--muted)]'>
-            NYC 매거진
+            {t('magazine.kicker')}
           </p>
           <h2 className='mt-1.5 text-base font-bold tracking-tight text-[var(--foreground)] sm:text-lg'>
-            에디터가 고른 뉴욕 라이프
+            {t('magazine.title')}
           </h2>
           <p className='mt-1 max-w-xl text-sm leading-relaxed text-[var(--muted-foreground)]'>
-            게시판과 별개로, 맛집·이벤트·놀거리를 짧게 소개하는 콘텐츠예요.
+            {t('magazine.description')}
           </p>
         </div>
-        <p className='shrink-0 text-xs font-medium text-[#F64310]'>
-          곧 공개됩니다
+        <p className='shrink-0 text-xs font-medium text-brand'>
+          {t('comingSoon')}
         </p>
       </div>
 
@@ -39,14 +43,14 @@ export function MagazinePreviewSection() {
                 sizes='(max-width: 640px) 68vw, 25vw'
               />
             </div>
-            <p className='mt-2 text-[11px] font-semibold tracking-wide text-[#F64310]'>
-              {item.tag}
+            <p className='mt-2 text-[11px] font-semibold tracking-wide text-brand'>
+              {t(`magazine.items.${item.id}.tag`)}
             </p>
             <h3 className='mt-0.5 text-sm font-semibold leading-snug text-[var(--foreground)]'>
-              {item.title}
+              {t(`magazine.items.${item.id}.title`)}
             </h3>
             <p className='mt-1 line-clamp-2 text-xs leading-relaxed text-[var(--muted-foreground)]'>
-              {item.excerpt}
+              {t(`magazine.items.${item.id}.excerpt`)}
             </p>
           </article>
         ))}

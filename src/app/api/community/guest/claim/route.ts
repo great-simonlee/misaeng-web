@@ -4,6 +4,7 @@ import { resolveAuthenticatedUser } from '@/app/api/agent-auth/lib/authHelpers'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import { claimGuestPostsForAccount } from '@lib/community/guestLink.server'
 import { isCommunityStorageConfigured } from '@lib/supabase/community.server'
+import { getRequestT } from '@lib/i18n/server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -12,13 +13,14 @@ export const dynamic = 'force-dynamic'
  * 로그인한 계정의 이메일과 같은 이메일로 남긴 미연결 게스트 글을 이 계정에 연결하고
  * 글 크레딧을 적립한다. 가입 완료 화면·내 글 목록에서 호출.
  */
-export async function POST() {
+export async function POST(request: Request) {
   if (!isCommunityStorageConfigured()) {
     return NextResponse.json({ posts: [], creditAwarded: 0 })
   }
+  const t = await getRequestT(request, 'api')
   const user = await resolveAuthenticatedUser()
   if (!user?.uid || !user.email) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
 
   try {
@@ -35,7 +37,7 @@ export async function POST() {
   } catch (error) {
     console.error('Guest post claim error:', error)
     return NextResponse.json(
-      { error: '게스트 글 연결에 실패했어요.' },
+      { error: t('community.guestClaimFailed') },
       { status: 500 },
     )
   }

@@ -82,13 +82,13 @@ function JobCard({ job, onClick }: { job: JobData; onClick: () => void }) {
     <button
       type='button'
       onClick={onClick}
-      className='group relative flex w-full cursor-pointer flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#F64310]/30 hover:shadow-md hover:shadow-[#F64310]/[0.06] sm:p-5'
+      className='group relative flex w-full cursor-pointer flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-md hover:shadow-brand/[0.06] sm:p-5'
     >
       <div className='flex flex-wrap items-start justify-between gap-2'>
-        <p className='text-[10px] font-semibold uppercase tracking-[0.2em] text-[#F64310]'>
+        <p className='text-[10px] font-semibold uppercase tracking-[0.2em] text-brand'>
           Intern
         </p>
-        <span className='rounded-full bg-[#F64310]/10 px-2.5 py-1 text-[10px] font-medium text-[#F64310]'>
+        <span className='rounded-full bg-brand/10 px-2.5 py-1 text-[10px] font-medium text-brand'>
           New York City Internship
         </span>
       </div>
@@ -98,7 +98,7 @@ function JobCard({ job, onClick }: { job: JobData; onClick: () => void }) {
       <p className='mt-2 line-clamp-3 text-xs leading-[1.5] text-[var(--muted-foreground)]'>
         {job.summary}
       </p>
-      <span className='mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#F64310]'>
+      <span className='mt-3 inline-flex items-center gap-1 text-xs font-semibold text-brand'>
         View details
         <span className='transition group-hover:translate-x-0.5' aria-hidden>
           →
@@ -132,7 +132,7 @@ function JobDetailModal({ job, onClose }: { job: JobData; onClose: () => void })
       <div className='relative z-10 flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--background)] shadow-xl'>
         <div className='flex shrink-0 items-start justify-between gap-4 border-b border-[var(--border)] bg-[var(--background)] p-6 sm:p-8'>
           <div>
-            <p className='text-[10px] font-semibold uppercase tracking-[0.22em] text-[#F64310]'>
+            <p className='text-[10px] font-semibold uppercase tracking-[0.22em] text-brand'>
               Intern · New York City
             </p>
             <h2
@@ -205,7 +205,7 @@ function JobDetailModal({ job, onClose }: { job: JobData; onClose: () => void })
             <a
               href='#apply'
               onClick={onClose}
-              className='inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[#F64310] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#d93a0e]'
+              className='inline-flex min-h-[44px] items-center justify-center rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-hover'
             >
               How to apply
             </a>
@@ -267,7 +267,7 @@ export function CareersScreen() {
             <div className='mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center'>
               <a
                 href='#apply'
-                className='animate-shimmer inline-flex min-h-[48px] w-full min-w-0 items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#F64310]/25 transition duration-300 hover:shadow-[#F64310]/35 active:scale-[0.98] sm:w-auto sm:min-w-[140px]'
+                className='animate-shimmer inline-flex min-h-[48px] w-full min-w-0 items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand/25 transition duration-300 hover:shadow-brand/35 active:scale-[0.98] sm:w-auto sm:min-w-[140px]'
               >
                 How to apply
                 <span className='text-white/90' aria-hidden>
@@ -331,7 +331,7 @@ export function CareersScreen() {
               </span>
               <a
                 href='mailto:info@misaeng.com'
-                className='font-mono text-sm font-medium text-[var(--foreground)] underline decoration-[var(--border)] underline-offset-2 transition hover:decoration-[#F64310]/50 hover:text-[#F64310]'
+                className='font-mono text-sm font-medium text-[var(--foreground)] underline decoration-[var(--border)] underline-offset-2 transition hover:decoration-brand/50 hover:text-brand'
               >
                 info@misaeng.com
               </a>

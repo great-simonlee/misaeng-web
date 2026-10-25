@@ -17,6 +17,7 @@ import {
   claimGuestPostsRequest,
   createGuestJobReviewRequest,
   type GuestJobReviewCreditInfo,
+  localizeCommunityError,
 } from '@lib/community/client'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
 import {
@@ -35,6 +36,8 @@ import {
   normalizeJobReviewTimeline,
   type JobReviewTimelineEntry,
 } from '@lib/community/jobReview'
+import { BRAND_CONFIG } from '@lib/brand'
+import { useFormat, useT } from '@lib/i18n/client'
 import { isAccountSuspended } from '@lib/community/schoolGate'
 import {
   clearWriteDraft,
@@ -53,7 +56,7 @@ import {
   COMMUNITY_CREDIT_TIMELINE_ENTRY,
   COMMUNITY_CREDIT_TIMELINE_POST_MAX,
 } from '@lib/constants/communityCredit'
-import { NYC_COMMUNITY_BOARD_META } from '@lib/constants/nyc'
+import { communityBoardKey } from '@lib/constants/nyc'
 import { isGoogleSignInConfigured } from '@lib/google/config'
 import { cn } from '@lib'
 import type { CommunityPost, JobReviewTypeId } from '@/types/nyc'
@@ -108,9 +111,11 @@ const COFFEE_CHAT_COST =
 export function JobReviewGuestWriteScreen() {
   const city = useCity()
   const href = useCityPath()
-  const meta = NYC_COMMUNITY_BOARD_META[BOARD_ID]
   const { user, profile, loading, signInGoogle } = useAuth()
   const { success, error: toastError } = useToast()
+  const t = useT('reviews')
+  const tCommunity = useT('community')
+  const format = useFormat()
   const { locale } = useConsentLocale()
 
   const [phase, setPhase] = useState<Phase>('choose')
@@ -252,11 +257,11 @@ export function JobReviewGuestWriteScreen() {
   const handleSaveDraft = useCallback(() => {
     try {
       persistDraft()
-      success('임시 저장했어요')
+      success(t('write.draftSaved'))
     } catch {
-      toastError('임시 저장에 실패했어요')
+      toastError(t('write.draftSaveFailed'))
     }
-  }, [persistDraft, success, toastError])
+  }, [persistDraft, success, t, toastError])
 
   const { requestSave, handleSectionFocus } = useStepAutosave(() => {
     try {
@@ -281,7 +286,7 @@ export function JobReviewGuestWriteScreen() {
         if (after === 'write') {
           setMode('member')
           setPhase('write')
-          success('로그인했어요. 후기는 이 계정에 바로 적립돼요')
+          success(t('guest.signedIn'))
           return
         }
         try {
@@ -292,20 +297,20 @@ export function JobReviewGuestWriteScreen() {
           })
           success(
             claimed.posts.length > 0
-              ? '가입 완료! 방금 남긴 후기가 계정에 연결됐어요'
-              : '가입이 완료됐어요',
+              ? t('guest.claimLinked')
+              : t('guest.claimDone'),
           )
         } catch (claimError) {
           setClaim({ linkedCount: 0, creditAwarded: 0 })
-          toastError(getErrorMessage(claimError, '후기 연결에 실패했어요'))
+          toastError(getErrorMessage(localizeCommunityError(claimError, tCommunity), t('guest.claimFailed')))
         }
       } catch (err) {
-        toastError(getErrorMessage(err, 'Google 로그인에 실패했어요'))
+        toastError(getErrorMessage(localizeCommunityError(err, tCommunity), t('guest.googleFailed')))
       } finally {
         setSigningIn(false)
       }
     },
-    [acceptedTerms, consentPayload, signInGoogle, success, toastError],
+    [acceptedTerms, consentPayload, signInGoogle, success, t, tCommunity, toastError],
   )
 
   async function handleSubmit(e: FormEvent) {
@@ -313,39 +318,44 @@ export function JobReviewGuestWriteScreen() {
 
     if (!isValidGuestNickname(nickname)) {
       toastError(
-        `게시용 닉네임을 ${GUEST_NICKNAME_MIN}~${GUEST_NICKNAME_MAX}자로 입력해 주세요`,
+        t('guest.errors.nicknameLength', {
+          min: GUEST_NICKNAME_MIN,
+          max: GUEST_NICKNAME_MAX,
+        }),
       )
       return
     }
     if (nicknameAvailability.status === 'taken') {
-      toastError('이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요')
+      toastError(t('guest.errors.nicknameTaken'))
       return
     }
     if (!isValidGuestEmail(email)) {
-      toastError('이메일을 정확히 입력해 주세요')
+      toastError(t('guest.errors.emailInvalid'))
       return
     }
     if (!isValidLinkedinUrl(linkedinUrl)) {
-      toastError('LinkedIn 프로필 주소를 확인해 주세요 (예: linkedin.com/in/your-name)')
+      toastError(t('guest.errors.linkedinInvalid'))
       return
     }
     if (!jobReviewType) {
-      toastError('인턴 / 신입 / 경력 / 이직 / 계약 중 유형을 선택해 주세요')
+      toastError(t('jobReview.write.errors.typeRequired'))
       return
     }
     if (!postTitle.trim()) {
-      toastError('제목을 입력해 주세요')
+      toastError(t('guest.errors.titleRequired'))
       return
     }
 
     const plain = htmlToPlainText(contentHtml)
     if (!plain) {
-      toastError('조심해야 할 점을 입력해 주세요')
+      toastError(t('jobReview.write.errors.tipsRequired'))
       return
     }
     if (plain.length > COMMUNITY_BODY_MAX) {
       toastError(
-        `조심해야 할 점은 ${COMMUNITY_BODY_MAX.toLocaleString('en-US')}자 이내로 작성해 주세요`,
+        t('jobReview.write.errors.tipsTooLong', {
+          max: format.number(COMMUNITY_BODY_MAX),
+        }),
       )
       return
     }
@@ -354,7 +364,7 @@ export function JobReviewGuestWriteScreen() {
     const normalizedTimeline = normalizeJobReviewTimeline(readyTimeline)
     if (normalizedTimeline.length === 0) {
       toastError(
-        '진행 기록(날짜 + 내용)을 최소 1건 입력한 뒤 「이 기록 추가」를 눌러 주세요',
+        t('jobReview.write.errors.timelineRequired'),
       )
       return
     }
@@ -364,23 +374,23 @@ export function JobReviewGuestWriteScreen() {
         !isJobReviewTimelineEntryComplete(entry),
     )
     if (incomplete) {
-      toastError('작성 중인 기록에 날짜와 내용을 함께 입력해 주세요')
+      toastError(t('write.errors.timelineIncomplete'))
       return
     }
     if (!jobReviewOutcome) {
-      toastError('최종 결과를 선택해 주세요')
+      toastError(t('jobReview.write.errors.outcomeRequired'))
       return
     }
     if (!jobReviewSource || !sourceComplete) {
       toastError(
         jobReviewSource === 'student-org'
-          ? '어느 학생회를 통해 연락이 닿았는지 선택해 주세요'
-          : '어떻게 연락이 닿았는지 선택해 주세요',
+          ? t('jobReview.write.errors.orgRequired')
+          : t('jobReview.write.errors.sourceRequired'),
       )
       return
     }
     if (!guidelinesAccepted) {
-      toastError('커뮤니티 작성 안내에 동의해 주세요')
+      toastError(t('guest.errors.guidelinesRequired'))
       return
     }
 
@@ -414,10 +424,10 @@ export function JobReviewGuestWriteScreen() {
       setPhase('done')
       setAcceptedTerms(false)
       setShowTermsError(false)
-      success('후기를 등록했어요. 감사합니다!')
+      success(t('guest.created'))
       if (typeof window !== 'undefined') window.scrollTo({ top: 0 })
     } catch (err) {
-      toastError(getErrorMessage(err, '등록에 실패했어요'))
+      toastError(getErrorMessage(localizeCommunityError(err, tCommunity), t('guest.createFailed')))
     } finally {
       setSubmitting(false)
     }
@@ -434,7 +444,7 @@ export function JobReviewGuestWriteScreen() {
       <div className='pb-16 pt-4 sm:pt-6'>
         <BoardBackLink
           href={listHref}
-          label='면접·취업 목록'
+          label={t('guest.backToList')}
           className='mb-5'
         />
 
@@ -460,12 +470,12 @@ export function JobReviewGuestWriteScreen() {
         ) : null}
 
         {phase === 'write' && !draftHydrated ? (
-          <LoadingState label='작성 중이던 내용을 확인하는 중…' />
+          <LoadingState label={t('guest.checkingDraft')} />
         ) : null}
 
         {phase === 'write' && draftHydrated ? (
           <>
-            <WriteHero mode={mode} writeLabel={meta.writeLabel} />
+            <WriteHero mode={mode} writeLabel={tCommunity(communityBoardKey(BOARD_ID, 'writeLabel'))} />
             <form
               onSubmit={(e) => void handleSubmit(e)}
               onFocus={handleSectionFocus}
@@ -474,18 +484,18 @@ export function JobReviewGuestWriteScreen() {
               <AutosaveNotice savedAt={draftSavedAt} />
               <CreateSection
                 step={1}
-                title='작성자 정보'
+                title={t('guest.authorSection')}
                 description={
                   mode === 'member'
-                    ? '닉네임은 공개, LinkedIn은 재직 확인용으로만 사용해요'
-                    : '닉네임만 공개돼요. 이메일·LinkedIn은 운영팀만 보고 게시되지 않아요'
+                    ? t('guest.authorSectionMember')
+                    : t('guest.authorSectionGuest')
                 }
               >
                 <div className='space-y-4'>
                   <Field
-                    label='닉네임'
+                    label={t('guest.nicknameLabel')}
                     required
-                    hint='게시용 · 공개'
+                    hint={t('guest.nicknameHint')}
                   >
                     <input
                       required
@@ -493,7 +503,7 @@ export function JobReviewGuestWriteScreen() {
                       onChange={(e) => setNickname(e.target.value)}
                       className={inputClass}
                       maxLength={GUEST_NICKNAME_MAX}
-                      placeholder='예: 뉴욕직장인'
+                      placeholder={t('guest.nicknamePlaceholder')}
                       autoComplete='nickname'
                     />
                     <NicknameAvailabilityHint
@@ -502,12 +512,12 @@ export function JobReviewGuestWriteScreen() {
                     />
                   </Field>
                   <Field
-                    label='이메일'
+                    label={t('guest.emailLabel')}
                     required
                     hint={
                       mode === 'member'
-                        ? '계정 이메일 · 비공개'
-                        : '기프트카드·크레딧 안내 발송용 · 비공개'
+                        ? t('guest.emailHintMember')
+                        : t('guest.emailHintGuest')
                     }
                   >
                     <input
@@ -525,9 +535,9 @@ export function JobReviewGuestWriteScreen() {
                     />
                   </Field>
                   <Field
-                    label='LinkedIn 프로필 주소'
+                    label={t('guest.linkedinLabel')}
                     required
-                    hint='실제 재직 확인용 · 비공개'
+                    hint={t('guest.linkedinHint')}
                   >
                     {/* type=text: 브라우저의 url 검증은 스킴 없는 붙여넣기를 막는다. 형식은 제출 시 normalizeLinkedinUrl로 검사 */}
                     <input
@@ -550,12 +560,13 @@ export function JobReviewGuestWriteScreen() {
                     />
                     <span className='min-w-0'>
                       <span className='block text-[13px] font-medium text-[var(--foreground)]'>
-                        후배들의 커피챗 요청을 받아도 괜찮아요{' '}
-                        <span className='font-normal text-[var(--muted)]'>(선택)</span>
+                        {t('guest.coffeeChatLabel')}{' '}
+                        <span className='font-normal text-[var(--muted)]'>
+                          {t('guest.optional')}
+                        </span>
                       </span>
                       <span className='mt-0.5 block text-[12px] leading-relaxed text-[var(--muted)]'>
-                        체크해도 연락처는 공개되지 않아요. 요청이 오면 운영팀이 먼저
-                        의사를 확인한 뒤 연결해 드려요.
+                        {t('guest.coffeeChatHint')}
                       </span>
                     </span>
                   </label>
@@ -574,7 +585,7 @@ export function JobReviewGuestWriteScreen() {
                 </div>
               </CreateSection>
 
-              <CreateSection step={2} title='어떤 유형인가요?'>
+              <CreateSection step={2} title={t('jobReview.write.typeSection')}>
                 <JobReviewTypePicker
                   value={jobReviewType}
                   onChange={(next) => {
@@ -586,16 +597,16 @@ export function JobReviewGuestWriteScreen() {
 
               <CreateSection
                 step={3}
-                title='기본 정보'
-                description='제목과 회사를 입력해 주세요'
+                title={t('jobReview.write.basicSection')}
+                description={t('jobReview.write.basicSectionDescription')}
               >
-                <Field label='제목' required>
+                <Field label={t('write.titleLabel')} required>
                   <input
                     required
                     value={postTitle}
                     onChange={(e) => setPostTitle(e.target.value)}
                     className={inputClass}
-                    placeholder={meta.titlePlaceholder}
+                    placeholder={tCommunity(communityBoardKey(BOARD_ID, 'titlePlaceholder'))}
                   />
                 </Field>
                 <StatusEmployerSelect
@@ -605,14 +616,14 @@ export function JobReviewGuestWriteScreen() {
                     setLocation(next)
                     requestSave()
                   }}
-                  label={meta.locationLabel}
+                  label={tCommunity(communityBoardKey(BOARD_ID, 'locationLabel'))}
                 />
               </CreateSection>
 
               <CreateSection
                 step={4}
-                title='진행 기록'
-                description='날짜별로 여러 건을 추가·수정·삭제할 수 있어요'
+                title={t('jobReview.write.timelineSection')}
+                description={t('write.timelineSectionDescription')}
               >
                 <JobReviewTimelineEditor
                   value={timeline}
@@ -625,13 +636,13 @@ export function JobReviewGuestWriteScreen() {
 
               <CreateSection
                 step={5}
-                title='조심해야 할 점'
-                description='다음 사람이 실수하지 않도록 꼭 알려주고 싶은 팁'
+                title={t('jobReview.write.tipsTitle')}
+                description={t('jobReview.write.tipsDescription')}
               >
                 <TipTapEditor
                   value={contentHtml}
                   onChange={setContentHtml}
-                  placeholder='예: 인터뷰 전에 팀의 최근 프로젝트를 꼭 찾아보세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.'
+                  placeholder={t('jobReview.write.tipsPlaceholder')}
                   minHeightClassName='min-h-[200px]'
                   contentClassName='!text-[13px] !leading-[1.65]'
                   simpleToolbar
@@ -641,16 +652,16 @@ export function JobReviewGuestWriteScreen() {
 
               <CreateSection
                 step={6}
-                title='최종 결과는 어떻게 됐나요?'
-                description='아직 진행 중이면 「진행 중」을 골라 주세요. 나중에 바꿀 수 있어요'
+                title={t('jobReview.write.outcomeSection')}
+                description={t('jobReview.write.outcomeSectionDescription')}
               >
                 <JobReviewOutcomePicker value={jobReviewOutcome} onChange={setJobReviewOutcome} />
               </CreateSection>
 
               <CreateSection
                 step={7}
-                title='어떻게 연락이 닿았나요?'
-                description='후기를 남기게 된 경로를 알려주세요. 다른 사람에게는 보이지 않아요'
+                title={t('jobReview.write.sourceSection')}
+                description={t('jobReview.write.sourceSectionDescription')}
               >
                 <JobReviewSourcePicker
                   value={jobReviewSource}
@@ -672,7 +683,7 @@ export function JobReviewGuestWriteScreen() {
                     className='mt-0.5 size-4 shrink-0 accent-[var(--brand)]'
                   />
                   <span className='text-[13px] leading-relaxed text-[var(--foreground)]'>
-                    위 커뮤니티 작성 안내를 확인했고, 실제 경험을 바탕으로 작성했어요.
+                    {t('guest.guidelinesAgree')}
                     <span className='text-[var(--brand)]'> *</span>
                   </span>
                 </label>
@@ -693,23 +704,23 @@ export function JobReviewGuestWriteScreen() {
                   className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
                 >
                   {submitting
-                    ? '등록 중…'
+                    ? t('write.submitting')
                     : !jobReviewType
-                      ? '유형을 선택해 주세요'
+                      ? t('write.selectTypeFirst')
                       : !jobReviewOutcome
-                        ? '최종 결과를 선택해 주세요'
+                        ? t('jobReview.write.errors.outcomeRequired')
                         : !sourceComplete
-                          ? '연락 경로를 선택해 주세요'
+                          ? t('jobReview.write.selectSourceFirst')
                           : mode === 'member'
-                        ? '후기 등록하기'
-                        : '가입 없이 후기 등록하기'}
+                        ? t('write.submit')
+                        : t('guest.submitGuest')}
                 </button>
               </WriteDraftActions>
 
               <p className='text-center text-[12px] text-[var(--muted)]'>
                 {mode === 'guest' ? (
                   <>
-                    가입은 필요 없어요.{' '}
+                    {t('guest.footnoteBefore')}{' '}
                     <button
                       type='button'
                       onClick={() => {
@@ -718,12 +729,12 @@ export function JobReviewGuestWriteScreen() {
                       }}
                       className='font-medium text-[var(--brand)] underline-offset-2 hover:underline'
                     >
-                      Google로 가입하고 남기기
+                      {t('guest.footnoteLink')}
                     </button>
-                    를 고르면 크레딧이 계정에 바로 적립돼요.
+                    {t('guest.footnoteAfter')}
                   </>
                 ) : (
-                  '등록 후에는 내 글에서 진행 기록을 이어서 추가·수정할 수 있어요.'
+                  t('guest.footnoteMember')
                 )}
               </p>
             </form>
@@ -783,17 +794,17 @@ function ChoosePhase({
   onGoogleError: (message: string) => void
   onGuest: () => void
 }) {
+  const t = useT('reviews')
   return (
     <div>
       <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--muted)]'>
-        현직자 후기 남기기
+        {t('guest.choose.eyebrow')}
       </p>
       <h1 className='mt-1.5 text-[1.35rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.55rem]'>
-        가입 없이도 후기를 남길 수 있어요
+        {t('guest.choose.title')}
       </h1>
       <p className='mt-2 text-[13px] leading-relaxed text-[var(--muted)]'>
-        서류부터 인터뷰, 결과까지 단계별로 남겨 주시면 같은 길을 준비하는
-        후배들에게 큰 도움이 돼요. 5분이면 충분해요.
+        {t('guest.choose.intro')}
       </p>
 
       <CreditPitch />
@@ -803,16 +814,16 @@ function ChoosePhase({
           <div className='flex items-start justify-between gap-3'>
             <div>
               <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--brand)]'>
-                추천
+                {t('guest.choose.recommended')}
               </p>
               <h2 className='mt-1 text-[15px] font-semibold text-[var(--foreground)]'>
-                Google로 가입하고 남기기
+                {t('guest.choose.googleTitle')}
               </h2>
             </div>
           </div>
           <ul className='mt-2.5 space-y-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-            <PitchItem>크레딧이 내 계정에 바로 적립돼요</PitchItem>
-            <PitchItem>등록 후에도 진행 기록을 이어서 추가할 수 있어요</PitchItem>
+            <PitchItem>{t('guest.choose.googlePitch1')}</PitchItem>
+            <PitchItem>{t('guest.choose.googlePitch2')}</PitchItem>
           </ul>
           <div className='mt-4 space-y-3'>
             <TermsConsentFields
@@ -831,21 +842,18 @@ function ChoosePhase({
 
         <section className='rounded-2xl bg-white p-4 ring-1 ring-black/[0.06] sm:p-5'>
           <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
-            가입 없이 남기기
+            {t('guest.choose.guestTitle')}
           </h2>
           <ul className='mt-2.5 space-y-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-            <PitchItem>닉네임·이메일·LinkedIn 주소만 적으면 돼요</PitchItem>
-            <PitchItem>
-              크레딧은 보관해 두었다가, 나중에 같은 이메일로 가입하면 자동으로
-              적립돼요
-            </PitchItem>
+            <PitchItem>{t('guest.choose.guestPitch1')}</PitchItem>
+            <PitchItem>{t('guest.choose.guestPitch2')}</PitchItem>
           </ul>
           <button
             type='button'
             onClick={onGuest}
             className='mt-4 inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90'
           >
-            가입 없이 후기 남기기
+            {t('guest.choose.guestCta')}
           </button>
         </section>
       </div>
@@ -854,27 +862,33 @@ function ChoosePhase({
 }
 
 function CreditPitch() {
+  const t = useT('reviews')
   return (
-    <div className='mt-5 rounded-2xl bg-[#fff8f5] p-4 ring-1 ring-[var(--brand)]/15 sm:p-5'>
+    <div className='mt-5 rounded-2xl bg-brand-soft p-4 ring-1 ring-[var(--brand)]/15 sm:p-5'>
       <p className='text-[12px] font-semibold text-[var(--brand)]'>
-        후기를 남기면 크레딧이 쌓여요
+        {t('guest.creditPitch.title')}
       </p>
       <ul className='mt-2 space-y-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
         <PitchItem accent>
-          채용 단계 1개당 {COMMUNITY_CREDIT_TIMELINE_ENTRY} 크레딧 (글당 최대{' '}
-          {COMMUNITY_CREDIT_TIMELINE_POST_MAX})
-          {FIRST_POST_BONUS > 0 ? ` · 첫 글 +${FIRST_POST_BONUS}` : ''}
+          {t(
+            FIRST_POST_BONUS > 0
+              ? 'guest.creditPitch.perStepWithBonus'
+              : 'guest.creditPitch.perStep',
+            {
+              perStep: COMMUNITY_CREDIT_TIMELINE_ENTRY,
+              max: COMMUNITY_CREDIT_TIMELINE_POST_MAX,
+              bonus: FIRST_POST_BONUS,
+            },
+          )}
         </PitchItem>
         <PitchItem accent>
-          자세히 남겨 주신 후기는 미생팀 리뷰 후 추가 크레딧을 드려요
+          {t('guest.creditPitch.review')}
         </PitchItem>
         <PitchItem accent>
-          모은 크레딧({COFFEE_CHAT_COST})으로 같은 업계·회사는 물론 다른 업계
-          현직자와의 1:1 커피챗에 쓸 수 있어요
+          {t('guest.creditPitch.coffeeChat', { cost: COFFEE_CHAT_COST })}
         </PitchItem>
         <PitchItem accent>
-          가입은 선택이에요. 가입하면 크레딧 사용과 후배들의 커피챗 요청 수신이
-          가능해져요
+          {t('guest.creditPitch.optionalSignup')}
         </PitchItem>
       </ul>
     </div>
@@ -905,18 +919,19 @@ function PitchItem({
 /* ---------- 2) 작성 ---------- */
 
 function WriteHero({ mode, writeLabel }: { mode: WriteMode; writeLabel: string }) {
+  const t = useT('reviews')
   return (
     <div>
       <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--muted)]'>
-        {mode === 'member' ? '내 계정으로 남기기' : '가입 없이 남기기'}
+        {mode === 'member' ? t('guest.hero.memberEyebrow') : t('guest.choose.guestTitle')}
       </p>
       <h1 className='mt-1.5 text-[1.35rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.55rem]'>
         {writeLabel}
       </h1>
       <p className='mt-2 text-[13px] leading-relaxed text-[var(--muted)]'>
         {mode === 'member'
-          ? '크레딧은 등록 즉시 이 계정에 적립돼요. 후배들의 커피챗 요청도 받아볼 수 있어요.'
-          : '가입은 필요 없어요. 크레딧은 보관해 두었다가 나중에 같은 이메일로 가입하면 자동으로 적립돼요.'}
+          ? t('guest.hero.memberIntro')
+          : t('guest.hero.guestIntro')}
       </p>
     </div>
   )
@@ -929,18 +944,21 @@ function CreditPreview({
   timelineCount: number
   mode: WriteMode
 }) {
+  const t = useT('reviews')
   const estimated = Math.min(
     timelineCount * COMMUNITY_CREDIT_TIMELINE_ENTRY,
     COMMUNITY_CREDIT_TIMELINE_POST_MAX,
   )
   return (
-    <div className='flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#fff8f5] px-4 py-3 text-[13px] ring-1 ring-[var(--brand)]/15'>
+    <div className='flex flex-wrap items-center justify-between gap-2 rounded-xl bg-brand-soft px-4 py-3 text-[13px] ring-1 ring-[var(--brand)]/15'>
       <span className='text-[var(--muted-foreground)]'>
-        지금까지 추가한 채용 단계 {timelineCount}건
+        {t('guest.preview.count', { count: timelineCount })}
       </span>
       <span className='font-semibold text-[var(--brand)]'>
-        {mode === 'member' ? '적립 예정' : '가입 시 적립'} {estimated} 크레딧
-        {FIRST_POST_BONUS > 0 ? ` (+첫 글 ${FIRST_POST_BONUS})` : ''}
+        {t(
+          `guest.preview.${mode === 'member' ? 'member' : 'guest'}${FIRST_POST_BONUS > 0 ? 'WithBonus' : ''}`,
+          { credit: estimated, bonus: FIRST_POST_BONUS },
+        )}
       </span>
     </div>
   )
@@ -983,6 +1001,7 @@ function DonePhase({
   }) => void
   onGoogleError: (message: string) => void
 }) {
+  const t = useT('reviews')
   const postHref = hrefForCommunityPost(post, city)
   const linkedNow = credit.linked || (claim?.linkedCount ?? 0) > 0
   const awarded = credit.linked ? credit.awarded : claim?.creditAwarded ?? 0
@@ -992,40 +1011,46 @@ function DonePhase({
     <div>
       <div className='rounded-2xl bg-white p-5 ring-1 ring-black/[0.06] sm:p-6'>
         <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--brand)]'>
-          등록 완료
+          {t('guest.done.eyebrow')}
         </p>
         <h1 className='mt-1.5 text-[1.35rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.5rem]'>
-          후기를 남겨 주셔서 감사해요
+          {t('guest.done.title')}
         </h1>
         <p className='mt-2 text-[13px] leading-relaxed text-[var(--muted)]'>
-          「{post.title}」이(가) 면접·취업 게시판에 올라갔어요. 채용 단계{' '}
-          {post.jobReviewTimeline.length}건이 후배들에게 공유돼요.
+          {t('guest.done.body', {
+            title: post.title,
+            count: post.jobReviewTimeline.length,
+          })}
         </p>
 
-        <div className='mt-4 rounded-xl bg-[#fff8f5] px-4 py-3.5 ring-1 ring-[var(--brand)]/15'>
+        <div className='mt-4 rounded-xl bg-brand-soft px-4 py-3.5 ring-1 ring-[var(--brand)]/15'>
           {linkedNow ? (
             <>
               <p className='text-[13px] font-semibold text-[var(--brand)]'>
                 {awarded > 0
-                  ? `${awarded} 크레딧이 계정에 적립됐어요`
-                  : '후기가 계정에 연결됐어요'}
+                  ? t('guest.done.awarded', { credit: awarded })
+                  : t('guest.done.linked')}
               </p>
               <p className='mt-1 text-[12px] leading-relaxed text-[var(--muted-foreground)]'>
-                크레딧은 같은 업계·회사는 물론 다른 업계 현직자와의 커피챗
-                ({COFFEE_CHAT_COST} 크레딧)에 쓸 수 있어요.
+                {t('guest.done.coffeeChat', { cost: COFFEE_CHAT_COST })}
               </p>
             </>
           ) : (
             <>
               <p className='text-[13px] font-semibold text-[var(--brand)]'>
-                가입하시면 {pending} 크레딧이 바로 적립돼요
+                {t('guest.done.pending', { credit: pending })}
               </p>
               <p className='mt-1 text-[12px] leading-relaxed text-[var(--muted-foreground)]'>
-                채용 단계 {post.jobReviewTimeline.length}건 = {credit.estimated}{' '}
-                크레딧
-                {credit.firstPostBonus > 0 ? ` + 첫 글 보너스 ${credit.firstPostBonus}` : ''}
-                . 후기에 적은 이메일과 같은 Google 계정으로 가입하면 자동으로
-                연결돼요.
+                {t(
+                  credit.firstPostBonus > 0
+                    ? 'guest.done.breakdownWithBonus'
+                    : 'guest.done.breakdown',
+                  {
+                    count: post.jobReviewTimeline.length,
+                    credit: credit.estimated,
+                    bonus: credit.firstPostBonus,
+                  },
+                )}
               </p>
             </>
           )}
@@ -1036,13 +1061,13 @@ function DonePhase({
             href={postHref}
             className='inline-flex h-11 flex-1 items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white transition hover:opacity-90'
           >
-            내 후기 보기
+            {t('guest.done.viewPost')}
           </Link>
           <Link
             href={linkedNow ? creditHref : listHref}
             className='inline-flex h-11 flex-1 items-center justify-center rounded-full bg-white text-[14px] font-semibold text-[var(--foreground)] ring-1 ring-black/[0.1] transition hover:bg-[#fafafa]'
           >
-            {linkedNow ? '내 크레딧 보기' : '목록으로'}
+            {linkedNow ? t('guest.done.viewCredit') : t('guest.done.toList')}
           </Link>
         </div>
       </div>
@@ -1050,24 +1075,19 @@ function DonePhase({
       {!isMember && !linkedNow ? (
         <section className='mt-4 rounded-2xl bg-white p-5 ring-1 ring-[var(--brand)]/30 sm:p-6'>
           <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--brand)]'>
-            선택 사항
+            {t('guest.done.optional')}
           </p>
           <h2 className='mt-1 text-[16px] font-semibold text-[var(--foreground)]'>
-            Misaeng에 가입하시면 후배들의 커피챗 요청을 받아보실 수 있어요
+            {t('guest.done.signupTitle', { brand: BRAND_CONFIG.name })}
           </h2>
           <ul className='mt-2.5 space-y-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-            <PitchItem>방금 남긴 후기와 {pending} 크레딧이 계정에 바로 연결돼요</PitchItem>
-            <PitchItem>
-              크레딧으로 같은 업계·회사, 혹은 다른 업계 현직자와 1:1 커피챗을 할 수
-              있어요
-            </PitchItem>
-            <PitchItem>진행 기록을 이어서 추가·수정할 수 있어요</PitchItem>
+            <PitchItem>{t('guest.done.signupPitch1', { credit: pending })}</PitchItem>
+            <PitchItem>{t('guest.done.signupPitch2')}</PitchItem>
+            <PitchItem>{t('guest.done.signupPitch3')}</PitchItem>
           </ul>
           {claim && claim.linkedCount === 0 ? (
             <p className='mt-3 rounded-xl bg-[#f4f5f7] px-3.5 py-2.5 text-[12px] leading-relaxed text-[var(--muted-foreground)]'>
-              가입한 계정 이메일이 후기에 적은 이메일과 달라 자동으로 연결되지
-              않았어요. 운영팀이 LinkedIn·이메일을 확인한 뒤 계정에 연결해
-              드릴게요.
+              {t('guest.done.emailMismatch')}
             </p>
           ) : null}
           <div className='mt-4 space-y-3'>
@@ -1084,9 +1104,9 @@ function DonePhase({
             />
           </div>
           <p className='mt-3 text-center text-[12px] text-[var(--muted)]'>
-            지금 가입하지 않아도 후기는 그대로 게시돼요.{' '}
+            {t('guest.done.skipNote')}{' '}
             <Link href={listHref} className='underline-offset-2 hover:underline'>
-              나중에 할게요
+              {t('guest.done.skip')}
             </Link>
           </p>
         </section>

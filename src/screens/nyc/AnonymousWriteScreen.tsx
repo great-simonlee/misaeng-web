@@ -13,6 +13,7 @@ import { cityLoginPath, hrefForCommunityPost } from '@lib/constants/cities'
 import {
   createCommunityPostRequest,
   fetchCommunityPost,
+  localizeCommunityError,
   updateCommunityPostRequest,
 } from '@lib/community/client'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
@@ -26,12 +27,14 @@ import {
 import {
   ANONYMOUS_TITLE_MAX,
   ANONYMOUS_TOPICS,
+  anonymousTopicKey,
 } from '@lib/constants/anonymousTopics'
 import {
-  NYC_COMMUNITY_BOARD_META,
+  communityBoardKey,
   isAnonymousBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
+import { useFormat, useT } from '@lib/i18n/client'
 import { BoardBackLink, BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
 import {
@@ -57,10 +60,15 @@ export function AnonymousWriteScreen({
   title,
   editPostId,
 }: AnonymousWriteScreenProps) {
+  const t = useT('community')
+  const fmt = useFormat()
   const city = useCity()
   const href = useCityPath()
   const boardId: NycCommunityBoardId = 'anonymous'
-  const meta = NYC_COMMUNITY_BOARD_META[boardId]
+  const topicLabel = (value: string) => {
+    const key = anonymousTopicKey(value)
+    return key ? t(key) : value
+  }
   const isEdit = Boolean(editPostId)
   const loginNext = editPostId
     ? href(`/${boardId}/${editPostId}/edit`)
@@ -102,12 +110,12 @@ export function AnonymousWriteScreen({
         const post = await fetchCommunityPost(editPostId)
         if (cancelled) return
         if (!post || !isAnonymousBoard(post.categoryId)) {
-          toastError('글을 찾을 수 없어요')
+          toastError(t('write.errors.postNotFound'))
           router.replace(href('/me/posts'))
           return
         }
         if (post.authorUid !== user.uid) {
-          toastError('수정 권한이 없어요')
+          toastError(t('write.errors.noEditPermission'))
           router.replace(hrefForCommunityPost(post, city))
           return
         }
@@ -116,7 +124,12 @@ export function AnonymousWriteScreen({
         setTopic(post.location)
       } catch (err) {
         if (!cancelled) {
-          toastError(getErrorMessage(err, '글을 불러오지 못했어요'))
+          toastError(
+            getErrorMessage(
+              localizeCommunityError(err, t),
+              t('detail.loadFailed'),
+            ),
+          )
           router.replace(href('/me/posts'))
         }
       } finally {
@@ -126,34 +139,34 @@ export function AnonymousWriteScreen({
     return () => {
       cancelled = true
     }
-  }, [city, editPostId, href, user?.uid, router, toastError])
+  }, [city, editPostId, href, user?.uid, router, t, toastError])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!user?.email) {
-      toastError('로그인이 필요해요')
+      toastError(t('errors.loginRequired'))
       router.replace(cityLoginPath(city, loginNext))
       return
     }
 
     const trimmedTitle = postTitle.trim()
     if (!trimmedTitle) {
-      toastError('제목을 입력해 주세요')
+      toastError(t('write.errors.titleRequired'))
       return
     }
     if (trimmedTitle.length > ANONYMOUS_TITLE_MAX) {
-      toastError(`제목은 ${ANONYMOUS_TITLE_MAX}자 이내로 작성해 주세요`)
+      toastError(t('write.errors.titleTooLong', { max: ANONYMOUS_TITLE_MAX }))
       return
     }
 
     const plain = htmlToPlainText(contentHtml)
     if (!plain) {
-      toastError('본문을 입력해 주세요')
+      toastError(t('write.errors.bodyRequired'))
       return
     }
     if (plain.length > COMMUNITY_BODY_MAX) {
       toastError(
-        `본문은 ${COMMUNITY_BODY_MAX.toLocaleString('en-US')}자 이내로 작성해 주세요`,
+        t('write.errors.bodyTooLong', { max: fmt.number(COMMUNITY_BODY_MAX) }),
       )
       return
     }
@@ -181,11 +194,14 @@ export function AnonymousWriteScreen({
       if (!isEdit && user.uid) {
         clearWriteDraft('anonymous', city, user.uid)
       }
-      success(isEdit ? '글을 수정했어요' : '글을 등록했어요')
+      success(isEdit ? t('write.updated') : t('write.created'))
       router.push(hrefForCommunityPost(post, city))
     } catch (err) {
       toastError(
-        getErrorMessage(err, isEdit ? '수정에 실패했어요' : '등록에 실패했어요'),
+        getErrorMessage(
+          localizeCommunityError(err, t),
+          isEdit ? t('errors.updateFailed') : t('errors.createFailed'),
+        ),
       )
     } finally {
       setSubmitting(false)
@@ -206,9 +222,9 @@ export function AnonymousWriteScreen({
         },
       )
       setDraftSavedAt(savedAt)
-      success('임시 저장했어요')
+      success(t('write.draftSaved'))
     } catch {
-      toastError('임시 저장에 실패했어요')
+      toastError(t('write.draftSaveFailed'))
     }
   }
 
@@ -218,7 +234,7 @@ export function AnonymousWriteScreen({
         <LoadingState
           fullPage
           label={
-            !loading && !isAuthenticated ? '로그인 페이지로 이동 중…' : undefined
+            !loading && !isAuthenticated ? t('write.redirectingToLogin') : undefined
           }
         />
       </BoardPageShell>
@@ -242,28 +258,37 @@ export function AnonymousWriteScreen({
               ? href(`/${boardId}/${editPostId}`)
               : href(`/${boardId}`)
           }
-          label={isEdit ? '글로 돌아가기' : `${title} 목록`}
+          label={
+            isEdit ? t('write.backToPost') : t('detail.backToList', { board: title })
+          }
           className='mb-5'
         />
 
-        {isEdit ? <UpdateHero title={postTitle} topic={topic} /> : <CreateHero />}
+        {isEdit ? (
+          <UpdateHero title={postTitle} topic={topic ? topicLabel(topic) : ''} />
+        ) : (
+          <CreateHero />
+        )}
 
         <form onSubmit={(e) => void handleSubmit(e)} className='mt-5 space-y-6'>
           <CreateSection
             step={1}
-            title='어떤 주제인가요?'
-            description='선택하지 않아도 괜찮아요'
+            title={t('anonymousWrite.topicTitle')}
+            description={t('anonymousWrite.topicDescription')}
           >
-            <div className='flex flex-wrap gap-1.5' aria-label='익명게시판 주제'>
+            <div
+              className='flex flex-wrap gap-1.5'
+              aria-label={t('anonymousWrite.topicAria')}
+            >
               <BoardQuickChip
-                label='선택 안 함'
+                label={t('list.none')}
                 active={!topic}
                 onClick={() => setTopic('')}
               />
               {ANONYMOUS_TOPICS.map((item) => (
                 <BoardQuickChip
                   key={item}
-                  label={item}
+                  label={topicLabel(item)}
                   active={topic === item}
                   onClick={() => setTopic(item)}
                 />
@@ -273,8 +298,8 @@ export function AnonymousWriteScreen({
 
           <CreateSection
             step={2}
-            title='제목'
-            description='한눈에 보이는 짧은 제목을 적어 주세요'
+            title={t('write.titleLabel')}
+            description={t('anonymousWrite.titleDescription')}
             trailing={`${postTitle.length}/${ANONYMOUS_TITLE_MAX}`}
           >
             <input
@@ -285,19 +310,19 @@ export function AnonymousWriteScreen({
                 setPostTitle(e.target.value.slice(0, ANONYMOUS_TITLE_MAX))
               }
               className={inputClass}
-              placeholder={meta.titlePlaceholder}
+              placeholder={t(communityBoardKey(boardId, 'titlePlaceholder'))}
             />
           </CreateSection>
 
           <CreateSection
             step={3}
-            title='본문'
-            description='부담 없이 남겨 보세요. 작성자는 익명으로 표시돼요.'
+            title={t('write.bodyLabel')}
+            description={t('anonymousWrite.bodyDescription')}
           >
             <TipTapEditor
               value={contentHtml}
               onChange={setContentHtml}
-              placeholder={meta.descriptionPlaceholder}
+              placeholder={t(communityBoardKey(boardId, 'descriptionPlaceholder'))}
               minHeightClassName='min-h-[200px]'
               contentClassName='!text-[13px] !leading-[1.65]'
               simpleToolbar
@@ -311,7 +336,7 @@ export function AnonymousWriteScreen({
               disabled={submitting || !postTitle.trim()}
               className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
             >
-              {submitting ? '저장 중…' : '수정 완료'}
+              {submitting ? t('comments.saving') : t('comments.saveEdit')}
             </button>
           ) : (
             <WriteDraftActions
@@ -324,7 +349,7 @@ export function AnonymousWriteScreen({
                 disabled={submitting || !postTitle.trim()}
                 className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
               >
-                {submitting ? '등록 중…' : '글 등록하기'}
+                {submitting ? t('comments.submitting') : t('write.submit')}
               </button>
             </WriteDraftActions>
           )}
@@ -338,7 +363,7 @@ export function AnonymousWriteScreen({
               }
               className='underline-offset-2 hover:underline'
             >
-              목록으로 돌아가기
+              {t('write.backToList')}
             </Link>
           </p>
         </form>
@@ -358,27 +383,29 @@ export function AnonymousWriteScreen({
 }
 
 function CreateHero() {
+  const t = useT('community')
   return (
     <div>
       <h1 className='text-[1.35rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.55rem]'>
-        익명게시판 글 올리기
+        {t('anonymousWrite.createTitle')}
       </h1>
       <p className='mt-2 text-[13px] leading-relaxed text-[var(--muted)]'>
-        이름·학교·사진은 보이지 않아요. 부담 없이 남겨 주세요.
+        {t('anonymousWrite.createDescription')}
       </p>
     </div>
   )
 }
 
 function UpdateHero({ title, topic }: { title: string; topic: string }) {
+  const t = useT('community')
   return (
-    <div className='overflow-hidden rounded-2xl bg-[#fff8f5] ring-1 ring-black/[0.06]'>
+    <div className='overflow-hidden rounded-2xl bg-brand-soft ring-1 ring-black/[0.06]'>
       <div className='border-b border-black/[0.06] px-4 py-4 sm:px-5'>
         <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--brand)]'>
-          글 수정
+          {t('write.editEyebrow')}
         </p>
         <h1 className='mt-1.5 text-[1.25rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.4rem]'>
-          익명 글 수정하기
+          {t('anonymousWrite.editTitle')}
         </h1>
       </div>
       <div className='flex flex-wrap items-center gap-2 bg-white/75 px-4 py-3 sm:px-5'>
@@ -388,7 +415,7 @@ function UpdateHero({ title, topic }: { title: string; topic: string }) {
           </span>
         ) : null}
         <span className='min-w-0 truncate text-[13px] font-medium text-[var(--foreground)]'>
-          {title || '제목 없음'}
+          {title || t('write.untitled')}
         </span>
       </div>
     </div>

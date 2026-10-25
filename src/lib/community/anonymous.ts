@@ -9,9 +9,12 @@ function isViewerAuthor(
   return Boolean(viewerUid && authorUid && viewerUid === authorUid)
 }
 
-/** 익명 표시명 — 첫 글자만 보이고 나머지는 ** (예: 익명 → 익**) */
+/**
+ * 익명 표시명 — 첫 글자만 보이고 나머지는 ** (예: 익명 → 익**).
+ * 화면에서는 `maskAnonymousDisplayName(t('author.anonymous'))`처럼 번역된 이름을 넘긴다.
+ */
 export function maskAnonymousDisplayName(name?: string | null): string {
-  const base = name?.trim() || '익명'
+  const base = name?.trim() || ''
   const first = Array.from(base)[0]
   if (!first) return '**'
   return `${first}**`

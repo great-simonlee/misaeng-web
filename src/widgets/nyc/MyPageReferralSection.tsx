@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState, type ReactNode } from 'react'
 
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import {
@@ -15,6 +15,7 @@ import {
   COMMUNITY_CREDIT_REFERRAL_MAX,
   COMMUNITY_CREDIT_REFERRAL_POST,
 } from '@lib/constants/communityCredit'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 
 type ReferralPayload = {
@@ -25,7 +26,18 @@ type ReferralPayload = {
   maxUses: number
 }
 
+/** `{name}` 자리에 요소를 끼운다 (언어마다 어순이 달라서 문장을 쪼개지 않는다) */
+function renderWithSlots(template: string, slots: Record<string, ReactNode>) {
+  return template.split(/(\{\w+\})/g).map((part, index) => {
+    const name = part.match(/^\{(\w+)\}$/)?.[1]
+    if (name && name in slots) return <Fragment key={index}>{slots[name]}</Fragment>
+    return part
+  })
+}
+
 export function MyPageReferralSection() {
+  const t = useT('me')
+  const tCredit = useT('credit')
   const { success, error: toastError } = useToast()
   const [data, setData] = useState<ReferralPayload | null>(null)
   const [loading, setLoading] = useState(true)
@@ -72,9 +84,9 @@ export function MyPageReferralSection() {
     setCopying(true)
     try {
       await navigator.clipboard.writeText(data.shareUrl)
-      success('추천 링크를 복사했어요')
+      success(t('referral.linkCopied'))
     } catch {
-      toastError('링크 복사에 실패했어요. 코드를 직접 전달해 주세요.')
+      toastError(t('referral.copyFailed'))
     } finally {
       setCopying(false)
     }
@@ -83,25 +95,28 @@ export function MyPageReferralSection() {
   async function handleBind() {
     const code = normalizeReferralCode(referrerDraft)
     if (!isValidReferralCode(code)) {
-      toastError('추천인 코드 8자리를 입력해 주세요')
+      toastError(t('referral.errors.invalidCode'))
       return
     }
     if (data?.code && code === data.code) {
-      toastError('본인 코드로는 추천할 수 없어요')
+      toastError(t('referral.errors.ownCode'))
       return
     }
     setSaving(true)
     try {
-      const bound = await bindReferralCodeRequest(code)
+      const bound = await bindReferralCodeRequest(
+        code,
+        tCredit('referral.bindFailed'),
+      )
       clearPersistedReferralCode()
       setData((prev) =>
         prev
           ? { ...prev, referredByCode: bound?.referredByCode ?? code }
           : prev,
       )
-      success('추천인을 연결했어요')
+      success(t('referral.bound'))
     } catch (err) {
-      toastError(getErrorMessage(err, '추천인 연결에 실패했어요'))
+      toastError(getErrorMessage(err, tCredit('referral.bindFailed')))
     } finally {
       setSaving(false)
     }
@@ -110,17 +125,23 @@ export function MyPageReferralSection() {
   return (
     <section>
       <h3 className='mb-3 px-0.5 text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
-        추천
+        {t('referral.title')}
       </h3>
       <div className='overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>
         <div className='px-5 py-4'>
           <p className='text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-            다른 사람이 내 추천 코드를 사용할 때마다 내가{' '}
-            <span className='font-semibold text-[var(--foreground)]'>
-              {COMMUNITY_CREDIT_REFERRAL_POST} 크레딧
-            </span>
-            을 받아요. 최대 {COMMUNITY_CREDIT_REFERRAL_MAX}명까지, 본인 추천은
-            안 돼요.
+            {renderWithSlots(
+              t('referral.description', { max: COMMUNITY_CREDIT_REFERRAL_MAX }),
+              {
+                credits: (
+                  <span className='font-semibold text-[var(--foreground)]'>
+                    {t('referral.creditsAmount', {
+                      count: COMMUNITY_CREDIT_REFERRAL_POST,
+                    })}
+                  </span>
+                ),
+              },
+            )}
           </p>
 
           <button
@@ -129,34 +150,38 @@ export function MyPageReferralSection() {
             disabled={loading || copying || !data?.shareUrl}
             className='mt-4 flex min-h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] px-4 text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-40'
           >
-            {copying ? '복사 중…' : '선후배 친구들에게 추천하기'}
+            {copying ? t('referral.copying') : t('referral.shareButton')}
           </button>
 
           <div className='mt-4 rounded-xl bg-[#f4f5f7] px-3.5 py-3'>
             <p className='text-[11px] font-medium text-[var(--muted)]'>
-              내 추천 코드
+              {t('referral.myCode')}
             </p>
             <p className='mt-1 font-mono text-[16px] font-semibold tracking-[0.14em] text-[var(--foreground)]'>
-              {loading ? '불러오는 중…' : data?.code || '—'}
+              {loading ? t('referral.loading') : data?.code || '—'}
             </p>
             <p className='mt-1 text-[12px] text-[var(--muted)]'>
-              사용한 사람 {data?.usedCount ?? 0}/
-              {data?.maxUses ?? COMMUNITY_CREDIT_REFERRAL_MAX}명
+              {t('referral.usedCount', {
+                used: data?.usedCount ?? 0,
+                max: data?.maxUses ?? COMMUNITY_CREDIT_REFERRAL_MAX,
+              })}
             </p>
           </div>
         </div>
 
         <div className='border-t border-[#f0f1f3] px-5 py-4'>
           <p className='text-[12px] font-medium text-[var(--muted)]'>
-            추천인 입력하기
+            {t('referral.enterReferrer')}
           </p>
           {data?.referredByCode ? (
             <p className='mt-2 text-[14px] font-medium text-[var(--foreground)]'>
-              추천인 코드{' '}
-              <span className='font-mono tracking-[0.08em]'>
-                {data.referredByCode}
-              </span>
-              와 연결됐어요.
+              {renderWithSlots(t('referral.boundTo'), {
+                code: (
+                  <span className='font-mono tracking-[0.08em]'>
+                    {data.referredByCode}
+                  </span>
+                ),
+              })}
             </p>
           ) : (
             <div className='mt-2 flex gap-2'>
@@ -167,7 +192,7 @@ export function MyPageReferralSection() {
                   setReferrerDraft(normalizeReferralCode(e.target.value))
                 }
                 maxLength={8}
-                placeholder='추천인 코드 8자리'
+                placeholder={t('referral.codePlaceholder')}
                 autoCapitalize='characters'
                 autoCorrect='off'
                 spellCheck={false}
@@ -181,7 +206,7 @@ export function MyPageReferralSection() {
                   'h-11 shrink-0 rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation disabled:opacity-40',
                 )}
               >
-                {saving ? '연결 중…' : '연결'}
+                {saving ? t('referral.binding') : t('referral.bind')}
               </button>
             </div>
           )}

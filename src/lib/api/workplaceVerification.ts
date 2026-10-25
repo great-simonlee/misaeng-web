@@ -1,7 +1,13 @@
-export async function sendWorkplaceEmailVerification(args: {
-  email: string
-  companyName: string
-}) {
+import type { Translate } from '@lib/i18n/translate'
+
+/** t는 네임스페이스 없는 번역기(`useT()`)다. 서버가 error를 주지 않을 때만 기본 문구를 쓴다. */
+export async function sendWorkplaceEmailVerification(
+  args: {
+    email: string
+    companyName: string
+  },
+  t: Translate,
+) {
   const response = await fetch('/api/agent-auth/work-email', {
     method: 'POST',
     credentials: 'include',
@@ -18,15 +24,18 @@ export async function sendWorkplaceEmailVerification(args: {
   } | null
 
   if (!response.ok) {
-    throw new Error(data?.error || '인증 메일 전송에 실패했어요')
+    throw new Error(data?.error || t('me.verification.errors.sendFailed'))
   }
 }
 
-export async function confirmWorkplaceEmailVerification(args: {
-  email: string
-  companyName: string
-  code: string
-}) {
+export async function confirmWorkplaceEmailVerification(
+  args: {
+    email: string
+    companyName: string
+    code: string
+  },
+  t: Translate,
+) {
   const response = await fetch('/api/agent-auth/work-email', {
     method: 'POST',
     credentials: 'include',
@@ -45,7 +54,7 @@ export async function confirmWorkplaceEmailVerification(args: {
   } | null
 
   if (!response.ok) {
-    throw new Error(data?.error || '인증에 실패했어요')
+    throw new Error(data?.error || t('me.verification.errors.confirmFailed'))
   }
 
   return {

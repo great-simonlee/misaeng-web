@@ -6,6 +6,8 @@ import {
   getCommunityCreditSummary,
 } from '@lib/community/creditLedger'
 import { isCommunityCreditStorageConfigured } from '@lib/supabase/communityCredit.server'
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -28,17 +30,18 @@ function json(
 }
 
 export async function GET(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
     if (!isCommunityCreditStorageConfigured()) {
       return json(
-        { error: 'Supabase 설정이 필요해요.', code: 'STORAGE_UNAVAILABLE' },
+        { error: t('common.supabaseNotConfigured'), code: 'STORAGE_UNAVAILABLE' },
         { status: 503 },
       )
     }
 
     const user = await resolveAuthenticatedUser()
     if (!user?.uid) {
-      return json({ error: '로그인이 필요해요.' }, { status: 401 })
+      return json({ error: t('common.loginRequired') }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -57,10 +60,7 @@ export async function GET(request: Request) {
     console.error('Community credit GET error:', error)
     return json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : '크레딧 정보를 불러오지 못했어요.',
+        error: apiErrorMessage(t, error, 'credit.loadFailed'),
       },
       { status: 500 },
     )

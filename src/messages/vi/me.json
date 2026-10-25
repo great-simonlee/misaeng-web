@@ -1,0 +1,333 @@
+{
+  "nickname": {
+    "checkFailed": "Không thể kiểm tra biệt danh này.",
+    "available": "Bạn có thể dùng biệt danh này",
+    "taken": "Biệt danh này đã có người dùng.",
+    "ruleHint": "Chỉ dùng chữ cái tiếng Anh và dấu \".\"",
+    "errors": {
+      "tooShort": "Biệt danh cần có ít nhất {min} ký tự",
+      "tooLong": "Biệt danh tối đa {max} ký tự",
+      "invalidChars": "Chỉ dùng chữ cái tiếng Anh và dấu \".\""
+    }
+  },
+  "profile": {
+    "gender": {
+      "male": "Nam",
+      "female": "Nữ",
+      "other": "Khác"
+    },
+    "occupation": {
+      "student": "Sinh viên",
+      "professional": "Người đi làm",
+      "other": "Khác"
+    },
+    "changePhotoAria": "Đổi ảnh đại diện",
+    "title": "Hồ sơ",
+    "nicknameLabel": "Biệt danh",
+    "notSet": "Chưa thiết lập",
+    "edit": "Sửa",
+    "set": "Thiết lập",
+    "saving": "Đang lưu…",
+    "genderLabel": "Giới tính",
+    "occupationLabel": "Nghề nghiệp",
+    "nicknamePlaceholder": "VD: food.hunter",
+    "photoAlt": "Hồ sơ của {name}"
+  },
+  "statusEmployer": {
+    "fieldLabel": "Trường / công ty / tổ chức (không bắt buộc)",
+    "modeName": "Nhập tên công ty",
+    "modeCategory": "Chọn loại công ty",
+    "namePlaceholder": "Nhập tên công ty",
+    "categoryTitle": "Loại công ty",
+    "categoryPlaceholder": "Chọn loại",
+    "noSelection": "Không chọn",
+    "option": "Công ty {industry} {origin}",
+    "other": "Khác",
+    "origins": {
+      "korean": "Hàn Quốc",
+      "us": "Mỹ",
+      "foreign": "nước ngoài"
+    },
+    "industries": {
+      "tech": "IT & Phần mềm",
+      "finance": "Tài chính & Fintech",
+      "consulting": "Tư vấn",
+      "healthcare": "Y tế & Công nghệ sinh học",
+      "accounting": "Kế toán & Thuế",
+      "engineering": "Sản xuất & Kỹ thuật",
+      "marketing": "Marketing"
+    }
+  },
+  "verification": {
+    "errors": {
+      "sendFailed": "Không thể gửi email xác minh",
+      "confirmFailed": "Xác minh thất bại",
+      "emailNotConfigured": "Email chưa được thiết lập. Hãy kiểm tra {envVar}."
+    },
+    "phone": {
+      "errors": {
+        "required": "Nhập số điện thoại của bạn",
+        "invalidFormat": "Số điện thoại có vẻ không đúng",
+        "unsupportedCountry": "Nhập số của Mỹ (+1) hoặc Hàn Quốc (+82)",
+        "sendFailed": "Không thể gửi tin nhắn xác minh",
+        "confirmFailed": "Xác minh số điện thoại thất bại"
+      },
+      "smsDisabledShort": "SMS đang tắt",
+      "afterSchool": "Sau khi xác minh trường",
+      "rowLabel": "Điện thoại",
+      "rowHint": "Xác minh bằng số điện thoại",
+      "smsDisabled": "Xác minh qua SMS hiện đang tắt.",
+      "verifiedToast": "Số điện thoại của bạn đã được xác minh",
+      "unavailable": "Khả dụng khi đã kết nối Supabase",
+      "title": "Xác minh số điện thoại",
+      "description": "Xác minh qua SMS bằng số của Mỹ (+1) hoặc Hàn Quốc (+82). Tối đa {max} lần mỗi ngày cho mỗi tài khoản, mỗi lần cách nhau {seconds} giây.",
+      "testOnly": "Hiện chỉ các số thử nghiệm đã được duyệt mới dùng được.",
+      "getCode": "Gửi mã cho tôi",
+      "codeSentTo": "Nhập mã chúng tôi đã gửi tới {phone}.",
+      "codePlaceholder": "Mã 6 chữ số",
+      "resendCode": "Gửi lại tin nhắn"
+    },
+    "workplace": {
+      "errors": {
+        "required": "Nhập email công việc của bạn.",
+        "invalidFormat": "Nhập địa chỉ email hợp lệ.",
+        "personalDomain": "Không thể dùng email cá nhân như Gmail. Hãy nhập email bạn dùng ở nơi làm việc.",
+        "companyRequired": "Nhập tên công ty của bạn"
+      },
+      "pendingDetail": "Đã xác minh email · Đang chờ đội ngũ Misaeng xem xét",
+      "retry": "Vui lòng xác minh lại",
+      "rowHint": "Xác minh bằng email công việc và tên công ty",
+      "rowLabel": "Xác minh nơi làm việc",
+      "submittedToast": "Email của bạn đã được xác minh. Việc xác minh nơi làm việc sẽ hoàn tất sau khi đội ngũ Misaeng xem xét.",
+      "approvedTitle": "Đã xác minh nơi làm việc",
+      "pendingTitle": "Đang xem xét xác minh nơi làm việc",
+      "approvedDescription": "Đội ngũ Misaeng đã xác nhận nơi làm việc của bạn.",
+      "pendingDescription": "Email công việc của bạn đã được xác minh. Đội ngũ Misaeng đang xem xét thông tin công ty của bạn.",
+      "formDescription": "Email công việc sẽ được liên kết với tài khoản bạn đang đăng nhập, kể cả khi khác với email đăng ký. Sau khi bạn nhập mã, đội ngũ Misaeng sẽ kiểm tra lại thông tin công ty.",
+      "companyLabel": "Tên công ty",
+      "companyPlaceholder": "VD: Misaeng LLC",
+      "emailLabel": "Email công việc",
+      "confirmButton": "Xác minh email",
+      "editForm": "Đổi công ty hoặc email"
+    },
+    "verifiedShort": "Đã xác minh",
+    "school": {
+      "rowLabel": "Email trường",
+      "rowHint": "Xác minh bạn là sinh viên bằng email trường",
+      "verifiedWithSchool": "Đã xác minh với {school}",
+      "verifiedToast": "Email trường của bạn đã được xác minh",
+      "registrationSentToast": "Chúng tôi đã nhận yêu cầu thêm trường của bạn và sẽ phản hồi sau khi xem xét.",
+      "errors": {
+        "eduRequired": "Nhập email trường đuôi .edu",
+        "unsupported": "Chúng tôi chưa hỗ trợ trường này. Hãy gửi yêu cầu để thêm trường.",
+        "nameRequired": "Nhập tên trường",
+        "invalidDomain": "Nhập tên miền email hợp lệ (VD: monroeu.com)",
+        "registrationFailed": "Không thể gửi yêu cầu thêm trường"
+      },
+      "registerTitle": "Yêu cầu thêm trường",
+      "registerDescription": "Nếu trường của bạn chưa có trong danh sách, bạn có thể đề nghị đội ngũ Misaeng thêm vào. Cho chúng tôi biết tên trường và tên miền email, chúng tôi sẽ thêm vào {brand} và ứng dụng.",
+      "nameLabel": "Tên trường",
+      "domainLabel": "Tên miền email trường",
+      "domainHint": "Chỉ nhập tên miền, không có @ (VD: monroeu.com)",
+      "registerSubmit": "Gửi yêu cầu tới đội ngũ Misaeng",
+      "backToVerify": "Quay lại xác minh email trường",
+      "verifyTitle": "Xác minh email trường",
+      "formDescription": "Email trường sẽ được liên kết với tài khoản bạn đang đăng nhập, kể cả khi khác với email đăng ký. Chúng tôi sẽ gửi mã 6 chữ số tới email trường của bạn.",
+      "notFoundRequest": "Không tìm thấy trường của bạn? Gửi yêu cầu"
+    },
+    "instagram": {
+      "rowLabel": "Instagram",
+      "rowHint": "Kết nối tài khoản"
+    },
+    "title": "Xác minh",
+    "description": "Email trường hoặc email công việc sẽ được liên kết với tài khoản này, kể cả khi khác với email bạn dùng để đăng ký.",
+    "status": {
+      "soon": "Sắp có",
+      "verified": "Đã xác minh",
+      "inReview": "Đang xem xét",
+      "verify": "Xác minh"
+    },
+    "chooser": {
+      "title": "Xác minh danh tính",
+      "description": "Xác minh bằng email trường hoặc email công việc, tùy cách nào tiện hơn. Email này sẽ liên kết với tài khoản kể cả khi khác với email đăng ký.",
+      "school": "Xác minh sinh viên bằng email trường",
+      "workplace": "Xác minh người đi làm bằng email công việc"
+    },
+    "clearInputAria": "Xóa nội dung đã nhập",
+    "sending": "Đang gửi…",
+    "getCode": "Nhận mã xác minh",
+    "codeSentTo": "Nhập mã 6 chữ số chúng tôi đã gửi tới{br}{email}",
+    "checking": "Đang kiểm tra…",
+    "resendIn": "Gửi lại sau {seconds} giây",
+    "resendCode": "Gửi lại mã",
+    "confirmButton": "Xác minh",
+    "digitAria": "Chữ số thứ {position} của mã xác minh"
+  },
+  "toasts": {
+    "loggedOut": "Bạn đã đăng xuất",
+    "photoSaved": "Đã cập nhật ảnh đại diện",
+    "photoFailed": "Không thể tải ảnh lên",
+    "nicknameSaved": "Đã lưu biệt danh",
+    "nicknameFailed": "Không thể lưu biệt danh",
+    "mbtiSaved": "Đã lưu MBTI",
+    "mbtiCleared": "Đã xóa MBTI",
+    "mbtiFailed": "Không thể lưu MBTI",
+    "genderSaved": "Đã lưu giới tính",
+    "genderFailed": "Không thể lưu giới tính",
+    "occupationSaved": "Đã lưu nghề nghiệp",
+    "occupationFailed": "Không thể lưu nghề nghiệp",
+    "profileSaved": "Đã lưu hồ sơ",
+    "profileFailed": "Không thể lưu hồ sơ"
+  },
+  "title": "Trang của tôi",
+  "suspendedNotice": "Tài khoản này đang bị tạm khóa. Bạn vẫn có thể xem, nhưng không thể đăng bài, bình luận hay yêu cầu credit.",
+  "nicknameSheet": {
+    "title": "Đặt biệt danh",
+    "minLength": "Tối thiểu {min} ký tự"
+  },
+  "actions": {
+    "cancel": "Hủy",
+    "save": "Lưu"
+  },
+  "setupSheet": {
+    "title": "Hoàn thiện hồ sơ",
+    "description": "Điền thông tin hồ sơ hiển thị trong cộng đồng. Họ tên chỉ dùng cho tài khoản, còn biệt danh là tên mọi người trong cộng đồng nhìn thấy.",
+    "firstNameLabel": "Tên",
+    "lastNameLabel": "Họ",
+    "nicknameLabel": "Biệt danh (hiển thị trong cộng đồng)",
+    "later": "Để sau",
+    "save": "Lưu"
+  },
+  "logout": {
+    "title": "Đăng xuất",
+    "descriptionMobile": "Đăng xuất tài khoản trên thiết bị này",
+    "descriptionDesktop": "Đăng xuất tài khoản"
+  },
+  "loadingAria": "Đang tải Trang của tôi",
+  "suspended": {
+    "title": "Tài khoản của bạn đang bị tạm khóa",
+    "toMyPage": "Đến Trang của tôi"
+  },
+  "verificationRequired": {
+    "title": "Cần xác minh",
+    "toCommunityHome": "Về trang chủ cộng đồng"
+  },
+  "cardAction": {
+    "profile": {
+      "title": "Hoàn thiện hồ sơ",
+      "description": "Thiết lập biệt danh, MBTI, giới tính và nghề nghiệp",
+      "descriptionDesktop": "Thiết lập thông tin cơ bản"
+    },
+    "identity": {
+      "title": "Xác minh danh tính",
+      "description": "Xác minh bằng email trường hoặc email công việc",
+      "descriptionDesktop": "Xác minh bằng email trường hoặc công việc"
+    },
+    "school": {
+      "title": "Xác minh email trường",
+      "description": "Hoàn tất xác minh sinh viên bằng email trường",
+      "descriptionDesktop": "Xác minh bạn là sinh viên"
+    },
+    "workplace": {
+      "title": "Xác minh nơi làm việc",
+      "description": "Xác minh bằng email công việc và tên công ty",
+      "descriptionDesktop": "Xác minh bạn là người đi làm"
+    },
+    "workplacePending": {
+      "title": "Chúng tôi đang xem xét xác minh nơi làm việc",
+      "description": "Email của bạn đã được xác minh. Vui lòng chờ đội ngũ Misaeng xem xét",
+      "descriptionDesktop": "Đang chờ đội ngũ Misaeng xem xét"
+    }
+  },
+  "credit": {
+    "loadFailed": "Không thể tải credit",
+    "ledgerLoadFailed": "Không thể tải lịch sử credit",
+    "redeemComingSoon": "Tính năng đổi thưởng đang được mở dần. Xem hướng dẫn credit để biết chi tiết.",
+    "loadFailedRetry": "Không thể tải credit · Thử lại",
+    "pillAria_other": "{count} credit cộng đồng, xem lịch sử",
+    "unit": "credit",
+    "history": "Lịch sử",
+    "requestTitle": "Dùng credit",
+    "balanceLabel": "Credit của bạn",
+    "requestDescription": "Chọn phần thưởng bạn muốn dùng. Sau khi bạn gửi yêu cầu, Misaeng sẽ xem xét và kết nối cho bạn.",
+    "optionMeta_other": "{duration} · {count} lần mỗi tháng",
+    "needMore_other": "Bạn cần thêm {count} credit",
+    "redeemGuideLink": "Tìm hiểu thêm về phần thưởng",
+    "submit": "Gửi yêu cầu",
+    "historyTitle": "Lịch sử credit",
+    "guideLink": "Xem hướng dẫn",
+    "retry": "Thử lại",
+    "emptyTitle": "Chưa có lịch sử",
+    "emptyDescription": "Kiếm credit bằng cách chia sẻ quán ăn, viết review và bình luận.",
+    "writeFoodReview": "Viết review ăn uống",
+    "kinds": {
+      "earn": "Nhận được",
+      "revoke": "Bị thu hồi",
+      "spend": "Đã dùng",
+      "restore": "Được hoàn lại",
+      "other": "Khác"
+    }
+  },
+  "referral": {
+    "linkCopied": "Đã sao chép link giới thiệu",
+    "copyFailed": "Không thể sao chép link. Hãy chia sẻ trực tiếp mã của bạn.",
+    "errors": {
+      "invalidCode": "Nhập mã giới thiệu 8 ký tự",
+      "ownCode": "Bạn không thể dùng mã của chính mình"
+    },
+    "bound": "Đã liên kết người giới thiệu",
+    "title": "Giới thiệu bạn bè",
+    "description": "Mỗi khi có người dùng mã giới thiệu của bạn, bạn nhận được {credits}. Tối đa {max} người và bạn không thể tự giới thiệu chính mình.",
+    "creditsAmount_other": "{count} credit",
+    "copying": "Đang sao chép…",
+    "shareButton": "Mời bạn bè",
+    "myCode": "Mã giới thiệu của tôi",
+    "loading": "Đang tải…",
+    "usedCount": "Đã dùng {used}/{max} người",
+    "enterReferrer": "Nhập người giới thiệu",
+    "boundTo": "Đã liên kết với mã giới thiệu {code}.",
+    "codePlaceholder": "Mã giới thiệu 8 ký tự",
+    "binding": "Đang liên kết…",
+    "bind": "Liên kết"
+  },
+  "posts": {
+    "loadFailed": "Không thể tải bài viết của bạn",
+    "deleteConfirm": "Xóa \"{title}\"?\nKhông thể hoàn tác thao tác này.",
+    "deleted": "Đã xóa bài viết",
+    "deleteFailed": "Không thể xóa bài viết",
+    "title": "Bài viết của tôi",
+    "description": "Xem bài viết của bạn trong cộng đồng theo danh mục, sửa hoặc xóa bài",
+    "categoryAria": "Danh mục bài viết",
+    "emptyAll": "Bạn chưa đăng bài viết nào",
+    "emptyCategory": "Không có bài viết nào trong {category}",
+    "emptyAllHint": "Bài viết bạn đăng ở bất kỳ bảng tin nào sẽ hiển thị tại đây",
+    "emptyCategoryHint": "Bài viết bạn đăng ở bảng tin này sẽ hiển thị tại đây",
+    "browseBoards": "Xem các bảng tin",
+    "edit": "Sửa",
+    "deleting": "Đang xóa…",
+    "delete": "Xóa"
+  },
+  "list": {
+    "redirectingToLogin": "Đang chuyển tới trang đăng nhập…",
+    "totalCount_other": "Tất cả {count}",
+    "count_other": "{count} bài viết",
+    "categoryHeading": "Danh mục",
+    "all": "Tất cả",
+    "loading": "Đang tải bài viết…",
+    "thisCategory": "danh mục này",
+    "viewBoard": "Xem {board}",
+    "viewDetail": "Xem chi tiết"
+  },
+  "likes": {
+    "title": "Bài viết đã thích",
+    "description": "Xem lại các bài viết bạn đã lưu từ Nhà ở, Ăn uống và OPT/Visa ở cùng một nơi",
+    "categoryAria": "Danh mục bài viết đã thích",
+    "emptyAll": "Bạn chưa thích bài viết nào",
+    "emptyCategory": "Không có bài viết đã thích nào trong {category}",
+    "emptyAllHint": "Nhấn vào trái tim ở bài viết bạn thích để lưu lại tại đây",
+    "emptyCategoryHint": "Nhấn vào trái tim ở bài viết trong bảng tin này để lưu lại tại đây",
+    "browseHousing": "Xem nhà ở",
+    "rent": "{amount}/tháng",
+    "rentWithNet": "{gross} / {net}/tháng"
+  }
+}

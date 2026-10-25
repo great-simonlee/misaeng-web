@@ -1,10 +1,12 @@
 'use client'
 
+import { TranslationNotice } from '@widgets/TranslationNotice'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useCity, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
+import { BRAND_CONFIG } from '@lib/brand'
 import {
   cityFirst,
   cityFirstText,
@@ -20,25 +22,27 @@ import {
   DEGREE_LABELS,
   JOB_FUNCTION_LABELS,
   JOB_FUNCTIONS,
-  postingCopy,
   type DegreeLevel,
   type JobFunction,
 } from '@lib/constants/postingCopy'
+import { useFormat, useT } from '@lib/i18n/client'
+import type { Translate } from '@lib/i18n/translate'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CompanyMark } from '@widgets/nyc/CompanyBrand'
 
+/** 문구 키 (companies 네임스페이스) */
 const LEVEL_LABEL: Record<PostingLevel, string> = {
-  intern: postingCopy.levelIntern,
-  new_grad: postingCopy.levelNewGrad,
+  intern: 'postings.level.intern',
+  new_grad: 'postings.level.new_grad',
 }
 const LEVEL_TONE: Record<PostingLevel, string> = {
   intern: 'bg-[#fff1eb] text-[var(--brand)] ring-[#ffd2c2]',
   new_grad: 'bg-[#eef2ff] text-[#4338ca] ring-[#c7d2fe]',
 }
 const WORK_LABEL: Partial<Record<PublicPosting['workArrangement'], string>> = {
-  remote: postingCopy.workRemote,
-  hybrid: postingCopy.workHybrid,
-  onsite: postingCopy.workOnsite,
+  remote: 'postings.work.remote',
+  hybrid: 'postings.work.hybrid',
+  onsite: 'postings.work.onsite',
 }
 const TAG = 'inline-flex items-center rounded-md px-2 py-[3px] text-[11px] font-semibold leading-none ring-1'
 const FUNCTION_TAG = 'bg-[#ecfeff] text-[#0e7490] ring-[#a5f3fc]'
@@ -48,38 +52,33 @@ const DEGREE_TAG: Record<DegreeLevel, string> = {
   both: 'bg-[#f5f3ff] text-[#6d28d9] ring-[#ddd6fe]',
   unspecified: 'bg-[#f4f5f7] text-[var(--muted)] ring-black/[0.05]',
 }
-/** 구분 필터 칩: 레벨(인턴·신입)과 자동 태그(한국어 우대·한국 근무) */
-export const KIND_OPTIONS: { id: Exclude<PostingKind, 'all'>; label: string }[] = [
-  { id: 'intern', label: postingCopy.levelIntern },
-  { id: 'new_grad', label: postingCopy.levelNewGrad },
-  { id: 'korean_preferred', label: postingCopy.tagKoreanPreferred },
-  { id: 'korea_based', label: postingCopy.tagKoreaBased },
+/** 구분 필터 칩: 레벨(인턴·신입)과 자동 태그(한국어 우대·한국 근무). labelKey: companies 문구 키 */
+export const KIND_OPTIONS: { id: Exclude<PostingKind, 'all'>; labelKey: string }[] = [
+  { id: 'intern', labelKey: 'postings.level.intern' },
+  { id: 'new_grad', labelKey: 'postings.level.new_grad' },
+  { id: 'korean_preferred', labelKey: 'postings.tag.korean_preferred' },
+  { id: 'korea_based', labelKey: 'postings.tag.korea_based' },
 ]
 
-/** 공고가 있는 구분만 [id, label, count] */
-export function kindCounts(postings: PublicPosting[]) {
-  return KIND_OPTIONS.map((k) => [k.id, k.label, postings.filter((p) => matchesKind(p, k.id)).length] as const).filter(
-    ([, , count]) => count > 0,
-  )
+/** 공고가 있는 구분만 [id, label, count]. t는 `useT('companies')` */
+export function kindCounts(postings: PublicPosting[], t: Translate) {
+  return KIND_OPTIONS.map(
+    (k) => [k.id, t(k.labelKey), postings.filter((p) => matchesKind(p, k.id)).length] as const,
+  ).filter(([, , count]) => count > 0)
 }
 
 const TAG_LABEL: Record<string, string> = {
-  korean_preferred: postingCopy.tagKoreanPreferred,
-  korea_based: postingCopy.tagKoreaBased,
+  korean_preferred: 'postings.tag.korean_preferred',
+  korea_based: 'postings.tag.korea_based',
 }
 
 /** 회사 페이지에서 처음 보여 주는 공고 수 */
 const COMPANY_PAGE_SIZE = 5
 
-function formatDate(ms: number) {
-  if (!Number.isFinite(ms) || ms <= 0) return ''
-  return new Date(ms).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
-}
-
-/** "2026-11-07" → "11월 7일" (달력 날짜라 시간대 변환 없이) */
-function formatIsoDate(iso: string) {
-  const [, m, d] = iso.split('-').map(Number)
-  return `${m}월 ${d}일`
+/** "2026-11-07" → "11월 7일" / "Nov 7" (달력 날짜라 시간대 변환 없이: UTC 자정으로 읽어 UTC로 표시) */
+function useIsoDate() {
+  const format = useFormat()
+  return (iso: string) => format.date(`${iso}T00:00:00Z`, { month: 'short', day: 'numeric', timeZone: 'UTC' })
 }
 
 /** "A · B · C": 구분점은 항목 사이에만 (줄 끝에 남지 않도록 점을 다음 항목에 붙인다) */
@@ -104,14 +103,16 @@ function MetaLine({ items }: { items: (MetaItem | null)[] }) {
 const URGENT_DAYS = 7
 
 function DeadlineText({ applyBy }: { applyBy: string }) {
+  const t = useT('companies')
+  const formatIsoDate = useIsoDate()
   const days = daysUntil(applyBy)
   const urgent = days >= 0 && days <= URGENT_DAYS
   return (
     <span className={cn('inline-flex items-center gap-1', urgent ? 'font-semibold text-[#dc2626]' : 'text-[var(--muted-foreground)]')}>
-      {postingCopy.deadline(formatIsoDate(applyBy))}
+      {t('postings.deadline', { date: formatIsoDate(applyBy) })}
       {urgent ? (
         <span className='rounded bg-[#fee2e2] px-1.5 py-[2px] text-[10px] font-bold leading-none text-[#b91c1c]'>
-          {postingCopy.dDay(days)}
+          {days === 0 ? t('postings.dueToday') : t('postings.daysLeft', { count: days })}
         </span>
       ) : null}
     </span>
@@ -120,23 +121,24 @@ function DeadlineText({ applyBy }: { applyBy: string }) {
 
 /** 펼친 공고 맨 위: 마감일 · 조기 지원 · 지원 팁. 하나도 없으면 그리지 않는다. */
 function ApplyGuide({ posting }: { posting: PublicPosting }) {
+  const t = useT('companies')
   const { applyNotes, earlyApply } = posting.summary
-  // "빨리 지원할수록 유리" 팁이 이미 있으면 같은 말을 두 번 하지 않는다.
-  const notes = earlyApply && !applyNotes.some((n) => /빨리|일찍|수시/.test(n))
-    ? [postingCopy.earlyApplyNote, ...applyNotes]
+  // "빨리 지원할수록 유리" 팁이 이미 있으면 같은 말을 두 번 하지 않는다 (서버가 한국어 원문으로 판단).
+  const notes = earlyApply && !posting.summary.earlyApplyMentioned
+    ? [t('postings.earlyApplyNote'), ...applyNotes]
     : applyNotes
   const { alwaysOpen } = posting.summary
   if (!posting.applyBy && !alwaysOpen && !notes.length) return null
   return (
     <div className='rounded-xl bg-[#f0fdf4] px-3.5 py-3 ring-1 ring-[#bbf7d0]'>
       <p className='flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] font-bold text-[#14532d]'>
-        {postingCopy.applyGuideTitle}
+        {t('postings.applyGuideTitle')}
         {posting.applyBy ? (
           <span className='text-[12px] font-semibold'>
             <DeadlineText applyBy={posting.applyBy} />
           </span>
         ) : alwaysOpen ? (
-          <span className='text-[12px] font-semibold'>{postingCopy.alwaysOpen}</span>
+          <span className='text-[12px] font-semibold'>{t('postings.alwaysOpen')}</span>
         ) : null}
       </p>
       {notes.length ? (
@@ -154,9 +156,9 @@ function ApplyGuide({ posting }: { posting: PublicPosting }) {
 }
 
 /** "Charlotte, NC · Dallas, TX 외 1곳" */
-function regionSummary(regions: string[]) {
+function regionSummary(regions: string[], t: Translate) {
   if (regions.length <= 2) return regions.join(' · ')
-  return `${regions.slice(0, 2).join(' · ')} ${postingCopy.moreRegions(regions.length - 2)}`
+  return t('postings.regionsMore', { regions: regions.slice(0, 2).join(' · '), count: regions.length - 2 })
 }
 
 /**
@@ -176,8 +178,16 @@ export function PostingRow({
 }) {
   const href = useCityPath()
   const city = useCity()
+  const t = useT('companies')
+  const format = useFormat()
+  const brand = BRAND_CONFIG.name
   const { summary } = posting
-  const work = WORK_LABEL[posting.workArrangement]
+  const workKey = WORK_LABEL[posting.workArrangement]
+  const work = workKey ? t(workKey) : undefined
+  const postedDate =
+    Number.isFinite(posting.postedAt) && posting.postedAt > 0
+      ? format.date(posting.postedAt, { month: 'short', day: 'numeric' })
+      : ''
   const detailId = `posting-${posting.id}`
   // 보고 있는 도시(뉴욕 등)가 지역 목록 맨 앞에 오도록
   const regions = cityFirst(posting.regions, city)
@@ -213,16 +223,16 @@ export function PostingRow({
               </span>
             ) : null}
             <span className='flex flex-wrap items-center gap-1.5'>
-              <span className={cn(TAG, LEVEL_TONE[posting.level])}>{LEVEL_LABEL[posting.level]}</span>
+              <span className={cn(TAG, LEVEL_TONE[posting.level])}>{t(LEVEL_LABEL[posting.level])}</span>
               {posting.jobFunction && posting.jobFunction !== 'other' ? (
-                <span className={cn(TAG, FUNCTION_TAG)}>{JOB_FUNCTION_LABELS[posting.jobFunction]}</span>
+                <span className={cn(TAG, FUNCTION_TAG)}>{t(JOB_FUNCTION_LABELS[posting.jobFunction])}</span>
               ) : null}
-              <span className={cn(TAG, DEGREE_TAG[summary.degree])}>{DEGREE_LABELS[summary.degree]}</span>
+              <span className={cn(TAG, DEGREE_TAG[summary.degree])}>{t(DEGREE_LABELS[summary.degree])}</span>
               {posting.tags
-                .filter((t) => TAG_LABEL[t])
-                .map((t) => (
-                  <span key={t} className={cn(TAG, 'bg-[#fff1f2] text-[#be123c] ring-[#fecdd3]')}>
-                    {TAG_LABEL[t]}
+                .filter((tag) => TAG_LABEL[tag])
+                .map((tag) => (
+                  <span key={tag} className={cn(TAG, 'bg-[#fff1f2] text-[#be123c] ring-[#fecdd3]')}>
+                    {t(TAG_LABEL[tag])}
                   </span>
                 ))}
             </span>
@@ -234,9 +244,9 @@ export function PostingRow({
               <span className='mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[12px] text-[var(--muted-foreground)]'>
                 {[
                   posting.applyBy ? <DeadlineText key='deadline' applyBy={posting.applyBy} /> : null,
-                  !posting.applyBy && summary.alwaysOpen ? <span key='always'>{postingCopy.alwaysOpen}</span> : null,
-                  summary.earlyApply ? <span key='early'>{postingCopy.earlyApply}</span> : null,
-                  posting.noSponsorship ? <span key='sponsor'>{postingCopy.noSponsorshipShort}</span> : null,
+                  !posting.applyBy && summary.alwaysOpen ? <span key='always'>{t('postings.alwaysOpen')}</span> : null,
+                  summary.earlyApply ? <span key='early'>{t('postings.earlyApply')}</span> : null,
+                  posting.noSponsorship ? <span key='sponsor'>{t('postings.noSponsorshipShort')}</span> : null,
                 ]
                   .filter(Boolean)
                   .map((node, i) => (
@@ -249,10 +259,10 @@ export function PostingRow({
             ) : null}
             <MetaLine
               items={[
-                regions.length ? { key: 'regions', node: regionSummary(regions) } : null,
+                regions.length ? { key: 'regions', node: regionSummary(regions, t) } : null,
                 work ? { key: 'work', node: work } : null,
                 // 등록일은 넓은 화면에서만 (모바일은 줄이 길어진다)
-                { key: 'posted', node: postingCopy.postedOn(formatDate(posting.postedAt)), desktopOnly: true },
+                { key: 'posted', node: t('postings.postedOn', { date: postedDate }), desktopOnly: true },
               ]}
             />
           </span>
@@ -261,7 +271,14 @@ export function PostingRow({
       </div>
 
       {open ? (
-        <div id={detailId} className='space-y-3 px-4 pb-4 text-[13px] leading-relaxed sm:px-5 sm:text-[14px]'>
+        <div
+          id={detailId}
+          lang={posting.i18n?.state === 'pending' ? posting.i18n.sourceLocale : undefined}
+          className='space-y-3 px-4 pb-4 text-[13px] leading-relaxed sm:px-5 sm:text-[14px]'
+        >
+          {posting.i18n?.state === 'pending' ? (
+            <TranslationNotice i18n={posting.i18n} showingOriginal={false} onToggle={() => {}} />
+          ) : null}
           <ApplyGuide posting={posting} />
           <ul className='space-y-1 text-[var(--muted-foreground)]'>
             {summary.overview.map((line, i) => (
@@ -273,12 +290,12 @@ export function PostingRow({
           </ul>
           {posting.noSponsorship ? (
             <p className='rounded-xl bg-[#fff7ed] px-3 py-2 text-[12px] font-medium text-[#c2410c]'>
-              {postingCopy.noSponsorship}
+              {t('postings.noSponsorship')}
             </p>
           ) : null}
           {summary.qualifications.length ? (
             <div>
-              <p className='font-semibold text-[var(--foreground)]'>{postingCopy.qualificationsTitle}</p>
+              <p className='font-semibold text-[var(--foreground)]'>{t('postings.qualificationsTitle')}</p>
               <ul className='mt-1 list-disc space-y-0.5 pl-5 text-[var(--muted-foreground)]'>
                 {summary.qualifications.map((line, i) => (
                   <li key={i}>{line}</li>
@@ -289,13 +306,13 @@ export function PostingRow({
           <dl className='grid gap-1.5 sm:grid-cols-[80px_1fr]'>
             {summary.workType ? (
               <>
-                <dt className='font-semibold text-[var(--foreground)]'>{postingCopy.workTypeLabel}</dt>
+                <dt className='font-semibold text-[var(--foreground)]'>{t('postings.workTypeLabel')}</dt>
                 <dd className='text-[var(--muted-foreground)]'>{summary.workType}</dd>
               </>
             ) : null}
             {summary.location ? (
               <>
-                <dt className='font-semibold text-[var(--foreground)]'>{postingCopy.locationLabel}</dt>
+                <dt className='font-semibold text-[var(--foreground)]'>{t('postings.locationLabel')}</dt>
                 <dd className='text-[var(--muted-foreground)]'>{cityFirstText(summary.location, city)}</dd>
               </>
             ) : null}
@@ -308,10 +325,10 @@ export function PostingRow({
               onClick={() => trackPostingClick(posting.id)}
               className='inline-flex h-9 items-center gap-1 rounded-full bg-[var(--foreground)] px-4 text-[13px] font-semibold text-white transition hover:opacity-90 active:scale-[0.98]'
             >
-              {postingCopy.applyButton}
+              {t('postings.applyButton')}
               <ExternalIcon className='size-3.5' />
             </a>
-            <p className='min-w-0 flex-1 text-[11px] text-[var(--muted)]'>{postingCopy.summaryNotice}</p>
+            <p className='min-w-0 flex-1 text-[11px] text-[var(--muted)]'>{t('postings.summaryNotice', { brand })}</p>
           </div>
         </div>
       ) : null}
@@ -388,6 +405,7 @@ export function FilterChip({
 export function CompanyPostings({ companySlug, companyName }: { companySlug: string; companyName: string }) {
   const city = useCity()
   const href = useCityPath()
+  const t = useT('companies')
   const [postings, setPostings] = useState<PublicPosting[]>([])
   const [moreUrl, setMoreUrl] = useState<string | null>(null)
   const [kind, setKind] = useState<PostingKind>('all')
@@ -425,7 +443,7 @@ export function CompanyPostings({ companySlug, companyName }: { companySlug: str
     }
   }, [city, companySlug])
 
-  const kinds = useMemo(() => kindCounts(postings), [postings])
+  const kinds = useMemo(() => kindCounts(postings, t), [postings, t])
   const functions = useMemo(
     () =>
       JOB_FUNCTIONS.map((code) => [code, postings.filter((p) => p.jobFunction === code).length] as const).filter(
@@ -446,7 +464,7 @@ export function CompanyPostings({ companySlug, companyName }: { companySlug: str
     return moreUrl ? (
       <section>
         <h2 className='text-[17px] font-bold tracking-tight text-[var(--foreground)] sm:text-[19px]'>
-          {postingCopy.sectionTitle}
+          {t('postings.sectionTitle')}
         </h2>
         <MoreOnCareersLink url={moreUrl} companyName={companyName} className='mt-3' />
       </section>
@@ -466,12 +484,12 @@ export function CompanyPostings({ companySlug, companyName }: { companySlug: str
     <section>
       <div className='flex items-center gap-3'>
         <h2 className='flex items-baseline gap-2 text-[17px] font-bold tracking-tight text-[var(--foreground)] sm:text-[19px]'>
-          {postingCopy.sectionTitle}
+          {t('postings.sectionTitle')}
           <span className='text-[14px] font-semibold tabular-nums text-[var(--muted)]'>{postings.length}</span>
         </h2>
         <span aria-hidden className='h-px flex-1 bg-gradient-to-r from-black/10 to-transparent' />
       </div>
-      <p className='mt-1 text-[12px] text-[var(--muted)] sm:text-[13px]'>{postingCopy.sectionDescription}</p>
+      <p className='mt-1 text-[12px] text-[var(--muted)] sm:text-[13px]'>{t('postings.sectionDescription', { brand: BRAND_CONFIG.name })}</p>
 
       {showLevelFilter || showFunctionFilter ? <div ref={stickySentinel} aria-hidden className='h-px' /> : null}
       {showLevelFilter || showFunctionFilter ? (
@@ -488,9 +506,9 @@ export function CompanyPostings({ companySlug, companyName }: { companySlug: str
           {showLevelFilter ? (
             // 레벨도 직무와 같은 칩 줄 ("전체"를 앞에 고정)
             <ChipScrollRow
-              ariaLabel={postingCopy.allLevels}
+              ariaLabel={t('postings.allLevels')}
               leading={
-                <FilterChip label={postingCopy.allLevels} active={kind === 'all'} onClick={() => pick(() => setKind('all'))} />
+                <FilterChip label={t('postings.allLevels')} active={kind === 'all'} onClick={() => pick(() => setKind('all'))} />
               }
             >
               {kinds.map(([id, label, count]) => (
@@ -501,10 +519,10 @@ export function CompanyPostings({ companySlug, companyName }: { companySlug: str
           {showFunctionFilter ? (
             // 직무는 많아질 수 있어 한 줄 가로 스크롤 (줄바꿈하지 않는다)
             <ChipScrollRow
-              ariaLabel={postingCopy.allFunctions}
+              ariaLabel={t('postings.allFunctions')}
               leading={
                 <FilterChip
-                  label={postingCopy.allFunctions}
+                  label={t('postings.allFunctions')}
                   active={jobFunction === 'all'}
                   onClick={() => pick(() => setJobFunction('all'))}
                 />
@@ -513,7 +531,7 @@ export function CompanyPostings({ companySlug, companyName }: { companySlug: str
               {functions.map(([code, count]) => (
                 <FilterChip
                   key={code}
-                  label={JOB_FUNCTION_LABELS[code]}
+                  label={t(JOB_FUNCTION_LABELS[code])}
                   count={count}
                   active={jobFunction === code}
                   onClick={() => pick(() => setJobFunction(code))}
@@ -529,7 +547,7 @@ export function CompanyPostings({ companySlug, companyName }: { companySlug: str
           <PostingRows postings={visible} />
         ) : (
           <p className='rounded-[1.25rem] bg-white px-5 py-8 text-center text-[13px] text-[var(--muted)] ring-1 ring-black/[0.06]'>
-            {postingCopy.noMatchTitle}
+            {t('postings.noMatchTitle')}
           </p>
         )}
       </div>
@@ -543,10 +561,12 @@ export function CompanyPostings({ companySlug, companyName }: { companySlug: str
             onClick={() => setShowAll((v) => !v)}
             className='inline-flex h-9 items-center rounded-full bg-[#f3f4f6] px-4 text-[13px] font-semibold text-[var(--muted-foreground)] transition hover:bg-[#e9ebee] hover:text-[var(--foreground)]'
           >
-            {showAll ? postingCopy.showLess : postingCopy.showMorePostings(filtered.length - COMPANY_PAGE_SIZE)}
+            {showAll
+              ? t('postings.showLess')
+              : t('postings.showMorePostings', { count: filtered.length - COMPANY_PAGE_SIZE })}
           </button>
           <Link href={href('/companies/postings')} className='text-[12px] font-semibold text-[var(--brand)] hover:underline'>
-            {postingCopy.listLink} ›
+            {t('postings.listLink')} ›
           </Link>
         </div>
       ) : null}
@@ -556,6 +576,7 @@ export function CompanyPostings({ companySlug, companyName }: { companySlug: str
 
 /** "더 많은 공고는 Google 공식 채용 사이트에서 확인하세요" (관리자가 등록한 감시 검색으로) */
 function MoreOnCareersLink({ url, companyName, className }: { url: string; companyName: string; className?: string }) {
+  const t = useT('companies')
   return (
     <a
       href={url}
@@ -566,7 +587,7 @@ function MoreOnCareersLink({ url, companyName, className }: { url: string; compa
         className,
       )}
     >
-      {postingCopy.moreOnCareers(companyName)}
+      {t('postings.moreOnCareers', { company: companyName })}
       <ExternalIcon className='size-3.5 shrink-0 text-[var(--muted)]' />
     </a>
   )

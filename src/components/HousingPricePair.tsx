@@ -1,4 +1,7 @@
+'use client'
+
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 interface HousingPricePairProps {
   gross: number
@@ -23,6 +26,7 @@ export function HousingPricePair({
   accent = false,
   className,
 }: HousingPricePairProps) {
+  const t = useT('housing')
   const isRow = layout === 'row' && net != null
   const amountClass =
     size === 'lg'
@@ -59,17 +63,17 @@ export function HousingPricePair({
         className={cn(
           'flex items-baseline gap-1.5 tabular-nums leading-none',
           amountClass,
-          accent ? 'text-[#F64310]' : 'text-[var(--foreground)]',
+          accent ? 'text-brand' : 'text-[var(--foreground)]',
         )}
       >
         <span>{money(gross)}</span>
         <span
           className={cn(
             labelClass,
-            accent && 'text-[#F64310]/70',
+            accent && 'text-brand/70',
           )}
         >
-          Gross
+          {t('price.gross')}
         </span>
       </p>
       {net != null ? (
@@ -80,7 +84,7 @@ export function HousingPricePair({
           )}
         >
           <span>{money(net)}</span>
-          <span className={labelClass}>Net</span>
+          <span className={labelClass}>{t('price.net')}</span>
         </p>
       ) : null}
     </div>

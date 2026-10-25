@@ -1,0 +1,333 @@
+{
+  "nickname": {
+    "checkFailed": "无法检查该昵称。",
+    "available": "该昵称可以使用",
+    "taken": "该昵称已被使用。",
+    "ruleHint": "只能使用英文字母和“.”",
+    "errors": {
+      "tooShort": "昵称至少需要 {min} 个字符",
+      "tooLong": "昵称最多 {max} 个字符",
+      "invalidChars": "只能使用英文字母和“.”"
+    }
+  },
+  "profile": {
+    "gender": {
+      "male": "男",
+      "female": "女",
+      "other": "其他"
+    },
+    "occupation": {
+      "student": "学生",
+      "professional": "上班族",
+      "other": "其他"
+    },
+    "changePhotoAria": "更换头像",
+    "title": "个人资料",
+    "nicknameLabel": "昵称",
+    "notSet": "尚未设置",
+    "edit": "编辑",
+    "set": "设置",
+    "saving": "保存中…",
+    "genderLabel": "性别",
+    "occupationLabel": "职业",
+    "nicknamePlaceholder": "例：food.hunter",
+    "photoAlt": "{name}的头像"
+  },
+  "statusEmployer": {
+    "fieldLabel": "学校 / 公司 / 机构（选填）",
+    "modeName": "输入公司名称",
+    "modeCategory": "选择公司类别",
+    "namePlaceholder": "请输入公司名称",
+    "categoryTitle": "公司类别",
+    "categoryPlaceholder": "选择类别",
+    "noSelection": "无",
+    "option": "{origin}{industry}公司",
+    "other": "其他",
+    "origins": {
+      "korean": "韩国",
+      "us": "美国",
+      "foreign": "外国"
+    },
+    "industries": {
+      "tech": "IT 软件",
+      "finance": "金融科技",
+      "consulting": "咨询",
+      "healthcare": "医疗生物",
+      "accounting": "会计税务",
+      "engineering": "制造工程",
+      "marketing": "营销"
+    }
+  },
+  "verification": {
+    "errors": {
+      "sendFailed": "验证邮件发送失败",
+      "confirmFailed": "验证失败",
+      "emailNotConfigured": "邮件服务尚未配置。请检查 {envVar}。"
+    },
+    "phone": {
+      "errors": {
+        "required": "请输入手机号",
+        "invalidFormat": "手机号格式不正确",
+        "unsupportedCountry": "请输入美国（+1）或韩国（+82）的号码",
+        "sendFailed": "验证短信发送失败",
+        "confirmFailed": "手机验证失败"
+      },
+      "smsDisabledShort": "短信已关闭",
+      "afterSchool": "学校验证后可用",
+      "rowLabel": "手机",
+      "rowHint": "使用手机号验证",
+      "smsDisabled": "手机短信验证目前已关闭。",
+      "verifiedToast": "手机已验证",
+      "unavailable": "连接 Supabase 后可用",
+      "title": "手机验证",
+      "description": "使用美国（+1）或韩国（+82）号码通过短信验证。每个账号每天限 {max} 次，间隔 {seconds} 秒。",
+      "testOnly": "目前仅支持已批准的测试号码。",
+      "getCode": "发送验证码短信",
+      "codeSentTo": "请输入发送到 {phone} 的验证码。",
+      "codePlaceholder": "6 位验证码",
+      "resendCode": "重新发送短信"
+    },
+    "workplace": {
+      "errors": {
+        "required": "请输入工作邮箱。",
+        "invalidFormat": "请输入有效的邮箱地址。",
+        "personalDomain": "不能使用 Gmail 等个人邮箱，请输入你在公司使用的邮箱。",
+        "companyRequired": "请输入公司名称"
+      },
+      "pendingDetail": "邮箱已验证 · 等待 Misaeng 团队审核",
+      "retry": "请重新验证",
+      "rowHint": "使用工作邮箱和公司名称验证",
+      "rowLabel": "职场验证",
+      "submittedToast": "邮箱已验证。Misaeng 团队审核后即完成职场验证。",
+      "approvedTitle": "职场验证已完成",
+      "pendingTitle": "职场验证审核中",
+      "approvedDescription": "Misaeng 团队已确认你的职场验证。",
+      "pendingDescription": "你的工作邮箱已验证，Misaeng 团队正在审核你的公司信息。",
+      "formDescription": "即使与注册邮箱不同，工作邮箱也会关联到当前登录的账号。输入验证码后，Misaeng 团队会再次核实你的公司信息。",
+      "companyLabel": "公司名称",
+      "companyPlaceholder": "例：Misaeng LLC",
+      "emailLabel": "工作邮箱",
+      "confirmButton": "验证邮箱",
+      "editForm": "更改公司或邮箱"
+    },
+    "verifiedShort": "已验证",
+    "school": {
+      "rowLabel": "学校邮箱",
+      "rowHint": "使用学校邮箱验证学生身份",
+      "verifiedWithSchool": "已通过 {school} 验证",
+      "verifiedToast": "学校邮箱已验证",
+      "registrationSentToast": "已收到你的学校添加申请，审核后我们会回复你。",
+      "errors": {
+        "eduRequired": "请输入 .edu 学校邮箱",
+        "unsupported": "暂不支持该学校，请提交添加申请。",
+        "nameRequired": "请输入学校名称",
+        "invalidDomain": "请输入有效的邮箱域名（例：monroeu.com）",
+        "registrationFailed": "学校添加申请发送失败"
+      },
+      "registerTitle": "申请添加学校",
+      "registerDescription": "如果列表中没有你的学校，可以请 Misaeng 团队添加。告诉我们学校名称和邮箱域名，我们会将其添加到 {brand} 和 App 中。",
+      "nameLabel": "学校名称",
+      "domainLabel": "学校邮箱域名",
+      "domainHint": "仅填写域名，不含 @（例：monroeu.com）",
+      "registerSubmit": "向 Misaeng 团队发送申请",
+      "backToVerify": "返回学校邮箱验证",
+      "verifyTitle": "学校邮箱验证",
+      "formDescription": "即使与注册邮箱不同，学校邮箱也会关联到当前登录的账号。我们会向你的学校邮箱发送 6 位验证码。",
+      "notFoundRequest": "找不到你的学校？申请添加"
+    },
+    "instagram": {
+      "rowLabel": "Instagram",
+      "rowHint": "关联你的账号"
+    },
+    "title": "验证",
+    "description": "即使与注册邮箱不同，学校或工作邮箱也会关联到这个账号。",
+    "status": {
+      "soon": "即将上线",
+      "verified": "已验证",
+      "inReview": "审核中",
+      "verify": "去验证"
+    },
+    "chooser": {
+      "title": "验证身份",
+      "description": "用学校邮箱或工作邮箱验证，选方便的就行。即使与注册邮箱不同，也会关联到这个账号。",
+      "school": "用学校邮箱验证学生身份",
+      "workplace": "用工作邮箱验证职场人身份"
+    },
+    "clearInputAria": "清除输入",
+    "sending": "发送中…",
+    "getCode": "获取验证码",
+    "codeSentTo": "请输入发送到{br}{email} 的 6 位验证码",
+    "checking": "验证中…",
+    "resendIn": "{seconds} 秒后重新发送",
+    "resendCode": "重新发送验证码",
+    "confirmButton": "验证",
+    "digitAria": "验证码第 {position} 位"
+  },
+  "toasts": {
+    "loggedOut": "已退出登录",
+    "photoSaved": "头像已更新",
+    "photoFailed": "照片上传失败",
+    "nicknameSaved": "昵称已保存",
+    "nicknameFailed": "昵称保存失败",
+    "mbtiSaved": "MBTI 已保存",
+    "mbtiCleared": "MBTI 已清除",
+    "mbtiFailed": "MBTI 保存失败",
+    "genderSaved": "性别已保存",
+    "genderFailed": "性别保存失败",
+    "occupationSaved": "职业已保存",
+    "occupationFailed": "职业保存失败",
+    "profileSaved": "个人资料已保存",
+    "profileFailed": "个人资料保存失败"
+  },
+  "title": "个人中心",
+  "suspendedNotice": "该账号已被停用。你仍然可以浏览，但无法发帖、评论或申请积分。",
+  "nicknameSheet": {
+    "title": "设置昵称",
+    "minLength": "至少 {min} 个字符"
+  },
+  "actions": {
+    "cancel": "取消",
+    "save": "保存"
+  },
+  "setupSheet": {
+    "title": "完善个人资料",
+    "description": "填写在社区中显示的个人资料。姓名（名/姓）仅用于账号，昵称才是社区里大家看到的名字。",
+    "firstNameLabel": "名",
+    "lastNameLabel": "姓",
+    "nicknameLabel": "昵称（在社区中显示）",
+    "later": "稍后",
+    "save": "保存"
+  },
+  "logout": {
+    "title": "退出登录",
+    "descriptionMobile": "在此设备上退出账号",
+    "descriptionDesktop": "退出账号"
+  },
+  "loadingAria": "正在加载个人中心",
+  "suspended": {
+    "title": "你的账号已被停用",
+    "toMyPage": "前往个人中心"
+  },
+  "verificationRequired": {
+    "title": "需要验证",
+    "toCommunityHome": "返回社区首页"
+  },
+  "cardAction": {
+    "profile": {
+      "title": "完善个人资料",
+      "description": "设置昵称、MBTI、性别和职业",
+      "descriptionDesktop": "设置基本信息"
+    },
+    "identity": {
+      "title": "验证身份",
+      "description": "使用学校或工作邮箱验证",
+      "descriptionDesktop": "使用学校或工作邮箱验证"
+    },
+    "school": {
+      "title": "验证学校邮箱",
+      "description": "使用学校邮箱完成学生验证",
+      "descriptionDesktop": "验证学生身份"
+    },
+    "workplace": {
+      "title": "验证工作单位",
+      "description": "使用工作邮箱和公司名称验证",
+      "descriptionDesktop": "验证职场人身份"
+    },
+    "workplacePending": {
+      "title": "职场验证审核中",
+      "description": "邮箱已验证，请等待 Misaeng 团队审核",
+      "descriptionDesktop": "等待 Misaeng 团队审核"
+    }
+  },
+  "credit": {
+    "loadFailed": "无法加载积分",
+    "ledgerLoadFailed": "无法加载积分明细",
+    "redeemComingSoon": "奖励申请将分阶段开放，详情请查看积分指南。",
+    "loadFailedRetry": "积分加载失败 · 重试",
+    "pillAria_other": "社区积分 {count}，查看明细",
+    "unit": "积分",
+    "history": "明细",
+    "requestTitle": "使用积分",
+    "balanceLabel": "我的积分",
+    "requestDescription": "选择要兑换的奖励。申请后，Misaeng 会进行审核并为你匹配。",
+    "optionMeta_other": "{duration} · 每月 {count} 次",
+    "needMore_other": "还需要 {count} 积分",
+    "redeemGuideLink": "了解更多奖励",
+    "submit": "申请",
+    "historyTitle": "积分明细",
+    "guideLink": "查看指南",
+    "retry": "重试",
+    "emptyTitle": "暂无明细",
+    "emptyDescription": "分享美食、写经验分享、发评论都能获得积分。",
+    "writeFoodReview": "写美食经验分享",
+    "kinds": {
+      "earn": "获得",
+      "revoke": "收回",
+      "spend": "使用",
+      "restore": "恢复",
+      "other": "其他"
+    }
+  },
+  "referral": {
+    "linkCopied": "推荐链接已复制",
+    "copyFailed": "链接复制失败，请直接分享你的推荐码。",
+    "errors": {
+      "invalidCode": "请输入 8 位推荐码",
+      "ownCode": "不能使用自己的推荐码"
+    },
+    "bound": "已绑定推荐人",
+    "title": "推荐好友",
+    "description": "每有一人使用你的推荐码，你就能获得 {credits}。最多 {max} 人，不能推荐自己。",
+    "creditsAmount_other": "{count} 积分",
+    "copying": "复制中…",
+    "shareButton": "邀请好友",
+    "myCode": "我的推荐码",
+    "loading": "加载中…",
+    "usedCount": "已使用 {used}/{max} 人",
+    "enterReferrer": "填写推荐人",
+    "boundTo": "已绑定推荐码 {code}。",
+    "codePlaceholder": "8 位推荐码",
+    "binding": "绑定中…",
+    "bind": "绑定"
+  },
+  "posts": {
+    "loadFailed": "无法加载你的帖子",
+    "deleteConfirm": "确定删除“{title}”吗？\n删除后无法恢复。",
+    "deleted": "帖子已删除",
+    "deleteFailed": "帖子删除失败",
+    "title": "我的帖子",
+    "description": "按分类查看你在社区发布的帖子，并进行编辑或删除",
+    "categoryAria": "帖子分类",
+    "emptyAll": "你还没有发过帖子",
+    "emptyCategory": "{category}中没有帖子",
+    "emptyAllHint": "你在任何版块发布的帖子都会显示在这里",
+    "emptyCategoryHint": "你在该版块发布的帖子会显示在这里",
+    "browseBoards": "浏览版块",
+    "edit": "编辑",
+    "deleting": "删除中…",
+    "delete": "删除"
+  },
+  "list": {
+    "redirectingToLogin": "正在跳转到登录页面…",
+    "totalCount_other": "全部 {count}",
+    "count_other": "{count} 篇帖子",
+    "categoryHeading": "分类",
+    "all": "全部",
+    "loading": "正在加载帖子…",
+    "thisCategory": "该分类",
+    "viewBoard": "查看{board}",
+    "viewDetail": "查看详情"
+  },
+  "likes": {
+    "title": "我点赞的帖子",
+    "description": "在一个地方查看你在租房、美食和 OPT/签证中收藏的帖子",
+    "categoryAria": "点赞帖子分类",
+    "emptyAll": "你还没有点赞过帖子",
+    "emptyCategory": "{category}中没有点赞的帖子",
+    "emptyAllHint": "点击喜欢的帖子上的爱心，它们就会显示在这里",
+    "emptyCategoryHint": "点击该版块帖子上的爱心，它们就会显示在这里",
+    "browseHousing": "浏览房源",
+    "rent": "{amount}/月",
+    "rentWithNet": "{gross} / {net}/月"
+  }
+}

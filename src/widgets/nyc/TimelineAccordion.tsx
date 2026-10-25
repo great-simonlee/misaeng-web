@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from 'react'
 
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 export type TimelineAccordionItem = {
   id: string
@@ -32,6 +33,7 @@ export function TimelineAccordion({
   softColor,
   className,
 }: TimelineAccordionProps) {
+  const t = useT('common')
   const [openId, setOpenId] = useState<string | null>(defaultOpenId)
 
   function toggle(id: string) {
@@ -65,7 +67,7 @@ export function TimelineAccordion({
                     color: accentColor,
                   }}
                 >
-                  {item.stepNumber}단계
+                  {t('ui.timeline.step', { step: item.stepNumber })}
                 </span>
                 <div className='min-w-0 flex-1'>
                   <div className='flex flex-wrap items-center gap-2'>
@@ -73,13 +75,13 @@ export function TimelineAccordion({
                       {item.title}
                     </p>
                     {item.isLatest ? (
-                      <span className='inline-flex rounded-full bg-[#fff8f5] px-2 py-0.5 text-[10px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
-                        최신
+                      <span className='inline-flex rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
+                        {t('ui.timeline.latest')}
                       </span>
                     ) : null}
                     {item.hasReview ? (
                       <span className='inline-flex rounded-full bg-[#f4f5f7] px-2 py-0.5 text-[10px] font-semibold text-[var(--muted-foreground)] ring-1 ring-black/8'>
-                        후기
+                        {t('ui.timeline.review')}
                       </span>
                     ) : null}
                   </div>

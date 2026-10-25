@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "privacyDescription": "{brand} NYC プライバシーポリシー：収集する情報、その利用・保管・共有の方法、匿名掲示板、Cookie、お客様の権利、お問い合わせ方法について。",
+    "termsDescription": "{brand} NYC 利用規約：コミュニティのルール、匿名掲示板、住まい・ルームメイト、アカウント、責任の制限、その他のサービス条件について。"
+  },
+  "view": {
+    "reference": "参考訳",
+    "versionLine": "バージョン {version} · 更新日 {updated} · 施行日 {effective}",
+    "translationIncomplete": "一部の段落はまだ翻訳されていないため、英語の原文のみを表示しています。",
+    "tableOfContents": "目次",
+    "note": "注記：",
+    "back": "← {city}に戻る",
+    "privacyPolicy": "プライバシーポリシー",
+    "termsOfUse": "利用規約"
+  }
+}

@@ -13,7 +13,6 @@ import {
   JOB_REVIEW_TIMELINE_MAX,
   createEmptyJobReviewTimelineEntry,
   formatJobReviewDate,
-  getJobReviewTimelinePlaceholder,
   isJobReviewTimelineEntryComplete,
   isJobReviewTimelineEntryFilled,
   sortJobReviewTimelineByDate,
@@ -22,8 +21,11 @@ import {
   type JobReviewTimelineFieldKey,
   type JobReviewTypeId,
 } from '@lib/community/jobReview'
+import { useLocale, useT } from '@lib/i18n/client'
 
 type DraftMode = 'add' | 'edit'
+
+const DEFAULT_TYPE: JobReviewTypeId = 'intern'
 
 type JobReviewTimelineEditorProps = {
   value: JobReviewTimelineEntry[]
@@ -113,6 +115,7 @@ function CreateTimelineForm({
   onEntryCommit?: () => void
   className?: string
 }) {
+  const t = useT('reviews')
   const [draftMode, setDraftMode] = useState<DraftMode>('add')
   const [draft, setDraft] = useState(() => createEmptyJobReviewTimelineEntry())
   const [editSnapshot, setEditSnapshot] = useState<JobReviewTimelineEntry | null>(
@@ -243,8 +246,8 @@ function CreateTimelineForm({
       {savedEntries.length > 0 ? (
         <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
           <SectionHeading
-            title={`추가된 기록 ${savedEntries.length}건`}
-            description='작성칸 위에 쌓여요. 수정·삭제로 날짜별 내용을 관리하세요'
+            title={t('timeline.addedTitle', { count: savedEntries.length })}
+            description={t('timeline.savedDescription')}
           />
           {savedEntries.map((entry, index) => {
             const isActiveEdit = draftMode === 'edit' && draft.id === entry.id
@@ -266,14 +269,14 @@ function CreateTimelineForm({
         {isEditing ? (
           <div className='flex items-center justify-between gap-2'>
             <p className='text-[14px] font-semibold text-[var(--foreground)]'>
-              선택한 기록 수정
+              {t('timeline.editingSelected')}
             </p>
             <button
               type='button'
               onClick={cancelDraft}
               className='shrink-0 rounded-full bg-white px-3 py-1.5 text-[12px] font-medium text-[var(--muted)] ring-1 ring-black/[0.08] touch-manipulation hover:text-[var(--foreground)]'
             >
-              취소
+              {t('timeline.cancel')}
             </button>
           </div>
         ) : null}
@@ -296,7 +299,7 @@ function CreateTimelineForm({
                 onClick={commitCurrentDraft}
                 className='inline-flex h-10 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-40'
               >
-                {isEditing ? '수정 완료' : '이 기록 추가'}
+                {isEditing ? t('timeline.finishEdit') : t('timeline.addEntry')}
               </button>
               {!isEditing && isJobReviewTimelineEntryFilled(draft) ? (
                 <button
@@ -304,7 +307,7 @@ function CreateTimelineForm({
                   onClick={startAdd}
                   className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
                 >
-                  작성 내용 비우기
+                  {t('timeline.clearDraft')}
                 </button>
               ) : null}
             </div>
@@ -312,8 +315,7 @@ function CreateTimelineForm({
           </>
         ) : (
           <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-3 text-[12px] text-[var(--muted)] ring-1 ring-black/[0.04]'>
-            기록 한도에 도달했습니다. 기존 기록을 삭제하면 다시 추가할 수
-            있어요.
+            {t('timeline.limitReached')}
           </p>
         )}
       </section>
@@ -336,6 +338,7 @@ function UpdateTimelineForm({
   onEntryCommit?: () => void
   className?: string
 }) {
+  const t = useT('reviews')
   const [draftMode, setDraftMode] = useState<DraftMode>('add')
   const [draft, setDraft] = useState(() => createEmptyJobReviewTimelineEntry())
   const [editSnapshot, setEditSnapshot] = useState<JobReviewTimelineEntry | null>(
@@ -490,19 +493,19 @@ function UpdateTimelineForm({
     <div ref={rootRef} className={cn('space-y-4', className)}>
       <GuideBox
         tone='update'
-        title={isEditing ? '기존 기록 수정 중' : '진행 기록 추가'}
+        title={isEditing ? t('timeline.updateGuide.editingTitle') : t('timeline.updateGuide.addTitle')}
         description={
           isEditing
-            ? '단계·플랫폼·서류·인터뷰·결과를 고친 뒤 「수정 완료」를 눌러 주세요.'
-            : '새 날짜를 고르고 내용을 적은 뒤 「이 기록 추가」로 여러 건을 이어서 남길 수 있어요.'
+            ? t('jobReview.timeline.editingDescription')
+            : t('timeline.updateGuide.addDescription')
         }
       />
 
       {savedEntries.length > 0 ? (
         <section className='space-y-2 rounded-2xl bg-[#f8f8f9] p-3 ring-1 ring-black/[0.04] sm:p-3.5'>
           <SectionHeading
-            title={`저장된 기록 ${savedEntries.length}건`}
-            description='작성칸 위에 쌓여요. 수정·삭제로 날짜별 내용을 관리하세요'
+            title={t('timeline.savedTitle', { count: savedEntries.length })}
+            description={t('timeline.savedDescription')}
           />
           {savedEntries.map((entry, index) => {
             const isActiveEdit = draftMode === 'edit' && draft.id === entry.id
@@ -529,14 +532,14 @@ function UpdateTimelineForm({
         <div className='flex items-center justify-between gap-2'>
           <div>
             <p className='text-[14px] font-semibold text-[var(--brand)]'>
-              {isEditing ? '선택한 기록 수정' : '새 진행 기록'}
+              {isEditing ? t('timeline.editingSelected') : t('timeline.newEntry')}
             </p>
             <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
               {isEditing
-                ? '수정 후 「수정 완료」를 눌러 주세요'
+                ? t('timeline.editHint')
                 : canAddMore
-                  ? `최대 ${JOB_REVIEW_TIMELINE_MAX}건까지 추가할 수 있어요`
-                  : `최대 ${JOB_REVIEW_TIMELINE_MAX}건까지입니다`}
+                  ? t('timeline.maxCanAdd', { max: JOB_REVIEW_TIMELINE_MAX })
+                  : t('timeline.maxReached', { max: JOB_REVIEW_TIMELINE_MAX })}
             </p>
           </div>
           {isEditing ? (
@@ -545,7 +548,7 @@ function UpdateTimelineForm({
               onClick={cancelDraft}
               className='shrink-0 rounded-full bg-white px-3 py-1.5 text-[12px] font-medium text-[var(--muted)] ring-1 ring-black/[0.08] touch-manipulation hover:text-[var(--foreground)]'
             >
-              취소
+              {t('timeline.cancel')}
             </button>
           ) : null}
         </div>
@@ -568,7 +571,7 @@ function UpdateTimelineForm({
                 onClick={commitCurrentDraft}
                 className='inline-flex h-10 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-40'
               >
-                {isEditing ? '수정 완료' : '이 기록 추가'}
+                {isEditing ? t('timeline.finishEdit') : t('timeline.addEntry')}
               </button>
               {!isEditing && isJobReviewTimelineEntryFilled(draft) ? (
                 <button
@@ -576,7 +579,7 @@ function UpdateTimelineForm({
                   onClick={startAdd}
                   className='text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
                 >
-                  작성 내용 비우기
+                  {t('timeline.clearDraft')}
                 </button>
               ) : null}
             </div>
@@ -584,8 +587,7 @@ function UpdateTimelineForm({
           </>
         ) : (
           <p className='rounded-xl bg-[#f8f8f9] px-3.5 py-3 text-[12px] text-[var(--muted)] ring-1 ring-black/[0.04]'>
-            기록 한도에 도달했습니다. 기존 기록을 삭제하면 다시 추가할 수
-            있어요.
+            {t('timeline.limitReached')}
           </p>
         )}
       </section>
@@ -594,10 +596,10 @@ function UpdateTimelineForm({
 }
 
 function AutoCommitHint() {
+  const t = useT('reviews')
   return (
     <p className='text-[11px] leading-relaxed text-[var(--muted)]'>
-      날짜와 내용을 적고 다음 칸으로 넘어가면, 버튼을 누르지 않아도 기록이 자동으로
-      추가·저장돼요.
+      {t('jobReview.timeline.autoCommitHint')}
     </p>
   )
 }
@@ -615,6 +617,8 @@ function SavedEntryRow({
   onEdit: () => void
   onRemove?: () => void
 }) {
+  const t = useT('reviews')
+  const locale = useLocale()
   const summary = summarizeJobReviewTimelineEntry(entry)
 
   return (
@@ -622,7 +626,7 @@ function SavedEntryRow({
       className={cn(
         'flex items-start gap-2 rounded-2xl px-3.5 py-3 ring-1 sm:px-4',
         active
-          ? 'bg-[#fff8f5] ring-[var(--brand)]/30'
+          ? 'bg-brand-soft ring-[var(--brand)]/30'
           : 'bg-white ring-black/[0.06]',
       )}
     >
@@ -631,7 +635,7 @@ function SavedEntryRow({
       </span>
       <div className='min-w-0 flex-1'>
         <p className='text-[13px] font-semibold text-[var(--foreground)]'>
-          {entry.date ? formatJobReviewDate(entry.date) : '날짜 없음'}
+          {entry.date ? formatJobReviewDate(entry.date, { locale }) : t('timeline.noDate')}
         </p>
         {summary ? (
           <p className='mt-0.5 line-clamp-2 text-[12px] leading-relaxed text-[var(--muted)]'>
@@ -646,11 +650,11 @@ function SavedEntryRow({
             onClick={onEdit}
             className='text-[11px] font-semibold text-[var(--brand)] touch-manipulation hover:underline'
           >
-            수정
+            {t('timeline.edit')}
           </button>
         ) : (
           <span className='text-[11px] font-semibold text-[var(--brand)]'>
-            수정 중
+            {t('timeline.editing')}
           </span>
         )}
         {onRemove ? (
@@ -659,7 +663,7 @@ function SavedEntryRow({
             onClick={onRemove}
             className='text-[11px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
           >
-            삭제
+            {t('timeline.delete')}
           </button>
         ) : null}
       </div>
@@ -680,6 +684,7 @@ function SingleEntryForm({
   showQuickSteps?: boolean
   onChange: (patch: Partial<JobReviewTimelineEntry>) => void
 }) {
+  const t = useT('reviews')
   const contentKeys = useMemo(
     () =>
       JOB_REVIEW_TIMELINE_FIELDS.filter((field) => entry[field.key].trim()).map(
@@ -731,19 +736,19 @@ function SingleEntryForm({
       className={cn(
         'overflow-hidden rounded-2xl bg-white ring-1',
         highlight
-          ? 'ring-[var(--brand)]/35 shadow-[0_0_0_1px_rgba(246,67,16,0.06)]'
+          ? 'ring-[var(--brand)]/35 shadow-[0_0_0_1px_rgb(var(--brand-rgb)/0.06)]'
           : 'ring-black/[0.06]',
       )}
     >
       <div
         className={cn(
           'border-b border-black/[0.04] px-3.5 py-3 sm:px-4',
-          highlight ? 'bg-[#fff8f5]' : 'bg-[#fafafa]',
+          highlight ? 'bg-brand-soft' : 'bg-[#fafafa]',
         )}
       >
         <label className='block'>
           <span className='text-[12px] font-semibold text-[var(--foreground)]'>
-            날짜
+            {t('timeline.date')}
           </span>
           <input
             type='date'
@@ -755,10 +760,10 @@ function SingleEntryForm({
 
         <div className='mt-3'>
           <p className='text-[12px] font-semibold text-[var(--foreground)]'>
-            기록할 항목 선택
+            {t('timeline.selectFields')}
           </p>
           <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
-            해당하는 것만 골라 작성하세요. 여러 개 선택해도 됩니다.
+            {t('timeline.selectFieldsHint')}
           </p>
           <div className='mt-2 flex flex-wrap gap-1.5'>
             {JOB_REVIEW_TIMELINE_FIELDS.map((field) => {
@@ -776,7 +781,7 @@ function SingleEntryForm({
                   )}
                 >
                   <span aria-hidden>{active ? '✓' : '+'}</span>
-                  {field.shortLabel}
+                  {t(`jobReview.fields.${field.key}.shortLabel`)}
                 </button>
               )
             })}
@@ -790,7 +795,7 @@ function SingleEntryForm({
             key={field.key}
             field={field}
             value={entry[field.key]}
-            placeholder={getJobReviewTimelinePlaceholder(jobReviewType, field.key)}
+            placeholder={t(`jobReview.placeholders.${jobReviewType ?? DEFAULT_TYPE}.${field.key}`)}
             onChange={(next) => onChange({ [field.key]: next })}
             onRemove={() => toggleField(field.key)}
           />
@@ -798,17 +803,16 @@ function SingleEntryForm({
 
         <div className='rounded-xl border border-black/[0.06] bg-[#fafbfc] px-3 py-3 sm:px-3.5 sm:py-3.5'>
           <p className='text-[12px] font-semibold text-[var(--foreground)]'>
-            단계 후기
+            {t('detail.stageReview')}
           </p>
           <p className='mt-0.5 text-[11px] leading-relaxed text-[var(--muted)]'>
-            질문, 분위기, 준비 팁, 피드백 등 이 단계에서 겪은 내용을 자유롭게
-            적어 주세요.
+            {t('jobReview.timeline.stageReviewHint')}
           </p>
           <div className='mt-2.5'>
             <TipTapEditor
               value={entry.stageReviewHtml}
               onChange={(html) => onChange({ stageReviewHtml: html })}
-              placeholder='예: Phone은 30분 정도였고, resume deep dive + behavioral 위주였습니다.'
+              placeholder={t('jobReview.timeline.stageReviewPlaceholder')}
               minHeightClassName='min-h-[160px]'
               contentClassName='!text-[13px] !leading-[1.65]'
               simpleToolbar
@@ -820,11 +824,11 @@ function SingleEntryForm({
 
       {!isJobReviewTimelineEntryFilled(entry) ? (
         <p className='border-t border-black/[0.04] px-3.5 py-2 text-[11px] text-[var(--muted)] sm:px-4'>
-          날짜와 선택한 항목 또는 단계 후기를 입력해 주세요
+          {t('timeline.incompleteEmpty')}
         </p>
       ) : !isJobReviewTimelineEntryComplete(entry) ? (
         <p className='border-t border-black/[0.04] px-3.5 py-2 text-[11px] text-amber-700 sm:px-4'>
-          날짜와 내용을 함께 입력해 주세요
+          {t('timeline.incompleteDate')}
         </p>
       ) : null}
     </div>
@@ -839,22 +843,33 @@ function QuickStepButtons({
   jobReviewType: JobReviewTypeId | null
   onApply: (patch: Partial<JobReviewTimelineEntry>) => void
 }) {
-  const quickSteps = jobReviewType ? JOB_REVIEW_QUICK_STEPS[jobReviewType] : []
-  if (quickSteps.length === 0) return null
+  const t = useT('reviews')
+  const type = jobReviewType
+  const quickSteps = type ? JOB_REVIEW_QUICK_STEPS[type] : []
+  if (!type || quickSteps.length === 0) return null
 
   return (
     <div className='flex flex-wrap gap-1.5'>
       <span className='mr-0.5 self-center text-[11px] font-medium text-[var(--muted)]'>
-        빠른 입력
+        {t('timeline.quickInput')}
       </span>
       {quickSteps.map((step) => (
         <button
-          key={step.label}
+          key={step.id}
           type='button'
-          onClick={() => onApply(step.patch)}
-          className='rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-[var(--foreground)] ring-1 ring-black/[0.08] touch-manipulation transition hover:bg-[#fff8f5] hover:ring-[var(--brand)]/25'
+          onClick={() =>
+            onApply(
+              Object.fromEntries(
+                step.fields.map((field) => [
+                  field,
+                  t(`jobReview.quickSteps.${type}.${step.id}.${field}`),
+                ]),
+              ),
+            )
+          }
+          className='rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-[var(--foreground)] ring-1 ring-black/[0.08] touch-manipulation transition hover:bg-brand-soft hover:ring-[var(--brand)]/25'
         >
-          {step.label}
+          {t(`jobReview.quickSteps.${type}.${step.id}.label`)}
         </button>
       ))}
     </div>
@@ -875,7 +890,7 @@ function GuideBox({
       className={cn(
         'rounded-2xl px-3.5 py-3 ring-1',
         tone === 'update'
-          ? 'bg-[#fff8f5] ring-[var(--brand)]/15'
+          ? 'bg-brand-soft ring-[var(--brand)]/15'
           : 'bg-[#f8f8f9] ring-black/[0.04]',
       )}
     >
@@ -926,17 +941,18 @@ function TimelineField({
   onChange: (value: string) => void
   onRemove?: () => void
 }) {
+  const t = useT('reviews')
   return (
     <div className={cn('rounded-xl px-3 py-2.5', field.rowClass)}>
       <div className='flex items-start justify-between gap-2'>
         <div className='min-w-0'>
           <p className={cn('text-[12px] font-semibold', field.labelClass)}>
-            {field.label}
+            {t(`jobReview.fields.${field.key}.label`)}
           </p>
-          <p className='mt-0.5 text-[10px] text-[var(--muted)]'>{field.hint}</p>
-          {field.guide ? (
+          <p className='mt-0.5 text-[10px] text-[var(--muted)]'>{t(`jobReview.fields.${field.key}.hint`)}</p>
+          {field.hasGuide ? (
             <p className='mt-1 text-[11px] leading-relaxed text-[var(--muted-foreground)]'>
-              {field.guide}
+              {t(`jobReview.fields.${field.key}.guide`)}
             </p>
           ) : null}
         </div>
@@ -946,7 +962,7 @@ function TimelineField({
             onClick={onRemove}
             className='shrink-0 text-[11px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
           >
-            빼기
+            {t('timeline.removeField')}
           </button>
         ) : null}
       </div>

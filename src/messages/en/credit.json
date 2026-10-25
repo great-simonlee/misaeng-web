@@ -1,0 +1,464 @@
+{
+  "meta": {
+    "description": "How {brand} NYC community credits work: earning, using, limits and FAQ. Collect credits with food, OPT and job reviews and comments, then use them for coffee chats, lawyer consultations, career mentoring and more.",
+    "reviewsDescription": "Review requests for extra credits on final-result posts."
+  },
+  "header": {
+    "eyebrow": "{brand} NYC",
+    "title": "Community Credit Guide",
+    "intro": "Use the credits you earn by helping the community to request rewards like coffee chats and immigration lawyer consultations. Credits can't be cashed out, and you need student or professional verification.",
+    "tagInteger": "Whole numbers only",
+    "tagNoCash": "No cash value",
+    "tagVerification": "Student or professional verification required",
+    "policyVersion": "v{version}"
+  },
+  "toc": {
+    "aria": "Table of contents",
+    "redeem": "Rewards",
+    "process": "How to apply",
+    "earn": "How to earn",
+    "principles": "Principles & flow",
+    "limits": "Limits & revocation",
+    "faq": "FAQ"
+  },
+  "redeem": {
+    "title": "Rewards you can get with credits",
+    "description": "Every session lasts 30 minutes or less. Credit costs are set higher than earn rates to cover expert and matching costs.",
+    "comingSoon": "Coming soon",
+    "applySoon": "Opening soon",
+    "callout": "Rewards open in stages after you check your balance on My Page. You can request a coffee chat and an immigration lawyer consultation once a month each.",
+    "credits": "credits",
+    "includes": "Included",
+    "excludes": "Not included",
+    "monthlyCap_one": "{count} time a month",
+    "monthlyCap_other": "{count} times a month",
+    "foodEquivalent_one": "≈ {count} food review",
+    "foodEquivalent_other": "≈ {count} food reviews"
+  },
+  "process": {
+    "title": "How to apply",
+    "description": "Four steps from request to finished session.",
+    "cancelNote": "If you cancel before matching, we refund all your credits. Same-day cancellations or no-shows after scheduling may not be refunded."
+  },
+  "earn": {
+    "title": "Earning credits",
+    "description": "After you verify your school email, you earn credits for the activities below.",
+    "colActivity": "Activity",
+    "colEarn": "Credits",
+    "colCoffeeChat": "Coffee chat",
+    "once": "One time",
+    "max": "Up to {amount}",
+    "maxParen": "(up to {amount})",
+    "unitWithMax": "{unit} · up to {amount}",
+    "detailsToggle": "See earning rules and rates",
+    "perUnit": "+{amount}/{unit}"
+  },
+  "principlesSection": {
+    "title": "Principles · How it works",
+    "description": "The program's core principles and the path from your first post to a reward.",
+    "flowTitle": "How it works"
+  },
+  "limits": {
+    "title": "Limits · Revocation",
+    "description": "Rules that keep things fair.",
+    "earnTitle": "Earning",
+    "spendTitle": "Using",
+    "commentCap": "Comments & replies: up to {amount} credits a day",
+    "noSelfReply": "Replies on your own posts or comments: no credits",
+    "revokeOnDelete": "Deleting a post or comment takes back its credits",
+    "oncePerAccount": "One-time bonuses: once per account",
+    "optionCap": "{label}: {cap} a month · {duration}",
+    "times_one": "once",
+    "times_other": "{count} times",
+    "recentActivity": "We recommend at least one activity in the last {days} days before you apply"
+  },
+  "faqSection": {
+    "title": "FAQ",
+    "glossaryTitle": "Glossary"
+  },
+  "footer": {
+    "disclaimer": "Immigration lawyer consultations are for information only and are separate from case representation. We may change this policy with advance notice.",
+    "myPage": "My Page",
+    "writeFood": "Write a food review"
+  },
+  "principles": {
+    "reward": {
+      "title": "Rewards for contributing",
+      "body": "The more helpful posts and comments you share, like food, visa and job reviews, the more credits you earn."
+    },
+    "notCash": {
+      "title": "Connections, not cash",
+      "body": "Credits can't be exchanged for money. Instead, you trade them for chances to meet experienced professionals and experts."
+    },
+    "cost": {
+      "title": "Reflects real costs",
+      "body": "Misaeng covers expert time and matching costs for coffee chats and immigration lawyer consultations, so using credits takes more than earning them."
+    },
+    "quality": {
+      "title": "Quality first",
+      "body": "Spam, duplicate or false posts made just to pile up credits won't earn anything and may be taken back."
+    }
+  },
+  "workflow": {
+    "verify": {
+      "title": "Verify your school",
+      "description": "Finish school email verification on My Page. You can post, comment and earn credits only after you verify."
+    },
+    "contribute": {
+      "title": "Contribute",
+      "description": "Write food, OPT or job reviews, or comment on other people's posts. Credits are added automatically when you meet the conditions."
+    },
+    "balance": {
+      "title": "Check your balance",
+      "description": "See your total credits and history on My Page. Any credits taken back for deletions or sanctions show up there too."
+    },
+    "redeem": {
+      "title": "Request a reward",
+      "description": "Once you have enough credits for a reward, send a request. The session happens after matching and scheduling."
+    }
+  },
+  "redeemProcess": {
+    "apply": {
+      "title": "Request",
+      "description": "Pick a program on My Page or the rewards page, and send a short summary of your interests and questions."
+    },
+    "review": {
+      "title": "Review & deduction",
+      "description": "We check your eligibility, balance and monthly limit, then deduct the credits. If we need to schedule, we'll email you."
+    },
+    "match": {
+      "title": "Matching",
+      "description": "Misaeng connects you with the right person from our partners, mentors and experts. If matching fails, your credits are refunded."
+    },
+    "session": {
+      "title": "Session",
+      "description": "Meet online or in person at the agreed time. No-shows or same-day cancellations may not be refunded, per our policy."
+    }
+  },
+  "earnRules": {
+    "food": {
+      "label": "Food review",
+      "description": "Earned when you post a food review with all the required details, like photos, location, menu and price.",
+      "conditions": {
+        "verified": "School email verified",
+        "requiredFields": "Required fields filled in: restaurant location, name, category, menu, photos",
+        "oncePerPost": "Paid once when first posted (editing the same post doesn't add more)"
+      },
+      "notEligible": {
+        "missingFields": "Missing required fields or placeholder content",
+        "copied": "Copying someone else's post or posting duplicates",
+        "repost": "Deleting and reposting the same content (abuse)"
+      },
+      "tip": "Photos and specific menu or wait-time details help other students the most."
+    },
+    "status": {
+      "label": "OPT, visa & green card review",
+      "unitLabel": "1 timeline step",
+      "description": "{entry} credits per timeline step (up to {postMax} per post). Reviews with a final result can earn up to {reviewBonus} more after a Misaeng team review (up to {totalMax} total).",
+      "conditions": {
+        "verified": "School email verified",
+        "type": "Choose a type: CPT/OPT/STEM OPT/visa/green card",
+        "perStep": "{entry} credits per timeline step",
+        "postMax": "Up to {postMax} automatic credits per post",
+        "editAdds": "Edit your post to add timeline steps and earn more (up to the cap)",
+        "reviewBonus": "After adding a final result, tap \"Request extra credits\" → +{reviewBonus} if the team approves"
+      },
+      "notEligible": {
+        "missingTimeline": "No timeline or type entered",
+        "copied": "Copying someone else's review",
+        "privacy": "Posts removed for exposing too much personal information",
+        "capReached": "Post already at its automatic cap (extra steps don't earn)",
+        "noFinalResult": "Requesting the review bonus without a final result"
+      },
+      "tip": "Add your final result (approval, card received, etc.) to request the team review bonus."
+    },
+    "job-review": {
+      "label": "Interviews & jobs",
+      "unitLabel": "1 timeline step",
+      "description": "{entry} credits per hiring step (timeline), up to {postMax} per post. Add your offer or final result to earn up to {reviewBonus} more after a Misaeng team review (up to {totalMax} total).",
+      "conditions": {
+        "verified": "School email verified",
+        "type": "Choose a type: internship/entry-level/experienced/contract",
+        "perStep": "{entry} credits per timeline step",
+        "postMax": "Up to {postMax} automatic credits per post",
+        "editAdds": "Edit your post to add timeline steps and earn more (up to the cap)",
+        "reviewBonus": "After adding a final result, tap \"Request extra credits\" → +{reviewBonus} if the team approves"
+      },
+      "notEligible": {
+        "missingFields": "Required steps or type not entered",
+        "falseInfo": "Fake company names or exaggerated details",
+        "anonymous": "Posts on the anonymous board (that board is excluded)",
+        "capReached": "Post already at its automatic cap",
+        "noFinalResult": "Requesting the review bonus without a final result"
+      }
+    },
+    "comment": {
+      "label": "Comments & replies",
+      "description": "1 credit for each comment or reply on someone else's post.",
+      "conditions": {
+        "verified": "School email verified",
+        "publicOthers": "Written on someone else's public post or comment",
+        "dailyCap": "Up to {commentCap} credits a day"
+      },
+      "notEligible": {
+        "ownPost": "Replies on your own posts or comments",
+        "deleted": "Deleted comments",
+        "spam": "Spam, abuse or meaningless repeated characters",
+        "copyPaste": "Pasting the same sentence over and over"
+      },
+      "tip": "Comments that answer questions or add your own experience help the community most."
+    },
+    "referral": {
+      "label": "Referral code used",
+      "description": "When someone uses your referral code, you get {referral} credits. Up to {referralMax} people.",
+      "conditions": {
+        "joined": "They signed up with your referral link or linked your code on My Page",
+        "perPerson": "{referral} credits per person",
+        "maxPeople": "Up to {referralMax} people per account",
+        "noSelf": "You can't refer yourself with your own code"
+      },
+      "notEligible": {
+        "self": "Referring yourself",
+        "maxReached": "{referralMax} people have already used your code",
+        "alreadyLinked": "Accounts already linked to another referrer"
+      },
+      "tip": "Copy your referral link on My Page and share it with classmates and friends."
+    }
+  },
+  "bonusRules": {
+    "school-verify": {
+      "label": "School email verification",
+      "description": "One time, when you first verify a school email (.edu, etc.) on My Page."
+    },
+    "first-post": {
+      "label": "First community post",
+      "description": "One time, for your first post on a board that earns credits, like food, OPT or job reviews (if it meets the conditions)."
+    }
+  },
+  "noEarn": {
+    "anonymous": "Anonymous board posts and comments (no credits, to keep them anonymous)",
+    "otherBoards": "Other boards like roommates, sublets and marketplace (may be added later)",
+    "editOnly": "Edits or metadata-only changes",
+    "reactions": "Reactions only, like likes, upvotes or shares",
+    "adminPosts": "Admin posts from the housing team or staff accounts"
+  },
+  "redeemOptions": {
+    "coffee-chat": {
+      "label": "Coffee chat in your field",
+      "duration": "About 30 min",
+      "description": "A 1:1 chat with someone working or studying in the industry or role you're interested in. Talk about careers, industry culture, New York life tips and more.",
+      "includes": {
+        "meeting": "1:1 meeting online or in person (Zoom or in NYC)",
+        "questions": "We review 3–5 questions you send ahead of time",
+        "scheduling": "Scheduling and matching by the Misaeng team"
+      },
+      "excludes": {
+        "jobGuarantee": "Guaranteed hiring or internal referrals",
+        "resumeWriting": "Writing your resume or portfolio for you",
+        "lawyer": "Immigration lawyer consultation (separate program)"
+      },
+      "eligibility": {
+        "verified": "School email verified",
+        "minCredits": "At least {cost} total credits",
+        "recentActivity": "At least one community activity in the last 90 days",
+        "noSanctions": "No account sanctions"
+      },
+      "note": "Mentors join as volunteers or partners, and Misaeng covers matching and operating costs."
+    },
+    "lawyer-consult": {
+      "label": "Immigration lawyer consultation",
+      "duration": "About 30 min",
+      "description": "A 30-minute Q&A with an immigration lawyer about US immigration and visas, like F-1, OPT, H-1B and green cards.",
+      "includes": {
+        "qa": "30-minute Q&A with an immigration lawyer",
+        "procedures": "General guidance on visa, status and green card processes",
+        "followUp": "Separate guidance if you need further representation"
+      },
+      "excludes": {
+        "representation": "Representing your case or handling lawsuits",
+        "paperwork": "Preparing or filing documents for you",
+        "outcome": "Guaranteeing a result (approval, status change, etc.)",
+        "otherLaw": "Non-immigration legal, criminal or civil advice"
+      },
+      "eligibility": {
+        "verified": "School email verified",
+        "minCredits": "At least {cost} total credits",
+        "summary": "Send a summary of your immigration or visa question and background when you apply",
+        "noSanctions": "No account sanctions"
+      },
+      "note": "Immigration consultations are for information only. An attorney-client relationship may require a separate agreement."
+    },
+    "career-mentor": {
+      "label": "Career mentoring",
+      "duration": "About 30 min",
+      "description": "Career mentoring on resumes, interviews, switching industries and more. The cost reflects matching with working mentors.",
+      "includes": {
+        "resume": "Resume and LinkedIn feedback (if sent ahead)",
+        "interview": "Q&A on interview and networking strategy",
+        "advice": "Practical, industry-specific advice"
+      },
+      "excludes": {
+        "applyForYou": "Applying on your behalf",
+        "jobGuarantee": "Guaranteed job placement",
+        "lawyer": "Immigration lawyer consultation"
+      },
+      "eligibility": {
+        "verified": "School email verified",
+        "minCredits": "At least {cost} total credits"
+      }
+    }
+  },
+  "revocation": {
+    "deleted": "If you delete a post or comment, its credits are taken back",
+    "guidelines": "Content hidden or removed for breaking the community guidelines",
+    "falseInfo": "Content confirmed as false or spam (past credits may be taken back)",
+    "abuse": "Abuse (multiple accounts, manipulation) leads to suspension and loss of your balance"
+  },
+  "faq": {
+    "cash": {
+      "q": "Can I exchange credits for cash?",
+      "a": "No. Community credits can't be cashed out, refunded, transferred, sold or moved to another account. You can only use them for reward programs set by {brand} NYC."
+    },
+    "comments": {
+      "q": "Can I earn a lot just by commenting?",
+      "a": "Each comment or reply earns 1 credit, but only up to {commentCap} credits a day. Comments on your own posts don't count. A coffee chat (120) takes at least 12 days and an immigration lawyer consultation (400) takes 40 days (at the cap) with comments alone, so writing reviews is more efficient."
+    },
+    "delete": {
+      "q": "If I delete a post, do I lose the credits?",
+      "a": "Yes. Credits for content that's deleted, reported or hidden by sanctions may be taken back. If credits you've already used need to be taken back, your balance can go negative."
+    },
+    "noVerify": {
+      "q": "Can I earn credits without school verification?",
+      "a": "No. You need school email verification to post, comment and earn. You get a one-time 5-credit bonus when you verify."
+    },
+    "timeline": {
+      "q": "Do OPT and job reviews earn only once per post?",
+      "a": "No. You get {entry} credits automatically for each timeline step, up to {postMax} per post. If you add your final result and tap \"Request extra credits,\" the Misaeng team reviews it and adds {reviewBonus} if approved, for up to {totalMax} total."
+    },
+    "sameRestaurant": {
+      "q": "If I review the same restaurant twice, do I earn twice?",
+      "a": "Separate posts can each earn once, but duplicates, copies or spam won't earn and may be taken back."
+    },
+    "schedule": {
+      "q": "What if the schedule doesn't work after I request a reward?",
+      "a": "If you cancel before matching, we refund all your credits. Same-day cancellations or no-shows after confirmation may not be refunded."
+    },
+    "lawyerGuarantee": {
+      "q": "Does the immigration lawyer consultation guarantee visa approval or a status change?",
+      "a": "No. It only covers general immigration and visa information and processes, and doesn't guarantee any result. Representing your case needs a separate agreement. Non-immigration legal and tax advice isn't included."
+    },
+    "policyChange": {
+      "q": "Can the credit policy change?",
+      "a": "Yes. Earning and usage rules and credit costs may change depending on how things run. When they do, we'll update this page and the policy version. Credits you've already earned generally stay."
+    },
+    "when": {
+      "q": "When can I start using credits?",
+      "a": "Credits are added as you take part in the community. Coffee chat and immigration lawyer requests will open in stages, and you can check your balance on My Page."
+    }
+  },
+  "glossary": {
+    "credit": {
+      "term": "Credit",
+      "definition": "Whole-number points you earn by contributing to the community. They have no cash value and are only used to request rewards."
+    },
+    "earn": {
+      "term": "Earning",
+      "definition": "Gaining credits through activities like posts and comments. It's 0 if the conditions aren't met."
+    },
+    "revoke": {
+      "term": "Revocation",
+      "definition": "Taking back credits you already received, for example after a deletion or violation."
+    },
+    "reward": {
+      "term": "Reward",
+      "definition": "Non-monetary programs Misaeng offers or arranges, like coffee chats and immigration lawyer consultations."
+    },
+    "dailyCap": {
+      "term": "Daily cap",
+      "definition": "Comments and replies earn up to {commentCap} credits a day."
+    },
+    "timeline": {
+      "term": "Timeline",
+      "definition": "The step-by-step record in OPT, visa, green card and job reviews. {entry} credits per step (up to {postMax} automatically). After a final result, a team review bonus of up to {reviewBonus} is possible."
+    }
+  },
+  "efficiency": {
+    "food": {
+      "activity": "Food review",
+      "unit": "post",
+      "toCoffeeChat_one": "{count} post",
+      "toCoffeeChat_other": "{count} posts",
+      "toLawyer_one": "{count} post",
+      "toLawyer_other": "{count} posts",
+      "note": "The easiest way to earn"
+    },
+    "timeline": {
+      "activity": "OPT, visa & job reviews",
+      "unit": "timeline step",
+      "toCoffeeChat_one": "{count} post (maxed out)",
+      "toCoffeeChat_other": "{count} posts (maxed out)",
+      "toLawyer_one": "{count} post (maxed out)",
+      "toLawyer_other": "{count} posts (maxed out)",
+      "note": "+{entry} per step · up to {postMax} automatically · +{reviewBonus} with review"
+    },
+    "comment": {
+      "activity": "Comments & replies",
+      "unit": "comment",
+      "toCoffeeChat_one": "{count} day ({commentCap}/day cap)",
+      "toCoffeeChat_other": "{count} days ({commentCap}/day cap)",
+      "toLawyer_one": "{count} day ({commentCap}/day cap)",
+      "toLawyer_other": "{count} days ({commentCap}/day cap)",
+      "note": "Extra earning · comments on your own posts excluded"
+    }
+  },
+  "ledger": {
+    "reasons": {
+      "food": "Food review",
+      "status": "OPT, visa & green card review",
+      "job-review": "Interviews & jobs",
+      "comment": "Comments & replies",
+      "school-verify": "School email verification",
+      "first-post": "First community post",
+      "review-bonus": "Final result review bonus",
+      "referral": "Referral code used"
+    },
+    "timeline": "{label} (timeline)",
+    "revoke": "{label} taken back"
+  },
+  "referral": {
+    "bindFailed": "Couldn't link the referral code"
+  },
+  "reviewCard": {
+    "title": "Final result review bonus",
+    "description": "If your review includes a final result, the Misaeng team can check it and give you {bonus} extra credits. (Up to {totalMax} per post, including automatic credits)",
+    "bonusAmount": "+{amount}",
+    "notEligible": "Add a final result to your timeline (approval, card received, offer, rejection, etc.) to send a request.",
+    "pending": "Waiting for review · We'll add the credits after the Misaeng team checks your post.",
+    "approved": "Approved · +{amount} extra credits have been added.",
+    "rejected": "Not approved. You can update your post and request again.",
+    "rejectedWithReason": "Not approved · {reason}. You can update your post and request again.",
+    "requesting": "Sending…",
+    "requestButton": "Request extra credits",
+    "editTimeline": "Edit timeline",
+    "loadFailed": "Couldn't load the status",
+    "requestFailed": "Couldn't send the request"
+  },
+  "reviews": {
+    "title": "Credit reviews",
+    "description": "Review OPT and job posts with a final result, then give +{amount} extra credits.",
+    "filterPending": "Pending",
+    "filterAll": "All",
+    "emptyPending": "No pending requests.",
+    "emptyAll": "No requests yet.",
+    "rejectReasonLabel": "Rejected: {reason}",
+    "approveButton": "Approve +{amount}",
+    "rejectButton": "Reject",
+    "rejectPrompt": "Reason for rejection (optional)",
+    "approveConfirm": "Approve this post and give +{amount} credits?",
+    "approved": "Approved · credits added",
+    "rejected": "Request rejected",
+    "loadFailed": "Couldn't load the list",
+    "actionFailed": "Couldn't complete that action",
+    "untitled": "Untitled"
+  }
+}

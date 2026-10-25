@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react'
 
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 /** 이 시간만 지나면 바로 드래그 시작 */
 const HOLD_MS = 120
@@ -36,6 +37,7 @@ export function SortablePhotoGrid({
   className,
   trailing,
 }: SortablePhotoGridProps) {
+  const t = useT('common')
   const [dragging, setDragging] = useState<number | null>(null)
   const draggingRef = useRef<number | null>(null)
   const holdTimer = useRef<number | null>(null)
@@ -171,7 +173,7 @@ export function SortablePhotoGrid({
             />
             {index === 0 ? (
               <span className='absolute left-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[9px] font-semibold text-white'>
-                대표
+                {t('ui.photoGrid.cover')}
               </span>
             ) : null}
             <button
@@ -180,7 +182,7 @@ export function SortablePhotoGrid({
               onClick={() => onChange(urls.filter((_, i) => i !== index))}
               className='absolute right-1 top-1 inline-flex h-6 items-center rounded-full bg-black/55 px-2 text-[10px] font-semibold text-white'
             >
-              삭제
+              {t('ui.imageUpload.remove')}
             </button>
           </div>
         )

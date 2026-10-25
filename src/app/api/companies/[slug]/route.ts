@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getRequestT } from '@lib/i18n/server'
 import { resolveCityId } from '@lib/constants/cities'
 import {
   countReviewsByCompany,
@@ -35,7 +36,8 @@ function summary(
 export async function GET(request: Request, context: RouteContext) {
   try {
     if (!isCompanyStorageConfigured()) {
-      return NextResponse.json({ error: 'Supabase 설정이 필요해요.' }, { status: 503 })
+      const t = await getRequestT(request, 'api')
+      return NextResponse.json({ error: t('common.supabaseNotConfigured') }, { status: 503 })
     }
     const { slug } = await context.params
     const company = await getActiveCompanyBySlug(slug)

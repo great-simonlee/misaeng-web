@@ -1,3 +1,4 @@
+import { ApiMessageError } from '@lib/i18n/apiError'
 import { isSupabaseStorageConfigured } from '@lib/supabase/avatar.server'
 import { getSupabaseAvatarBucket } from '@lib/supabase/server'
 
@@ -73,7 +74,7 @@ export async function saveReferralIndex(
   const url = getSupabaseUrl()
   const secretKey = getSupabaseSecretKey()
   if (!url || !secretKey) {
-    throw new Error('추천 코드 저장소 설정이 필요해요.')
+    throw new ApiMessageError('Referral storage is not configured.', 'referral.storageNotConfigured')
   }
 
   const bucket = getSupabaseAvatarBucket()
@@ -94,7 +95,7 @@ export async function saveReferralIndex(
   )
 
   if (!response.ok) {
-    throw new Error('추천 코드 저장에 실패했어요.')
+    throw new ApiMessageError('Referral index save failed', 'referral.saveFailed')
   }
   return record
 }

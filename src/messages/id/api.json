@@ -1,0 +1,240 @@
+{
+  "places": {
+    "searchFailed": "Gagal mencari tempat.",
+    "detailsFailed": "Gagal memuat detail tempat.",
+    "placeIdRequired": "placeId wajib diisi.",
+    "notFound": "Tempat itu tidak ditemukan.",
+    "invalidCoordinates": "Koordinat tersebut tidak valid.",
+    "mapLoadFailed": "Gagal memuat peta.",
+    "placeFallbackName": "Tempat",
+    "addressFallbackName": "Alamat",
+    "locationFallbackName": "Lokasi",
+    "venuesCoordinatesRequired": "Lintang dan bujur wajib diisi.",
+    "venuesLoadFailed": "Gagal memuat daftar restoran."
+  },
+  "common": {
+    "loginRequired": "Silakan masuk dulu.",
+    "supabaseNotConfigured": "Supabase belum dikonfigurasi.",
+    "supabaseNotConfiguredDetail": "Supabase belum dikonfigurasi. Periksa NEXT_PUBLIC_SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY.",
+    "supabaseNotConfiguredLocal": "Supabase belum dikonfigurasi. Untuk sementara, data disimpan secara lokal di browser kamu.",
+    "storageNotConfigured": "Supabase Storage belum dikonfigurasi. Periksa NEXT_PUBLIC_SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY.",
+    "supabaseUrlInvalid": "NEXT_PUBLIC_SUPABASE_URL bukan URL yang valid. Contoh: https://your-project.supabase.co",
+    "supabaseHostUnreachable": "Tidak bisa terhubung ke project Supabase ({hostname}). Periksa Project URL di Dashboard → Project Settings → API lalu perbarui .env.local.",
+    "supabaseConnectFailed": "Gagal terhubung ke Supabase ({hostname}). Periksa Project URL, API key, dan koneksi internet kamu.",
+    "forbidden": "Kamu tidak punya izin untuk melakukan itu.",
+    "badRequest": "Permintaan tersebut tidak valid.",
+    "postNotFound": "Postingan itu tidak ditemukan.",
+    "accountSuspended": "Akun ini sedang ditangguhkan.",
+    "identityVerificationRequired": "Untuk menulis postingan dan komentar, verifikasi kampus atau tempat kerja kamu dulu."
+  },
+  "auth": {
+    "ellieoUnavailable": "Tidak bisa terhubung ke server Ellieo. Coba lagi sebentar lagi.",
+    "noAccessToken": "Kami tidak menerima access token.",
+    "loginFailed": "Gagal masuk.",
+    "signupFailed": "Gagal mendaftar.",
+    "googleLoginFailed": "Gagal masuk dengan Google.",
+    "googleSignupFailed": "Gagal mendaftar dengan Google.",
+    "agentGoogleSignupFailed": "Gagal mendaftar dengan Google.",
+    "appConnectMissing": "Environment variable APP_CONNECT_API_BASE_URL wajib diisi.",
+    "appConnectMissingLogin": "Login tidak tersedia karena environment variable APP_CONNECT_API_BASE_URL belum ada.",
+    "googleIdTokenRequired": "idToken Google wajib diisi.",
+    "googleAccountHint": "Kamu perlu akun Google yang terdaftar di Ellieo.",
+    "googleAuthError": "Terjadi kesalahan saat masuk dengan Google.",
+    "emailRequired": "Masukkan email kamu.",
+    "passwordRequired": "Masukkan kata sandi kamu.",
+    "passwordResetFailed": "Gagal mengirim permintaan reset kata sandi.",
+    "emailAuthError": "Terjadi kesalahan saat masuk dengan email.",
+    "sessionExpired": "Sesi kamu sudah berakhir. Silakan masuk lagi.",
+    "userInfoUnavailable": "Kamu sudah masuk, tapi detail akun kamu gagal dimuat."
+  },
+  "profile": {
+    "nickname": {
+      "tooShort": "Nama panggilan minimal {min} karakter",
+      "tooLong": "Nama panggilan maksimal {max} karakter",
+      "invalidChars": "Gunakan hanya huruf Latin dan \".\""
+    },
+    "nicknameTaken": "Nama panggilan itu sudah dipakai. Coba yang lain.",
+    "nicknameTakenShort": "Nama panggilan itu sudah dipakai.",
+    "nicknameCheckFailed": "Gagal mengecek nama panggilan.",
+    "nicknameCheckFailedRetry": "Gagal mengecek nama panggilan. Coba lagi sebentar lagi.",
+    "nicknameCheckFailedStatus": "Gagal mengecek nama panggilan. (HTTP {status})",
+    "listFailed": "Gagal memuat daftar profil (HTTP {status})",
+    "invalidGender": "Pilih jenis kelamin yang valid.",
+    "invalidOccupationType": "Pilih jenis pekerjaan yang valid.",
+    "saveFailed": "Gagal menyimpan profil.",
+    "saveFailedDetail": "Gagal menyimpan profil: {detail}"
+  },
+  "upload": {
+    "photoUrlRequired": "photoURL wajib diisi.",
+    "fileRequired": "Pilih file yang ingin diunggah.",
+    "avatarUploadError": "Terjadi kesalahan saat mengunggah foto profil.",
+    "avatarBucketMissing": "Bucket Supabase \"{bucket}\" tidak ditemukan. Buat bucket publik di Storage.",
+    "storageUploadFailed": "Gagal mengunggah ke Storage: {detail}",
+    "imageTypeUnsupported": "Kamu hanya bisa mengunggah gambar JPG, PNG, WEBP, atau GIF.",
+    "imageTooLarge": "Ukuran gambar maksimal {max}.",
+    "imageBucketMissing": "Bucket Supabase \"{bucket}\" tidak ditemukan. Periksa bucket kamu di Storage.",
+    "imageUploadFailedDetail": "Gagal mengunggah gambar: {detail}",
+    "imageUploadFailed": "Gagal mengunggah gambar."
+  },
+  "verification": {
+    "codeSendFailed": "Gagal mengirim kode verifikasi.",
+    "schoolDomainUnsupported": "Domain email kampus ini belum didukung. Minta tim Misaeng untuk menambahkan kampus kamu.",
+    "codeInvalid": "Kode verifikasi salah atau sudah kedaluwarsa.",
+    "schoolOtpDisabled": "Verifikasi email kampus untuk sementara tidak tersedia.",
+    "schoolEmailRequired": "Masukkan email kampus kamu (.edu atau domain yang terdaftar).",
+    "codeRequired": "Masukkan kode verifikasi.",
+    "schoolEmailError": "Terjadi kesalahan saat memverifikasi email kampus kamu.",
+    "companyNameRequired": "Masukkan nama perusahaan kamu.",
+    "companyNameTooLong": "Nama perusahaan maksimal {max} karakter.",
+    "workEmail": {
+      "required": "Masukkan email kantor kamu.",
+      "invalidFormat": "Masukkan alamat email yang valid.",
+      "personalDomain": "Email pribadi seperti Gmail tidak bisa digunakan. Masukkan email yang kamu pakai di kantor."
+    },
+    "workplaceAlreadyApproved": "Tempat kerja kamu sudah terverifikasi.",
+    "workplacePending": "Tim Misaeng sedang meninjau verifikasi tempat kerja kamu.",
+    "workplaceStorageMissing": "Penyimpanan verifikasi tempat kerja belum dikonfigurasi.",
+    "workplaceSaveFailed": "Gagal menyimpan permintaan verifikasi tempat kerja (HTTP {status})",
+    "workEmailError": "Terjadi kesalahan saat memverifikasi email kantor kamu."
+  },
+  "consent": {
+    "termsRequired": "Setujui Ketentuan untuk melanjutkan.",
+    "storageNotConfigured": "Penyimpanan persetujuan belum dikonfigurasi.",
+    "policyOutdated": "Ketentuan atau Kebijakan Privasi telah diperbarui. Muat ulang halaman dan setujui kembali."
+  },
+  "referral": {
+    "featureStorageMissing": "Fitur referral memerlukan penyimpanan yang sudah dikonfigurasi.",
+    "loadFailed": "Gagal memuat info referral kamu.",
+    "bindFailed": "Gagal menghubungkan referrer.",
+    "storageNotConfigured": "Penyimpanan kode referral belum dikonfigurasi.",
+    "saveFailed": "Gagal menyimpan kode referral.",
+    "codeCreateFailed": "Gagal membuat kode referral. Coba lagi sebentar lagi.",
+    "codeInvalid": "Periksa kode referral 8 karakter kamu.",
+    "alreadyBound": "Kamu sudah punya referrer.",
+    "ownCode": "Kamu tidak bisa memakai kode referral sendiri.",
+    "codeNotFound": "Kode referral itu tidak ada.",
+    "referrerNotFound": "Referrer itu tidak ditemukan.",
+    "maxUsesReached": "Kode referral ini hanya bisa dipakai maksimal {max} orang."
+  },
+  "credit": {
+    "loadFailed": "Gagal memuat info kredit kamu.",
+    "invalidUser": "Pengguna tersebut tidak valid.",
+    "saveFailed": "Gagal menyimpan kredit (HTTP {status})",
+    "reviewListLoadFailed": "Gagal memuat daftar peninjauan.",
+    "reviewRequestNotFound": "Permintaan itu tidak ditemukan.",
+    "reviewAlreadyProcessed": "Permintaan ini sudah diproses.",
+    "reviewPostMissing": "Postingan tidak ada atau sudah dihapus.",
+    "awardFailed": "Gagal memberikan kredit. Periksa pengaturan penyimpanan.",
+    "processFailed": "Gagal menyelesaikan tindakan itu.",
+    "reviewSaveFailed": "Gagal menyimpan permintaan peninjauan (HTTP {status})",
+    "reviewStatusLoadFailed": "Gagal memuat status permintaan peninjauan.",
+    "reviewBoardIneligible": "Postingan di forum ini tidak bisa mengajukan kredit tambahan.",
+    "reviewFinalResultRequired": "Tambahkan hasil akhir ke timeline kamu dulu (disetujui, kartu diterima, offer, ditolak, dll.).",
+    "reviewAlreadyAwarded": "Postingan ini sudah menerima bonus ulasan.",
+    "reviewAlreadyPending": "Ini sudah menunggu peninjauan.",
+    "reviewRequestFailed": "Gagal mengajukan kredit tambahan."
+  },
+  "postings": {
+    "loadFailed": "Gagal memuat lowongan kerja."
+  },
+  "comments": {
+    "bodyRequired": "Tulis komentar dulu.",
+    "bodyTooLong": "Komentar maksimal {max} karakter.",
+    "parentNotFound": "Komentar yang ingin kamu balas tidak ditemukan.",
+    "createFailed": "Gagal mengirim komentar kamu.",
+    "editTargetRequired": "Pilih komentar yang ingin diedit.",
+    "notFound": "Komentar itu tidak ditemukan.",
+    "editOwnOnly": "Kamu hanya bisa mengedit komentar sendiri.",
+    "updateFailed": "Gagal memperbarui komentar.",
+    "deleteTargetRequired": "Pilih komentar yang ingin dihapus.",
+    "deleteOwnOnly": "Kamu hanya bisa menghapus komentar sendiri.",
+    "deleteFailed": "Gagal menghapus komentar.",
+    "saveFailedRetry": "Gagal menyimpan komentar. Coba lagi sebentar lagi."
+  },
+  "community": {
+    "invalidBoard": "Forum itu tidak ada.",
+    "invalidPost": "Postingan itu tidak valid.",
+    "companyReselect": "Pilih perusahaan lagi.",
+    "saveFailed": "Gagal menyimpan postingan kamu.",
+    "saveFailedRetry": "Gagal menyimpan postingan kamu. Coba lagi sebentar lagi.",
+    "updateFailed": "Gagal menyimpan perubahan kamu.",
+    "deleteFailed": "Gagal menghapus.",
+    "recommendFailed": "Gagal memperbarui suka kamu.",
+    "recommendSaveFailed": "Gagal menyimpan suka kamu. Coba lagi sebentar lagi.",
+    "beenThereFoodOnly": "Tanda \"Pernah ke sini\" hanya bisa di postingan kuliner.",
+    "beenThereFailed": "Gagal memperbarui \"Pernah ke sini\".",
+    "beenThereSaveFailed": "Gagal menyimpan \"Pernah ke sini\". Coba lagi sebentar lagi.",
+    "reportSaveFailed": "Gagal menyimpan laporan kamu. Coba lagi sebentar lagi.",
+    "notGuestPost": "Ini bukan postingan tamu.",
+    "guestPostLinkedElsewhere": "Postingan ini sudah ditautkan ke akun lain.",
+    "guestClaimFailed": "Gagal menautkan postingan tamu kamu.",
+    "report": {
+      "reasonRequired": "Pilih alasan laporan.",
+      "detailTooLong": "Detail maksimal {max} karakter.",
+      "otherDetailRequired": "Kalau memilih \"Lainnya\", jelaskan alasannya.",
+      "alreadyReported": "Kamu sudah melaporkan postingan atau komentar ini.",
+      "failed": "Gagal mengirim laporan kamu."
+    },
+    "write": {
+      "titleBodyRequired": "Masukkan judul dan isi.",
+      "bodyTooLong": "Isi maksimal {max} karakter.",
+      "roommateTypeRequired": "Pilih jenisnya.",
+      "roommateTitleTooLong": "Judul maksimal {max} karakter.",
+      "roommateOnePerAccount": "Kamu hanya bisa punya satu postingan roommate atau sublet per akun. Edit atau hapus postingan yang ada, lalu coba lagi.",
+      "endDateAfterStart": "Pilih tanggal selesai setelah tanggal mulai.",
+      "partySizeRequired": "Masukkan jumlah orang.",
+      "totalSpendRequired": "Masukkan total pengeluaran.",
+      "tipIncludedRequired": "Pilih apakah tip sudah termasuk.",
+      "waitMinutesRequired": "Masukkan waktu antre (0 kalau tidak antre).",
+      "foodCategoryRequired": "Pilih kategori (Wajib coba, Hemat, Suasana asyik, Tempat belajar).",
+      "placeRequired": "Periksa alamat dan nama restoran.",
+      "cptOptTypeRequired": "Pilih jenisnya: CPT, OPT, STEM OPT, visa, atau green card.",
+      "cptOptTimelineRequired": "Tambahkan minimal satu tahap timeline.",
+      "jobReviewTypeRequired": "Pilih jenisnya: magang, entry-level, berpengalaman, atau kontrak.",
+      "jobReviewTimelineRequired": "Tambahkan minimal satu tahap rekrutmen.",
+      "jobReviewSourceRequired": "Pilih dari mana kamu terhubung. Kalau memilih asosiasi mahasiswa, pilih juga yang mana.",
+      "jobReviewOutcomeRequired": "Pilih hasil akhirnya.",
+      "cityRequired": "Periksa kotanya."
+    },
+    "roommate": {
+      "required": {
+        "has-room": {
+          "location": "Masukkan lingkungan / lokasi kamu saat ini.",
+          "budget": "Masukkan sewa bulanan untuk roommate ($).",
+          "moveInStart": "Pilih tanggal pindah masuk.",
+          "moveInEnd": "Pilih tanggal pindah keluar."
+        },
+        "together": {
+          "location": "Masukkan lingkungan yang kamu inginkan.",
+          "budget": "Masukkan budget bulanan maksimal kamu ($).",
+          "moveInStart": "Pilih tanggal pindah masuk yang kamu inginkan.",
+          "moveInEnd": "Pilih tanggal pindah keluar."
+        },
+        "room": {
+          "location": "Masukkan lingkungan yang kamu inginkan.",
+          "budget": "Masukkan budget bulanan maksimal kamu ($).",
+          "moveInStart": "Pilih tanggal pindah masuk yang kamu inginkan.",
+          "moveInEnd": "Pilih tanggal pindah keluar."
+        },
+        "sublet": {
+          "location": "Masukkan lokasi sublet.",
+          "budget": "Masukkan sewa bulanan ($).",
+          "moveInStart": "Pilih tanggal mulai sublet.",
+          "moveInEnd": "Pilih tanggal selesai sublet."
+        }
+      }
+    }
+  },
+  "guest": {
+    "invalidRequest": "Periksa permintaan kamu.",
+    "nicknameInvalid": "Masukkan nama panggilan tampilan {min}–{max} karakter (bukan alamat email).",
+    "emailInvalid": "Masukkan email yang valid agar kami bisa mengirim info gift card dan kredit.",
+    "linkedinRequired": "Masukkan URL profil LinkedIn kamu. Contoh: linkedin.com/in/your-name",
+    "guidelinesRequired": "Setujui pedoman posting komunitas.",
+    "titleRequired": "Masukkan judul.",
+    "bodyRequired": "Bagikan hal yang perlu diwaspadai orang lain.",
+    "bodyTooLong": "\"Hal yang perlu diwaspadai\" maksimal {max} karakter.",
+    "jobReviewTypeRequired": "Pilih jenisnya: magang, entry-level, berpengalaman, pindah kerja, atau kontrak.",
+    "rateLimited": "Coba lagi sebentar lagi. (Terlalu banyak permintaan dalam waktu singkat)"
+  }
+}

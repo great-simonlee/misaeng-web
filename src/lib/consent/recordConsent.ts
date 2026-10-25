@@ -13,15 +13,18 @@ import {
   isLegalConsentStorageConfigured,
 } from '@lib/supabase/legalConsent.server'
 import { upsertSupabaseProfile } from '@lib/supabase/profile.server'
+import type { Translate } from '@lib/i18n/translate'
 
 export function isTruthyConsent(value: unknown) {
   return value === true || value === 'true' || value === 1 || value === '1'
 }
 
-export function consentRejectedResponse() {
+/** t는 `getRequestT(request, 'api')` — 넘기면 error 필드를 요청 언어로 채운다 */
+export function consentRejectedResponse(t?: Translate) {
   return bilingualError(
     'Please agree to the Terms to continue.',
     '약관에 동의해 주세요.',
+    t?.('consent.termsRequired'),
   )
 }
 
@@ -29,6 +32,7 @@ export async function assertAcceptedCurrentPolicy(input: {
   acceptedTerms: unknown
   termsVersion?: unknown
   privacyVersion?: unknown
+  t?: Translate
 }) {
   if (!isLegalConsentStorageConfigured()) {
     return {
@@ -37,6 +41,7 @@ export async function assertAcceptedCurrentPolicy(input: {
       body: bilingualError(
         'Consent storage is not configured.',
         '동의 기록 저장소가 설정되지 않았습니다.',
+        input.t?.('consent.storageNotConfigured'),
       ),
     }
   }
@@ -45,7 +50,7 @@ export async function assertAcceptedCurrentPolicy(input: {
     return {
       ok: false as const,
       status: 400,
-      body: consentRejectedResponse(),
+      body: consentRejectedResponse(input.t),
     }
   }
 
@@ -64,6 +69,7 @@ export async function assertAcceptedCurrentPolicy(input: {
       body: bilingualError(
         'The Terms or Privacy Policy version is out of date. Please refresh and try again.',
         '약관 또는 개인정보처리방침 버전이 변경되었습니다. 새로고침 후 다시 동의해 주세요.',
+        input.t?.('consent.policyOutdated'),
       ),
     }
   }
@@ -80,6 +86,7 @@ export async function persistConsentRecord(input: {
   privacyVersion?: unknown
   uiLanguage?: unknown
   method: ConsentMethod
+  t?: Translate
 }) {
   const checked = await assertAcceptedCurrentPolicy(input)
   if (!checked.ok) return checked
@@ -95,6 +102,7 @@ export async function persistConsentRecord(input: {
       body: bilingualError(
         'Consent storage is not configured.',
         '동의 기록 저장소가 설정되지 않았습니다.',
+        input.t?.('consent.storageNotConfigured'),
       ),
     }
   }

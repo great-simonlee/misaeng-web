@@ -1,0 +1,124 @@
+{
+  "categories": {
+    "restaurant": "Must-try",
+    "value": "Great value",
+    "vibe": "Good vibes",
+    "study": "Study spot"
+  },
+  "categoryDescriptions": {
+    "restaurant": "Places you have to try",
+    "value": "Worth every dollar",
+    "vibe": "Places with a great atmosphere",
+    "study": "Cafés good for studying or working"
+  },
+  "cuisines": {
+    "brunch": "Brunch",
+    "korean": "Korean",
+    "japanese": "Japanese",
+    "chinese": "Chinese",
+    "american": "Western",
+    "french": "French",
+    "italian": "Italian",
+    "mexican": "Mexican",
+    "thai": "Thai",
+    "vietnamese": "Vietnamese",
+    "indian": "Indian",
+    "other": "Other"
+  },
+  "spend": {
+    "people_one": "{count} person",
+    "people_other": "{count} people",
+    "total": "${amount} total",
+    "totalWithTip": "${amount} total · tip included",
+    "totalWithoutTip": "${amount} total · tip not included",
+    "peopleTotal_one": "{count} person · ${amount} total",
+    "peopleTotal_other": "{count} people · ${amount} total",
+    "peopleTotalWithTip_one": "{count} person · ${amount} total · tip included",
+    "peopleTotalWithTip_other": "{count} people · ${amount} total · tip included",
+    "peopleTotalWithoutTip_one": "{count} person · ${amount} total · tip not included",
+    "peopleTotalWithoutTip_other": "{count} people · ${amount} total · tip not included",
+    "tipIncluded": "Tip included",
+    "tipExcluded": "Tip not included"
+  },
+  "wait": {
+    "none": "No wait",
+    "minutes": "{minutes} min wait",
+    "hours": "{hours} hr wait",
+    "hoursMinutes": "{hours} hr {minutes} min wait"
+  },
+  "carousel": {
+    "cover": "Cover",
+    "menu": "Menu",
+    "vibe": "Vibe",
+    "backToList": "Back to list",
+    "photosLabel": "Restaurant photos",
+    "previous": "Previous photo",
+    "next": "Next photo",
+    "photoNumber": "Photo {number}"
+  },
+  "map": {
+    "postsMapLabel": "Food map",
+    "emptyTitle": "No places to show on the map",
+    "emptyDescription": "Only reviews with a saved address show up as pins",
+    "unnamedPlace": "Restaurant",
+    "reviewCount_one": "{count} review",
+    "reviewCount_other": "{count} reviews",
+    "close": "Close",
+    "viewReview": "View review",
+    "placeMapLabel": "Map of {name}",
+    "directions": "Directions"
+  },
+  "detail": {
+    "menu": "Menu",
+    "interior": "Inside",
+    "backToList": "Back to {board}",
+    "views_one": "{views} view",
+    "views_other": "{views} views",
+    "metrics": {
+      "party": "Party",
+      "totalSpend": "Total",
+      "spend": "${amount}",
+      "spendWithTip": "${amount} · tip incl.",
+      "spendWithoutTip": "${amount} · tip excl.",
+      "wait": "Wait",
+      "waitNone": "None",
+      "waitMinutes": "{minutes} min"
+    },
+    "location": "Location",
+    "viewMenuPhoto": "View menu photo",
+    "interiorAndVibe": "Inside · Vibe",
+    "viewVibePhoto": "View vibe photo",
+    "review": "Review"
+  },
+  "placeSearch": {
+    "errors": {
+      "searchFailed": "Search failed. Please try again.",
+      "detailsFailed": "Couldn't load place details",
+      "noCoordinates": "Couldn't find the location of that place"
+    },
+    "pickExactAddress": "Pick an exact address",
+    "mapTitle": "Location of {name}",
+    "change": "Change",
+    "addressPlaceholder": "e.g. 53 W 53rd St, New York",
+    "placePlaceholder": "e.g. Halal Guys, Joe's Pizza, West 53rd St",
+    "resolving": "Checking…",
+    "searching": "Searching…",
+    "noResults": "No results. Try a more detailed address or street name in English.",
+    "addressHint": "Pick an address to save the location.",
+    "placeHint": "Pick a place from the list to post."
+  },
+  "restaurantName": {
+    "placeholder": "Restaurant name",
+    "reviewCount_one": "{count} review",
+    "reviewCount_other": "{count} reviews",
+    "checking": "Checking restaurants at this location…",
+    "existing_one": "{count} restaurant already listed here · Pick it below or enter a new one",
+    "existing_other": "{count} restaurants already listed here · Pick one below or enter a new one",
+    "none": "No restaurants listed here yet. Enter a new name.",
+    "hint": "This name shows on the list and detail pages"
+  },
+  "card": {
+    "comments": "Comments",
+    "recommends": "Likes"
+  }
+}

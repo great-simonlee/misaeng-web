@@ -1,4 +1,7 @@
+import { pickTranslationFields } from '@lib/translations/content'
 import type { CommunityComment } from '@/types/nyc'
+import { ApiMessageError } from '@lib/i18n/apiError'
+import { invalidatePostCounts } from '@lib/supabase/listCache.server'
 
 const DEFAULT_BUCKET = 'housing'
 const FALLBACK_BUCKET = 'avatars'
@@ -95,6 +98,7 @@ function normalizeComment(raw: unknown): CommunityComment | null {
     createdAt: Number(data.createdAt) || Date.now(),
     updatedAt: Number(data.updatedAt) || Date.now(),
     status: data.status === 'deleted' ? 'deleted' : 'open',
+    ...pickTranslationFields(data),
   }
 }
 
@@ -133,13 +137,14 @@ export async function saveStoredCommunityComments(
   comments: CommunityComment[],
 ): Promise<CommunityComment[]> {
   if (!isCommunityCommentStorageConfigured()) {
-    throw new Error(
-      'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.supabaseNotConfiguredDetail',
     )
   }
 
   const id = String(postId || '').trim()
-  if (!id) throw new Error('잘못된 게시글이에요.')
+  if (!id) throw new ApiMessageError('Invalid post id', 'community.invalidPost')
 
   const bucket = await resolveBucket()
   const body = Buffer.from(JSON.stringify({ comments }), 'utf8')
@@ -159,12 +164,11 @@ export async function saveStoredCommunityComments(
     const payload = (await res?.json().catch(() => null)) as
       | { message?: string; error?: string }
       | null
-    throw new Error(
-      payload?.message ||
-        payload?.error ||
-        '댓글 저장에 실패했어요. 잠시 후 다시 시도해 주세요.',
-    )
+    const detail = payload?.message || payload?.error
+    if (detail) throw new Error(detail)
+    throw new ApiMessageError('Comment save failed', 'comments.saveFailedRetry')
   }
 
+  invalidatePostCounts(id)
   return comments
 }

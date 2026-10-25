@@ -1,3 +1,6 @@
+'use client'
+
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 
 type Variant =
@@ -13,33 +16,25 @@ type Props = {
   className?: string
 }
 
+/** 문구는 `me.cardAction.<variant>.title|description|descriptionDesktop` */
 const VARIANTS = {
   profile: {
-    title: '프로필을 완성해 보세요',
-    description: '닉네임·MBTI·성별·직업을 설정해요',
-    descriptionDesktop: '기본 정보를 설정해요',
     shell:
-      'border-[#F64310]/18 bg-[linear-gradient(180deg,#fffaf8_0%,#fff3ee_100%)] ring-[#F64310]/8 hover:border-[#F64310]/28 hover:bg-[#fff3ee]',
-    icon: 'bg-[#F64310]/10 text-[#F64310]',
+      'border-brand/18 bg-[linear-gradient(180deg,var(--brand-soft)_0%,var(--brand-subtle)_100%)] ring-brand/8 hover:border-brand/28 hover:bg-brand-subtle',
+    icon: 'bg-brand/10 text-brand',
     titleColor: 'text-[#C9340A]',
-    chevron: 'text-[#F64310]/45 group-hover:text-[#F64310]',
+    chevron: 'text-brand/45 group-hover:text-brand',
     Icon: ProfileCompleteIcon,
   },
   identity: {
-    title: '본인 인증해 보세요',
-    description: '학교 메일 또는 직장 메일로 인증해요',
-    descriptionDesktop: '학교·직장 메일로 인증해요',
     shell:
-      'border-[#F64310]/18 bg-[linear-gradient(180deg,#fffaf8_0%,#fff3ee_100%)] ring-[#F64310]/8 hover:border-[#F64310]/28 hover:bg-[#fff3ee]',
-    icon: 'bg-[#F64310]/10 text-[#F64310]',
+      'border-brand/18 bg-[linear-gradient(180deg,var(--brand-soft)_0%,var(--brand-subtle)_100%)] ring-brand/8 hover:border-brand/28 hover:bg-brand-subtle',
+    icon: 'bg-brand/10 text-brand',
     titleColor: 'text-[#C9340A]',
-    chevron: 'text-[#F64310]/45 group-hover:text-[#F64310]',
+    chevron: 'text-brand/45 group-hover:text-brand',
     Icon: IdentityVerifyIcon,
   },
   school: {
-    title: '학교 이메일 인증해 보세요',
-    description: '학교 메일로 학생 인증을 완료해요',
-    descriptionDesktop: '학생 인증을 진행해요',
     shell:
       'border-[#57068c]/16 bg-[linear-gradient(180deg,#fbf9ff_0%,#f5f0ff_100%)] ring-[#57068c]/8 hover:border-[#57068c]/24 hover:bg-[#f5f0ff]',
     icon: 'bg-[#57068c]/10 text-[#57068c]',
@@ -48,9 +43,6 @@ const VARIANTS = {
     Icon: SchoolVerifyIcon,
   },
   workplace: {
-    title: '직장인 인증해 보세요',
-    description: '직장 메일과 회사 이름으로 인증해요',
-    descriptionDesktop: '직장인 인증을 진행해요',
     shell:
       'border-[#0f766e]/16 bg-[linear-gradient(180deg,#f4fbfa_0%,#ecf8f6_100%)] ring-[#0f766e]/8 hover:border-[#0f766e]/24 hover:bg-[#ecf8f6]',
     icon: 'bg-[#0f766e]/10 text-[#0f766e]',
@@ -59,9 +51,6 @@ const VARIANTS = {
     Icon: WorkplaceVerifyIcon,
   },
   workplacePending: {
-    title: '직장인 인증을 확인하고 있어요',
-    description: '이메일 인증은 끝났어요. 미생 팀 확인을 기다려 주세요',
-    descriptionDesktop: '미생 팀 확인을 기다려 주세요',
     shell:
       'border-amber-200/80 bg-[linear-gradient(180deg,#fffbeb_0%,#fef3c7_100%)] ring-amber-200/50 hover:border-amber-300 hover:bg-[#fef3c7]',
     icon: 'bg-amber-100 text-amber-700',
@@ -72,6 +61,7 @@ const VARIANTS = {
 } as const
 
 export function ProfileCardAction({ variant, onClick, className }: Props) {
+  const t = useT('me')
   const config = VARIANTS[variant]
   const Icon = config.Icon
 
@@ -101,13 +91,13 @@ export function ProfileCardAction({ variant, onClick, className }: Props) {
               config.titleColor,
             )}
           >
-            {config.title}
+            {t(`cardAction.${variant}.title`)}
           </span>
           <span className='mt-0.5 block text-[11px] leading-snug text-[var(--muted)] lg:hidden'>
-            {config.description}
+            {t(`cardAction.${variant}.description`)}
           </span>
           <span className='mt-0.5 hidden text-[11px] leading-snug text-[var(--muted)] lg:block'>
-            {config.descriptionDesktop}
+            {t(`cardAction.${variant}.descriptionDesktop`)}
           </span>
         </span>
         <ChevronIcon className={cn(config.chevron, 'lg:size-3.5')} />

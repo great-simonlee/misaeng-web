@@ -7,14 +7,16 @@ import {
   uploadAvatarToSupabase,
 } from '@lib/supabase/avatar.server'
 import { upsertSupabaseProfile } from '@lib/supabase/profile.server'
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
 
 export async function POST(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
     if (!isSupabaseStorageConfigured()) {
       return NextResponse.json(
         {
-          error:
-            'Supabase 스토리지 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+          error: t('common.storageNotConfigured'),
         },
         { status: 503 },
       )
@@ -22,7 +24,7 @@ export async function POST(request: Request) {
 
     const currentUser = await resolveAuthenticatedUser()
     if (!currentUser?.uid) {
-      return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+      return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
     }
 
     const contentType = request.headers.get('content-type') || ''
@@ -32,7 +34,7 @@ export async function POST(request: Request) {
       const photoURL = body.photoURL?.trim()
       if (!photoURL) {
         return NextResponse.json(
-          { error: 'photoURL이 필요해요.' },
+          { error: t('upload.photoUrlRequired') },
           { status: 400 },
         )
       }
@@ -52,7 +54,7 @@ export async function POST(request: Request) {
     const file = formData.get('file')
     if (!(file instanceof File)) {
       return NextResponse.json(
-        { error: '업로드할 파일이 필요해요.' },
+        { error: t('upload.fileRequired') },
         { status: 400 },
       )
     }
@@ -76,10 +78,7 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : '프로필 이미지 업로드 중 오류가 발생했어요.',
+        error: apiErrorMessage(t, error, 'upload.avatarUploadError'),
       },
       { status: 500 },
     )

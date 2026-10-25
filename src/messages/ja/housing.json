@@ -1,0 +1,445 @@
+{
+  "amenities": {
+    "24HourAttendedLobby": "24時間ドアマン",
+    "conciergeService": "コンシェルジュ",
+    "elevator": "エレベーター",
+    "fitnessCenter": "ジム",
+    "mailRoom": "メールルーム",
+    "laundryRoom": "ランドリールーム",
+    "residentLounge": "ラウンジ",
+    "rooftopOutdoorSpace": "屋上アウトドアスペース",
+    "rooftopLounge": "屋上ラウンジ",
+    "petFriendly": "ペット可",
+    "garageParking": "駐車場",
+    "sauna": "サウナ",
+    "pool": "プール",
+    "swimmingPool": "プール",
+    "indoorPool": "屋内プール",
+    "outdoorPool": "屋外プール",
+    "workingSpace": "勉強・ワークスペース",
+    "businessMeetingRoom": "会議室",
+    "pilatesStudio": "ピラティススタジオ",
+    "yogaStudio": "ヨガルーム",
+    "recoveryRoom": "リカバリールーム",
+    "indoorBasketballCourt": "屋内バスケットボールコート",
+    "indoorPickleballCourt": "屋内ピックルボール",
+    "indoorGolfSimulator": "ゴルフシミュレーター",
+    "bowlingAlley": "ボウリング場",
+    "pokerRoom": "ポーカールーム",
+    "billiardsRoom": "ビリヤードルーム",
+    "arcadeRoom": "ゲームルーム",
+    "pingPongTable": "卓球台",
+    "tennisCourts": "テニスコート",
+    "bbqGrills": "BBQグリル",
+    "bbqGrill": "BBQグリル",
+    "sundeck": "屋外スペース",
+    "dogRun": "ドッグラン",
+    "childrensPlayroom": "プレイルーム",
+    "mediaRoom": "シアタールーム",
+    "garden": "ガーデン",
+    "bikeRoom": "自転車置き場",
+    "storageSpace": "収納スペース",
+    "valetService": "バレーパーキング",
+    "liveInSuper": "常駐スーパー（管理人）",
+    "wheelchairAccess": "車いす対応",
+    "indoorSquashCourt": "屋内スカッシュ"
+  },
+  "utilities": {
+    "heat": "暖房費込み",
+    "hotWater": "お湯代込み",
+    "gas": "ガス代込み",
+    "electricity": "電気代込み",
+    "water": "水道代込み",
+    "sewer": "下水道代込み"
+  },
+  "appliances": {
+    "dishwasher": "食洗機",
+    "microwave": "電子レンジ",
+    "oven": "オーブン",
+    "refrigerator": "冷蔵庫",
+    "washer": "洗濯機",
+    "dryer": "乾燥機",
+    "airConditioning": "エアコン",
+    "inUnitWasher": "洗濯機"
+  },
+  "perks": {
+    "roommate-waiting": "ルームメイト待機中",
+    "no-broker-fee": "ブローカーフィーなし",
+    "no-guarantor": "保証人不要",
+    "free-credit": "フリークレジット",
+    "doorman-24h": "24時間ドアマン",
+    "washer-dryer": "洗濯機・乾燥機",
+    "terrace": "テラス",
+    "gym": "ジム",
+    "pool": "プール",
+    "wall-ok": "仕切り壁OK",
+    "package-storage": "荷物受け取りルーム",
+    "mail-room": "メールルーム",
+    "rooftop": "屋上",
+    "bbq-grill": "BBQグリル",
+    "work-study": "勉強・ワークスペース",
+    "sauna": "サウナ"
+  },
+  "roomTypes": {
+    "master-w-bath": "マスター・ウィズ・バス",
+    "master-wo-bath": "マスター・ウィズアウト・バス",
+    "regular-bedroom": "レギュラー",
+    "flexroom": "フレックス",
+    "entire": "ユニット全体",
+    "studio": "スタジオ"
+  },
+  "unitTypes": {
+    "studio": "スタジオ",
+    "1b1b": "1B1B",
+    "2b1b": "2B1B",
+    "2b2b": "2B2B",
+    "3b1b": "3B1B",
+    "3b2b": "3B2B",
+    "4-plus": "4ベッドルーム以上",
+    "unknown": "タイプ未定"
+  },
+  "credit": {
+    "monthsFree_other": "{count}か月無料",
+    "dollarCredit": "${amount}クレジット"
+  },
+  "amenityFee": {
+    "unknown": "未確認",
+    "free": "無料",
+    "mandatoryPersonMonthly": "必須 · 1人あたり月${amount}",
+    "mandatoryPersonYearly": "必須 · 1人あたり年${amount}",
+    "mandatoryUnitMonthly": "必須 · 1ユニットあたり月${amount}",
+    "mandatoryUnitYearly": "必須 · 1ユニットあたり年${amount}",
+    "optionalPersonMonthly": "任意 · 1人あたり月${amount}",
+    "optionalPersonYearly": "任意 · 1人あたり年${amount}",
+    "optionalUnitMonthly": "任意 · 1ユニットあたり月${amount}",
+    "optionalUnitYearly": "任意 · 1ユニットあたり年${amount}"
+  },
+  "partWall": {
+    "fullWall": "フルウォール",
+    "regularWall": "通常の壁",
+    "curtainOnly": "カーテンのみ"
+  },
+  "income": {
+    "personal": "収入{multiple}倍",
+    "guarantor": "保証人{multiple}倍",
+    "guarantorCompany": "保証会社OK"
+  },
+  "roommatePreferences": {
+    "master-w-bath": "マスター・ウィズ・バス希望",
+    "master-wo-bath": "マスター・ウィズアウト・バス希望",
+    "regular-bedroom": "レギュラー希望",
+    "flexroom": "フレックス希望",
+    "any": "部屋タイプ問わず"
+  },
+  "price": {
+    "gross": "グロス",
+    "net": "ネット"
+  },
+  "card": {
+    "photoLabel": "{address}の写真{number}",
+    "noPhoto": "写真なし",
+    "moveIn": "{date}入居",
+    "moveInTbd": "未定",
+    "composition": {
+      "male_other": "男性{count}人",
+      "female_other": "女性{count}人"
+    },
+    "loadingLabel": "物件を読み込み中",
+    "loadingDescription": "物件を読み込んでいます…"
+  },
+  "roommateIntro": {
+    "title": "待機中のルームメイト",
+    "introFallback": "お問い合わせいただいた際に詳しくお伝えします。",
+    "male": "男性",
+    "female": "女性",
+    "worker": "社会人"
+  },
+  "map": {
+    "location": "場所",
+    "directions": "経路",
+    "openInGoogleMaps": "Googleマップで{name}を見る",
+    "viewInGoogleMaps": "Googleマップで場所を見る"
+  },
+  "detail": {
+    "toasts": {
+      "notAvailableYet": "まもなく利用できるようになります",
+      "kakaoNotReady": "KakaoTalkのお問い合わせリンクはまだ準備中です",
+      "linkCopied": "リンクをコピーしました",
+      "linkCopyFailed": "リンクをコピーできませんでした"
+    },
+    "notFound": {
+      "title": "物件が見つかりません",
+      "description": "募集が終了したか、削除された可能性があります。",
+      "action": "住まいに戻る"
+    },
+    "mailSubject": "[{brand} 住まい] {address}",
+    "backToList": "住まい",
+    "noPhotos": "まだ写真がありません",
+    "previousPhoto": "前の写真",
+    "nextPhoto": "次の写真",
+    "layout": "間取り",
+    "watchVideo": "動画を見る",
+    "photoNumber": "写真{number}",
+    "previousThumbnails": "前のサムネイルを表示",
+    "moreThumbnails": "さらにサムネイルを表示",
+    "benefits": "特典",
+    "roomOptions": "部屋のオプション",
+    "amenities": "共用設備",
+    "utilities": "光熱費",
+    "appliances": "家電",
+    "emailInquiry": "メールで問い合わせ",
+    "kakaoInquiry": "KakaoTalkで問い合わせ",
+    "share": "共有",
+    "closeListing": "募集を終了",
+    "description": "詳細",
+    "property": {
+      "title": "建物情報",
+      "zipcode": "郵便番号（ZIP）",
+      "wall": "仕切り壁のオプション",
+      "amenityFee": "アメニティフィー",
+      "income": "収入条件",
+      "subway": "地下鉄"
+    }
+  },
+  "listingKinds": {
+    "unit": {
+      "label": "ユニット全体",
+      "description": "アパートを丸ごと探す"
+    },
+    "room": {
+      "label": "個室",
+      "description": "部屋をひとつだけ探す"
+    }
+  },
+  "list": {
+    "title": "住まい",
+    "subtitle": "{brand}が厳選したNYCの物件 · ユニット全体も個室もまとめて探せます。",
+    "filters": "フィルター",
+    "quickFilters": "クイックフィルター",
+    "previousFilters": "前のフィルターを表示",
+    "moreFilters": "さらにフィルターを表示",
+    "price": {
+      "upTo": "${amount}まで",
+      "atLeast": "${amount}以上",
+      "range": "${min}〜${max}"
+    },
+    "summaryAll_other": "物件{count}件",
+    "summaryFiltered_other": "{filters} · 物件{count}件",
+    "empty": {
+      "title": "条件に一致する物件がありません",
+      "description": "フィルターを変更して、もう一度検索してください。",
+      "action": "フィルターをリセット"
+    },
+    "sheet": {
+      "clearAll": "すべてクリア",
+      "showResults_other": "物件{count}件を表示",
+      "lookingFor": "何をお探しですか？",
+      "unitType": "ユニットタイプ",
+      "roomType": "部屋タイプ",
+      "all": "すべて",
+      "price": "価格",
+      "unitRent": "ユニット全体の月額家賃",
+      "roomRent": "1部屋あたりの月額家賃",
+      "benefits": "特典",
+      "amenities": "共用設備",
+      "area": "エリア"
+    }
+  },
+  "new": {
+    "errors": {
+      "loginRequired": "先にログインしてください",
+      "submitFailed": "物件を掲載できませんでした"
+    },
+    "redirectingToLogin": "ログインページに移動しています…",
+    "teamOnly": {
+      "title": "チームアカウント専用",
+      "description": "住まいの物件は{domain}のメールアドレスでのみ掲載できます。現在のログイン：{email}",
+      "unknownEmail": "不明"
+    },
+    "breadcrumb": "新規",
+    "title": "新しい物件を掲載",
+    "signedInAs": "{email}でログイン中",
+    "fields": {
+      "streetAddress": "住所",
+      "neighborhood": "エリア",
+      "unitRent": "ユニット全体の月額家賃（$）",
+      "unitRentPlaceholder": "全部屋の合計金額",
+      "roomRent": "1部屋あたりの月額家賃（$）",
+      "bedrooms": "ベッドルーム数",
+      "availableFrom": "入居日",
+      "availableTo": "退去日",
+      "contactEmail": "連絡先メールアドレス",
+      "description": "説明",
+      "descriptionPlaceholder": "リース条件、設備、どんな人に向いているかなど"
+    },
+    "submitting": "掲載しています…",
+    "submit": "掲載する"
+  },
+  "roommate": {
+    "intents": {
+      "offer-room": {
+        "label": "部屋を提供する",
+        "description": "自分の家のルームメイトを探す、またはサブレットを掲載"
+      },
+      "seek": {
+        "label": "ルームメイトを探す",
+        "description": "一緒に家を探す人や、入居できる部屋を探す"
+      }
+    },
+    "lookingFor": {
+      "has-room": {
+        "label": "うちに入ってくれるルームメイトを探しています",
+        "shortLabel": "部屋あり",
+        "description": "すでに家があり、一緒に住む人が必要"
+      },
+      "sublet": {
+        "label": "しばらく自分の部屋をサブレットします",
+        "shortLabel": "サブレット",
+        "description": "自分の部屋を短期間サブレットとして貸し出す"
+      },
+      "together": {
+        "label": "一緒に家を探すルームメイトを探しています",
+        "shortLabel": "一緒に家探し",
+        "description": "まだ家がないので、一緒に探すルームメイトを見つける"
+      },
+      "room": {
+        "label": "入居できる部屋だけを探しています",
+        "shortLabel": "部屋を探し中",
+        "description": "ルームメイトなしで部屋やアパートを探す"
+      }
+    },
+    "form": {
+      "has-room": {
+        "locationLabel": "現在のエリア・場所",
+        "locationPlaceholder": "例：Brooklyn Bushwick",
+        "budgetLabel": "ルームメイトの月額家賃（$）",
+        "budgetPlaceholder": "例：1400",
+        "moveInStartLabel": "入居可能日",
+        "moveInEndLabel": "退去日",
+        "photosHint": "部屋・アパートの写真推奨 · 最大6枚 · 1枚目がカバーになります",
+        "titlePlaceholder": "例：Bushwickの2ベッドでルームメイト募集",
+        "bodyPlaceholder": "間取り、生活スタイル、光熱費、デポジットについて書いてください。連絡を受けられるよう、KakaoTalkの1:1オープンチャットのリンクを残してください。"
+      },
+      "together": {
+        "locationLabel": "希望エリア",
+        "locationPlaceholder": "例：Queens Astoria / Brooklyn",
+        "budgetLabel": "月額予算の上限（$）",
+        "budgetPlaceholder": "例：1600",
+        "moveInStartLabel": "希望入居日",
+        "moveInEndLabel": "退去日",
+        "photosHint": "参考写真があれば追加してください · 最大6枚",
+        "titlePlaceholder": "例：9月入居、Astoriaで一緒に家探し",
+        "bodyPlaceholder": "予算、希望エリア、生活スタイルを教えてください。連絡を受けられるよう、KakaoTalkの1:1オープンチャットのリンクを残してください。"
+      },
+      "room": {
+        "locationLabel": "希望エリア",
+        "locationPlaceholder": "例：Manhattan UES / Jersey City",
+        "budgetLabel": "月額予算の上限（$）",
+        "budgetPlaceholder": "例：1800",
+        "moveInStartLabel": "希望入居日",
+        "moveInEndLabel": "退去日",
+        "photosHint": "参考写真があれば追加してください · 最大6枚",
+        "titlePlaceholder": "例：Midtown周辺で部屋を探しています",
+        "bodyPlaceholder": "予算、希望の場所、入居時期を教えてください。連絡を受けられるよう、KakaoTalkの1:1オープンチャットのリンクを残してください。"
+      },
+      "sublet": {
+        "locationLabel": "サブレットの場所",
+        "locationPlaceholder": "例：Upper East Side",
+        "budgetLabel": "月額家賃（$）",
+        "budgetPlaceholder": "例：2200",
+        "moveInStartLabel": "サブレット開始日",
+        "moveInEndLabel": "サブレット終了日",
+        "photosHint": "部屋・アパートの写真推奨 · 最大6枚 · 1枚目がカバーになります",
+        "titlePlaceholder": "例：UESのスタジオをサブレット、9月〜11月",
+        "bodyPlaceholder": "期間、家具の有無、交通、光熱費、デポジットについて書いてください。連絡を受けられるよう、KakaoTalkの1:1オープンチャットのリンクを残してください。"
+      }
+    },
+    "card": {
+      "pricePerMonth": "{price}/月"
+    },
+    "list": {
+      "budgetPresets": {
+        "under-1500": "$1,500まで",
+        "1500-2000": "$1,500〜2,000",
+        "2000-2500": "$2,000〜2,500",
+        "2500-plus": "$2,500以上"
+      },
+      "loadFailed": "投稿を読み込めませんでした",
+      "summaryAll_other": "投稿{count}件",
+      "summaryFiltered_other": "{filters} · 投稿{count}件",
+      "login": "ログイン",
+      "suspended": "アカウント利用停止中",
+      "breadcrumb": "ルームメイト · サブレット",
+      "empty": {
+        "noPostsTitle": "ルームメイト・サブレットの投稿はまだありません",
+        "noMatchTitle": "条件に一致する投稿がありません",
+        "firstPost": "最初の投稿をして、盛り上げましょう。",
+        "verifyToPost": "投稿するには学生または社会人の認証をしてください。",
+        "loginToPost": "投稿するにはログインしてください。"
+      },
+      "showResults_other": "投稿{count}件を表示",
+      "category": "カテゴリー",
+      "monthlyBudget": "月額予算",
+      "neighborhood": "エリア"
+    },
+    "write": {
+      "errors": {
+        "alreadyPosted": "すでにルームメイト・サブレットの投稿があります。編集画面に移動します。",
+        "notFound": "投稿が見つかりません",
+        "noPermission": "この投稿を編集する権限がありません",
+        "loadFailed": "投稿を読み込めませんでした",
+        "typeRequired": "種類を選択してください",
+        "titleRequired": "タイトルを入力してください",
+        "titleTooLong": "タイトルは{max}文字以内にしてください",
+        "bodyRequired": "本文を入力してください",
+        "bodyTooLong": "本文は{max}文字以内にしてください",
+        "fieldRequired": "入力してください：{field}",
+        "fieldSelect": "選択してください：{field}",
+        "budgetRange": "$0〜${max}の金額を入力してください",
+        "endBeforeStart": "終了日は開始日より後にしてください",
+        "updateFailed": "変更を保存できませんでした",
+        "draftSaveFailed": "下書きを保存できませんでした"
+      },
+      "updated": "投稿を更新しました",
+      "created": "投稿を公開しました",
+      "draftSaved": "下書きを保存しました",
+      "checkingExisting": "既存の投稿を確認しています…",
+      "backToPost": "投稿に戻る",
+      "backToList": "{board}に戻る",
+      "onePostNotice": "ルームメイト · サブレットには{limit}投稿できます。状況が変わった場合は、既存の投稿を編集または削除してから投稿し直してください。",
+      "onePostLimit": "1アカウントにつき1件まで",
+      "steps": {
+        "type": "どんな投稿ですか？",
+        "basics": "基本情報",
+        "basicsDescription": "タイトル、場所、予算、日程を入力してください",
+        "photos": "写真",
+        "photosDescription": "{hint} · 長押ししてドラッグで並び替え · {current}/{max}",
+        "details": "詳細",
+        "detailsDescription": "生活スタイルや条件を教えてください。連絡を受けられるよう、KakaoTalkの1:1オープンチャットを作成してリンクを残すのがおすすめです。"
+      },
+      "subtype": "種類の詳細",
+      "fields": {
+        "title": "タイトル"
+      },
+      "pickSubtypeHint": "種類を選ぶと、場所・予算・入居日の項目が表示されます。",
+      "pickIntentHint": "「部屋を提供する」か「ルームメイトを探す」を選んでください。",
+      "photosDefaultHint": "最大{max}枚 · 1枚目がカバーになります",
+      "addPhoto": "追加",
+      "saving": "保存しています…",
+      "saveEdit": "変更を保存",
+      "submit": "投稿を公開",
+      "backToListShort": "一覧に戻る",
+      "createHero": {
+        "title": "ルームメイト · サブレットに投稿",
+        "description": "「部屋を提供する」か「ルームメイトを探す」を選んで、場所と日程を追加してください。",
+        "photoTip": "横長4:3の写真がきれいに表示されます。"
+      },
+      "updateHero": {
+        "eyebrow": "投稿を編集",
+        "title": "投稿を編集する",
+        "description": "状況が変わったら、種類・場所・日程を更新してください。"
+      },
+      "untitled": "無題"
+    }
+  }
+}

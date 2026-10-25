@@ -5,7 +5,10 @@ import type { Map as LeafletMap, Marker as LeafletMarker } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 import type { FoodPlacePoint } from '@lib/community/foodMap'
+import { useInView } from '@hooks/useInView'
 import { getLeafletTileConfig } from '@lib/community/leafletTiles'
+import { trackMapView } from '@lib/usage/client'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 
 type FoodPlaceMapProps = {
@@ -20,13 +23,17 @@ export function FoodPlaceMap({
   className,
   heightClassName = 'h-48 sm:h-56',
 }: FoodPlaceMapProps) {
+  const t = useT('food')
+  const placeName = place.name || t('map.unnamedPlace')
   const containerRef = useRef<HTMLDivElement>(null)
+  // 화면에 보일 때만 지도를 만든다 (CARTO 타일 요청 절약)
+  const [setContainer, visible] = useInView(containerRef)
   const mapRef = useRef<LeafletMap | null>(null)
   const markerRef = useRef<LeafletMarker | null>(null)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return
+    if (!visible || !containerRef.current || mapRef.current) return
     let cancelled = false
 
     void (async () => {
@@ -48,6 +55,7 @@ export function FoodPlaceMap({
       }).addTo(map)
 
       mapRef.current = map
+      trackMapView('food_place')
       setReady(true)
       requestAnimationFrame(() => map.invalidateSize())
     })()
@@ -61,7 +69,7 @@ export function FoodPlaceMap({
       setReady(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [visible])
 
   useEffect(() => {
     if (!ready || !mapRef.current) return
@@ -97,10 +105,10 @@ export function FoodPlaceMap({
     const map = mapRef.current
     const onResize = () => map.invalidateSize()
     window.addEventListener('resize', onResize)
-    const t = window.setTimeout(onResize, 120)
+    const timer = window.setTimeout(onResize, 120)
     return () => {
       window.removeEventListener('resize', onResize)
-      window.clearTimeout(t)
+      window.clearTimeout(timer)
     }
   }, [ready])
 
@@ -116,18 +124,18 @@ export function FoodPlaceMap({
       )}
     >
       <div
-        ref={containerRef}
+        ref={setContainer}
         className={cn(
           'relative z-0 w-full bg-[#e8eaee] [&_.leaflet-control-attribution]:bg-white/80 [&_.leaflet-control-attribution]:text-[9px]',
           heightClassName,
         )}
         role='application'
-        aria-label={`${place.name} 위치 지도`}
+        aria-label={t('map.placeMapLabel', { name: placeName })}
       />
       <div className='flex items-center justify-between gap-3 border-t border-black/[0.05] px-3.5 py-2.5'>
         <div className='min-w-0'>
           <p className='truncate text-[13px] font-semibold text-[var(--foreground)]'>
-            {place.name}
+            {placeName}
           </p>
           {place.address ? (
             <p className='mt-0.5 truncate text-[11px] text-[var(--muted)]'>
@@ -141,7 +149,7 @@ export function FoodPlaceMap({
           rel='noopener noreferrer'
           className='shrink-0 rounded-full bg-[#f3f4f6] px-3 py-1.5 text-[11px] font-semibold text-[var(--foreground)] touch-manipulation transition hover:bg-[#e8eaee]'
         >
-          길찾기
+          {t('map.directions')}
         </a>
       </div>
     </div>
@@ -156,7 +164,7 @@ function placePinHtml() {
       filter:drop-shadow(0 1px 2px rgba(15,23,42,0.28));
     ">
       <svg width="24" height="30" viewBox="0 0 36 44" aria-hidden="true">
-        <path d="M18 0C8.6 0 1 7.6 1 17c0 11.4 14.2 25.2 15.5 26.4a2 2 0 0 0 2.9 0C20.8 42.2 35 28.4 35 17 35 7.6 27.4 0 18 0z" fill="#F64310"/>
+        <path d="M18 0C8.6 0 1 7.6 1 17c0 11.4 14.2 25.2 15.5 26.4a2 2 0 0 0 2.9 0C20.8 42.2 35 28.4 35 17 35 7.6 27.4 0 18 0z" style="fill:var(--brand)"/>
         <circle cx="18" cy="16" r="7.5" fill="#fff"/>
       </svg>
     </div>

@@ -1,27 +1,27 @@
 import type { LegalDocument } from '@lib/constants/legalDocument'
 
-/** Misaeng NYC Terms of Use — English controls; Korean is a convenience translation */
+/** Misaeng NYC · Ellieo Terms of Use — English controls; other languages are convenience translations */
 export const NYC_TERMS_OF_USE: LegalDocument = {
   eyebrow: 'LEGAL',
   title: 'Terms of Use',
   titleKo: '이용약관',
-  version: '2026-08-30',
-  lastUpdated: 'August 30, 2026',
-  lastUpdatedKo: '2026년 8월 30일',
-  effectiveDate: 'August 30, 2026',
-  effectiveDateKo: '2026년 8월 30일',
+  version: '2026-11-23',
+  lastUpdated: 'October 23, 2026',
+  lastUpdatedKo: '2026년 10월 23일',
+  effectiveDate: 'November 23, 2026',
+  effectiveDateKo: '2026년 11월 23일',
   contactEmail: 'info@misaeng.com',
   companyName: 'Misaeng LLC',
   companyAddress:
     '45 Rockefeller Plaza, Fl 20, New York, NY 10111, United States',
   languageNotice: {
-    en: 'The English version of these Terms is the official and controlling version. The Korean text is provided for convenience only. If there is any conflict or inconsistency between the English and Korean versions, the English version prevails.',
-    ko: '본 약관의 영문본이 공식·기준 문서입니다. 한글은 참고용 번역이며, 영문과 한글에 차이·불일치가 있을 경우 영문본이 우선합니다.',
+    en: 'The English version of these Terms is the official and controlling version. Versions in other languages (Korean, Vietnamese, Japanese, Simplified Chinese, Traditional Chinese, and Indonesian) are reference translations provided for convenience only. If there is any conflict or inconsistency between the English version and any translation, the English version prevails.',
+    ko: '본 약관의 영문본이 공식·기준 문서입니다. 다른 언어(한국어, 베트남어, 일본어, 중국어 간체·번체, 인도네시아어) 번역본은 이해를 돕기 위한 참고용이며, 영문본과 번역본에 차이·불일치가 있을 경우 영문본이 우선합니다.',
   },
   intro: [
     {
-      en: 'These Terms of Use (the “Terms”) govern your access to and use of the websites and related online services operated by Misaeng LLC (“Company,” “we,” “us,” or “Misaeng”), including the New York City community platform for international students and professionals known as “Misaeng NYC” (collectively, the “Services”).',
-      ko: '본 이용약관(이하 “본 약관”)은 Misaeng LLC(이하 “회사”, “당사”, “Misaeng”)가 운영하는 웹사이트 및 관련 온라인 서비스, 특히 New York City 지역 유학생·직장인을 위한 커뮤니티 플랫폼 “Misaeng NYC”(이하 통칭 “서비스”)의 이용 조건과 회사와 이용자 간의 권리·의무를 정합니다.',
+      en: 'These Terms of Use (the “Terms”) govern your access to and use of the websites and related online services operated by Misaeng LLC (“Company,” “we,” “us,” or “Misaeng”), including the New York City community platform for international students and professionals known as “Misaeng NYC” and its multilingual edition “Ellieo” (collectively, the “Services”). Misaeng NYC and Ellieo share one account system and the same community Content, so one account works on both, and these Terms apply to both.',
+      ko: '본 이용약관(이하 “본 약관”)은 Misaeng LLC(이하 “회사”, “당사”, “Misaeng”)가 운영하는 웹사이트 및 관련 온라인 서비스, 특히 New York City 지역 유학생·직장인을 위한 커뮤니티 플랫폼 “Misaeng NYC”와 그 다국어 서비스 “Ellieo”(이하 통칭 “서비스”)의 이용 조건과 회사와 이용자 간의 권리·의무를 정합니다. Misaeng NYC와 Ellieo는 하나의 계정 체계와 같은 커뮤니티 게시물을 공유하므로 하나의 계정으로 두 서비스를 모두 이용할 수 있으며, 본 약관은 두 서비스 모두에 적용됩니다.',
     },
     {
       en: 'By accessing, browsing, registering for, posting on, commenting on, contacting us through, applying for credits in connection with, or otherwise using the Services, you acknowledge that you have read, understood, and agree to be bound by these Terms. If you do not agree, do not use the Services.',
@@ -186,6 +186,10 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
               ko: '파트너·인플루언서·전문 서비스 안내 등 정보성 페이지',
             },
             {
+              en: 'Multilingual access: the Services are offered in several languages, and Content may be shown on both Misaeng NYC and Ellieo in its original language or in translation (see Section 6)',
+              ko: '다국어 이용: 서비스는 여러 언어로 제공되며, 게시물은 원문 또는 번역문으로 Misaeng NYC와 Ellieo 양쪽에 표시될 수 있습니다(제6조 참고)',
+            },
+            {
               en: 'Customer inquiries via email, contact forms, social channels, and similar',
               ko: '고객 문의(이메일, 문의 페이지, 소셜 채널 등)',
             },
@@ -212,8 +216,12 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
           type: 'ul',
           items: [
             {
-              en: 'Subject to these Terms, you retain ownership of your Content. You grant the Company a worldwide, non-exclusive, royalty-free, transferable, and sublicensable license to use, reproduce, modify, distribute, publicly display, and perform your Content as needed to operate, improve, secure, promote, archive, and legally defend the Services.',
-              ko: '게시물의 소유권은 원칙적으로 작성 이용자에게 귀속됩니다. 다만 이용자는 회사에 대해, 서비스 운영·개선·보안·홍보·아카이빙·법령 대응에 필요한 범위에서 전 세계적·비독점적·무상·양도 가능한(하위 라이선스 가능) 사용·복제·수정·배포·공중송신·표시 권한을 부여합니다.',
+              en: 'Subject to these Terms, you retain ownership of your Content. You grant the Company a worldwide, non-exclusive, royalty-free, transferable, and sublicensable license to use, reproduce, modify, translate into other languages (including with automated or AI-assisted tools), distribute, publicly display, and perform your Content, in its original language and in translation, on Misaeng NYC, Ellieo, and related services, as needed to operate, improve, secure, promote, archive, and legally defend the Services.',
+              ko: '게시물의 소유권은 원칙적으로 작성 이용자에게 귀속됩니다. 다만 이용자는 회사에 대해, 서비스 운영·개선·보안·홍보·아카이빙·법령 대응에 필요한 범위에서 게시물을 원문 및 번역문으로 Misaeng NYC, Ellieo 및 관련 서비스에서 사용·복제·수정·다른 언어로 번역(자동·AI 보조 도구 이용 포함)·배포·공중송신·표시할 수 있는 전 세계적·비독점적·무상·양도 가능한(하위 라이선스 가능) 권한을 부여합니다.',
+            },
+            {
+              en: 'Translations of your Content are created by the Company and are deleted when you delete the original Content.',
+              ko: '게시물의 번역문은 회사가 작성하며, 이용자가 원문 게시물을 삭제하면 번역문도 함께 삭제됩니다.',
             },
             {
               en: 'You represent that your Content complies with these Terms, community guidelines, and applicable law.',
@@ -232,14 +240,47 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
       ],
     },
     {
-      id: 'community-rules',
-      title: '6. Community Rules and Prohibited Conduct',
-      titleKo: '6. 커뮤니티 이용 규칙 및 금지행위',
+      id: 'translations',
+      title: '6. Translations',
+      titleKo: '6. 번역',
       blocks: [
         {
           type: 'p',
-          en: 'The Services depend on mutual respect and safe information sharing. You must not engage in the following. Violations may result in Content removal, feature limits, account suspension or termination, and referral to authorities.',
-          ko: '서비스는 상호 존중과 안전한 정보 공유를 전제로 합니다. 이용자는 다음 행위를 해서는 안 됩니다. 위반 시 게시물 삭제, 기능 제한, 계정 정지·해지, 수사기관 신고 등 조치가 취해질 수 있습니다.',
+          en: 'To help Users who speak different languages understand each other, the Company may translate Content and Service text into other languages using automated or AI-assisted translation tools, with or without human review, and may show a translation instead of, or together with, the original. Translations are made by the Company; they are not written or approved by the author of the original Content.',
+          ko: '서로 다른 언어를 쓰는 이용자들이 내용을 이해할 수 있도록, 회사는 자동·AI 보조 번역 도구를 이용해(사람의 검토를 거치거나 거치지 않고) 게시물과 서비스 문구를 다른 언어로 번역할 수 있으며, 원문 대신 또는 원문과 함께 번역문을 표시할 수 있습니다. 번역문은 회사가 작성한 것이며, 원문 작성자가 작성하거나 승인한 것이 아닙니다.',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Translations may be inaccurate or incomplete or may lose nuance. For Content, the original language version prevails over any translation. Where a translation is shown, you can open the original with “View original.”',
+              ko: '번역문은 부정확하거나 불완전할 수 있고 뉘앙스가 달라질 수 있습니다. 게시물은 원문이 번역문보다 우선하며, 번역문이 표시된 경우 “원문 보기”로 원문을 확인할 수 있습니다.',
+            },
+            {
+              en: 'Do not rely on a translation alone for decisions about visas or immigration, employment, housing contracts or payments, or legal or tax matters. Check the original and consult a qualified professional (see Section 11).',
+              ko: '비자·이민, 취업, 주거 계약·지급, 법률·세무 관련 결정을 번역문에만 의존해서 내리지 마십시오. 원문을 확인하고 자격 있는 전문가와 상담하십시오(제11조 참고).',
+            },
+            {
+              en: 'The Company may choose not to translate some Content (for example, suspected spam, advertising, harmful Content, or Content containing personal contact details), may show Content untranslated until a translation is available, and may correct or remove translations at any time.',
+              ko: '회사는 일부 게시물(예: 스팸·광고·유해 게시물 또는 개인 연락처가 포함된 게시물로 의심되는 경우)을 번역하지 않을 수 있고, 번역문이 준비될 때까지 원문만 표시하거나 해당 언어 화면에 표시하지 않을 수 있으며, 언제든지 번역문을 수정·삭제할 수 있습니다.',
+            },
+            {
+              en: 'These Terms, the Privacy Policy, and other legal notices are governed by their English versions as described in the language notice above.',
+              ko: '본 약관, 개인정보처리방침 및 기타 법적 고지는 위 언어 고지에 따라 영문본이 기준입니다.',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'community-rules',
+      title: '7. Community Rules and Prohibited Conduct',
+      titleKo: '7. 커뮤니티 이용 규칙 및 금지행위',
+      blocks: [
+        {
+          type: 'p',
+          en: 'The Services depend on mutual respect and safe information sharing. You must not engage in the following. Violations may result in Content removal, feature limits, account suspension or termination, and referral to authorities. These rules apply to Content in every language, and the Company may use translations, including automated translations, to review and moderate Content.',
+          ko: '서비스는 상호 존중과 안전한 정보 공유를 전제로 합니다. 이용자는 다음 행위를 해서는 안 됩니다. 위반 시 게시물 삭제, 기능 제한, 계정 정지·해지, 수사기관 신고 등 조치가 취해질 수 있습니다. 이 규칙은 모든 언어로 작성된 게시물에 적용되며, 회사는 게시물 검토·관리에 번역문(자동 번역 포함)을 이용할 수 있습니다.',
         },
         {
           type: 'ul',
@@ -295,8 +336,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'anonymous',
-      title: '7. Special Notice for the Anonymous Board',
-      titleKo: '7. 익명게시판에 관한 특별 고지',
+      title: '8. Special Notice for the Anonymous Board',
+      titleKo: '8. 익명게시판에 관한 특별 고지',
       blocks: [
         {
           type: 'p',
@@ -328,23 +369,23 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'housing-transactions',
-      title: '8. Housing, Roommate Posts, Brokerage Roles, and Fees',
-      titleKo: '8. 하우징·룸메이트·중개 역할 및 수수료',
+      title: '9. Housing, Roommate Posts, Brokerage Roles, and Fees',
+      titleKo: '9. 하우징·룸메이트·중개 역할 및 수수료',
       blocks: [
         {
           type: 'p',
-          en: '8.1 Two different roles on the Services. Misaeng NYC includes both (a) community information and peer-to-peer posts (for example roommate/sublet boards and User-generated tips) and (b) housing-related activity that may involve New York–licensed real estate professionals affiliated with the Company and/or a partner brokerage (which may include Fact Real Estate or another licensed brokerage). These roles are not the same, and the applicable duties depend on the facts of each interaction.',
-          ko: '8.1 서비스상의 두 가지 역할. Misaeng NYC에는 (a) 커뮤니티 정보·개인간 게시(룸메이트·서블렛 게시판, 이용자 팁 등)와 (b) 회사 및/또는 파트너 브로커리지(Fact Real Estate 등 면허 브로커리지 포함 가능)에 소속·제휴된 뉴욕주 공인 부동산 전문가의 하우징 관련 활동이 함께 있을 수 있습니다. 역할이 동일하지 않으며, 각 상호작용의 사실에 따라 적용되는 의무가 달라집니다.',
+          en: '9.1 Two different roles on the Services. Misaeng NYC includes both (a) community information and peer-to-peer posts (for example roommate/sublet boards and User-generated tips) and (b) housing-related activity that may involve New York–licensed real estate professionals affiliated with the Company and/or a partner brokerage (which may include Fact Real Estate or another licensed brokerage). These roles are not the same, and the applicable duties depend on the facts of each interaction.',
+          ko: '9.1 서비스상의 두 가지 역할. Misaeng NYC에는 (a) 커뮤니티 정보·개인간 게시(룸메이트·서블렛 게시판, 이용자 팁 등)와 (b) 회사 및/또는 파트너 브로커리지(Fact Real Estate 등 면허 브로커리지 포함 가능)에 소속·제휴된 뉴욕주 공인 부동산 전문가의 하우징 관련 활동이 함께 있을 수 있습니다. 역할이 동일하지 않으며, 각 상호작용의 사실에 따라 적용되는 의무가 달라집니다.',
         },
         {
           type: 'p',
-          en: '8.2 Peer-to-peer and informational use. For roommate/sublet posts, community discussions, and other User-to-User communications where no licensed brokerage representation is offered or accepted, the Company is not your landlord, tenant, escrow agent, or guarantor, and does not automatically become your real estate broker or salesperson solely because content appears on the Services. You must independently verify counterparties, terms, payment requests, identity, and authority. Be especially careful with high-risk payment methods such as advance deposits, cash wires, gift cards, or cryptocurrency, and report suspicious requests.',
-          ko: '8.2 개인간·정보성 이용. 룸메이트·서블렛 게시, 커뮤니티 토론 등 면허 중개 대리가 제안·수락되지 않은 이용자 간 소통에 대해, 회사는 귀하의 임대인·임차인·에스크로·보증인이 아니며, 콘텐츠가 서비스에 게시되었다는 사실만으로 자동으로 귀하의 부동산 브로커·세일즈퍼슨이 되지 않습니다. 상대방·조건·입금 요청·신분·권한은 스스로 확인해야 합니다. 선입금·현금 송금·기프트카드·암호화폐 등 위험 결제수단에 특히 주의하고, 의심 요청은 신고해 주세요.',
+          en: '9.2 Peer-to-peer and informational use. For roommate/sublet posts, community discussions, and other User-to-User communications where no licensed brokerage representation is offered or accepted, the Company is not your landlord, tenant, escrow agent, or guarantor, and does not automatically become your real estate broker or salesperson solely because content appears on the Services. You must independently verify counterparties, terms, payment requests, identity, and authority. Be especially careful with high-risk payment methods such as advance deposits, cash wires, gift cards, or cryptocurrency, and report suspicious requests.',
+          ko: '9.2 개인간·정보성 이용. 룸메이트·서블렛 게시, 커뮤니티 토론 등 면허 중개 대리가 제안·수락되지 않은 이용자 간 소통에 대해, 회사는 귀하의 임대인·임차인·에스크로·보증인이 아니며, 콘텐츠가 서비스에 게시되었다는 사실만으로 자동으로 귀하의 부동산 브로커·세일즈퍼슨이 되지 않습니다. 상대방·조건·입금 요청·신분·권한은 스스로 확인해야 합니다. 선입금·현금 송금·기프트카드·암호화폐 등 위험 결제수단에 특히 주의하고, 의심 요청은 신고해 주세요.',
         },
         {
           type: 'p',
-          en: '8.3 Licensed brokerage activity and agency disclosure. Where a New York–licensed real estate salesperson or broker affiliated with the Company or a partner brokerage introduces, shows, negotiates, or otherwise assists with a rental or related real-estate transaction, an agency or brokerage relationship may arise under New York law. New York requires clear disclosure of agency relationships in many residential real-estate dealings (see, among other authorities, N.Y. Real Property Law §443 and related Department of State brokerage rules and forms). In those cases:',
-          ko: '8.3 면허 중개 활동 및 대리관계 공시. 회사 또는 파트너 브로커리지에 소속·제휴된 뉴욕주 공인 부동산 세일즈퍼슨·브로커가 임대 등 부동산 거래의 소개·쇼잉·협상·지원을 하는 경우, 뉴욕주 법률에 따른 대리·중개 관계가 성립할 수 있습니다. 뉴욕주는 많은 주거용 부동산 거래에서 대리관계의 명확한 공시를 요구합니다(예: N.Y. Real Property Law §443 및 관련 Department of State 중개 규정·양식). 이 경우:',
+          en: '9.3 Licensed brokerage activity and agency disclosure. Where a New York–licensed real estate salesperson or broker affiliated with the Company or a partner brokerage introduces, shows, negotiates, or otherwise assists with a rental or related real-estate transaction, an agency or brokerage relationship may arise under New York law. New York requires clear disclosure of agency relationships in many residential real-estate dealings (see, among other authorities, N.Y. Real Property Law §443 and related Department of State brokerage rules and forms). In those cases:',
+          ko: '9.3 면허 중개 활동 및 대리관계 공시. 회사 또는 파트너 브로커리지에 소속·제휴된 뉴욕주 공인 부동산 세일즈퍼슨·브로커가 임대 등 부동산 거래의 소개·쇼잉·협상·지원을 하는 경우, 뉴욕주 법률에 따른 대리·중개 관계가 성립할 수 있습니다. 뉴욕주는 많은 주거용 부동산 거래에서 대리관계의 명확한 공시를 요구합니다(예: N.Y. Real Property Law §443 및 관련 Department of State 중개 규정·양식). 이 경우:',
         },
         {
           type: 'ul',
@@ -365,8 +406,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
         },
         {
           type: 'p',
-          en: '8.4 Broker fees, “no-broker-fee” labels, and New York City rules (including the FARE Act). Labels such as “no broker fee,” “OP,” owner-pays, or similar fee badges on listings are informational summaries based on data available at the time of posting. They are not a warranty that you will never pay any fee, concession charge, or other cost. New York City’s Fairness in Apartment Rental Expenses (FARE) Act and related rules have changed how broker fees may be charged and disclosed in many rental situations. Fee responsibility can depend on who engaged the broker, the listing’s compensation structure, and applicable law at the time of your deal. Always confirm fee allocation in writing before you tour, apply, or sign. Marketing phrases about “broker-fee-free” inventory must be read together with then-current NYC law and the specific listing/brokerage disclosures—not as a blanket legal conclusion for every property.',
-          ko: '8.4 브로커 수수료, “중개비 무료” 라벨, 뉴욕시 규정(FARE Act 포함). 매물의 “no broker fee”, “OP”, 소유자 부담, 유사 수수료 배지는 게시 시점 데이터에 따른 정보 요약이며, 귀하가 어떠한 수수료·비용도 내지 않는다는 보증이 아닙니다. 뉴욕시 Fairness in Apartment Rental Expenses(FARE) Act 및 관련 규정으로 많은 임대 상황에서 브로커 수수료의 청구·공시 방식이 달라졌습니다. 수수료 부담은 누가 브로커를 고용했는지, 리스팅 보수 구조, 거래 시점의 적용법에 따라 달라질 수 있습니다. 투어·신청·계약 전에 서면으로 수수료 배분을 확인하세요. “broker-fee-free” 등 마케팅 문구는 당시 NYC 법과 해당 매물/중개 공시와 함께 읽어야 하며, 모든 매물에 대한 일률적 법적 결론이 아닙니다.',
+          en: '9.4 Broker fees, “no-broker-fee” labels, and New York City rules (including the FARE Act). Labels such as “no broker fee,” “OP,” owner-pays, or similar fee badges on listings are informational summaries based on data available at the time of posting. They are not a warranty that you will never pay any fee, concession charge, or other cost. New York City’s Fairness in Apartment Rental Expenses (FARE) Act and related rules have changed how broker fees may be charged and disclosed in many rental situations. Fee responsibility can depend on who engaged the broker, the listing’s compensation structure, and applicable law at the time of your deal. Always confirm fee allocation in writing before you tour, apply, or sign. Marketing phrases about “broker-fee-free” inventory must be read together with then-current NYC law and the specific listing/brokerage disclosures—not as a blanket legal conclusion for every property.',
+          ko: '9.4 브로커 수수료, “중개비 무료” 라벨, 뉴욕시 규정(FARE Act 포함). 매물의 “no broker fee”, “OP”, 소유자 부담, 유사 수수료 배지는 게시 시점 데이터에 따른 정보 요약이며, 귀하가 어떠한 수수료·비용도 내지 않는다는 보증이 아닙니다. 뉴욕시 Fairness in Apartment Rental Expenses(FARE) Act 및 관련 규정으로 많은 임대 상황에서 브로커 수수료의 청구·공시 방식이 달라졌습니다. 수수료 부담은 누가 브로커를 고용했는지, 리스팅 보수 구조, 거래 시점의 적용법에 따라 달라질 수 있습니다. 투어·신청·계약 전에 서면으로 수수료 배분을 확인하세요. “broker-fee-free” 등 마케팅 문구는 당시 NYC 법과 해당 매물/중개 공시와 함께 읽어야 하며, 모든 매물에 대한 일률적 법적 결론이 아닙니다.',
         },
         {
           type: 'note',
@@ -377,8 +418,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'fair-housing',
-      title: '9. Fair Housing and Equal Opportunity',
-      titleKo: '9. 공정주거 및 평등한 기회',
+      title: '10. Fair Housing and Equal Opportunity',
+      titleKo: '10. 공정주거 및 평등한 기회',
       blocks: [
         {
           type: 'p',
@@ -406,8 +447,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'no-advice',
-      title: '10. Visa, Career, Legal, and Tax Information — Not Advice',
-      titleKo: '10. 비자·취업·법률·세무 정보 — 조언이 아님',
+      title: '11. Visa, Career, Legal, and Tax Information — Not Advice',
+      titleKo: '11. 비자·취업·법률·세무 정보 — 조언이 아님',
       blocks: [
         {
           type: 'p',
@@ -435,8 +476,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'credits',
-      title: '11. Community Credits',
-      titleKo: '11. 커뮤니티 크레딧',
+      title: '12. Community Credits',
+      titleKo: '12. 커뮤니티 크레딧',
       blocks: [
         {
           type: 'p',
@@ -468,8 +509,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'ip',
-      title: '12. Company Intellectual Property',
-      titleKo: '12. 회사의 지식재산권',
+      title: '13. Company Intellectual Property',
+      titleKo: '13. 회사의 지식재산권',
       blocks: [
         {
           type: 'p',
@@ -485,8 +526,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'third-party',
-      title: '13. Third-Party Services and Links',
-      titleKo: '13. 제3자 서비스 및 링크',
+      title: '14. Third-Party Services and Links',
+      titleKo: '14. 제3자 서비스 및 링크',
       blocks: [
         {
           type: 'p',
@@ -497,8 +538,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'copyright',
-      title: '14. Copyright Complaints and DMCA Designated Agent',
-      titleKo: '14. 저작권 침해 신고 및 DMCA Designated Agent',
+      title: '15. Copyright Complaints and DMCA Designated Agent',
+      titleKo: '15. 저작권 침해 신고 및 DMCA Designated Agent',
       blocks: [
         {
           type: 'p',
@@ -570,8 +611,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'moderation',
-      title: '15. Reports, Monitoring, and Enforcement',
-      titleKo: '15. 신고, 모니터링 및 조치',
+      title: '16. Reports, Monitoring, and Enforcement',
+      titleKo: '16. 신고, 모니터링 및 조치',
       blocks: [
         {
           type: 'p',
@@ -599,8 +640,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'availability',
-      title: '16. Availability, Changes, and Interruptions',
-      titleKo: '16. 서비스 제공, 변경 및 중단',
+      title: '17. Availability, Changes, and Interruptions',
+      titleKo: '17. 서비스 제공, 변경 및 중단',
       blocks: [
         {
           type: 'p',
@@ -611,8 +652,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'disclaimers',
-      title: '17. Disclaimer of Warranties',
-      titleKo: '17. 보증의 부인',
+      title: '18. Disclaimer of Warranties',
+      titleKo: '18. 보증의 부인',
       blocks: [
         {
           type: 'p',
@@ -623,8 +664,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'liability',
-      title: '18. Limitation of Liability',
-      titleKo: '18. 책임의 제한',
+      title: '19. Limitation of Liability',
+      titleKo: '19. 책임의 제한',
       blocks: [
         {
           type: 'p',
@@ -640,8 +681,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'indemnity',
-      title: '19. Indemnification',
-      titleKo: '19. 면책(Indemnification)',
+      title: '20. Indemnification',
+      titleKo: '20. 면책(Indemnification)',
       blocks: [
         {
           type: 'p',
@@ -652,8 +693,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'termination',
-      title: '20. Suspension and Termination',
-      titleKo: '20. 이용 제한 및 해지',
+      title: '21. Suspension and Termination',
+      titleKo: '21. 이용 제한 및 해지',
       blocks: [
         {
           type: 'ul',
@@ -676,8 +717,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'changes',
-      title: '21. Changes to These Terms',
-      titleKo: '21. 약관의 변경',
+      title: '22. Changes to These Terms',
+      titleKo: '22. 약관의 변경',
       blocks: [
         {
           type: 'p',
@@ -688,61 +729,61 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'governing-law',
-      title: '22. Governing Law; Informal Resolution; Arbitration; Class-Action Waiver',
-      titleKo: '22. 준거법, 사전 협의, 중재, 집단소송 포기',
+      title: '23. Governing Law; Informal Resolution; Arbitration; Class-Action Waiver',
+      titleKo: '23. 준거법, 사전 협의, 중재, 집단소송 포기',
       emphasized: true,
       blocks: [
         {
           type: 'note',
-          en: 'IMPORTANT — PLEASE READ. This Section includes a binding individual arbitration agreement and a class-action waiver that affect your legal rights. You may opt out within 30 days as described in Section 22.7.',
-          ko: '중요 — 꼭 읽어 주세요. 본 조에는 법적 권리에 영향을 미치는 구속력 있는 개별 중재 합의 및 집단소송 포기 조항이 포함됩니다. 22.7에 따라 30일 이내 옵트아웃할 수 있습니다.',
+          en: 'IMPORTANT — PLEASE READ. This Section includes a binding individual arbitration agreement and a class-action waiver that affect your legal rights. You may opt out within 30 days as described in Section 23.7.',
+          ko: '중요 — 꼭 읽어 주세요. 본 조에는 법적 권리에 영향을 미치는 구속력 있는 개별 중재 합의 및 집단소송 포기 조항이 포함됩니다. 23.7에 따라 30일 이내 옵트아웃할 수 있습니다.',
         },
         {
           type: 'p',
-          en: '22.1 Governing law. These Terms and disputes relating to the Services are governed by the laws of the State of New York, United States, without regard to conflict-of-law principles, except that the Federal Arbitration Act governs the interpretation and enforcement of the arbitration agreement below to the fullest extent permitted.',
-          ko: '22.1 준거법. 본 약관 및 서비스 관련 분쟁에는 미국 뉴욕주 법률(법 충돌 원칙 제외)이 적용됩니다. 다만 아래 중재 합의의 해석·집행에는 허용되는 최대 범위에서 Federal Arbitration Act가 적용됩니다.',
+          en: '23.1 Governing law. These Terms and disputes relating to the Services are governed by the laws of the State of New York, United States, without regard to conflict-of-law principles, except that the Federal Arbitration Act governs the interpretation and enforcement of the arbitration agreement below to the fullest extent permitted.',
+          ko: '23.1 준거법. 본 약관 및 서비스 관련 분쟁에는 미국 뉴욕주 법률(법 충돌 원칙 제외)이 적용됩니다. 다만 아래 중재 합의의 해석·집행에는 허용되는 최대 범위에서 Federal Arbitration Act가 적용됩니다.',
         },
         {
           type: 'p',
-          en: '22.2 Informal resolution first. Before starting arbitration or a lawsuit that is not subject to arbitration, you and the Company agree to try to resolve the dispute informally for at least thirty (30) days after written notice to info@misaeng.com (include your name, the email on your account, a description of the dispute, and the relief sought).',
-          ko: '22.2 사전 협의. 중재 또는 중재 대상이 아닌 소송을 시작하기 전에, 귀하와 회사는 info@misaeng.com 으로 서면 통지(이름, 계정 이메일, 분쟁 내용, 구하는 구제) 후 최소 30일간 성실한 비공식 해결을 시도하기로 합니다.',
+          en: '23.2 Informal resolution first. Before starting arbitration or a lawsuit that is not subject to arbitration, you and the Company agree to try to resolve the dispute informally for at least thirty (30) days after written notice to info@misaeng.com (include your name, the email on your account, a description of the dispute, and the relief sought).',
+          ko: '23.2 사전 협의. 중재 또는 중재 대상이 아닌 소송을 시작하기 전에, 귀하와 회사는 info@misaeng.com 으로 서면 통지(이름, 계정 이메일, 분쟁 내용, 구하는 구제) 후 최소 30일간 성실한 비공식 해결을 시도하기로 합니다.',
         },
         {
           type: 'p',
-          en: '22.3 Binding individual arbitration. Except for the carve-outs below, you and the Company agree that any dispute, claim, or controversy arising out of or relating to these Terms or the Services will be resolved by binding individual arbitration administered by the American Arbitration Association (“AAA”) under its Consumer Arbitration Rules (or other AAA rules the AAA determines apply). The arbitration will be conducted in English. Hearings may be held in New York County, New York, or by video/phone as the arbitrator allows. Judgment on the award may be entered in any court of competent jurisdiction.',
-          ko: '22.3 구속력 있는 개별 중재. 아래 예외를 제외하고, 본 약관 또는 서비스에서 비롯되거나 이와 관련된 모든 분쟁·청구·쟁점은 American Arbitration Association(AAA)의 Consumer Arbitration Rules(또는 AAA가 적용한다고 정하는 규칙)에 따른 구속력 있는 개별 중재로 해결합니다. 중재는 영어로 진행되며, 심리는 뉴욕주 New York County 또는 중재인이 허용하는 화상/전화로 진행될 수 있습니다. 중재판정은 관할 법원에 집행판결을 구할 수 있습니다.',
+          en: '23.3 Binding individual arbitration. Except for the carve-outs below, you and the Company agree that any dispute, claim, or controversy arising out of or relating to these Terms or the Services will be resolved by binding individual arbitration administered by the American Arbitration Association (“AAA”) under its Consumer Arbitration Rules (or other AAA rules the AAA determines apply). The arbitration will be conducted in English. Hearings may be held in New York County, New York, or by video/phone as the arbitrator allows. Judgment on the award may be entered in any court of competent jurisdiction.',
+          ko: '23.3 구속력 있는 개별 중재. 아래 예외를 제외하고, 본 약관 또는 서비스에서 비롯되거나 이와 관련된 모든 분쟁·청구·쟁점은 American Arbitration Association(AAA)의 Consumer Arbitration Rules(또는 AAA가 적용한다고 정하는 규칙)에 따른 구속력 있는 개별 중재로 해결합니다. 중재는 영어로 진행되며, 심리는 뉴욕주 New York County 또는 중재인이 허용하는 화상/전화로 진행될 수 있습니다. 중재판정은 관할 법원에 집행판결을 구할 수 있습니다.',
         },
         {
           type: 'p',
-          en: '22.4 Class-action and representative-action waiver. YOU AND THE COMPANY AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN AN INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, COLLECTIVE, CONSOLIDATED, PRIVATE ATTORNEY GENERAL, OR REPRESENTATIVE PROCEEDING. The arbitrator may not consolidate more than one person’s claims or otherwise preside over any form of representative proceeding, unless both parties agree in writing after the dispute arises.',
-          ko: '22.4 집단·대표소송 포기. 귀하와 회사는 상대방에 대한 청구를 오직 개인 자격으로만 제기할 수 있으며, 집단·집합·병합·사인검찰(private attorney general)·대표 소송의 원고 또는 구성원으로서 제기할 수 없습니다. 분쟁 발생 후 양 당사자가 서면 합의하지 않는 한, 중재인은 복수 개인의 청구를 병합하거나 대표 절차를 주재할 수 없습니다.',
+          en: '23.4 Class-action and representative-action waiver. YOU AND THE COMPANY AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN AN INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, COLLECTIVE, CONSOLIDATED, PRIVATE ATTORNEY GENERAL, OR REPRESENTATIVE PROCEEDING. The arbitrator may not consolidate more than one person’s claims or otherwise preside over any form of representative proceeding, unless both parties agree in writing after the dispute arises.',
+          ko: '23.4 집단·대표소송 포기. 귀하와 회사는 상대방에 대한 청구를 오직 개인 자격으로만 제기할 수 있으며, 집단·집합·병합·사인검찰(private attorney general)·대표 소송의 원고 또는 구성원으로서 제기할 수 없습니다. 분쟁 발생 후 양 당사자가 서면 합의하지 않는 한, 중재인은 복수 개인의 청구를 병합하거나 대표 절차를 주재할 수 없습니다.',
         },
         {
           type: 'p',
-          en: '22.5 Carve-outs. This arbitration agreement does not require arbitration of: (a) individual claims in small-claims court within that court’s jurisdiction; (b) claims for injunctive or other equitable relief to stop unauthorized use or infringement of intellectual property; or (c) claims that applicable law prohibits from being subject to pre-dispute arbitration (including certain rights that cannot be waived). Disputes about whether a claim is arbitrable are for the arbitrator to decide, except that a court may decide gateway issues of enforceability of this Section’s class waiver if required by controlling law.',
-          ko: '22.5 예외. 다음에는 본 중재 합의가 강제 중재를 요구하지 않습니다: (a) 소액재판소 관할 내 개인 청구; (b) 지식재산의 무단 이용·침해를 막기 위한 금지명령 등 형평법상 구제; (c) 적용법이 사전 중재 합의 대상에서 금지하는 청구(포기할 수 없는 권리 포함). 청구의 중재 가능성에 관한 분쟁은 원칙적으로 중재인이 판단하되, 통제법상 요구되는 경우 본 조의 집단소송 포기 집행 가능성 등 gateway 쟁점은 법원이 판단할 수 있습니다.',
+          en: '23.5 Carve-outs. This arbitration agreement does not require arbitration of: (a) individual claims in small-claims court within that court’s jurisdiction; (b) claims for injunctive or other equitable relief to stop unauthorized use or infringement of intellectual property; or (c) claims that applicable law prohibits from being subject to pre-dispute arbitration (including certain rights that cannot be waived). Disputes about whether a claim is arbitrable are for the arbitrator to decide, except that a court may decide gateway issues of enforceability of this Section’s class waiver if required by controlling law.',
+          ko: '23.5 예외. 다음에는 본 중재 합의가 강제 중재를 요구하지 않습니다: (a) 소액재판소 관할 내 개인 청구; (b) 지식재산의 무단 이용·침해를 막기 위한 금지명령 등 형평법상 구제; (c) 적용법이 사전 중재 합의 대상에서 금지하는 청구(포기할 수 없는 권리 포함). 청구의 중재 가능성에 관한 분쟁은 원칙적으로 중재인이 판단하되, 통제법상 요구되는 경우 본 조의 집단소송 포기 집행 가능성 등 gateway 쟁점은 법원이 판단할 수 있습니다.',
         },
         {
           type: 'p',
-          en: '22.6 Licensed real-estate matters. Separate brokerage agreements, agency disclosures, or New York Department of State / licensing procedures may provide additional or different dispute paths for a specific licensed transaction. Those documents control that brokerage relationship. This Section still applies to platform/community disputes that are not governed by such separate brokerage paperwork, to the extent permitted by law.',
-          ko: '22.6 면허 부동산 사항. 개별 중개 계약, 대리관계 공시, 또는 뉴욕주 Department of State/라이선스 절차가 특정 면허 거래에 대해 추가·다른 분쟁 경로를 둘 수 있으며, 해당 중개 관계에는 그 서류가 우선합니다. 법이 허용하는 범위에서, 그러한 별도 중개 서류가 규율하지 않는 플랫폼·커뮤니티 분쟁에는 본 조가 계속 적용됩니다.',
+          en: '23.6 Licensed real-estate matters. Separate brokerage agreements, agency disclosures, or New York Department of State / licensing procedures may provide additional or different dispute paths for a specific licensed transaction. Those documents control that brokerage relationship. This Section still applies to platform/community disputes that are not governed by such separate brokerage paperwork, to the extent permitted by law.',
+          ko: '23.6 면허 부동산 사항. 개별 중개 계약, 대리관계 공시, 또는 뉴욕주 Department of State/라이선스 절차가 특정 면허 거래에 대해 추가·다른 분쟁 경로를 둘 수 있으며, 해당 중개 관계에는 그 서류가 우선합니다. 법이 허용하는 범위에서, 그러한 별도 중개 서류가 규율하지 않는 플랫폼·커뮤니티 분쟁에는 본 조가 계속 적용됩니다.',
         },
         {
           type: 'p',
-          en: '22.7 30-day opt-out. You may opt out of this arbitration agreement by emailing info@misaeng.com with subject line “Arbitration Opt-Out” within thirty (30) days after you first accept these Terms (or after this arbitration section first becomes applicable to you). Include your full name and account email. Opting out does not affect other Terms.',
-          ko: '22.7 30일 옵트아웃. 본 약관에 처음 동의한 날(또는 본 중재 조항이 처음 적용된 날)부터 30일 이내에 제목 “Arbitration Opt-Out”으로 info@misaeng.com 에 이메일하면 본 중재 합의에서 옵트아웃할 수 있습니다. 성명과 계정 이메일을 포함하세요. 옵트아웃은 나머지 약관에 영향을 주지 않습니다.',
+          en: '23.7 30-day opt-out. You may opt out of this arbitration agreement by emailing info@misaeng.com with subject line “Arbitration Opt-Out” within thirty (30) days after you first accept these Terms (or after this arbitration section first becomes applicable to you). Include your full name and account email. Opting out does not affect other Terms.',
+          ko: '23.7 30일 옵트아웃. 본 약관에 처음 동의한 날(또는 본 중재 조항이 처음 적용된 날)부터 30일 이내에 제목 “Arbitration Opt-Out”으로 info@misaeng.com 에 이메일하면 본 중재 합의에서 옵트아웃할 수 있습니다. 성명과 계정 이메일을 포함하세요. 옵트아웃은 나머지 약관에 영향을 주지 않습니다.',
         },
         {
           type: 'p',
-          en: '22.8 Court venue if arbitration does not apply. If a claim is not subject to arbitration, exclusive venue lies in the state or federal courts located in New York County, New York, subject to any non-waivable consumer protections.',
-          ko: '22.8 중재가 적용되지 않는 경우의 관할. 청구가 중재 대상이 아니면, 소비자의 강행법상 권리를 침해하지 않는 범위에서 뉴욕주 New York County 소재 주·연방 법원이 배타적 관할입니다.',
+          en: '23.8 Court venue if arbitration does not apply. If a claim is not subject to arbitration, exclusive venue lies in the state or federal courts located in New York County, New York, subject to any non-waivable consumer protections.',
+          ko: '23.8 중재가 적용되지 않는 경우의 관할. 청구가 중재 대상이 아니면, 소비자의 강행법상 권리를 침해하지 않는 범위에서 뉴욕주 New York County 소재 주·연방 법원이 배타적 관할입니다.',
         },
       ],
     },
     {
       id: 'misc',
-      title: '23. Miscellaneous',
-      titleKo: '23. 기타',
+      title: '24. Miscellaneous',
+      titleKo: '24. 기타',
       blocks: [
         {
           type: 'ul',
@@ -773,8 +814,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'contact',
-      title: '24. Contact',
-      titleKo: '24. 문의',
+      title: '25. Contact',
+      titleKo: '25. 문의',
       blocks: [
         {
           type: 'p',

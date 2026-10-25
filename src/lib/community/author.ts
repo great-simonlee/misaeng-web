@@ -1,4 +1,10 @@
+import type { Translate } from '@lib/i18n/translate'
 import type { CommunityComment, CommunityPost } from '@/types/nyc'
+
+/** 닉네임이 없을 때 표시명. `t`는 community 네임스페이스 번역기 */
+function memberLabel(t: Translate): string {
+  return t('author.member')
+}
 
 type AuthorFields = Pick<CommunityPost, 'authorNickname'> & {
   authorEmail?: string | null
@@ -30,24 +36,26 @@ export function sanitizeCommunityNickname(
  */
 export function getCommunityAuthorDisplayName(
   post: AuthorFields,
-  fallbackNickname?: string | null,
+  fallbackNickname: string | null | undefined,
+  t: Translate,
 ): string {
   return (
     sanitizeCommunityNickname(post.authorNickname, post.authorEmail) ||
     sanitizeCommunityNickname(fallbackNickname, post.authorEmail) ||
-    '회원'
+    memberLabel(t)
   )
 }
 
 /** 댓글 작성자 표시명 — 저장된 닉네임, 없으면 폴백 닉네임 */
 export function getCommentAuthorDisplayName(
   comment: CommentAuthorFields,
-  fallbackNickname?: string | null,
+  fallbackNickname: string | null | undefined,
+  t: Translate,
 ): string {
   return (
     sanitizeCommunityNickname(comment.authorNickname, comment.authorEmail) ||
     sanitizeCommunityNickname(fallbackNickname, comment.authorEmail) ||
-    '회원'
+    memberLabel(t)
   )
 }
 

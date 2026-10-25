@@ -6,6 +6,7 @@ import { useCity } from '@hooks/useCity'
 import { hrefForCommunityPost } from '@lib/constants/cities'
 import { getCommunityAuthorDisplayName } from '@lib/community/author'
 import { maskAnonymousDisplayName } from '@lib/community/anonymous'
+import { useT } from '@lib/i18n/client'
 import { UserAvatar, SchoolBadge } from '@components'
 import type { CommunityPost } from '@/types/nyc'
 import { CommunityEngagementBar } from '@widgets/nyc/CommunityEngagementBar'
@@ -29,13 +30,14 @@ export function CommunityPostFooter({
   anonymous = false,
   isAuthor = false,
   loginNext,
-  editLabel = '수정',
+  editLabel,
   onDelete,
 }: CommunityPostFooterProps) {
+  const t = useT('community')
   const city = useCity()
   const authorName = anonymous
-    ? maskAnonymousDisplayName('익명')
-    : getCommunityAuthorDisplayName(post)
+    ? maskAnonymousDisplayName(t('author.anonymous'))
+    : getCommunityAuthorDisplayName(post, null, t)
   const authorInitial = authorName.charAt(0).toUpperCase()
   const photoURL = anonymous ? null : post.authorPhotoURL?.trim() || null
 
@@ -67,14 +69,14 @@ export function CommunityPostFooter({
               href={hrefForCommunityPost(post, city, 'edit')}
               className='rounded-lg px-2 py-1 font-medium text-[var(--muted-foreground)] touch-manipulation transition-colors hover:bg-black/[0.04] hover:text-[var(--foreground)]'
             >
-              {editLabel}
+              {editLabel ?? t('detail.edit')}
             </Link>
             <button
               type='button'
               onClick={onDelete}
               className='rounded-lg px-2 py-1 font-medium text-red-600/90 touch-manipulation transition-colors hover:bg-red-50 hover:text-red-700'
             >
-              삭제
+              {t('detail.delete')}
             </button>
           </div>
         ) : (

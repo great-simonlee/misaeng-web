@@ -16,6 +16,7 @@ import { cityLoginPath, hrefForCommunityPost } from '@lib/constants/cities'
 import {
   createCommunityPostRequest,
   fetchCommunityPost,
+  localizeCommunityError,
   updateCommunityPostRequest,
 } from '@lib/community/client'
 import {
@@ -52,9 +53,11 @@ import {
 } from '@lib/constants/anonymousTopics'
 import {
   NYC_COMMUNITY_BOARD_META,
+  communityBoardKey,
   isAnonymousBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
+import { useFormat, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import type {
   CommunityPost,
@@ -164,9 +167,14 @@ function CommunityBoardNewScreen({
   title,
   editPostId,
 }: CommunityNewScreenProps) {
+  const t = useT('community')
+  const tFood = useT('food')
+  const fmt = useFormat()
   const city = useCity()
   const href = useCityPath()
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
+  const boardText = (field: Parameters<typeof communityBoardKey>[1]) =>
+    t(communityBoardKey(boardId, field))
   const isEdit = Boolean(editPostId)
   const anonymousBoard = isAnonymousBoard(boardId)
   const loginNext = editPostId
@@ -250,12 +258,12 @@ function CommunityBoardNewScreen({
         const post = await fetchCommunityPost(editPostId)
         if (cancelled) return
         if (!post) {
-          toastError('글을 찾을 수 없어요')
+          toastError(t('write.errors.postNotFound'))
           router.replace(href('/me/posts'))
           return
         }
         if (post.authorUid !== user.uid) {
-          toastError('수정 권한이 없어요')
+          toastError(t('write.errors.noEditPermission'))
           router.replace(hrefForCommunityPost(post, city))
           return
         }
@@ -316,7 +324,12 @@ function CommunityBoardNewScreen({
         }
       } catch (err) {
         if (!cancelled) {
-          toastError(getErrorMessage(err, '글을 불러오지 못했어요'))
+          toastError(
+            getErrorMessage(
+              localizeCommunityError(err, t),
+              t('detail.loadFailed'),
+            ),
+          )
           router.replace(href('/me/posts'))
         }
       } finally {
@@ -326,7 +339,7 @@ function CommunityBoardNewScreen({
     return () => {
       cancelled = true
     }
-  }, [city, editPostId, href, user?.uid, boardId, router, toastError])
+  }, [city, editPostId, href, user?.uid, boardId, router, t, toastError])
 
   useEffect(() => {
     const key = pendingFocusKeyRef.current
@@ -377,20 +390,23 @@ function CommunityBoardNewScreen({
 
     const remaining = FOOD_MENU_MAX - menuDraftsRef.current.length
     if (remaining <= 0) {
-      toastError(`메뉴는 최대 ${FOOD_MENU_MAX}개까지 등록할 수 있어요`)
+      toastError(t('write.food.menuMaxReached', { max: FOOD_MENU_MAX }))
       resetMenuFileInput()
       return
     }
 
     const selected = pickImageFiles(files, remaining)
     if (selected.length === 0) {
-      toastError('이미지 파일만 선택할 수 있어요')
+      toastError(t('write.food.imagesOnly'))
       resetMenuFileInput()
       return
     }
     if (files.length > remaining) {
       toastError(
-        `메뉴는 최대 ${FOOD_MENU_MAX}개까지예요. ${selected.length}장만 추가합니다`,
+        t('write.food.menuMaxPartial', {
+          max: FOOD_MENU_MAX,
+          count: selected.length,
+        }),
       )
     }
 
@@ -402,7 +418,7 @@ function CommunityBoardNewScreen({
 
     for (const file of selected) {
       try {
-        const url = await uploadCommunityImageFile(file)
+        const url = await uploadCommunityImageFile(file, t)
         const draft: MenuDraft = {
           key: createPhotoKey('menu'),
           imageUrl: url,
@@ -428,8 +444,11 @@ function CommunityBoardNewScreen({
     if (failCount > 0) {
       toastError(
         successCount > 0
-          ? `${successCount}장은 추가됐고, ${failCount}장은 실패했어요`
-          : '메뉴 사진 업로드에 실패했어요',
+          ? t('write.food.uploadPartial', {
+              success: successCount,
+              failed: failCount,
+            })
+          : t('write.food.menuUploadFailed'),
       )
     }
 
@@ -450,20 +469,23 @@ function CommunityBoardNewScreen({
 
     const remaining = FOOD_GALLERY_MAX - galleryDraftsRef.current.length
     if (remaining <= 0) {
-      toastError(`분위기 사진은 최대 ${FOOD_GALLERY_MAX}장까지 등록할 수 있어요`)
+      toastError(t('write.food.galleryMaxReached', { max: FOOD_GALLERY_MAX }))
       resetGalleryFileInput()
       return
     }
 
     const selected = pickImageFiles(files, remaining)
     if (selected.length === 0) {
-      toastError('이미지 파일만 선택할 수 있어요')
+      toastError(t('write.food.imagesOnly'))
       resetGalleryFileInput()
       return
     }
     if (files.length > remaining) {
       toastError(
-        `분위기 사진은 최대 ${FOOD_GALLERY_MAX}장까지예요. ${selected.length}장만 추가합니다`,
+        t('write.food.galleryMaxPartial', {
+          max: FOOD_GALLERY_MAX,
+          count: selected.length,
+        }),
       )
     }
 
@@ -474,7 +496,7 @@ function CommunityBoardNewScreen({
 
     for (const file of selected) {
       try {
-        const url = await uploadCommunityImageFile(file)
+        const url = await uploadCommunityImageFile(file, t)
         const draft: GalleryDraft = {
           key: createPhotoKey('gallery'),
           imageUrl: url,
@@ -494,8 +516,11 @@ function CommunityBoardNewScreen({
     if (failCount > 0) {
       toastError(
         successCount > 0
-          ? `${successCount}장은 추가됐고, ${failCount}장은 실패했어요`
-          : '분위기 사진 업로드에 실패했어요',
+          ? t('write.food.uploadPartial', {
+              success: successCount,
+              failed: failCount,
+            })
+          : t('write.food.galleryUploadFailed'),
       )
     }
 
@@ -507,19 +532,19 @@ function CommunityBoardNewScreen({
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!user?.email) {
-      toastError('로그인이 필요해요')
+      toastError(t('errors.loginRequired'))
       router.replace(cityLoginPath(city, loginNext))
       return
     }
 
     const plain = htmlToPlainText(contentHtml)
     if (!plain) {
-      toastError('본문을 입력해 주세요')
+      toastError(t('write.errors.bodyRequired'))
       return
     }
     if (plain.length > COMMUNITY_BODY_MAX) {
       toastError(
-        `본문은 ${COMMUNITY_BODY_MAX.toLocaleString('en-US')}자 이내로 작성해 주세요`,
+        t('write.errors.bodyTooLong', { max: fmt.number(COMMUNITY_BODY_MAX) }),
       )
       return
     }
@@ -536,37 +561,37 @@ function CommunityBoardNewScreen({
 
     if (anonymousBoard) {
       if (!titleValue) {
-        toastError('제목을 입력해 주세요')
+        toastError(t('write.errors.titleRequired'))
         return
       }
       if (titleValue.length > ANONYMOUS_TITLE_MAX) {
-        toastError(`제목은 ${ANONYMOUS_TITLE_MAX}자 이내로 작성해 주세요`)
+        toastError(t('write.errors.titleTooLong', { max: ANONYMOUS_TITLE_MAX }))
         return
       }
     }
 
     if (isFood) {
       if (!selectedPlace) {
-        toastError('지도에서 주소를 검색해 선택해 주세요')
+        toastError(t('write.food.errors.addressRequired'))
         return
       }
       if (
         selectedPlace.latitude == null ||
         selectedPlace.longitude == null
       ) {
-        toastError('선택한 주소의 좌표를 확인하지 못했어요')
+        toastError(t('write.food.errors.coordinatesMissing'))
         return
       }
       if (!foodCategory) {
-        toastError('카테고리를 선택해 주세요')
+        toastError(t('write.food.errors.categoryRequired'))
         return
       }
       if (!foodCuisine) {
-        toastError('어떤 음식인지 선택해 주세요')
+        toastError(t('write.food.errors.cuisineRequired'))
         return
       }
       if (!postTitle.trim()) {
-        toastError('음식점 이름을 입력해 주세요')
+        toastError(t('write.food.errors.nameRequired'))
         return
       }
       partySizeNum = parseFoodInt(
@@ -585,19 +610,28 @@ function CommunityBoardNewScreen({
         FOOD_WAIT_MAX,
       )
       if (partySizeNum == null) {
-        toastError(`방문 인원을 ${FOOD_PARTY_MIN}~${FOOD_PARTY_MAX}명으로 입력해 주세요`)
+        toastError(
+          t('write.food.errors.partySizeRange', {
+            min: FOOD_PARTY_MIN,
+            max: FOOD_PARTY_MAX,
+          }),
+        )
         return
       }
       if (totalSpendNum == null) {
-        toastError(`총 금액을 $0~$${FOOD_SPEND_MAX.toLocaleString('en-US')} 정수로 입력해 주세요`)
+        toastError(
+          t('write.food.errors.spendRange', {
+            max: fmt.usd(FOOD_SPEND_MAX),
+          }),
+        )
         return
       }
       if (tipIncluded == null) {
-        toastError('팁 포함 / 팁 제외 중 하나를 선택해 주세요')
+        toastError(t('write.food.errors.tipRequired'))
         return
       }
       if (waitMinutesNum == null) {
-        toastError(`웨이팅을 0~${FOOD_WAIT_MAX}분 정수로 입력해 주세요`)
+        toastError(t('write.food.errors.waitRange', { max: FOOD_WAIT_MAX }))
         return
       }
 
@@ -608,7 +642,7 @@ function CommunityBoardNewScreen({
         return hasImage && (!hasName || !hasCaption)
       })
       if (incompleteMenu) {
-        toastError('메뉴는 사진·메뉴 이름·한 줄 평을 모두 입력해야 등록할 수 있어요')
+        toastError(t('write.food.errors.menuIncomplete'))
         return
       }
 
@@ -643,7 +677,7 @@ function CommunityBoardNewScreen({
         selectedPlace.address?.trim() || selectedPlace.name.trim()
       detailValue = getFoodCuisineLabel(foodCuisine) || ''
     } else if (!titleValue) {
-      toastError('제목과 본문을 입력해 주세요')
+      toastError(t('write.errors.titleAndBodyRequired'))
       return
     }
 
@@ -690,10 +724,15 @@ function CommunityBoardNewScreen({
       if (!isEdit && isFood && user.uid) {
         clearWriteDraft('food', city, user.uid)
       }
-      success(isEdit ? '글을 수정했어요' : '글을 등록했어요')
+      success(isEdit ? t('write.updated') : t('write.created'))
       router.push(hrefForCommunityPost(post, city))
     } catch (err) {
-      toastError(getErrorMessage(err, isEdit ? '수정에 실패했어요' : '등록에 실패했어요'))
+      toastError(
+        getErrorMessage(
+          localizeCommunityError(err, t),
+          isEdit ? t('errors.updateFailed') : t('errors.createFailed'),
+        ),
+      )
     } finally {
       setSubmitting(false)
     }
@@ -718,9 +757,9 @@ function CommunityBoardNewScreen({
         galleryDrafts,
       })
       setDraftSavedAt(savedAt)
-      success('임시 저장했어요')
+      success(t('write.draftSaved'))
     } catch {
-      toastError('임시 저장에 실패했어요')
+      toastError(t('write.draftSaveFailed'))
     }
   }
 
@@ -731,7 +770,7 @@ function CommunityBoardNewScreen({
           fullPage
           label={
             !loading && !isAuthenticated
-              ? '로그인 페이지로 이동 중…'
+              ? t('write.redirectingToLogin')
               : undefined
           }
         />
@@ -760,7 +799,11 @@ function CommunityBoardNewScreen({
                 ? href(`/${boardId}/${editPostId}`)
                 : href(`/${boardId}`)
             }
-            label={isEdit ? '글로 돌아가기' : `${title} 목록`}
+            label={
+              isEdit
+                ? t('write.backToPost')
+                : t('detail.backToList', { board: title })
+            }
             className='mb-6'
           />
 
@@ -768,10 +811,10 @@ function CommunityBoardNewScreen({
 
           <section>
             <h2 className='text-[1.25rem] font-semibold tracking-[-0.03em] text-[var(--foreground)]'>
-              어디서 먹었어요?
+              {t('write.food.whereTitle')}
             </h2>
             <p className='mt-1 text-[13px] text-[var(--muted)]'>
-              정확한 주소를 선택하면 위치가 저장돼요
+              {t('write.food.whereDescription')}
             </p>
             <PlaceSearchField
               mode='address'
@@ -784,7 +827,7 @@ function CommunityBoardNewScreen({
           </section>
 
           <section className='mt-6'>
-            <Field label='음식점 이름' required>
+            <Field label={t('write.food.nameLabel')} required>
               <RestaurantNameField
                 value={postTitle}
                 onChange={setPostTitle}
@@ -792,14 +835,14 @@ function CommunityBoardNewScreen({
                 longitude={selectedPlace?.longitude ?? null}
                 placeId={selectedPlace?.placeId ?? null}
                 inputClassName={inputClass}
-                placeholder={meta.titlePlaceholder}
+                placeholder={boardText('titlePlaceholder')}
               />
             </Field>
           </section>
 
           <section className='mt-8'>
             <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
-              카테고리
+              {t('write.food.categoryTitle')}
             </h2>
             <div className='mt-2.5 flex flex-wrap gap-2'>
               {FOOD_CATEGORIES.map((cat) => {
@@ -820,7 +863,7 @@ function CommunityBoardNewScreen({
                       categoryId={cat.id}
                       className='size-3.5 opacity-90'
                     />
-                    {cat.label}
+                    {tFood(`categories.${cat.id}`)}
                   </button>
                 )
               })}
@@ -829,7 +872,7 @@ function CommunityBoardNewScreen({
 
           <section className='mt-8'>
             <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
-              어떤 음식인가요?
+              {t('write.food.cuisineTitle')}
             </h2>
             <div className='mt-2.5 flex flex-wrap gap-2'>
               {FOOD_CUISINES.map((cuisine) => {
@@ -846,7 +889,7 @@ function CommunityBoardNewScreen({
                         : 'bg-white text-[var(--foreground)] ring-1 ring-black/[0.08] hover:ring-black/15',
                     )}
                   >
-                    {cuisine.label}
+                    {getFoodCuisineLabel(cuisine.id, tFood) ?? cuisine.label}
                   </button>
                 )
               })}
@@ -855,13 +898,13 @@ function CommunityBoardNewScreen({
 
           <section className='mt-8'>
             <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
-              방문 정보
+              {t('write.food.visitTitle')}
             </h2>
             <div className='mt-2.5 overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.06]'>
               <VisitIntField
-                label='인원'
-                hint={`최대 ${FOOD_PARTY_MAX}명`}
-                unit='명'
+                label={t('write.food.partySize')}
+                hint={t('write.food.partySizeHint', { max: FOOD_PARTY_MAX })}
+                unit={t('write.food.partySizeUnit')}
                 value={partySize}
                 min={FOOD_PARTY_MIN}
                 max={FOOD_PARTY_MAX}
@@ -871,23 +914,25 @@ function CommunityBoardNewScreen({
               <div className='flex items-center justify-between gap-2.5 px-4 py-3.5'>
                 <div className='min-w-0 shrink'>
                   <p className='text-[14px] font-semibold tracking-tight text-[var(--foreground)]'>
-                    총 금액
+                    {t('write.food.totalSpend')}
                   </p>
                   <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
-                    $0 ~ ${FOOD_SPEND_MAX.toLocaleString('en-US')} · 정수
+                    {t('write.food.totalSpendHint', {
+                      max: fmt.usd(FOOD_SPEND_MAX),
+                    })}
                   </p>
                 </div>
 
                 <div className='flex shrink-0 items-center gap-1.5'>
                   <div
                     role='group'
-                    aria-label='팁 포함 여부'
+                    aria-label={t('write.food.tipAria')}
                     className='inline-flex h-9 items-center rounded-full bg-[#f1f2f4] p-0.5 ring-1 ring-black/[0.04]'
                   >
                     {(
                       [
-                        { value: true, label: '팁포함' },
-                        { value: false, label: '팁제외' },
+                        { value: true, label: t('write.food.tipIncluded') },
+                        { value: false, label: t('write.food.tipExcluded') },
                       ] as const
                     ).map((option) => {
                       const active = tipIncluded === option.value
@@ -942,16 +987,16 @@ function CommunityBoardNewScreen({
                         else setTotalSpend(String(FOOD_SPEND_MIN))
                       }}
                       className='w-14 bg-transparent text-center text-[18px] font-semibold tabular-nums tracking-tight text-[var(--foreground)] outline-none'
-                      aria-label='총 금액'
+                      aria-label={t('write.food.totalSpend')}
                     />
                   </label>
                 </div>
               </div>
               <div className='mx-4 border-t border-black/[0.05]' />
               <VisitIntField
-                label='웨이팅'
-                hint={`없으면 0 · 최대 ${FOOD_WAIT_MAX}분`}
-                unit='분'
+                label={t('write.food.wait')}
+                hint={t('write.food.waitHint', { max: FOOD_WAIT_MAX })}
+                unit={t('write.food.waitUnit')}
                 value={waitMinutes}
                 min={FOOD_WAIT_MIN}
                 max={FOOD_WAIT_MAX}
@@ -965,10 +1010,10 @@ function CommunityBoardNewScreen({
             <div className='flex items-end justify-between gap-3'>
               <div>
                 <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                  가게 내부 · 분위기
+                  {t('write.food.galleryTitle')}
                 </h2>
                 <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
-                  인테리어, 좌석, 분위기 사진 · 최대 {FOOD_GALLERY_MAX}장
+                  {t('write.food.galleryDescription', { max: FOOD_GALLERY_MAX })}
                 </p>
               </div>
               <p className='shrink-0 pb-0.5 text-[12px] font-medium tabular-nums text-[var(--muted)]'>
@@ -990,17 +1035,17 @@ function CommunityBoardNewScreen({
                 type='button'
                 disabled={!canAddGallery}
                 onClick={openGalleryPicker}
-                className='mt-3 flex w-full items-center gap-3 rounded-2xl bg-white px-3.5 py-3.5 text-left ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-[#fff8f5] hover:ring-[var(--brand)]/30 disabled:opacity-60'
+                className='mt-3 flex w-full items-center gap-3 rounded-2xl bg-white px-3.5 py-3.5 text-left ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-brand-soft hover:ring-[var(--brand)]/30 disabled:opacity-60'
               >
-                <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#fff1ed] text-[var(--brand)]'>
+                <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-[var(--brand)]'>
                   <PlusIcon className='size-3.5' />
                 </span>
                 <span className='min-w-0 flex-1'>
                   <span className='block text-[13px] font-semibold text-[var(--foreground)]'>
-                    분위기 사진 선택
+                    {t('write.food.galleryPick')}
                   </span>
                   <span className='mt-0.5 block text-[11px] text-[var(--muted)]'>
-                    갤러리에서 최대 {FOOD_GALLERY_MAX}장까지 한 번에 고를 수 있어요
+                    {t('write.food.galleryPickHint', { max: FOOD_GALLERY_MAX })}
                   </span>
                 </span>
               </button>
@@ -1022,7 +1067,7 @@ function CommunityBoardNewScreen({
                       onClick={() => removeGalleryRow(item.key)}
                       className='absolute right-1 top-1 inline-flex h-6 items-center rounded-full bg-black/55 px-2 text-[10px] font-semibold text-white touch-manipulation backdrop-blur-sm'
                     >
-                      삭제
+                      {t('detail.delete')}
                     </button>
                   </div>
                 ))}
@@ -1045,12 +1090,14 @@ function CommunityBoardNewScreen({
                     type='button'
                     disabled={!canAddGallery}
                     onClick={openGalleryPicker}
-                    className='flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-white text-[var(--brand)] ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-[#fff8f5] hover:ring-[var(--brand)]/30 disabled:opacity-60'
-                    aria-label={`분위기 사진 ${galleryRemaining}장 더 추가`}
+                    className='flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-white text-[var(--brand)] ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-brand-soft hover:ring-[var(--brand)]/30 disabled:opacity-60'
+                    aria-label={t('write.food.galleryAddMoreAria', {
+                      count: galleryRemaining,
+                    })}
                   >
                     <PlusIcon className='size-4' />
                     <span className='text-[10px] font-semibold tabular-nums text-[var(--muted)]'>
-                      {galleryRemaining}장 더
+                      {t('write.food.galleryAddMore', { count: galleryRemaining })}
                     </span>
                   </button>
                 ) : null}
@@ -1059,7 +1106,7 @@ function CommunityBoardNewScreen({
 
             {galleryUploading ? (
               <p className='mt-2 text-[11px] font-medium text-[var(--muted)]'>
-                업로드 중…
+                {t('write.food.uploading')}
               </p>
             ) : null}
           </section>
@@ -1068,10 +1115,10 @@ function CommunityBoardNewScreen({
             <div className='flex items-end justify-between gap-3'>
               <div>
                 <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                  메뉴 사진
+                  {t('write.food.menuTitle')}
                 </h2>
                 <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
-                  사진마다 메뉴 이름과 한 줄 평을 따로 적어 주세요
+                  {t('write.food.menuDescription')}
                 </p>
               </div>
               <p className='shrink-0 pb-0.5 text-[12px] font-medium tabular-nums text-[var(--muted)]'>
@@ -1079,12 +1126,12 @@ function CommunityBoardNewScreen({
               </p>
             </div>
 
-            <div className='mt-3 rounded-xl bg-[#fff8f5] px-3.5 py-2.5 ring-1 ring-[var(--brand)]/15'>
+            <div className='mt-3 rounded-xl bg-brand-soft px-3.5 py-2.5 ring-1 ring-[var(--brand)]/15'>
               <p className='text-[12px] font-semibold text-[var(--brand)]'>
-                첫 번째 메뉴 사진이 대표 사진으로 등록돼요
+                {t('write.food.coverNoticeTitle')}
               </p>
               <p className='mt-0.5 text-[11px] leading-relaxed text-[var(--muted)]'>
-                목록 카드와 상세 상단에 첫 번째 메뉴 사진이 크게 보여요.
+                {t('write.food.coverNoticeBody')}
               </p>
             </div>
 
@@ -1102,17 +1149,17 @@ function CommunityBoardNewScreen({
                 type='button'
                 disabled={!canAddMenu}
                 onClick={openMenuPicker}
-                className='mt-3 flex w-full items-center gap-3 rounded-2xl bg-white px-3.5 py-3.5 text-left ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-[#fff8f5] hover:ring-[var(--brand)]/30 disabled:opacity-60'
+                className='mt-3 flex w-full items-center gap-3 rounded-2xl bg-white px-3.5 py-3.5 text-left ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-brand-soft hover:ring-[var(--brand)]/30 disabled:opacity-60'
               >
-                <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#fff1ed] text-[var(--brand)]'>
+                <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-[var(--brand)]'>
                   <PlusIcon className='size-3.5' />
                 </span>
                 <span className='min-w-0 flex-1'>
                   <span className='block text-[13px] font-semibold text-[var(--foreground)]'>
-                    메뉴 사진 여러 장 선택
+                    {t('write.food.menuPick')}
                   </span>
                   <span className='mt-0.5 block text-[11px] text-[var(--muted)]'>
-                    최대 {FOOD_MENU_MAX}장 · 첫 장이 대표 사진 · 이름·한 줄 평 필수
+                    {t('write.food.menuPickHint', { max: FOOD_MENU_MAX })}
                   </span>
                 </span>
               </button>
@@ -1139,11 +1186,11 @@ function CommunityBoardNewScreen({
                       <div className='mb-2.5 flex items-center justify-between gap-2'>
                         <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
                           <p className='text-[12px] font-semibold text-[var(--muted)]'>
-                            메뉴 {index + 1}
+                            {t('write.food.menuNumber', { n: index + 1 })}
                           </p>
                           {isCover ? (
-                            <span className='inline-flex rounded-full bg-[#fff8f5] px-2 py-0.5 text-[10px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
-                              대표 사진
+                            <span className='inline-flex rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
+                              {t('write.food.coverPhoto')}
                             </span>
                           ) : null}
                         </div>
@@ -1152,7 +1199,7 @@ function CommunityBoardNewScreen({
                           onClick={() => removeMenuRow(item.key)}
                           className='text-[11px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
                         >
-                          삭제
+                          {t('detail.delete')}
                         </button>
                       </div>
 
@@ -1165,13 +1212,13 @@ function CommunityBoardNewScreen({
                             onUploaded={(url) =>
                               updateMenuRow(item.key, { imageUrl: url })
                             }
-                            emptyLabel='사진'
+                            emptyLabel={t('write.food.photo')}
                             emptyHint=''
                             aspectClassName='aspect-square'
                           />
                           {isCover && item.imageUrl ? (
                             <span className='pointer-events-none absolute left-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[9px] font-semibold text-white backdrop-blur-sm'>
-                              대표
+                              {t('write.food.cover')}
                             </span>
                           ) : null}
                         </div>
@@ -1192,14 +1239,14 @@ function CommunityBoardNewScreen({
                                 })
                               }
                               maxLength={FOOD_MENU_NAME_MAX}
-                              placeholder='메뉴 이름 (필수)'
+                              placeholder={t('write.food.menuNamePlaceholder')}
                               className={cn(
                                 'w-full rounded-xl bg-[#f8f8f9] px-3 py-2.5 pr-12 text-[13px] font-semibold outline-none ring-1 transition placeholder:font-normal placeholder:text-[var(--muted)] sm:text-[14px]',
                                 missingName
                                   ? 'ring-red-300 focus:ring-red-400'
                                   : 'ring-black/[0.05] focus:ring-[var(--brand)]/35',
                               )}
-                              aria-label={`메뉴 ${index + 1} 이름`}
+                              aria-label={t('write.food.menuNameAria', { n: index + 1 })}
                             />
                             <span className='pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] tabular-nums text-[var(--muted)]'>
                               {item.name.length}/{FOOD_MENU_NAME_MAX}
@@ -1220,14 +1267,14 @@ function CommunityBoardNewScreen({
                                 })
                               }
                               maxLength={FOOD_MENU_CAPTION_MAX}
-                              placeholder='한 줄 평 (필수)'
+                              placeholder={t('write.food.menuCaptionPlaceholder')}
                               className={cn(
                                 'h-[4.75rem] w-full resize-none rounded-xl bg-[#f8f8f9] px-3 py-2.5 pb-6 text-[13px] leading-relaxed outline-none ring-1 transition placeholder:text-[var(--muted)] sm:h-[5.25rem] sm:text-[14px]',
                                 missingCaption
                                   ? 'ring-red-300 focus:ring-red-400'
                                   : 'ring-black/[0.05] focus:ring-[var(--brand)]/35',
                               )}
-                              aria-label={`메뉴 ${index + 1} 한 줄 평`}
+                              aria-label={t('write.food.menuCaptionAria', { n: index + 1 })}
                             />
                             <span className='pointer-events-none absolute bottom-2 right-2.5 text-[10px] tabular-nums text-[var(--muted)]'>
                               {item.caption.length}/{FOOD_MENU_CAPTION_MAX}
@@ -1238,10 +1285,10 @@ function CommunityBoardNewScreen({
                       {missingName || missingCaption ? (
                         <p className='mt-2 text-[11px] font-medium text-red-600'>
                           {missingName && missingCaption
-                            ? '메뉴 이름과 한 줄 평을 입력해 주세요'
+                            ? t('write.food.missingNameAndCaption')
                             : missingName
-                              ? '메뉴 이름을 입력해 주세요'
-                              : '한 줄 평을 입력해 주세요'}
+                              ? t('write.food.missingName')
+                              : t('write.food.missingCaption')}
                         </p>
                       ) : null}
                     </div>
@@ -1255,7 +1302,7 @@ function CommunityBoardNewScreen({
                     aria-hidden
                   >
                     <span className='text-[12px] font-medium text-[var(--muted)]'>
-                      업로드 중…
+                      {t('write.food.uploading')}
                     </span>
                   </div>
                 ))}
@@ -1265,16 +1312,16 @@ function CommunityBoardNewScreen({
                     type='button'
                     disabled={!canAddMenu}
                     onClick={openMenuPicker}
-                    className='flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-3.5 py-3 text-[13px] font-semibold text-[var(--foreground)] ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-[#fff8f5] hover:ring-[var(--brand)]/30 disabled:opacity-60'
+                    className='flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-3.5 py-3 text-[13px] font-semibold text-[var(--foreground)] ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-brand-soft hover:ring-[var(--brand)]/30 disabled:opacity-60'
                   >
                     <PlusIcon className='size-3.5 text-[var(--brand)]' />
                     {menuUploading
-                      ? '업로드 중…'
-                      : `메뉴 사진 ${menuRemaining}장 더 추가`}
+                      ? t('write.food.uploading')
+                      : t('write.food.menuAddMore', { count: menuRemaining })}
                   </button>
                 ) : (
                   <p className='rounded-2xl bg-[#f3f4f6] px-4 py-2.5 text-center text-[12px] font-medium text-[var(--muted)]'>
-                    메뉴는 최대 {FOOD_MENU_MAX}개까지 등록할 수 있어요
+                    {t('write.food.menuMaxReached', { max: FOOD_MENU_MAX })}
                   </p>
                 )}
               </div>
@@ -1284,17 +1331,17 @@ function CommunityBoardNewScreen({
           <section className='mt-8'>
             <div>
               <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                본문
+                {t('write.bodyLabel')}
               </h2>
               <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
-                추천 포인트, 가는 길, 팁을 자유롭게 적어 주세요
+                {t('write.food.bodyDescription')}
               </p>
             </div>
             <div className='mt-3'>
               <TipTapEditor
                 value={contentHtml}
                 onChange={setContentHtml}
-                placeholder={meta.descriptionPlaceholder}
+                placeholder={boardText('descriptionPlaceholder')}
                 minHeightClassName='min-h-[200px]'
                 maxLength={COMMUNITY_BODY_MAX}
               />
@@ -1314,9 +1361,9 @@ function CommunityBoardNewScreen({
                   !foodCategory ||
                   !foodCuisine
                 }
-                className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-[0.99] disabled:opacity-50 sm:h-12 sm:text-[15px]'
+                className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-[0.99] disabled:opacity-50 sm:h-12 sm:text-[15px]'
               >
-                {submitting ? '저장 중…' : '수정 완료'}
+                {submitting ? t('comments.saving') : t('comments.saveEdit')}
               </button>
             ) : (
               <WriteDraftActions
@@ -1335,22 +1382,22 @@ function CommunityBoardNewScreen({
                     !foodCategory ||
                     !foodCuisine
                   }
-                  className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-[0.99] disabled:opacity-50 sm:h-12 sm:text-[15px]'
+                  className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-[0.99] disabled:opacity-50 sm:h-12 sm:text-[15px]'
                 >
                   {submitting
-                    ? '등록 중…'
+                    ? t('comments.submitting')
                     : !postTitle.trim()
-                      ? '음식점 이름을 입력해 주세요'
+                      ? t('write.food.errors.nameRequired')
                       : !selectedPlace
-                        ? '주소를 선택해 주세요'
+                        ? t('write.food.selectAddress')
                         : selectedPlace.latitude == null ||
                             selectedPlace.longitude == null
-                          ? '주소 좌표를 확인 중이에요'
+                          ? t('write.food.checkingCoordinates')
                           : !foodCategory
-                            ? '카테고리를 선택해 주세요'
+                            ? t('write.food.errors.categoryRequired')
                             : !foodCuisine
-                              ? '음식을 선택해 주세요'
-                              : '올리기'}
+                              ? t('write.food.selectCuisine')
+                              : t('write.food.submit')}
                 </button>
               </WriteDraftActions>
             )}
@@ -1369,7 +1416,11 @@ function CommunityBoardNewScreen({
                 ? href(`/${boardId}/${editPostId}`)
                 : href(`/${boardId}`)
             }
-            label={isEdit ? '글로 돌아가기' : `${title} 목록`}
+            label={
+              isEdit
+                ? t('write.backToPost')
+                : t('detail.backToList', { board: title })
+            }
             className='mb-5'
         />
 
@@ -1380,7 +1431,7 @@ function CommunityBoardNewScreen({
           />
           <form onSubmit={handleSubmit} className='space-y-5'>
             <Field
-              label='제목'
+              label={t('write.titleLabel')}
               required
               hint={
                 anonymousBoard
@@ -1400,36 +1451,36 @@ function CommunityBoardNewScreen({
                   )
                 }
                 className={inputClass}
-                placeholder={meta.titlePlaceholder}
+                placeholder={boardText('titlePlaceholder')}
               />
             </Field>
 
             <div
               className={cn(
                 'grid gap-4',
-                meta.detailInput && meta.detailLabel
+                meta.detailInput && meta.hasDetail
                   ? 'sm:grid-cols-2'
                   : null,
               )}
             >
-              <Field label={meta.locationLabel}>
+              <Field label={boardText('locationLabel')}>
                 {anonymousBoard ? (
                   <AnonymousTopicSelect
                     value={location}
                     onChange={setLocation}
-                    placeholder={meta.locationPlaceholder}
+                    placeholder={boardText('locationPlaceholder')}
                   />
                 ) : (
                   <input
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     className={inputClass}
-                    placeholder={meta.locationPlaceholder}
+                    placeholder={boardText('locationPlaceholder')}
                   />
                 )}
               </Field>
-              {meta.detailInput && meta.detailLabel && (
-                <Field label={meta.detailLabel}>
+              {meta.detailInput && meta.hasDetail && (
+                <Field label={boardText('detailLabel')}>
                   <input
                     type={
                       meta.detailInput === 'number'
@@ -1440,7 +1491,9 @@ function CommunityBoardNewScreen({
                     value={detail}
                     onChange={(e) => setDetail(e.target.value)}
                     className={inputClass}
-                    placeholder={meta.detailPlaceholder}
+                    placeholder={
+                      meta.hasDetailPlaceholder ? boardText('detailPlaceholder') : ''
+                    }
                   />
                 </Field>
               )}
@@ -1448,13 +1501,13 @@ function CommunityBoardNewScreen({
 
             <div>
               <p className='text-[13px] font-medium text-[var(--foreground)]'>
-                본문 *
+                {t('write.bodyLabel')} *
               </p>
               <div className='mt-1.5'>
                 <TipTapEditor
                   value={contentHtml}
                   onChange={setContentHtml}
-                  placeholder={meta.descriptionPlaceholder}
+                  placeholder={boardText('descriptionPlaceholder')}
                   maxLength={COMMUNITY_BODY_MAX}
                 />
               </div>
@@ -1463,15 +1516,15 @@ function CommunityBoardNewScreen({
             <button
               type='submit'
               disabled={submitting}
-              className='h-11 w-full rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation hover:bg-[var(--brand-hover)] disabled:opacity-50'
+              className='h-11 w-full rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation hover:bg-[var(--brand-hover)] disabled:opacity-50'
             >
               {submitting
                 ? isEdit
-                  ? '저장 중…'
-                  : '등록 중…'
+                  ? t('comments.saving')
+                  : t('comments.submitting')
                 : isEdit
-                  ? '수정 완료'
-                  : '게시하기'}
+                  ? t('comments.saveEdit')
+                  : t('write.publish')}
             </button>
           </form>
         </BoardSurface>

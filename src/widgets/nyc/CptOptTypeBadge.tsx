@@ -3,10 +3,10 @@
 import { cn } from '@lib'
 import {
   CPT_OPT_TYPES,
-  getCptOptTypeLabel,
   getCptOptTypeStyle,
   type CptOptTypeId,
 } from '@lib/community/cptOpt'
+import { useT } from '@lib/i18n/client'
 
 type CptOptTypeBadgeProps = {
   type: CptOptTypeId | null | undefined
@@ -14,8 +14,9 @@ type CptOptTypeBadgeProps = {
 }
 
 export function CptOptTypeBadge({ type, className }: CptOptTypeBadgeProps) {
-  const label = getCptOptTypeLabel(type)
-  if (!label) return null
+  const t = useT('reviews')
+  if (!type || !CPT_OPT_TYPES.some((item) => item.id === type)) return null
+  const label = t(`cptOpt.types.${type}.label`)
   const style = getCptOptTypeStyle(type)
   return (
     <span
@@ -36,6 +37,7 @@ type CptOptTypePickerProps = {
 }
 
 export function CptOptTypePicker({ value, onChange }: CptOptTypePickerProps) {
+  const t = useT('reviews')
   return (
     <div className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
       {CPT_OPT_TYPES.map((item) => {
@@ -61,10 +63,10 @@ export function CptOptTypePicker({ value, onChange }: CptOptTypePickerProps) {
               </span>
             ) : null}
             <span className='block text-[15px] font-semibold text-[var(--foreground)]'>
-              {item.label}
+              {t(`cptOpt.types.${item.id}.label`)}
             </span>
             <span className='mt-1 block text-[12px] font-light leading-snug text-[var(--muted-foreground)]'>
-              {item.description}
+              {t(`cptOpt.types.${item.id}.description`)}
             </span>
           </button>
         )

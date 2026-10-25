@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { useCityPath } from '@hooks/useCity'
 import { useRequireAuth } from '@hooks/useRequireAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import { useT } from '@lib/i18n/client'
 // import { isFirebaseConfigured } from '@lib/firebase/client'
 // import { createHousingPost } from '@lib/firebase/housing'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
@@ -14,6 +15,7 @@ import { LoadingState } from '@components'
 import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
 
 export function HousingNewScreen() {
+  const t = useT('housing')
   const href = useCityPath()
   const { user, loading, isAuthenticated, isMisaengUser } = useRequireAuth(
     href('/housing/new'),
@@ -34,13 +36,13 @@ export function HousingNewScreen() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!user?.email) {
-      toastError('로그인이 필요해요')
+      toastError(t('new.errors.loginRequired'))
       return
     }
     setSubmitting(true)
     try {
       // 임시: 파이어베이스 하우징 등록 비활성화
-      throw new Error('Supabase 연동 후 이용할 수 있어요')
+      throw new Error(t('detail.toasts.notAvailableYet'))
       /*
       const id = await createHousingPost(
         {
@@ -80,7 +82,7 @@ export function HousingNewScreen() {
       router.push(href(`/housing/${id}`))
       */
     } catch (err) {
-      toastError(getErrorMessage(err, '등록에 실패했어요'))
+      toastError(getErrorMessage(err, t('new.errors.submitFailed')))
     } finally {
       setSubmitting(false)
     }
@@ -91,33 +93,35 @@ export function HousingNewScreen() {
       <LoadingState
         fullPage
         label={
-          !loading && !isAuthenticated ? '로그인 페이지로 이동 중…' : undefined
+          !loading && !isAuthenticated ? t('new.redirectingToLogin') : undefined
         }
       />
     )
   }
 
   if (!isMisaengUser) {
+    const [teamOnlyBefore, teamOnlyAfter = ''] = t('new.teamOnly.description', {
+      email: user?.email ?? t('new.teamOnly.unknownEmail'),
+    }).split('{domain}')
     return (
       <div className='mx-auto max-w-2xl px-4 py-12'>
         <p className='text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]'>
-          하우징
+          {t('list.title')}
         </p>
         <h1 className='mt-3 text-2xl font-bold tracking-tight'>
-          팀 계정만 등록 가능
+          {t('new.teamOnly.title')}
         </h1>
         <p className='mt-3 text-sm leading-relaxed text-[var(--muted-foreground)]'>
-          하우징 매물은{' '}
-          <strong className='text-[var(--foreground)]'>@misaeng.com</strong>{' '}
-          이메일로만 등록할 수 있습니다. 현재 로그인:{' '}
-          {user?.email ?? '알 수 없음'}
+          {teamOnlyBefore}
+          <strong className='text-[var(--foreground)]'>@misaeng.com</strong>
+          {teamOnlyAfter}
         </p>
         <div className='mt-6 flex flex-wrap gap-3'>
           <Link
             href={href('/housing')}
             className='rounded-full border border-[var(--border)] px-5 py-2.5 text-sm font-semibold'
           >
-            하우징 목록
+            {t('detail.backToList')}
           </Link>
         </div>
       </div>
@@ -128,16 +132,16 @@ export function HousingNewScreen() {
     <div className='min-h-screen bg-[var(--background)]'>
       <div className='mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-12'>
         <p className='text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]'>
-          <Link href={href('/housing')} className='hover:text-[#F64310]'>
-            하우징
+          <Link href={href('/housing')} className='hover:text-brand'>
+            {t('list.title')}
           </Link>{' '}
-          / 등록
+          / {t('new.breadcrumb')}
         </p>
         <h1 className='mt-3 text-2xl font-bold tracking-tight sm:text-3xl'>
-          하우징 등록
+          {t('new.title')}
         </h1>
         <p className='mt-2 text-sm text-[var(--muted-foreground)]'>
-          로그인: {user.email}
+          {t('new.signedInAs', { email: user.email })}
         </p>
 
         <form
@@ -145,7 +149,7 @@ export function HousingNewScreen() {
           className='mt-8 space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-6'
         >
           <CommunityWritingGuidelines className='mb-2' />
-          <Field label='스트리트 주소' required>
+          <Field label={t('new.fields.streetAddress')} required>
             <input
               required
               value={title}
@@ -154,7 +158,7 @@ export function HousingNewScreen() {
               placeholder='2950 Broadway'
             />
           </Field>
-          <Field label='동네' required>
+          <Field label={t('new.fields.neighborhood')} required>
             <input
               required
               value={neighborhood}
@@ -164,7 +168,7 @@ export function HousingNewScreen() {
             />
           </Field>
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-            <Field label='전체 유닛 월세 ($)' required>
+            <Field label={t('new.fields.unitRent')} required>
               <input
                 required
                 type='number'
@@ -172,10 +176,10 @@ export function HousingNewScreen() {
                 value={unitRent}
                 onChange={(e) => setUnitRent(e.target.value)}
                 className={inputClass}
-                placeholder='룸 합산 전체 유닛 가격'
+                placeholder={t('new.fields.unitRentPlaceholder')}
               />
             </Field>
-            <Field label='룸 월세 ($)' required>
+            <Field label={t('new.fields.roomRent')} required>
               <input
                 required
                 type='number'
@@ -187,7 +191,7 @@ export function HousingNewScreen() {
             </Field>
           </div>
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-            <Field label='침실 수' required>
+            <Field label={t('new.fields.bedrooms')} required>
               <input
                 required
                 type='number'
@@ -200,7 +204,7 @@ export function HousingNewScreen() {
             </Field>
           </div>
           <div className='grid gap-4 sm:grid-cols-2'>
-            <Field label='입주 시작일' required>
+            <Field label={t('new.fields.availableFrom')} required>
               <input
                 required
                 type='date'
@@ -209,7 +213,7 @@ export function HousingNewScreen() {
                 className={inputClass}
               />
             </Field>
-            <Field label='입주 종료일' required>
+            <Field label={t('new.fields.availableTo')} required>
               <input
                 required
                 type='date'
@@ -220,7 +224,7 @@ export function HousingNewScreen() {
               />
             </Field>
           </div>
-          <Field label='연락 이메일'>
+          <Field label={t('new.fields.contactEmail')}>
             <input
               type='email'
               value={contactEmail}
@@ -229,23 +233,23 @@ export function HousingNewScreen() {
               placeholder={user.email ?? ''}
             />
           </Field>
-          <Field label='상세 설명' required>
+          <Field label={t('new.fields.description')} required>
             <textarea
               required
               rows={5}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className={inputClass}
-              placeholder='계약 조건, 편의시설, 추천 대상 등'
+              placeholder={t('new.fields.descriptionPlaceholder')}
             />
           </Field>
 
           <button
             type='submit'
             disabled={submitting}
-            className='min-h-[48px] w-full rounded-full bg-[#F64310] text-sm font-semibold text-white touch-manipulation hover:bg-[#d93a0e] disabled:opacity-50'
+            className='min-h-[48px] w-full rounded-full bg-brand text-sm font-semibold text-white touch-manipulation hover:bg-brand-hover disabled:opacity-50'
           >
-            {submitting ? '등록 중…' : '게시하기'}
+            {submitting ? t('new.submitting') : t('new.submit')}
           </button>
         </form>
       </div>
@@ -254,7 +258,7 @@ export function HousingNewScreen() {
 }
 
 const inputClass =
-  'mt-1.5 min-h-[48px] w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base outline-none focus:border-[#F64310]'
+  'mt-1.5 min-h-[48px] w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base outline-none focus:border-brand'
 
 function Field({
   label,

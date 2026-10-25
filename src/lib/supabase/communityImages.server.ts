@@ -1,3 +1,5 @@
+import { ApiMessageError } from '@lib/i18n/apiError'
+
 function getSupabaseUrl() {
   return process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || null
 }
@@ -37,17 +39,18 @@ export async function uploadCommunityImageToSupabase(args: {
   const url = getSupabaseUrl()
   const secretKey = getSupabaseSecretKey()
   if (!url || !secretKey) {
-    throw new Error(
-      'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.supabaseNotConfiguredDetail',
     )
   }
 
   const type = (args.file.type || '').toLowerCase()
   if (type && !ALLOWED_TYPES.has(type)) {
-    throw new Error('JPG, PNG, WEBP, GIF 이미지만 올릴 수 있어요.')
+    throw new ApiMessageError('Unsupported image type', 'upload.imageTypeUnsupported')
   }
   if (args.file.size > MAX_BYTES) {
-    throw new Error('이미지는 5MB 이하로 올려 주세요.')
+    throw new ApiMessageError('Image exceeds 5MB', 'upload.imageTooLarge', { max: '5MB' })
   }
 
   const extFromName = args.file.name.includes('.')
@@ -91,11 +94,15 @@ export async function uploadCommunityImageToSupabase(args: {
     const detail =
       payload?.message || payload?.error || `HTTP ${uploadResponse.status}`
     if (uploadResponse.status === 404) {
-      throw new Error(
-        `Supabase 버킷 "${bucket}"을 찾을 수 없어요. Storage에서 버킷을 확인해 주세요.`,
+      throw new ApiMessageError(
+        `Supabase bucket "${bucket}" not found.`,
+        'upload.imageBucketMissing',
+        { bucket },
       )
     }
-    throw new Error(`이미지 업로드 실패: ${detail}`)
+    throw new ApiMessageError(`Image upload failed: ${detail}`, 'upload.imageUploadFailedDetail', {
+      detail,
+    })
   }
 
   return `${url}/storage/v1/object/public/${bucket}/${filePath}`

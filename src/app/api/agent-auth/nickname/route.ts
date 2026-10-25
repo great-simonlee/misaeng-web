@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../lib/authHelpers'
-import { getNicknameValidationError } from '@lib/constants/profile'
+import { getNicknameValidationIssue } from '@lib/constants/profile'
+import { getRequestT } from '@lib/i18n/server'
 import { isSupabaseProfileConfigured } from '@lib/supabase/profile.server'
 import { isNicknameTakenByOther } from '@lib/supabase/nicknameIndex.server'
 
@@ -14,9 +15,10 @@ export const dynamic = 'force-dynamic'
  * - 기본: 멤버 닉네임 규칙까지 함께 검사
  */
 export async function GET(request: Request) {
+  const t = await getRequestT(request, 'api')
   if (!isSupabaseProfileConfigured()) {
     return NextResponse.json(
-      { error: 'Supabase 설정이 필요해요.' },
+      { error: t('common.supabaseNotConfigured') },
       { status: 503 },
     )
   }
@@ -26,9 +28,15 @@ export async function GET(request: Request) {
   const isGuestScope = searchParams.get('scope') === 'guest'
 
   if (!isGuestScope) {
-    const formatError = getNicknameValidationError(nickname)
-    if (formatError) {
-      return NextResponse.json({ available: false, error: formatError })
+    const issue = getNicknameValidationIssue(nickname)
+    if (issue) {
+      return NextResponse.json({
+        available: false,
+        error: t(`profile.nickname.${issue.code}`, {
+          min: 'min' in issue ? issue.min : undefined,
+          max: 'max' in issue ? issue.max : undefined,
+        }),
+      })
     }
   }
 
@@ -38,13 +46,13 @@ export async function GET(request: Request) {
     const taken = await isNicknameTakenByOther(nickname, user?.uid)
     return NextResponse.json(
       taken
-        ? { available: false, error: '이미 사용 중인 닉네임이에요.' }
+        ? { available: false, error: t('profile.nicknameTakenShort') }
         : { available: true },
     )
   } catch (error) {
     console.error('Nickname check error:', error)
     return NextResponse.json(
-      { error: '닉네임 확인에 실패했어요. 잠시 후 다시 시도해 주세요.' },
+      { error: t('profile.nicknameCheckFailedRetry') },
       { status: 500 },
     )
   }

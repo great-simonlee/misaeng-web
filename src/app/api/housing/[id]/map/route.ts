@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { searchAddresses } from '@lib/community/places.server'
+import { getRequestT } from '@lib/i18n/server'
 import { getListingArea, getListingDisplayAddress } from '@lib/housing/listing'
 import { getHousingMapCoordinates } from '@lib/housing/publicListing'
 import { getStoredHousingListing } from '@lib/supabase/housing.server'
@@ -64,7 +65,9 @@ export async function GET(request: Request, { params }: HousingMapRouteProps) {
     }
 
     const coords = await resolveCoordinates(listing)
-    const name = getListingDisplayAddress(listing) || '위치'
+    const name =
+      getListingDisplayAddress(listing) ||
+      (await getRequestT(request, 'api'))('places.locationFallbackName')
     const neighborhood = getListingArea(listing).trim()
     const address = neighborhood
       ? `${neighborhood}, New York`

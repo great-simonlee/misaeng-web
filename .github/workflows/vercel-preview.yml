@@ -13,46 +13,70 @@ concurrency:
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-  APP_ENV_JSON: ${{ vars.APP_ENV_JSON }}
 
 jobs:
   lint-and-preview:
-    name: Lint and Preview Deploy
+    # 한 코드베이스를 두 Vercel 프로젝트로 배포한다 (src/lib/brand).
+    # ellieo는 VERCEL_PROJECT_ID_ELLIEO secret이 있을 때만 배포한다.
+    name: Lint and Preview Deploy (${{ matrix.brand }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        brand: [misaeng, ellieo]
+    env:
+      VERCEL_PROJECT_ID: ${{ matrix.brand == 'ellieo' && secrets.VERCEL_PROJECT_ID_ELLIEO || secrets.VERCEL_PROJECT_ID }}
+      APP_ENV_JSON: ${{ matrix.brand == 'ellieo' && vars.APP_ENV_JSON_ELLIEO || vars.APP_ENV_JSON }}
 
     steps:
+      - name: Skip when this brand has no Vercel project
+        id: gate
+        run: |
+          if [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "No Vercel project for ${{ matrix.brand }} — skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout
+        if: steps.gate.outputs.skip != 'true'
         uses: actions/checkout@v4
 
       - name: Setup Node.js
+        if: steps.gate.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
       - name: Install dependencies
+        if: steps.gate.outputs.skip != 'true'
         run: npm ci
 
       - name: Lint
+        if: steps.gate.outputs.skip != 'true' && matrix.brand == 'misaeng'
         run: npm run lint
 
       - name: Install Vercel CLI
+        if: steps.gate.outputs.skip != 'true'
         run: npm install --global vercel@latest
 
       - name: Pull Vercel Environment Information
+        if: steps.gate.outputs.skip != 'true'
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Load app env from APP_ENV_JSON
-        run: node scripts/export-app-env.mjs preview
+        if: steps.gate.outputs.skip != 'true'
+        run: node scripts/export-app-env.mjs preview ${{ matrix.brand }}
 
       - name: Build Project Artifacts
+        if: steps.gate.outputs.skip != 'true'
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Preview to Vercel
+        if: steps.gate.outputs.skip != 'true'
         id: deploy
         run: |
           url="$(vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})"
@@ -61,4 +85,5 @@ jobs:
           echo "$url" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Print Preview URL
+        if: steps.gate.outputs.skip != 'true'
         run: echo "${{ steps.deploy.outputs.url }}"

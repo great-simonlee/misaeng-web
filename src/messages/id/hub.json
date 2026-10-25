@@ -1,0 +1,153 @@
+{
+  "loading": "Memuat…",
+  "brandCity": "{brand} {city}",
+  "comingSoon": "Segera hadir",
+  "cities": {
+    "nyc": {
+      "headline": "Menjalani hidup di New York bersama-sama",
+      "description": "Tempat pelajar dan profesional internasional berbagi tips seputar New York City."
+    },
+    "boston": {
+      "headline": "Menjalani hidup di Boston bersama-sama",
+      "description": "Tempat pelajar dan profesional internasional berbagi tips seputar Boston."
+    }
+  },
+  "magazine": {
+    "kicker": "NYC Magazine",
+    "title": "Hidup di New York, pilihan editor kami",
+    "description": "Bacaan singkat soal kuliner, acara, dan hal seru untuk dilakukan, terpisah dari forum.",
+    "items": {
+      "mag-1": {
+        "tag": "Kuliner",
+        "title": "Tempat kalguksu di Flushing yang antreannya sampai ke luar",
+        "excerpt": "Makanan yang lebih mengenyangkan dari brunch akhir pekan, langganan orang Korea lokal."
+      },
+      "mag-2": {
+        "tag": "Acara",
+        "title": "Networking Korea di Manhattan minggu ini",
+        "excerpt": "Meetup santai malam hari untuk pelajar dan junior."
+      },
+      "mag-3": {
+        "tag": "Aktivitas",
+        "title": "Rute dalam ruangan untuk hari hujan",
+        "excerpt": "Dari museum sampai kafe, semuanya dalam satu hari."
+      },
+      "mag-4": {
+        "tag": "Lingkungan",
+        "title": "Jalan-jalan siang di Astoria",
+        "excerpt": "Dari jalan penuh kafe sampai taman, rute jalan kaki akhir pekan yang asyik."
+      }
+    }
+  },
+  "professionals": {
+    "kicker": "Pakar",
+    "title": "Partner kehidupan",
+    "description": "Real estate, pengacara, jasa pindahan, akuntan: pakar yang paling banyak dicari di NYC.",
+    "categoriesAria": "Kategori pakar",
+    "categories": {
+      "real-estate": {
+        "title": "Real estate",
+        "description": "Sewa, jual beli, dan saran broker"
+      },
+      "lawyer": {
+        "title": "Pengacara",
+        "description": "Hukum visa, imigrasi, dan kontrak"
+      },
+      "moving": {
+        "title": "Jasa pindahan",
+        "description": "Pindahan dan angkut barang di NYC"
+      },
+      "accountant": {
+        "title": "Akuntan",
+        "description": "Pajak dan layanan CPA"
+      }
+    },
+    "items": {
+      "re-1": {
+        "name": "Sample Realty",
+        "specialty": "Sewa di Manhattan · Brooklyn"
+      },
+      "re-2": {
+        "name": "Sample Broker",
+        "specialty": "Hunian untuk pelajar dan profesional"
+      },
+      "law-1": {
+        "name": "Sample Law Office",
+        "specialty": "Hukum visa · imigrasi"
+      },
+      "law-2": {
+        "name": "Sample Attorney",
+        "specialty": "Lease · Kontrak"
+      },
+      "mv-1": {
+        "name": "Sample Movers",
+        "specialty": "Pindahan lokal dan sekitarnya"
+      },
+      "mv-2": {
+        "name": "Sample Moving",
+        "specialty": "Studio · 1BR"
+      },
+      "acc-1": {
+        "name": "Sample Accounting",
+        "specialty": "Pajak pribadi dan freelancer"
+      },
+      "acc-2": {
+        "name": "Sample CPA",
+        "specialty": "OPT · ITIN · Lapor pajak"
+      }
+    }
+  },
+  "introCarousel": {
+    "intro": {
+      "kicker": "{brand} NYC",
+      "headline": "Tempat yang wajib diketahui setiap pelajar di New York",
+      "body": "Kami bekerja sama dengan asosiasi mahasiswa Korea di tiap kampus untuk mengumpulkan info visa, kerja, kuliner, dan acara di satu tempat. Plus koneksi ke para pakar."
+    },
+    "status": {
+      "kicker": "Visa · Status",
+      "headline": "Apa aku sudah melakukannya dengan benar?",
+      "body": "Bersiaplah dengan ulasan tahap demi tahap dari orang-orang yang sudah melewati OPT, CPT, visa, dan green card."
+    },
+    "food": {
+      "kicker": "Kuliner",
+      "headline": "Nggak perlu bingung lagi mau makan apa hari ini",
+      "body": "Daftar kuliner kami diurutkan berdasarkan menu, bukan lingkungan, jadi begitu kamu ngidam sesuatu, langsung cari dan berangkat."
+    },
+    "housing": {
+      "kicker": "Hunian · Roommate",
+      "headline": "Nggak perlu cari tempat tinggal sendirian lagi",
+      "body": "Bandingkan listing terverifikasi dan roommate yang gaya hidupnya cocok dengan kamu, semua di satu tempat."
+    },
+    "anonymous": {
+      "kicker": "Forum anonim",
+      "headline": "Pertanyaan yang lebih nyaman ditanyakan tanpa nama",
+      "body": "Soal visa atau hubungan, lebih mudah jujur kalau anonim."
+    },
+    "credit": {
+      "kicker": "Kredit referral",
+      "headline": "Undang teman dan bagikan ulasan",
+      "body": "Tulis ulasan OPT, CPT, atau visa yang detail, dan kamu serta teman yang mengundangmu sama-sama dapat kredit."
+    },
+    "expert": {
+      "kicker": "Koneksi pakar",
+      "headline": "Pakai kredit untuk bertemu pakar",
+      "body": "Pakai kredit kamu untuk coffee chat dengan orang yang bekerja di bidang incaranmu, atau booking konsultasi dengan pakar."
+    },
+    "cta": {
+      "kicker": "Mulai sekarang",
+      "headline": "Cari info di sini, dapatkan jawaban dari pakar",
+      "body": "Lihat partner asosiasi mahasiswa dan listing terverifikasi di {siteHost}/nyc."
+    }
+  },
+  "carouselTest": {
+    "kicker": "{brand} NYC · Draf carousel",
+    "title": "Carousel intro",
+    "description": "Latar foto full-bleed · 1080×1080 · geser ke kiri dan kanan. Setiap slide punya overlay suasana sendiri sesuai topiknya.",
+    "photoNote": "Latar belakangnya adalah foto New York dan gaya hidup dari Unsplash. Sebaiknya ganti dengan foto brand beresolusi tinggi sebelum dipublikasikan.",
+    "backHome": "Kembali ke beranda komunitas"
+  },
+  "instagramDm": {
+    "body": "{message}: DM kami di {handle}.",
+    "button": "Kirim DM Instagram"
+  }
+}

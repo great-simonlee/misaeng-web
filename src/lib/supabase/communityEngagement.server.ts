@@ -1,3 +1,5 @@
+import { ApiMessageError } from '@lib/i18n/apiError'
+import { invalidatePostCounts } from '@lib/supabase/listCache.server'
 import type {
   CommunityBeenThere,
   CommunityRecommend,
@@ -174,13 +176,14 @@ export async function saveStoredRecommends(
   recommends: CommunityRecommend[],
 ): Promise<CommunityRecommend[]> {
   if (!isCommunityEngagementStorageConfigured()) {
-    throw new Error(
-      'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.supabaseNotConfiguredDetail',
     )
   }
 
   const id = String(postId || '').trim()
-  if (!id) throw new Error('잘못된 게시글이에요.')
+  if (!id) throw new ApiMessageError('Invalid post id', 'community.invalidPost')
 
   const bucket = await resolveBucket()
   const body = Buffer.from(JSON.stringify({ recommends }), 'utf8')
@@ -200,13 +203,12 @@ export async function saveStoredRecommends(
     const payload = (await res?.json().catch(() => null)) as
       | { message?: string; error?: string }
       | null
-    throw new Error(
-      payload?.message ||
-        payload?.error ||
-        '추천 저장에 실패했어요. 잠시 후 다시 시도해 주세요.',
-    )
+    const detail = payload?.message || payload?.error
+    if (detail) throw new Error(detail)
+    throw new ApiMessageError('Recommend save failed', 'community.recommendSaveFailed')
   }
 
+  invalidatePostCounts(id)
   return recommends
 }
 
@@ -263,13 +265,14 @@ export async function saveStoredBeenThere(
   visits: CommunityBeenThere[],
 ): Promise<CommunityBeenThere[]> {
   if (!isCommunityEngagementStorageConfigured()) {
-    throw new Error(
-      'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.supabaseNotConfiguredDetail',
     )
   }
 
   const id = String(postId || '').trim()
-  if (!id) throw new Error('잘못된 게시글이에요.')
+  if (!id) throw new ApiMessageError('Invalid post id', 'community.invalidPost')
 
   const bucket = await resolveBucket()
   const body = Buffer.from(JSON.stringify({ visits }), 'utf8')
@@ -289,11 +292,9 @@ export async function saveStoredBeenThere(
     const payload = (await res?.json().catch(() => null)) as
       | { message?: string; error?: string }
       | null
-    throw new Error(
-      payload?.message ||
-        payload?.error ||
-        '가봤어요 저장에 실패했어요. 잠시 후 다시 시도해 주세요.',
-    )
+    const detail = payload?.message || payload?.error
+    if (detail) throw new Error(detail)
+    throw new ApiMessageError('Been-there save failed', 'community.beenThereSaveFailed')
   }
 
   return visits
@@ -331,8 +332,9 @@ export async function saveStoredReports(
   reports: CommunityReport[],
 ): Promise<CommunityReport[]> {
   if (!isCommunityEngagementStorageConfigured()) {
-    throw new Error(
-      'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.supabaseNotConfiguredDetail',
     )
   }
 
@@ -354,11 +356,9 @@ export async function saveStoredReports(
     const payload = (await res?.json().catch(() => null)) as
       | { message?: string; error?: string }
       | null
-    throw new Error(
-      payload?.message ||
-        payload?.error ||
-        '신고 저장에 실패했어요. 잠시 후 다시 시도해 주세요.',
-    )
+    const detail = payload?.message || payload?.error
+    if (detail) throw new Error(detail)
+    throw new ApiMessageError('Report save failed', 'community.reportSaveFailed')
   }
 
   return reports

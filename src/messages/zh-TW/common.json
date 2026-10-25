@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "title": "{brand} NYC | 紐約留學生與上班族社群",
+    "description": "在紐約讀書、工作的人分享的租屋、美食、CPT/OPT、簽證與面試評價。"
+  },
+  "language": {
+    "label": "語言",
+    "menuAria": "選擇語言",
+    "saved": "語言已切換為{language}",
+    "settingLabel": "語言",
+    "settingHint": "網站內容與翻譯貼文會以這個語言顯示。",
+    "sheetTitle": "語言",
+    "setupLabel": "偏好語言",
+    "setupHint": "社群貼文與留言會翻譯成這個語言，隨時可在我的頁面中更改。",
+    "saveFailed": "無法儲存語言設定，請稍後再試。"
+  },
+  "translation": {
+    "translatedFrom": "譯自{language}",
+    "showOriginal": "查看原文",
+    "showTranslation": "查看翻譯",
+    "original": "原文",
+    "pending": "翻譯即將完成",
+    "iconLabel": "翻譯貼文"
+  },
+  "actions": {
+    "save": "儲存",
+    "cancel": "取消",
+    "close": "關閉",
+    "confirm": "確定",
+    "back": "返回",
+    "more": "查看更多",
+    "retry": "再試一次",
+    "loading": "載入中…"
+  },
+  "errors": {
+    "generic": "發生錯誤，請稍後再試。",
+    "network": "請檢查網路連線。"
+  },
+  "ui": {
+    "bottomSheetSelect": {
+      "placeholder": "請選擇"
+    },
+    "imageUpload": {
+      "selectPhoto": "選擇照片",
+      "uploading": "上傳中…",
+      "failed": "上傳失敗",
+      "remove": "移除",
+      "change": "更換",
+      "addPhoto": "新增照片",
+      "tapToUpload": "點一下上傳"
+    },
+    "loading": {
+      "aria": "載入中",
+      "label": "載入中…"
+    },
+    "mbti": {
+      "placeholder": "請選擇",
+      "title": "選擇 MBTI",
+      "clear": "不選",
+      "result": "你的類型",
+      "selectAll": "請選滿 4 項",
+      "groups": {
+        "analyst": {
+          "label": "分析師",
+          "subtitle": "直覺 · 思考"
+        },
+        "diplomat": {
+          "label": "外交官",
+          "subtitle": "直覺 · 情感"
+        },
+        "sentinel": {
+          "label": "守護者",
+          "subtitle": "實感 · 思考"
+        },
+        "explorer": {
+          "label": "探險家",
+          "subtitle": "實感 · 情感"
+        }
+      },
+      "nicknames": {
+        "INTJ": "建築師",
+        "INTP": "邏輯學家",
+        "ENTJ": "指揮官",
+        "ENTP": "辯論家",
+        "INFJ": "提倡者",
+        "INFP": "調停者",
+        "ENFJ": "主人公",
+        "ENFP": "競選者",
+        "ISTJ": "物流師",
+        "ISFJ": "守衛者",
+        "ESTJ": "總經理",
+        "ESFJ": "執政官",
+        "ISTP": "鑒賞家",
+        "ISFP": "探險家",
+        "ESTP": "企業家",
+        "ESFP": "表演者"
+      },
+      "dimensions": {
+        "ei": "能量",
+        "ns": "心智",
+        "tf": "天性",
+        "jp": "策略"
+      },
+      "options": {
+        "E": "外向",
+        "I": "內向",
+        "N": "直覺",
+        "S": "實感",
+        "T": "思考",
+        "F": "情感",
+        "J": "判斷",
+        "P": "展望"
+      }
+    },
+    "nickname": {
+      "checking": "正在確認是否可用…"
+    },
+    "photoLightbox": {
+      "title": "照片檢視",
+      "close": "關閉",
+      "previous": "上一張",
+      "next": "下一張"
+    },
+    "pullToRefresh": {
+      "refreshing": "正在更新 {brand}…",
+      "release": "放開即可更新",
+      "pull": "下拉即可更新"
+    },
+    "rangeSlider": {
+      "minPrice": "最低價格",
+      "maxPrice": "最高價格"
+    },
+    "schoolBadge": {
+      "title": "{school} · 學校信箱已認證",
+      "aria": "{school} 已認證"
+    },
+    "editor": {
+      "placeholder": "寫點什麼吧",
+      "imageUploadFailed": "圖片上傳失敗",
+      "bold": "粗體",
+      "italic": "斜體",
+      "heading": "標題",
+      "bulletList": "清單",
+      "quote": "引用",
+      "linkPrompt": "請輸入連結網址",
+      "link": "連結",
+      "photo": "照片",
+      "maxLengthReached": "已達字數上限",
+      "charCount": "字數（僅計文字）"
+    },
+    "authErrors": {
+      "loginCancelled": "已取消登入",
+      "popupBlocked": "彈出視窗被封鎖了，請檢查瀏覽器設定",
+      "invalidEmail": "Email 格式不正確",
+      "userDisabled": "這個帳號已被停用",
+      "userNotFound": "找不到這個帳號",
+      "wrongPassword": "密碼不正確",
+      "invalidCredential": "請確認 Email 或密碼",
+      "emailAlreadyInUse": "這個 Email 已經註冊過了",
+      "weakPassword": "密碼至少需要 6 個字元",
+      "tooManyRequests": "嘗試次數過多，請稍後再試",
+      "networkRequestFailed": "請檢查網路連線"
+    },
+    "configBanner": {
+      "loginPage": "登入頁面"
+    },
+    "authConfigBanner": {
+      "body": "AppConnect API 尚未設定。請比照 ellieo-erp AppConnect，在環境變數中加入 {baseUrl} 和 {clientId}（供 Google Identity Services 使用）。Google idToken 會傳送至 Ellieo {endpoint}（請參考 {envExample}）。"
+    },
+    "supabaseConfigBanner": {
+      "body": "Supabase 環境變數尚未設定。請在 {envLocal} 中加入 Supabase 設定值（請參考 {envExample}）。在此之前你可以瀏覽畫面，但無法儲存資料或上傳大頭貼。"
+    },
+    "chipScroll": {
+      "previous": "顯示上一個",
+      "next": "顯示更多"
+    },
+    "copyLink": {
+      "copiedToast": "已複製連結",
+      "failedToast": "連結複製失敗",
+      "linkCopied": "已複製連結",
+      "copyLink": "複製連結",
+      "copied": "已複製",
+      "share": "分享"
+    },
+    "photoGrid": {
+      "cover": "封面"
+    },
+    "timeline": {
+      "step": "步驟 {step}",
+      "latest": "最新",
+      "review": "評價"
+    },
+    "draft": {
+      "save": "儲存草稿",
+      "savedAt": "草稿已儲存 · {time}"
+    },
+    "autosave": {
+      "title": "你寫的內容會自動儲存",
+      "description": "每次新增進度或進到下一個項目時，都會儲存在這台裝置上。關閉視窗後也能從上次的地方繼續。",
+      "savedAt": "已儲存 · {time}"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "agreeTerms": "Saya telah membaca dan menyetujui {terms}.",
+  "agreePrivacy": "Saya telah membaca dan menyetujui {privacy}.",
+  "agreeTermsAria": "Kotak centang Ketentuan Penggunaan",
+  "agreePrivacyAria": "Kotak centang Kebijakan Privasi",
+  "termsLink": "Ketentuan Penggunaan",
+  "privacyLink": "Kebijakan Privasi",
+  "arbitrationNotice": "Ketentuan ini memuat klausul arbitrase, dan kamu dapat memilih untuk tidak ikut (opt-out) dalam waktu 30 hari. Detailnya ada di {terms}.",
+  "languageNotice": "Versi bahasa Inggris dari Ketentuan Penggunaan dan Kebijakan Privasi adalah versi resmi dan yang berlaku. Terjemahan ke bahasa lain hanya sebagai referensi; jika terdapat perbedaan, versi bahasa Inggris yang berlaku.",
+  "agreeError": "Setujui Ketentuan Penggunaan dan Kebijakan Privasi untuk melanjutkan.",
+  "signUp": "Daftar",
+  "reconsentTitle": "Ketentuan yang diperbarui memerlukan persetujuan kamu",
+  "reconsentBody": "Ketentuan Penggunaan dan Kebijakan Privasi kami telah berubah. Setujui untuk tetap menggunakan {brand}.",
+  "reconsentConfirm": "Saya setuju, lanjutkan",
+  "reconsentVersions": "Ketentuan {terms} · Privasi {privacy}",
+  "optOutHint": "Opt-out arbitrase: kirim email ke info@misaeng.com dalam waktu 30 hari setelah menyetujui, dengan subjek “Arbitration Opt-Out”.",
+  "saving": "Menyimpan…",
+  "defaultSummary": "Harap tinjau Ketentuan Penggunaan dan Kebijakan Privasi. Ketentuan ini mencakup perjanjian arbitrase individual yang mengikat dan pengesampingan gugatan kelompok (class action)."
+}

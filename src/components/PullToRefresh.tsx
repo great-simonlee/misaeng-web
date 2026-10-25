@@ -10,11 +10,12 @@ import {
 } from 'react'
 
 import { cn } from '@lib'
+import { BRAND_CONFIG } from '@lib/brand'
+import { useT } from '@lib/i18n/client'
 
 const PULL_THRESHOLD = 76
 const PULL_MAX = 120
 const REFRESH_HOLD = 96
-const BRAND = '#F64310'
 
 type PullToRefreshProps = {
   onRefresh: () => void | Promise<void>
@@ -60,6 +61,7 @@ export function PullToRefresh({
   disabled = false,
 }: PullToRefreshProps) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const t = useT('common')
   const [pull, setPull] = useState(0)
   const [refreshing, setRefreshing] = useState(false)
   const pullRef = useRef(0)
@@ -250,7 +252,7 @@ export function PullToRefresh({
             className={cn(
               'relative flex size-11 items-center justify-center rounded-full bg-white transition-[box-shadow,transform]',
               ready || refreshing
-                ? 'shadow-[0_6px_20px_rgba(246,67,16,0.28)]'
+                ? 'shadow-[0_6px_20px_rgb(var(--brand-rgb)/0.28)]'
                 : 'shadow-[0_4px_14px_rgba(15,23,42,0.08)]',
             )}
             style={{
@@ -274,7 +276,7 @@ export function PullToRefresh({
                   cy='22'
                   r='19'
                   fill='none'
-                  stroke='rgba(246,67,16,0.12)'
+                  style={{ stroke: 'rgb(var(--brand-rgb) / 0.12)' }}
                   strokeWidth='2.5'
                 />
                 <circle
@@ -282,7 +284,7 @@ export function PullToRefresh({
                   cy='22'
                   r='19'
                   fill='none'
-                  stroke={BRAND}
+                  style={{ stroke: 'var(--brand)' }}
                   strokeWidth='2.5'
                   strokeLinecap='round'
                   strokeDasharray={
@@ -299,18 +301,21 @@ export function PullToRefresh({
 
             <span className='relative z-[1] flex size-6 items-center justify-center'>
               <Image
-                src='/img/logo_square.png'
+                src={BRAND_CONFIG.assets.square}
                 alt=''
                 width={48}
                 height={48}
-                className='size-full object-contain mix-blend-lighten'
+                className={cn(
+                  'size-full object-contain',
+                  BRAND_CONFIG.id === 'misaeng' && 'mix-blend-lighten',
+                )}
                 priority
               />
             </span>
 
             {(ready || refreshing) && (
               <span
-                className='absolute inset-0 rounded-full ring-2 ring-[#F64310]/25'
+                className='absolute inset-0 rounded-full ring-2 ring-brand/25'
                 aria-hidden
               />
             )}
@@ -319,14 +324,14 @@ export function PullToRefresh({
           <p
             className={cn(
               'text-[11px] font-semibold tracking-tight transition-colors',
-              ready || refreshing ? 'text-[#F64310]' : 'text-[var(--muted)]',
+              ready || refreshing ? 'text-brand' : 'text-[var(--muted)]',
             )}
           >
             {refreshing
-              ? '미생 새로고침 중…'
+              ? t('ui.pullToRefresh.refreshing', { brand: BRAND_CONFIG.name })
               : ready
-                ? '놓으면 새로고침'
-                : '당겨서 새로고침'}
+                ? t('ui.pullToRefresh.release')
+                : t('ui.pullToRefresh.pull')}
           </p>
         </div>
       </div>

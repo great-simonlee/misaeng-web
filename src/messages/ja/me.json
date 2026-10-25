@@ -1,0 +1,333 @@
+{
+  "nickname": {
+    "checkFailed": "ニックネームを確認できませんでした。",
+    "available": "このニックネームは使用できます",
+    "taken": "このニックネームはすでに使われています。",
+    "ruleHint": "英字と「.」のみ使用できます",
+    "errors": {
+      "tooShort": "ニックネームは{min}文字以上にしてください",
+      "tooLong": "ニックネームは{max}文字以内にしてください",
+      "invalidChars": "英字と「.」のみ使用できます"
+    }
+  },
+  "profile": {
+    "gender": {
+      "male": "男性",
+      "female": "女性",
+      "other": "その他"
+    },
+    "occupation": {
+      "student": "学生",
+      "professional": "社会人",
+      "other": "その他"
+    },
+    "changePhotoAria": "プロフィール写真を変更",
+    "title": "プロフィール",
+    "nicknameLabel": "ニックネーム",
+    "notSet": "未設定",
+    "edit": "編集",
+    "set": "設定",
+    "saving": "保存しています…",
+    "genderLabel": "性別",
+    "occupationLabel": "職業",
+    "nicknamePlaceholder": "例：food.hunter",
+    "photoAlt": "{name}さんのプロフィール"
+  },
+  "statusEmployer": {
+    "fieldLabel": "学校・会社・団体（任意）",
+    "modeName": "会社名を入力",
+    "modeCategory": "会社の種類を選択",
+    "namePlaceholder": "会社名を入力してください",
+    "categoryTitle": "会社の種類",
+    "categoryPlaceholder": "種類を選択",
+    "noSelection": "選択しない",
+    "option": "{origin}の{industry}企業",
+    "other": "その他",
+    "origins": {
+      "korean": "韓国",
+      "us": "米国",
+      "foreign": "外資"
+    },
+    "industries": {
+      "tech": "IT・ソフトウェア",
+      "finance": "金融・フィンテック",
+      "consulting": "コンサルティング",
+      "healthcare": "ヘルスケア・バイオ",
+      "accounting": "会計・税務",
+      "engineering": "製造・エンジニアリング",
+      "marketing": "マーケティング"
+    }
+  },
+  "verification": {
+    "errors": {
+      "sendFailed": "認証メールを送信できませんでした",
+      "confirmFailed": "認証に失敗しました",
+      "emailNotConfigured": "メールがまだ設定されていません。{envVar}を確認してください。"
+    },
+    "phone": {
+      "errors": {
+        "required": "電話番号を入力してください",
+        "invalidFormat": "電話番号の形式が正しくありません",
+        "unsupportedCountry": "米国（+1）または韓国（+82）の番号を入力してください",
+        "sendFailed": "認証SMSを送信できませんでした",
+        "confirmFailed": "電話番号の認証に失敗しました"
+      },
+      "smsDisabledShort": "SMS停止中",
+      "afterSchool": "学校認証のあとで",
+      "rowLabel": "電話番号",
+      "rowHint": "電話番号で認証",
+      "smsDisabled": "現在、SMSによる電話番号認証は停止しています。",
+      "verifiedToast": "電話番号の認証が完了しました",
+      "unavailable": "Supabase接続後に利用できます",
+      "title": "電話番号認証",
+      "description": "米国（+1）または韓国（+82）の番号でSMS認証します。1アカウントにつき1日{max}回まで、再送信は{seconds}秒後から可能です。",
+      "testOnly": "現在は承認済みのテスト番号のみ利用できます。",
+      "getCode": "SMSでコードを受け取る",
+      "codeSentTo": "{phone}に送信したコードを入力してください。",
+      "codePlaceholder": "6桁のコード",
+      "resendCode": "SMSを再送信"
+    },
+    "workplace": {
+      "errors": {
+        "required": "勤務先のメールアドレスを入力してください。",
+        "invalidFormat": "有効なメールアドレスを入力してください。",
+        "personalDomain": "Gmailなどの個人メールは使用できません。勤務先で使っているメールアドレスを入力してください。",
+        "companyRequired": "会社名を入力してください"
+      },
+      "pendingDetail": "メール認証済み · Misaengチームの確認待ち",
+      "retry": "もう一度認証してください",
+      "rowHint": "勤務先のメールアドレスと会社名で認証",
+      "rowLabel": "勤務先認証",
+      "submittedToast": "メールの認証が完了しました。Misaengチームの確認後、勤務先認証が完了します。",
+      "approvedTitle": "勤務先認証が完了しました",
+      "pendingTitle": "勤務先認証を確認中です",
+      "approvedDescription": "Misaengチームが勤務先認証を確認しました。",
+      "pendingDescription": "勤務先のメールアドレスは認証済みです。現在、Misaengチームが会社情報を確認しています。",
+      "formDescription": "勤務先のメールアドレスは、登録時のメールアドレスと異なっていても、現在ログイン中のアカウントに紐づけられます。コードを入力したあと、Misaengチームが会社情報をあらためて確認します。",
+      "companyLabel": "会社名",
+      "companyPlaceholder": "例：Misaeng LLC",
+      "emailLabel": "勤務先のメールアドレス",
+      "confirmButton": "メールを認証",
+      "editForm": "会社名またはメールアドレスを変更"
+    },
+    "verifiedShort": "認証済み",
+    "school": {
+      "rowLabel": "学校メール",
+      "rowHint": "学校のメールアドレスで学生であることを認証",
+      "verifiedWithSchool": "{school}で認証済み",
+      "verifiedToast": "学校メールの認証が完了しました",
+      "registrationSentToast": "学校の登録リクエストを受け付けました。確認後にご連絡します。",
+      "errors": {
+        "eduRequired": ".eduの学校メールアドレスを入力してください",
+        "unsupported": "この学校にはまだ対応していません。追加のリクエストを送ってください。",
+        "nameRequired": "学校名を入力してください",
+        "invalidDomain": "有効なメールドメインを入力してください（例：monroeu.com）",
+        "registrationFailed": "学校の登録リクエストを送信できませんでした"
+      },
+      "registerTitle": "学校の追加をリクエスト",
+      "registerDescription": "学校がリストにない場合は、Misaengチームに追加をリクエストできます。学校名とメールドメインを教えていただければ、{brand}とアプリに追加します。",
+      "nameLabel": "学校名",
+      "domainLabel": "学校のメールドメイン",
+      "domainHint": "@を除いたドメインのみ（例：monroeu.com）",
+      "registerSubmit": "Misaengチームにリクエストを送る",
+      "backToVerify": "学校メール認証に戻る",
+      "verifyTitle": "学校メール認証",
+      "formDescription": "学校のメールアドレスは、登録時のメールアドレスと異なっていても、現在ログイン中のアカウントに紐づけられます。学校のメールアドレスに6桁のコードをお送りします。",
+      "notFoundRequest": "学校が見つかりませんか？追加をリクエスト"
+    },
+    "instagram": {
+      "rowLabel": "Instagram",
+      "rowHint": "アカウントを連携"
+    },
+    "title": "認証",
+    "description": "学校または勤務先のメールアドレスは、登録時のメールアドレスと異なっていてもこのアカウントに紐づけられます。",
+    "status": {
+      "soon": "近日公開",
+      "verified": "認証済み",
+      "inReview": "確認中",
+      "verify": "認証する"
+    },
+    "chooser": {
+      "title": "本人認証",
+      "description": "学校または勤務先のメールアドレスのうち、使いやすいほうで認証してください。登録時のメールアドレスと異なっていても、このアカウントに紐づけられます。",
+      "school": "学校メールで学生として認証",
+      "workplace": "勤務先メールで社会人として認証"
+    },
+    "clearInputAria": "入力をクリア",
+    "sending": "送信しています…",
+    "getCode": "認証コードを受け取る",
+    "codeSentTo": "{email}に送信した{br}6桁のコードを入力してください",
+    "checking": "確認しています…",
+    "resendIn": "{seconds}秒後に再送信",
+    "resendCode": "コードを再送信",
+    "confirmButton": "認証する",
+    "digitAria": "認証コードの{position}桁目"
+  },
+  "toasts": {
+    "loggedOut": "ログアウトしました",
+    "photoSaved": "プロフィール写真を更新しました",
+    "photoFailed": "写真をアップロードできませんでした",
+    "nicknameSaved": "ニックネームを保存しました",
+    "nicknameFailed": "ニックネームを保存できませんでした",
+    "mbtiSaved": "MBTIを保存しました",
+    "mbtiCleared": "MBTIを削除しました",
+    "mbtiFailed": "MBTIを保存できませんでした",
+    "genderSaved": "性別を保存しました",
+    "genderFailed": "性別を保存できませんでした",
+    "occupationSaved": "職業を保存しました",
+    "occupationFailed": "職業を保存できませんでした",
+    "profileSaved": "プロフィールを保存しました",
+    "profileFailed": "プロフィールを保存できませんでした"
+  },
+  "title": "マイページ",
+  "suspendedNotice": "このアカウントは利用停止中です。閲覧はできますが、投稿、コメント、クレジットの申請はできません。",
+  "nicknameSheet": {
+    "title": "ニックネームを設定",
+    "minLength": "{min}文字以上"
+  },
+  "actions": {
+    "cancel": "キャンセル",
+    "save": "保存"
+  },
+  "setupSheet": {
+    "title": "プロフィールを完成させましょう",
+    "description": "コミュニティに表示されるプロフィール情報を入力してください。名前（名・姓）はアカウント専用で、コミュニティにはニックネームが表示されます。",
+    "firstNameLabel": "名",
+    "lastNameLabel": "姓",
+    "nicknameLabel": "ニックネーム（コミュニティに表示）",
+    "later": "あとで",
+    "save": "保存"
+  },
+  "logout": {
+    "title": "ログアウト",
+    "descriptionMobile": "この端末でアカウントからログアウトします",
+    "descriptionDesktop": "アカウントからログアウトします"
+  },
+  "loadingAria": "マイページを読み込み中",
+  "suspended": {
+    "title": "アカウントが利用停止されています",
+    "toMyPage": "マイページへ"
+  },
+  "verificationRequired": {
+    "title": "認証が必要です",
+    "toCommunityHome": "コミュニティホームに戻る"
+  },
+  "cardAction": {
+    "profile": {
+      "title": "プロフィールを完成させる",
+      "description": "ニックネーム、MBTI、性別、職業を設定しましょう",
+      "descriptionDesktop": "基本情報を設定しましょう"
+    },
+    "identity": {
+      "title": "本人認証をする",
+      "description": "学校または勤務先のメールアドレスで認証しましょう",
+      "descriptionDesktop": "学校・勤務先メールで認証"
+    },
+    "school": {
+      "title": "学校メールを認証する",
+      "description": "学校のメールアドレスで学生認証を完了しましょう",
+      "descriptionDesktop": "学生であることを認証"
+    },
+    "workplace": {
+      "title": "勤務先を認証する",
+      "description": "勤務先のメールアドレスと会社名で認証しましょう",
+      "descriptionDesktop": "社会人であることを認証"
+    },
+    "workplacePending": {
+      "title": "勤務先認証を確認しています",
+      "description": "メールは認証済みです。Misaengチームの確認をお待ちください",
+      "descriptionDesktop": "Misaengチームの確認待ち"
+    }
+  },
+  "credit": {
+    "loadFailed": "クレジットを読み込めませんでした",
+    "ledgerLoadFailed": "クレジット履歴を読み込めませんでした",
+    "redeemComingSoon": "特典の申請は段階的に開始しています。詳しくはクレジットガイドをご覧ください。",
+    "loadFailedRetry": "クレジットを読み込めませんでした · 再試行",
+    "pillAria_other": "コミュニティクレジット{count}、履歴を見る",
+    "unit": "クレジット",
+    "history": "履歴",
+    "requestTitle": "クレジットを使う",
+    "balanceLabel": "保有クレジット",
+    "requestDescription": "使いたい特典を選んでください。申請後、Misaengが確認してマッチングします。",
+    "optionMeta_other": "{duration} · 月{count}回",
+    "needMore_other": "あと{count}クレジット必要です",
+    "redeemGuideLink": "特典について詳しく見る",
+    "submit": "申請する",
+    "historyTitle": "クレジット履歴",
+    "guideLink": "ガイドを見る",
+    "retry": "再試行",
+    "emptyTitle": "まだ履歴がありません",
+    "emptyDescription": "グルメ情報、レビュー、コメントでクレジットを獲得しましょう。",
+    "writeFoodReview": "グルメレビューを書く",
+    "kinds": {
+      "earn": "獲得",
+      "revoke": "取り消し",
+      "spend": "使用",
+      "restore": "復元",
+      "other": "その他"
+    }
+  },
+  "referral": {
+    "linkCopied": "紹介リンクをコピーしました",
+    "copyFailed": "リンクをコピーできませんでした。コードを直接シェアしてください。",
+    "errors": {
+      "invalidCode": "8文字の紹介コードを入力してください",
+      "ownCode": "自分のコードは使用できません"
+    },
+    "bound": "紹介者を登録しました",
+    "title": "友だち紹介",
+    "description": "あなたの紹介コードが使われるたびに{credits}がもらえます。最大{max}人まで、自分自身を紹介することはできません。",
+    "creditsAmount_other": "{count}クレジット",
+    "copying": "コピーしています…",
+    "shareButton": "友だちを招待する",
+    "myCode": "自分の紹介コード",
+    "loading": "読み込み中…",
+    "usedCount": "{used}/{max}人が使用",
+    "enterReferrer": "紹介者を入力",
+    "boundTo": "紹介コード{code}と連携しています。",
+    "codePlaceholder": "8文字の紹介コード",
+    "binding": "連携しています…",
+    "bind": "連携する"
+  },
+  "posts": {
+    "loadFailed": "投稿を読み込めませんでした",
+    "deleteConfirm": "「{title}」を削除しますか？\nこの操作は取り消せません。",
+    "deleted": "投稿を削除しました",
+    "deleteFailed": "投稿を削除できませんでした",
+    "title": "自分の投稿",
+    "description": "コミュニティへの投稿をカテゴリー別に確認し、編集・削除できます",
+    "categoryAria": "投稿カテゴリー",
+    "emptyAll": "まだ投稿がありません",
+    "emptyCategory": "{category}の投稿はありません",
+    "emptyAllHint": "どの掲示板に書いた投稿もここに表示されます",
+    "emptyCategoryHint": "この掲示板に書いた投稿がここに表示されます",
+    "browseBoards": "掲示板を見る",
+    "edit": "編集",
+    "deleting": "削除しています…",
+    "delete": "削除"
+  },
+  "list": {
+    "redirectingToLogin": "ログイン画面に移動しています…",
+    "totalCount_other": "すべて {count}",
+    "count_other": "投稿{count}件",
+    "categoryHeading": "カテゴリー",
+    "all": "すべて",
+    "loading": "投稿を読み込み中…",
+    "thisCategory": "このカテゴリー",
+    "viewBoard": "{board}を見る",
+    "viewDetail": "詳細を見る"
+  },
+  "likes": {
+    "title": "いいねした投稿",
+    "description": "住まい、グルメ、OPT/ビザで保存した投稿をまとめて確認できます",
+    "categoryAria": "いいねした投稿のカテゴリー",
+    "emptyAll": "まだいいねした投稿がありません",
+    "emptyCategory": "{category}にいいねした投稿はありません",
+    "emptyAllHint": "気に入った投稿のハートをタップすると、ここに表示されます",
+    "emptyCategoryHint": "この掲示板の投稿のハートをタップすると、ここに表示されます",
+    "browseHousing": "住まいを見る",
+    "rent": "{amount}/月",
+    "rentWithNet": "{gross} / {net}/月"
+  }
+}

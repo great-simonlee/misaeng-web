@@ -1,4 +1,5 @@
 import type { CommunityPost } from '@/types/nyc'
+import type { Translate, TranslateParams } from '@lib/i18n/translate'
 import {
   DEFAULT_CITY_ID,
   isSharedCommunityBoard,
@@ -24,6 +25,42 @@ import {
   listMockCommunityComments,
 } from '@lib/constants/communityCommentsMock'
 import { listLocalCommunityComments } from '@lib/community/comments.local'
+
+/**
+ * 클라이언트에서 만든 에러 (서버 응답에 에러 문구가 없을 때).
+ * `key`는 community 네임스페이스 번역 키 — 화면에서 `localizeCommunityError(err, t)`로 바꿔 보여 준다.
+ */
+export class CommunityClientError extends Error {
+  readonly key: string
+  readonly params?: TranslateParams
+
+  constructor(key: string, params?: TranslateParams) {
+    super(key)
+    this.name = 'CommunityClientError'
+    this.key = key
+    this.params = params
+  }
+}
+
+/** 서버가 준 (이미 번역된) 에러 문구가 있으면 그대로, 없으면 클라이언트 키로 에러를 던진다. */
+export function throwCommunityRequestError(
+  serverError: string | null | undefined,
+  key: string,
+): never {
+  if (serverError) throw new Error(serverError)
+  throw new CommunityClientError(key)
+}
+
+/**
+ * CommunityClientError를 현재 언어 문구의 Error로 바꾼다 (그 밖의 에러는 그대로).
+ * `t`는 `useT('community')`. 토스트: `getErrorMessage(localizeCommunityError(err, t), t('errors.xxx'))`
+ */
+export function localizeCommunityError(err: unknown, t: Translate): unknown {
+  if (err instanceof CommunityClientError) {
+    return new Error(t(err.key, err.params))
+  }
+  return err
+}
 
 function withLocalCounts(post: CommunityPost): CommunityPost {
   const localBeenThere = listLocalBeenThere(post.id).length
@@ -171,7 +208,7 @@ export async function createCommunityPostRequest(input: {
     | { post?: CommunityPost; error?: string }
     | null
   if (!res.ok || !data?.post) {
-    throw new Error(data?.error || '등록에 실패했어요')
+    throwCommunityRequestError(data?.error, 'errors.createFailed')
   }
   return data.post
 }
@@ -215,7 +252,7 @@ export async function createGuestJobReviewRequest(input: {
     | { post?: CommunityPost; credit?: GuestJobReviewCreditInfo; error?: string }
     | null
   if (!res.ok || !data?.post) {
-    throw new Error(data?.error || '등록에 실패했어요')
+    throwCommunityRequestError(data?.error, 'errors.createFailed')
   }
   return {
     post: data.post,
@@ -238,7 +275,10 @@ export async function claimGuestPostsRequest(): Promise<{
     | { posts?: CommunityPost[]; creditAwarded?: number; error?: string }
     | null
   if (!res.ok) {
-    throw new Error(data?.error || '게스트 글 연결에 실패했어요')
+    throwCommunityRequestError(
+      data?.error,
+      'errors.claimGuestFailed'
+    )
   }
   return {
     posts: Array.isArray(data?.posts) ? data.posts : [],
@@ -252,7 +292,10 @@ export async function fetchMyCommunityPosts(): Promise<CommunityPost[]> {
     | { posts?: CommunityPost[]; error?: string }
     | null
   if (!res.ok) {
-    throw new Error(data?.error || '내 글을 불러오지 못했어요')
+    throwCommunityRequestError(
+      data?.error,
+      'errors.myPostsLoadFailed'
+    )
   }
   return (Array.isArray(data?.posts) ? data.posts : []).map(withLocalCounts)
 }
@@ -294,7 +337,9 @@ export async function updateCommunityPostRequest(
   },
 ): Promise<CommunityPost> {
   if (id.startsWith('mock-')) {
-    throw new Error('예시 글은 수정할 수 없어요')
+    throw new CommunityClientError(
+      'errors.mockEditBlocked',
+    )
   }
   const res = await fetch(`/api/community/${encodeURIComponent(id)}`, {
     method: 'PATCH',
@@ -305,14 +350,16 @@ export async function updateCommunityPostRequest(
     | { post?: CommunityPost; error?: string }
     | null
   if (!res.ok || !data?.post) {
-    throw new Error(data?.error || '수정에 실패했어요')
+    throwCommunityRequestError(data?.error, 'errors.updateFailed')
   }
   return data.post
 }
 
 export async function deleteCommunityPostRequest(id: string): Promise<void> {
   if (id.startsWith('mock-')) {
-    throw new Error('예시 글은 삭제할 수 없어요')
+    throw new CommunityClientError(
+      'errors.mockDeleteBlocked',
+    )
   }
   const res = await fetch(`/api/community/${encodeURIComponent(id)}`, {
     method: 'DELETE',
@@ -321,6 +368,6 @@ export async function deleteCommunityPostRequest(id: string): Promise<void> {
     | { ok?: boolean; error?: string }
     | null
   if (!res.ok || !data?.ok) {
-    throw new Error(data?.error || '삭제에 실패했어요')
+    throwCommunityRequestError(data?.error, 'errors.deleteFailed')
   }
 }

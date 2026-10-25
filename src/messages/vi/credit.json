@@ -1,0 +1,455 @@
+{
+  "meta": {
+    "description": "Cách hoạt động của credit cộng đồng {brand} NYC: cách kiếm, cách dùng, giới hạn và câu hỏi thường gặp. Tích credit qua review ăn uống, OPT, việc làm và bình luận, rồi dùng cho coffee chat, tư vấn luật sư, cố vấn nghề nghiệp và nhiều hơn nữa.",
+    "reviewsDescription": "Xét duyệt yêu cầu thêm credit cho các bài viết có kết quả cuối cùng."
+  },
+  "header": {
+    "eyebrow": "{brand} NYC",
+    "title": "Hướng dẫn credit cộng đồng",
+    "intro": "Dùng credit kiếm được khi giúp đỡ cộng đồng để yêu cầu các phần thưởng như coffee chat hay tư vấn với luật sư di trú. Credit không thể quy đổi thành tiền mặt và bạn cần xác minh là sinh viên hoặc người đi làm.",
+    "tagInteger": "Chỉ số nguyên",
+    "tagNoCash": "Không có giá trị tiền mặt",
+    "tagVerification": "Cần xác minh sinh viên hoặc người đi làm",
+    "policyVersion": "v{version}"
+  },
+  "toc": {
+    "aria": "Mục lục",
+    "redeem": "Phần thưởng",
+    "process": "Cách đăng ký",
+    "earn": "Cách kiếm",
+    "principles": "Nguyên tắc & quy trình",
+    "limits": "Giới hạn & thu hồi",
+    "faq": "Câu hỏi thường gặp"
+  },
+  "redeem": {
+    "title": "Phần thưởng bạn có thể nhận bằng credit",
+    "description": "Mỗi buổi kéo dài tối đa 30 phút. Số credit cần dùng được đặt cao hơn mức kiếm được để bù chi phí chuyên gia và kết nối.",
+    "comingSoon": "Sắp có",
+    "applySoon": "Sắp mở đăng ký",
+    "callout": "Phần thưởng sẽ được mở dần sau khi bạn kiểm tra số dư trong Trang của tôi. Bạn có thể yêu cầu coffee chat và tư vấn luật sư di trú, mỗi loại một lần mỗi tháng.",
+    "credits": "credit",
+    "includes": "Bao gồm",
+    "excludes": "Không bao gồm",
+    "monthlyCap_other": "{count} lần mỗi tháng",
+    "foodEquivalent_other": "≈ {count} review ăn uống"
+  },
+  "process": {
+    "title": "Cách đăng ký",
+    "description": "Bốn bước từ lúc gửi yêu cầu đến khi hoàn tất buổi gặp.",
+    "cancelNote": "Nếu bạn hủy trước khi được kết nối, chúng tôi sẽ hoàn lại toàn bộ credit. Hủy trong ngày hoặc vắng mặt sau khi đã lên lịch có thể không được hoàn lại."
+  },
+  "earn": {
+    "title": "Kiếm credit",
+    "description": "Sau khi xác minh email trường, bạn sẽ kiếm được credit từ các hoạt động dưới đây.",
+    "colActivity": "Hoạt động",
+    "colEarn": "Credit",
+    "colCoffeeChat": "Coffee chat",
+    "once": "Một lần",
+    "max": "Tối đa {amount}",
+    "maxParen": "(tối đa {amount})",
+    "unitWithMax": "{unit} · tối đa {amount}",
+    "detailsToggle": "Xem quy tắc và mức kiếm credit",
+    "perUnit": "+{amount}/{unit}"
+  },
+  "principlesSection": {
+    "title": "Nguyên tắc · Cách hoạt động",
+    "description": "Các nguyên tắc cốt lõi của chương trình và hành trình từ bài viết đầu tiên đến phần thưởng.",
+    "flowTitle": "Cách hoạt động"
+  },
+  "limits": {
+    "title": "Giới hạn · Thu hồi",
+    "description": "Các quy tắc giúp mọi thứ công bằng.",
+    "earnTitle": "Kiếm",
+    "spendTitle": "Dùng",
+    "commentCap": "Bình luận & trả lời: tối đa {amount} credit mỗi ngày",
+    "noSelfReply": "Trả lời trong bài viết hoặc bình luận của chính bạn: không có credit",
+    "revokeOnDelete": "Xóa bài viết hoặc bình luận sẽ thu hồi credit tương ứng",
+    "oncePerAccount": "Thưởng một lần: mỗi tài khoản một lần",
+    "optionCap": "{label}: {cap} mỗi tháng · {duration}",
+    "times_other": "{count} lần",
+    "recentActivity": "Bạn nên có ít nhất một hoạt động trong {days} ngày gần nhất trước khi đăng ký"
+  },
+  "faqSection": {
+    "title": "Câu hỏi thường gặp",
+    "glossaryTitle": "Thuật ngữ"
+  },
+  "footer": {
+    "disclaimer": "Tư vấn với luật sư di trú chỉ nhằm cung cấp thông tin và tách biệt với việc đại diện hồ sơ. Chúng tôi có thể thay đổi chính sách này với thông báo trước.",
+    "myPage": "Trang của tôi",
+    "writeFood": "Viết review ăn uống"
+  },
+  "principles": {
+    "reward": {
+      "title": "Thưởng cho sự đóng góp",
+      "body": "Bạn càng chia sẻ nhiều bài viết và bình luận hữu ích, như review ăn uống, visa và việc làm, thì càng kiếm được nhiều credit."
+    },
+    "notCash": {
+      "title": "Kết nối, không phải tiền mặt",
+      "body": "Credit không thể đổi thành tiền. Thay vào đó, bạn dùng credit để có cơ hội gặp những người đi làm giàu kinh nghiệm và chuyên gia."
+    },
+    "cost": {
+      "title": "Phản ánh chi phí thực tế",
+      "body": "Misaeng chi trả thời gian của chuyên gia và chi phí kết nối cho coffee chat và tư vấn luật sư di trú, nên số credit cần dùng sẽ nhiều hơn số credit kiếm được."
+    },
+    "quality": {
+      "title": "Chất lượng là trên hết",
+      "body": "Bài viết spam, trùng lặp hoặc sai sự thật chỉ để tích credit sẽ không được tính và có thể bị thu hồi."
+    }
+  },
+  "workflow": {
+    "verify": {
+      "title": "Xác minh trường",
+      "description": "Hoàn tất xác minh email trường trong Trang của tôi. Bạn chỉ có thể đăng bài, bình luận và kiếm credit sau khi xác minh."
+    },
+    "contribute": {
+      "title": "Đóng góp",
+      "description": "Viết review ăn uống, OPT hoặc việc làm, hay bình luận vào bài viết của người khác. Credit được cộng tự động khi bạn đáp ứng điều kiện."
+    },
+    "balance": {
+      "title": "Kiểm tra số dư",
+      "description": "Xem tổng credit và lịch sử trong Trang của tôi. Credit bị thu hồi do xóa bài hoặc bị xử phạt cũng hiển thị tại đó."
+    },
+    "redeem": {
+      "title": "Yêu cầu phần thưởng",
+      "description": "Khi đủ credit cho một phần thưởng, hãy gửi yêu cầu. Buổi gặp sẽ diễn ra sau khi kết nối và lên lịch."
+    }
+  },
+  "redeemProcess": {
+    "apply": {
+      "title": "Gửi yêu cầu",
+      "description": "Chọn chương trình trong Trang của tôi hoặc trang phần thưởng, và gửi một bản tóm tắt ngắn về mối quan tâm và câu hỏi của bạn."
+    },
+    "review": {
+      "title": "Xét duyệt & trừ credit",
+      "description": "Chúng tôi kiểm tra điều kiện, số dư và giới hạn hàng tháng của bạn, rồi trừ credit. Nếu cần lên lịch, chúng tôi sẽ gửi email cho bạn."
+    },
+    "match": {
+      "title": "Kết nối",
+      "description": "Misaeng kết nối bạn với người phù hợp từ mạng lưới đối tác, mentor và chuyên gia. Nếu không kết nối được, credit sẽ được hoàn lại."
+    },
+    "session": {
+      "title": "Buổi gặp",
+      "description": "Gặp online hoặc trực tiếp vào thời gian đã hẹn. Vắng mặt hoặc hủy trong ngày có thể không được hoàn lại theo chính sách của chúng tôi."
+    }
+  },
+  "earnRules": {
+    "food": {
+      "label": "Review ăn uống",
+      "description": "Nhận được khi bạn đăng review ăn uống có đầy đủ các thông tin bắt buộc như ảnh, vị trí, menu và giá.",
+      "conditions": {
+        "verified": "Đã xác minh email trường",
+        "requiredFields": "Điền đủ các mục bắt buộc: vị trí, tên, danh mục, menu, ảnh của nhà hàng",
+        "oncePerPost": "Chỉ cộng một lần khi đăng lần đầu (sửa cùng bài viết không được cộng thêm)"
+      },
+      "notEligible": {
+        "missingFields": "Thiếu mục bắt buộc hoặc nội dung chỉ để lấp chỗ",
+        "copied": "Sao chép bài viết của người khác hoặc đăng trùng lặp",
+        "repost": "Xóa rồi đăng lại cùng nội dung (lạm dụng)"
+      },
+      "tip": "Ảnh và thông tin cụ thể về món ăn hay thời gian chờ giúp ích cho các bạn sinh viên khác nhiều nhất."
+    },
+    "status": {
+      "label": "Review OPT, visa & thẻ xanh",
+      "unitLabel": "1 bước timeline",
+      "description": "{entry} credit cho mỗi bước timeline (tối đa {postMax} mỗi bài viết). Review có kết quả cuối cùng có thể nhận thêm tối đa {reviewBonus} sau khi đội ngũ Misaeng xét duyệt (tổng cộng tối đa {totalMax}).",
+      "conditions": {
+        "verified": "Đã xác minh email trường",
+        "type": "Chọn loại: CPT/OPT/STEM OPT/visa/thẻ xanh",
+        "perStep": "{entry} credit cho mỗi bước timeline",
+        "postMax": "Tối đa {postMax} credit tự động mỗi bài viết",
+        "editAdds": "Sửa bài viết để thêm bước timeline và kiếm thêm (đến mức tối đa)",
+        "reviewBonus": "Sau khi thêm kết quả cuối cùng, nhấn \"Yêu cầu thêm credit\" → +{reviewBonus} nếu đội ngũ duyệt"
+      },
+      "notEligible": {
+        "missingTimeline": "Chưa nhập timeline hoặc loại",
+        "copied": "Sao chép review của người khác",
+        "privacy": "Bài viết bị gỡ do để lộ quá nhiều thông tin cá nhân",
+        "capReached": "Bài viết đã đạt mức tối đa tự động (thêm bước không được cộng)",
+        "noFinalResult": "Yêu cầu thưởng xét duyệt khi chưa có kết quả cuối cùng"
+      },
+      "tip": "Thêm kết quả cuối cùng (được duyệt, đã nhận thẻ, v.v.) để yêu cầu thưởng xét duyệt từ đội ngũ."
+    },
+    "job-review": {
+      "label": "Phỏng vấn & việc làm",
+      "unitLabel": "1 bước timeline",
+      "description": "{entry} credit cho mỗi bước tuyển dụng (timeline), tối đa {postMax} mỗi bài viết. Thêm offer hoặc kết quả cuối cùng để nhận thêm tối đa {reviewBonus} sau khi đội ngũ Misaeng xét duyệt (tổng cộng tối đa {totalMax}).",
+      "conditions": {
+        "verified": "Đã xác minh email trường",
+        "type": "Chọn loại: thực tập/mới đi làm/có kinh nghiệm/hợp đồng",
+        "perStep": "{entry} credit cho mỗi bước timeline",
+        "postMax": "Tối đa {postMax} credit tự động mỗi bài viết",
+        "editAdds": "Sửa bài viết để thêm bước timeline và kiếm thêm (đến mức tối đa)",
+        "reviewBonus": "Sau khi thêm kết quả cuối cùng, nhấn \"Yêu cầu thêm credit\" → +{reviewBonus} nếu đội ngũ duyệt"
+      },
+      "notEligible": {
+        "missingFields": "Chưa nhập các bước bắt buộc hoặc loại",
+        "falseInfo": "Tên công ty giả hoặc thông tin phóng đại",
+        "anonymous": "Bài viết trên bảng tin ẩn danh (bảng tin này không được tính)",
+        "capReached": "Bài viết đã đạt mức tối đa tự động",
+        "noFinalResult": "Yêu cầu thưởng xét duyệt khi chưa có kết quả cuối cùng"
+      }
+    },
+    "comment": {
+      "label": "Bình luận & trả lời",
+      "description": "1 credit cho mỗi bình luận hoặc trả lời trong bài viết của người khác.",
+      "conditions": {
+        "verified": "Đã xác minh email trường",
+        "publicOthers": "Viết trong bài viết hoặc bình luận công khai của người khác",
+        "dailyCap": "Tối đa {commentCap} credit mỗi ngày"
+      },
+      "notEligible": {
+        "ownPost": "Trả lời trong bài viết hoặc bình luận của chính bạn",
+        "deleted": "Bình luận đã bị xóa",
+        "spam": "Spam, xúc phạm hoặc ký tự lặp vô nghĩa",
+        "copyPaste": "Dán đi dán lại cùng một câu"
+      },
+      "tip": "Bình luận trả lời câu hỏi hoặc chia sẻ trải nghiệm của bạn giúp ích cho cộng đồng nhiều nhất."
+    },
+    "referral": {
+      "label": "Mã giới thiệu được sử dụng",
+      "description": "Khi có người dùng mã giới thiệu của bạn, bạn nhận được {referral} credit. Tối đa {referralMax} người.",
+      "conditions": {
+        "joined": "Người đó đăng ký qua link giới thiệu của bạn hoặc liên kết mã của bạn trong Trang của tôi",
+        "perPerson": "{referral} credit mỗi người",
+        "maxPeople": "Tối đa {referralMax} người mỗi tài khoản",
+        "noSelf": "Bạn không thể tự giới thiệu bằng mã của chính mình"
+      },
+      "notEligible": {
+        "self": "Tự giới thiệu chính mình",
+        "maxReached": "Đã có {referralMax} người dùng mã của bạn",
+        "alreadyLinked": "Tài khoản đã liên kết với người giới thiệu khác"
+      },
+      "tip": "Sao chép link giới thiệu trong Trang của tôi và chia sẻ với bạn cùng lớp và bạn bè."
+    }
+  },
+  "bonusRules": {
+    "school-verify": {
+      "label": "Xác minh email trường",
+      "description": "Một lần, khi bạn xác minh email trường (.edu, v.v.) lần đầu trong Trang của tôi."
+    },
+    "first-post": {
+      "label": "Bài viết đầu tiên trong cộng đồng",
+      "description": "Một lần, cho bài viết đầu tiên của bạn trên bảng tin được tính credit, như review ăn uống, OPT hoặc việc làm (nếu đáp ứng điều kiện)."
+    }
+  },
+  "noEarn": {
+    "anonymous": "Bài viết và bình luận trên bảng tin ẩn danh (không có credit để giữ tính ẩn danh)",
+    "otherBoards": "Các bảng tin khác như bạn cùng phòng, sublet và mua bán (có thể được bổ sung sau)",
+    "editOnly": "Chỉnh sửa hoặc chỉ thay đổi metadata",
+    "reactions": "Chỉ tương tác như thích, đề xuất hoặc chia sẻ",
+    "adminPosts": "Bài viết của quản trị viên từ đội ngũ nhà ở hoặc tài khoản nhân viên"
+  },
+  "redeemOptions": {
+    "coffee-chat": {
+      "label": "Coffee chat trong lĩnh vực của bạn",
+      "duration": "Khoảng 30 phút",
+      "description": "Trò chuyện 1:1 với người đang làm việc hoặc học tập trong ngành hay vị trí bạn quan tâm. Bàn về sự nghiệp, văn hóa ngành, mẹo sống ở New York và nhiều hơn nữa.",
+      "includes": {
+        "meeting": "Gặp 1:1 online hoặc trực tiếp (Zoom hoặc tại NYC)",
+        "questions": "Chúng tôi xem trước 3–5 câu hỏi bạn gửi",
+        "scheduling": "Đội ngũ Misaeng lên lịch và kết nối"
+      },
+      "excludes": {
+        "jobGuarantee": "Đảm bảo được tuyển hoặc giới thiệu nội bộ",
+        "resumeWriting": "Viết hộ resume hoặc portfolio",
+        "lawyer": "Tư vấn luật sư di trú (chương trình riêng)"
+      },
+      "eligibility": {
+        "verified": "Đã xác minh email trường",
+        "minCredits": "Có tổng cộng ít nhất {cost} credit",
+        "recentActivity": "Có ít nhất một hoạt động cộng đồng trong 90 ngày gần nhất",
+        "noSanctions": "Tài khoản không bị xử phạt"
+      },
+      "note": "Mentor tham gia với tư cách tình nguyện viên hoặc đối tác, Misaeng chi trả chi phí kết nối và vận hành."
+    },
+    "lawyer-consult": {
+      "label": "Tư vấn luật sư di trú",
+      "duration": "Khoảng 30 phút",
+      "description": "Buổi hỏi đáp 30 phút với luật sư di trú về di trú và visa Mỹ, như F-1, OPT, H-1B và thẻ xanh.",
+      "includes": {
+        "qa": "Hỏi đáp 30 phút với luật sư di trú",
+        "procedures": "Hướng dẫn chung về thủ tục visa, tình trạng cư trú và thẻ xanh",
+        "followUp": "Hướng dẫn riêng nếu bạn cần đại diện thêm"
+      },
+      "excludes": {
+        "representation": "Đại diện hồ sơ hoặc xử lý kiện tụng",
+        "paperwork": "Chuẩn bị hoặc nộp giấy tờ thay bạn",
+        "outcome": "Đảm bảo kết quả (được duyệt, đổi tình trạng, v.v.)",
+        "otherLaw": "Tư vấn pháp lý ngoài di trú, hình sự hoặc dân sự"
+      },
+      "eligibility": {
+        "verified": "Đã xác minh email trường",
+        "minCredits": "Có tổng cộng ít nhất {cost} credit",
+        "summary": "Gửi tóm tắt câu hỏi và hoàn cảnh về di trú hoặc visa khi đăng ký",
+        "noSanctions": "Tài khoản không bị xử phạt"
+      },
+      "note": "Tư vấn di trú chỉ nhằm cung cấp thông tin. Quan hệ luật sư – khách hàng có thể cần thỏa thuận riêng."
+    },
+    "career-mentor": {
+      "label": "Cố vấn nghề nghiệp",
+      "duration": "Khoảng 30 phút",
+      "description": "Cố vấn nghề nghiệp về resume, phỏng vấn, chuyển ngành và nhiều hơn nữa. Chi phí phản ánh việc kết nối với mentor đang đi làm.",
+      "includes": {
+        "resume": "Góp ý resume và LinkedIn (nếu gửi trước)",
+        "interview": "Hỏi đáp về chiến lược phỏng vấn và networking",
+        "advice": "Lời khuyên thực tế theo từng ngành"
+      },
+      "excludes": {
+        "applyForYou": "Ứng tuyển thay bạn",
+        "jobGuarantee": "Đảm bảo có việc làm",
+        "lawyer": "Tư vấn luật sư di trú"
+      },
+      "eligibility": {
+        "verified": "Đã xác minh email trường",
+        "minCredits": "Có tổng cộng ít nhất {cost} credit"
+      }
+    }
+  },
+  "revocation": {
+    "deleted": "Nếu bạn xóa bài viết hoặc bình luận, credit tương ứng sẽ bị thu hồi",
+    "guidelines": "Nội dung bị ẩn hoặc gỡ do vi phạm nguyên tắc cộng đồng",
+    "falseInfo": "Nội dung được xác nhận là sai sự thật hoặc spam (credit đã nhận trước đó có thể bị thu hồi)",
+    "abuse": "Lạm dụng (nhiều tài khoản, gian lận) sẽ bị tạm khóa tài khoản và mất số dư"
+  },
+  "faq": {
+    "cash": {
+      "q": "Tôi có thể đổi credit thành tiền mặt không?",
+      "a": "Không. Credit cộng đồng không thể quy đổi thành tiền mặt, hoàn tiền, chuyển nhượng, bán hay chuyển sang tài khoản khác. Bạn chỉ có thể dùng cho các chương trình phần thưởng do {brand} NYC quy định."
+    },
+    "comments": {
+      "q": "Chỉ bình luận thôi có kiếm được nhiều credit không?",
+      "a": "Mỗi bình luận hoặc trả lời được 1 credit, nhưng tối đa {commentCap} credit mỗi ngày. Bình luận trong bài viết của chính bạn không được tính. Nếu chỉ bình luận, một buổi coffee chat (120) mất ít nhất 12 ngày và một buổi tư vấn luật sư di trú (400) mất 40 ngày (ở mức tối đa), nên viết review sẽ hiệu quả hơn."
+    },
+    "delete": {
+      "q": "Nếu xóa bài viết, tôi có mất credit không?",
+      "a": "Có. Credit từ nội dung bị xóa, bị báo cáo hoặc bị ẩn do xử phạt có thể bị thu hồi. Nếu cần thu hồi credit bạn đã dùng, số dư của bạn có thể bị âm."
+    },
+    "noVerify": {
+      "q": "Tôi có thể kiếm credit mà không xác minh trường không?",
+      "a": "Không. Bạn cần xác minh email trường để đăng bài, bình luận và kiếm credit. Bạn sẽ nhận thưởng một lần 5 credit khi xác minh."
+    },
+    "timeline": {
+      "q": "Review OPT và việc làm chỉ được tính một lần cho mỗi bài viết thôi sao?",
+      "a": "Không. Bạn tự động nhận {entry} credit cho mỗi bước timeline, tối đa {postMax} mỗi bài viết. Nếu bạn thêm kết quả cuối cùng và nhấn \"Yêu cầu thêm credit\", đội ngũ Misaeng sẽ xét duyệt và cộng {reviewBonus} nếu được duyệt, tổng cộng tối đa {totalMax}."
+    },
+    "sameRestaurant": {
+      "q": "Nếu tôi review cùng một nhà hàng hai lần, tôi có được tính hai lần không?",
+      "a": "Mỗi bài viết riêng biệt có thể được tính một lần, nhưng bài trùng lặp, sao chép hoặc spam sẽ không được tính và có thể bị thu hồi."
+    },
+    "schedule": {
+      "q": "Nếu không sắp xếp được lịch sau khi yêu cầu phần thưởng thì sao?",
+      "a": "Nếu bạn hủy trước khi được kết nối, chúng tôi sẽ hoàn lại toàn bộ credit. Hủy trong ngày hoặc vắng mặt sau khi đã xác nhận có thể không được hoàn lại."
+    },
+    "lawyerGuarantee": {
+      "q": "Tư vấn luật sư di trú có đảm bảo được duyệt visa hoặc đổi tình trạng không?",
+      "a": "Không. Buổi tư vấn chỉ cung cấp thông tin chung về di trú, visa và thủ tục, không đảm bảo bất kỳ kết quả nào. Việc đại diện hồ sơ cần thỏa thuận riêng. Không bao gồm tư vấn pháp lý ngoài di trú và tư vấn thuế."
+    },
+    "policyChange": {
+      "q": "Chính sách credit có thể thay đổi không?",
+      "a": "Có. Quy tắc kiếm và dùng credit cũng như số credit cần dùng có thể thay đổi tùy tình hình vận hành. Khi có thay đổi, chúng tôi sẽ cập nhật trang này và phiên bản chính sách. Credit bạn đã kiếm được thường vẫn được giữ nguyên."
+    },
+    "when": {
+      "q": "Khi nào tôi có thể bắt đầu dùng credit?",
+      "a": "Credit được cộng khi bạn tham gia cộng đồng. Yêu cầu coffee chat và tư vấn luật sư di trú sẽ được mở dần, và bạn có thể kiểm tra số dư trong Trang của tôi."
+    }
+  },
+  "glossary": {
+    "credit": {
+      "term": "Credit",
+      "definition": "Điểm số nguyên bạn kiếm được khi đóng góp cho cộng đồng. Credit không có giá trị tiền mặt và chỉ dùng để yêu cầu phần thưởng."
+    },
+    "earn": {
+      "term": "Kiếm credit",
+      "definition": "Nhận credit qua các hoạt động như đăng bài và bình luận. Nếu không đáp ứng điều kiện thì được 0."
+    },
+    "revoke": {
+      "term": "Thu hồi",
+      "definition": "Lấy lại credit bạn đã nhận, ví dụ sau khi xóa bài hoặc vi phạm."
+    },
+    "reward": {
+      "term": "Phần thưởng",
+      "definition": "Các chương trình phi tiền tệ do Misaeng cung cấp hoặc sắp xếp, như coffee chat và tư vấn luật sư di trú."
+    },
+    "dailyCap": {
+      "term": "Giới hạn mỗi ngày",
+      "definition": "Bình luận và trả lời được tối đa {commentCap} credit mỗi ngày."
+    },
+    "timeline": {
+      "term": "Timeline",
+      "definition": "Phần ghi lại từng bước trong review OPT, visa, thẻ xanh và việc làm. {entry} credit cho mỗi bước (tự động tối đa {postMax}). Sau khi có kết quả cuối cùng, có thể nhận thưởng xét duyệt tối đa {reviewBonus}."
+    }
+  },
+  "efficiency": {
+    "food": {
+      "activity": "Review ăn uống",
+      "unit": "bài viết",
+      "toCoffeeChat_other": "{count} bài viết",
+      "toLawyer_other": "{count} bài viết",
+      "note": "Cách kiếm dễ nhất"
+    },
+    "timeline": {
+      "activity": "Review OPT, visa & việc làm",
+      "unit": "bước timeline",
+      "toCoffeeChat_other": "{count} bài viết (đạt tối đa)",
+      "toLawyer_other": "{count} bài viết (đạt tối đa)",
+      "note": "+{entry} mỗi bước · tự động tối đa {postMax} · +{reviewBonus} khi được xét duyệt"
+    },
+    "comment": {
+      "activity": "Bình luận & trả lời",
+      "unit": "bình luận",
+      "toCoffeeChat_other": "{count} ngày (tối đa {commentCap}/ngày)",
+      "toLawyer_other": "{count} ngày (tối đa {commentCap}/ngày)",
+      "note": "Kiếm thêm · không tính bình luận trong bài viết của bạn"
+    }
+  },
+  "ledger": {
+    "reasons": {
+      "food": "Review ăn uống",
+      "status": "Review OPT, visa & thẻ xanh",
+      "job-review": "Phỏng vấn & việc làm",
+      "comment": "Bình luận & trả lời",
+      "school-verify": "Xác minh email trường",
+      "first-post": "Bài viết đầu tiên trong cộng đồng",
+      "review-bonus": "Thưởng xét duyệt kết quả cuối cùng",
+      "referral": "Mã giới thiệu được sử dụng"
+    },
+    "timeline": "{label} (timeline)",
+    "revoke": "Thu hồi {label}"
+  },
+  "referral": {
+    "bindFailed": "Không thể liên kết mã giới thiệu"
+  },
+  "reviewCard": {
+    "title": "Thưởng xét duyệt kết quả cuối cùng",
+    "description": "Nếu review của bạn có kết quả cuối cùng, đội ngũ Misaeng có thể kiểm tra và tặng thêm {bonus} credit. (Tối đa {totalMax} mỗi bài viết, bao gồm credit tự động)",
+    "bonusAmount": "+{amount}",
+    "notEligible": "Thêm kết quả cuối cùng vào timeline (được duyệt, đã nhận thẻ, nhận offer, bị từ chối, v.v.) để gửi yêu cầu.",
+    "pending": "Đang chờ xét duyệt · Chúng tôi sẽ cộng credit sau khi đội ngũ Misaeng kiểm tra bài viết của bạn.",
+    "approved": "Đã duyệt · Đã cộng thêm +{amount} credit.",
+    "rejected": "Chưa được duyệt. Bạn có thể cập nhật bài viết và yêu cầu lại.",
+    "rejectedWithReason": "Chưa được duyệt · {reason}. Bạn có thể cập nhật bài viết và yêu cầu lại.",
+    "requesting": "Đang gửi…",
+    "requestButton": "Yêu cầu thêm credit",
+    "editTimeline": "Sửa timeline",
+    "loadFailed": "Không thể tải trạng thái",
+    "requestFailed": "Không thể gửi yêu cầu"
+  },
+  "reviews": {
+    "title": "Xét duyệt credit",
+    "description": "Xét duyệt các bài viết OPT và việc làm có kết quả cuối cùng, rồi tặng thêm +{amount} credit.",
+    "filterPending": "Đang chờ",
+    "filterAll": "Tất cả",
+    "emptyPending": "Không có yêu cầu nào đang chờ.",
+    "emptyAll": "Chưa có yêu cầu nào.",
+    "rejectReasonLabel": "Bị từ chối: {reason}",
+    "approveButton": "Duyệt +{amount}",
+    "rejectButton": "Từ chối",
+    "rejectPrompt": "Lý do từ chối (không bắt buộc)",
+    "approveConfirm": "Duyệt bài viết này và tặng +{amount} credit?",
+    "approved": "Đã duyệt · đã cộng credit",
+    "rejected": "Đã từ chối yêu cầu",
+    "loadFailed": "Không thể tải danh sách",
+    "actionFailed": "Không thể hoàn tất thao tác",
+    "untitled": "Chưa có tiêu đề"
+  }
+}

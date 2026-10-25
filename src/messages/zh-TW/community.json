@@ -1,0 +1,485 @@
+{
+  "categories": {
+    "housing": {
+      "title": "租屋",
+      "description": "Misaeng 團隊刊登的 {city} 房源"
+    },
+    "events": {
+      "title": "活動",
+      "description": "聚會、表演與各種活動"
+    },
+    "food": {
+      "title": "美食",
+      "description": "餐廳與咖啡廳推薦"
+    },
+    "marketplace": {
+      "title": "二手市集",
+      "description": "買賣生活用品"
+    },
+    "status": {
+      "title": "OPT · 簽證 · 綠卡",
+      "description": "簽證、CPT/OPT 與綠卡經驗分享"
+    },
+    "job-review": {
+      "title": "面試 · 求職",
+      "description": "面試、求職與職場經驗分享"
+    },
+    "roommate": {
+      "title": "室友 · 轉租",
+      "description": "找室友、找房間與轉租"
+    },
+    "anonymous": {
+      "title": "匿名看板",
+      "description": "不具名，暢所欲言"
+    },
+    "comingSoon": "即將推出"
+  },
+  "boards": {
+    "events": {
+      "writeLabel": "刊登活動",
+      "listIntro": "分享在 {city} 舉辦的聚會、表演與活動。",
+      "locationLabel": "地點",
+      "locationPlaceholder": "Manhattan / 線上",
+      "detailLabel": "日期與時間",
+      "titlePlaceholder": "韓國人交流之夜",
+      "descriptionPlaceholder": "時間、參加方式、一句話介紹"
+    },
+    "food": {
+      "writeLabel": "推薦店家",
+      "listIntro": "分享你去過的餐廳和咖啡廳，照片和評價都可以自由附上。",
+      "locationLabel": "區域",
+      "locationPlaceholder": "Flushing / Koreatown",
+      "detailLabel": "料理類型",
+      "titlePlaceholder": "餐廳名稱",
+      "descriptionPlaceholder": "菜單、價位、等候時間、喜歡的地方…"
+    },
+    "marketplace": {
+      "writeLabel": "刊登物品",
+      "listIntro": "用不到的、需要的，都可以和鄰居交換。",
+      "locationLabel": "地區",
+      "locationPlaceholder": "Brooklyn / 可面交",
+      "detailLabel": "售價（$）",
+      "detailPlaceholder": "0",
+      "titlePlaceholder": "IKEA 書櫃，免費送或出售",
+      "descriptionPlaceholder": "請說明物品狀況、取貨方式和交易方式。"
+    },
+    "status": {
+      "writeLabel": "分享你的經驗",
+      "listIntro": "分享你在每個日期準備和遞交了什麼、怎麼拿到結果，以及接下來的計畫。",
+      "locationLabel": "學校／公司／機構（選填）",
+      "locationPlaceholder": "例：韓商 IT 與軟體公司",
+      "detailLabel": "類型",
+      "titlePlaceholder": "我在金融公司的 OPT 時間軸",
+      "descriptionPlaceholder": "分享需要注意的地方，讓下一個人不要犯同樣的錯。"
+    },
+    "cpt-opt": {
+      "writeLabel": "分享你的經驗",
+      "listIntro": "分享你在每個日期準備和遞交了什麼、怎麼拿到結果，以及接下來的計畫。",
+      "locationLabel": "學校／公司／機構（選填）",
+      "locationPlaceholder": "例：韓商 IT 與軟體公司",
+      "detailLabel": "類型",
+      "titlePlaceholder": "我在金融公司的 OPT 時間軸",
+      "descriptionPlaceholder": "分享需要注意的地方，讓下一個人不要犯同樣的錯。"
+    },
+    "visa": {
+      "writeLabel": "分享你的經驗",
+      "listIntro": "分享你的簽證準備與面談經驗。",
+      "locationLabel": "地點（選填）",
+      "locationPlaceholder": "NY / 大使館等",
+      "detailLabel": "簽證類型",
+      "detailPlaceholder": "F-1 / H-1B / O-1",
+      "titlePlaceholder": "我的 H-1B 申請經驗",
+      "descriptionPlaceholder": "時間軸、文件、小技巧"
+    },
+    "job-review": {
+      "writeLabel": "分享你的經驗",
+      "listIntro": "依日期記錄你的申請、面試與結果。發文後也可以繼續新增。",
+      "locationLabel": "公司（選填）",
+      "locationPlaceholder": "請輸入公司名稱",
+      "detailLabel": "類型",
+      "titlePlaceholder": "我在金融公司的實習申請經驗",
+      "descriptionPlaceholder": "分享需要注意的地方，讓下一個人不要犯同樣的錯。"
+    },
+    "roommate": {
+      "writeLabel": "發文",
+      "listIntro": "刊登房間（徵室友或轉租）或尋找室友。每個帳號限發一篇。",
+      "locationLabel": "區域／位置",
+      "locationPlaceholder": "Flushing / Brooklyn / Manhattan",
+      "detailLabel": "每月預算／房租（$）",
+      "detailPlaceholder": "1500",
+      "titlePlaceholder": "Brooklyn 徵室友",
+      "descriptionPlaceholder": "說說你的生活習慣、預算和入住日期。請留下 KakaoTalk 一對一開放聊天室連結，方便大家聯絡你。"
+    },
+    "green-card": {
+      "writeLabel": "分享你的經驗",
+      "listIntro": "和社群分享你的綠卡申請歷程。",
+      "locationLabel": "類別（選填）",
+      "locationPlaceholder": "EB-2 / 婚姻等",
+      "detailLabel": "階段",
+      "detailPlaceholder": "I-140 / 面談等",
+      "titlePlaceholder": "我的 EB-2 NIW 核准經驗",
+      "descriptionPlaceholder": "時間軸、律師、小技巧"
+    },
+    "anonymous": {
+      "writeLabel": "匿名發文",
+      "listIntro": "{city} 匿名看板，不具名也能暢所欲言。",
+      "locationLabel": "主題（選填）",
+      "locationPlaceholder": "選擇主題",
+      "titlePlaceholder": "用一句話聊聊你的一天",
+      "descriptionPlaceholder": "想說什麼就寫吧，你會以匿名顯示。"
+    }
+  },
+  "errors": {
+    "createFailed": "發文失敗，請再試一次。",
+    "claimGuestFailed": "無法連結你的訪客貼文。",
+    "myPostsLoadFailed": "無法載入你的貼文。",
+    "mockEditBlocked": "範例貼文無法編輯。",
+    "mockDeleteBlocked": "範例貼文無法刪除。",
+    "updateFailed": "無法儲存變更。",
+    "deleteFailed": "貼文刪除失敗。",
+    "uploadFailed": "圖片上傳失敗。",
+    "commentRequired": "請輸入留言。",
+    "loginRequired": "請先登入。",
+    "commentVerifyRequired": "需要完成學校信箱認證才能發文和留言。",
+    "commentCreateFailed": "留言發布失敗。",
+    "replyParentNotFound": "找不到你要回覆的留言。",
+    "commentEditTargetMissing": "請選擇要編輯的留言。",
+    "commentEditForbidden": "只能編輯自己的留言。",
+    "commentNotFound": "找不到這則留言。",
+    "commentUpdateFailed": "留言更新失敗。",
+    "commentDeleteTargetMissing": "請選擇要刪除的留言。",
+    "commentDeleteForbidden": "只能刪除自己的留言。",
+    "commentDeleteFailed": "留言刪除失敗。",
+    "recommendFailed": "按讚儲存失敗。",
+    "reportReasonRequired": "請選擇原因。",
+    "alreadyReported": "你已經檢舉過了。",
+    "reportFailed": "檢舉送出失敗。",
+    "beenThereFoodOnly": "只有美食貼文可以標記「去過」。",
+    "beenThereFailed": "「去過」儲存失敗。"
+  },
+  "author": {
+    "member": "會員",
+    "anonymous": "匿名"
+  },
+  "verify": {
+    "required": "需要完成學生或上班族認證才能發文和留言。",
+    "cta": "前往認證",
+    "linkLabel": "學生或上班族認證",
+    "suspended": "此帳號已被停權。"
+  },
+  "guidelines": {
+    "common": {
+      "noPersonalInfo": "請勿張貼真實姓名、聯絡方式或任何可識別個人身分的資訊。",
+      "noAbuse": "禁止辱罵、仇恨、歧視、威脅或散布不實資訊。",
+      "noPrivacyViolation": "請避免私人糾紛、侵犯隱私，或分享未經同意拍攝的照片。",
+      "violationPenalty": "違反規範的貼文可能會被移除，帳號也可能受到限制。"
+    },
+    "anonymous": {
+      "noTargeting": "即使匿名，也不得點名或暗示特定人物，或在背後議論他人。",
+      "stillResponsible": "其他人看不到你的名字、學校或照片，但你仍須對發布的內容負法律責任。",
+      "loginRequired": "需要登入才能編輯或刪除你的貼文。處理檢舉時，我們的團隊可以確認發文者。"
+    },
+    "commonTitle": "社群規範",
+    "anonymousTitle": "匿名看板規範"
+  },
+  "anonymousTopics": {
+    "opt": "OPT·CPT·STEM OPT",
+    "visa": "簽證與身分",
+    "jobs": "求職與實習",
+    "housing": "租屋與室友",
+    "campusLife": "校園生活",
+    "classes": "課業與學習",
+    "finance": "金錢、稅務與保險",
+    "relationships": "感情",
+    "mentalHealth": "心理健康與煩惱",
+    "transportation": "開車與交通",
+    "lifeTips": "生活小撇步",
+    "secondhand": "二手與贈送",
+    "daily": "日常",
+    "other": "其他"
+  },
+  "report": {
+    "reasons": {
+      "spam": {
+        "label": "垃圾訊息 · 廣告",
+        "description": "宣傳、洗版、無關連結"
+      },
+      "abuse": {
+        "label": "謾罵 · 騷擾",
+        "description": "辱罵、仇恨或威脅"
+      },
+      "inappropriate": {
+        "label": "不當內容",
+        "description": "色情或暴力內容，或違反社群規範"
+      },
+      "misinformation": {
+        "label": "不實資訊 · 疑似詐騙",
+        "description": "不實資訊、疑似詐騙或釣魚"
+      },
+      "privacy": {
+        "label": "個人資訊外洩",
+        "description": "未經同意分享聯絡方式、照片或個人資料"
+      },
+      "other": {
+        "label": "其他",
+        "description": "以上未列出的情況"
+      }
+    },
+    "action": "檢舉",
+    "title": "檢舉",
+    "cancel": "取消",
+    "submitting": "傳送中…",
+    "submit": "送出檢舉",
+    "intro": {
+      "post": "你正在檢舉這篇貼文，管理員會審核並處理。",
+      "comment": "你正在檢舉這則留言，管理員會審核並處理。",
+      "generic": "你正在檢舉這則內容，管理員會審核並處理。"
+    },
+    "detailLabelRequired": "詳細說明（必填）",
+    "detailLabelOptional": "詳細說明（選填）",
+    "detailPlaceholder": "請多告訴我們一些檢舉的原因",
+    "submitted": "謝謝，我們已收到你的檢舉，管理員會進行審核。"
+  },
+  "anonymousNotice": {
+    "close": "關閉",
+    "eyebrow": "開始之前",
+    "board": "匿名看板",
+    "title": "一起守護的匿名空間",
+    "body": "為了讓 {brand} 成為健康又有幫助的社群，即使在匿名看板也請遵守規範、互相尊重！",
+    "confirm": "我知道了",
+    "snooze24h": "24 小時內不再顯示"
+  },
+  "detail": {
+    "edit": "編輯",
+    "delete": "刪除",
+    "companyPageFallback": "公司頁面",
+    "loadFailed": "無法載入這篇貼文。",
+    "deleteConfirm": "要刪除「{title}」嗎？\n刪除後無法復原。",
+    "deleted": "貼文已刪除",
+    "loading": "載入中…",
+    "notFoundTitle": "找不到貼文",
+    "notFoundDescription": "可能已經被刪除了。",
+    "backToListAction": "返回{board}",
+    "backToList": "{board}",
+    "roommateType": "類型",
+    "roommateBudget": "每月預算／房租",
+    "perMonthValue": "{value}/月",
+    "roommateMoveIn": "入住／搬出",
+    "views": "{n} 次瀏覽"
+  },
+  "like": {
+    "like": "按讚",
+    "unlike": "收回讚"
+  },
+  "engagement": {
+    "recommend": "推薦",
+    "recommended": "已推薦",
+    "recommendCancelled": "已取消推薦",
+    "beenThere": "我去過",
+    "beenThereAdded": "已標記為去過",
+    "beenThereCancelled": "已取消「去過」"
+  },
+  "card": {
+    "noPhoto": "沒有照片",
+    "beenThereCount_other": "{n} 人去過",
+    "timelineSteps_other": "{count} 步驟時間軸",
+    "hiringSteps_other": "{count} 個招募步驟",
+    "hiringStepsWithMore_other": "{count} 個招募步驟 · 還有 {hidden} 個",
+    "period": "期間 {period}",
+    "perMonth": "/月",
+    "stepNumber": "步驟 {n}",
+    "noStepInfo": "沒有步驟資訊",
+    "views": "瀏覽"
+  },
+  "anonymous": {
+    "topicPlaceholder": "選擇主題",
+    "topicAria": "主題"
+  },
+  "toolbar": {
+    "filter": "篩選",
+    "filterApplied_other": "已套用 {count} 個篩選"
+  },
+  "comments": {
+    "title": "留言",
+    "loadFailed": "無法載入留言。",
+    "bodyRequired": "請輸入留言。",
+    "posted": "留言已發布",
+    "replyPosted": "回覆已發布",
+    "deleteConfirm": "要刪除這則留言嗎？\n底下的回覆也會一併刪除。",
+    "deleted": "留言已刪除",
+    "updated": "留言已更新",
+    "loginPrompt": "請{link}後留言。",
+    "loginLink": "登入",
+    "verifyPrompt": "要留言，請先完成{link}。",
+    "checkingLogin": "正在確認登入狀態…",
+    "placeholder": "留個言吧",
+    "submitting": "發布中…",
+    "submit": "發布留言",
+    "loading": "正在載入留言…",
+    "empty": "還沒有留言，成為第一個留言的人吧。",
+    "replyPlaceholder": "寫下回覆",
+    "cancel": "取消",
+    "replySubmit": "發布回覆",
+    "deleting": "刪除中…",
+    "saving": "儲存中…",
+    "saveEdit": "儲存",
+    "reply": "回覆"
+  },
+  "share": {
+    "metaDescription": "不需註冊。一步步分享你的申請、面試與結果。每篇評價都能賺積分，可用來和業界人士 coffee chat。"
+  },
+  "wip": {
+    "title": "即將推出",
+    "description": "我們正在打造{board}看板，請再稍等一下！",
+    "homeAction": "返回社群首頁",
+    "otherBoards": "對其他看板有興趣嗎？先看看{link}吧。"
+  },
+  "list": {
+    "mapLoading": "正在載入地圖…",
+    "foodVibeAria": "氣氛",
+    "all": "全部",
+    "cuisineAria": "料理類型",
+    "allCuisines": "所有料理",
+    "loadFailed": "無法載入貼文。",
+    "login": "登入",
+    "suspended": "已停權",
+    "retry": "再試一次",
+    "emptyTitle": "{board}還沒有貼文",
+    "noMatchTitle": "沒有符合篩選條件的貼文",
+    "emptyCanWrite": "成為第一個發文的人，開啟話題吧。",
+    "emptyNeedsVerify": "完成學生或上班族認證後即可發文。",
+    "emptyNeedsLogin": "登入後即可發文。",
+    "noMatchFood": "試試其他氣氛或料理類型。",
+    "noMatchCptOpt": "試試其他類型（CPT/OPT/STEM OPT）。",
+    "noMatchJobReview": "試試其他類型或公司。",
+    "noMatchDefault": "試著調整篩選條件。",
+    "showMap": "顯示地圖",
+    "showList": "顯示列表",
+    "map": "地圖",
+    "list": "列表",
+    "clearAll": "全部清除",
+    "apply": "套用",
+    "filterType": "類型",
+    "cptOptTypeAria": "CPT/OPT 類型",
+    "filterCity": "城市",
+    "filterSchool": "學校",
+    "jobReviewTypeAria": "面試與求職類型",
+    "search": "搜尋",
+    "searchPlaceholder": "搜尋標題、內容或地點",
+    "sort": "排序",
+    "sortRecentlyUpdated": "最近更新",
+    "sortLeastRecentlyUpdated": "最久未更新",
+    "sortNewest": "最新",
+    "sortOldest": "最舊",
+    "company": "公司",
+    "companyFilterAria": "公司篩選",
+    "companyName": "公司名稱",
+    "companyCategory": "公司類別",
+    "companyNamePlaceholder": "以公司名稱搜尋",
+    "companyCategoryPlaceholder": "請選擇類別",
+    "none": "不選"
+  },
+  "write": {
+    "errors": {
+      "postNotFound": "找不到這篇貼文。",
+      "noEditPermission": "你沒有編輯這篇貼文的權限。",
+      "titleRequired": "請輸入標題。",
+      "titleTooLong": "標題最多 {max} 個字元。",
+      "bodyRequired": "請輸入內文。",
+      "bodyTooLong": "內文最多 {max} 個字元。",
+      "titleAndBodyRequired": "請輸入標題和內文。"
+    },
+    "updated": "貼文已更新",
+    "created": "貼文已發布",
+    "draftSaved": "草稿已儲存",
+    "draftSaveFailed": "草稿儲存失敗。",
+    "redirectingToLogin": "正在前往登入頁面…",
+    "backToPost": "返回貼文",
+    "backToList": "返回列表",
+    "titleLabel": "標題",
+    "bodyLabel": "內文",
+    "submit": "發布貼文",
+    "publish": "發布",
+    "editEyebrow": "編輯貼文",
+    "untitled": "無標題",
+    "food": {
+      "menuMaxReached": "最多可新增 {max} 個菜色。",
+      "imagesOnly": "只能選擇圖片檔。",
+      "menuMaxPartial_other": "最多可新增 {max} 個菜色，只會加入 {count} 張照片。",
+      "uploadPartial": "已新增 {success} 張，{failed} 張失敗。",
+      "menuUploadFailed": "菜色照片上傳失敗。",
+      "galleryMaxReached": "最多可新增 {max} 張氣氛照片。",
+      "galleryMaxPartial_other": "最多可新增 {max} 張氣氛照片，只會加入 {count} 張。",
+      "galleryUploadFailed": "氣氛照片上傳失敗。",
+      "errors": {
+        "addressRequired": "請在地圖上搜尋並選擇地址。",
+        "coordinatesMissing": "找不到這個地址的位置。",
+        "categoryRequired": "請選擇分類。",
+        "cuisineRequired": "請選擇料理類型。",
+        "nameRequired": "請輸入餐廳名稱。",
+        "partySizeRange": "請輸入 {min} 到 {max} 之間的人數。",
+        "spendRange": "請輸入 $0 到 {max} 之間的整數總金額。",
+        "tipRequired": "請選擇含小費或不含小費。",
+        "waitRange": "請輸入 0 到 {max} 分鐘之間的等候時間。",
+        "menuIncomplete": "每個菜色都需要照片、名稱和一句話評價。"
+      },
+      "whereTitle": "你在哪裡吃的？",
+      "whereDescription": "請選擇正確地址，以便儲存位置。",
+      "nameLabel": "餐廳名稱",
+      "categoryTitle": "分類",
+      "cuisineTitle": "吃了什麼料理？",
+      "visitTitle": "用餐資訊",
+      "partySize": "人數",
+      "partySizeHint": "最多 {max} 人",
+      "partySizeUnit": "人",
+      "totalSpend": "總消費",
+      "totalSpendHint": "$0 ~ {max} · 整數",
+      "tipAria": "含小費",
+      "tipIncluded": "含小費",
+      "tipExcluded": "不含小費",
+      "wait": "等候",
+      "waitHint": "沒有請填 0 · 最多 {max} 分鐘",
+      "waitUnit": "分鐘",
+      "galleryTitle": "店內 · 氣氛",
+      "galleryDescription": "店內、座位與氣氛照片 · 最多 {max} 張",
+      "galleryPick": "選擇氣氛照片",
+      "galleryPickHint": "可一次從相簿選擇最多 {max} 張照片。",
+      "galleryAddMoreAria_other": "再新增 {count} 張氣氛照片",
+      "galleryAddMore_other": "還可新增 {count} 張",
+      "uploading": "上傳中…",
+      "menuTitle": "菜色照片",
+      "menuDescription": "為每張照片加上菜名和一句話評價。",
+      "coverNoticeTitle": "第一張菜色照片會成為封面照片",
+      "coverNoticeBody": "會大大顯示在列表卡片和貼文最上方。",
+      "menuPick": "選擇菜色照片",
+      "menuPickHint": "最多 {max} 張 · 第一張為封面 · 菜名與評價必填",
+      "menuNumber": "菜色 {n}",
+      "coverPhoto": "封面照片",
+      "photo": "照片",
+      "cover": "封面",
+      "menuNamePlaceholder": "菜名（必填）",
+      "menuNameAria": "菜色 {n} 名稱",
+      "menuCaptionPlaceholder": "一句話評價（必填）",
+      "menuCaptionAria": "菜色 {n} 一句話評價",
+      "missingNameAndCaption": "請輸入菜名和一句話評價。",
+      "missingName": "請輸入菜名。",
+      "missingCaption": "請輸入一句話評價。",
+      "menuAddMore_other": "再新增 {count} 張菜色照片",
+      "bodyDescription": "分享你喜歡的地方、怎麼去，以及任何小技巧。",
+      "selectAddress": "請選擇地址",
+      "checkingCoordinates": "正在確認地址位置…",
+      "selectCuisine": "請選擇料理類型",
+      "submit": "發布"
+    }
+  },
+  "anonymousWrite": {
+    "topicTitle": "想聊什麼？",
+    "topicDescription": "可以跳過。",
+    "topicAria": "匿名看板主題",
+    "titleDescription": "寫一個讓人一眼就懂的簡短標題。",
+    "bodyDescription": "想說什麼就寫吧，你會以匿名顯示。",
+    "createTitle": "在匿名看板發文",
+    "createDescription": "你的名字、學校和照片都會隱藏，放心分享吧。",
+    "editTitle": "編輯匿名貼文"
+  }
+}

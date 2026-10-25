@@ -1,0 +1,54 @@
+{
+  "brandCity": "{brand} {city}",
+  "links": {
+    "housing": "Hunian",
+    "food": "Kuliner",
+    "marketplace": "Jual Beli",
+    "status": "CPT·OPT·Visa·Green Card",
+    "jobReview": "Interview·Kerja",
+    "roommate": "Roommate·Sublet",
+    "anonymous": "Anonim"
+  },
+  "account": {
+    "me": "Halaman saya",
+    "myPosts": "Postingan saya",
+    "myLikes": "Postingan yang saya suka",
+    "creditReviews": "Peninjauan kredit"
+  },
+  "accountMenu": "Menu akun",
+  "openAccountMenu": "Buka menu akun",
+  "closeAccountMenu": "Tutup menu akun",
+  "openMenu": "Buka menu",
+  "closeMenu": "Tutup menu",
+  "menuAria": "Menu {city}",
+  "mobileMenuAria": "Menu seluler {city}",
+  "homeAria": "Beranda komunitas {city}",
+  "communityHome": "Beranda komunitas",
+  "login": "Masuk",
+  "selectCity": "Pilih kota",
+  "currentCity": "Saat ini",
+  "profileAlt": "Profil {name}",
+  "profileAltFallback": "Profil",
+  "footer": {
+    "tagline": "Komunitas {city} untuk pelajar dan profesional internasional",
+    "groups": {
+      "community": "Komunitas",
+      "company": "Perusahaan",
+      "support": "Bantuan"
+    },
+    "links": {
+      "housing": "Hunian",
+      "credit": "Kredit",
+      "partners": "Partner",
+      "companySite": "Situs perusahaan",
+      "about": "Tentang kami",
+      "service": "Layanan",
+      "careers": "Karier",
+      "contact": "Hubungi kami",
+      "me": "Halaman saya",
+      "terms": "Ketentuan Penggunaan",
+      "privacy": "Kebijakan Privasi",
+      "ads": "Iklan & kemitraan"
+    }
+  }
+}

@@ -4,12 +4,15 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from 'react'
 
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
+import type { Translate } from '@lib/i18n/translate'
 
 export type ToastVariant = 'success' | 'error' | 'info'
 
@@ -30,8 +33,19 @@ const ToastContext = createContext<ToastContextValue | null>(null)
 
 const AUTO_DISMISS_MS = 3200
 
+/**
+ * getErrorMessage를 t 없이 부르는 화면용: ToastProvider가 현재 언어의 common 번역기를 등록해 둔다.
+ * (ToastProvider는 LocaleProvider 안에 있다)
+ */
+let activeCommonT: Translate | null = null
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ToastItem[]>([])
+  const commonT = useT('common')
+
+  useEffect(() => {
+    activeCommonT = commonT
+  }, [commonT])
 
   const dismiss = useCallback((id: string) => {
     setItems((prev) => prev.filter((t) => t.id !== id))
@@ -83,6 +97,7 @@ function ToastCard({
   item: ToastItem
   onDismiss: () => void
 }) {
+  const t = useT('common')
   return (
     <div
       role={item.variant === 'error' ? 'alert' : 'status'}
@@ -115,7 +130,7 @@ function ToastCard({
         type='button'
         onClick={onDismiss}
         className='inline-flex size-6 shrink-0 items-center justify-center text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
-        aria-label='닫기'
+        aria-label={t('actions.close')}
       >
         <svg className='size-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
           <path
@@ -138,29 +153,40 @@ export function useToast() {
   return ctx
 }
 
-/** Firebase / 일반 Error를 사용자용 한국어 메시지로 변환 */
-export function getErrorMessage(err: unknown, fallback: string): string {
+/** Firebase 에러 코드 → common.ui.authErrors.<key> */
+const AUTH_ERROR_KEYS: Record<string, string> = {
+  'auth/popup-closed-by-user': 'loginCancelled',
+  'auth/cancelled-popup-request': 'loginCancelled',
+  'auth/popup-blocked': 'popupBlocked',
+  'auth/invalid-email': 'invalidEmail',
+  'auth/user-disabled': 'userDisabled',
+  'auth/user-not-found': 'userNotFound',
+  'auth/wrong-password': 'wrongPassword',
+  'auth/invalid-credential': 'invalidCredential',
+  'auth/email-already-in-use': 'emailAlreadyInUse',
+  'auth/weak-password': 'weakPassword',
+  'auth/too-many-requests': 'tooManyRequests',
+  'auth/network-request-failed': 'networkRequestFailed',
+}
+
+/**
+ * Firebase / 일반 Error를 사용자용 메시지로 변환.
+ * t는 `useT('common')` 번역기. 생략하면 ToastProvider가 등록한 현재 언어 번역기를 쓴다.
+ */
+export function getErrorMessage(
+  err: unknown,
+  fallback: string,
+  t?: Translate,
+): string {
   const raw = err instanceof Error ? err.message : String(err ?? '')
   const codeMatch = raw.match(/\(([^)]+)\)/)
   const code = codeMatch?.[1] ?? ''
+  const translate = t ?? activeCommonT
 
-  const map: Record<string, string> = {
-    'auth/popup-closed-by-user': '로그인을 취소했어요',
-    'auth/cancelled-popup-request': '로그인을 취소했어요',
-    'auth/popup-blocked': '팝업이 차단되었어요. 브라우저 설정을 확인해 주세요',
-    'auth/invalid-email': '이메일 형식이 올바르지 않아요',
-    'auth/user-disabled': '비활성화된 계정이에요',
-    'auth/user-not-found': '등록되지 않은 계정이에요',
-    'auth/wrong-password': '비밀번호가 올바르지 않아요',
-    'auth/invalid-credential': '이메일 또는 비밀번호를 확인해 주세요',
-    'auth/email-already-in-use': '이미 가입된 이메일이에요',
-    'auth/weak-password': '비밀번호는 6자 이상으로 설정해 주세요',
-    'auth/too-many-requests': '시도가 너무 많아요. 잠시 후 다시 시도해 주세요',
-    'auth/network-request-failed': '네트워크 연결을 확인해 주세요',
-  }
-
-  if (code && map[code]) return map[code]
-  if (raw.includes('popup-closed-by-user')) return map['auth/popup-closed-by-user']
+  const authKey =
+    (code && AUTH_ERROR_KEYS[code]) ||
+    (raw.includes('popup-closed-by-user') ? 'loginCancelled' : '')
+  if (authKey && translate) return translate(`ui.authErrors.${authKey}`)
   if (raw.trim()) {
     const cleaned = raw
       .replace(/^Firebase:\s*/i, '')

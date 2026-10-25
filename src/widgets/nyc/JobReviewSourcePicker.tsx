@@ -8,6 +8,8 @@ import {
   type JobReviewOutcomeId,
   type JobReviewSourceId,
 } from '@lib/community/jobReview'
+import { BRAND_CONFIG } from '@lib/brand'
+import { useT } from '@lib/i18n/client'
 
 type ChoiceCardsProps<T extends string> = {
   options: readonly { id: T; label: string; description?: string }[]
@@ -56,8 +58,6 @@ function ChoiceCards<T extends string>({ options, value, onChange }: ChoiceCards
   )
 }
 
-const ORG_OPTIONS = PARTNER_ORGS.map((org) => ({ id: org.id as string, label: org.name }))
-
 type JobReviewSourcePickerProps = {
   value: JobReviewSourceId | null
   orgId: string | null
@@ -66,20 +66,31 @@ type JobReviewSourcePickerProps = {
 
 /** 어떻게 연락이 닿았는지 (필수, 비공개). 학생회를 고르면 어느 학생회인지도 필수 */
 export function JobReviewSourcePicker({ value, orgId, onChange }: JobReviewSourcePickerProps) {
+  const t = useT('reviews')
+  const tPartners = useT('partners')
+  const brand = BRAND_CONFIG.name
+  const options = JOB_REVIEW_SOURCES.map((item) => ({
+    id: item.id,
+    label: t(`jobReview.sources.${item.id}.label`, { brand }),
+    description: t(`jobReview.sources.${item.id}.description`, { brand }),
+  }))
   return (
     <div className='space-y-3'>
       <ChoiceCards
-        options={JOB_REVIEW_SOURCES}
+        options={options}
         value={value}
         onChange={(next) => onChange(next, next === 'student-org' ? orgId : null)}
       />
       {value === 'student-org' ? (
         <div>
           <p className='mb-2 text-[13px] font-medium text-[var(--foreground)]'>
-            어느 학생회인가요?<span className='text-[var(--brand)]'> *</span>
+            {t('jobReview.sourcePicker.orgQuestion')}<span className='text-[var(--brand)]'> *</span>
           </p>
           <ChoiceCards
-            options={ORG_OPTIONS}
+            options={PARTNER_ORGS.map((org) => ({
+              id: org.id as string,
+              label: tPartners(`orgs.${org.id}.name`),
+            }))}
             value={orgId}
             onChange={(nextOrg) => onChange('student-org', nextOrg)}
           />
@@ -96,7 +107,13 @@ type JobReviewOutcomePickerProps = {
 
 /** 최종 결과 (필수) */
 export function JobReviewOutcomePicker({ value, onChange }: JobReviewOutcomePickerProps) {
-  return <ChoiceCards options={JOB_REVIEW_OUTCOMES} value={value} onChange={onChange} />
+  const t = useT('reviews')
+  const options = JOB_REVIEW_OUTCOMES.map((item) => ({
+    id: item.id,
+    label: t(`jobReview.outcomes.${item.id}.label`),
+    description: t(`jobReview.outcomes.${item.id}.description`),
+  }))
+  return <ChoiceCards options={options} value={value} onChange={onChange} />
 }
 
 /** 연락 경로 + 학생회까지 모두 골랐는지 */

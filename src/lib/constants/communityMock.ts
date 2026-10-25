@@ -813,24 +813,3 @@ export function extractFirstImageSrc(html: string | null | undefined) {
   const match = html.match(/<img[^>]+src=["']([^"']+)["']/i)
   return match?.[1]?.trim() || null
 }
-
-export function formatCommunityCount(value: number) {
-  const n = Math.max(0, Math.floor(Number(value) || 0))
-  if (n >= 10_000) return `${Math.floor(n / 1000)}천+`
-  return n.toLocaleString('ko-KR')
-}
-
-export function formatCommunityRelativeTime(timestamp: number) {
-  const diff = Date.now() - timestamp
-  const minute = 60_000
-  const hour = 60 * minute
-  const day = 24 * hour
-  if (diff < minute) return '방금'
-  if (diff < hour) return `${Math.floor(diff / minute)}분 전`
-  if (diff < day) return `${Math.floor(diff / hour)}시간 전`
-  if (diff < 7 * day) return `${Math.floor(diff / day)}일 전`
-  return new Date(timestamp).toLocaleDateString('ko-KR', {
-    month: 'short',
-    day: 'numeric',
-  })
-}

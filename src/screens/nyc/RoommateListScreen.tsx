@@ -11,8 +11,9 @@ import {
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
-import { fetchCommunityPosts } from '@lib/community/client'
-import { cityLoginPath } from '@lib/constants/cities'
+import { fetchCommunityPosts, localizeCommunityError } from '@lib/community/client'
+import { cityLoginPath, getCity } from '@lib/constants/cities'
+import { useT } from '@lib/i18n/client'
 import {
   ROOMMATE_BUDGET_MAX,
   ROOMMATE_INTENT_OPTIONS,
@@ -24,12 +25,11 @@ import {
   type RoommateLookingFor,
 } from '@lib/community/roommate'
 import {
-  getIdentityVerifyCtaLabel,
   getIdentityVerifyHref,
   isAccountSuspended,
   isIdentityVerified,
 } from '@lib/community/schoolGate'
-import { NYC_COMMUNITY_BOARD_META } from '@lib/constants/nyc'
+import { communityBoardKey } from '@lib/constants/nyc'
 import { cn } from '@lib'
 import type { CommunityPost } from '@/types/nyc'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
@@ -42,13 +42,15 @@ const BOARD_ID = 'roommate' as const
 const BUDGET_STEP = 100
 const BUDGET_BOUNDS = { min: 0, max: Math.min(5000, ROOMMATE_BUDGET_MAX) }
 
+/** 라벨: housing `roommate.list.budgetPresets.<id>` */
 const BUDGET_PRESETS = [
-  { id: 'under-1500', label: '$1,500 이하', min: 0, max: 1500 },
-  { id: '1500-2000', label: '$1,500–2,000', min: 1500, max: 2000 },
-  { id: '2000-2500', label: '$2,000–2,500', min: 2000, max: 2500 },
-  { id: '2500-plus', label: '$2,500+', min: 2500, max: BUDGET_BOUNDS.max },
+  { id: 'under-1500', min: 0, max: 1500 },
+  { id: '1500-2000', min: 1500, max: 2000 },
+  { id: '2000-2500', min: 2000, max: 2500 },
+  { id: '2500-plus', min: 2500, max: BUDGET_BOUNDS.max },
 ] as const
 
+/** 글의 location 원문과 부분 일치로 거르는 값이라 번역하지 않는다 (장소 이름 데이터) */
 const NEIGHBORHOOD_HINTS = [
   '맨해튼',
   '브루클린',
@@ -66,9 +68,10 @@ type LookingForFilter = 'all' | RoommateLookingFor
 type NeighborhoodFilter = 'all' | string
 
 export function RoommateListScreen() {
+  const t = useT('housing')
+  const tCommunity = useT('community')
   const city = useCity()
   const href = useCityPath()
-  const meta = NYC_COMMUNITY_BOARD_META[BOARD_ID]
   const { user, profile, loading: authLoading } = useAuth()
   const { error: toastError } = useToast()
 
@@ -98,14 +101,14 @@ export function RoommateListScreen() {
         setPosts(data)
       } catch (err) {
         if (!opts?.silent) {
-          toastError(getErrorMessage(err, '목록을 불러오지 못했어요'))
+          toastError(getErrorMessage(localizeCommunityError(err, tCommunity), t('roommate.list.loadFailed')))
         }
         throw err
       } finally {
         setLoading(false)
       }
     },
-    [city, toastError],
+    [city, toastError, t, tCommunity],
   )
 
   useEffect(() => {
@@ -231,14 +234,9 @@ export function RoommateListScreen() {
   const summaryLabel = useMemo(() => {
     const parts: string[] = []
     if (lookingFor !== 'all') {
-      parts.push(
-        ROOMMATE_LOOKING_FOR_OPTIONS.find((item) => item.id === lookingFor)
-          ?.label ?? '',
-      )
+      parts.push(t(`roommate.lookingFor.${lookingFor}.label`))
     } else if (intent !== 'all') {
-      parts.push(
-        ROOMMATE_INTENT_OPTIONS.find((item) => item.id === intent)?.label ?? '',
-      )
+      parts.push(t(`roommate.intents.${intent}.label`))
     }
     if (neighborhood !== 'all') parts.push(neighborhood)
     if (budgetMin > BUDGET_BOUNDS.min || budgetMax < BUDGET_BOUNDS.max) {
@@ -246,9 +244,15 @@ export function RoommateListScreen() {
         `${formatRoommateBudget(budgetMin) ?? `$${budgetMin}`}–${formatRoommateBudget(budgetMax) ?? `$${budgetMax}`}`,
       )
     }
-    if (parts.length === 0) return `${filteredPosts.length}개의 글`
-    return `${parts.filter(Boolean).join(' · ')} · ${filteredPosts.length}개`
+    if (parts.length === 0) {
+      return t('roommate.list.summaryAll', { count: filteredPosts.length })
+    }
+    return t('roommate.list.summaryFiltered', {
+      count: filteredPosts.length,
+      filters: parts.filter(Boolean).join(' · '),
+    })
   }, [
+    t,
     intent,
     lookingFor,
     neighborhood,
@@ -310,7 +314,7 @@ export function RoommateListScreen() {
   const identityVerified = isIdentityVerified(profile)
   const suspended = isAccountSuspended(profile)
   const canWrite = Boolean(user) && identityVerified && !suspended
-  const verifyCta = getIdentityVerifyCtaLabel()
+  const verifyCta = tCommunity('verify.cta')
   const postHref = !user
     ? loginNext
     : suspended
@@ -319,28 +323,28 @@ export function RoommateListScreen() {
         ? newPath
         : getIdentityVerifyHref(newPath)
   const writeCtaLabel = !user
-    ? '로그인'
+    ? t('roommate.list.login')
     : suspended
-      ? '이용 정지'
+      ? t('roommate.list.suspended')
       : identityVerified
-        ? meta.writeLabel
+        ? tCommunity(communityBoardKey(BOARD_ID, 'writeLabel'))
         : verifyCta
 
   return (
     <PullToRefresh onRefresh={refreshPosts} className='flex flex-1 flex-col'>
       <BoardPageShell width='narrow' className='flex flex-1 flex-col'>
         <BoardListToolbar
-          breadcrumbLabel='룸메이트 · 서블렛'
-          intro={meta.listIntro}
+          breadcrumbLabel={t('roommate.list.breadcrumb')}
+          intro={tCommunity(communityBoardKey(BOARD_ID, 'listIntro'), { city: getCity(city).name })}
           writeHref={postHref}
-          writeLabel={authLoading ? meta.writeLabel : writeCtaLabel}
+          writeLabel={authLoading ? tCommunity(communityBoardKey(BOARD_ID, 'writeLabel')) : writeCtaLabel}
           onFilterClick={openFilters}
           filterCount={activeFilterCount}
           showWrite={!authLoading && !suspended}
         >
-          <ChipScrollRow ariaLabel='빠른 필터'>
+          <ChipScrollRow ariaLabel={t('list.quickFilters')}>
             <BoardQuickChip
-              label='전체'
+              label={t('list.sheet.all')}
               active={lookingFor === 'all' && intent === 'all'}
               onClick={() => {
                 setLookingFor('all')
@@ -350,7 +354,7 @@ export function RoommateListScreen() {
             {ROOMMATE_LOOKING_FOR_OPTIONS.map((option) => (
               <BoardQuickChip
                 key={option.id}
-                label={option.label}
+                label={t(`roommate.lookingFor.${option.id}.label`)}
                 active={lookingFor === option.id}
                 onClick={() => toggleQuickLookingFor(option.id)}
               />
@@ -358,7 +362,7 @@ export function RoommateListScreen() {
             {BUDGET_PRESETS.map((preset) => (
               <BoardQuickChip
                 key={preset.id}
-                label={preset.label}
+                label={t(`roommate.list.budgetPresets.${preset.id}`)}
                 active={activeBudgetPreset === preset.id}
                 onClick={() => toggleQuickBudget(preset.min, preset.max)}
               />
@@ -381,21 +385,21 @@ export function RoommateListScreen() {
             <EmptyState
               title={
                 posts.length === 0
-                  ? '아직 룸메이트·서블렛 글이 없습니다'
-                  : '조건에 맞는 글이 없어요'
+                  ? t('roommate.list.empty.noPostsTitle')
+                  : t('roommate.list.empty.noMatchTitle')
               }
               description={
                 posts.length === 0
                   ? canWrite
-                    ? '첫 글을 올려 커뮤니티를 시작해 보세요.'
+                    ? t('roommate.list.empty.firstPost')
                     : user
-                      ? '학생 또는 직장인 인증 후 글을 올릴 수 있어요.'
-                      : '로그인 후 글을 올릴 수 있어요.'
-                  : '필터를 바꿔 다시 검색해 보세요.'
+                      ? t('roommate.list.empty.verifyToPost')
+                      : t('roommate.list.empty.loginToPost')
+                  : t('list.empty.description')
               }
               actionHref={posts.length === 0 ? postHref : undefined}
               actionLabel={
-                posts.length === 0 ? writeCtaLabel : '필터 초기화'
+                posts.length === 0 ? writeCtaLabel : t('list.empty.action')
               }
               onAction={posts.length === 0 ? undefined : clearAllFilters}
             />
@@ -416,7 +420,7 @@ export function RoommateListScreen() {
         <BottomSheet
           open={filtersOpen}
           onClose={() => setFiltersOpen(false)}
-          title='필터'
+          title={t('list.filters')}
           maxHeightClassName='max-h-[min(85dvh,720px)]'
           footer={
             <div className='flex items-center justify-between gap-3 px-5 py-4'>
@@ -431,14 +435,14 @@ export function RoommateListScreen() {
                 }}
                 className='text-[14px] font-semibold text-[var(--foreground)] underline underline-offset-2 touch-manipulation'
               >
-                전체 해제
+                {t('list.sheet.clearAll')}
               </button>
               <button
                 type='button'
                 onClick={applyFilters}
                 className='inline-flex h-11 min-w-[140px] items-center justify-center rounded-full bg-[var(--foreground)] px-5 text-[14px] font-semibold text-white touch-manipulation hover:bg-[var(--navy-light)]'
               >
-                글 {draftResultCount}개 보기
+                {t('roommate.list.showResults', { count: draftResultCount })}
               </button>
             </div>
           }
@@ -446,11 +450,11 @@ export function RoommateListScreen() {
           <div className='space-y-7 overflow-x-hidden px-3 pb-2'>
             <section>
               <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                분류
+                {t('roommate.list.category')}
               </h4>
               <div className='mt-3 flex flex-wrap gap-2'>
                 <SheetChip
-                  label='전체'
+                  label={t('list.sheet.all')}
                   active={draftIntent === 'all' && draftLookingFor === 'all'}
                   onClick={() => {
                     setDraftIntent('all')
@@ -460,7 +464,7 @@ export function RoommateListScreen() {
                 {ROOMMATE_INTENT_OPTIONS.map((option) => (
                   <SheetChip
                     key={option.id}
-                    label={option.label}
+                    label={t(`roommate.intents.${option.id}.label`)}
                     active={
                       draftIntent === option.id && draftLookingFor === 'all'
                     }
@@ -475,7 +479,7 @@ export function RoommateListScreen() {
                 {ROOMMATE_INTENT_OPTIONS.map((group) => (
                   <div key={group.id}>
                     <p className='text-[12px] font-medium text-[var(--muted)]'>
-                      {group.label}
+                      {t(`roommate.intents.${group.id}.label`)}
                     </p>
                     <div className='mt-2 flex flex-wrap gap-2'>
                       {ROOMMATE_LOOKING_FOR_OPTIONS.filter(
@@ -483,7 +487,7 @@ export function RoommateListScreen() {
                       ).map((option) => (
                         <SheetChip
                           key={option.id}
-                          label={option.label}
+                          label={t(`roommate.lookingFor.${option.id}.label`)}
                           active={draftLookingFor === option.id}
                           onClick={() => {
                             setDraftLookingFor(option.id)
@@ -499,7 +503,7 @@ export function RoommateListScreen() {
 
             <section>
               <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                월 예산
+                {t('roommate.list.monthlyBudget')}
               </h4>
               <p className='mt-1 text-[12px] text-[var(--muted)]'>
                 {(formatRoommateBudget(draftBudgetMin) ??
@@ -528,7 +532,7 @@ export function RoommateListScreen() {
                 {BUDGET_PRESETS.map((preset) => (
                   <SheetChip
                     key={preset.id}
-                    label={preset.label}
+                    label={t(`roommate.list.budgetPresets.${preset.id}`)}
                     active={
                       draftBudgetMin === preset.min &&
                       draftBudgetMax === preset.max
@@ -544,11 +548,11 @@ export function RoommateListScreen() {
 
             <section>
               <h4 className='text-[15px] font-semibold text-[var(--foreground)]'>
-                동네
+                {t('roommate.list.neighborhood')}
               </h4>
               <div className='mt-3 flex flex-wrap gap-2'>
                 <SheetChip
-                  label='전체'
+                  label={t('list.sheet.all')}
                   active={draftNeighborhood === 'all'}
                   onClick={() => setDraftNeighborhood('all')}
                 />

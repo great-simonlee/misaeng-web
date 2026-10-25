@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 
 import {
   resolveAppConnectBaseUrl,
@@ -20,7 +20,20 @@ export function getDefaultDeviceId() {
   return resolveAppConnectDeviceId()
 }
 
+/** 네이티브 앱은 쿠키 대신 `Authorization: Bearer <access token>`으로 보낸다 */
+export async function getRequestBearerToken(): Promise<string | null> {
+  try {
+    const value = (await headers()).get('authorization') || ''
+    const match = value.match(/^Bearer\s+(\S+)$/i)
+    return match ? match[1] : null
+  } catch {
+    return null
+  }
+}
+
 export async function getEllieoAccessToken() {
+  const bearer = await getRequestBearerToken()
+  if (bearer) return bearer
   const jar = await cookies()
   const fromCookie = jar.get(ELLIEO_ACCESS_COOKIE)?.value?.trim()
   if (fromCookie) return fromCookie
@@ -28,6 +41,8 @@ export async function getEllieoAccessToken() {
 }
 
 export async function getEllieoRefreshToken() {
+  // 앱 요청은 토큰을 스스로 갱신한다 (/api/app-auth/refresh). 쿠키 세션과 섞지 않는다.
+  if (await getRequestBearerToken()) return null
   const jar = await cookies()
   return jar.get(ELLIEO_REFRESH_COOKIE)?.value?.trim() || null
 }
@@ -332,4 +347,27 @@ export async function ellieoAuthorizedMultipartFetch(
   }
 
   return result
+}
+
+/**
+ * Ellieo가 이 액세스 토큰을 받아 주는지 확인한다 (서명 검증은 Ellieo 서버만 할 수 있다).
+ * 401 → 무효. 그 밖의 응답(200·403·404)은 토큰 자체는 유효하다는 뜻이다.
+ * 네트워크 오류·5xx는 확인할 수 없으므로 null.
+ */
+export async function isEllieoTokenAccepted(accessToken: string): Promise<boolean | null> {
+  const baseUrl = getEllieoBaseUrl()
+  if (!baseUrl) return null
+  try {
+    const res = await fetch(`${baseUrl}/user/profile`, {
+      method: 'GET',
+      headers: { Accept: 'application/json', Authorization: `Bearer ${accessToken}` },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(8000),
+    })
+    if (res.status === 401) return false
+    if (res.status >= 500) return null
+    return true
+  } catch {
+    return null
+  }
 }

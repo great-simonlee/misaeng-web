@@ -20,14 +20,14 @@ import {
   type CompanyListItem,
 } from '@lib/company/client'
 import { companyMatchesQuery } from '@lib/company/companyRules'
-import { companyCopy } from '@lib/constants/companyCopy'
-import { postingCopy } from '@lib/constants/postingCopy'
+import { useFormat, useT } from '@lib/i18n/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import {
   CompanyHeroPanel,
   CompanyMark,
   IndustryTag,
+  useIndustryLabel,
   tintFor,
   tintGradient,
   type Tint,
@@ -37,6 +37,8 @@ import { EmptyState } from '@widgets/nyc/EmptyState'
 export function CompanyListScreen() {
   const city = useCity()
   const href = useCityPath()
+  const t = useT('companies')
+  const industryLabel = useIndustryLabel()
   const searchRef = useRef<HTMLInputElement>(null)
   const [companies, setCompanies] = useState<CompanyListItem[]>([])
   const [industryOptions, setIndustryOptions] = useState<CompanyIndustryOption[]>([])
@@ -71,11 +73,11 @@ export function CompanyListScreen() {
       setCompanies(data.companies.filter((c) => c.reviewCount > 0 || c.postingCount > 0))
       setIndustryOptions(data.industries)
     } catch (e) {
-      setError(e instanceof Error ? e.message : companyCopy.loadError)
+      setError(e instanceof Error && e.message ? e.message : t('common.requestFailed'))
     } finally {
       setLoading(false)
     }
-  }, [city])
+  }, [city, t])
 
   useEffect(() => {
     void load()
@@ -133,8 +135,10 @@ export function CompanyListScreen() {
   const featured = useMemo(() => filtered.filter((c) => c.isFeatured), [filtered])
   const groups = useMemo(() => {
     const rest = filtered.filter((c) => !c.isFeatured)
-    return sort === 'industry' ? groupByIndustry(rest, industryOptions) : groupByInitial(rest)
-  }, [filtered, sort, industryOptions])
+    return sort === 'industry'
+      ? groupByIndustry(rest, industryOptions, industryLabel)
+      : groupByInitial(rest)
+  }, [filtered, sort, industryOptions, industryLabel])
   const hrefFor = (slug: string) => href(`/companies/${slug}`)
 
   return (
@@ -145,13 +149,13 @@ export function CompanyListScreen() {
             href={href('/job-review')}
             className='inline-flex items-center gap-1 text-[12px] font-medium text-[var(--muted)] hover:text-[var(--foreground)] sm:text-[13px]'
           >
-            <span aria-hidden>‹</span> 면접 · 취업 후기
+            <span aria-hidden>‹</span> {t('list.backToJobReviews')}
           </Link>
           <Link
             href={href('/companies/postings')}
             className='inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--brand)] hover:underline sm:text-[13px]'
           >
-            {postingCopy.listLink} <span aria-hidden>›</span>
+            {t('postings.listLink')} <span aria-hidden>›</span>
           </Link>
         </div>
 
@@ -160,32 +164,32 @@ export function CompanyListScreen() {
             <div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
               <div className='min-w-0'>
                 <h1 className='text-[1.4rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.6rem]'>
-                  {companyCopy.listTitle}
+                  {t('list.title')}
                 </h1>
                 <p className='mt-1.5 text-[13px] leading-relaxed text-white/55 sm:text-[14px]'>
-                  {companyCopy.listIntro}
+                  {t('list.intro')}
                 </p>
               </div>
               <dl className='flex shrink-0 items-center gap-3 text-[12px] sm:text-[13px]'>
                 <HeroStat
-                  label={companyCopy.statCompanies}
+                  label={t('list.statCompanies')}
                   value={loading ? null : companies.length}
                 />
                 <span aria-hidden className='h-3 w-px bg-white/15' />
                 <HeroStat
-                  label={companyCopy.statIndustries}
+                  label={t('list.statIndustries')}
                   value={loading ? null : industries.length}
                 />
                 <span aria-hidden className='h-3 w-px bg-white/15' />
                 <HeroStat
-                  label={companyCopy.statReviews}
+                  label={t('list.statReviews')}
                   value={loading ? null : totalReviews}
                   accent
                 />
                 {totalPostings > 0 ? (
                   <>
                     <span aria-hidden className='h-3 w-px bg-white/15' />
-                    <HeroStat label={postingCopy.statPostings} value={loading ? null : totalPostings} accent />
+                    <HeroStat label={t('postings.statPostings')} value={loading ? null : totalPostings} accent />
                   </>
                 ) : null}
               </dl>
@@ -203,13 +207,13 @@ export function CompanyListScreen() {
                   type='search'
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder={companyCopy.searchPlaceholder}
+                  placeholder={t('list.searchPlaceholder')}
                   className='h-[52px] min-w-0 flex-1 bg-transparent px-3 text-[15px] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] [&::-webkit-search-cancel-button]:hidden'
                 />
                 {query ? (
                   <button
                     type='button'
-                    aria-label={companyCopy.clearSearch}
+                    aria-label={t('list.clearSearch')}
                     onClick={() => {
                       setQuery('')
                       searchRef.current?.focus()
@@ -253,10 +257,10 @@ export function CompanyListScreen() {
         {industries.length > 1 ? (
           <ChipScrollRow
             className='mt-5'
-            ariaLabel={companyCopy.statIndustries}
+            ariaLabel={t('list.statIndustries')}
             leading={
               <IndustryChip
-                label={companyCopy.allIndustries}
+                label={t('list.allIndustries')}
                 count={companies.length}
                 active={industry === 'all'}
                 onClick={() => setIndustry('all')}
@@ -266,7 +270,7 @@ export function CompanyListScreen() {
             {industries.map(({ code, label }) => (
               <IndustryChip
                 key={code}
-                label={label}
+                label={industryLabel(code, label)}
                 count={industryCounts.get(code) ?? 0}
                 tint={tintFor(code)}
                 active={industry === code}
@@ -280,34 +284,34 @@ export function CompanyListScreen() {
       <section className='mt-6 pb-20 sm:mt-8'>
         {loading ? (
           <div className='py-16'>
-            <LoadingState label={companyCopy.loading} />
+            <LoadingState label={t('list.loading')} />
           </div>
         ) : error ? (
           <EmptyState
-            title={companyCopy.loadError}
+            title={t('list.loadError')}
             description={error}
             onAction={() => void load()}
-            actionLabel={companyCopy.retry}
+            actionLabel={t('common.retry')}
           />
         ) : companies.length === 0 ? (
-          <EmptyState title={companyCopy.emptyTitle} description={companyCopy.emptyDescription} />
+          <EmptyState title={t('list.emptyTitle')} description={t('list.emptyDescription')} />
         ) : filtered.length === 0 ? (
           <EmptyState
-            title={companyCopy.noMatchTitle}
-            description={companyCopy.noMatchDescription}
+            title={t('list.noMatchTitle')}
+            description={t('list.noMatchDescription')}
           />
         ) : (
           <div className='flex flex-col gap-10'>
             <div className='-mb-4 flex items-center justify-between gap-3'>
               <p className='text-[12px] font-medium text-[var(--muted)] sm:text-[13px]'>
-                {companyCopy.resultCount(filtered.length)}
+                {t('list.resultCount', { count: filtered.length })}
               </p>
               <SortToggle value={sort} onChange={changeSort} />
             </div>
 
             {featured.length ? (
               <div>
-                <SectionTitle>{companyCopy.featuredTitle}</SectionTitle>
+                <SectionTitle>{t('list.featuredTitle')}</SectionTitle>
                 <ul className='grid grid-cols-1 gap-3 min-[560px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4'>
                   {featured.map((company, i) => (
                     <li key={company.slug} className={cardEnter} style={enterDelay(i)}>
@@ -321,7 +325,7 @@ export function CompanyListScreen() {
             {groups.length ? (
               <div>
                 {featured.length ? (
-                  <SectionTitle>{companyCopy.allCompaniesTitle}</SectionTitle>
+                  <SectionTitle>{t('list.allCompaniesTitle')}</SectionTitle>
                 ) : null}
                 <div className='flex flex-col gap-7'>
                   {groups.map(({ key, label, items }, gi) =>
@@ -385,18 +389,19 @@ type SortMode = 'name' | 'industry'
 const SORT_STORAGE_KEY = 'misaeng:companies:sort'
 
 function SortToggle({ value, onChange }: { value: SortMode; onChange: (next: SortMode) => void }) {
+  const t = useT('companies')
   const options: { value: SortMode; label: string; icon: ReactNode }[] = [
-    { value: 'name', label: companyCopy.sortByName, icon: <AzIcon className='size-3.5' /> },
+    { value: 'name', label: t('list.sortByName'), icon: <AzIcon className='size-3.5' /> },
     {
       value: 'industry',
-      label: companyCopy.sortByIndustry,
+      label: t('list.sortByIndustry'),
       icon: <LayersIcon className='size-3.5' />,
     },
   ]
   return (
     <div
       role='radiogroup'
-      aria-label={companyCopy.sortLabel}
+      aria-label={t('list.sortLabel')}
       className='relative inline-flex shrink-0 rounded-full bg-[#f1f2f4] p-0.5'
     >
       <span
@@ -475,13 +480,14 @@ function HeroStat({
   value: number | null
   accent?: boolean
 }) {
+  const format = useFormat()
   return (
     <div className='flex items-baseline gap-1'>
       <dd className={cn('font-semibold tabular-nums', accent ? 'text-[#ff8a65]' : 'text-white')}>
         {value === null ? (
           <span className='inline-block h-3 w-5 animate-pulse rounded bg-white/15 align-middle' />
         ) : (
-          value.toLocaleString()
+          format.number(value)
         )}
       </dd>
       <dt className='text-white/45'>{label}</dt>
@@ -571,15 +577,16 @@ function CompanyCard({
 }
 
 function FeaturedCard({ company, href }: { company: CompanyListItem; href: string }) {
+  const industryLabel = useIndustryLabel()
   return (
     <Link
       href={href}
-      className='group relative block h-full rounded-[1.4rem] bg-gradient-to-br from-[var(--brand)] via-[#ff9a76] to-[#6d5dfc] p-px touch-manipulation transition duration-200 hover:shadow-[0_8px_22px_-10px_rgba(246,67,16,0.3)] active:scale-[0.99]'
+      className='group relative block h-full rounded-[1.4rem] bg-gradient-to-br from-[var(--brand)] via-[#ff9a76] to-[#6d5dfc] p-px touch-manipulation transition duration-200 hover:shadow-[0_8px_22px_-10px_rgb(var(--brand-rgb)/0.3)] active:scale-[0.99]'
     >
       <span className='relative flex h-full items-center gap-4 overflow-hidden rounded-[calc(1.4rem-1px)] bg-white p-4 sm:p-5'>
         <span
           aria-hidden
-          className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(246,67,16,0.10),transparent_55%)]'
+          className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgb(var(--brand-rgb)/0.10),transparent_55%)]'
         />
         <CompanyMark company={company} className='relative size-14 text-[20px]' />
         <span className='relative min-w-0 flex-1'>
@@ -588,7 +595,7 @@ function FeaturedCard({ company, href }: { company: CompanyListItem; href: strin
           </span>
           <span className='mt-1.5 flex flex-wrap items-center gap-1.5'>
             <span className='text-[12px] font-medium text-[var(--muted)]'>
-              {company.industryLabel}
+              {industryLabel(company.industry, company.industryLabel)}
             </span>
             {company.reviewCount > 0 ? <ReviewBadge count={company.reviewCount} /> : null}
             {company.postingCount > 0 ? <PostingBadge count={company.postingCount} /> : null}
@@ -601,10 +608,11 @@ function FeaturedCard({ company, href }: { company: CompanyListItem; href: strin
 }
 
 function PostingBadge({ count }: { count: number }) {
+  const t = useT('companies')
   return (
     <span className='inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md bg-[var(--foreground)] py-[3px] pl-1.5 pr-2 text-[11px] font-bold leading-none text-white shadow-[0_2px_6px_-1px_rgba(15,23,42,0.35)]'>
       <BriefcaseIcon className='size-3' />
-      {postingCopy.postingCount(count)}
+      {t('postings.postingCount', { count })}
     </span>
   )
 }
@@ -628,10 +636,11 @@ function BriefcaseIcon({ className }: { className?: string }) {
 }
 
 function ReviewBadge({ count }: { count: number }) {
+  const t = useT('companies')
   return (
-    <span className='inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md bg-gradient-to-br from-[#ff7a45] to-[var(--brand)] py-[3px] pl-1.5 pr-2 text-[11px] font-bold leading-none text-white shadow-[0_2px_6px_-1px_rgba(246,67,16,0.45)]'>
+    <span className='inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md bg-gradient-to-br from-brand-bright to-[var(--brand)] py-[3px] pl-1.5 pr-2 text-[11px] font-bold leading-none text-white shadow-[0_2px_6px_-1px_rgb(var(--brand-rgb)/0.45)]'>
       <ChatIcon className='size-3' />
-      {companyCopy.reviewCount(count)}
+      {t('list.reviewCount', { count })}
     </span>
   )
 }
@@ -681,7 +690,8 @@ function groupByInitial(companies: CompanyListItem[]): CompanyGroup[] {
 /** 업계별로 묶는다. 업계 순서는 관리자가 정한 순서, 목록에 없는 업계는 맨 뒤 (그룹 안은 입력 순서 유지) */
 function groupByIndustry(
   companies: CompanyListItem[],
-  options: CompanyIndustryOption[]
+  options: CompanyIndustryOption[],
+  industryLabel: (code: string, fallback: string) => string
 ): CompanyGroup[] {
   const byCode = new Map<string, CompanyGroup>()
   for (const company of companies) {
@@ -690,7 +700,7 @@ function groupByIndustry(
     else
       byCode.set(company.industry, {
         key: company.industry,
-        label: company.industryLabel,
+        label: industryLabel(company.industry, company.industryLabel),
         items: [company],
       })
   }

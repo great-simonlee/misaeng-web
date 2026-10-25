@@ -6,45 +6,22 @@ import { createPortal } from 'react-dom'
 
 import { useBodyScrollLock } from '@hooks/useBodyScrollLock'
 import {
-  ANONYMOUS_WRITING_GUIDELINES,
-  COMMUNITY_WRITING_GUIDELINES,
+  ANONYMOUS_WRITING_GUIDELINE_KEYS,
+  COMMUNITY_WRITING_GUIDELINE_KEYS,
 } from '@lib/constants/communityGuidelines'
+import { useT } from '@lib/i18n/client'
 
-const ORIENTATION_STEPS = [
-  {
-    eyebrow: 'STEP 1',
-    title: '날짜별로 남기는 후기예요',
-    body: 'CPT · OPT · STEM OPT · 비자 · 영주권 진행을 한 날짜씩 기록해요. 나중에 보는 사람이 순서대로 따라갈 수 있게 남겨 주세요.',
-  },
-  {
-    eyebrow: 'STEP 2',
-    title: '날짜 → 항목 → 내용 순서',
-    body: '아래 작성칸에서 날짜를 고르고, 준비·제출·결과·다음 스텝 중 필요한 항목만 선택한 뒤 내용을 적어요.',
-  },
-  {
-    eyebrow: 'STEP 3',
-    title: '「이 기록 추가」하면 위로 쌓여요',
-    body: '작성을 마친 뒤 「이 기록 추가」를 누르면, 그 기록이 작성칸 위 목록으로 올라갑니다. 다음 날짜는 아래 작성칸에서 이어서 적으면 돼요.',
-  },
-] as const
+const ORIENTATION_STEP_IDS = ['step1', 'step2', 'step3'] as const
 
-const JOB_REVIEW_ORIENTATION_STEPS = [
-  {
-    eyebrow: 'STEP 1',
-    title: '날짜별로 남기는 후기예요',
-    body: '인턴 · 신입 · 경력 · 이직 · 계약 전형을 한 날짜씩 기록해요. 나중에 보는 사람이 서류부터 오퍼까지 순서대로 따라갈 수 있게 남겨 주세요.',
-  },
-  {
-    eyebrow: 'STEP 2',
-    title: '날짜 → 항목 → 내용 순서',
-    body: '아래 작성칸에서 날짜를 고르고, 단계·플랫폼·서류·인터뷰·결과 중 필요한 항목만 선택한 뒤 내용을 적어요.',
-  },
-  {
-    eyebrow: 'STEP 3',
-    title: '「이 기록 추가」하면 위로 쌓여요',
-    body: '작성을 마친 뒤 「이 기록 추가」를 누르면, 그 기록이 작성칸 위 목록으로 올라갑니다. 다음 날짜는 아래 작성칸에서 이어서 적으면 돼요.',
-  },
-] as const
+/** `reviews.orientation.<kind>.step1.title` 등에서 작성 가이드 문구를 읽는다 */
+function useOrientationSteps(kind: 'cptOpt' | 'jobReview'): OrientationStep[] {
+  const t = useT('reviews')
+  return ORIENTATION_STEP_IDS.map((id, index) => ({
+    eyebrow: `STEP ${index + 1}`,
+    title: t(`orientation.${kind}.${id}.title`),
+    body: t(`orientation.${kind}.${id}.body`),
+  }))
+}
 
 type OrientationStep = {
   eyebrow: string
@@ -59,6 +36,7 @@ type WriteConsentModalProps = {
   error?: string | null
   onAgree: () => void
   steps?: readonly OrientationStep[]
+  /** 공통 안내 뒤에 붙일 추가 안내 (`community` 네임스페이스 키) */
   extraGuidelines?: readonly string[]
   eyebrow?: string
   titleId: string
@@ -72,10 +50,12 @@ function WriteConsentModal({
   onAgree,
   steps = [],
   extraGuidelines = [],
-  eyebrow = '후기 작성',
+  eyebrow,
   titleId,
   listHref,
 }: WriteConsentModalProps) {
+  const t = useT('reviews')
+  const tCommunity = useT('community')
   useBodyScrollLock(open)
 
   if (!open || typeof document === 'undefined') return null
@@ -102,18 +82,18 @@ function WriteConsentModal({
           />
           <div className='mt-3 w-full px-5'>
             <p className='text-[11px] font-semibold tracking-[0.14em] text-[var(--muted)]'>
-              {eyebrow}
+              {eyebrow ?? t('orientation.defaultEyebrow')}
             </p>
             <h2
               id={titleId}
               className='mt-1 text-[1.25rem] font-semibold tracking-[-0.03em] text-[var(--foreground)]'
             >
-              작성 전에 확인해 주세요
+              {t('orientation.title')}
             </h2>
             <p className='mt-1.5 text-[13px] leading-relaxed text-[var(--muted)]'>
               {steps.length > 0
-                ? '작성 가이드와 커뮤니티 안내를 확인하고 동의해 주세요.'
-                : '커뮤니티 작성 안내를 확인하고 동의해 주세요.'}
+                ? t('orientation.subtitleWithGuide')
+                : t('orientation.subtitle')}
             </p>
           </div>
         </div>
@@ -122,7 +102,7 @@ function WriteConsentModal({
           {steps.length > 0 ? (
             <section>
               <p className='text-[12px] font-semibold text-[var(--foreground)]'>
-                작성 가이드
+                {t('orientation.guideTitle')}
               </p>
               <ol className='mt-2 space-y-2'>
                 {steps.map((step) => (
@@ -147,10 +127,15 @@ function WriteConsentModal({
 
           <section className={steps.length > 0 ? 'mt-5' : undefined}>
             <p className='text-[12px] font-semibold text-[var(--foreground)]'>
-              커뮤니티 작성 안내
+              {t('orientation.communityTitle')}
             </p>
             <ul className='mt-2 space-y-1.5'>
-              {[...COMMUNITY_WRITING_GUIDELINES, ...extraGuidelines].map(
+              {[
+                ...COMMUNITY_WRITING_GUIDELINE_KEYS.map(
+                  (key) => `guidelines.common.${key}`,
+                ),
+                ...extraGuidelines,
+              ].map(
                 (item) => (
                   <li
                     key={item}
@@ -160,7 +145,7 @@ function WriteConsentModal({
                       className='mt-1.5 size-1 shrink-0 rounded-full bg-[var(--muted)]'
                       aria-hidden
                     />
-                    <span>{item}</span>
+                    <span>{tCommunity(item)}</span>
                   </li>
                 ),
               )}
@@ -178,16 +163,16 @@ function WriteConsentModal({
             type='button'
             onClick={onAgree}
             disabled={agreeing}
-            className='min-h-[48px] w-full rounded-full bg-[linear-gradient(135deg,#ff4c14_0%,#f64310_50%,#df390e_100%)] text-[15px] font-semibold text-white shadow-[0_10px_20px_rgba(246,67,16,0.24)] transition hover:brightness-[1.03] disabled:cursor-not-allowed disabled:opacity-50'
+            className='min-h-[48px] w-full rounded-full bg-[linear-gradient(135deg,var(--brand-bright)_0%,var(--brand)_50%,var(--brand-deep)_100%)] text-[15px] font-semibold text-white shadow-[0_10px_20px_rgb(var(--brand-rgb)/0.24)] transition hover:brightness-[1.03] disabled:cursor-not-allowed disabled:opacity-50'
           >
-            {agreeing ? '저장 중…' : '동의하고 작성하기'}
+            {agreeing ? t('orientation.saving') : t('orientation.agree')}
           </button>
           {listHref ? (
             <Link
               href={listHref}
               className='mt-3 flex min-h-11 items-center justify-center text-[13px] font-medium text-[var(--muted)] underline-offset-2 hover:underline'
             >
-              목록으로 돌아가기
+              {t('orientation.backToList')}
             </Link>
           ) : null}
         </div>
@@ -198,6 +183,7 @@ function WriteConsentModal({
 }
 
 function useWriteConsent(enabled: boolean, source: WriteConsentSource) {
+  const t = useT('reviews')
   const [required, setRequired] = useState(false)
   const [ready, setReady] = useState(!enabled)
   const [agreeing, setAgreeing] = useState(false)
@@ -243,11 +229,11 @@ function useWriteConsent(enabled: boolean, source: WriteConsentSource) {
         body: JSON.stringify({ source }),
       })
       if (!res.ok) {
-        throw new Error('동의 기록 저장에 실패했어요')
+        throw new Error('write consent save failed')
       }
       setRequired(false)
     } catch {
-      setError('동의 기록 저장에 실패했어요. 다시 시도해 주세요.')
+      setError(t('orientation.saveFailed'))
     } finally {
       setAgreeing(false)
     }
@@ -277,13 +263,14 @@ export function CptOptWriteOrientationModal({
   onClose,
   listHref,
 }: WriteConsentModalExportProps) {
+  const steps = useOrientationSteps('cptOpt')
   return (
     <WriteConsentModal
       open={open}
       agreeing={agreeing}
       error={error}
       onAgree={onClose}
-      steps={ORIENTATION_STEPS}
+      steps={steps}
       titleId='status-write-consent-title'
       listHref={listHref}
     />
@@ -301,13 +288,14 @@ export function JobReviewWriteOrientationModal({
   onClose,
   listHref,
 }: WriteConsentModalExportProps) {
+  const steps = useOrientationSteps('jobReview')
   return (
     <WriteConsentModal
       open={open}
       agreeing={agreeing}
       error={error}
       onAgree={onClose}
-      steps={JOB_REVIEW_ORIENTATION_STEPS}
+      steps={steps}
       titleId='job-review-write-consent-title'
       listHref={listHref}
     />
@@ -325,13 +313,14 @@ export function RoommateWriteOrientationModal({
   onClose,
   listHref,
 }: WriteConsentModalExportProps) {
+  const t = useT('reviews')
   return (
     <WriteConsentModal
       open={open}
       agreeing={agreeing}
       error={error}
       onAgree={onClose}
-      eyebrow='룸메이트 · 서블렛'
+      eyebrow={t('orientation.roommateEyebrow')}
       titleId='roommate-write-consent-title'
       listHref={listHref}
     />
@@ -349,14 +338,17 @@ export function AnonymousWriteOrientationModal({
   onClose,
   listHref,
 }: WriteConsentModalExportProps) {
+  const t = useT('reviews')
   return (
     <WriteConsentModal
       open={open}
       agreeing={agreeing}
       error={error}
       onAgree={onClose}
-      extraGuidelines={ANONYMOUS_WRITING_GUIDELINES}
-      eyebrow='익명게시판'
+      extraGuidelines={ANONYMOUS_WRITING_GUIDELINE_KEYS.map(
+        (key) => `guidelines.anonymous.${key}`,
+      )}
+      eyebrow={t('orientation.anonymousEyebrow')}
       titleId='anonymous-write-consent-title'
       listHref={listHref}
     />

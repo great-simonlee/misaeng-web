@@ -1,0 +1,445 @@
+{
+  "amenities": {
+    "24HourAttendedLobby": "24 小時門房",
+    "conciergeService": "禮賓服務",
+    "elevator": "電梯",
+    "fitnessCenter": "健身房",
+    "mailRoom": "郵件室",
+    "laundryRoom": "洗衣房",
+    "residentLounge": "住戶交誼廳",
+    "rooftopOutdoorSpace": "頂樓戶外空間",
+    "rooftopLounge": "頂樓交誼廳",
+    "petFriendly": "可養寵物",
+    "garageParking": "室內停車場",
+    "sauna": "三溫暖",
+    "pool": "游泳池",
+    "swimmingPool": "游泳池",
+    "indoorPool": "室內游泳池",
+    "outdoorPool": "戶外游泳池",
+    "workingSpace": "讀書／工作空間",
+    "businessMeetingRoom": "會議室",
+    "pilatesStudio": "皮拉提斯教室",
+    "yogaStudio": "瑜伽教室",
+    "recoveryRoom": "恢復室",
+    "indoorBasketballCourt": "室內籃球場",
+    "indoorPickleballCourt": "室內匹克球場",
+    "indoorGolfSimulator": "高爾夫模擬器",
+    "bowlingAlley": "保齡球館",
+    "pokerRoom": "撲克室",
+    "billiardsRoom": "撞球室",
+    "arcadeRoom": "遊戲室",
+    "pingPongTable": "桌球桌",
+    "tennisCourts": "網球場",
+    "bbqGrills": "BBQ 烤肉架",
+    "bbqGrill": "BBQ 烤肉架",
+    "sundeck": "戶外空間",
+    "dogRun": "狗狗運動區",
+    "childrensPlayroom": "兒童遊戲室",
+    "mediaRoom": "影音室",
+    "garden": "花園",
+    "bikeRoom": "單車停放室",
+    "storageSpace": "儲藏室",
+    "valetService": "代客停車",
+    "liveInSuper": "駐點管理員",
+    "wheelchairAccess": "無障礙通道",
+    "indoorSquashCourt": "室內壁球場"
+  },
+  "utilities": {
+    "heat": "含暖氣",
+    "hotWater": "含熱水",
+    "gas": "含瓦斯",
+    "electricity": "含電費",
+    "water": "含水費",
+    "sewer": "含污水處理費"
+  },
+  "appliances": {
+    "dishwasher": "洗碗機",
+    "microwave": "微波爐",
+    "oven": "烤箱",
+    "refrigerator": "冰箱",
+    "washer": "洗衣機",
+    "dryer": "烘衣機",
+    "airConditioning": "冷氣",
+    "inUnitWasher": "洗衣機"
+  },
+  "perks": {
+    "roommate-waiting": "已有室友等待中",
+    "no-broker-fee": "免仲介費",
+    "no-guarantor": "不需保證人",
+    "free-credit": "免租優惠",
+    "doorman-24h": "24 小時門房",
+    "washer-dryer": "洗衣機／烘衣機",
+    "terrace": "露台",
+    "gym": "健身房",
+    "pool": "游泳池",
+    "wall-ok": "可加隔間牆",
+    "package-storage": "包裹室",
+    "mail-room": "郵件室",
+    "rooftop": "頂樓",
+    "bbq-grill": "BBQ 烤肉架",
+    "work-study": "工作與讀書空間",
+    "sauna": "三溫暖"
+  },
+  "roomTypes": {
+    "master-w-bath": "Master w/ Bath",
+    "master-wo-bath": "Master w/o Bath",
+    "regular-bedroom": "Regular",
+    "flexroom": "Flex",
+    "entire": "整層",
+    "studio": "Studio"
+  },
+  "unitTypes": {
+    "studio": "Studio",
+    "1b1b": "1B1B",
+    "2b1b": "2B1B",
+    "2b2b": "2B2B",
+    "3b1b": "3B1B",
+    "3b2b": "3B2B",
+    "4-plus": "4 房以上",
+    "unknown": "房型待定"
+  },
+  "credit": {
+    "monthsFree_other": "免租 {count} 個月",
+    "dollarCredit": "${amount} 租金折抵"
+  },
+  "amenityFee": {
+    "unknown": "尚未確認",
+    "free": "免費",
+    "mandatoryPersonMonthly": "必繳 · 每人每月 ${amount}",
+    "mandatoryPersonYearly": "必繳 · 每人每年 ${amount}",
+    "mandatoryUnitMonthly": "必繳 · 每戶每月 ${amount}",
+    "mandatoryUnitYearly": "必繳 · 每戶每年 ${amount}",
+    "optionalPersonMonthly": "選繳 · 每人每月 ${amount}",
+    "optionalPersonYearly": "選繳 · 每人每年 ${amount}",
+    "optionalUnitMonthly": "選繳 · 每戶每月 ${amount}",
+    "optionalUnitYearly": "選繳 · 每戶每年 ${amount}"
+  },
+  "partWall": {
+    "fullWall": "整面隔間牆",
+    "regularWall": "一般隔間牆",
+    "curtainOnly": "僅限隔簾"
+  },
+  "income": {
+    "personal": "收入 {multiple} 倍",
+    "guarantor": "保證人 {multiple} 倍",
+    "guarantorCompany": "可用保證公司"
+  },
+  "roommatePreferences": {
+    "master-w-bath": "想住 Master",
+    "master-wo-bath": "想住 Master w/o Bath",
+    "regular-bedroom": "想住 Regular",
+    "flexroom": "想住 Flex",
+    "any": "都可以"
+  },
+  "price": {
+    "gross": "Gross",
+    "net": "Net"
+  },
+  "card": {
+    "photoLabel": "{address} 照片 {number}",
+    "noPhoto": "沒有照片",
+    "moveIn": "{date} 入住",
+    "moveInTbd": "待定",
+    "composition": {
+      "male_other": "男生 {count} 人",
+      "female_other": "女生 {count} 人"
+    },
+    "loadingLabel": "正在載入房源",
+    "loadingDescription": "正在載入房源…"
+  },
+  "roommateIntro": {
+    "title": "等待中的室友",
+    "introFallback": "聯絡我們後會提供更多資訊。",
+    "male": "男性",
+    "female": "女性",
+    "worker": "上班族"
+  },
+  "map": {
+    "location": "位置",
+    "directions": "路線",
+    "openInGoogleMaps": "在 Google 地圖查看 {name}",
+    "viewInGoogleMaps": "在 Google 地圖查看位置"
+  },
+  "detail": {
+    "toasts": {
+      "notAvailableYet": "即將開放",
+      "kakaoNotReady": "KakaoTalk 洽詢連結尚未準備好",
+      "linkCopied": "已複製連結",
+      "linkCopyFailed": "連結複製失敗"
+    },
+    "notFound": {
+      "title": "找不到房源",
+      "description": "可能已經下架或刪除。",
+      "action": "返回租屋"
+    },
+    "mailSubject": "[{brand} 租屋] {address}",
+    "backToList": "租屋",
+    "noPhotos": "還沒有照片",
+    "previousPhoto": "上一張",
+    "nextPhoto": "下一張",
+    "layout": "格局",
+    "watchVideo": "觀看影片",
+    "photoNumber": "第 {number} 張照片",
+    "previousThumbnails": "顯示前面的縮圖",
+    "moreThumbnails": "顯示更多縮圖",
+    "benefits": "優惠",
+    "roomOptions": "房間選擇",
+    "amenities": "公共設施",
+    "utilities": "水電瓦斯",
+    "appliances": "家電",
+    "emailInquiry": "Email 洽詢",
+    "kakaoInquiry": "用 KakaoTalk 洽詢",
+    "share": "分享",
+    "closeListing": "下架房源",
+    "description": "詳細說明",
+    "property": {
+      "title": "大樓資訊",
+      "zipcode": "郵遞區號",
+      "wall": "隔間選項",
+      "amenityFee": "設施費",
+      "income": "收入條件",
+      "subway": "地鐵"
+    }
+  },
+  "listingKinds": {
+    "unit": {
+      "label": "整層",
+      "description": "想找整間公寓"
+    },
+    "room": {
+      "label": "獨立房間",
+      "description": "只想找一間房"
+    }
+  },
+  "list": {
+    "title": "租屋",
+    "subtitle": "{brand} 精選的 NYC 房源 · 整層與獨立房間一次找。",
+    "filters": "篩選",
+    "quickFilters": "快速篩選",
+    "previousFilters": "顯示前面的篩選",
+    "moreFilters": "顯示更多篩選",
+    "price": {
+      "upTo": "${amount} 以下",
+      "atLeast": "${amount} 以上",
+      "range": "${min} – ${max}"
+    },
+    "summaryAll_other": "{count} 個房源",
+    "summaryFiltered_other": "{filters} · {count} 個房源",
+    "empty": {
+      "title": "沒有符合篩選條件的房源",
+      "description": "試著調整篩選條件再搜尋一次。",
+      "action": "重設篩選"
+    },
+    "sheet": {
+      "clearAll": "全部清除",
+      "showResults_other": "顯示 {count} 個房源",
+      "lookingFor": "你在找什麼？",
+      "unitType": "房型",
+      "roomType": "房間類型",
+      "all": "全部",
+      "price": "價格",
+      "unitRent": "整層月租",
+      "roomRent": "每間房月租",
+      "benefits": "優惠",
+      "amenities": "公共設施",
+      "area": "區域"
+    }
+  },
+  "new": {
+    "errors": {
+      "loginRequired": "請先登入",
+      "submitFailed": "房源刊登失敗"
+    },
+    "redirectingToLogin": "正在前往登入頁面…",
+    "teamOnly": {
+      "title": "僅限團隊帳號",
+      "description": "只有 {domain} Email 才能刊登房源。你目前登入的是：{email}",
+      "unknownEmail": "未知"
+    },
+    "breadcrumb": "新增",
+    "title": "新增房源",
+    "signedInAs": "目前登入：{email}",
+    "fields": {
+      "streetAddress": "街道地址",
+      "neighborhood": "區域",
+      "unitRent": "整層月租（$）",
+      "unitRentPlaceholder": "所有房間的總價",
+      "roomRent": "每間房月租（$）",
+      "bedrooms": "房間數",
+      "availableFrom": "入住日期",
+      "availableTo": "搬出日期",
+      "contactEmail": "聯絡 Email",
+      "description": "說明",
+      "descriptionPlaceholder": "租約條件、公共設施、適合什麼樣的人等。"
+    },
+    "submitting": "刊登中…",
+    "submit": "刊登"
+  },
+  "roommate": {
+    "intents": {
+      "offer-room": {
+        "label": "提供房間",
+        "description": "幫你的住處找室友，或刊登轉租"
+      },
+      "seek": {
+        "label": "找室友",
+        "description": "找一起找房的人，或找可以入住的房間"
+      }
+    },
+    "lookingFor": {
+      "has-room": {
+        "label": "徵室友入住我們的住處",
+        "shortLabel": "有房間",
+        "description": "已經有住處，需要一起住的人"
+      },
+      "sublet": {
+        "label": "短期轉租我的房間",
+        "shortLabel": "轉租",
+        "description": "把你的房間短期轉租出去"
+      },
+      "together": {
+        "label": "徵室友一起找房",
+        "shortLabel": "一起找房",
+        "description": "還沒有住處，找室友一起找房"
+      },
+      "room": {
+        "label": "只想找房間入住",
+        "shortLabel": "找房間",
+        "description": "不找室友，只找房間或公寓"
+      }
+    },
+    "form": {
+      "has-room": {
+        "locationLabel": "目前區域／位置",
+        "locationPlaceholder": "例：Brooklyn Bushwick",
+        "budgetLabel": "室友每月房租（$）",
+        "budgetPlaceholder": "例：1400",
+        "moveInStartLabel": "可入住日期",
+        "moveInEndLabel": "搬出日期",
+        "photosHint": "建議附上房間／公寓照片 · 最多 6 張 · 第一張為封面",
+        "titlePlaceholder": "例：Bushwick 2 房徵室友",
+        "bodyPlaceholder": "說明格局、生活習慣、水電瓦斯與押金。請留下 KakaoTalk 一對一開放聊天室連結，方便大家聯絡你。"
+      },
+      "together": {
+        "locationLabel": "偏好區域",
+        "locationPlaceholder": "例：Queens Astoria / Brooklyn",
+        "budgetLabel": "每月預算上限（$）",
+        "budgetPlaceholder": "例：1600",
+        "moveInStartLabel": "希望入住日期",
+        "moveInEndLabel": "搬出日期",
+        "photosHint": "有參考照片的話可以附上 · 最多 6 張",
+        "titlePlaceholder": "例：9 月入住，一起在 Astoria 找房",
+        "bodyPlaceholder": "分享你的預算、偏好區域和生活習慣。請留下 KakaoTalk 一對一開放聊天室連結，方便大家聯絡你。"
+      },
+      "room": {
+        "locationLabel": "偏好區域",
+        "locationPlaceholder": "例：Manhattan UES / Jersey City",
+        "budgetLabel": "每月預算上限（$）",
+        "budgetPlaceholder": "例：1800",
+        "moveInStartLabel": "希望入住日期",
+        "moveInEndLabel": "搬出日期",
+        "photosHint": "有參考照片的話可以附上 · 最多 6 張",
+        "titlePlaceholder": "例：想找 Midtown 附近的房間",
+        "bodyPlaceholder": "分享你的預算、偏好地點和入住時間。請留下 KakaoTalk 一對一開放聊天室連結，方便大家聯絡你。"
+      },
+      "sublet": {
+        "locationLabel": "轉租地點",
+        "locationPlaceholder": "例：Upper East Side",
+        "budgetLabel": "每月房租（$）",
+        "budgetPlaceholder": "例：2200",
+        "moveInStartLabel": "轉租開始日期",
+        "moveInEndLabel": "轉租結束日期",
+        "photosHint": "建議附上房間／公寓照片 · 最多 6 張 · 第一張為封面",
+        "titlePlaceholder": "例：UES Studio 轉租，9–11 月",
+        "bodyPlaceholder": "說明日期、是否附家具、交通、水電瓦斯與押金。請留下 KakaoTalk 一對一開放聊天室連結，方便大家聯絡你。"
+      }
+    },
+    "card": {
+      "pricePerMonth": "{price}/月"
+    },
+    "list": {
+      "budgetPresets": {
+        "under-1500": "$1,500 以下",
+        "1500-2000": "$1,500–2,000",
+        "2000-2500": "$2,000–2,500",
+        "2500-plus": "$2,500 以上"
+      },
+      "loadFailed": "無法載入貼文",
+      "summaryAll_other": "{count} 篇貼文",
+      "summaryFiltered_other": "{filters} · {count} 篇貼文",
+      "login": "登入",
+      "suspended": "帳號已停權",
+      "breadcrumb": "室友 · 轉租",
+      "empty": {
+        "noPostsTitle": "還沒有室友或轉租貼文",
+        "noMatchTitle": "沒有符合篩選條件的貼文",
+        "firstPost": "成為第一個發文的人，開啟話題吧。",
+        "verifyToPost": "完成學生或上班族認證後即可發文。",
+        "loginToPost": "登入後即可發文。"
+      },
+      "showResults_other": "顯示 {count} 篇貼文",
+      "category": "分類",
+      "monthlyBudget": "每月預算",
+      "neighborhood": "區域"
+    },
+    "write": {
+      "errors": {
+        "alreadyPosted": "你已經有一篇室友／轉租貼文，正在帶你前往編輯。",
+        "notFound": "找不到貼文",
+        "noPermission": "你沒有編輯這篇貼文的權限",
+        "loadFailed": "無法載入貼文",
+        "typeRequired": "請選擇類型",
+        "titleRequired": "請輸入標題",
+        "titleTooLong": "標題最多 {max} 個字元",
+        "bodyRequired": "請輸入內文",
+        "bodyTooLong": "內文最多 {max} 個字元",
+        "fieldRequired": "請填寫：{field}",
+        "fieldSelect": "請選擇：{field}",
+        "budgetRange": "請輸入 $0 到 ${max} 之間的金額",
+        "endBeforeStart": "結束日期必須晚於開始日期",
+        "updateFailed": "無法儲存變更",
+        "draftSaveFailed": "草稿儲存失敗"
+      },
+      "updated": "貼文已更新",
+      "created": "貼文已發布",
+      "draftSaved": "草稿已儲存",
+      "checkingExisting": "正在確認是否已有貼文…",
+      "backToPost": "返回貼文",
+      "backToList": "返回{board}",
+      "onePostNotice": "在室友 · 轉租看板，{limit}。如果情況有變，請編輯或刪除現有貼文後再重新發文。",
+      "onePostLimit": "每個帳號只能發一篇貼文",
+      "steps": {
+        "type": "這是哪種貼文？",
+        "basics": "基本資訊",
+        "basicsDescription": "填寫標題、地點、預算和日期",
+        "photos": "照片",
+        "photosDescription": "{hint} · 長按拖曳可調整順序 · {current}/{max}",
+        "details": "詳細內容",
+        "detailsDescription": "分享你的生活習慣與條件。建議建立 KakaoTalk 一對一開放聊天室並留下連結，方便大家聯絡你。"
+      },
+      "subtype": "類型詳情",
+      "fields": {
+        "title": "標題"
+      },
+      "pickSubtypeHint": "選擇類型後會顯示地點、預算和入住欄位。",
+      "pickIntentHint": "請選擇提供房間或找室友。",
+      "photosDefaultHint": "最多 {max} 張 · 第一張為封面",
+      "addPhoto": "新增",
+      "saving": "儲存中…",
+      "saveEdit": "儲存變更",
+      "submit": "發布貼文",
+      "backToListShort": "返回列表",
+      "createHero": {
+        "title": "在室友 · 轉租看板發文",
+        "description": "選擇提供房間或找室友，再填寫地點和日期。",
+        "photoTip": "橫式 4:3 照片效果最好。"
+      },
+      "updateHero": {
+        "eyebrow": "編輯貼文",
+        "title": "編輯你的貼文",
+        "description": "如果情況有變，可以更新類型、地點或日期。"
+      },
+      "untitled": "無標題"
+    }
+  }
+}

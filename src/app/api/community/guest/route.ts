@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
 
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { formatNumber } from '@lib/i18n/format'
+import { getRequestLocale, getT } from '@lib/i18n/server'
+
 import { resolveAuthenticatedUser } from '@/app/api/agent-auth/lib/authHelpers'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
@@ -26,10 +30,7 @@ import {
   normalizeJobReviewTips,
   normalizeJobReviewType,
 } from '@lib/community/jobReview'
-import {
-  ACCOUNT_SUSPENDED_MESSAGE,
-  isAccountSuspended,
-} from '@lib/community/schoolGate'
+import { isAccountSuspended } from '@lib/community/schoolGate'
 import { WRITE_GUIDELINES_VERSION } from '@lib/constants/communityGuidelines'
 import { getClientIp } from '@lib/consent/requestMeta'
 import {
@@ -104,15 +105,14 @@ function bad(error: string, status = 400) {
 }
 
 export async function POST(request: Request) {
+  const locale = await getRequestLocale(request)
+  const t = await getT(locale, 'api')
   if (!isCommunityStorageConfigured()) {
-    return bad(
-      'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
-      503,
-    )
+    return bad(t('common.supabaseNotConfiguredDetail'), 503)
   }
 
   const body = (await request.json().catch(() => null)) as GuestCreateBody | null
-  if (!body) return bad('요청 내용을 확인해 주세요.')
+  if (!body) return bad(t('guest.invalidRequest'))
   if (String(body.website || '').trim()) {
     // 봇 허니팟 — 성공한 것처럼 응답만 하고 저장하지 않는다.
     return NextResponse.json({ ok: true })
@@ -121,7 +121,7 @@ export async function POST(request: Request) {
   const user = await resolveAuthenticatedUser()
   const profile = user?.uid ? await getSupabaseProfile(user.uid) : null
   if (user && isAccountSuspended(profile)) {
-    return bad(ACCOUNT_SUSPENDED_MESSAGE, 403)
+    return bad(t('common.accountSuspended'), 403)
   }
 
   const guest = body.guest || {}
@@ -130,42 +130,43 @@ export async function POST(request: Request) {
   )
   if (!isValidGuestNickname(nickname)) {
     return bad(
-      `게시용 닉네임을 ${GUEST_NICKNAME_MIN}~${GUEST_NICKNAME_MAX}자로 입력해 주세요. (이메일 형식 제외)`,
+      t('guest.nicknameInvalid', {
+        min: formatNumber(locale, GUEST_NICKNAME_MIN),
+        max: formatNumber(locale, GUEST_NICKNAME_MAX),
+      }),
     )
   }
   try {
     if (await isNicknameTakenByOther(nickname, user?.uid)) {
-      return bad('이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요.', 409)
+      return bad(t('profile.nicknameTaken'), 409)
     }
   } catch (error) {
     console.error('Guest nickname check error:', error)
-    return bad('닉네임 확인에 실패했어요. 잠시 후 다시 시도해 주세요.', 500)
+    return bad(t('profile.nicknameCheckFailedRetry'), 500)
   }
   const email = normalizeGuestEmail(guest.email || user?.email || '')
   if (!isValidGuestEmail(email)) {
-    return bad('기프트카드·크레딧 안내를 받을 이메일을 정확히 입력해 주세요.')
+    return bad(t('guest.emailInvalid'))
   }
   const linkedinUrl = normalizeLinkedinUrl(guest.linkedinUrl)
   if (!linkedinUrl) {
-    return bad(
-      'LinkedIn 프로필 주소를 입력해 주세요. 예: linkedin.com/in/your-name',
-    )
+    return bad(t('guest.linkedinRequired'))
   }
   if (guest.guidelinesAccepted !== true) {
-    return bad('커뮤니티 작성 안내에 동의해 주세요.')
+    return bad(t('guest.guidelinesRequired'))
   }
   const coffeeChatOk = guest.coffeeChatOk === true
 
   const title = String(body.title || '').trim()
   const contentHtml = sanitizeCommunityHtml(String(body.contentHtml || '').trim())
-  if (!title) return bad('제목을 입력해 주세요.')
+  if (!title) return bad(t('guest.titleRequired'))
   if (!contentHtml || contentHtml === '<p></p>') {
-    return bad('조심해야 할 점을 입력해 주세요.')
+    return bad(t('guest.bodyRequired'))
   }
   const plain = htmlToPlainText(contentHtml)
   if (plain.length > COMMUNITY_BODY_MAX) {
     return bad(
-      `조심해야 할 점은 ${COMMUNITY_BODY_MAX.toLocaleString('en-US')}자 이내로 작성해 주세요.`,
+      t('guest.bodyTooLong', { max: formatNumber(locale, COMMUNITY_BODY_MAX) }),
     )
   }
 
@@ -173,11 +174,11 @@ export async function POST(request: Request) {
     ? body.jobReviewType
     : normalizeJobReviewType(body.jobReviewType, body.detail)
   if (!jobReviewType) {
-    return bad('인턴 / 신입 / 경력 / 이직 / 계약 중 유형을 선택해 주세요.')
+    return bad(t('guest.jobReviewTypeRequired'))
   }
   const jobReviewTimeline = normalizeJobReviewTimeline(body.jobReviewTimeline)
   if (jobReviewTimeline.length === 0) {
-    return bad('채용 단계를 최소 1건 이상 입력해 주세요.')
+    return bad(t('community.write.jobReviewTimelineRequired'))
   }
   const jobReviewTips = normalizeJobReviewTips(body.jobReviewTips) || null
   const jobReviewIndustry = String(body.jobReviewIndustry || '').trim() || null
@@ -186,21 +187,21 @@ export async function POST(request: Request) {
     body.jobReviewSourceOrgId,
   )
   if (!jobReviewSource) {
-    return bad('어떻게 연락이 닿았는지 선택해 주세요. 학생회를 골랐다면 어느 학생회인지도 선택해 주세요.')
+    return bad(t('community.write.jobReviewSourceRequired'))
   }
   const jobReviewOutcome = isJobReviewOutcomeId(body.jobReviewOutcome)
     ? body.jobReviewOutcome
     : null
   if (!jobReviewOutcome) {
-    return bad('최종 결과를 선택해 주세요.')
+    return bad(t('community.write.jobReviewOutcomeRequired'))
   }
   const companyResult = await resolveReviewCompanyId(body.companyId)
   if (!companyResult.ok) {
-    return NextResponse.json({ error: companyResult.error }, { status: 400 })
+    return NextResponse.json({ error: t(companyResult.errorKey) }, { status: 400 })
   }
 
   if (!user && isRateLimited(getClientIp(request))) {
-    return bad('잠시 후 다시 시도해 주세요. (짧은 시간에 너무 많은 요청)', 429)
+    return bad(t('guest.rateLimited'), 429)
   }
 
   const now = Date.now()
@@ -209,6 +210,8 @@ export async function POST(request: Request) {
 
   const post: CommunityPost = {
     id,
+    // 작성 화면 언어 = 원문 언어 (번역이 다르면 ERP 번역 단계에서 바로잡는다)
+    sourceLocale: locale,
     categoryId: 'job-review',
     city: null,
     title,
@@ -320,9 +323,6 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Guest community create error:', error)
-    return bad(
-      error instanceof Error ? error.message : '게시글 저장에 실패했어요.',
-      500,
-    )
+    return bad(apiErrorMessage(t, error, 'community.saveFailed'), 500)
   }
 }

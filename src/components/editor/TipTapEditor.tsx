@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { uploadCommunityImageFile } from '@lib/community/upload.client'
 import { cn } from '@lib'
+import { useFormat, useT } from '@lib/i18n/client'
 
 type TipTapEditorProps = {
   value: string
@@ -27,13 +28,16 @@ type TipTapEditorProps = {
 export function TipTapEditor({
   value,
   onChange,
-  placeholder = '내용을 입력해 주세요',
+  placeholder,
   className,
   minHeightClassName = 'min-h-[220px]',
   contentClassName,
   simpleToolbar = false,
   maxLength,
 }: TipTapEditorProps) {
+  const t = useT('common')
+  const tCommunity = useT('community')
+  const format = useFormat()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const maxLengthRef = useRef(maxLength)
   const [uploading, setUploading] = useState(false)
@@ -50,11 +54,13 @@ export function TipTapEditor({
         heading: { levels: [2, 3] },
         link: false,
       }),
-      Placeholder.configure({ placeholder }),
+      Placeholder.configure({
+        placeholder: placeholder ?? t('ui.editor.placeholder'),
+      }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-[#F64310] underline underline-offset-2',
+          class: 'text-brand underline underline-offset-2',
         },
       }),
       Image.configure({
@@ -124,14 +130,14 @@ export function TipTapEditor({
     try {
       for (const file of Array.from(files)) {
         if (!file.type.startsWith('image/')) continue
-        const url = await uploadCommunityImageFile(file)
+        const url = await uploadCommunityImageFile(file, tCommunity)
         editor.chain().focus().setImage({ src: url }).run()
       }
     } catch (error) {
       window.alert(
         error instanceof Error
           ? error.message
-          : '이미지 업로드에 실패했어요',
+          : t('ui.editor.imageUploadFailed'),
       )
     } finally {
       setUploading(false)
@@ -164,12 +170,12 @@ export function TipTapEditor({
         <ToolbarButton
           active={editor.isActive('bold')}
           onClick={() => editor.chain().focus().toggleBold().run()}
-          label='굵게'
+          label={t('ui.editor.bold')}
         />
         <ToolbarButton
           active={editor.isActive('italic')}
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          label='기울임'
+          label={t('ui.editor.italic')}
         />
         {simpleToolbar ? null : (
           <>
@@ -178,23 +184,23 @@ export function TipTapEditor({
               onClick={() =>
                 editor.chain().focus().toggleHeading({ level: 2 }).run()
               }
-              label='제목'
+              label={t('ui.editor.heading')}
             />
             <ToolbarButton
               active={editor.isActive('bulletList')}
               onClick={() => editor.chain().focus().toggleBulletList().run()}
-              label='목록'
+              label={t('ui.editor.bulletList')}
             />
             <ToolbarButton
               active={editor.isActive('blockquote')}
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
-              label='인용'
+              label={t('ui.editor.quote')}
             />
           </>
         )}
         <ToolbarButton
           onClick={() => {
-            const url = window.prompt('링크 URL을 입력하세요')
+            const url = window.prompt(t('ui.editor.linkPrompt'))
             if (!url) return
             editor
               .chain()
@@ -203,11 +209,13 @@ export function TipTapEditor({
               .setLink({ href: url })
               .run()
           }}
-          label='링크'
+          label={t('ui.editor.link')}
         />
         <ToolbarButton
           onClick={() => fileInputRef.current?.click()}
-          label={uploading ? '업로드 중…' : '사진'}
+          label={
+            uploading ? t('ui.imageUpload.uploading') : t('ui.editor.photo')
+          }
           disabled={uploading}
         />
       </div>
@@ -223,7 +231,9 @@ export function TipTapEditor({
       {maxLength != null ? (
         <div className='flex items-center justify-between border-t border-black/[0.04] px-3 py-2'>
           <p className='text-[11px] text-[var(--muted)]'>
-            {atLimit ? '최대 글자 수에 도달했어요' : '텍스트 기준 글자 수'}
+            {atLimit
+              ? t('ui.editor.maxLengthReached')
+              : t('ui.editor.charCount')}
           </p>
           <p
             className={cn(
@@ -231,8 +241,7 @@ export function TipTapEditor({
               atLimit ? 'text-[var(--brand)]' : 'text-[var(--muted)]',
             )}
           >
-            {charCount.toLocaleString('en-US')}/
-            {maxLength.toLocaleString('en-US')}
+            {format.number(charCount)}/{format.number(maxLength)}
           </p>
         </div>
       ) : null}

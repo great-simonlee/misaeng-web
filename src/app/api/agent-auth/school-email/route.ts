@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
 
+import { ApiMessageError, apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
+import type { Translate } from '@lib/i18n/translate'
+
 import {
   getAuthErrorMessage,
   resolveAuthenticatedUser,
@@ -23,7 +27,7 @@ type SchoolEmailBody = {
   code?: string
 }
 
-async function sendViaEllieo(email: string) {
+async function sendViaEllieo(t: Translate, email: string) {
   const { res, data } = await ellieoAuthorizedFetch(
     'auth/verification/school',
     {
@@ -36,12 +40,11 @@ async function sendViaEllieo(email: string) {
     return { ok: true as const }
   }
 
-  const message = getAuthErrorMessage(data, '인증 코드 발송에 실패했어요.')
+  const message = getAuthErrorMessage(t, data, t('verification.codeSendFailed'))
   if (/invalid school email domain/i.test(message)) {
     return {
       ok: false as const,
-      error:
-        '아직 지원하지 않는 학교 이메일 도메인이에요. 미생팀에 학교 등록을 요청해 주세요.',
+      error: t('verification.schoolDomainUnsupported'),
       code: 'SCHOOL_DOMAIN_UNSUPPORTED' as const,
     }
   }
@@ -49,12 +52,12 @@ async function sendViaEllieo(email: string) {
   return { ok: false as const, error: message }
 }
 
-async function confirmViaEllieo(email: string, code: string) {
+async function confirmViaEllieo(t: Translate, email: string, code: string) {
   const bodies = [
     { email, code },
     { email, verificationCode: code },
   ]
-  let lastError = '인증 코드가 올바르지 않거나 만료되었어요.'
+  let lastError = t('verification.codeInvalid')
 
   for (const body of bodies) {
     const { res, data } = await ellieoAuthorizedFetch(
@@ -69,7 +72,7 @@ async function confirmViaEllieo(email: string, code: string) {
       return { ok: true as const }
     }
 
-    lastError = getAuthErrorMessage(data, lastError)
+    lastError = getAuthErrorMessage(t, data, lastError)
   }
 
   return { ok: false as const, error: lastError }
@@ -81,7 +84,7 @@ async function markSchoolVerified(uid: string, email: string) {
   const domain = normalizedEmail.split('@')[1] ?? ''
 
   if (!isSupabaseProfileConfigured()) {
-    throw new Error('Supabase 설정이 필요해요.')
+    throw new ApiMessageError('Supabase is not configured.', 'common.supabaseNotConfigured')
   }
 
   const profile = await upsertSupabaseProfile(uid, {
@@ -99,26 +102,27 @@ async function markSchoolVerified(uid: string, email: string) {
 }
 
 export async function POST(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
     if (!isSchoolOtpEnabled()) {
       return NextResponse.json(
-        { error: '학교 이메일 인증이 일시적으로 비활성화되어 있어요.' },
+        { error: t('verification.schoolOtpDisabled') },
         { status: 503 },
       )
     }
 
     if (!getEllieoBaseUrl()) {
       return NextResponse.json(
-        { error: 'APP_CONNECT_API_BASE_URL 환경 변수가 필요해요.' },
+        { error: t('auth.appConnectMissing') },
         { status: 503 },
       )
     }
 
     const user = await resolveAuthenticatedUser()
     if (!user?.uid) {
-      return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+      return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
     }
-    const suspended = await accountSuspendedResponse(user.uid)
+    const suspended = await accountSuspendedResponse(user.uid, t)
     if (suspended) return suspended
 
     const body = (await request.json()) as SchoolEmailBody
@@ -127,13 +131,13 @@ export async function POST(request: Request) {
 
     if (!email || !isSchoolEmail(email)) {
       return NextResponse.json(
-        { error: '학교 이메일(.edu 또는 등록된 도메인)을 입력해 주세요.' },
+        { error: t('verification.schoolEmailRequired') },
         { status: 400 },
       )
     }
 
     if (action === 'send') {
-      const result = await sendViaEllieo(email)
+      const result = await sendViaEllieo(t, email)
       if (!result.ok) {
         return NextResponse.json(
           {
@@ -151,12 +155,12 @@ export async function POST(request: Request) {
       const code = body.code?.trim()
       if (!code) {
         return NextResponse.json(
-          { error: '인증 코드를 입력해 주세요.' },
+          { error: t('verification.codeRequired') },
           { status: 400 },
         )
       }
 
-      const result = await confirmViaEllieo(email, code)
+      const result = await confirmViaEllieo(t, email, code)
       if (!result.ok) {
         return NextResponse.json({ error: result.error }, { status: 400 })
       }
@@ -180,14 +184,11 @@ export async function POST(request: Request) {
       })
     }
 
-    return NextResponse.json({ error: '잘못된 요청이에요.' }, { status: 400 })
+    return NextResponse.json({ error: t('common.badRequest') }, { status: 400 })
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : getAuthErrorMessage(null, '학교 이메일 인증 중 오류가 발생했어요.'),
+        error: apiErrorMessage(t, error, 'verification.schoolEmailError'),
       },
       { status: 500 },
     )

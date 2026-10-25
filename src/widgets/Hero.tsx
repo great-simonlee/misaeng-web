@@ -1,5 +1,5 @@
-import Link from 'next/link'
-import Image from 'next/image'
+import Link from 'next/link';
+import Image from 'next/image';
 
 export function Hero() {
   return (
@@ -24,17 +24,21 @@ export function Hero() {
       {/* Ellieo 한줄 소개: 배너 맨 위 고정, 검정 70% 투명 */}
       <div className='absolute left-0 right-0 top-0 z-10 bg-black/70 px-3 py-2 text-center sm:px-6 sm:py-2'>
         <p className='mx-auto max-w-4xl text-xs leading-snug text-white/90 sm:whitespace-nowrap sm:text-base sm:leading-normal'>
-          <strong className='font-bold text-white'>Ellieo</strong>—Misaeng&apos;s New York City app
-          for verified housing & roommates. Launching this Spring. 🚀
+          <strong className='font-bold text-white'>Ellieo</strong>
+          —New York City app for verified housing & roommates. Live on the App
+          Store & Google Play 🎉
         </p>
       </div>
 
       <div className='relative z-10 flex w-full max-w-5xl min-w-0 flex-col items-center px-4 pt-16 pb-12 text-center sm:px-6 sm:pt-20 sm:pb-16 lg:px-8 lg:pt-28 lg:pb-20'>
         {/* Decorative line */}
         <div className='mb-3 flex items-center justify-center gap-2 sm:mb-3'>
-          <div className='h-px w-8 bg-[#F64310]/80 sm:w-12' aria-hidden />
-          <div className='h-1 w-1 shrink-0 rounded-full bg-[#F64310]' aria-hidden />
-          <div className='h-px w-8 bg-[#F64310]/80 sm:w-12' aria-hidden />
+          <div className='h-px w-8 bg-brand/80 sm:w-12' aria-hidden />
+          <div
+            className='h-1 w-1 shrink-0 rounded-full bg-brand'
+            aria-hidden
+          />
+          <div className='h-px w-8 bg-brand/80 sm:w-12' aria-hidden />
         </div>
         <p className='text-[10px] font-semibold uppercase tracking-[0.2em] text-white/80 sm:tracking-[0.28em]'>
           Next-Gen Housing for New York City
@@ -43,22 +47,24 @@ export function Hero() {
           Half the Rent, Twice the Story.
         </h1>
         <p className='mt-4 max-w-xl text-sm leading-relaxed text-white/90 sm:mt-5 sm:text-base'>
-          Misaeng is building <strong className='font-semibold text-white'>Ellieo</strong>—
-          <br className='sm:hidden' /> a secure, identity-verified rental platform{' '}
-          <br className='sm:hidden' />
+          Misaeng operates{' '}
+          <strong className='font-semibold text-white'>Ellieo</strong>—
+          <br className='sm:hidden' /> a secure, identity-verified rental
+          platform <br className='sm:hidden' />
           for students and professionals in New York City.
         </p>
 
         <div className='mt-6 flex w-full max-w-sm flex-col items-center gap-3 sm:mt-8 sm:max-w-none sm:flex-row sm:items-center sm:justify-center'>
           <Link
-            href='https://ellieo.com/#early'
-            target='_blank'
-            rel='noopener noreferrer'
-            className='group inline-flex min-h-[44px] w-full max-w-[280px] items-center justify-center gap-1.5 rounded-full bg-[#F64310] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_24px_rgba(246,67,16,0.35)] transition active:scale-[0.98] hover:bg-[#d93a0e] hover:shadow-[0_0_32px_rgba(246,67,16,0.45)] sm:min-h-0 sm:max-w-none sm:w-auto sm:py-3'
+            href='/mobile-app'
+            className='group inline-flex min-h-[44px] w-full max-w-[280px] items-center justify-center gap-1.5 rounded-full bg-brand px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_24px_rgb(var(--brand-rgb)/0.35)] transition active:scale-[0.98] hover:bg-brand-hover hover:shadow-[0_0_32px_rgb(var(--brand-rgb)/0.45)] sm:min-h-0 sm:max-w-none sm:w-auto sm:py-3'
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            Get Early Access to Ellieo
-            <span className='text-white/80 transition group-hover:translate-x-0.5' aria-hidden>
+            Download Ellieo
+            <span
+              className='text-white/80 transition group-hover:translate-x-0.5'
+              aria-hidden
+            >
               →
             </span>
           </Link>
@@ -73,19 +79,19 @@ export function Hero() {
 
         <div className='mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2.5 text-xs leading-relaxed text-white/85 sm:mt-6 sm:gap-x-6 sm:leading-normal'>
           <span className='flex items-center gap-1.5'>
-            <span className='h-1 w-1 rounded-full bg-[#F64310]' />
+            <span className='h-1 w-1 rounded-full bg-brand' />
             Identity verification
           </span>
           <span className='flex items-center gap-1.5'>
-            <span className='h-1 w-1 rounded-full bg-[#F64310]' />
+            <span className='h-1 w-1 rounded-full bg-brand' />
             Scam prevention
           </span>
           <span className='flex items-center gap-1.5'>
-            <span className='h-1 w-1 rounded-full bg-[#F64310]' />
-            New York City launch 2026
+            <span className='h-1 w-1 rounded-full bg-brand' />
+            Live on iOS & Android
           </span>
         </div>
       </div>
     </section>
-  )
+  );
 }

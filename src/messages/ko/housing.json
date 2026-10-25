@@ -1,0 +1,445 @@
+{
+  "amenities": {
+    "24HourAttendedLobby": "24시간 도어맨",
+    "conciergeService": "컨시어지",
+    "elevator": "엘리베이터",
+    "fitnessCenter": "헬스장",
+    "mailRoom": "메일 룸",
+    "laundryRoom": "세탁실",
+    "residentLounge": "라운지",
+    "rooftopOutdoorSpace": "옥상 실외 공간",
+    "rooftopLounge": "옥상 라운지",
+    "petFriendly": "반려동물 가능",
+    "garageParking": "주차장",
+    "sauna": "사우나",
+    "pool": "수영장",
+    "swimmingPool": "수영장",
+    "indoorPool": "실내 수영장",
+    "outdoorPool": "실외 수영장",
+    "workingSpace": "공부/업무 공간",
+    "businessMeetingRoom": "미팅 룸",
+    "pilatesStudio": "필라테스",
+    "yogaStudio": "요가 룸",
+    "recoveryRoom": "회복실",
+    "indoorBasketballCourt": "실내 농구장",
+    "indoorPickleballCourt": "실내 피클볼",
+    "indoorGolfSimulator": "스크린 골프",
+    "bowlingAlley": "볼링장",
+    "pokerRoom": "포커 룸",
+    "billiardsRoom": "당구장",
+    "arcadeRoom": "게임 룸",
+    "pingPongTable": "탁구대",
+    "tennisCourts": "테니스 코트",
+    "bbqGrills": "BBQ 그릴",
+    "bbqGrill": "BBQ 그릴",
+    "sundeck": "실외 공간",
+    "dogRun": "강아지 산책",
+    "childrensPlayroom": "놀이방",
+    "mediaRoom": "영화관",
+    "garden": "정원",
+    "bikeRoom": "자전거 보관",
+    "storageSpace": "창고",
+    "valetService": "주차 서비스",
+    "liveInSuper": "수리공",
+    "wheelchairAccess": "휠체어 가능",
+    "indoorSquashCourt": "실내 스쿼시"
+  },
+  "utilities": {
+    "heat": "난방 비용 포함",
+    "hotWater": "온수 비용 포함",
+    "gas": "가스 비용 포함",
+    "electricity": "전기 비용 포함",
+    "water": "수도 비용 포함",
+    "sewer": "하수 비용 포함"
+  },
+  "appliances": {
+    "dishwasher": "식기세척기",
+    "microwave": "전자레인지",
+    "oven": "오븐",
+    "refrigerator": "냉장고",
+    "washer": "세탁기",
+    "dryer": "건조기",
+    "airConditioning": "에어컨",
+    "inUnitWasher": "세탁기"
+  },
+  "perks": {
+    "roommate-waiting": "룸메이트 대기중",
+    "no-broker-fee": "중개비 무료",
+    "no-guarantor": "게런터 무료",
+    "free-credit": "무료 크레딧",
+    "doorman-24h": "24시간 도어맨",
+    "washer-dryer": "세탁기/건조기",
+    "terrace": "테라스",
+    "gym": "헬스장",
+    "pool": "수영장",
+    "wall-ok": "플렉스 벽 가능",
+    "package-storage": "택배 보관",
+    "mail-room": "메일 룸",
+    "rooftop": "루프탑",
+    "bbq-grill": "바베큐 그릴",
+    "work-study": "업무 및 공부 공간",
+    "sauna": "사우나"
+  },
+  "roomTypes": {
+    "master-w-bath": "Master w/ Bath",
+    "master-wo-bath": "Master w/o Bath",
+    "regular-bedroom": "Regular",
+    "flexroom": "Flex",
+    "entire": "유닛 전체",
+    "studio": "Studio"
+  },
+  "unitTypes": {
+    "studio": "Studio",
+    "1b1b": "1B1B",
+    "2b1b": "2B1B",
+    "2b2b": "2B2B",
+    "3b1b": "3B1B",
+    "3b2b": "3B2B",
+    "4-plus": "4+ Bedrooms",
+    "unknown": "타입 미정"
+  },
+  "credit": {
+    "monthsFree_other": "{count}개월 무료",
+    "dollarCredit": "${amount} 크레딧"
+  },
+  "amenityFee": {
+    "unknown": "아직 모름",
+    "free": "무료",
+    "mandatoryPersonMonthly": "필수 · 인당 ${amount}/월",
+    "mandatoryPersonYearly": "필수 · 인당 ${amount}/년",
+    "mandatoryUnitMonthly": "필수 · 유닛당 ${amount}/월",
+    "mandatoryUnitYearly": "필수 · 유닛당 ${amount}/년",
+    "optionalPersonMonthly": "옵션 · 인당 ${amount}/월",
+    "optionalPersonYearly": "옵션 · 인당 ${amount}/년",
+    "optionalUnitMonthly": "옵션 · 유닛당 ${amount}/월",
+    "optionalUnitYearly": "옵션 · 유닛당 ${amount}/년"
+  },
+  "partWall": {
+    "fullWall": "풀 월",
+    "regularWall": "레귤러 월",
+    "curtainOnly": "커튼만"
+  },
+  "income": {
+    "personal": "개인 {multiple}x",
+    "guarantor": "게런터 {multiple}x",
+    "guarantorCompany": "보증 회사 가능"
+  },
+  "roommatePreferences": {
+    "master-w-bath": "Master 희망",
+    "master-wo-bath": "Master w/o Bath 희망",
+    "regular-bedroom": "Regular 희망",
+    "flexroom": "Flex 희망",
+    "any": "모두 가능"
+  },
+  "price": {
+    "gross": "Gross",
+    "net": "Net"
+  },
+  "card": {
+    "photoLabel": "{address} 사진 {number}",
+    "noPhoto": "사진 없음",
+    "moveIn": "입주 {date}",
+    "moveInTbd": "미정",
+    "composition": {
+      "male_other": "남 {count}",
+      "female_other": "여 {count}"
+    },
+    "loadingLabel": "매물 불러오는 중",
+    "loadingDescription": "매물을 불러오는 중입니다"
+  },
+  "roommateIntro": {
+    "title": "기다리는 룸메이트",
+    "introFallback": "자세한 소개는 문의 시 안내해 드려요.",
+    "male": "남성",
+    "female": "여성",
+    "worker": "직장인"
+  },
+  "map": {
+    "location": "위치",
+    "directions": "길찾기",
+    "openInGoogleMaps": "{name} 구글 맵스에서 보기",
+    "viewInGoogleMaps": "구글 맵스에서 위치 보기"
+  },
+  "detail": {
+    "toasts": {
+      "notAvailableYet": "Supabase 연동 후 이용할 수 있어요",
+      "kakaoNotReady": "카카오톡 문의 링크를 준비 중이에요",
+      "linkCopied": "주소를 복사했어요",
+      "linkCopyFailed": "주소 복사에 실패했어요"
+    },
+    "notFound": {
+      "title": "게시글을 찾을 수 없습니다",
+      "description": "마감되었거나 삭제된 하우징 글일 수 있습니다.",
+      "action": "하우징 목록으로"
+    },
+    "mailSubject": "[{brand} Housing] {address}",
+    "backToList": "하우징 목록",
+    "noPhotos": "등록된 사진이 없어요",
+    "previousPhoto": "이전 사진",
+    "nextPhoto": "다음 사진",
+    "layout": "레이아웃",
+    "watchVideo": "영상 보기",
+    "photoNumber": "사진 {number}",
+    "previousThumbnails": "이전 썸네일 보기",
+    "moreThumbnails": "더 많은 썸네일 보기",
+    "benefits": "혜택",
+    "roomOptions": "룸 옵션",
+    "amenities": "어메니티",
+    "utilities": "유틸리티",
+    "appliances": "가전제품",
+    "emailInquiry": "이메일 문의",
+    "kakaoInquiry": "카카오톡 문의",
+    "share": "공유하기",
+    "closeListing": "게시 마감",
+    "description": "상세 설명",
+    "property": {
+      "title": "건물 정보",
+      "zipcode": "우편번호",
+      "wall": "벽 옵션",
+      "amenityFee": "어메니티 비용",
+      "income": "소득 요건",
+      "subway": "지하철"
+    }
+  },
+  "listingKinds": {
+    "unit": {
+      "label": "전체 유닛",
+      "description": "아파트 전체를 찾아요"
+    },
+    "room": {
+      "label": "개인 방",
+      "description": "룸 하나만 찾아요"
+    }
+  },
+  "list": {
+    "title": "하우징",
+    "subtitle": "{brand|이/가} 엄선한 NYC 매물 · 유닛과 개인 방을 한곳에서 찾아보세요.",
+    "filters": "필터",
+    "quickFilters": "빠른 필터",
+    "previousFilters": "이전 필터 보기",
+    "moreFilters": "더 많은 필터 보기",
+    "price": {
+      "upTo": "${amount} 이하",
+      "atLeast": "${amount}+",
+      "range": "${min} – ${max}"
+    },
+    "summaryAll_other": "등록 매물 {count}개",
+    "summaryFiltered_other": "{filters} · {count}개",
+    "empty": {
+      "title": "조건에 맞는 매물이 없어요",
+      "description": "필터를 바꿔 다시 검색해 보세요.",
+      "action": "필터 초기화"
+    },
+    "sheet": {
+      "clearAll": "전체 해제",
+      "showResults_other": "매물 {count}개 보기",
+      "lookingFor": "무엇을 찾으세요?",
+      "unitType": "유닛 타입",
+      "roomType": "룸 타입",
+      "all": "전체",
+      "price": "가격",
+      "unitRent": "유닛 전체 월세",
+      "roomRent": "룸 월세",
+      "benefits": "혜택",
+      "amenities": "어메니티",
+      "area": "지역"
+    }
+  },
+  "new": {
+    "errors": {
+      "loginRequired": "로그인이 필요해요",
+      "submitFailed": "등록에 실패했어요"
+    },
+    "redirectingToLogin": "로그인 페이지로 이동 중…",
+    "teamOnly": {
+      "title": "팀 계정만 등록 가능",
+      "description": "하우징 매물은 {domain} 이메일로만 등록할 수 있습니다. 현재 로그인: {email}",
+      "unknownEmail": "알 수 없음"
+    },
+    "breadcrumb": "등록",
+    "title": "하우징 등록",
+    "signedInAs": "로그인: {email}",
+    "fields": {
+      "streetAddress": "스트리트 주소",
+      "neighborhood": "동네",
+      "unitRent": "전체 유닛 월세 ($)",
+      "unitRentPlaceholder": "룸 합산 전체 유닛 가격",
+      "roomRent": "룸 월세 ($)",
+      "bedrooms": "침실 수",
+      "availableFrom": "입주 시작일",
+      "availableTo": "입주 종료일",
+      "contactEmail": "연락 이메일",
+      "description": "상세 설명",
+      "descriptionPlaceholder": "계약 조건, 편의시설, 추천 대상 등"
+    },
+    "submitting": "등록 중…",
+    "submit": "게시하기"
+  },
+  "roommate": {
+    "intents": {
+      "offer-room": {
+        "label": "방 올리기",
+        "description": "있는 방에 룸메를 구하거나 서블렛을 올려요"
+      },
+      "seek": {
+        "label": "룸메 찾기",
+        "description": "같이 구할 룸메나 들어갈 방을 찾아요"
+      }
+    },
+    "lookingFor": {
+      "has-room": {
+        "label": "저희 방에 입주할 룸메 찾아요",
+        "shortLabel": "방 있음",
+        "description": "이미 방이 있고, 함께 살 사람을 구해요"
+      },
+      "sublet": {
+        "label": "제 방에 잠깐 지내실 서블렛 올려요",
+        "shortLabel": "서블렛",
+        "description": "단기 임대·서블렛으로 방을 빌려드려요"
+      },
+      "together": {
+        "label": "같이 입주할 방 찾을 룸메 구해요",
+        "shortLabel": "같이 구함",
+        "description": "아직 방이 없고, 같이 구할 룸메를 찾아요"
+      },
+      "room": {
+        "label": "입주할 수 있는 방만 구해요",
+        "shortLabel": "방 구함",
+        "description": "룸메 없이 들어갈 방·집만 찾아요"
+      }
+    },
+    "form": {
+      "has-room": {
+        "locationLabel": "현재 동네 / 위치",
+        "locationPlaceholder": "예: Brooklyn Bushwick",
+        "budgetLabel": "룸메 월세 ($)",
+        "budgetPlaceholder": "예: 1400",
+        "moveInStartLabel": "입주 가능일",
+        "moveInEndLabel": "이사 나가는 날",
+        "photosHint": "방·집 사진 권장 · 최대 6장 · 첫 장이 대표",
+        "titlePlaceholder": "예: Bushwick 2bed 룸메이트 구해요",
+        "bodyPlaceholder": "방 구조, 생활 패턴, 유틸·보증금을 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요."
+      },
+      "together": {
+        "locationLabel": "희망 동네",
+        "locationPlaceholder": "예: Queens Astoria / Brooklyn",
+        "budgetLabel": "월 예산 상한 ($)",
+        "budgetPlaceholder": "예: 1600",
+        "moveInStartLabel": "입주 희망일",
+        "moveInEndLabel": "이사 나가는 날",
+        "photosHint": "참고 사진이 있으면 올려 주세요 · 최대 6장",
+        "titlePlaceholder": "예: 9월 입주, Astoria 같이 구해요",
+        "bodyPlaceholder": "예산, 희망 동네, 생활 패턴을 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요."
+      },
+      "room": {
+        "locationLabel": "희망 동네",
+        "locationPlaceholder": "예: Manhattan UES / Jersey City",
+        "budgetLabel": "월 예산 상한 ($)",
+        "budgetPlaceholder": "예: 1800",
+        "moveInStartLabel": "입주 희망일",
+        "moveInEndLabel": "이사 나가는 날",
+        "photosHint": "참고 사진이 있으면 올려 주세요 · 최대 6장",
+        "titlePlaceholder": "예: Midtown 근처 방 구해요",
+        "bodyPlaceholder": "예산, 희망 위치, 입주 시기를 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요."
+      },
+      "sublet": {
+        "locationLabel": "서블렛 위치",
+        "locationPlaceholder": "예: Upper East Side",
+        "budgetLabel": "월세 ($)",
+        "budgetPlaceholder": "예: 2200",
+        "moveInStartLabel": "서블렛 시작일",
+        "moveInEndLabel": "서블렛 종료일",
+        "photosHint": "방·집 사진 권장 · 최대 6장 · 첫 장이 대표",
+        "titlePlaceholder": "예: UES 스튜디오 9~11월 서블렛",
+        "bodyPlaceholder": "기간, 가구 포함 여부, 교통, 유틸·보증금을 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요."
+      }
+    },
+    "card": {
+      "pricePerMonth": "{price}/월"
+    },
+    "list": {
+      "budgetPresets": {
+        "under-1500": "$1,500 이하",
+        "1500-2000": "$1,500–2,000",
+        "2000-2500": "$2,000–2,500",
+        "2500-plus": "$2,500+"
+      },
+      "loadFailed": "목록을 불러오지 못했어요",
+      "summaryAll_other": "{count}개의 글",
+      "summaryFiltered_other": "{filters} · {count}개",
+      "login": "로그인",
+      "suspended": "이용 정지",
+      "breadcrumb": "룸메이트 · 서블렛",
+      "empty": {
+        "noPostsTitle": "아직 룸메이트·서블렛 글이 없습니다",
+        "noMatchTitle": "조건에 맞는 글이 없어요",
+        "firstPost": "첫 글을 올려 커뮤니티를 시작해 보세요.",
+        "verifyToPost": "학생 또는 직장인 인증 후 글을 올릴 수 있어요.",
+        "loginToPost": "로그인 후 글을 올릴 수 있어요."
+      },
+      "showResults_other": "글 {count}개 보기",
+      "category": "분류",
+      "monthlyBudget": "월 예산",
+      "neighborhood": "동네"
+    },
+    "write": {
+      "errors": {
+        "alreadyPosted": "이미 올린 룸메이트·서블렛 글이 있어요. 수정 화면으로 이동합니다.",
+        "notFound": "글을 찾을 수 없어요",
+        "noPermission": "수정 권한이 없어요",
+        "loadFailed": "글을 불러오지 못했어요",
+        "typeRequired": "유형을 선택해 주세요",
+        "titleRequired": "제목을 입력해 주세요",
+        "titleTooLong": "제목은 {max}자 이내로 작성해 주세요",
+        "bodyRequired": "본문을 입력해 주세요",
+        "bodyTooLong": "본문은 {max}자 이내로 작성해 주세요",
+        "fieldRequired": "{field}을(를) 입력해 주세요",
+        "fieldSelect": "{field}을(를) 선택해 주세요",
+        "budgetRange": "금액은 $0~${max} 사이로 입력해 주세요",
+        "endBeforeStart": "종료일은 시작일 이후로 선택해 주세요",
+        "updateFailed": "수정에 실패했어요",
+        "draftSaveFailed": "임시 저장에 실패했어요"
+      },
+      "updated": "글을 수정했어요",
+      "created": "글을 등록했어요",
+      "draftSaved": "임시 저장했어요",
+      "checkingExisting": "기존 글 확인 중…",
+      "backToPost": "글로 돌아가기",
+      "backToList": "{board} 목록",
+      "onePostNotice": "룸메이트·서블렛 글은 {limit}만 올릴 수 있어요. 상황 바뀌면 기존 글을 수정하거나 삭제한 뒤 다시 올려 주세요.",
+      "onePostLimit": "계정당 1개",
+      "steps": {
+        "type": "어떤 유형인가요?",
+        "basics": "기본 정보",
+        "basicsDescription": "제목과 위치·예산·기간을 입력해 주세요",
+        "photos": "사진",
+        "photosDescription": "{hint} · 눌러 끌어 순서 변경 · {current}/{max}",
+        "details": "상세 내용",
+        "detailsDescription": "생활 패턴, 조건을 적어 주세요. 연락은 카카오톡 1:1 오픈채팅을 만들고 링크를 남기는 걸 추천해요."
+      },
+      "subtype": "세부 유형",
+      "fields": {
+        "title": "제목"
+      },
+      "pickSubtypeHint": "세부 유형을 선택하면 위치·예산·입주 기간 입력란이 나타나요.",
+      "pickIntentHint": "방 올리기 / 룸메 찾기를 선택해 주세요.",
+      "photosDefaultHint": "최대 {max}장 · 첫 장이 대표 사진",
+      "addPhoto": "추가",
+      "saving": "저장 중…",
+      "saveEdit": "수정 완료",
+      "submit": "글 등록하기",
+      "backToListShort": "목록으로 돌아가기",
+      "createHero": {
+        "title": "룸메이트 · 서블렛 글 올리기",
+        "description": "방 올리기 또는 룸메 찾기를 고르고, 위치·기간을 남겨 주세요.",
+        "photoTip": "사진은 가로 4:3으로 찍은 걸 추천해요."
+      },
+      "updateHero": {
+        "eyebrow": "글 수정",
+        "title": "올린 글 수정하기",
+        "description": "상황 바뀌면 유형·위치·기간을 업데이트해 주세요."
+      },
+      "untitled": "제목 없음"
+    }
+  }
+}

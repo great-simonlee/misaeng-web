@@ -14,8 +14,8 @@ import {
   type CompanyReview,
 } from '@lib/company/client'
 import { getJobReviewTypeStyle, JOB_REVIEW_TYPES } from '@lib/community/jobReview'
-import { countryLabel } from '@lib/constants/company'
-import { companyCopy } from '@lib/constants/companyCopy'
+import { countryLabelKey } from '@lib/constants/company'
+import { useFormat, useT } from '@lib/i18n/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CompanyHeroPanel, CompanyMark, IndustryTag } from '@widgets/nyc/CompanyBrand'
@@ -24,24 +24,29 @@ import { EmptyState } from '@widgets/nyc/EmptyState'
 import { CompanyPostings } from '@widgets/nyc/PostingCard'
 
 const PRIMARY_LINK =
-  'inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-[var(--brand)] px-5 text-[14px] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(246,67,16,0.7)] touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-[0.98]'
+  'inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-[var(--brand)] px-5 text-[14px] font-semibold text-white shadow-[0_8px_24px_-8px_rgb(var(--brand-rgb)/0.7)] touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-[0.98]'
 const SECONDARY_LINK =
   'inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-white/[0.08] px-5 text-[14px] font-semibold text-white ring-1 ring-white/15 backdrop-blur touch-manipulation transition hover:bg-white/[0.14] active:scale-[0.98]'
 const HERO_PILL =
   'inline-flex items-center gap-1 rounded-md bg-white/[0.08] px-2 py-[3px] text-[11px] font-semibold leading-none text-white/70 ring-1 ring-white/10'
 
-function formatDate(ms: number) {
-  if (!Number.isFinite(ms) || ms <= 0) return ''
-  return new Date(ms).toLocaleDateString('ko-KR', {
-    year: '2-digit',
-    month: 'short',
-    day: 'numeric',
-  })
-}
 
 export function CompanyDetailScreen({ slug }: { slug: string }) {
   const city = useCity()
   const href = useCityPath()
+  const t = useT('companies')
+  const tRoot = useT()
+  const format = useFormat()
+  const formatDate = (ms: number) =>
+    Number.isFinite(ms) && ms > 0
+      ? format.date(ms, { year: '2-digit', month: 'short', day: 'numeric' })
+      : ''
+  /** 문구가 없는 국가 코드는 코드 그대로 */
+  const countryName = (code: string) => {
+    const key = countryLabelKey(code)
+    const label = t(key)
+    return label.endsWith(key) ? code : label
+  }
   const [detail, setDetail] = useState<CompanyDetail | null>(null)
   const [reviews, setReviews] = useState<CompanyReview[]>([])
   const [loading, setLoading] = useState(true)
@@ -60,11 +65,11 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
       setDetail(await fetchCompany(slug, city))
     } catch (e) {
       if ((e as { status?: number }).status === 404) setNotFound(true)
-      else setError(e instanceof Error ? e.message : companyCopy.loadError)
+      else setError(e instanceof Error && e.message ? e.message : t('common.requestFailed'))
     } finally {
       setLoading(false)
     }
-  }, [slug, city])
+  }, [slug, city, t])
 
   const loadReviews = useCallback(async () => {
     setReviewsLoading(true)
@@ -72,11 +77,11 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
     try {
       setReviews(await fetchCompanyReviews(slug, city, { includeSubsidiaries }))
     } catch (e) {
-      setReviewsError(e instanceof Error ? e.message : companyCopy.reviewsError)
+      setReviewsError(e instanceof Error && e.message ? e.message : t('common.requestFailed'))
     } finally {
       setReviewsLoading(false)
     }
-  }, [slug, city, includeSubsidiaries])
+  }, [slug, city, includeSubsidiaries, t])
 
   useEffect(() => {
     void loadCompany()
@@ -96,7 +101,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
   }, [reviews])
 
   const presentTypes = useMemo(
-    () => JOB_REVIEW_TYPES.filter((t) => typeCounts.has(t.id)),
+    () => JOB_REVIEW_TYPES.filter((item) => typeCounts.has(item.id)),
     [typeCounts]
   )
 
@@ -109,7 +114,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
     return (
       <BoardPageShell width='wide'>
         <div className='py-24'>
-          <LoadingState label={companyCopy.loading} />
+          <LoadingState label={t('list.loading')} />
         </div>
       </BoardPageShell>
     )
@@ -120,10 +125,10 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
       <BoardPageShell width='wide'>
         <div className='pt-8'>
           <EmptyState
-            title={notFound ? companyCopy.notFoundTitle : companyCopy.loadError}
-            description={notFound ? companyCopy.notFoundDescription : error}
+            title={notFound ? t('detail.notFoundTitle') : t('list.loadError')}
+            description={notFound ? t('detail.notFoundDescription') : error}
             actionHref={href('/companies')}
-            actionLabel={companyCopy.backToList}
+            actionLabel={t('detail.backToList')}
           />
         </div>
       </BoardPageShell>
@@ -139,7 +144,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
           href={href('/companies')}
           className='flex w-fit items-center gap-1 text-[12px] font-medium text-[var(--muted)] hover:text-[var(--foreground)] sm:text-[13px]'
         >
-          <span aria-hidden>‹</span> {companyCopy.backToList}
+          <span aria-hidden>‹</span> {t('detail.backToList')}
         </Link>
 
         <CompanyHeroPanel className='mt-3'>
@@ -161,7 +166,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
                   />
                   {company.country ? (
                     <span className={HERO_PILL}>
-                      {companyCopy.countryBadge(countryLabel(company.country))}
+                      {t('detail.countryBadge', { country: countryName(company.country) })}
                     </span>
                   ) : null}
                   {parent ? (
@@ -169,7 +174,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
                       href={href(`/companies/${parent.slug}`)}
                       className={cn(HERO_PILL, 'transition hover:bg-white/[0.14] hover:text-white')}
                     >
-                      <span className='text-white/45'>{companyCopy.parentLabel}</span>
+                      <span className='text-white/45'>{t('detail.parentLabel')}</span>
                       {parent.name}
                     </Link>
                   ) : null}
@@ -187,7 +192,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
                   onClick={() => trackCompanyClick(company.slug, 'students')}
                   className={PRIMARY_LINK}
                 >
-                  {companyCopy.studentsButton}
+                  {t('detail.studentsButton')}
                   <ExternalIcon className='size-4' />
                 </a>
               ) : null}
@@ -198,20 +203,20 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
                 onClick={() => trackCompanyClick(company.slug, 'careers')}
                 className={company.studentsUrl ? SECONDARY_LINK : PRIMARY_LINK}
               >
-                {companyCopy.careersButton}
+                {t('detail.careersButton')}
                 <ExternalIcon className='size-4' />
               </a>
             </div>
           </div>
 
           <p className='mt-5 text-[12px] leading-relaxed text-white/45'>
-            {companyCopy.careersNotice}
+            {t('detail.careersNotice')}
           </p>
 
           {children.length ? (
             <div className='mt-4 flex flex-wrap items-center gap-2 border-t border-white/10 pt-4'>
               <span className='mr-1 text-[12px] font-medium text-white/45'>
-                {companyCopy.subsidiariesLabel}
+                {t('detail.subsidiariesLabel')}
               </span>
               {children.map((child) => (
                 <Link
@@ -243,7 +248,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
         <section className='min-w-0 lg:col-start-1'>
           <div className='flex items-center gap-3'>
             <h2 className='flex items-baseline gap-2 text-[17px] font-bold tracking-tight text-[var(--foreground)] sm:text-[19px]'>
-              {companyCopy.reviewsTitle}
+              {t('detail.reviewsTitle')}
               {!reviewsLoading ? (
                 <span className='text-[14px] font-semibold tabular-nums text-[var(--muted)]'>
                   {reviews.length}
@@ -262,7 +267,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
                   onChange={(e) => setIncludeSubsidiaries(e.target.checked)}
                   className='accent-[var(--brand)]'
                 />
-                {companyCopy.includeSubsidiaries}
+                {t('detail.includeSubsidiaries')}
               </label>
             ) : null}
           </div>
@@ -272,7 +277,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
               className='mt-4'
               leading={
                 <TypeChip
-                  label={companyCopy.allTypes}
+                  label={t('detail.allTypes')}
                   count={reviews.length}
                   active={type === 'all'}
                   onClick={() => setType('all')}
@@ -282,7 +287,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
               {presentTypes.map((item) => (
                 <TypeChip
                   key={item.id}
-                  label={item.label}
+                  label={tRoot(`reviews.jobReview.types.${item.id}.label`)}
                   count={typeCounts.get(item.id) ?? 0}
                   active={type === item.id}
                   onClick={() => setType(item.id)}
@@ -298,17 +303,17 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
               </div>
             ) : reviewsError ? (
               <EmptyState
-                title={companyCopy.reviewsError}
+                title={t('detail.reviewsError')}
                 description={reviewsError}
                 onAction={() => void loadReviews()}
-                actionLabel={companyCopy.retry}
+                actionLabel={t('common.retry')}
               />
             ) : visibleReviews.length === 0 ? (
               <EmptyState
-                title={companyCopy.reviewsEmpty}
+                title={t('detail.reviewsEmpty')}
                 description={company.name}
                 actionHref={href('/job-review/new')}
-                actionLabel={companyCopy.writeReview}
+                actionLabel={t('detail.writeReview')}
               />
             ) : (
               <ul className='flex flex-col gap-3'>
@@ -326,14 +331,16 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
                       >
                         <div className='min-w-0 flex-1'>
                           <div className='flex flex-wrap items-center gap-1.5'>
-                            {meta.typeLabel ? (
+                            {meta.jobReviewType || meta.typeLabel ? (
                               <span
                                 className={cn(
                                   'rounded-md px-2 py-[3px] text-[11px] font-semibold leading-none ring-1',
                                   style.badge
                                 )}
                               >
-                                {meta.typeLabel}
+                                {meta.jobReviewType
+                                  ? tRoot(`reviews.jobReview.types.${meta.jobReviewType}.label`)
+                                  : meta.typeLabel}
                               </span>
                             ) : null}
                             {meta.companyText && meta.companyText !== company.name ? (

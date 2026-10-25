@@ -19,11 +19,8 @@ import {
   findListingRoomByKey,
   getHousingRoomLabel,
   getHousingRoomNet,
-  getListingAmenityLabels,
-  getListingApplianceLabels,
   getListingArea,
   getListingCardBadges,
-  getListingUtilityLabels,
   getListingDisplayAddress,
   getListingUnitNet,
   getListingUnitRent,
@@ -35,8 +32,18 @@ import {
   getRoomSelectionKey,
   shouldShowListingRoomRows,
   sortHousingRooms,
+  HOUSING_AMENITY_LABELS,
+  HOUSING_APPLIANCE_LABELS,
+  HOUSING_UTILITY_LABELS,
 } from '@lib/constants/housingMock'
+import { BRAND_CONFIG } from '@lib/brand'
+import {
+  translateHousingFeatureLabels,
+  translateListingCardBadges,
+} from '@lib/housing/listing'
+import { useT } from '@lib/i18n/client'
 import { fetchHousingListing, shouldUnoptimizeHousingImage } from '@lib/housing/fetchListings'
+import { TranslationNotice, useTranslatedContent } from '@widgets/TranslationNotice'
 import { KAKAO_INQUIRY_URL } from '@lib/constants/nyc'
 import { cn } from '@lib'
 import type { HousingListing } from '@/types/nyc'
@@ -69,6 +76,7 @@ interface HousingDetailScreenProps {
 }
 
 export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
+  const t = useT('housing')
   const city = useCity()
   const href = useCityPath()
   const { user } = useAuth()
@@ -195,12 +203,12 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
 
   async function handleClose() {
     if (!listing || !user) return
-    toastError('Supabase 연동 후 이용할 수 있어요')
+    toastError(t('detail.toasts.notAvailableYet'))
   }
 
   function handleKakaoInquiry() {
     if (!KAKAO_INQUIRY_URL) {
-      toastError('카카오톡 문의 링크를 준비 중이에요')
+      toastError(t('detail.toasts.kakaoNotReady'))
       return
     }
     window.open(KAKAO_INQUIRY_URL, '_blank', 'noopener,noreferrer')
@@ -210,9 +218,9 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     if (typeof window === 'undefined') return
     try {
       await navigator.clipboard.writeText(window.location.href)
-      success('주소를 복사했어요')
+      success(t('detail.toasts.linkCopied'))
     } catch {
-      toastError('주소 복사에 실패했어요')
+      toastError(t('detail.toasts.linkCopyFailed'))
     }
   }
 
@@ -229,10 +237,10 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
       <PullToRefresh onRefresh={refreshListing}>
         <BoardPageShell width='narrow' className='py-12'>
           <EmptyState
-            title='게시글을 찾을 수 없습니다'
-            description='마감되었거나 삭제된 하우징 글일 수 있습니다.'
+            title={t('detail.notFound.title')}
+            description={t('detail.notFound.description')}
             actionHref={href('/housing')}
-            actionLabel='하우징 목록으로'
+            actionLabel={t('detail.notFound.action')}
           />
         </BoardPageShell>
       </PullToRefresh>
@@ -248,12 +256,33 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   const availableDate = getListingAvailableDate(listing)
   const youtubeUrl = getListingYoutubeUrl(listing)
   const layoutIndex = getListingLayoutImageIndex(listing)
-  const amenityLabels = getListingAmenityLabels(listing)
-  const utilityLabels = getListingUtilityLabels(listing)
-  const applianceLabels = getListingApplianceLabels(listing)
-  const benefitBadges = getListingCardBadges(listing)
+  const amenityLabels = translateHousingFeatureLabels(
+    listing.property.amenities,
+    HOUSING_AMENITY_LABELS,
+    'amenities',
+    t,
+  )
+  const utilityLabels = translateHousingFeatureLabels(
+    listing.property.includedUtility ?? [],
+    HOUSING_UTILITY_LABELS,
+    'utilities',
+    t,
+  )
+  const applianceLabels = translateHousingFeatureLabels(
+    listing.property.appliances,
+    HOUSING_APPLIANCE_LABELS,
+    'appliances',
+    t,
+  )
+  const benefitBadges = translateListingCardBadges(
+    listing,
+    getListingCardBadges(listing),
+    t,
+  )
   const showRoomRows = shouldShowListingRoomRows(listing)
-  const mailSubject = encodeURIComponent(`[Misaeng Housing] ${displayAddress}`)
+  const mailSubject = encodeURIComponent(
+    t('detail.mailSubject', { brand: BRAND_CONFIG.name, address: displayAddress }),
+  )
   const mailHref = `mailto:${listing.contactEmail}?subject=${mailSubject}`
 
   return (
@@ -262,7 +291,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
       <article className='pb-16 pt-5 sm:pb-20 sm:pt-7'>
         <BoardBackLink
           href={href('/housing')}
-          label='하우징 목록'
+          label={t('detail.backToList')}
           className='mb-5'
         />
 
@@ -295,7 +324,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                 </div>
               ) : (
                 <div className='flex h-full items-center justify-center text-sm text-[var(--muted)]'>
-                  등록된 사진이 없어요
+                  {t('detail.noPhotos')}
                 </div>
               )}
 
@@ -311,7 +340,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                 <>
                   <button
                     type='button'
-                    aria-label='이전 사진'
+                    aria-label={t('detail.previousPhoto')}
                     onClick={() => goToImage(activeImage - 1)}
                     className='absolute left-3 top-1/2 z-10 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/95 text-[var(--foreground)] shadow-md touch-manipulation transition hover:bg-white sm:left-4 sm:size-10'
                   >
@@ -319,7 +348,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                   </button>
                   <button
                     type='button'
-                    aria-label='다음 사진'
+                    aria-label={t('detail.nextPhoto')}
                     onClick={() => goToImage(activeImage + 1)}
                     className='absolute right-3 top-1/2 z-10 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/95 text-[var(--foreground)] shadow-md touch-manipulation transition hover:bg-white sm:right-4 sm:size-10'
                   >
@@ -341,7 +370,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                     )}
                   >
                     <LayoutPlanIcon className='size-3 shrink-0' />
-                    레이아웃
+                    {t('detail.layout')}
                   </button>
                 ) : null}
                 {youtubeUrl ? (
@@ -352,7 +381,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                     className='inline-flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-medium text-white touch-manipulation transition hover:bg-black/70'
                   >
                     <YoutubePlayIcon className='size-3 shrink-0 text-[#FF0000]' />
-                    영상 보기
+                    {t('detail.watchVideo')}
                   </a>
                 ) : null}
                 {images.length > 1 ? (
@@ -385,7 +414,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                               ? 'border-[var(--brand)]'
                               : 'border-transparent opacity-80 hover:opacity-100',
                           )}
-                          aria-label={`사진 ${index + 1}`}
+                          aria-label={t('detail.photoNumber', { number: index + 1 })}
                           aria-pressed={active}
                         >
                           <span className='relative block h-full w-full overflow-hidden rounded-[10px]'>
@@ -412,7 +441,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                     />
                     <button
                       type='button'
-                      aria-label='이전 썸네일 보기'
+                      aria-label={t('detail.previousThumbnails')}
                       onClick={() => scrollThumbs('left')}
                       className='pointer-events-auto relative ml-1 inline-flex size-7 items-center justify-center rounded-full border border-black/[0.06] bg-white/95 text-[var(--foreground)] shadow-[0_2px_10px_rgba(15,23,42,0.12)] backdrop-blur-[2px] touch-manipulation transition hover:bg-white'
                     >
@@ -429,7 +458,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                     />
                     <button
                       type='button'
-                      aria-label='더 많은 썸네일 보기'
+                      aria-label={t('detail.moreThumbnails')}
                       onClick={() => scrollThumbs('right')}
                       className='pointer-events-auto relative mr-1 inline-flex size-7 items-center justify-center rounded-full border border-black/[0.06] bg-white/95 text-[var(--foreground)] shadow-[0_2px_10px_rgba(15,23,42,0.12)] backdrop-blur-[2px] touch-manipulation transition hover:bg-white'
                     >
@@ -477,14 +506,18 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                 {formatListingBedBath(listing)}
               </p>
               <p className='text-[13px] font-medium text-[var(--muted)]'>
-                입주 {formatHousingAvailableDate(availableDate) || '미정'}
+                {t('card.moveIn', {
+                  date:
+                    formatHousingAvailableDate(availableDate) ||
+                    t('card.moveInTbd'),
+                })}
               </p>
             </div>
 
             {benefitBadges.length > 0 && (
               <div className='mt-5'>
                 <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
-                  혜택
+                  {t('detail.benefits')}
                 </p>
                 <div className='mt-2 flex flex-wrap gap-1.5'>
                   {benefitBadges.map((badge) => (
@@ -497,7 +530,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             {showRoomRows && (
               <div className='mt-5'>
                 <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
-                  룸 옵션
+                  {t('detail.roomOptions')}
                 </p>
                 <div className='mt-2 space-y-1.5'>
                   {roomRows.map((room, index) => {
@@ -519,7 +552,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                         )}
                       >
                         <span className='min-w-0 truncate text-[14px] font-semibold text-[var(--foreground)]'>
-                          {getHousingRoomLabel(room)}
+                          {getHousingRoomLabel(room, t)}
                         </span>
                         <HousingPricePair
                           gross={room.price}
@@ -543,7 +576,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             {amenityLabels.length > 0 && (
               <div className='mt-5'>
                 <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
-                  어메니티
+                  {t('detail.amenities')}
                 </p>
                 <div className='mt-2 flex flex-wrap gap-1.5'>
                   {amenityLabels.map((label) => (
@@ -556,7 +589,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             {utilityLabels.length > 0 && (
               <div className='mt-5'>
                 <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
-                  유틸리티
+                  {t('detail.utilities')}
                 </p>
                 <div className='mt-2 flex flex-wrap gap-1.5'>
                   {utilityLabels.map((label) => (
@@ -569,7 +602,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             {applianceLabels.length > 0 && (
               <div className='mt-5'>
                 <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
-                  가전제품
+                  {t('detail.appliances')}
                 </p>
                 <div className='mt-2 flex flex-wrap gap-1.5'>
                   {applianceLabels.map((label) => (
@@ -579,31 +612,28 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               </div>
             )}
 
-            <HousingDescriptionSection
-              description={listing.description}
-              className='mt-5'
-            />
+            <HousingDescriptionSection listing={listing} className='mt-5' />
 
             <div className='mt-6 flex flex-col gap-2.5 border-t border-black/[0.04] pt-5 sm:flex-row sm:items-stretch'>
               <a
                 href={mailHref}
-                className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full bg-[var(--brand)] px-5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(246,67,16,0.22)] touch-manipulation transition hover:bg-[var(--brand-hover)]'
+                className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full bg-[var(--brand)] px-5 text-sm font-semibold text-white shadow-[0_8px_20px_rgb(var(--brand-rgb)/0.22)] touch-manipulation transition hover:bg-[var(--brand-hover)]'
               >
-                이메일 문의
+                {t('detail.emailInquiry')}
               </a>
               <button
                 type='button'
                 onClick={handleKakaoInquiry}
                 className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-[#E8D84A] bg-[#FEE500] px-5 text-sm font-semibold text-[#191919] touch-manipulation transition hover:brightness-95'
               >
-                카카오톡 문의
+                {t('detail.kakaoInquiry')}
               </button>
               <button
                 type='button'
                 onClick={() => void handleShare()}
                 className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-black/[0.08] bg-[#fafbfc] px-5 text-sm font-semibold text-[var(--foreground)] touch-manipulation transition hover:bg-white'
               >
-                공유하기
+                {t('detail.share')}
               </button>
             </div>
 
@@ -613,7 +643,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                 onClick={() => void handleClose()}
                 className='mt-3 inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-black/10 px-4 text-sm font-medium text-[var(--muted-foreground)] touch-manipulation hover:border-red-300 hover:text-red-600 sm:w-auto'
               >
-                게시 마감
+                {t('detail.closeListing')}
               </button>
             )}
             </BoardSurface>
@@ -635,20 +665,33 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
 }
 
 function HousingDescriptionSection({
-  description,
+  listing,
   className,
 }: {
-  description: string
+  listing: HousingListing
   className?: string
 }) {
+  const t = useT('housing')
+  const translated = useTranslatedContent<HousingListing, HousingListing>(listing, 'listing')
+  const description = translated.item.description
   if (!description.trim()) return null
 
   return (
     <div className={cn('space-y-2', className)}>
-      <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
-        상세 설명
-      </p>
-      <p className='whitespace-pre-wrap text-[15px] leading-relaxed text-[var(--muted-foreground)]'>
+      <div className='flex flex-wrap items-center justify-between gap-2'>
+        <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
+          {t('detail.description')}
+        </p>
+        <TranslationNotice
+          i18n={listing.i18n}
+          showingOriginal={translated.showingOriginal}
+          onToggle={translated.toggle}
+        />
+      </div>
+      <p
+        lang={translated.lang}
+        className='whitespace-pre-wrap text-[15px] leading-relaxed text-[var(--muted-foreground)]'
+      >
         {description}
       </p>
     </div>
@@ -662,10 +705,11 @@ function HousingPropertySection({
   listing: HousingListing
   className?: string
 }) {
+  const t = useT('housing')
   const { property } = listing
-  const amenityFeeLabel = formatPropertyAmenityFee(property)
-  const wallLabel = formatHousingPartWall(property.partWall)
-  const incomeLabel = formatPropertyIncomeRequirements(property)
+  const amenityFeeLabel = formatPropertyAmenityFee(property, t)
+  const wallLabel = formatHousingPartWall(property.partWall, t)
+  const incomeLabel = formatPropertyIncomeRequirements(property, t)
   const hasContent =
     property.subway.length > 0 ||
     wallLabel ||
@@ -681,24 +725,25 @@ function HousingPropertySection({
       className={cn('px-4 py-4 sm:px-5 sm:py-5', className)}
     >
       <h2 className='text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
-        건물 정보
+        {t('detail.property.title')}
       </h2>
 
-      <dl className='mt-3 space-y-2.5 text-[13px]'>
+      {/* 라벨 열은 가장 긴 라벨에 맞춘다 (언어마다 라벨 길이가 달라 고정 폭이면 줄이 꺾인다) */}
+      <dl className='mt-3 grid grid-cols-[minmax(6rem,max-content)_minmax(0,1fr)] gap-x-5 gap-y-2.5 text-[13px]'>
         {property.zipcode ? (
-          <PropertyRow label='우편번호' value={property.zipcode} />
+          <PropertyRow label={t('detail.property.zipcode')} value={property.zipcode} />
         ) : null}
         {wallLabel ? (
-          <PropertyRow label='벽 옵션' value={wallLabel} />
+          <PropertyRow label={t('detail.property.wall')} value={wallLabel} />
         ) : null}
-        <PropertyRow label='어메니티 비용' value={amenityFeeLabel} />
+        <PropertyRow label={t('detail.property.amenityFee')} value={amenityFeeLabel} />
         {incomeLabel ? (
-          <PropertyRow label='소득 요건' value={incomeLabel} />
+          <PropertyRow label={t('detail.property.income')} value={incomeLabel} />
         ) : null}
       </dl>
 
       {property.subway.length > 0 && (
-        <PropertyList title='지하철' items={property.subway} />
+        <PropertyList title={t('detail.property.subway')} items={property.subway} />
       )}
     </BoardSurface>
   )
@@ -706,10 +751,10 @@ function HousingPropertySection({
 
 function PropertyRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className='flex gap-3'>
-      <dt className='w-24 shrink-0 text-[var(--muted)]'>{label}</dt>
+    <>
+      <dt className='text-[var(--muted)] sm:whitespace-nowrap'>{label}</dt>
       <dd className='min-w-0 font-medium text-[var(--foreground)]'>{value}</dd>
-    </div>
+    </>
   )
 }
 

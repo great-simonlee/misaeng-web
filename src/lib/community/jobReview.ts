@@ -7,6 +7,8 @@ import type {
 } from '@/types/nyc'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
+import { formatDate } from '@lib/i18n/format'
+import type { Locale } from '@lib/i18n/locales'
 
 export type { JobReviewTimelineEntry, JobReviewTypeId } from '@/types/nyc'
 
@@ -17,42 +19,19 @@ export type JobReviewTimelineFieldKey =
   | 'interviewRound'
   | 'outcome'
 
+/**
+ * `label`은 화면 문구가 아니라 저장값이다 (글의 `detail` 컬럼에 그대로 저장됨).
+ * 화면에는 `t('reviews.jobReview.types.<id>.label')`을 쓴다.
+ */
 export const JOB_REVIEW_TYPES: {
   id: JobReviewTypeId
   label: string
-  description: string
-  summary: string
 }[] = [
-  {
-    id: 'intern',
-    label: '인턴',
-    description: 'Summer / Winter / 학기',
-    summary: '서류 → 인터뷰 → 오퍼까지의 전형',
-  },
-  {
-    id: 'new-grad',
-    label: '신입',
-    description: '졸업 후 풀타임',
-    summary: '캠퍼스 리크루팅·온라인 지원 후기',
-  },
-  {
-    id: 'experienced',
-    label: '경력',
-    description: 'Mid / Senior 채용',
-    summary: '리크루터 연락부터 멀티 라운드 인터뷰',
-  },
-  {
-    id: 'job-change',
-    label: '이직',
-    description: '재직 중 · 퇴사 후 이직',
-    summary: '현직 병행 지원·오퍼 협상까지의 과정',
-  },
-  {
-    id: 'contract',
-    label: '계약',
-    description: '계약직 · 프리랜스',
-    summary: '단기·프로젝트 기반 채용 과정',
-  },
+  { id: 'intern', label: '인턴' },
+  { id: 'new-grad', label: '신입' },
+  { id: 'experienced', label: '경력' },
+  { id: 'job-change', label: '이직' },
+  { id: 'contract', label: '계약' },
 ]
 
 export const JOB_REVIEW_TYPE_STYLES: Record<
@@ -104,212 +83,70 @@ export const JOB_REVIEW_TYPE_STYLES: Record<
 
 export const JOB_REVIEW_TIMELINE_FIELDS: {
   key: JobReviewTimelineFieldKey
-  label: string
-  shortLabel: string
-  hint: string
-  guide?: string
+  /** true면 `reviews.jobReview.fields.<key>.guide` 안내를 함께 보여 준다 */
+  hasGuide?: boolean
   rowClass: string
   labelClass: string
 }[] = [
   {
     key: 'stageLabel',
-    label: '어떤 단계인지',
-    shortLabel: '단계',
-    hint: '서류, Phone, Onsite, Offer 등',
     rowClass: 'border-l-[3px] border-[#60a5fa] bg-[#f8fbff]',
     labelClass: 'text-[#1d4ed8]',
   },
   {
     key: 'platform',
-    label: '어디서 지원했는지',
-    shortLabel: '플랫폼',
-    hint: 'LinkedIn, Handshake, Referral, 회사 careers',
     rowClass: 'border-l-[3px] border-[#a78bfa] bg-[#faf8ff]',
     labelClass: 'text-[#6d28d9]',
   },
   {
     key: 'documentsSubmitted',
-    label: '어떤 서류를 넣었는지',
-    shortLabel: '서류',
-    hint: 'Resume, Cover letter, Portfolio, Transcript',
     rowClass: 'border-l-[3px] border-[#fbbf24] bg-[#fffdf5]',
     labelClass: 'text-[#b45309]',
   },
   {
     key: 'interviewRound',
-    label: '몇 차 인터뷰인지',
-    shortLabel: '인터뷰',
-    hint: '1차 Recruiter, 2차 Tech, Panel, HM 등',
-    guide:
-      '인터뷰 후기: 몇 차였는지와 함께, 어떤 질문을 받았고 어떻게 대답했는지도 적어 주세요. 기억나는 질문·답변을 구체적으로 남기면 다음 사람에게 도움이 돼요.',
+    hasGuide: true,
     rowClass: 'border-l-[3px] border-[#34d399] bg-[#f6fffb]',
     labelClass: 'text-[#047857]',
   },
   {
     key: 'outcome',
-    label: '결과는 어땠는지',
-    shortLabel: '결과',
-    hint: 'Pass, Reject, Pending, Offer 등',
     rowClass: 'border-l-[3px] border-[#fb7185] bg-[#fff8f8]',
     labelClass: 'text-[#e11d48]',
   },
 ]
 
-const JOB_REVIEW_PLACEHOLDERS: Record<
-  JobReviewTypeId,
-  Record<JobReviewTimelineFieldKey, string>
-> = {
-  intern: {
-    stageLabel: '예: Phone Screen',
-    platform: '예: Handshake → 회사 careers',
-    documentsSubmitted: '예: Resume, Transcript, Cover letter',
-    interviewRound: '예: 1차 Recruiter screen. 질문: Why this intern role? → 수업에서 ~를 해보고 지원했어요.',
-    outcome: '예: Pass → 다음 라운드 일정 잡힘',
-  },
-  'new-grad': {
-    stageLabel: '예: 서류 지원',
-    platform: '예: LinkedIn Easy Apply',
-    documentsSubmitted: '예: Resume PDF, GitHub 링크',
-    interviewRound: '예: 2차 Tech. Q. 최근 프로젝트에서 막힌 점은? A. … 이렇게 대답했어요.',
-    outcome: '예: Reject (2주 후 이메일)',
-  },
-  experienced: {
-    stageLabel: '예: Recruiter reach-out',
-    platform: '예: LinkedIn InMail',
-    documentsSubmitted: '예: Updated resume',
-    interviewRound: '예: HM 1:1. Q. Why this role? A. 팀의 방향이 ~해서 …',
-    outcome: '예: Onsite invite',
-  },
-  'job-change': {
-    stageLabel: '예: Recruiter screen',
-    platform: '예: LinkedIn / Referral',
-    documentsSubmitted: '예: Resume, LinkedIn',
-    interviewRound: '예: 2차 HM + Team. Q. 갈등 상황 대처? A. …',
-    outcome: '예: Offer · 연봉 협상',
-  },
-  contract: {
-    stageLabel: '예: 에이전시 서류',
-    platform: '예: Recruiter referral',
-    documentsSubmitted: '예: Resume, rate card',
-    interviewRound: '예: Client intro. Q. 가능한 시작일? A. 2주 뒤부터요.',
-    outcome: '예: Contract offer',
-  },
-}
-
+/**
+ * 단계 빠른 입력. 버튼 이름은 `reviews.jobReview.quickSteps.<type>.<id>.label`,
+ * 채워 넣는 값은 `reviews.jobReview.quickSteps.<type>.<id>.<field>`.
+ */
 export const JOB_REVIEW_QUICK_STEPS: Record<
   JobReviewTypeId,
-  { label: string; patch: Partial<JobReviewTimelineEntry> }[]
+  { id: string; fields: JobReviewTimelineFieldKey[] }[]
 > = {
   intern: [
-    {
-      label: '서류 지원',
-      patch: {
-        stageLabel: '서류 지원',
-        platform: 'Handshake / LinkedIn',
-        documentsSubmitted: 'Resume, Transcript',
-      },
-    },
-    {
-      label: '인터뷰',
-      patch: {
-        stageLabel: 'Technical Interview',
-        interviewRound: '1차 Tech',
-      },
-    },
-    {
-      label: '오퍼',
-      patch: {
-        stageLabel: 'Offer',
-        outcome: 'Offer received',
-      },
-    },
+    { id: 'apply', fields: ['stageLabel', 'platform', 'documentsSubmitted'] },
+    { id: 'interview', fields: ['stageLabel', 'interviewRound'] },
+    { id: 'offer', fields: ['stageLabel', 'outcome'] },
   ],
   'new-grad': [
-    {
-      label: '지원',
-      patch: {
-        stageLabel: '서류 지원',
-        platform: '회사 careers portal',
-        documentsSubmitted: 'Resume, Cover letter',
-      },
-    },
-    {
-      label: 'Phone',
-      patch: {
-        stageLabel: 'Phone Screen',
-        interviewRound: '1차 HR',
-      },
-    },
-    {
-      label: 'Onsite',
-      patch: {
-        stageLabel: 'Onsite / Virtual onsite',
-        interviewRound: 'Final round',
-      },
-    },
+    { id: 'apply', fields: ['stageLabel', 'platform', 'documentsSubmitted'] },
+    { id: 'phone', fields: ['stageLabel', 'interviewRound'] },
+    { id: 'onsite', fields: ['stageLabel', 'interviewRound'] },
   ],
   experienced: [
-    {
-      label: '리크루터',
-      patch: {
-        stageLabel: 'Recruiter screen',
-        platform: 'LinkedIn InMail',
-      },
-    },
-    {
-      label: 'HM',
-      patch: {
-        stageLabel: 'Hiring Manager',
-        interviewRound: 'HM 1:1',
-      },
-    },
-    {
-      label: 'Panel',
-      patch: {
-        stageLabel: 'Panel interview',
-        interviewRound: 'Team panel',
-      },
-    },
+    { id: 'recruiter', fields: ['stageLabel', 'platform'] },
+    { id: 'hm', fields: ['stageLabel', 'interviewRound'] },
+    { id: 'panel', fields: ['stageLabel', 'interviewRound'] },
   ],
   'job-change': [
-    {
-      label: '지원',
-      patch: {
-        stageLabel: '서류 지원',
-        platform: 'LinkedIn / Referral',
-        documentsSubmitted: 'Resume',
-      },
-    },
-    {
-      label: '인터뷰',
-      patch: {
-        stageLabel: 'Hiring Manager',
-        interviewRound: 'HM + Team',
-      },
-    },
-    {
-      label: '오퍼',
-      patch: {
-        stageLabel: 'Offer · 협상',
-        outcome: 'Offer received',
-      },
-    },
+    { id: 'apply', fields: ['stageLabel', 'platform', 'documentsSubmitted'] },
+    { id: 'interview', fields: ['stageLabel', 'interviewRound'] },
+    { id: 'offer', fields: ['stageLabel', 'outcome'] },
   ],
   contract: [
-    {
-      label: '서류',
-      patch: {
-        stageLabel: '서류 제출',
-        documentsSubmitted: 'Resume',
-      },
-    },
-    {
-      label: '클라이언트',
-      patch: {
-        stageLabel: 'Client interview',
-        interviewRound: 'Intro call',
-      },
-    },
+    { id: 'documents', fields: ['stageLabel', 'documentsSubmitted'] },
+    { id: 'client', fields: ['stageLabel', 'interviewRound'] },
   ],
 }
 
@@ -388,6 +225,7 @@ export function getLatestJobReviewTimelineEntryId(
   return null
 }
 
+/** 저장용 유형 이름 (`detail` 컬럼). 화면 표시는 `t('reviews.jobReview.types.<id>.label')` */
 export function getJobReviewTypeLabel(type: JobReviewTypeId | null | undefined) {
   return JOB_REVIEW_TYPES.find((item) => item.id === type)?.label ?? ''
 }
@@ -397,16 +235,9 @@ export function getJobReviewTypeStyle(type: JobReviewTypeId | null | undefined) 
   return JOB_REVIEW_TYPE_STYLES.intern
 }
 
-export function getJobReviewTimelinePlaceholder(
-  type: JobReviewTypeId | null | undefined,
-  field: JobReviewTimelineFieldKey
-) {
-  if (type) return JOB_REVIEW_PLACEHOLDERS[type][field]
-  return JOB_REVIEW_PLACEHOLDERS.intern[field]
-}
-
 export function getJobReviewTimelineDateRange(
-  timeline: JobReviewTimelineEntry[] | null | undefined
+  timeline: JobReviewTimelineEntry[] | null | undefined,
+  locale: Locale = 'ko',
 ) {
   const dates = [
     ...new Set(
@@ -416,8 +247,8 @@ export function getJobReviewTimelineDateRange(
     ),
   ].sort()
   if (dates.length === 0) return null
-  if (dates.length === 1) return formatJobReviewDate(dates[0], { compactYear: true })
-  return `${formatJobReviewDate(dates[0], { compactYear: true })} – ${formatJobReviewDate(dates[dates.length - 1], { compactYear: true })}`
+  if (dates.length === 1) return formatJobReviewDate(dates[0], { compactYear: true, locale })
+  return `${formatJobReviewDate(dates[0], { compactYear: true, locale })} – ${formatJobReviewDate(dates[dates.length - 1], { compactYear: true, locale })}`
 }
 
 function escapeLegacyReviewText(text: string) {
@@ -527,13 +358,16 @@ export function normalizeJobReviewTips(raw: unknown) {
     .slice(0, JOB_REVIEW_TIPS_MAX)
 }
 
-export function formatJobReviewDate(value: string, options?: { compactYear?: boolean }) {
+export function formatJobReviewDate(
+  value: string,
+  options?: { compactYear?: boolean; locale?: Locale },
+) {
   const trimmed = value.trim()
   if (!trimmed) return ''
   if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
     const date = new Date(`${trimmed}T12:00:00`)
     if (!Number.isNaN(date.getTime())) {
-      return date.toLocaleDateString('ko-KR', {
+      return formatDate(options?.locale ?? 'ko', date, {
         year: options?.compactYear ? '2-digit' : 'numeric',
         month: 'short',
         day: 'numeric',
@@ -587,15 +421,12 @@ export function isJobReviewTimelineEntryComplete(entry: JobReviewTimelineEntry) 
 /** 후기를 남기게 된 경로. 작성 시 필수, 공개되지 않음 (ellieo-erp에서 관리) */
 export type { JobReviewOutcomeId, JobReviewSourceId }
 
-export const JOB_REVIEW_SOURCES: readonly {
-  id: JobReviewSourceId
-  label: string
-  description: string
-}[] = [
-  { id: 'misaeng', label: 'Misaeng을 통해', description: 'Misaeng 사이트·SNS를 보고 왔어요' },
-  { id: 'student-org', label: '학생회를 통해', description: '학교 학생회에서 연락을 받았어요' },
-  { id: 'referral', label: '지인을 통해', description: '아는 사람에게 소개받았어요' },
-  { id: 'other', label: '기타', description: '그 외 다른 경로' },
+/** 화면 문구: `reviews.jobReview.sources.<id>.label` / `.description` */
+export const JOB_REVIEW_SOURCES: readonly { id: JobReviewSourceId }[] = [
+  { id: 'misaeng' },
+  { id: 'student-org' },
+  { id: 'referral' },
+  { id: 'other' },
 ]
 
 export function isJobReviewSourceId(value: unknown): value is JobReviewSourceId {
@@ -627,15 +458,12 @@ export function parseJobReviewSourceInput(
   return isPartnerOrgId(orgId) ? { source, orgId } : null
 }
 
-export const JOB_REVIEW_OUTCOMES: readonly {
-  id: JobReviewOutcomeId
-  label: string
-  description: string
-}[] = [
-  { id: 'offer', label: '오퍼 받음', description: '최종 합격·오퍼를 받았어요' },
-  { id: 'rejected', label: '불합격', description: '중간 또는 최종에서 떨어졌어요' },
-  { id: 'in-progress', label: '진행 중', description: '아직 결과를 기다리고 있어요' },
-  { id: 'withdrew', label: '중도 포기', description: '제가 지원을 그만뒀어요' },
+/** 화면 문구: `reviews.jobReview.outcomes.<id>.label` / `.description` */
+export const JOB_REVIEW_OUTCOMES: readonly { id: JobReviewOutcomeId }[] = [
+  { id: 'offer' },
+  { id: 'rejected' },
+  { id: 'in-progress' },
+  { id: 'withdrew' },
 ]
 
 export function isJobReviewOutcomeId(value: unknown): value is JobReviewOutcomeId {

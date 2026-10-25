@@ -5,6 +5,7 @@ import { useRef, useState } from 'react'
 import { uploadCommunityImageFile } from '@lib/community/upload.client'
 import { IMAGE_LIBRARY_ACCEPT } from '@lib/constants/imageUpload'
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 type ImageUploadButtonProps = {
   label?: string
@@ -14,11 +15,13 @@ type ImageUploadButtonProps = {
 }
 
 export function ImageUploadButton({
-  label = '사진 선택',
+  label,
   onUploaded,
   className,
   compact,
 }: ImageUploadButtonProps) {
+  const t = useT('common')
+  const tCommunity = useT('community')
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -29,10 +32,10 @@ export function ImageUploadButton({
     setUploading(true)
     setError(null)
     try {
-      const url = await uploadCommunityImageFile(file)
+      const url = await uploadCommunityImageFile(file, tCommunity)
       onUploaded(url)
     } catch (err) {
-      setError(err instanceof Error ? err.message : '업로드 실패')
+      setError(err instanceof Error ? err.message : t('ui.imageUpload.failed'))
     } finally {
       setUploading(false)
       if (inputRef.current) inputRef.current.value = ''
@@ -50,7 +53,9 @@ export function ImageUploadButton({
           compact ? 'h-9 px-3 text-[12px]' : 'h-10 px-4 text-[13px]',
         )}
       >
-        {uploading ? '업로드 중…' : label}
+        {uploading
+          ? t('ui.imageUpload.uploading')
+          : (label ?? t('ui.imageUpload.selectPhoto'))}
       </button>
       <input
         ref={inputRef}
@@ -79,6 +84,7 @@ export function ImagePreview({
   onRemove,
   className,
 }: ImagePreviewProps) {
+  const t = useT('common')
   return (
     <div
       className={cn(
@@ -94,7 +100,7 @@ export function ImagePreview({
           onClick={onRemove}
           className='absolute right-2 top-2 inline-flex h-7 items-center rounded-full bg-black/60 px-2.5 text-[11px] font-semibold text-white touch-manipulation'
         >
-          삭제
+          {t('ui.imageUpload.remove')}
         </button>
       ) : null}
     </div>
@@ -129,14 +135,18 @@ export function PhotoUploadZone({
   onUploaded,
   onUploadedMany,
   onRemove,
-  emptyLabel = '사진 추가',
-  emptyHint = '탭해서 올리기',
+  emptyLabel,
+  emptyHint,
   className,
   aspectClassName = 'aspect-[16/10]',
   compact = false,
   multiple = false,
   maxFiles,
 }: PhotoUploadZoneProps) {
+  const t = useT('common')
+  const tCommunity = useT('community')
+  const emptyLabelText = emptyLabel ?? t('ui.imageUpload.addPhoto')
+  const emptyHintText = emptyHint ?? t('ui.imageUpload.tapToUpload')
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -157,7 +167,7 @@ export function PhotoUploadZone({
     const uploaded: string[] = []
     try {
       for (const file of selected) {
-        const url = await uploadCommunityImageFile(file)
+        const url = await uploadCommunityImageFile(file, tCommunity)
         uploaded.push(url)
         if (!onUploadedMany) onUploaded?.(url)
       }
@@ -165,7 +175,7 @@ export function PhotoUploadZone({
         onUploadedMany(uploaded)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '업로드 실패')
+      setError(err instanceof Error ? err.message : t('ui.imageUpload.failed'))
       if (onUploadedMany && uploaded.length > 0) {
         onUploadedMany(uploaded)
       }
@@ -211,7 +221,7 @@ export function PhotoUploadZone({
                     : 'h-8 px-3 text-[12px]',
                 )}
               >
-                {uploading ? '…' : '바꾸기'}
+                {uploading ? '…' : t('ui.imageUpload.change')}
               </button>
               {onRemove ? (
                 <button
@@ -224,7 +234,7 @@ export function PhotoUploadZone({
                       : 'h-8 px-3 text-[12px]',
                   )}
                 >
-                  삭제
+                  {t('ui.imageUpload.remove')}
                 </button>
               ) : null}
             </div>
@@ -261,11 +271,11 @@ export function PhotoUploadZone({
                 compact ? 'text-[12px]' : 'text-[13px]',
               )}
             >
-              {uploading ? '업로드 중…' : emptyLabel}
+              {uploading ? t('ui.imageUpload.uploading') : emptyLabelText}
             </span>
-            {!uploading && emptyHint ? (
+            {!uploading && emptyHintText ? (
               <span className='text-[11px] text-[var(--muted)]'>
-                {emptyHint}
+                {emptyHintText}
               </span>
             ) : null}
           </button>

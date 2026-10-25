@@ -1,4 +1,5 @@
 import { getRegisteredSchoolDomains } from '@lib/constants/schools'
+import type { Translate } from '@lib/i18n/translate'
 
 /** 미국 학교(.edu) 또는 등록된 학교 도메인 이메일인지 판별합니다. */
 export function isSchoolEmail(email: string): boolean {
@@ -20,14 +21,17 @@ export function isValidEmailFormat(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim().toLowerCase())
 }
 
-/** 미국(+1) / 한국(+82) 번호를 E.164로 정규화합니다. */
-export function normalizePhoneE164(input: string): string {
+/**
+ * 미국(+1) / 한국(+82) 번호를 E.164로 정규화합니다.
+ * t는 네임스페이스 없는 번역기(`useT()`) — 오류 문구용.
+ */
+export function normalizePhoneE164(input: string, t: Translate): string {
   const raw = input.trim()
-  if (!raw) throw new Error('휴대폰 번호를 입력해 주세요')
+  if (!raw) throw new Error(t('me.verification.phone.errors.required'))
 
   if (raw.startsWith('+')) {
     const digits = `+${raw.slice(1).replace(/\D/g, '')}`
-    if (digits.length < 11) throw new Error('휴대폰 번호 형식이 올바르지 않아요')
+    if (digits.length < 11) throw new Error(t('me.verification.phone.errors.invalidFormat'))
     return digits
   }
 
@@ -43,7 +47,7 @@ export function normalizePhoneE164(input: string): string {
   if (digits.length === 10) return `+1${digits}`
   if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`
 
-  throw new Error('미국(+1) 또는 한국(+82) 번호로 입력해 주세요')
+  throw new Error(t('me.verification.phone.errors.unsupportedCountry'))
 }
 
 export function formatPhoneDisplay(e164: string): string {

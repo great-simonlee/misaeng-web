@@ -1,0 +1,240 @@
+{
+  "places": {
+    "searchFailed": "Không thể tìm địa điểm.",
+    "detailsFailed": "Không thể tải thông tin địa điểm.",
+    "placeIdRequired": "Cần có placeId.",
+    "notFound": "Không tìm thấy địa điểm này.",
+    "invalidCoordinates": "Tọa độ không hợp lệ.",
+    "mapLoadFailed": "Không thể tải bản đồ.",
+    "placeFallbackName": "Địa điểm",
+    "addressFallbackName": "Địa chỉ",
+    "locationFallbackName": "Vị trí",
+    "venuesCoordinatesRequired": "Cần có vĩ độ và kinh độ.",
+    "venuesLoadFailed": "Không thể tải danh sách nhà hàng."
+  },
+  "common": {
+    "loginRequired": "Vui lòng đăng nhập trước.",
+    "supabaseNotConfigured": "Supabase chưa được cấu hình.",
+    "supabaseNotConfiguredDetail": "Supabase chưa được cấu hình. Hãy kiểm tra NEXT_PUBLIC_SUPABASE_URL và SUPABASE_SERVICE_ROLE_KEY.",
+    "supabaseNotConfiguredLocal": "Supabase chưa được cấu hình. Ở môi trường local, dữ liệu tạm thời được lưu trong trình duyệt.",
+    "storageNotConfigured": "Supabase Storage chưa được cấu hình. Hãy kiểm tra NEXT_PUBLIC_SUPABASE_URL và SUPABASE_SERVICE_ROLE_KEY.",
+    "supabaseUrlInvalid": "NEXT_PUBLIC_SUPABASE_URL không phải URL hợp lệ. Ví dụ: https://your-project.supabase.co",
+    "supabaseHostUnreachable": "Không kết nối được project Supabase ({hostname}). Hãy kiểm tra Project URL trong Dashboard → Project Settings → API và cập nhật .env.local.",
+    "supabaseConnectFailed": "Không thể kết nối Supabase ({hostname}). Hãy kiểm tra Project URL, API key và kết nối mạng.",
+    "forbidden": "Bạn không có quyền thực hiện thao tác này.",
+    "badRequest": "Yêu cầu không hợp lệ.",
+    "postNotFound": "Không tìm thấy bài viết này.",
+    "accountSuspended": "Tài khoản này đang bị tạm khóa.",
+    "identityVerificationRequired": "Để viết bài và bình luận, vui lòng xác minh trường học hoặc nơi làm việc trước."
+  },
+  "auth": {
+    "ellieoUnavailable": "Không kết nối được máy chủ Ellieo. Vui lòng thử lại sau giây lát.",
+    "noAccessToken": "Không nhận được access token.",
+    "loginFailed": "Đăng nhập thất bại.",
+    "signupFailed": "Đăng ký thất bại.",
+    "googleLoginFailed": "Đăng nhập bằng Google thất bại.",
+    "googleSignupFailed": "Đăng ký bằng Google thất bại.",
+    "agentGoogleSignupFailed": "Đăng ký bằng Google không thành công.",
+    "appConnectMissing": "Cần có biến môi trường APP_CONNECT_API_BASE_URL.",
+    "appConnectMissingLogin": "Không thể đăng nhập vì thiếu biến môi trường APP_CONNECT_API_BASE_URL.",
+    "googleIdTokenRequired": "Cần có Google idToken.",
+    "googleAccountHint": "Bạn cần có tài khoản Google đã đăng ký với Ellieo.",
+    "googleAuthError": "Đã xảy ra lỗi khi đăng nhập bằng Google.",
+    "emailRequired": "Vui lòng nhập email.",
+    "passwordRequired": "Vui lòng nhập mật khẩu.",
+    "passwordResetFailed": "Không thể gửi yêu cầu đặt lại mật khẩu.",
+    "emailAuthError": "Đã xảy ra lỗi khi đăng nhập bằng email.",
+    "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+    "userInfoUnavailable": "Bạn đã đăng nhập nhưng chúng tôi không thể tải thông tin tài khoản."
+  },
+  "profile": {
+    "nickname": {
+      "tooShort": "Biệt danh phải có ít nhất {min} ký tự",
+      "tooLong": "Biệt danh tối đa {max} ký tự",
+      "invalidChars": "Chỉ dùng chữ cái tiếng Anh và dấu \".\""
+    },
+    "nicknameTaken": "Biệt danh này đã có người dùng. Vui lòng thử biệt danh khác.",
+    "nicknameTakenShort": "Biệt danh này đã có người dùng.",
+    "nicknameCheckFailed": "Không thể kiểm tra biệt danh.",
+    "nicknameCheckFailedRetry": "Không thể kiểm tra biệt danh. Vui lòng thử lại sau giây lát.",
+    "nicknameCheckFailedStatus": "Không thể kiểm tra biệt danh. (HTTP {status})",
+    "listFailed": "Không thể tải danh sách hồ sơ (HTTP {status})",
+    "invalidGender": "Vui lòng chọn giới tính hợp lệ.",
+    "invalidOccupationType": "Vui lòng chọn loại nghề nghiệp hợp lệ.",
+    "saveFailed": "Không thể lưu hồ sơ.",
+    "saveFailedDetail": "Không thể lưu hồ sơ: {detail}"
+  },
+  "upload": {
+    "photoUrlRequired": "Cần có photoURL.",
+    "fileRequired": "Vui lòng chọn tệp để tải lên.",
+    "avatarUploadError": "Đã xảy ra lỗi khi tải ảnh đại diện lên.",
+    "avatarBucketMissing": "Không tìm thấy bucket Supabase \"{bucket}\". Hãy tạo một bucket public trong Storage.",
+    "storageUploadFailed": "Tải lên Storage thất bại: {detail}",
+    "imageTypeUnsupported": "Chỉ có thể tải lên ảnh JPG, PNG, WEBP hoặc GIF.",
+    "imageTooLarge": "Ảnh phải có dung lượng tối đa {max}.",
+    "imageBucketMissing": "Không tìm thấy bucket Supabase \"{bucket}\". Hãy kiểm tra các bucket trong Storage.",
+    "imageUploadFailedDetail": "Tải ảnh lên thất bại: {detail}",
+    "imageUploadFailed": "Không thể tải ảnh lên."
+  },
+  "verification": {
+    "codeSendFailed": "Không thể gửi mã xác minh.",
+    "schoolDomainUnsupported": "Chúng tôi chưa hỗ trợ tên miền email của trường này. Hãy liên hệ đội ngũ Misaeng để thêm trường của bạn.",
+    "codeInvalid": "Mã xác minh không đúng hoặc đã hết hạn.",
+    "schoolOtpDisabled": "Xác minh email trường tạm thời không khả dụng.",
+    "schoolEmailRequired": "Vui lòng nhập email trường (.edu hoặc tên miền đã đăng ký).",
+    "codeRequired": "Vui lòng nhập mã xác minh.",
+    "schoolEmailError": "Đã xảy ra lỗi khi xác minh email trường.",
+    "companyNameRequired": "Vui lòng nhập tên công ty.",
+    "companyNameTooLong": "Tên công ty tối đa {max} ký tự.",
+    "workEmail": {
+      "required": "Vui lòng nhập email công việc.",
+      "invalidFormat": "Vui lòng nhập địa chỉ email hợp lệ.",
+      "personalDomain": "Không thể dùng email cá nhân như Gmail. Vui lòng nhập email bạn dùng ở nơi làm việc."
+    },
+    "workplaceAlreadyApproved": "Nơi làm việc của bạn đã được xác minh.",
+    "workplacePending": "Đội ngũ Misaeng đang xem xét yêu cầu xác minh nơi làm việc của bạn.",
+    "workplaceStorageMissing": "Bộ lưu trữ xác minh nơi làm việc chưa được cấu hình.",
+    "workplaceSaveFailed": "Không thể lưu yêu cầu xác minh nơi làm việc (HTTP {status})",
+    "workEmailError": "Đã xảy ra lỗi khi xác minh email công việc."
+  },
+  "consent": {
+    "termsRequired": "Vui lòng đồng ý với Điều khoản để tiếp tục.",
+    "storageNotConfigured": "Bộ lưu trữ thông tin đồng ý chưa được cấu hình.",
+    "policyOutdated": "Điều khoản hoặc Chính sách quyền riêng tư đã được cập nhật. Vui lòng tải lại trang và đồng ý lại."
+  },
+  "referral": {
+    "featureStorageMissing": "Tính năng giới thiệu cần cấu hình bộ lưu trữ.",
+    "loadFailed": "Không thể tải thông tin giới thiệu.",
+    "bindFailed": "Không thể kết nối người giới thiệu.",
+    "storageNotConfigured": "Bộ lưu trữ mã giới thiệu chưa được cấu hình.",
+    "saveFailed": "Không thể lưu mã giới thiệu.",
+    "codeCreateFailed": "Không thể tạo mã giới thiệu. Vui lòng thử lại sau giây lát.",
+    "codeInvalid": "Vui lòng kiểm tra lại mã giới thiệu 8 ký tự.",
+    "alreadyBound": "Bạn đã có người giới thiệu.",
+    "ownCode": "Bạn không thể dùng mã giới thiệu của chính mình.",
+    "codeNotFound": "Mã giới thiệu này không tồn tại.",
+    "referrerNotFound": "Không tìm thấy người giới thiệu này.",
+    "maxUsesReached": "Mã giới thiệu này chỉ dùng được tối đa cho {max} người."
+  },
+  "credit": {
+    "loadFailed": "Không thể tải thông tin credit.",
+    "invalidUser": "Người dùng không hợp lệ.",
+    "saveFailed": "Không thể lưu credit (HTTP {status})",
+    "reviewListLoadFailed": "Không thể tải danh sách yêu cầu xét duyệt.",
+    "reviewRequestNotFound": "Không tìm thấy yêu cầu này.",
+    "reviewAlreadyProcessed": "Yêu cầu này đã được xử lý.",
+    "reviewPostMissing": "Bài viết không tồn tại hoặc đã bị xóa.",
+    "awardFailed": "Không thể cộng credit. Vui lòng kiểm tra cài đặt bộ lưu trữ.",
+    "processFailed": "Không thể hoàn tất thao tác.",
+    "reviewSaveFailed": "Không thể lưu yêu cầu xét duyệt (HTTP {status})",
+    "reviewStatusLoadFailed": "Không thể tải trạng thái yêu cầu xét duyệt.",
+    "reviewBoardIneligible": "Bài viết ở bảng tin này không thể yêu cầu thêm credit.",
+    "reviewFinalResultRequired": "Hãy thêm kết quả cuối cùng vào timeline trước (được duyệt, đã nhận thẻ, nhận offer, bị từ chối, v.v.).",
+    "reviewAlreadyAwarded": "Bài viết này đã nhận thưởng xét duyệt.",
+    "reviewAlreadyPending": "Yêu cầu này đang chờ xét duyệt.",
+    "reviewRequestFailed": "Không thể yêu cầu thêm credit."
+  },
+  "postings": {
+    "loadFailed": "Không thể tải tin tuyển dụng."
+  },
+  "comments": {
+    "bodyRequired": "Vui lòng viết bình luận.",
+    "bodyTooLong": "Bình luận tối đa {max} ký tự.",
+    "parentNotFound": "Không tìm thấy bình luận bạn đang trả lời.",
+    "createFailed": "Không thể đăng bình luận.",
+    "editTargetRequired": "Vui lòng chọn bình luận cần sửa.",
+    "notFound": "Không tìm thấy bình luận này.",
+    "editOwnOnly": "Bạn chỉ có thể sửa bình luận của mình.",
+    "updateFailed": "Không thể cập nhật bình luận.",
+    "deleteTargetRequired": "Vui lòng chọn bình luận cần xóa.",
+    "deleteOwnOnly": "Bạn chỉ có thể xóa bình luận của mình.",
+    "deleteFailed": "Không thể xóa bình luận.",
+    "saveFailedRetry": "Không thể lưu bình luận. Vui lòng thử lại sau giây lát."
+  },
+  "community": {
+    "invalidBoard": "Bảng tin này không tồn tại.",
+    "invalidPost": "Bài viết không hợp lệ.",
+    "companyReselect": "Vui lòng chọn lại công ty.",
+    "saveFailed": "Không thể lưu bài viết.",
+    "saveFailedRetry": "Không thể lưu bài viết. Vui lòng thử lại sau giây lát.",
+    "updateFailed": "Không thể lưu thay đổi.",
+    "deleteFailed": "Không thể xóa.",
+    "recommendFailed": "Không thể cập nhật lượt thích.",
+    "recommendSaveFailed": "Không thể lưu lượt thích. Vui lòng thử lại sau giây lát.",
+    "beenThereFoodOnly": "Bạn chỉ có thể đánh dấu \"Đã đến\" cho bài viết ăn uống.",
+    "beenThereFailed": "Không thể cập nhật \"Đã đến\".",
+    "beenThereSaveFailed": "Không thể lưu \"Đã đến\". Vui lòng thử lại sau giây lát.",
+    "reportSaveFailed": "Không thể lưu báo cáo. Vui lòng thử lại sau giây lát.",
+    "notGuestPost": "Đây không phải bài viết của khách.",
+    "guestPostLinkedElsewhere": "Bài viết này đã được liên kết với tài khoản khác.",
+    "guestClaimFailed": "Không thể liên kết bài viết khách của bạn.",
+    "report": {
+      "reasonRequired": "Vui lòng chọn lý do báo cáo.",
+      "detailTooLong": "Chi tiết tối đa {max} ký tự.",
+      "otherDetailRequired": "Nếu chọn \"Khác\", vui lòng mô tả lý do.",
+      "alreadyReported": "Bạn đã báo cáo bài viết hoặc bình luận này rồi.",
+      "failed": "Không thể gửi báo cáo."
+    },
+    "write": {
+      "titleBodyRequired": "Vui lòng nhập tiêu đề và nội dung.",
+      "bodyTooLong": "Nội dung tối đa {max} ký tự.",
+      "roommateTypeRequired": "Vui lòng chọn loại.",
+      "roommateTitleTooLong": "Tiêu đề tối đa {max} ký tự.",
+      "roommateOnePerAccount": "Mỗi tài khoản chỉ được có một bài viết tìm bạn cùng phòng hoặc sublet. Hãy sửa hoặc xóa bài viết hiện có rồi thử lại.",
+      "endDateAfterStart": "Vui lòng chọn ngày kết thúc sau ngày bắt đầu.",
+      "partySizeRequired": "Vui lòng nhập số người.",
+      "totalSpendRequired": "Vui lòng nhập tổng số tiền đã chi.",
+      "tipIncludedRequired": "Vui lòng chọn đã gồm tip hay chưa.",
+      "waitMinutesRequired": "Vui lòng nhập thời gian chờ (nhập 0 nếu không phải chờ).",
+      "foodCategoryRequired": "Vui lòng chọn danh mục (Phải thử, Đáng tiền, Không gian đẹp, Chỗ học bài).",
+      "placeRequired": "Vui lòng kiểm tra địa chỉ và tên nhà hàng.",
+      "cptOptTypeRequired": "Vui lòng chọn loại: CPT, OPT, STEM OPT, visa hoặc thẻ xanh.",
+      "cptOptTimelineRequired": "Vui lòng thêm ít nhất một bước vào timeline.",
+      "jobReviewTypeRequired": "Vui lòng chọn loại: thực tập, mới đi làm, có kinh nghiệm hoặc hợp đồng.",
+      "jobReviewTimelineRequired": "Vui lòng thêm ít nhất một bước tuyển dụng.",
+      "jobReviewSourceRequired": "Vui lòng chọn cách bạn được kết nối. Nếu chọn hội sinh viên, hãy chọn cả hội nào.",
+      "jobReviewOutcomeRequired": "Vui lòng chọn kết quả cuối cùng.",
+      "cityRequired": "Vui lòng kiểm tra thành phố."
+    },
+    "roommate": {
+      "required": {
+        "has-room": {
+          "location": "Vui lòng nhập khu vực / vị trí hiện tại.",
+          "budget": "Vui lòng nhập tiền thuê hàng tháng của bạn cùng phòng ($).",
+          "moveInStart": "Vui lòng chọn ngày dọn vào.",
+          "moveInEnd": "Vui lòng chọn ngày dọn ra."
+        },
+        "together": {
+          "location": "Vui lòng nhập khu vực mong muốn.",
+          "budget": "Vui lòng nhập ngân sách tối đa hàng tháng ($).",
+          "moveInStart": "Vui lòng chọn ngày dọn vào mong muốn.",
+          "moveInEnd": "Vui lòng chọn ngày dọn ra."
+        },
+        "room": {
+          "location": "Vui lòng nhập khu vực mong muốn.",
+          "budget": "Vui lòng nhập ngân sách tối đa hàng tháng ($).",
+          "moveInStart": "Vui lòng chọn ngày dọn vào mong muốn.",
+          "moveInEnd": "Vui lòng chọn ngày dọn ra."
+        },
+        "sublet": {
+          "location": "Vui lòng nhập vị trí sublet.",
+          "budget": "Vui lòng nhập tiền thuê hàng tháng ($).",
+          "moveInStart": "Vui lòng chọn ngày bắt đầu sublet.",
+          "moveInEnd": "Vui lòng chọn ngày kết thúc sublet."
+        }
+      }
+    }
+  },
+  "guest": {
+    "invalidRequest": "Vui lòng kiểm tra lại yêu cầu.",
+    "nicknameInvalid": "Vui lòng nhập biệt danh hiển thị từ {min}–{max} ký tự (không phải địa chỉ email).",
+    "emailInvalid": "Vui lòng nhập email hợp lệ để chúng tôi gửi thông tin về thẻ quà tặng và credit.",
+    "linkedinRequired": "Vui lòng nhập URL hồ sơ LinkedIn. Ví dụ: linkedin.com/in/your-name",
+    "guidelinesRequired": "Vui lòng đồng ý với nguyên tắc đăng bài của cộng đồng.",
+    "titleRequired": "Vui lòng nhập tiêu đề.",
+    "bodyRequired": "Vui lòng chia sẻ những điều người khác cần lưu ý.",
+    "bodyTooLong": "Phần \"Cần lưu ý\" tối đa {max} ký tự.",
+    "jobReviewTypeRequired": "Vui lòng chọn loại: thực tập, mới đi làm, có kinh nghiệm, chuyển việc hoặc hợp đồng.",
+    "rateLimited": "Vui lòng thử lại sau giây lát. (Quá nhiều yêu cầu trong thời gian ngắn)"
+  }
+}

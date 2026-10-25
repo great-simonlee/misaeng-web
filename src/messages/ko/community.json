@@ -1,0 +1,485 @@
+{
+  "categories": {
+    "housing": {
+      "title": "하우징",
+      "description": "Misaeng 팀이 올리는 {city} 매물"
+    },
+    "events": {
+      "title": "이벤트",
+      "description": "모임·공연·행사 공유"
+    },
+    "food": {
+      "title": "맛집",
+      "description": "맛집·카페 추천"
+    },
+    "marketplace": {
+      "title": "중고거래",
+      "description": "생활용품 사고팔기"
+    },
+    "status": {
+      "title": "OPT · 비자 · 영주권",
+      "description": "비자·CPT/OPT·영주권 후기"
+    },
+    "job-review": {
+      "title": "면접 · 취업 후기",
+      "description": "면접·취업·직장 경험"
+    },
+    "roommate": {
+      "title": "룸메이트 · 서블렛",
+      "description": "룸메이트·방·서블렛 구하기"
+    },
+    "anonymous": {
+      "title": "익명게시판",
+      "description": "익명으로 이야기 나누기"
+    },
+    "comingSoon": "Coming Soon"
+  },
+  "boards": {
+    "events": {
+      "writeLabel": "이벤트 올리기",
+      "listIntro": "{city}에서 열리는 모임·공연·행사를 공유해 보세요.",
+      "locationLabel": "장소",
+      "locationPlaceholder": "맨해튼 / 온라인",
+      "detailLabel": "일시",
+      "titlePlaceholder": "한인 네트워킹 나이트",
+      "descriptionPlaceholder": "시간, 참가 방법, 한 줄 소개"
+    },
+    "food": {
+      "writeLabel": "맛집 추천하기",
+      "listIntro": "가본 맛집·카페를 남겨 주세요. 사진과 후기를 자유롭게 적어 보세요.",
+      "locationLabel": "동네",
+      "locationPlaceholder": "플러싱 / 코리아타운",
+      "detailLabel": "음식",
+      "titlePlaceholder": "식당 이름",
+      "descriptionPlaceholder": "메뉴, 가격대, 웨이팅, 추천 포인트…"
+    },
+    "marketplace": {
+      "writeLabel": "물품 등록하기",
+      "listIntro": "필요 없는 물건, 필요한 물건 — 이웃과 거래해 보세요.",
+      "locationLabel": "거래 지역",
+      "locationPlaceholder": "브루클린 / 미팅 가능",
+      "detailLabel": "희망 가격 ($)",
+      "detailPlaceholder": "0",
+      "titlePlaceholder": "IKEA 책장 나눔/판매",
+      "descriptionPlaceholder": "상태, 픽업 가능 여부, 거래 방식을 적어 주세요."
+    },
+    "status": {
+      "writeLabel": "후기 올리기",
+      "listIntro": "날짜별로 뭘 준비·제출했는지, 결과는 어떻게 받았는지, 다음 스텝은 뭔지를 남겨 보세요.",
+      "locationLabel": "학교 / 회사 / 관련 기관 (선택)",
+      "locationPlaceholder": "예: 한국계 IT·소프트웨어 회사",
+      "detailLabel": "유형",
+      "titlePlaceholder": "금융 회사 OPT 신청 타임라인",
+      "descriptionPlaceholder": "다음 사람이 실수하지 않도록 조심해야 할 점을 적어 주세요."
+    },
+    "cpt-opt": {
+      "writeLabel": "후기 올리기",
+      "listIntro": "날짜별로 뭘 준비·제출했는지, 결과는 어떻게 받았는지, 다음 스텝은 뭔지를 남겨 보세요.",
+      "locationLabel": "학교 / 회사 / 관련 기관 (선택)",
+      "locationPlaceholder": "예: 한국계 IT·소프트웨어 회사",
+      "detailLabel": "유형",
+      "titlePlaceholder": "금융 회사 OPT 신청 타임라인",
+      "descriptionPlaceholder": "다음 사람이 실수하지 않도록 조심해야 할 점을 적어 주세요."
+    },
+    "visa": {
+      "writeLabel": "후기 남기기",
+      "listIntro": "비자 준비·인터뷰 경험을 공유해 주세요.",
+      "locationLabel": "관련 지역 (선택)",
+      "locationPlaceholder": "NY / 대사관 등",
+      "detailLabel": "비자 종류",
+      "detailPlaceholder": "F-1 / H-1B / O-1",
+      "titlePlaceholder": "H-1B 청원 후기",
+      "descriptionPlaceholder": "타임라인, 서류, 팁"
+    },
+    "job-review": {
+      "writeLabel": "후기 올리기",
+      "listIntro": "날짜별로 서류·인터뷰·결과를 남겨 보세요. 등록 후에도 이어서 추가할 수 있어요.",
+      "locationLabel": "회사 (선택)",
+      "locationPlaceholder": "회사명을 입력해 주세요",
+      "detailLabel": "유형",
+      "titlePlaceholder": "금융 회사 인턴 지원 타임라인",
+      "descriptionPlaceholder": "다음 사람이 실수하지 않도록 조심해야 할 점을 적어 주세요."
+    },
+    "roommate": {
+      "writeLabel": "글 올리기",
+      "listIntro": "방 올리기(룸메·서블렛)와 룸메 찾기를 나눠 올려 주세요. 계정당 1개만 등록할 수 있어요.",
+      "locationLabel": "동네 / 위치",
+      "locationPlaceholder": "플러싱 / 브루클린 / 맨해튼",
+      "detailLabel": "월 예산·월세 ($)",
+      "detailPlaceholder": "1500",
+      "titlePlaceholder": "브루클린에서 룸메이트 구해요",
+      "descriptionPlaceholder": "생활 패턴, 예산, 입주 시기를 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요."
+    },
+    "green-card": {
+      "writeLabel": "후기 남기기",
+      "listIntro": "영주권 여정을 커뮤니티와 공유해 주세요.",
+      "locationLabel": "카테고리 (선택)",
+      "locationPlaceholder": "EB-2 / 결혼 등",
+      "detailLabel": "단계",
+      "detailPlaceholder": "I-140 / 인터뷰 등",
+      "titlePlaceholder": "EB-2 NIW 승인 후기",
+      "descriptionPlaceholder": "기간, 변호사, 팁"
+    },
+    "anonymous": {
+      "writeLabel": "익명으로 글 남기기",
+      "listIntro": "이름 없이 편하게 나누는 {city} 익명 게시판이에요.",
+      "locationLabel": "주제 (선택)",
+      "locationPlaceholder": "주제를 선택해 주세요",
+      "titlePlaceholder": "오늘 하루 한 줄",
+      "descriptionPlaceholder": "부담 없이 남겨 보세요. 작성자는 익명으로 표시돼요."
+    }
+  },
+  "errors": {
+    "createFailed": "등록에 실패했어요",
+    "claimGuestFailed": "게스트 글 연결에 실패했어요",
+    "myPostsLoadFailed": "내 글을 불러오지 못했어요",
+    "mockEditBlocked": "예시 글은 수정할 수 없어요",
+    "mockDeleteBlocked": "예시 글은 삭제할 수 없어요",
+    "updateFailed": "수정에 실패했어요",
+    "deleteFailed": "삭제에 실패했어요",
+    "uploadFailed": "이미지 업로드에 실패했어요",
+    "commentRequired": "댓글을 입력해 주세요.",
+    "loginRequired": "로그인이 필요해요.",
+    "commentVerifyRequired": "글과 댓글을 작성하려면 학교 이메일 인증이 필요해요.",
+    "commentCreateFailed": "댓글 등록에 실패했어요",
+    "replyParentNotFound": "대댓글 대상 댓글을 찾을 수 없어요.",
+    "commentEditTargetMissing": "수정할 댓글을 지정해 주세요.",
+    "commentEditForbidden": "본인이 작성한 댓글만 수정할 수 있어요.",
+    "commentNotFound": "댓글을 찾을 수 없어요.",
+    "commentUpdateFailed": "댓글 수정에 실패했어요",
+    "commentDeleteTargetMissing": "삭제할 댓글을 지정해 주세요.",
+    "commentDeleteForbidden": "본인이 작성한 댓글만 삭제할 수 있어요.",
+    "commentDeleteFailed": "댓글 삭제에 실패했어요",
+    "recommendFailed": "추천에 실패했어요",
+    "reportReasonRequired": "신고 사유를 선택해 주세요.",
+    "alreadyReported": "이미 신고한 글/댓글이에요.",
+    "reportFailed": "신고에 실패했어요",
+    "beenThereFoodOnly": "맛집 게시글만 가봤어요를 표시할 수 있어요.",
+    "beenThereFailed": "가봤어요에 실패했어요"
+  },
+  "author": {
+    "member": "회원",
+    "anonymous": "익명"
+  },
+  "verify": {
+    "required": "글과 댓글을 작성하려면 학생 또는 직장인 인증이 필요해요.",
+    "cta": "인증하기",
+    "linkLabel": "학생 또는 직장인 인증",
+    "suspended": "이 계정은 이용 정지되었습니다."
+  },
+  "guidelines": {
+    "common": {
+      "noPersonalInfo": "실명·연락처 등 타인을 특정할 수 있는 정보는 올리지 마세요.",
+      "noAbuse": "비방·혐오·차별·위협·허위 사실 유포는 금지됩니다.",
+      "noPrivacyViolation": "개인 간 분쟁·사생활 침해·무단 촬영물 공유는 삼가 주세요.",
+      "violationPenalty": "위반 시 글이 삭제되거나 이용이 제한될 수 있어요."
+    },
+    "anonymous": {
+      "noTargeting": "익명이어도 특정인을 지칭·암시하는 글이나 뒷담화성 비방은 금지입니다.",
+      "stillResponsible": "작성자 이름·학교·사진은 다른 사람에게 보이지 않지만, 법적·운영상 책임은 그대로예요.",
+      "loginRequired": "로그인은 글 관리(수정·삭제)를 위해 필요하며, 운영팀이 신고 대응을 위해 확인할 수 있어요."
+    },
+    "commonTitle": "커뮤니티 작성 안내",
+    "anonymousTitle": "익명게시판 작성 안내"
+  },
+  "anonymousTopics": {
+    "opt": "OPT·CPT·STEM OPT",
+    "visa": "비자·신분",
+    "jobs": "취업·인턴",
+    "housing": "주거·룸메",
+    "campusLife": "학교생활",
+    "classes": "학업·수업",
+    "finance": "재정·세금·보험",
+    "relationships": "인간관계",
+    "mentalHealth": "멘탈·고민",
+    "transportation": "운전·교통",
+    "lifeTips": "생활팁",
+    "secondhand": "중고·나눔",
+    "daily": "일상",
+    "other": "기타"
+  },
+  "report": {
+    "reasons": {
+      "spam": {
+        "label": "스팸 · 광고",
+        "description": "홍보, 도배, 무관한 링크 등"
+      },
+      "abuse": {
+        "label": "욕설 · 괴롭힘",
+        "description": "비방, 혐오, 위협적인 표현"
+      },
+      "inappropriate": {
+        "label": "부적절한 내용",
+        "description": "선정적·폭력적·커뮤니티 가이드 위반"
+      },
+      "misinformation": {
+        "label": "허위 · 사기 의심",
+        "description": "거짓 정보, 사기·피싱 의심"
+      },
+      "privacy": {
+        "label": "개인정보 노출",
+        "description": "동의 없는 연락처·사진·신상 공개"
+      },
+      "other": {
+        "label": "기타",
+        "description": "위에 해당하지 않는 사유"
+      }
+    },
+    "action": "신고",
+    "title": "신고하기",
+    "cancel": "취소",
+    "submitting": "접수 중…",
+    "submit": "신고 접수",
+    "intro": {
+      "post": "이 게시글을(를) 신고합니다. 접수된 신고는 관리자(ellieo-erp)에서 확인 후 조치됩니다.",
+      "comment": "이 댓글을(를) 신고합니다. 접수된 신고는 관리자(ellieo-erp)에서 확인 후 조치됩니다.",
+      "generic": "이 글을(를) 신고합니다. 접수된 신고는 관리자(ellieo-erp)에서 확인 후 조치됩니다."
+    },
+    "detailLabelRequired": "상세 내용 (필수)",
+    "detailLabelOptional": "상세 내용 (선택)",
+    "detailPlaceholder": "신고 사유를 조금 더 알려 주세요",
+    "submitted": "신고가 접수되었어요. 관리자가 확인합니다."
+  },
+  "anonymousNotice": {
+    "close": "닫기",
+    "eyebrow": "이용 주의사항",
+    "board": "익명게시판",
+    "title": "함께 지키는 익명 공간",
+    "body": "{brand}의 건강하고 생산적인 커뮤니티의 발전을 위해, 익명게시판에서도 서로를 존중하는 이용 규칙을 지켜 주세요!",
+    "confirm": "확인했어요",
+    "snooze24h": "24시간 동안 보지 않기"
+  },
+  "detail": {
+    "edit": "수정",
+    "delete": "삭제",
+    "companyPageFallback": "회사 페이지",
+    "loadFailed": "글을 불러오지 못했어요",
+    "deleteConfirm": "\"{title}\" 글을 삭제할까요?\n삭제하면 되돌릴 수 없어요.",
+    "deleted": "글을 삭제했어요",
+    "loading": "글을 불러오는 중이에요…",
+    "notFoundTitle": "게시글을 찾을 수 없습니다",
+    "notFoundDescription": "삭제된 글일 수 있습니다.",
+    "backToListAction": "{board} 목록으로",
+    "backToList": "{board} 목록",
+    "roommateType": "유형",
+    "roommateBudget": "월 예산·월세",
+    "perMonthValue": "{value}/월",
+    "roommateMoveIn": "입주·이사",
+    "views": "조회 {n}"
+  },
+  "like": {
+    "like": "좋아요",
+    "unlike": "좋아요 취소"
+  },
+  "engagement": {
+    "recommend": "추천",
+    "recommended": "추천했어요",
+    "recommendCancelled": "추천을 취소했어요",
+    "beenThere": "나도 가봤어요",
+    "beenThereAdded": "가봤어요를 남겼어요",
+    "beenThereCancelled": "가봤어요를 취소했어요"
+  },
+  "card": {
+    "noPhoto": "사진 없음",
+    "beenThereCount_other": "{n}명이 가봤어요",
+    "timelineSteps_other": "타임라인 {count}단계",
+    "hiringSteps_other": "채용 단계 {count}건",
+    "hiringStepsWithMore_other": "채용 단계 {count}건 · {hidden}단계 더 보기",
+    "period": "기간 {period}",
+    "perMonth": "/월",
+    "stepNumber": "{n}단계",
+    "noStepInfo": "단계 정보 없음",
+    "views": "조회수"
+  },
+  "anonymous": {
+    "topicPlaceholder": "주제를 선택해 주세요",
+    "topicAria": "주제"
+  },
+  "toolbar": {
+    "filter": "필터",
+    "filterApplied_other": "필터 {count}개 적용됨"
+  },
+  "comments": {
+    "title": "댓글",
+    "loadFailed": "댓글을 불러오지 못했어요",
+    "bodyRequired": "댓글을 입력해 주세요",
+    "posted": "댓글을 남겼어요",
+    "replyPosted": "답글을 남겼어요",
+    "deleteConfirm": "이 댓글을 삭제할까요?\n삭제하면 답글도 함께 삭제돼요.",
+    "deleted": "댓글을 삭제했어요",
+    "updated": "댓글을 수정했어요",
+    "loginPrompt": "댓글을 쓰려면 {link}이 필요해요.",
+    "loginLink": "로그인",
+    "verifyPrompt": "댓글을 쓰려면 {link}이 필요해요.",
+    "checkingLogin": "로그인 상태를 확인하는 중이에요…",
+    "placeholder": "댓글을 남겨 보세요",
+    "submitting": "등록 중…",
+    "submit": "댓글 등록",
+    "loading": "댓글을 불러오는 중이에요…",
+    "empty": "아직 댓글이 없어요. 첫 댓글을 남겨 보세요.",
+    "replyPlaceholder": "답글을 입력하세요",
+    "cancel": "취소",
+    "replySubmit": "답글 등록",
+    "deleting": "삭제 중…",
+    "saving": "저장 중…",
+    "saveEdit": "수정 완료",
+    "reply": "답글 달기"
+  },
+  "share": {
+    "metaDescription": "가입 없이도 서류·인터뷰·결과를 단계별로 남길 수 있어요. 후기를 남기면 크레딧이 쌓이고, 현직자 커피챗에 사용할 수 있습니다."
+  },
+  "wip": {
+    "title": "준비 중이에요",
+    "description": "{board} 게시판은 지금 만들고 있어요. 조금만 기다려 주세요.",
+    "homeAction": "커뮤니티 홈으로",
+    "otherBoards": "다른 게시판이 궁금하시면 {link}을 먼저 둘러보세요."
+  },
+  "list": {
+    "mapLoading": "지도를 불러오는 중…",
+    "foodVibeAria": "맛집 분위기",
+    "all": "전체",
+    "cuisineAria": "음식 종류",
+    "allCuisines": "음식 전체",
+    "loadFailed": "목록을 불러오지 못했어요",
+    "login": "로그인",
+    "suspended": "이용 정지",
+    "retry": "다시 시도",
+    "emptyTitle": "아직 {board} 글이 없습니다",
+    "noMatchTitle": "조건에 맞는 글이 없어요",
+    "emptyCanWrite": "첫 글을 올려 커뮤니티를 시작해 보세요.",
+    "emptyNeedsVerify": "학생 또는 직장인 인증 후 글을 올릴 수 있어요.",
+    "emptyNeedsLogin": "로그인 후 글을 올릴 수 있어요.",
+    "noMatchFood": "다른 분위기 · 음식 종류를 선택해 보세요.",
+    "noMatchCptOpt": "다른 유형(CPT/OPT/STEM OPT)을 선택해 보세요.",
+    "noMatchJobReview": "다른 유형이나 회사를 선택해 보세요.",
+    "noMatchDefault": "필터를 바꿔 다시 찾아 보세요.",
+    "showMap": "지도로 보기",
+    "showList": "리스트로 보기",
+    "map": "지도",
+    "list": "리스트",
+    "clearAll": "전체 해제",
+    "apply": "적용하기",
+    "filterType": "유형",
+    "cptOptTypeAria": "CPT OPT 유형",
+    "filterCity": "도시",
+    "filterSchool": "학교",
+    "jobReviewTypeAria": "면접·취업 유형",
+    "search": "검색",
+    "searchPlaceholder": "제목, 내용, 지역으로 검색",
+    "sort": "정렬",
+    "sortRecentlyUpdated": "최근 업데이트순",
+    "sortLeastRecentlyUpdated": "오래된 업데이트순",
+    "sortNewest": "최신순",
+    "sortOldest": "오래된순",
+    "company": "회사",
+    "companyFilterAria": "회사 필터",
+    "companyName": "회사명",
+    "companyCategory": "회사 카테고리",
+    "companyNamePlaceholder": "회사명으로 검색",
+    "companyCategoryPlaceholder": "카테고리를 선택해 주세요",
+    "none": "선택 안 함"
+  },
+  "write": {
+    "errors": {
+      "postNotFound": "글을 찾을 수 없어요",
+      "noEditPermission": "수정 권한이 없어요",
+      "titleRequired": "제목을 입력해 주세요",
+      "titleTooLong": "제목은 {max}자 이내로 작성해 주세요",
+      "bodyRequired": "본문을 입력해 주세요",
+      "bodyTooLong": "본문은 {max}자 이내로 작성해 주세요",
+      "titleAndBodyRequired": "제목과 본문을 입력해 주세요"
+    },
+    "updated": "글을 수정했어요",
+    "created": "글을 등록했어요",
+    "draftSaved": "임시 저장했어요",
+    "draftSaveFailed": "임시 저장에 실패했어요",
+    "redirectingToLogin": "로그인 페이지로 이동 중…",
+    "backToPost": "글로 돌아가기",
+    "backToList": "목록으로 돌아가기",
+    "titleLabel": "제목",
+    "bodyLabel": "본문",
+    "submit": "글 등록하기",
+    "publish": "게시하기",
+    "editEyebrow": "글 수정",
+    "untitled": "제목 없음",
+    "food": {
+      "menuMaxReached": "메뉴는 최대 {max}개까지 등록할 수 있어요",
+      "imagesOnly": "이미지 파일만 선택할 수 있어요",
+      "menuMaxPartial_other": "메뉴는 최대 {max}개까지예요. {count}장만 추가합니다",
+      "uploadPartial": "{success}장은 추가됐고, {failed}장은 실패했어요",
+      "menuUploadFailed": "메뉴 사진 업로드에 실패했어요",
+      "galleryMaxReached": "분위기 사진은 최대 {max}장까지 등록할 수 있어요",
+      "galleryMaxPartial_other": "분위기 사진은 최대 {max}장까지예요. {count}장만 추가합니다",
+      "galleryUploadFailed": "분위기 사진 업로드에 실패했어요",
+      "errors": {
+        "addressRequired": "지도에서 주소를 검색해 선택해 주세요",
+        "coordinatesMissing": "선택한 주소의 좌표를 확인하지 못했어요",
+        "categoryRequired": "카테고리를 선택해 주세요",
+        "cuisineRequired": "어떤 음식인지 선택해 주세요",
+        "nameRequired": "음식점 이름을 입력해 주세요",
+        "partySizeRange": "방문 인원을 {min}~{max}명으로 입력해 주세요",
+        "spendRange": "총 금액을 $0~{max} 정수로 입력해 주세요",
+        "tipRequired": "팁 포함 / 팁 제외 중 하나를 선택해 주세요",
+        "waitRange": "웨이팅을 0~{max}분 정수로 입력해 주세요",
+        "menuIncomplete": "메뉴는 사진·메뉴 이름·한 줄 평을 모두 입력해야 등록할 수 있어요"
+      },
+      "whereTitle": "어디서 먹었어요?",
+      "whereDescription": "정확한 주소를 선택하면 위치가 저장돼요",
+      "nameLabel": "음식점 이름",
+      "categoryTitle": "카테고리",
+      "cuisineTitle": "어떤 음식인가요?",
+      "visitTitle": "방문 정보",
+      "partySize": "인원",
+      "partySizeHint": "최대 {max}명",
+      "partySizeUnit": "명",
+      "totalSpend": "총 금액",
+      "totalSpendHint": "$0 ~ {max} · 정수",
+      "tipAria": "팁 포함 여부",
+      "tipIncluded": "팁포함",
+      "tipExcluded": "팁제외",
+      "wait": "웨이팅",
+      "waitHint": "없으면 0 · 최대 {max}분",
+      "waitUnit": "분",
+      "galleryTitle": "가게 내부 · 분위기",
+      "galleryDescription": "인테리어, 좌석, 분위기 사진 · 최대 {max}장",
+      "galleryPick": "분위기 사진 선택",
+      "galleryPickHint": "갤러리에서 최대 {max}장까지 한 번에 고를 수 있어요",
+      "galleryAddMoreAria_other": "분위기 사진 {count}장 더 추가",
+      "galleryAddMore_other": "{count}장 더",
+      "uploading": "업로드 중…",
+      "menuTitle": "메뉴 사진",
+      "menuDescription": "사진마다 메뉴 이름과 한 줄 평을 따로 적어 주세요",
+      "coverNoticeTitle": "첫 번째 메뉴 사진이 대표 사진으로 등록돼요",
+      "coverNoticeBody": "목록 카드와 상세 상단에 첫 번째 메뉴 사진이 크게 보여요.",
+      "menuPick": "메뉴 사진 여러 장 선택",
+      "menuPickHint": "최대 {max}장 · 첫 장이 대표 사진 · 이름·한 줄 평 필수",
+      "menuNumber": "메뉴 {n}",
+      "coverPhoto": "대표 사진",
+      "photo": "사진",
+      "cover": "대표",
+      "menuNamePlaceholder": "메뉴 이름 (필수)",
+      "menuNameAria": "메뉴 {n} 이름",
+      "menuCaptionPlaceholder": "한 줄 평 (필수)",
+      "menuCaptionAria": "메뉴 {n} 한 줄 평",
+      "missingNameAndCaption": "메뉴 이름과 한 줄 평을 입력해 주세요",
+      "missingName": "메뉴 이름을 입력해 주세요",
+      "missingCaption": "한 줄 평을 입력해 주세요",
+      "menuAddMore_other": "메뉴 사진 {count}장 더 추가",
+      "bodyDescription": "추천 포인트, 가는 길, 팁을 자유롭게 적어 주세요",
+      "selectAddress": "주소를 선택해 주세요",
+      "checkingCoordinates": "주소 좌표를 확인 중이에요",
+      "selectCuisine": "음식을 선택해 주세요",
+      "submit": "올리기"
+    }
+  },
+  "anonymousWrite": {
+    "topicTitle": "어떤 주제인가요?",
+    "topicDescription": "선택하지 않아도 괜찮아요",
+    "topicAria": "익명게시판 주제",
+    "titleDescription": "한눈에 보이는 짧은 제목을 적어 주세요",
+    "bodyDescription": "부담 없이 남겨 보세요. 작성자는 익명으로 표시돼요.",
+    "createTitle": "익명게시판 글 올리기",
+    "createDescription": "이름·학교·사진은 보이지 않아요. 부담 없이 남겨 주세요.",
+    "editTitle": "익명 글 수정하기"
+  }
+}

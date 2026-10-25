@@ -7,7 +7,9 @@ import { LoadingState } from '@components'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
 import { cityFirst, fetchPostings, matchesKind, type PostingKind, type PublicPosting } from '@lib/company/postings'
-import { JOB_FUNCTION_LABELS, JOB_FUNCTIONS, postingCopy, type JobFunction } from '@lib/constants/postingCopy'
+import { BRAND_CONFIG } from '@lib/brand'
+import { JOB_FUNCTION_LABELS, JOB_FUNCTIONS, type JobFunction } from '@lib/constants/postingCopy'
+import { useT } from '@lib/i18n/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CompanyHeroPanel } from '@widgets/nyc/CompanyBrand'
@@ -23,6 +25,7 @@ const normalize = (value: string) => value.toLowerCase().replace(/\s+/g, '')
 export function PostingListScreen() {
   const city = useCity()
   const href = useCityPath()
+  const t = useT('companies')
   const [postings, setPostings] = useState<PublicPosting[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -43,11 +46,11 @@ export function PostingListScreen() {
     try {
       setPostings(await fetchPostings(city))
     } catch (e) {
-      setError(e instanceof Error ? e.message : postingCopy.loadError)
+      setError(e instanceof Error && e.message ? e.message : t('postings.loadError'))
     } finally {
       setLoading(false)
     }
-  }, [city])
+  }, [city, t])
 
   useEffect(() => {
     void load()
@@ -83,7 +86,7 @@ export function PostingListScreen() {
   )
 
   // 구분: 인턴·신입·한국어 우대·한국 근무 (공고가 있는 것만)
-  const kinds = useMemo(() => kindCounts(postings), [postings])
+  const kinds = useMemo(() => kindCounts(postings, t), [postings, t])
 
   return (
     <BoardPageShell width='wide'>
@@ -92,18 +95,18 @@ export function PostingListScreen() {
           href={href('/companies')}
           className='flex w-fit items-center gap-1 text-[12px] font-medium text-[var(--muted)] hover:text-[var(--foreground)] sm:text-[13px]'
         >
-          <span aria-hidden>‹</span> {postingCopy.backToCompanies}
+          <span aria-hidden>‹</span> {t('postings.backToCompanies')}
         </Link>
         <CompanyHeroPanel className='mt-3'>
           <h1 className='text-[1.4rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.6rem]'>
-            {postingCopy.listTitle}
+            {t('postings.listTitle')}
           </h1>
-          <p className='mt-1.5 text-[13px] leading-relaxed text-white/55 sm:text-[14px]'>{postingCopy.listIntro}</p>
+          <p className='mt-1.5 text-[13px] leading-relaxed text-white/55 sm:text-[14px]'>{t('postings.listIntro', { brand: BRAND_CONFIG.name })}</p>
           <input
             type='search'
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={postingCopy.searchPlaceholder}
+            placeholder={t('postings.searchPlaceholder')}
             className='mt-5 h-[52px] w-full rounded-2xl bg-white px-4 text-[15px] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]'
           />
         </CompanyHeroPanel>
@@ -111,7 +114,7 @@ export function PostingListScreen() {
 
       <div className='mt-6 space-y-3'>
         <ChipScrollRow
-          leading={<Chip label={postingCopy.allLevels} count={postings.length} active={kind === 'all'} onClick={() => setKind('all')} />}
+          leading={<Chip label={t('postings.allLevels')} count={postings.length} active={kind === 'all'} onClick={() => setKind('all')} />}
         >
           {kinds.map(([id, label, count]) => (
             <Chip key={id} label={label} count={count} active={kind === id} onClick={() => setKind(id)} />
@@ -121,7 +124,7 @@ export function PostingListScreen() {
           <ChipScrollRow
             leading={
               <Chip
-                label={postingCopy.allFunctions}
+                label={t('postings.allFunctions')}
                 active={jobFunction === 'all'}
                 onClick={() => setJobFunction('all')}
               />
@@ -130,7 +133,7 @@ export function PostingListScreen() {
             {functions.map(([code, count]) => (
               <Chip
                 key={code}
-                label={JOB_FUNCTION_LABELS[code]}
+                label={t(JOB_FUNCTION_LABELS[code])}
                 count={count}
                 active={jobFunction === code}
                 onClick={() => setJobFunction(code)}
@@ -141,7 +144,7 @@ export function PostingListScreen() {
         {regions.length > 1 ? (
           <ChipScrollRow
             leading={
-              <Chip label={postingCopy.allRegions} active={region === 'all'} onClick={() => setRegion('all')} />
+              <Chip label={t('postings.allRegions')} active={region === 'all'} onClick={() => setRegion('all')} />
             }
           >
             {regions.map(([name, count]) => (
@@ -158,18 +161,18 @@ export function PostingListScreen() {
           </div>
         ) : error ? (
           <EmptyState
-            title={postingCopy.loadError}
+            title={t('postings.loadError')}
             description={error}
             onAction={() => void load()}
-            actionLabel={postingCopy.retry}
+            actionLabel={t('common.retry')}
           />
         ) : postings.length === 0 ? (
-          <EmptyState title={postingCopy.emptyTitle} description={postingCopy.emptyDescription} />
+          <EmptyState title={t('postings.emptyTitle')} description={t('postings.emptyDescription')} />
         ) : filtered.length === 0 ? (
-          <EmptyState title={postingCopy.noMatchTitle} description={postingCopy.noMatchDescription} />
+          <EmptyState title={t('postings.noMatchTitle')} description={t('postings.noMatchDescription')} />
         ) : (
           <>
-            <p className='mb-3 text-[13px] font-medium text-[var(--muted)]'>{postingCopy.resultCount(filtered.length)}</p>
+            <p className='mb-3 text-[13px] font-medium text-[var(--muted)]'>{t('postings.resultCount', { count: filtered.length })}</p>
             <PostingRows postings={filtered.slice(0, limit)} showCompany />
             {filtered.length > limit ? (
               <div className='mt-4 flex justify-center'>
@@ -178,7 +181,7 @@ export function PostingListScreen() {
                   onClick={() => setLimit((n) => n + PAGE_SIZE)}
                   className='inline-flex h-10 items-center rounded-full bg-[#f3f4f6] px-5 text-[13px] font-semibold text-[var(--muted-foreground)] transition hover:bg-[#e9ebee] hover:text-[var(--foreground)]'
                 >
-                  {postingCopy.loadMore} ({filtered.length - limit})
+                  {t('postings.loadMore', { count: filtered.length - limit })}
                 </button>
               </div>
             ) : null}

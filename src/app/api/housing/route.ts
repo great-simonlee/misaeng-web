@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import { localizeListings } from '@lib/translations/localize.server'
+import { getRequestLocale } from '@lib/i18n/server'
 
 import { parseCityId } from '@lib/constants/cities'
 import { toPublicHousingListing } from '@lib/housing/publicListing'
@@ -10,9 +12,11 @@ export const dynamic = 'force-dynamic'
 export async function GET(request: Request) {
   try {
     const city = parseCityId(new URL(request.url).searchParams.get('city'))
-    const listings = (await listStoredHousingListings(city ?? undefined)).map(
-      toPublicHousingListing,
-    )
+    const locale = await getRequestLocale(request)
+    const listings = localizeListings(
+      await listStoredHousingListings(city ?? undefined),
+      locale,
+    ).map(toPublicHousingListing)
     return NextResponse.json({ listings })
   } catch (error) {
     console.error('Housing list error:', error)

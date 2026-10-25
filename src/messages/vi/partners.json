@@ -1,0 +1,50 @@
+{
+  "schoolsLabel": "Hội sinh viên Hàn Quốc đối tác",
+  "influencersLabel": "Influencer đối tác",
+  "more": "Xem thêm",
+  "backToHome": "Về trang chủ cộng đồng",
+  "schools": {
+    "title": "Hội sinh viên đối tác",
+    "intro": "Tin tức từ các hội sinh viên Hàn Quốc mà chúng tôi hợp tác sẽ được cập nhật tại đây.",
+    "profilePending": "Hồ sơ sắp có",
+    "logoPending": "Logo sắp có",
+    "dmMessage": "Liên hệ hợp tác hội sinh viên"
+  },
+  "influencers": {
+    "title": "Nội dung từ influencer",
+    "intro": "Chúng tôi đang tìm influencer đối tác và sẽ hợp tác cùng các nhà sáng tạo trên Instagram, YouTube và TikTok.",
+    "recruitingTitle": "Chúng tôi đang tìm influencer đối tác!",
+    "searching": "Đang tìm influencer đối tác",
+    "recruitingBody": "Chúng tôi đang tìm influencer đối tác. Bạn sẽ sớm xem được nội dung của họ tại đây.",
+    "recruitingHandle": "Đang tuyển influencer đối tác",
+    "dmMessage": "Liên hệ hợp tác influencer"
+  },
+  "influencerPlatforms": {
+    "instagram": {
+      "title": "Instagram",
+      "description": "Instagram về đời sống và địa phương"
+    },
+    "youtube": {
+      "title": "YouTuber",
+      "description": "Vlog và thông tin trên YouTube"
+    },
+    "tiktok": {
+      "title": "TikToker",
+      "description": "Tin tức địa phương qua video ngắn"
+    }
+  },
+  "orgs": {
+    "nyu-kiso": {
+      "name": "Hội sinh viên Hàn Quốc NYU"
+    },
+    "fit-ksof": {
+      "name": "Hội sinh viên Hàn Quốc FIT"
+    },
+    "baruch-ksa": {
+      "name": "Hội sinh viên Hàn Quốc Baruch"
+    },
+    "parsons-ksa": {
+      "name": "Hội sinh viên Hàn Quốc Parsons"
+    }
+  }
+}

@@ -8,8 +8,10 @@ import { useCityPath } from '@hooks/useCity'
 import { useToast } from '@hooks/useToast'
 import {
   COMMUNITY_CREDIT_REDEEM_OPTIONS,
+  communityCreditEntryLabel,
   type CommunityCreditEntry,
 } from '@lib/constants/communityCredit'
+import { useFormat, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 
 type CreditSummary = {
@@ -23,36 +25,31 @@ type CreditLedger = CreditSummary & {
   entries: CommunityCreditEntry[]
 }
 
-function formatAbsoluteTime(ts: number) {
-  return new Intl.DateTimeFormat('ko-KR', {
-    timeZone: 'America/New_York',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }).format(new Date(ts))
+const ABSOLUTE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
+  timeZone: 'America/New_York',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
 }
+
+const KNOWN_KINDS: readonly CommunityCreditEntry['kind'][] = [
+  'earn',
+  'revoke',
+  'spend',
+  'restore',
+]
 
 function shortRef(id: string) {
   const clean = id.replace(/[^a-zA-Z0-9]/g, '')
   return clean.slice(-8).toUpperCase() || id.slice(-8).toUpperCase()
 }
 
-function kindLabel(kind: CommunityCreditEntry['kind']) {
-  switch (kind) {
-    case 'earn':
-      return '적립'
-    case 'revoke':
-      return '회수'
-    case 'spend':
-      return '사용'
-    case 'restore':
-      return '복구'
-    default:
-      return '기타'
-  }
+/** `me.credit.kinds.<kind>` 키 (모르는 종류는 other) */
+function kindKey(kind: CommunityCreditEntry['kind']) {
+  return KNOWN_KINDS.includes(kind) ? kind : 'other'
 }
 
 type Props = {
@@ -65,7 +62,7 @@ const creditPillButtonClassName =
 function CreditPillGlow() {
   return (
     <span
-      className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(246,67,16,0.35),transparent_55%)]'
+      className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgb(var(--brand-rgb)/0.35),transparent_55%)]'
       aria-hidden
     />
   )
@@ -73,6 +70,9 @@ function CreditPillGlow() {
 
 /** 프로필 카드용 간단 크레딧 잔액 + 내역 모달 */
 export function MyPageCreditSection({ className }: Props) {
+  const t = useT('me')
+  const tCredit = useT('credit')
+  const format = useFormat()
   const href = useCityPath()
   const { success } = useToast()
   const [summary, setSummary] = useState<CreditSummary | null>(null)
@@ -101,7 +101,7 @@ export function MyPageCreditSection({ className }: Props) {
         | null
 
       if (!res.ok) {
-        throw new Error(data?.error || '크레딧을 불러오지 못했어요')
+        throw new Error(data?.error || t('credit.loadFailed'))
       }
 
       setSummary({
@@ -112,13 +112,13 @@ export function MyPageCreditSection({ className }: Props) {
       })
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : '크레딧을 불러오지 못했어요',
+        err instanceof Error ? err.message : t('credit.loadFailed'),
       )
       setSummary(null)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   const loadLedger = useCallback(async () => {
     setLedgerLoading(true)
@@ -135,7 +135,7 @@ export function MyPageCreditSection({ className }: Props) {
         | null
 
       if (!res.ok) {
-        throw new Error(data?.error || '적립 내역을 불러오지 못했어요')
+        throw new Error(data?.error || t('credit.ledgerLoadFailed'))
       }
 
       const next: CreditLedger = {
@@ -154,13 +154,13 @@ export function MyPageCreditSection({ className }: Props) {
       })
     } catch (err) {
       setLedgerError(
-        err instanceof Error ? err.message : '적립 내역을 불러오지 못했어요',
+        err instanceof Error ? err.message : t('credit.ledgerLoadFailed'),
       )
       setLedger(null)
     } finally {
       setLedgerLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     void loadSummary()
@@ -179,7 +179,7 @@ export function MyPageCreditSection({ className }: Props) {
   function handleRedeemSubmit() {
     if (!selectedRedeemId) return
     setRequestOpen(false)
-    success('보상 신청은 순차 오픈 예정이에요. 크레딧 가이드에서 자세히 확인해 주세요.')
+    success(t('credit.redeemComingSoon'))
   }
 
   const redeemOptions = COMMUNITY_CREDIT_REDEEM_OPTIONS.filter(
@@ -200,14 +200,14 @@ export function MyPageCreditSection({ className }: Props) {
           onClick={() => void loadSummary()}
           className='inline-flex h-9 items-center rounded-full bg-[#f7f8fa] px-3.5 text-[12px] font-medium text-[var(--muted)] ring-1 ring-black/[0.05] touch-manipulation'
         >
-          크레딧 불러오기 실패 · 재시도
+          {t('credit.loadFailedRetry')}
         </button>
       ) : summary ? (
         <button
           type='button'
           onClick={openHistory}
           className={cn(creditPillButtonClassName, 'gap-2 text-left')}
-          aria-label={`커뮤니티 크레딧 ${summary.balance}점, 내역 보기`}
+          aria-label={t('credit.pillAria', { count: summary.balance })}
         >
           <CreditPillGlow />
           <span className='relative flex size-5 items-center justify-center rounded-full bg-white/12 ring-1 ring-white/15'>
@@ -215,13 +215,15 @@ export function MyPageCreditSection({ className }: Props) {
           </span>
           <span className='relative flex items-baseline gap-1'>
             <span className='text-[14px] font-bold tabular-nums tracking-tight text-white'>
-              {summary.balance.toLocaleString('en-US')}
+              {format.number(summary.balance)}
             </span>
-            <span className='text-[11px] font-medium text-white/70'>크레딧</span>
+            <span className='text-[11px] font-medium text-white/70'>
+              {t('credit.unit')}
+            </span>
           </span>
           <span className='relative h-3 w-px bg-white/20' aria-hidden />
           <span className='relative text-[11px] font-semibold text-white/85'>
-            내역
+            {t('credit.history')}
             {summary.entryCount > 0 ? (
               <span className='ml-1 tabular-nums text-white/55'>
                 {summary.entryCount}
@@ -236,11 +238,11 @@ export function MyPageCreditSection({ className }: Props) {
           type='button'
           onClick={openRequest}
           className={creditPillButtonClassName}
-          aria-label='크레딧 사용 요청'
+          aria-label={t('credit.requestTitle')}
         >
           <CreditPillGlow />
           <span className='relative text-[11px] font-semibold text-white/85'>
-            크레딧 사용 요청
+            {t('credit.requestTitle')}
           </span>
         </button>
       ) : null}
@@ -248,20 +250,19 @@ export function MyPageCreditSection({ className }: Props) {
       <BottomSheet
         open={requestOpen}
         onClose={() => setRequestOpen(false)}
-        title='크레딧 사용 요청'
+        title={t('credit.requestTitle')}
         maxHeightClassName='max-h-[min(82dvh,680px)]'
       >
         <div className='space-y-4 px-3 pb-2 pt-1'>
           <div className='rounded-2xl bg-[#f7f8fa] px-4 py-3'>
-            <p className='text-[11px] text-[var(--muted)]'>보유 크레딧</p>
+            <p className='text-[11px] text-[var(--muted)]'>{t('credit.balanceLabel')}</p>
             <p className='mt-0.5 text-[1.25rem] font-bold tabular-nums text-[var(--foreground)]'>
-              {balance.toLocaleString('en-US')}
+              {format.number(balance)}
             </p>
           </div>
 
           <p className='px-0.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-            사용할 보상을 선택해 주세요. 신청 후 미생이 검토·매칭을
-            진행합니다.
+            {t('credit.requestDescription')}
           </p>
 
           <ul className='space-y-2'>
@@ -277,17 +278,20 @@ export function MyPageCreditSection({ className }: Props) {
                     className={cn(
                       'w-full rounded-2xl px-4 py-3.5 text-left ring-1 transition touch-manipulation',
                       selected
-                        ? 'bg-[#fff7f4] ring-[var(--brand)]'
+                        ? 'bg-brand-soft ring-[var(--brand)]'
                         : 'bg-white ring-black/[0.05] hover:ring-black/[0.1]',
                     )}
                   >
                     <div className='flex items-start justify-between gap-3'>
                       <div className='min-w-0'>
                         <p className='text-[14px] font-semibold text-[var(--foreground)]'>
-                          {option.label}
+                          {tCredit(`redeemOptions.${option.id}.label`)}
                         </p>
                         <p className='mt-1 text-[12px] text-[var(--muted)]'>
-                          {option.duration} · 월 {option.monthlyCap}회
+                          {t('credit.optionMeta', {
+                            duration: tCredit(`redeemOptions.${option.id}.duration`),
+                            count: option.monthlyCap,
+                          })}
                         </p>
                       </div>
                       <span className='shrink-0 text-[15px] font-bold tabular-nums text-[var(--brand)]'>
@@ -296,7 +300,7 @@ export function MyPageCreditSection({ className }: Props) {
                     </div>
                     {!affordable ? (
                       <p className='mt-2 text-[12px] text-[var(--muted)]'>
-                        {option.cost - balance} 크레딧 더 필요해요
+                        {t('credit.needMore', { count: option.cost - balance })}
                       </p>
                     ) : null}
                   </button>
@@ -310,7 +314,7 @@ export function MyPageCreditSection({ className }: Props) {
             onClick={() => setRequestOpen(false)}
             className='block px-0.5 text-[12px] font-medium text-[var(--brand)] hover:underline'
           >
-            보상 안내 자세히 보기
+            {t('credit.redeemGuideLink')}
           </Link>
 
           <button
@@ -325,7 +329,7 @@ export function MyPageCreditSection({ className }: Props) {
             onClick={handleRedeemSubmit}
             className='flex h-11 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white touch-manipulation disabled:cursor-not-allowed disabled:opacity-45'
           >
-            신청하기
+            {t('credit.submit')}
           </button>
         </div>
       </BottomSheet>
@@ -333,17 +337,15 @@ export function MyPageCreditSection({ className }: Props) {
       <BottomSheet
         open={historyOpen}
         onClose={() => setHistoryOpen(false)}
-        title='크레딧 적립 내역'
+        title={t('credit.historyTitle')}
         maxHeightClassName='max-h-[min(82dvh,680px)]'
       >
         <div className='space-y-4 px-3 pb-2 pt-1'>
           <div className='flex items-center justify-between gap-3 rounded-2xl bg-[#f7f8fa] px-4 py-3'>
             <div>
-              <p className='text-[11px] text-[var(--muted)]'>보유 크레딧</p>
+              <p className='text-[11px] text-[var(--muted)]'>{t('credit.balanceLabel')}</p>
               <p className='mt-0.5 text-[1.25rem] font-bold tabular-nums text-[var(--foreground)]'>
-                {(ledger?.balance ?? summary?.balance ?? 0).toLocaleString(
-                  'en-US',
-                )}
+                {format.number(ledger?.balance ?? summary?.balance ?? 0)}
               </p>
             </div>
             <Link
@@ -351,7 +353,7 @@ export function MyPageCreditSection({ className }: Props) {
               onClick={() => setHistoryOpen(false)}
               className='text-[12px] font-medium text-[var(--brand)] hover:underline'
             >
-              안내 보기
+              {t('credit.guideLink')}
             </Link>
           </div>
 
@@ -374,23 +376,23 @@ export function MyPageCreditSection({ className }: Props) {
                 onClick={() => void loadLedger()}
                 className='mt-2 text-[13px] font-semibold text-[var(--brand)]'
               >
-                다시 시도
+                {t('credit.retry')}
               </button>
             </div>
           ) : !ledger || ledger.entries.length === 0 ? (
             <div className='px-1 py-6 text-center'>
               <p className='text-[14px] font-semibold text-[var(--foreground)]'>
-                아직 내역이 없어요
+                {t('credit.emptyTitle')}
               </p>
               <p className='mt-1 text-[13px] text-[var(--muted)]'>
-                맛집·후기·댓글로 크레딧을 모아 보세요.
+                {t('credit.emptyDescription')}
               </p>
               <Link
                 href={href('/food/new')}
                 onClick={() => setHistoryOpen(false)}
                 className='mt-4 inline-flex h-9 items-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white'
               >
-                맛집 후기 쓰기
+                {t('credit.writeFoodReview')}
               </Link>
             </div>
           ) : (
@@ -407,18 +409,18 @@ export function MyPageCreditSection({ className }: Props) {
                           className={cn(
                             'rounded-md px-1.5 py-0.5 text-[10px] font-semibold',
                             entry.kind === 'earn' || entry.kind === 'restore'
-                              ? 'bg-[#fff0eb] text-[var(--brand)]'
+                              ? 'bg-brand-subtle text-[var(--brand)]'
                               : 'bg-[#f3f4f6] text-[var(--muted)]',
                           )}
                         >
-                          {kindLabel(entry.kind)}
+                          {t(`credit.kinds.${kindKey(entry.kind)}`)}
                         </span>
                         <p className='truncate text-[13px] font-semibold text-[var(--foreground)]'>
-                          {entry.label}
+                          {communityCreditEntryLabel(entry, tCredit)}
                         </p>
                       </div>
                       <p className='mt-1 text-[11px] tabular-nums text-[var(--muted)]'>
-                        {formatAbsoluteTime(entry.createdAt)}
+                        {format.date(entry.createdAt, ABSOLUTE_TIME_OPTIONS)}
                       </p>
                       <p className='mt-0.5 font-mono text-[10px] text-[var(--muted)]'>
                         REF {shortRef(entry.id)}
@@ -433,7 +435,7 @@ export function MyPageCreditSection({ className }: Props) {
                       )}
                     >
                       {entry.amount >= 0 ? '+' : ''}
-                      {entry.amount.toLocaleString('en-US')}
+                      {format.number(entry.amount)}
                     </span>
                   </div>
                 </li>

@@ -268,11 +268,11 @@ export async function recordCompanyClick(input: {
  */
 export async function resolveReviewCompanyId(
   value: unknown,
-): Promise<{ ok: true; companyId: string | null | undefined } | { ok: false; error: string }> {
+): Promise<{ ok: true; companyId: string | null | undefined } | { ok: false; errorKey: string }> {
   if (value === undefined) return { ok: true, companyId: undefined }
   if (value === null || value === '') return { ok: true, companyId: null }
-  if (typeof value !== 'string') return { ok: false, error: '회사를 다시 선택해 주세요.' }
+  if (typeof value !== 'string') return { ok: false, errorKey: 'community.companyReselect' }
   const company = await getActiveCompanyById(value.trim())
-  if (!company) return { ok: false, error: '회사를 다시 선택해 주세요.' }
+  if (!company) return { ok: false, errorKey: 'community.companyReselect' }
   return { ok: true, companyId: company.id }
 }

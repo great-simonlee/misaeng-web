@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "title": "{brand} NYC | Cộng đồng du học sinh & người đi làm quốc tế tại New York",
+    "description": "Review về nhà ở, ăn uống, CPT/OPT, visa và phỏng vấn xin việc từ những người đang học tập và làm việc tại New York."
+  },
+  "language": {
+    "label": "Ngôn ngữ",
+    "menuAria": "Chọn ngôn ngữ",
+    "saved": "Đã đổi ngôn ngữ sang {language}",
+    "settingLabel": "Ngôn ngữ",
+    "settingHint": "Trang web và các bài viết được dịch sẽ hiển thị bằng ngôn ngữ này.",
+    "sheetTitle": "Ngôn ngữ",
+    "setupLabel": "Ngôn ngữ ưa thích",
+    "setupHint": "Bài viết và bình luận trong cộng đồng sẽ được dịch sang ngôn ngữ này. Bạn có thể đổi bất cứ lúc nào trong Trang của tôi.",
+    "saveFailed": "Không thể lưu ngôn ngữ. Vui lòng thử lại sau giây lát."
+  },
+  "translation": {
+    "translatedFrom": "Dịch từ {language}",
+    "showOriginal": "Xem bản gốc",
+    "showTranslation": "Xem bản dịch",
+    "original": "Bản gốc",
+    "pending": "Bản dịch sắp có",
+    "iconLabel": "Bài viết đã dịch"
+  },
+  "actions": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "confirm": "OK",
+    "back": "Quay lại",
+    "more": "Xem thêm",
+    "retry": "Thử lại",
+    "loading": "Đang tải…"
+  },
+  "errors": {
+    "generic": "Đã xảy ra lỗi. Vui lòng thử lại sau giây lát.",
+    "network": "Vui lòng kiểm tra kết nối mạng."
+  },
+  "ui": {
+    "bottomSheetSelect": {
+      "placeholder": "Chọn"
+    },
+    "imageUpload": {
+      "selectPhoto": "Chọn ảnh",
+      "uploading": "Đang tải lên…",
+      "failed": "Tải lên thất bại",
+      "remove": "Xóa",
+      "change": "Đổi",
+      "addPhoto": "Thêm ảnh",
+      "tapToUpload": "Chạm để tải lên"
+    },
+    "loading": {
+      "aria": "Đang tải",
+      "label": "Đang tải…"
+    },
+    "mbti": {
+      "placeholder": "Vui lòng chọn",
+      "title": "Chọn MBTI",
+      "clear": "Không chọn",
+      "result": "Kiểu của bạn",
+      "selectAll": "Chọn đủ 4 mục",
+      "groups": {
+        "analyst": {
+          "label": "Nhà phân tích",
+          "subtitle": "Trực giác · Lý trí"
+        },
+        "diplomat": {
+          "label": "Nhà ngoại giao",
+          "subtitle": "Trực giác · Cảm xúc"
+        },
+        "sentinel": {
+          "label": "Người bảo vệ",
+          "subtitle": "Giác quan · Lý trí"
+        },
+        "explorer": {
+          "label": "Nhà thám hiểm",
+          "subtitle": "Giác quan · Cảm xúc"
+        }
+      },
+      "nicknames": {
+        "INTJ": "Nhà kiến trúc",
+        "INTP": "Nhà logic học",
+        "ENTJ": "Nhà chỉ huy",
+        "ENTP": "Người tranh luận",
+        "INFJ": "Người ủng hộ",
+        "INFP": "Người hòa giải",
+        "ENFJ": "Người dẫn dắt",
+        "ENFP": "Người truyền cảm hứng",
+        "ISTJ": "Người thực tế",
+        "ISFJ": "Người bảo vệ",
+        "ESTJ": "Người điều hành",
+        "ESFJ": "Người quan tâm",
+        "ISTP": "Nhà kỹ thuật",
+        "ISFP": "Người phiêu lưu",
+        "ESTP": "Người khởi nghiệp",
+        "ESFP": "Người trình diễn"
+      },
+      "dimensions": {
+        "ei": "Năng lượng",
+        "ns": "Tư duy",
+        "tf": "Bản chất",
+        "jp": "Chiến thuật"
+      },
+      "options": {
+        "E": "Hướng ngoại",
+        "I": "Hướng nội",
+        "N": "Trực giác",
+        "S": "Giác quan",
+        "T": "Lý trí",
+        "F": "Cảm xúc",
+        "J": "Nguyên tắc",
+        "P": "Linh hoạt"
+      }
+    },
+    "nickname": {
+      "checking": "Đang kiểm tra…"
+    },
+    "photoLightbox": {
+      "title": "Xem ảnh",
+      "close": "Đóng",
+      "previous": "Ảnh trước",
+      "next": "Ảnh tiếp theo"
+    },
+    "pullToRefresh": {
+      "refreshing": "Đang làm mới {brand}…",
+      "release": "Thả ra để làm mới",
+      "pull": "Kéo xuống để làm mới"
+    },
+    "rangeSlider": {
+      "minPrice": "Giá thấp nhất",
+      "maxPrice": "Giá cao nhất"
+    },
+    "schoolBadge": {
+      "title": "{school} · Đã xác minh email trường",
+      "aria": "Đã xác minh {school}"
+    },
+    "editor": {
+      "placeholder": "Viết gì đó",
+      "imageUploadFailed": "Không thể tải ảnh lên",
+      "bold": "In đậm",
+      "italic": "In nghiêng",
+      "heading": "Tiêu đề",
+      "bulletList": "Danh sách",
+      "quote": "Trích dẫn",
+      "linkPrompt": "Nhập URL liên kết",
+      "link": "Liên kết",
+      "photo": "Ảnh",
+      "maxLengthReached": "Bạn đã đạt giới hạn ký tự",
+      "charCount": "Số ký tự (chỉ tính văn bản)"
+    },
+    "authErrors": {
+      "loginCancelled": "Đã hủy đăng nhập",
+      "popupBlocked": "Cửa sổ pop-up đã bị chặn. Vui lòng kiểm tra cài đặt trình duyệt",
+      "invalidEmail": "Địa chỉ email không hợp lệ",
+      "userDisabled": "Tài khoản này đã bị vô hiệu hóa",
+      "userNotFound": "Không tìm thấy tài khoản",
+      "wrongPassword": "Mật khẩu không đúng",
+      "invalidCredential": "Vui lòng kiểm tra lại email hoặc mật khẩu",
+      "emailAlreadyInUse": "Email này đã được đăng ký",
+      "weakPassword": "Vui lòng dùng mật khẩu có ít nhất 6 ký tự",
+      "tooManyRequests": "Bạn đã thử quá nhiều lần. Vui lòng thử lại sau giây lát",
+      "networkRequestFailed": "Vui lòng kiểm tra kết nối mạng"
+    },
+    "configBanner": {
+      "loginPage": "Trang đăng nhập"
+    },
+    "authConfigBanner": {
+      "body": "AppConnect API chưa được thiết lập. Giống như ellieo-erp AppConnect, hãy thêm {baseUrl} và {clientId} (cho Google Identity Services) vào biến môi trường. Google idToken sẽ được gửi tới Ellieo {endpoint} (xem {envExample})."
+    },
+    "supabaseConfigBanner": {
+      "body": "Biến môi trường Supabase chưa được thiết lập. Hãy thêm các giá trị Supabase vào {envLocal} (xem {envExample}). Trong lúc đó bạn vẫn xem được các màn hình, nhưng không thể lưu dữ liệu hay tải ảnh đại diện lên."
+    },
+    "chipScroll": {
+      "previous": "Xem mục trước",
+      "next": "Xem thêm"
+    },
+    "copyLink": {
+      "copiedToast": "Đã sao chép link",
+      "failedToast": "Không thể sao chép link",
+      "linkCopied": "Đã sao chép link",
+      "copyLink": "Sao chép link",
+      "copied": "Đã sao chép",
+      "share": "Chia sẻ"
+    },
+    "photoGrid": {
+      "cover": "Ảnh bìa"
+    },
+    "timeline": {
+      "step": "Bước {step}",
+      "latest": "Mới nhất",
+      "review": "Review"
+    },
+    "draft": {
+      "save": "Lưu nháp",
+      "savedAt": "Đã lưu nháp · {time}"
+    },
+    "autosave": {
+      "title": "Nội dung của bạn được lưu tự động",
+      "description": "Nội dung được lưu trên thiết bị này mỗi khi bạn thêm cập nhật tiến trình hoặc chuyển sang mục tiếp theo. Bạn có thể đóng cửa sổ và viết tiếp sau.",
+      "savedAt": "Đã lưu · {time}"
+    }
+  }
+}

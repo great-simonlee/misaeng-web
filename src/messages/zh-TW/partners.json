@@ -1,0 +1,50 @@
+{
+  "schoolsLabel": "合作韓國學生會",
+  "influencersLabel": "合作網紅",
+  "more": "查看更多",
+  "backToHome": "返回社群首頁",
+  "schools": {
+    "title": "合作學生會",
+    "intro": "我們會在這裡分享合作韓國學生會的最新消息。",
+    "profilePending": "簡介即將推出",
+    "logoPending": "Logo 即將推出",
+    "dmMessage": "合作學生會洽詢"
+  },
+  "influencers": {
+    "title": "網紅內容",
+    "intro": "我們正在招募合作網紅，將與 Instagram、YouTube 和 TikTok 上的創作者攜手合作。",
+    "recruitingTitle": "合作網紅招募中！",
+    "searching": "正在尋找合作網紅",
+    "recruitingBody": "我們正在招募合作網紅，很快就能在這裡看到他們的內容。",
+    "recruitingHandle": "合作網紅招募中",
+    "dmMessage": "合作網紅洽詢"
+  },
+  "influencerPlatforms": {
+    "instagram": {
+      "title": "Instagram",
+      "description": "生活風格與在地 Instagram"
+    },
+    "youtube": {
+      "title": "YouTuber",
+      "description": "YouTube 上的 Vlog 與實用資訊"
+    },
+    "tiktok": {
+      "title": "TikToker",
+      "description": "用短影音看在地消息"
+    }
+  },
+  "orgs": {
+    "nyu-kiso": {
+      "name": "NYU 韓國學生會"
+    },
+    "fit-ksof": {
+      "name": "FIT 韓國學生會"
+    },
+    "baruch-ksa": {
+      "name": "Baruch 韓國學生會"
+    },
+    "parsons-ksa": {
+      "name": "Parsons 韓國學生會"
+    }
+  }
+}

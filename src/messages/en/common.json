@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "title": "{brand} NYC | Community for International Students & Professionals in New York",
+    "description": "Housing, food, CPT/OPT, visa and job interview reviews from people who study and work in New York."
+  },
+  "language": {
+    "label": "Language",
+    "menuAria": "Choose language",
+    "saved": "Language changed to {language}",
+    "settingLabel": "Language",
+    "settingHint": "We show the site and translated posts in this language.",
+    "sheetTitle": "Language",
+    "setupLabel": "Preferred language",
+    "setupHint": "We translate community posts and comments into this language. You can change it anytime in My Page.",
+    "saveFailed": "Couldn't save your language. Please try again in a moment."
+  },
+  "translation": {
+    "translatedFrom": "Translated from {language}",
+    "showOriginal": "View original",
+    "showTranslation": "View translation",
+    "original": "Original",
+    "pending": "Translation coming soon",
+    "iconLabel": "Translated post"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "OK",
+    "back": "Back",
+    "more": "See more",
+    "retry": "Try again",
+    "loading": "Loading…"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again in a moment.",
+    "network": "Please check your network connection."
+  },
+  "ui": {
+    "bottomSheetSelect": {
+      "placeholder": "Select"
+    },
+    "imageUpload": {
+      "selectPhoto": "Choose photo",
+      "uploading": "Uploading…",
+      "failed": "Upload failed",
+      "remove": "Remove",
+      "change": "Change",
+      "addPhoto": "Add photo",
+      "tapToUpload": "Tap to upload"
+    },
+    "loading": {
+      "aria": "Loading",
+      "label": "Loading…"
+    },
+    "mbti": {
+      "placeholder": "Please choose",
+      "title": "Choose MBTI",
+      "clear": "None",
+      "result": "Your type",
+      "selectAll": "Pick all 4",
+      "groups": {
+        "analyst": {
+          "label": "Analysts",
+          "subtitle": "Intuition · Thinking"
+        },
+        "diplomat": {
+          "label": "Diplomats",
+          "subtitle": "Intuition · Feeling"
+        },
+        "sentinel": {
+          "label": "Sentinels",
+          "subtitle": "Sensing · Thinking"
+        },
+        "explorer": {
+          "label": "Explorers",
+          "subtitle": "Sensing · Feeling"
+        }
+      },
+      "nicknames": {
+        "INTJ": "Architect",
+        "INTP": "Logician",
+        "ENTJ": "Commander",
+        "ENTP": "Debater",
+        "INFJ": "Advocate",
+        "INFP": "Mediator",
+        "ENFJ": "Protagonist",
+        "ENFP": "Campaigner",
+        "ISTJ": "Logistician",
+        "ISFJ": "Defender",
+        "ESTJ": "Executive",
+        "ESFJ": "Consul",
+        "ISTP": "Virtuoso",
+        "ISFP": "Adventurer",
+        "ESTP": "Entrepreneur",
+        "ESFP": "Entertainer"
+      },
+      "dimensions": {
+        "ei": "Energy",
+        "ns": "Mind",
+        "tf": "Nature",
+        "jp": "Tactics"
+      },
+      "options": {
+        "E": "Extraverted",
+        "I": "Introverted",
+        "N": "Intuitive",
+        "S": "Sensing",
+        "T": "Thinking",
+        "F": "Feeling",
+        "J": "Judging",
+        "P": "Prospecting"
+      }
+    },
+    "nickname": {
+      "checking": "Checking availability…"
+    },
+    "photoLightbox": {
+      "title": "Photo viewer",
+      "close": "Close",
+      "previous": "Previous photo",
+      "next": "Next photo"
+    },
+    "pullToRefresh": {
+      "refreshing": "Refreshing {brand}…",
+      "release": "Release to refresh",
+      "pull": "Pull to refresh"
+    },
+    "rangeSlider": {
+      "minPrice": "Minimum price",
+      "maxPrice": "Maximum price"
+    },
+    "schoolBadge": {
+      "title": "{school} · School email verified",
+      "aria": "{school} verified"
+    },
+    "editor": {
+      "placeholder": "Write something",
+      "imageUploadFailed": "Couldn't upload the image",
+      "bold": "Bold",
+      "italic": "Italic",
+      "heading": "Heading",
+      "bulletList": "List",
+      "quote": "Quote",
+      "linkPrompt": "Enter a link URL",
+      "link": "Link",
+      "photo": "Photo",
+      "maxLengthReached": "You've reached the character limit",
+      "charCount": "Characters (text only)"
+    },
+    "authErrors": {
+      "loginCancelled": "Login was canceled",
+      "popupBlocked": "The pop-up was blocked. Please check your browser settings",
+      "invalidEmail": "That email address isn't valid",
+      "userDisabled": "This account has been disabled",
+      "userNotFound": "We couldn't find that account",
+      "wrongPassword": "That password isn't right",
+      "invalidCredential": "Please check your email or password",
+      "emailAlreadyInUse": "This email is already registered",
+      "weakPassword": "Please use a password with at least 6 characters",
+      "tooManyRequests": "Too many attempts. Please try again in a moment",
+      "networkRequestFailed": "Please check your network connection"
+    },
+    "configBanner": {
+      "loginPage": "Login page"
+    },
+    "authConfigBanner": {
+      "body": "The AppConnect API isn't set up yet. Like ellieo-erp AppConnect, add {baseUrl} and {clientId} (for Google Identity Services) to your environment variables. The Google idToken is sent to Ellieo {endpoint} (see {envExample})."
+    },
+    "supabaseConfigBanner": {
+      "body": "Supabase environment variables aren't set up yet. Add your Supabase values to {envLocal} (see {envExample}). Until then you can browse the screens, but saving data and uploading profile photos won't work."
+    },
+    "chipScroll": {
+      "previous": "Show previous",
+      "next": "Show more"
+    },
+    "copyLink": {
+      "copiedToast": "Link copied",
+      "failedToast": "Couldn't copy the link",
+      "linkCopied": "Link copied",
+      "copyLink": "Copy link",
+      "copied": "Copied",
+      "share": "Share"
+    },
+    "photoGrid": {
+      "cover": "Cover"
+    },
+    "timeline": {
+      "step": "Step {step}",
+      "latest": "Latest",
+      "review": "Review"
+    },
+    "draft": {
+      "save": "Save draft",
+      "savedAt": "Draft saved · {time}"
+    },
+    "autosave": {
+      "title": "Your writing is saved automatically",
+      "description": "It's saved on this device every time you add a progress update or move to the next item. You can close the window and pick up where you left off.",
+      "savedAt": "Saved · {time}"
+    }
+  }
+}

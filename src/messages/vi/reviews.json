@@ -1,0 +1,686 @@
+{
+  "activity": {
+    "updated": "Cập nhật {time}",
+    "posted": "Đăng {time}",
+    "firstPosted": "Đăng lần đầu {time}"
+  },
+  "cptOpt": {
+    "types": {
+      "cpt": {
+        "label": "CPT",
+        "description": "Giấy phép làm việc khi đang đi học",
+        "summary": "Nộp đơn qua OGS và nhận I-20 mới"
+      },
+      "opt": {
+        "label": "OPT",
+        "description": "1 năm được phép làm việc sau khi tốt nghiệp",
+        "summary": "OGS đề xuất, sau đó nộp I-765 lên USCIS và nhận EAD"
+      },
+      "stem-opt": {
+        "label": "STEM OPT",
+        "description": "Gia hạn STEM OPT",
+        "summary": "I-983 và OGS xét duyệt, sau đó báo cáo xác nhận SEVP"
+      },
+      "visa": {
+        "label": "Visa",
+        "description": "F-1, H-1B, O-1 và các loại khác",
+        "summary": "Từ chuẩn bị giấy tờ, phỏng vấn đến khi được duyệt"
+      },
+      "green-card": {
+        "label": "Thẻ xanh",
+        "description": "Diện lao động, kết hôn và các diện khác",
+        "summary": "Nộp đơn, phỏng vấn, được duyệt và nhận thẻ"
+      }
+    },
+    "fields": {
+      "prepared": {
+        "label": "Bạn đã chuẩn bị gì",
+        "shortLabel": "Chuẩn bị",
+        "hint": "Giấy tờ bạn đã chuẩn bị và các yêu cầu đã kiểm tra"
+      },
+      "submitted": {
+        "label": "Bạn đã nộp thế nào",
+        "shortLabel": "Đã nộp",
+        "hint": "Nộp ở đâu và bằng cách nào"
+      },
+      "resultReceived": {
+        "label": "Bạn nhận kết quả thế nào",
+        "shortLabel": "Kết quả",
+        "hint": "Email, thư, cổng thông tin: kết quả đến bằng cách nào và nói gì"
+      },
+      "nextStep": {
+        "label": "Bước tiếp theo",
+        "shortLabel": "Bước tiếp theo",
+        "hint": "Những việc bạn còn phải làm hoặc đang chờ"
+      }
+    },
+    "placeholders": {
+      "cpt": {
+        "prepared": "VD: Hoàn thành CPT module, offer letter, checklist của OGS",
+        "submitted": "VD: Tải form CPT và offer letter lên cổng OGS",
+        "resultReceived": "VD: Nhận file PDF I-20 mới qua email trường",
+        "nextStep": "VD: In và ký I-20, chốt ngày bắt đầu làm"
+      },
+      "opt": {
+        "prepared": "VD: Workshop OPT của OGS, I-765, ảnh hộ chiếu, giấy chứng nhận tốt nghiệp",
+        "submitted": "VD: Nộp I-765 online lên USCIS sau khi OGS đề xuất, đóng phí",
+        "resultReceived": "VD: Thẻ EAD gửi về qua bưu điện, tài khoản hiện đã được duyệt",
+        "nextStep": "VD: Ghi ngày hết hạn EAD và yêu cầu gia hạn STEM vào lịch"
+      },
+      "stem-opt": {
+        "prepared": "VD: I-983, thông tin công ty, đã liên hệ OGS/DSO",
+        "submitted": "VD: Nộp gia hạn STEM OPT sau khi OGS xét duyệt",
+        "resultReceived": "VD: Nhận thông báo duyệt I-797 qua email/bưu điện",
+        "nextStep": "VD: Lên lịch báo cáo xác nhận 6/12/18 tháng"
+      },
+      "visa": {
+        "prepared": "VD: DS-160, giấy tờ tài chính, luyện câu hỏi phỏng vấn",
+        "submitted": "VD: Đặt lịch phỏng vấn ở đại sứ quán và nộp giấy tờ",
+        "resultReceived": "VD: Được duyệt visa, đã nhận lại hộ chiếu",
+        "nextStep": "VD: Nhập cảnh Mỹ, kiểm tra I-94, đăng ký SEVIS/với trường"
+      },
+      "green-card": {
+        "prepared": "VD: Hồ sơ I-140/I-485, khám sức khỏe, gặp luật sư",
+        "submitted": "VD: Nộp đơn lên USCIS online/qua bưu điện, đi phỏng vấn",
+        "resultReceived": "VD: Nhận thông báo duyệt, sau đó thẻ xanh gửi về qua bưu điện",
+        "nextStep": "VD: Kiểm tra thẻ, xem ngày tái nhập cảnh và gia hạn"
+      }
+    },
+    "quickSteps": {
+      "cpt": {
+        "module": {
+          "label": "Hoàn thành CPT module",
+          "prepared": "Đã hoàn thành CPT module (orientation)",
+          "nextStep": "Chờ offer letter, kiểm tra checklist"
+        },
+        "offerLetter": {
+          "label": "Nhận offer letter",
+          "prepared": "Đã nhận offer letter",
+          "nextStep": "Điền đơn CPT của OGS"
+        },
+        "apply": {
+          "label": "Đã nộp đơn CPT",
+          "prepared": "Offer letter, đơn CPT",
+          "submitted": "Đã nộp đơn trên cổng OGS",
+          "nextStep": "Chờ I-20 mới"
+        },
+        "newI20": {
+          "label": "Nhận I-20 mới",
+          "resultReceived": "Nhận I-20 mới qua email",
+          "nextStep": "Ký và bắt đầu đi làm"
+        }
+      },
+      "opt": {
+        "recommendation": {
+          "label": "OGS đề xuất",
+          "prepared": "Đã kiểm tra giấy tờ OPT và điều kiện tốt nghiệp",
+          "submitted": "Đã yêu cầu OGS đề xuất OPT",
+          "nextStep": "Chuẩn bị nộp I-765"
+        },
+        "i765": {
+          "label": "Đã nộp I-765",
+          "prepared": "I-765, ảnh, phí",
+          "submitted": "Đã nộp online lên USCIS",
+          "nextStep": "Thường xuyên kiểm tra trạng thái hồ sơ"
+        },
+        "ead": {
+          "label": "Nhận EAD",
+          "resultReceived": "Thẻ EAD gửi về qua bưu điện",
+          "nextStep": "Bắt đầu đi làm, kiểm tra yêu cầu gia hạn STEM"
+        }
+      },
+      "stem-opt": {
+        "i983": {
+          "label": "Đã nộp I-983",
+          "prepared": "I-983, thông tin công ty",
+          "submitted": "Đã nộp I-983 cho OGS",
+          "nextStep": "Kiểm tra ngày duyệt và ngày báo cáo xác nhận"
+        },
+        "approved": {
+          "label": "Được duyệt gia hạn",
+          "resultReceived": "Đã được duyệt gia hạn STEM OPT",
+          "nextStep": "Đặt nhắc nhở hạn nộp báo cáo"
+        }
+      },
+      "visa": {
+        "interview": {
+          "label": "Đã đặt lịch phỏng vấn",
+          "prepared": "DS-160, bộ hồ sơ",
+          "submitted": "Đã đặt lịch phỏng vấn ở đại sứ quán",
+          "nextStep": "Chuẩn bị phỏng vấn, kiểm tra lại giấy tờ lần cuối"
+        },
+        "approved": {
+          "label": "Được duyệt visa",
+          "resultReceived": "Được duyệt visa, đã nhận lại hộ chiếu",
+          "nextStep": "Nhập cảnh Mỹ, đăng ký với trường/nhà tuyển dụng"
+        }
+      },
+      "green-card": {
+        "petition": {
+          "label": "Đã nộp đơn",
+          "prepared": "Bộ hồ sơ nộp đơn",
+          "submitted": "Đã nộp đơn lên USCIS",
+          "nextStep": "Chờ giấy biên nhận và ngày phỏng vấn"
+        },
+        "card": {
+          "label": "Nhận thẻ",
+          "resultReceived": "Đã nhận thẻ xanh",
+          "nextStep": "Kiểm tra giấy tờ gia hạn và tái nhập cảnh"
+        }
+      }
+    },
+    "detail": {
+      "authorTitle": "Đây là bài ghi chép đang tiếp diễn",
+      "authorBody": "Khi có mốc ngày mới, bạn chỉ cần thêm một mục ở màn hình cập nhật. Sau khi lưu, bài viết sẽ lên đầu danh sách.",
+      "addEntry": "Thêm mục mới",
+      "timelineTitle_other": "{count} mục tiến trình",
+      "tipsTitle": "Cần lưu ý"
+    },
+    "write": {
+      "errors": {
+        "typeRequired": "Chọn loại: CPT, OPT, STEM OPT, Visa hoặc Thẻ xanh",
+        "tipsEmptyEdit": "Phần \"Cần lưu ý\" đang trống. Vui lòng kiểm tra trong chi tiết bài viết",
+        "tipsRequired": "Vui lòng điền phần \"Cần lưu ý\"",
+        "tipsTooLong": "Phần \"Cần lưu ý\" không quá {max} ký tự",
+        "timelineRequiredEdit": "Vui lòng giữ ít nhất 1 mục tiến trình",
+        "timelineRequired": "Vui lòng thêm ít nhất 1 mục tiến trình (ngày + chi tiết)"
+      },
+      "updated": "Đã cập nhật tiến trình. Bài viết của bạn đang ở đầu danh sách",
+      "created": "Đã đăng review. Bạn có thể tiếp tục thêm tiến trình sau",
+      "moreSettingsTitle": "Sửa chi tiết bài viết",
+      "moreSettingsHint": "Chỉ mở mục này nếu bạn muốn đổi tiêu đề, địa điểm hoặc \"Cần lưu ý\"",
+      "tipsTitle": "Cần lưu ý",
+      "tipsDescription": "Những mẹo bạn thật sự muốn người sau biết để không mắc lỗi tương tự",
+      "tipsPlaceholder": "VD: Gửi giấy tờ cho OGS 2–3 tuần trước ngày bắt đầu làm. Cổng thông tin mỗi trường mỗi khác, nên hãy xem checklist của OGS trước.",
+      "updateSubmit": "Cập nhật tiến trình",
+      "typeSection": "Đây là loại nào?",
+      "basicSection": "Thông tin cơ bản",
+      "basicSectionDescription": "Thêm tiêu đề và công ty hoặc tổ chức",
+      "timelineSection": "Tiến trình",
+      "createFootnote": "Bạn có thể tiếp tục thêm và sửa tiến trình sau khi đăng.",
+      "createIntro": "Chọn loại và ghi lại tiến trình theo ngày. Bạn có thể tiếp tục bổ sung sau khi đăng.",
+      "updateEyebrow": "Cập nhật tiến trình",
+      "updateTitle": "Thêm mục tiến trình mới"
+    },
+    "timeline": {
+      "editingDescription": "Sửa Chuẩn bị, Đã nộp, Kết quả hoặc Bước tiếp theo, rồi nhấn \"Sửa xong\".",
+      "stageReviewHint": "Chia sẻ những gì đã diễn ra hôm đó: thời gian chờ, mẹo, sai sót, bất cứ điều gì.",
+      "stageReviewPlaceholder": "VD: Tải lên cổng OGS liên tục lỗi nên mình đã nén PDF rồi thử lại. Mất một ngày để khớp ngày trên offer letter."
+    }
+  },
+  "jobReview": {
+    "types": {
+      "intern": {
+        "label": "Thực tập",
+        "description": "Mùa hè / mùa đông / theo học kỳ",
+        "summary": "Từ ứng tuyển đến phỏng vấn và nhận offer"
+      },
+      "new-grad": {
+        "label": "New grad",
+        "description": "Toàn thời gian sau khi tốt nghiệp",
+        "summary": "Tuyển dụng tại trường và ứng tuyển online"
+      },
+      "experienced": {
+        "label": "Có kinh nghiệm",
+        "description": "Tuyển cấp Mid / Senior",
+        "summary": "Từ recruiter liên hệ đến phỏng vấn nhiều vòng"
+      },
+      "job-change": {
+        "label": "Chuyển việc",
+        "description": "Chuyển việc khi đang làm hoặc đang nghỉ",
+        "summary": "Ứng tuyển khi đang đi làm, đến đàm phán offer"
+      },
+      "contract": {
+        "label": "Hợp đồng",
+        "description": "Hợp đồng · Freelance",
+        "summary": "Tuyển ngắn hạn và theo dự án"
+      }
+    },
+    "fields": {
+      "stageLabel": {
+        "label": "Giai đoạn nào",
+        "shortLabel": "Giai đoạn",
+        "hint": "Application, Phone, Onsite, Offer, v.v."
+      },
+      "platform": {
+        "label": "Bạn ứng tuyển ở đâu",
+        "shortLabel": "Nền tảng",
+        "hint": "LinkedIn, Handshake, Referral, trang tuyển dụng công ty"
+      },
+      "documentsSubmitted": {
+        "label": "Bạn đã nộp gì",
+        "shortLabel": "Hồ sơ",
+        "hint": "Resume, Cover letter, Portfolio, Bảng điểm"
+      },
+      "interviewRound": {
+        "label": "Vòng phỏng vấn nào",
+        "shortLabel": "Phỏng vấn",
+        "hint": "Vòng 1 Recruiter, vòng 2 Tech, Panel, HM, v.v.",
+        "guide": "Ghi chú phỏng vấn: ngoài vòng phỏng vấn, hãy chia sẻ bạn được hỏi gì và đã trả lời thế nào. Những câu hỏi và câu trả lời cụ thể bạn nhớ được sẽ giúp ích rất nhiều cho người sau."
+      },
+      "outcome": {
+        "label": "Kết quả thế nào",
+        "shortLabel": "Kết quả",
+        "hint": "Đậu, Trượt, Đang chờ, Offer, v.v."
+      }
+    },
+    "placeholders": {
+      "intern": {
+        "stageLabel": "VD: Phone Screen",
+        "platform": "VD: Handshake → trang tuyển dụng công ty",
+        "documentsSubmitted": "VD: Resume, Bảng điểm, Cover letter",
+        "interviewRound": "VD: Vòng 1 Recruiter screen. Q: Tại sao chọn vị trí thực tập này? → Mình nói đã thử ~ trên lớp và muốn làm nhiều hơn.",
+        "outcome": "VD: Đậu → đã lên lịch vòng tiếp theo"
+      },
+      "new-grad": {
+        "stageLabel": "VD: Application",
+        "platform": "VD: LinkedIn Easy Apply",
+        "documentsSubmitted": "VD: Resume PDF, link GitHub",
+        "interviewRound": "VD: Vòng 2 Tech. Q. Bạn gặp khó ở đâu trong dự án gần đây? A. … mình đã trả lời thế này.",
+        "outcome": "VD: Trượt (email báo sau 2 tuần)"
+      },
+      "experienced": {
+        "stageLabel": "VD: Recruiter liên hệ",
+        "platform": "VD: LinkedIn InMail",
+        "documentsSubmitted": "VD: Resume đã cập nhật",
+        "interviewRound": "VD: HM 1:1. Q. Tại sao chọn vị trí này? A. Vì team đang hướng tới ~ …",
+        "outcome": "VD: Được mời onsite"
+      },
+      "job-change": {
+        "stageLabel": "VD: Recruiter screen",
+        "platform": "VD: LinkedIn / Referral",
+        "documentsSubmitted": "VD: Resume, LinkedIn",
+        "interviewRound": "VD: Vòng 2 HM + Team. Q. Bạn xử lý mâu thuẫn thế nào? A. …",
+        "outcome": "VD: Offer · đàm phán lương"
+      },
+      "contract": {
+        "stageLabel": "VD: Ứng tuyển qua agency",
+        "platform": "VD: Recruiter giới thiệu",
+        "documentsSubmitted": "VD: Resume, bảng giá",
+        "interviewRound": "VD: Gặp client. Q. Khi nào bạn có thể bắt đầu? A. Sau 2 tuần.",
+        "outcome": "VD: Offer hợp đồng"
+      }
+    },
+    "quickSteps": {
+      "intern": {
+        "apply": {
+          "label": "Đã ứng tuyển",
+          "stageLabel": "Application",
+          "platform": "Handshake / LinkedIn",
+          "documentsSubmitted": "Resume, Bảng điểm"
+        },
+        "interview": {
+          "label": "Phỏng vấn",
+          "stageLabel": "Technical Interview",
+          "interviewRound": "Vòng 1 Tech"
+        },
+        "offer": {
+          "label": "Offer",
+          "stageLabel": "Offer",
+          "outcome": "Đã nhận offer"
+        }
+      },
+      "new-grad": {
+        "apply": {
+          "label": "Đã ứng tuyển",
+          "stageLabel": "Application",
+          "platform": "Cổng tuyển dụng công ty",
+          "documentsSubmitted": "Resume, Cover letter"
+        },
+        "phone": {
+          "label": "Phone",
+          "stageLabel": "Phone Screen",
+          "interviewRound": "Vòng 1 HR"
+        },
+        "onsite": {
+          "label": "Onsite",
+          "stageLabel": "Onsite / Virtual onsite",
+          "interviewRound": "Vòng cuối"
+        }
+      },
+      "experienced": {
+        "recruiter": {
+          "label": "Recruiter",
+          "stageLabel": "Recruiter screen",
+          "platform": "LinkedIn InMail"
+        },
+        "hm": {
+          "label": "HM",
+          "stageLabel": "Hiring Manager",
+          "interviewRound": "HM 1:1"
+        },
+        "panel": {
+          "label": "Panel",
+          "stageLabel": "Phỏng vấn panel",
+          "interviewRound": "Panel với team"
+        }
+      },
+      "job-change": {
+        "apply": {
+          "label": "Đã ứng tuyển",
+          "stageLabel": "Application",
+          "platform": "LinkedIn / Referral",
+          "documentsSubmitted": "Resume"
+        },
+        "interview": {
+          "label": "Phỏng vấn",
+          "stageLabel": "Hiring Manager",
+          "interviewRound": "HM + Team"
+        },
+        "offer": {
+          "label": "Offer",
+          "stageLabel": "Offer · Đàm phán",
+          "outcome": "Đã nhận offer"
+        }
+      },
+      "contract": {
+        "documents": {
+          "label": "Hồ sơ",
+          "stageLabel": "Đã nộp hồ sơ",
+          "documentsSubmitted": "Resume"
+        },
+        "client": {
+          "label": "Client",
+          "stageLabel": "Phỏng vấn với client",
+          "interviewRound": "Cuộc gọi giới thiệu"
+        }
+      }
+    },
+    "sources": {
+      "misaeng": {
+        "label": "Qua {brand}",
+        "description": "Mình thấy trang web hoặc mạng xã hội của {brand}"
+      },
+      "student-org": {
+        "label": "Qua hội sinh viên",
+        "description": "Một hội sinh viên ở trường đã liên hệ mình"
+      },
+      "referral": {
+        "label": "Qua người quen",
+        "description": "Người quen đã giới thiệu mình"
+      },
+      "other": {
+        "label": "Khác",
+        "description": "Cách khác"
+      }
+    },
+    "sourcePicker": {
+      "orgQuestion": "Hội sinh viên nào?"
+    },
+    "outcomes": {
+      "offer": {
+        "label": "Nhận được offer",
+        "description": "Mình đã đậu và nhận được offer"
+      },
+      "rejected": {
+        "label": "Bị từ chối",
+        "description": "Mình không đậu, giữa chừng hoặc ở vòng cuối"
+      },
+      "in-progress": {
+        "label": "Đang diễn ra",
+        "description": "Mình vẫn đang chờ kết quả"
+      },
+      "withdrew": {
+        "label": "Đã rút",
+        "description": "Mình tự dừng quy trình"
+      }
+    },
+    "detail": {
+      "authorTitle": "Đây là bài ghi chép tuyển dụng đang tiếp diễn",
+      "authorBody": "Khi có giai đoạn mới, bạn chỉ cần thêm một mục ở màn hình cập nhật. Sau khi lưu, bài viết sẽ lên đầu danh sách.",
+      "addEntry": "Thêm giai đoạn mới",
+      "timelineTitle_other": "{count} giai đoạn tuyển dụng",
+      "emptySection": "Các giai đoạn tuyển dụng",
+      "emptyTitle": "Chưa có giai đoạn tuyển dụng nào",
+      "emptyBody": "Tiến trình theo ngày của bạn, như ứng tuyển, phỏng vấn và kết quả, sẽ được xếp tại đây theo Bước 1, Bước 2, v.v.",
+      "emptyCta": "Thêm giai đoạn tuyển dụng",
+      "tipsTitle": "Gửi người ứng tuyển sau"
+    },
+    "timeline": {
+      "editingDescription": "Sửa Giai đoạn, Nền tảng, Hồ sơ, Phỏng vấn hoặc Kết quả, rồi nhấn \"Sửa xong\".",
+      "stageReviewHint": "Chia sẻ những gì bạn trải qua ở giai đoạn này: câu hỏi, không khí, mẹo chuẩn bị, phản hồi, bất cứ điều gì.",
+      "stageReviewPlaceholder": "VD: Phone screen khoảng 30 phút, chủ yếu đào sâu resume + câu hỏi behavioral.",
+      "autoCommitHint": "Khi bạn thêm ngày và chi tiết rồi chuyển sang mục tiếp theo, mục này sẽ tự động được thêm và lưu. Không cần nhấn nút."
+    },
+    "write": {
+      "errors": {
+        "typeRequired": "Chọn loại: Thực tập, New grad, Có kinh nghiệm, Chuyển việc hoặc Hợp đồng",
+        "tipsEmptyEdit": "Phần \"Cần lưu ý\" đang trống. Vui lòng kiểm tra trong chi tiết bài viết",
+        "tipsRequired": "Vui lòng điền phần \"Cần lưu ý\"",
+        "tipsTooLong": "Phần \"Cần lưu ý\" không quá {max} ký tự",
+        "timelineRequiredEdit": "Vui lòng giữ ít nhất 1 mục tiến trình. Thêm ngày và chi tiết, rồi nhấn \"Thêm mục này\"",
+        "timelineRequired": "Thêm ít nhất 1 mục tiến trình (ngày + chi tiết), rồi nhấn \"Thêm mục này\"",
+        "outcomeRequired": "Vui lòng chọn kết quả cuối cùng",
+        "orgRequired": "Vui lòng chọn hội sinh viên đã kết nối bạn",
+        "sourceRequired": "Vui lòng chọn cách bạn được kết nối"
+      },
+      "updated": "Đã cập nhật tiến trình. Bài viết của bạn đang ở đầu danh sách",
+      "created": "Đã đăng review. Bạn có thể tiếp tục thêm tiến trình sau",
+      "moreSettingsTitle": "Sửa chi tiết bài viết",
+      "moreSettingsHint": "Chỉ mở mục này nếu bạn muốn đổi tiêu đề, công ty hoặc \"Cần lưu ý\"",
+      "tipsTitle": "Cần lưu ý",
+      "tipsDescription": "Những mẹo bạn thật sự muốn người sau biết để không mắc lỗi tương tự",
+      "tipsPlaceholder": "VD: Tìm hiểu các dự án gần đây của team trước khi phỏng vấn. Referral qua LinkedIn được phản hồi tốt hơn nhiều so với Handshake.",
+      "outcomeSection": "Kết quả cuối cùng là gì?",
+      "outcomeEditHint": "Nếu có thay đổi, hãy cập nhật cả ở đây",
+      "outcomeSectionDescription": "Nếu vẫn đang diễn ra, hãy chọn \"Đang diễn ra\". Bạn có thể đổi sau",
+      "sourceSection": "Bạn được kết nối bằng cách nào?",
+      "sourceSectionDescription": "Cho chúng tôi biết lý do bạn viết review này. Người khác sẽ không thấy thông tin này",
+      "selectSourceFirst": "Vui lòng chọn cách bạn được kết nối",
+      "updateSubmit": "Cập nhật tiến trình",
+      "typeSection": "Đây là loại nào?",
+      "basicSection": "Thông tin cơ bản",
+      "basicSectionDescription": "Thêm tiêu đề và công ty",
+      "timelineSection": "Tiến trình",
+      "createFootnote": "Bạn có thể tiếp tục thêm và sửa tiến trình sau khi đăng.",
+      "createIntro": "Chọn loại và ghi lại tiến trình theo ngày. Bạn có thể tiếp tục bổ sung sau khi đăng.",
+      "updateEyebrow": "Cập nhật tiến trình",
+      "updateTitle": "Thêm mục tiến trình mới"
+    }
+  },
+  "detail": {
+    "noDate": "Không có ngày",
+    "stageReview": "Ghi chú giai đoạn",
+    "views": "{views} lượt xem",
+    "accordionHint": "Nhấn vào một bước để mở hoặc đóng. Mỗi lần chỉ mở được một bước.",
+    "editLabel": "Cập nhật"
+  },
+  "orientation": {
+    "defaultEyebrow": "Viết review",
+    "title": "Trước khi bắt đầu",
+    "subtitleWithGuide": "Vui lòng đọc hướng dẫn viết bài và nguyên tắc cộng đồng, rồi đồng ý.",
+    "subtitle": "Vui lòng đọc nguyên tắc cộng đồng, rồi đồng ý.",
+    "guideTitle": "Hướng dẫn viết bài",
+    "communityTitle": "Nguyên tắc cộng đồng",
+    "saving": "Đang lưu…",
+    "agree": "Đồng ý và bắt đầu viết",
+    "backToList": "Quay lại danh sách",
+    "saveFailed": "Không thể lưu sự đồng ý của bạn. Vui lòng thử lại.",
+    "roommateEyebrow": "Bạn cùng phòng · Sublet",
+    "anonymousEyebrow": "Bảng tin ẩn danh",
+    "cptOpt": {
+      "step1": {
+        "title": "Review ghi lại theo ngày",
+        "body": "Ghi lại tiến trình CPT, OPT, STEM OPT, visa hoặc thẻ xanh theo từng ngày, để sau này người khác có thể theo dõi từng bước."
+      },
+      "step2": {
+        "title": "Ngày → mục → chi tiết",
+        "body": "Trong form bên dưới, chọn ngày, chỉ chọn các mục cần thiết (Chuẩn bị, Đã nộp, Kết quả, Bước tiếp theo), rồi viết chi tiết."
+      },
+      "step3": {
+        "title": "\"Thêm mục này\" sẽ xếp mục lên trên",
+        "body": "Khi xong, nhấn \"Thêm mục này\" và mục đó sẽ chuyển vào danh sách phía trên form. Tiếp tục với ngày tiếp theo trong form bên dưới."
+      }
+    },
+    "jobReview": {
+      "step1": {
+        "title": "Review ghi lại theo ngày",
+        "body": "Ghi lại quy trình tuyển dụng thực tập, new grad, có kinh nghiệm, chuyển việc hoặc hợp đồng theo từng ngày, để người khác có thể theo dõi từ lúc ứng tuyển đến khi nhận offer."
+      },
+      "step2": {
+        "title": "Ngày → mục → chi tiết",
+        "body": "Trong form bên dưới, chọn ngày, chỉ chọn các mục cần thiết (Giai đoạn, Nền tảng, Hồ sơ, Phỏng vấn, Kết quả), rồi viết chi tiết."
+      },
+      "step3": {
+        "title": "\"Thêm mục này\" sẽ xếp mục lên trên",
+        "body": "Khi xong, nhấn \"Thêm mục này\" và mục đó sẽ chuyển vào danh sách phía trên form. Tiếp tục với ngày tiếp theo trong form bên dưới."
+      }
+    }
+  },
+  "write": {
+    "notFound": "Không tìm thấy bài viết này",
+    "noPermission": "Bạn không có quyền sửa bài viết này",
+    "loadFailed": "Không thể tải bài viết",
+    "errors": {
+      "timelineIncomplete": "Vui lòng thêm cả ngày và chi tiết cho mục bạn đang viết"
+    },
+    "saveFailed": "Không thể lưu",
+    "draftSaved": "Đã lưu nháp",
+    "draftSaveFailed": "Không thể lưu nháp",
+    "checkingLogin": "Đang kiểm tra đăng nhập…",
+    "loadingPost": "Đang tải bài viết…",
+    "backToPost": "Quay lại bài viết",
+    "boardList": "Danh sách {board}",
+    "collapse": "Đóng",
+    "expand": "Mở",
+    "titleLabel": "Tiêu đề",
+    "updating": "Đang cập nhật…",
+    "updateFootnote": "Sau khi lưu, bài viết sẽ lên đầu danh sách và mọi người sẽ thấy tiến trình mới nhất của bạn.",
+    "timelineSectionDescription": "Thêm, sửa hoặc xóa bao nhiêu mục theo ngày tùy thích",
+    "submitting": "Đang đăng…",
+    "selectTypeFirst": "Vui lòng chọn loại",
+    "submit": "Đăng review",
+    "backToList": "Quay lại danh sách",
+    "createEyebrow": "Bài viết mới",
+    "updateIntro": "Giờ chỉ cần thêm ngày và chi tiết. Sau khi lưu, bài viết sẽ lên đầu danh sách.",
+    "untitled": "Chưa có tiêu đề",
+    "existingCount_other": "Đã có {count} mục",
+    "restoredAutosave": "Chúng tôi đã khôi phục các chỉnh sửa được tự động lưu trước khi bạn gửi",
+    "draftEmpty": "Chưa có gì để lưu"
+  },
+  "timeline": {
+    "addedTitle_other": "Đã thêm {count} mục",
+    "savedTitle_other": "{count} mục đã lưu",
+    "savedDescription": "Các mục được xếp phía trên form. Sửa hoặc xóa để quản lý từng ngày",
+    "editingSelected": "Sửa mục đã chọn",
+    "cancel": "Hủy",
+    "finishEdit": "Sửa xong",
+    "addEntry": "Thêm mục này",
+    "clearDraft": "Xóa form",
+    "limitReached": "Bạn đã đạt giới hạn số mục. Hãy xóa một mục để thêm mục mới.",
+    "updateGuide": {
+      "editingTitle": "Đang sửa mục hiện có",
+      "addTitle": "Thêm tiến trình",
+      "addDescription": "Chọn ngày mới, viết chi tiết, rồi nhấn \"Thêm mục này\". Bạn có thể thêm nhiều mục liên tiếp."
+    },
+    "newEntry": "Mục tiến trình mới",
+    "editHint": "Nhấn \"Sửa xong\" khi bạn hoàn tất",
+    "maxCanAdd": "Bạn có thể thêm tối đa {max} mục",
+    "maxReached": "Giới hạn là {max} mục",
+    "noDate": "Không có ngày",
+    "edit": "Sửa",
+    "editing": "Đang sửa",
+    "delete": "Xóa",
+    "date": "Ngày",
+    "selectFields": "Chọn nội dung cần ghi",
+    "selectFieldsHint": "Chỉ chọn những mục phù hợp. Bạn có thể chọn nhiều mục.",
+    "incompleteEmpty": "Thêm ngày và một mục đã chọn hoặc ghi chú giai đoạn",
+    "incompleteDate": "Vui lòng thêm cả ngày và chi tiết",
+    "quickInput": "Điền nhanh",
+    "removeField": "Bỏ"
+  },
+  "guest": {
+    "signedIn": "Bạn đã đăng nhập. Review của bạn sẽ được đăng thẳng vào tài khoản này",
+    "claimLinked": "Bạn đã đăng ký xong! Review bạn vừa viết đã được liên kết với tài khoản",
+    "claimDone": "Bạn đã đăng ký xong",
+    "claimFailed": "Không thể liên kết review của bạn",
+    "googleFailed": "Đăng nhập bằng Google không thành công",
+    "errors": {
+      "nicknameLength": "Vui lòng nhập biệt danh hiển thị từ {min}–{max} ký tự",
+      "nicknameTaken": "Biệt danh này đã có người dùng. Vui lòng thử biệt danh khác",
+      "emailInvalid": "Vui lòng nhập email hợp lệ",
+      "linkedinInvalid": "Vui lòng kiểm tra URL hồ sơ LinkedIn (VD: linkedin.com/in/your-name)",
+      "titleRequired": "Vui lòng nhập tiêu đề",
+      "guidelinesRequired": "Vui lòng đồng ý với nguyên tắc cộng đồng"
+    },
+    "created": "Đã đăng review. Cảm ơn bạn!",
+    "createFailed": "Không thể đăng review",
+    "backToList": "Review phỏng vấn & việc làm",
+    "checkingDraft": "Đang kiểm tra bản nháp đã lưu…",
+    "authorSection": "Về bạn",
+    "authorSectionMember": "Biệt danh của bạn được công khai. LinkedIn chỉ dùng để xác nhận nơi bạn làm việc",
+    "authorSectionGuest": "Chỉ biệt danh được công khai. Email và LinkedIn chỉ đội ngũ của chúng tôi xem và không bao giờ được đăng",
+    "nicknameLabel": "Biệt danh",
+    "nicknameHint": "Hiển thị trên bài viết · Công khai",
+    "nicknamePlaceholder": "VD: NYCWorker",
+    "emailLabel": "Email",
+    "emailHintMember": "Email tài khoản · Riêng tư",
+    "emailHintGuest": "Để nhận thông tin thẻ quà tặng và credit · Riêng tư",
+    "linkedinLabel": "URL hồ sơ LinkedIn",
+    "linkedinHint": "Để xác nhận nơi bạn làm việc · Riêng tư",
+    "coffeeChatLabel": "Mình sẵn sàng nhận lời mời coffee chat từ người mới bắt đầu",
+    "optional": "(không bắt buộc)",
+    "coffeeChatHint": "Thông tin liên lạc của bạn vẫn được giữ kín kể cả khi chọn mục này. Khi có yêu cầu, đội ngũ của chúng tôi sẽ hỏi ý bạn trước khi kết nối.",
+    "guidelinesAgree": "Mình đã đọc nguyên tắc cộng đồng ở trên và review này dựa trên trải nghiệm thật của mình.",
+    "submitGuest": "Đăng review không cần đăng ký",
+    "footnoteBefore": "Không cần đăng ký.",
+    "footnoteLink": "Đăng ký bằng Google và đăng bài",
+    "footnoteAfter": " để nhận credit vào tài khoản ngay.",
+    "footnoteMember": "Sau khi đăng, bạn có thể tiếp tục thêm và sửa tiến trình trong Bài viết của tôi.",
+    "choose": {
+      "eyebrow": "Chia sẻ trải nghiệm",
+      "title": "Bạn có thể đăng review mà không cần đăng ký",
+      "intro": "Kể lại từng bước, từ ứng tuyển, phỏng vấn đến kết quả. Điều này giúp ích rất nhiều cho những người đang chuẩn bị đi cùng con đường. Chỉ mất 5 phút.",
+      "recommended": "Khuyên dùng",
+      "googleTitle": "Đăng ký bằng Google và đăng bài",
+      "googlePitch1": "Credit được cộng thẳng vào tài khoản",
+      "googlePitch2": "Bạn có thể tiếp tục thêm tiến trình sau khi đăng",
+      "guestTitle": "Đăng bài không cần đăng ký",
+      "guestPitch1": "Chỉ cần biệt danh, email và URL LinkedIn",
+      "guestPitch2": "Chúng tôi sẽ giữ credit cho bạn và tự động cộng khi bạn đăng ký sau bằng cùng email",
+      "guestCta": "Đăng review không cần đăng ký"
+    },
+    "creditPitch": {
+      "title": "Nhận credit cho review của bạn",
+      "perStep": "{perStep} credit cho mỗi giai đoạn tuyển dụng (tối đa {max} mỗi bài viết)",
+      "perStepWithBonus": "{perStep} credit cho mỗi giai đoạn tuyển dụng (tối đa {max} mỗi bài viết) · Bài viết đầu tiên +{bonus}",
+      "review": "Review chi tiết sẽ nhận thêm credit sau khi đội ngũ Misaeng xét duyệt",
+      "coffeeChat": "Dùng credit ({cost}) cho buổi coffee chat 1:1 với người trong ngành hoặc công ty của bạn, hay cả ngành khác",
+      "optionalSignup": "Đăng ký là không bắt buộc. Sau khi đăng ký, bạn có thể dùng credit và nhận lời mời coffee chat"
+    },
+    "hero": {
+      "memberEyebrow": "Đăng bằng tài khoản của tôi",
+      "memberIntro": "Credit được cộng vào tài khoản này ngay khi bạn đăng bài. Bạn cũng có thể nhận lời mời coffee chat.",
+      "guestIntro": "Không cần đăng ký. Chúng tôi sẽ giữ credit cho bạn và tự động cộng khi bạn đăng ký sau bằng cùng email."
+    },
+    "preview": {
+      "count_other": "Đã thêm {count} giai đoạn tuyển dụng",
+      "member": "Bạn sẽ nhận {credit} credit",
+      "memberWithBonus": "Bạn sẽ nhận {credit} credit (+{bonus} bài viết đầu tiên)",
+      "guest": "{credit} credit khi bạn đăng ký",
+      "guestWithBonus": "{credit} credit khi bạn đăng ký (+{bonus} bài viết đầu tiên)"
+    },
+    "done": {
+      "eyebrow": "Đã đăng",
+      "title": "Cảm ơn bạn đã chia sẻ review",
+      "body_other": "\"{title}\" đã có mặt trên bảng tin Review phỏng vấn & việc làm. {count} giai đoạn tuyển dụng của bạn sẽ giúp ích cho những người đi sau.",
+      "awarded": "Đã cộng {credit} credit vào tài khoản của bạn",
+      "linked": "Review của bạn đã được liên kết với tài khoản",
+      "coffeeChat": "Dùng credit cho coffee chat ({cost} credit) với người trong ngành hoặc công ty của bạn, hay cả ngành khác.",
+      "pending": "Đăng ký để nhận ngay {credit} credit",
+      "breakdown_other": "{count} giai đoạn tuyển dụng = {credit} credit. Đăng ký bằng tài khoản Google trùng với email trong review, hệ thống sẽ tự động liên kết.",
+      "breakdownWithBonus_other": "{count} giai đoạn tuyển dụng = {credit} credit + {bonus} thưởng bài viết đầu tiên. Đăng ký bằng tài khoản Google trùng với email trong review, hệ thống sẽ tự động liên kết.",
+      "viewPost": "Xem review của tôi",
+      "viewCredit": "Xem credit của tôi",
+      "toList": "Quay lại danh sách",
+      "optional": "Không bắt buộc",
+      "signupTitle": "Đăng ký {brand} để nhận lời mời coffee chat từ người mới bắt đầu",
+      "signupPitch1": "Review bạn vừa viết và {credit} credit sẽ được liên kết với tài khoản ngay",
+      "signupPitch2": "Dùng credit cho coffee chat 1:1 với người trong ngành hoặc công ty của bạn, hay ngành khác",
+      "signupPitch3": "Bạn có thể tiếp tục thêm và sửa tiến trình",
+      "emailMismatch": "Email tài khoản của bạn khác với email trong review nên chúng tôi không thể tự động liên kết. Đội ngũ của chúng tôi sẽ kiểm tra LinkedIn và email của bạn, rồi liên kết với tài khoản.",
+      "skipNote": "Review của bạn vẫn được đăng kể cả khi bạn chưa đăng ký bây giờ.",
+      "skip": "Để sau"
+    }
+  }
+}

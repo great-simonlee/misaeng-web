@@ -1,0 +1,116 @@
+{
+  "categories": {
+    "restaurant": "Wajib coba",
+    "value": "Hemat",
+    "vibe": "Suasana asyik",
+    "study": "Tempat belajar"
+  },
+  "categoryDescriptions": {
+    "restaurant": "Tempat yang wajib kamu coba",
+    "value": "Sepadan dengan harganya",
+    "vibe": "Tempat dengan suasana yang asyik",
+    "study": "Kafe yang enak buat belajar atau kerja"
+  },
+  "cuisines": {
+    "brunch": "Brunch",
+    "korean": "Korea",
+    "japanese": "Jepang",
+    "chinese": "Tionghoa",
+    "american": "Barat",
+    "french": "Prancis",
+    "italian": "Italia",
+    "mexican": "Meksiko",
+    "thai": "Thailand",
+    "vietnamese": "Vietnam",
+    "indian": "India",
+    "other": "Lainnya"
+  },
+  "spend": {
+    "people_other": "{count} orang",
+    "total": "Total ${amount}",
+    "totalWithTip": "Total ${amount} · termasuk tip",
+    "totalWithoutTip": "Total ${amount} · belum termasuk tip",
+    "peopleTotal_other": "{count} orang · total ${amount}",
+    "peopleTotalWithTip_other": "{count} orang · total ${amount} · termasuk tip",
+    "peopleTotalWithoutTip_other": "{count} orang · total ${amount} · belum termasuk tip",
+    "tipIncluded": "Termasuk tip",
+    "tipExcluded": "Belum termasuk tip"
+  },
+  "wait": {
+    "none": "Tanpa antre",
+    "minutes": "Antre {minutes} mnt",
+    "hours": "Antre {hours} jam",
+    "hoursMinutes": "Antre {hours} jam {minutes} mnt"
+  },
+  "carousel": {
+    "cover": "Sampul",
+    "menu": "Menu",
+    "vibe": "Suasana",
+    "backToList": "Kembali ke daftar",
+    "photosLabel": "Foto restoran",
+    "previous": "Foto sebelumnya",
+    "next": "Foto berikutnya",
+    "photoNumber": "Foto {number}"
+  },
+  "map": {
+    "postsMapLabel": "Peta kuliner",
+    "emptyTitle": "Belum ada tempat untuk ditampilkan di peta",
+    "emptyDescription": "Hanya ulasan dengan alamat tersimpan yang muncul sebagai pin",
+    "unnamedPlace": "Restoran",
+    "reviewCount_other": "{count} ulasan",
+    "close": "Tutup",
+    "viewReview": "Lihat ulasan",
+    "placeMapLabel": "Peta {name}",
+    "directions": "Petunjuk arah"
+  },
+  "detail": {
+    "menu": "Menu",
+    "interior": "Interior",
+    "backToList": "Kembali ke {board}",
+    "views_other": "{views} kali dilihat",
+    "metrics": {
+      "party": "Jumlah orang",
+      "totalSpend": "Total",
+      "spend": "${amount}",
+      "spendWithTip": "${amount} · termasuk tip",
+      "spendWithoutTip": "${amount} · tanpa tip",
+      "wait": "Antre",
+      "waitNone": "Tidak ada",
+      "waitMinutes": "{minutes} mnt"
+    },
+    "location": "Lokasi",
+    "viewMenuPhoto": "Lihat foto menu",
+    "interiorAndVibe": "Interior · Suasana",
+    "viewVibePhoto": "Lihat foto suasana",
+    "review": "Ulasan"
+  },
+  "placeSearch": {
+    "errors": {
+      "searchFailed": "Pencarian gagal. Coba lagi.",
+      "detailsFailed": "Gagal memuat detail tempat",
+      "noCoordinates": "Lokasi tempat itu tidak ditemukan"
+    },
+    "pickExactAddress": "Pilih alamat yang tepat",
+    "mapTitle": "Lokasi {name}",
+    "change": "Ganti",
+    "addressPlaceholder": "mis. 53 W 53rd St, New York",
+    "placePlaceholder": "mis. Halal Guys, Joe's Pizza, West 53rd St",
+    "resolving": "Mengecek…",
+    "searching": "Mencari…",
+    "noResults": "Tidak ada hasil. Coba alamat yang lebih detail atau nama jalan dalam bahasa Inggris.",
+    "addressHint": "Pilih alamat untuk menyimpan lokasi.",
+    "placeHint": "Pilih tempat dari daftar untuk memposting."
+  },
+  "restaurantName": {
+    "placeholder": "Nama restoran",
+    "reviewCount_other": "{count} ulasan",
+    "checking": "Mengecek restoran di lokasi ini…",
+    "existing_other": "Sudah ada {count} restoran terdaftar di sini · Pilih di bawah atau masukkan yang baru",
+    "none": "Belum ada restoran terdaftar di sini. Masukkan nama baru.",
+    "hint": "Nama ini akan tampil di daftar dan halaman detail"
+  },
+  "card": {
+    "comments": "Komentar",
+    "recommends": "Suka"
+  }
+}

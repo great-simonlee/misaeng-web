@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "privacyDescription": "{brand} NYC 개인정보처리방침. 수집·이용·보관·공유, 익명게시판, 쿠키, 이용자 권리 및 문의 방법을 안내합니다.",
+    "termsDescription": "{brand} NYC 이용약관. 커뮤니티 이용, 익명게시판, 하우징·룸메이트, 계정, 책임 제한 등 서비스 이용 조건을 안내합니다."
+  },
+  "view": {
+    "reference": "참고 번역",
+    "versionLine": "버전 {version} · 최종 업데이트: {updated} · 시행일: {effective}",
+    "translationIncomplete": "일부 문단은 아직 번역되지 않아 영어 원문만 표시돼요.",
+    "tableOfContents": "목차 (참고)",
+    "note": "참고.",
+    "back": "← {city|으로/로} 돌아가기",
+    "privacyPolicy": "개인정보처리방침",
+    "termsOfUse": "이용약관"
+  }
+}

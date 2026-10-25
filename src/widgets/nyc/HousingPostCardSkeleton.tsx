@@ -1,5 +1,8 @@
+'use client'
+
 import { Skeleton } from '@components/Skeleton'
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 type HousingPostCardSkeletonProps = {
   className?: string
@@ -48,6 +51,7 @@ export function HousingPostCardSkeletonGrid({
   count = 8,
   className,
 }: HousingPostCardSkeletonGridProps) {
+  const t = useT('housing')
   return (
     <div
       className={cn(
@@ -56,12 +60,12 @@ export function HousingPostCardSkeletonGrid({
       )}
       role='status'
       aria-live='polite'
-      aria-label='매물 불러오는 중'
+      aria-label={t('card.loadingLabel')}
     >
       {Array.from({ length: count }, (_, index) => (
         <HousingPostCardSkeleton key={index} />
       ))}
-      <span className='sr-only'>매물을 불러오는 중입니다</span>
+      <span className='sr-only'>{t('card.loadingDescription')}</span>
     </div>
   )
 }

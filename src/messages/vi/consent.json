@@ -1,0 +1,19 @@
+{
+  "agreeTerms": "Tôi đã đọc và đồng ý với {terms}.",
+  "agreePrivacy": "Tôi đã đọc và đồng ý với {privacy}.",
+  "agreeTermsAria": "Ô đánh dấu Điều khoản sử dụng",
+  "agreePrivacyAria": "Ô đánh dấu Chính sách quyền riêng tư",
+  "termsLink": "Điều khoản sử dụng",
+  "privacyLink": "Chính sách quyền riêng tư",
+  "arbitrationNotice": "Điều khoản có bao gồm điều khoản trọng tài và bạn có thể chọn không tham gia trong vòng 30 ngày. Chi tiết xem tại {terms}.",
+  "languageNotice": "Bản tiếng Anh của Điều khoản sử dụng và Chính sách quyền riêng tư là bản chính thức và có giá trị ràng buộc. Các bản dịch sang ngôn ngữ khác chỉ mang tính tham khảo; nếu có khác biệt, bản tiếng Anh sẽ được ưu tiên áp dụng.",
+  "agreeError": "Vui lòng đồng ý với Điều khoản sử dụng và Chính sách quyền riêng tư để tiếp tục.",
+  "signUp": "Đăng ký",
+  "reconsentTitle": "Điều khoản đã được cập nhật và cần bạn đồng ý",
+  "reconsentBody": "Điều khoản sử dụng và Chính sách quyền riêng tư của chúng tôi đã thay đổi. Vui lòng đồng ý để tiếp tục sử dụng {brand}.",
+  "reconsentConfirm": "Tôi đồng ý, tiếp tục",
+  "reconsentVersions": "Điều khoản {terms} · Quyền riêng tư {privacy}",
+  "optOutHint": "Từ chối trọng tài: gửi email tới info@misaeng.com trong vòng 30 ngày kể từ khi đồng ý, với tiêu đề “Arbitration Opt-Out”.",
+  "saving": "Đang lưu…",
+  "defaultSummary": "Vui lòng xem lại Điều khoản sử dụng và Chính sách quyền riêng tư. Điều khoản này bao gồm thỏa thuận trọng tài cá nhân có tính ràng buộc và điều khoản từ bỏ quyền khởi kiện tập thể."
+}

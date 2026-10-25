@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 
 import { usePagedGallery } from '@hooks/usePagedGallery'
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 import type { FoodCarouselSlide } from '@lib/community/food'
 
 type FoodDetailHeroCarouselProps = {
@@ -17,9 +18,10 @@ type FoodDetailHeroCarouselProps = {
 export function FoodDetailHeroCarousel({
   slides,
   backHref,
-  backLabel = '목록',
+  backLabel,
   className,
 }: FoodDetailHeroCarouselProps) {
+  const t = useT('food')
   const count = slides.length
   const {
     ref: scrollRef,
@@ -49,7 +51,10 @@ export function FoodDetailHeroCarousel({
           className,
         )}
       >
-        <CarouselBackButton backHref={backHref} backLabel={backLabel} />
+        <CarouselBackButton
+        backHref={backHref}
+        backLabel={backLabel ?? t('carousel.backToList')}
+      />
       </div>
     )
   }
@@ -65,7 +70,7 @@ export function FoodDetailHeroCarousel({
           '[-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden',
         )}
         aria-roledescription='carousel'
-        aria-label='맛집 사진'
+        aria-label={t('carousel.photosLabel')}
       >
         {trackSlides.map((slide, trackIndex) => {
           const logicalIndex = looping
@@ -94,13 +99,16 @@ export function FoodDetailHeroCarousel({
       </div>
 
       <div className='pointer-events-none absolute inset-x-0 top-0 z-[1] h-20 bg-gradient-to-b from-black/40 to-transparent' />
-      <CarouselBackButton backHref={backHref} backLabel={backLabel} />
+      <CarouselBackButton
+        backHref={backHref}
+        backLabel={backLabel ?? t('carousel.backToList')}
+      />
 
       {count > 1 ? (
         <>
           <button
             type='button'
-            aria-label='이전 사진'
+            aria-label={t('carousel.previous')}
             onClick={() => goTo(activeIndex - 1, { wrap: true })}
             className='absolute left-3 top-1/2 z-10 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/95 text-[var(--foreground)] shadow-md touch-manipulation transition hover:bg-white sm:inline-flex sm:left-4'
           >
@@ -108,7 +116,7 @@ export function FoodDetailHeroCarousel({
           </button>
           <button
             type='button'
-            aria-label='다음 사진'
+            aria-label={t('carousel.next')}
             onClick={() => goTo(activeIndex + 1, { wrap: true })}
             className='absolute right-3 top-1/2 z-10 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/95 text-[var(--foreground)] shadow-md touch-manipulation transition hover:bg-white sm:inline-flex sm:right-4'
           >
@@ -120,7 +128,7 @@ export function FoodDetailHeroCarousel({
               <button
                 key={slide.id}
                 type='button'
-                aria-label={`${index + 1}번째 사진`}
+                aria-label={t('carousel.photoNumber', { number: index + 1 })}
                 aria-current={index === activeIndex}
                 onClick={() => goTo(index)}
                 className={cn(

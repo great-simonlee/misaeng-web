@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { BottomSheetSelect } from '@components'
+import { useT } from '@lib/i18n/client'
 import {
   formatStatusEmployerLocation,
   isStatusEmployerOther,
@@ -10,6 +11,7 @@ import {
   STATUS_EMPLOYER_NAME_MAX,
   STATUS_EMPLOYER_OPTIONS,
   STATUS_EMPLOYER_OTHER_VALUE,
+  translateStatusEmployerOption,
 } from '@lib/constants/statusEmployer'
 import { cn } from '@lib'
 
@@ -39,10 +41,20 @@ function inferLocationMode(location: string): LocationMode | null {
 export function StatusEmployerSelect({
   value,
   onChange,
-  label = '학교 / 회사 / 관련 기관 (선택)',
+  label,
   className,
   inputClassName,
 }: StatusEmployerSelectProps) {
+  const t = useT('me')
+  const tRoot = useT()
+  const categoryOptions = useMemo(
+    () =>
+      CATEGORY_OPTIONS.map((option) => ({
+        value: option.value,
+        label: translateStatusEmployerOption(tRoot, option.value),
+      })),
+    [tRoot],
+  )
   const inferred = inferLocationMode(value)
   const [modeOverride, setModeOverride] = useState<LocationMode | null>(null)
   const mode = modeOverride ?? inferred
@@ -72,17 +84,17 @@ export function StatusEmployerSelect({
 
   return (
     <div className={cn(className)}>
-      <p className='text-[13px] font-medium text-[var(--foreground)]'>{label}</p>
+      <p className='text-[13px] font-medium text-[var(--foreground)]'>{label ?? t('statusEmployer.fieldLabel')}</p>
       <div className='mt-1.5 grid grid-cols-2 gap-2'>
         <ModeButton
           active={mode === 'name'}
           onClick={() => selectMode('name')}
-          label='회사명 바로 입력'
+          label={t('statusEmployer.modeName')}
         />
         <ModeButton
           active={mode === 'category'}
           onClick={() => selectMode('category')}
-          label='회사 카테고리 선택'
+          label={t('statusEmployer.modeCategory')}
         />
       </div>
       {mode === 'name' ? (
@@ -95,7 +107,7 @@ export function StatusEmployerSelect({
               'h-11 w-full rounded-xl bg-white px-3.5 text-[15px] outline-none ring-1 ring-black/[0.08] transition placeholder:text-[var(--muted)] focus:ring-black/20',
               inputClassName,
             )}
-            placeholder='회사명을 입력해 주세요'
+            placeholder={t('statusEmployer.namePlaceholder')}
           />
           <p className='mt-1.5 text-right text-[11px] tabular-nums text-[var(--muted)]'>
             {nameValue.length}/{STATUS_EMPLOYER_NAME_MAX}
@@ -105,12 +117,12 @@ export function StatusEmployerSelect({
       {mode === 'category' ? (
         <div className='mt-2'>
           <BottomSheetSelect
-            title='회사 카테고리'
+            title={t('statusEmployer.categoryTitle')}
             value={categoryValue}
-            options={CATEGORY_OPTIONS}
+            options={categoryOptions}
             onChange={handleCategory}
-            placeholder='카테고리를 선택해 주세요'
-            emptyOption={{ value: '', label: '선택 안 함' }}
+            placeholder={t('statusEmployer.categoryPlaceholder')}
+            emptyOption={{ value: '', label: t('statusEmployer.noSelection') }}
           />
         </div>
       ) : null}

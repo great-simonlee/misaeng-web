@@ -1,5 +1,8 @@
+'use client'
+
 import { getVerifiedSchool } from '@lib/constants/schools'
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 type SchoolBadgeProps = {
   schoolId?: string | null
@@ -17,6 +20,7 @@ export function SchoolBadge({
   size = 'sm',
   className,
 }: SchoolBadgeProps) {
+  const t = useT('common')
   const school = getVerifiedSchool(schoolId)
   if (!school) return null
 
@@ -25,8 +29,8 @@ export function SchoolBadge({
 
   return (
     <span
-      title={`${school.fullName} · 학교 이메일 인증`}
-      aria-label={`${school.fullName} 인증`}
+      title={t('ui.schoolBadge.title', { school: school.fullName })}
+      aria-label={t('ui.schoolBadge.aria', { school: school.fullName })}
       className={cn(
         'inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-[#57068c]',
         size === 'author' &&

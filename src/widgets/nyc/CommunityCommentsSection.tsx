@@ -20,19 +20,19 @@ import {
   fetchCommunityComments,
   updateCommunityCommentRequest,
 } from '@lib/community/comments.client'
+import { localizeCommunityError } from '@lib/community/client'
 import { createCommunityReportRequest } from '@lib/community/engagement.client'
 import {
-  ACCOUNT_SUSPENDED_MESSAGE,
   getIdentityVerifyHref,
-  getIdentityVerifyLinkLabel,
   isAccountSuspended,
   isIdentityVerified,
-  SCHOOL_VERIFY_REQUIRED_MESSAGE,
 } from '@lib/community/schoolGate'
-import { formatCommunityRelativeTime } from '@lib/constants/communityMock'
 import { countOpenComments } from '@lib/constants/communityCommentsMock'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import type { CommunityComment, CommunityReportReason } from '@/types/nyc'
+import { TranslationNotice, useTranslatedContent } from '@widgets/TranslationNotice'
+import { useCommunityFormat } from '@widgets/nyc/CommunityPostCard'
 import { CommunityReportSheet } from '@widgets/nyc/CommunityReportSheet'
 
 type CommunityCommentsSectionProps = {
@@ -50,6 +50,7 @@ export function CommunityCommentsSection({
   loginNext,
   onCountChange,
 }: CommunityCommentsSectionProps) {
+  const t = useT('community')
   const city = useCity()
   const href = useCityPath()
   const { user, profile, nickname, loading: authLoading } = useAuth()
@@ -101,11 +102,16 @@ export function CommunityCommentsSection({
       setComments(normalized)
       onCountChange?.(countOpenComments(normalized))
     } catch (err) {
-      toastError(getErrorMessage(err, '댓글을 불러오지 못했어요'))
+      toastError(
+        getErrorMessage(
+          localizeCommunityError(err, t),
+          t('comments.loadFailed'),
+        ),
+      )
     } finally {
       setLoading(false)
     }
-  }, [myNickname, onCountChange, postId, toastError, user?.uid])
+  }, [myNickname, onCountChange, postId, t, toastError, user?.uid])
 
   useEffect(() => {
     void loadComments()
@@ -118,20 +124,23 @@ export function CommunityCommentsSection({
   const identityVerified = isIdentityVerified(profile)
   const verifyHref = getIdentityVerifyHref(fallbackNext)
   const canCompose = Boolean(user) && identityVerified && !isAccountSuspended(profile)
+  // 문장 가운데 링크가 들어가서 {link} 앞뒤로 나눠 그린다
+  const loginPrompt = splitAroundLink(t('comments.loginPrompt'))
+  const verifyPrompt = splitAroundLink(t('comments.verifyPrompt'))
 
   async function submitComment(body: string, parentId: string | null) {
     if (!user?.uid || !user.email) return
     if (isAccountSuspended(profile)) {
-      toastError(ACCOUNT_SUSPENDED_MESSAGE)
+      toastError(t('verify.suspended'))
       return
     }
     if (!isIdentityVerified(profile)) {
-      toastError(SCHOOL_VERIFY_REQUIRED_MESSAGE)
+      toastError(t('verify.required'))
       return
     }
     const text = body.trim()
     if (!text) {
-      toastError('댓글을 입력해 주세요')
+      toastError(t('comments.bodyRequired'))
       return
     }
 
@@ -164,7 +173,7 @@ export function CommunityCommentsSection({
         onCountChange?.(countOpenComments(next))
         return next
       })
-      success(parentId ? '답글을 남겼어요' : '댓글을 남겼어요')
+      success(parentId ? t('comments.replyPosted') : t('comments.posted'))
       if (parentId) {
         setReplyToId(null)
         setReplyDraft('')
@@ -172,7 +181,12 @@ export function CommunityCommentsSection({
         setDraft('')
       }
     } catch (err) {
-      toastError(getErrorMessage(err, '댓글 등록에 실패했어요'))
+      toastError(
+        getErrorMessage(
+          localizeCommunityError(err, t),
+          t('errors.commentCreateFailed'),
+        ),
+      )
     } finally {
       setSubmitting(false)
     }
@@ -198,9 +212,14 @@ export function CommunityCommentsSection({
         },
       })
       setReportTargetId(null)
-      success('신고가 접수되었어요. 관리자가 확인합니다.')
+      success(t('report.submitted'))
     } catch (err) {
-      toastError(getErrorMessage(err, '신고에 실패했어요'))
+      toastError(
+        getErrorMessage(
+          localizeCommunityError(err, t),
+          t('errors.reportFailed'),
+        ),
+      )
     } finally {
       setReporting(false)
     }
@@ -208,9 +227,7 @@ export function CommunityCommentsSection({
 
   async function handleDeleteComment(commentId: string) {
     if (!user?.uid) return
-    const ok = window.confirm(
-      '이 댓글을 삭제할까요?\n삭제하면 답글도 함께 삭제돼요.',
-    )
+    const ok = window.confirm(t('comments.deleteConfirm'))
     if (!ok) return
 
     setDeletingId(commentId)
@@ -239,9 +256,14 @@ export function CommunityCommentsSection({
         setEditingId(null)
         setEditDraft('')
       }
-      success('댓글을 삭제했어요')
+      success(t('comments.deleted'))
     } catch (err) {
-      toastError(getErrorMessage(err, '댓글 삭제에 실패했어요'))
+      toastError(
+        getErrorMessage(
+          localizeCommunityError(err, t),
+          t('errors.commentDeleteFailed'),
+        ),
+      )
     } finally {
       setDeletingId(null)
     }
@@ -263,7 +285,7 @@ export function CommunityCommentsSection({
     if (!user?.uid) return
     const text = editDraft.trim()
     if (!text) {
-      toastError('댓글을 입력해 주세요')
+      toastError(t('comments.bodyRequired'))
       return
     }
 
@@ -280,9 +302,14 @@ export function CommunityCommentsSection({
       )
       setEditingId(null)
       setEditDraft('')
-      success('댓글을 수정했어요')
+      success(t('comments.updated'))
     } catch (err) {
-      toastError(getErrorMessage(err, '댓글 수정에 실패했어요'))
+      toastError(
+        getErrorMessage(
+          localizeCommunityError(err, t),
+          t('errors.commentUpdateFailed'),
+        ),
+      )
     } finally {
       setSavingEdit(false)
     }
@@ -293,7 +320,7 @@ export function CommunityCommentsSection({
       <div className='px-5 py-5 sm:px-6'>
         <div className='flex items-center justify-between gap-3'>
           <h2 className='text-[16px] font-semibold tracking-tight text-[var(--foreground)]'>
-            댓글
+            {t('comments.title')}
           </h2>
           <span className='rounded-full bg-[#f4f5f7] px-2.5 py-0.5 text-[12px] font-semibold tabular-nums text-[var(--muted)]'>
             {totalCount}
@@ -302,33 +329,33 @@ export function CommunityCommentsSection({
 
         {!authLoading && !user ? (
           <div className='mt-4 rounded-xl bg-[#f7f8fa] px-4 py-3.5 text-[13px] text-[var(--muted-foreground)]'>
-            댓글을 쓰려면{' '}
+            {loginPrompt[0]}
             <Link
               href={loginHref}
               className='font-semibold text-[var(--brand)] underline-offset-2 hover:underline'
             >
-              로그인
+              {t('comments.loginLink')}
             </Link>
-            이 필요해요.
+            {loginPrompt[1]}
           </div>
         ) : authLoading ? (
           <p className='mt-4 text-[13px] text-[var(--muted)]'>
-            로그인 상태를 확인하는 중이에요…
+            {t('comments.checkingLogin')}
           </p>
         ) : isAccountSuspended(profile) ? (
           <div className='mt-4 rounded-xl bg-red-50 px-4 py-3.5 text-[13px] text-red-700'>
-            {ACCOUNT_SUSPENDED_MESSAGE}
+            {t('verify.suspended')}
           </div>
         ) : !identityVerified ? (
           <div className='mt-4 rounded-xl bg-[#f7f8fa] px-4 py-3.5 text-[13px] text-[var(--muted-foreground)]'>
-            댓글을 쓰려면{' '}
+            {verifyPrompt[0]}
             <Link
               href={verifyHref}
               className='font-semibold text-[var(--brand)] underline-offset-2 hover:underline'
             >
-              {getIdentityVerifyLinkLabel()}
+              {t('verify.linkLabel')}
             </Link>
-            이 필요해요.
+            {verifyPrompt[1]}
           </div>
         ) : (
           <form
@@ -343,7 +370,7 @@ export function CommunityCommentsSection({
               onChange={(e) => setDraft(e.target.value)}
               rows={3}
               maxLength={2000}
-              placeholder='댓글을 남겨 보세요'
+              placeholder={t('comments.placeholder')}
               className='w-full resize-none rounded-xl border-0 bg-[#f7f8fa] px-4 py-3.5 text-[14px] leading-relaxed outline-none transition placeholder:text-[var(--muted)] focus:bg-white focus:ring-2 focus:ring-[var(--brand)]/15'
             />
             <div className='mt-2.5 flex justify-end'>
@@ -352,7 +379,7 @@ export function CommunityCommentsSection({
                 disabled={submitting || !draft.trim()}
                 className='inline-flex h-9 items-center rounded-full bg-[var(--foreground)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--navy-light)] disabled:opacity-40'
               >
-                {submitting ? '등록 중…' : '댓글 등록'}
+                {submitting ? t('comments.submitting') : t('comments.submit')}
               </button>
             </div>
           </form>
@@ -362,13 +389,13 @@ export function CommunityCommentsSection({
       <div className='border-t border-black/[0.05] px-5 py-2 sm:px-6'>
         {loading && (
           <p className='py-8 text-center text-[13px] text-[var(--muted)]'>
-            댓글을 불러오는 중이에요…
+            {t('comments.loading')}
           </p>
         )}
 
         {!loading && threads.length === 0 && (
           <p className='py-8 text-center text-[13px] text-[var(--muted)]'>
-            아직 댓글이 없어요. 첫 댓글을 남겨 보세요.
+            {t('comments.empty')}
           </p>
         )}
 
@@ -484,7 +511,7 @@ export function CommunityCommentsSection({
                     onChange={(e) => setReplyDraft(e.target.value)}
                     rows={2}
                     maxLength={2000}
-                    placeholder='답글을 입력하세요'
+                    placeholder={t('comments.replyPlaceholder')}
                     className='w-full resize-none rounded-xl border-0 bg-[#f7f8fa] px-3.5 py-2.5 text-[13px] outline-none focus:bg-white focus:ring-2 focus:ring-[var(--brand)]/15'
                     autoFocus
                   />
@@ -497,14 +524,14 @@ export function CommunityCommentsSection({
                       }}
                       className='h-8 rounded-full px-3 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
                     >
-                      취소
+                      {t('comments.cancel')}
                     </button>
                     <button
                       type='submit'
                       disabled={submitting || !replyDraft.trim()}
                       className='h-8 rounded-full bg-[var(--foreground)] px-3.5 text-[12px] font-semibold text-white touch-manipulation disabled:opacity-50'
                     >
-                      답글 등록
+                      {t('comments.replySubmit')}
                     </button>
                   </div>
                 </form>
@@ -516,7 +543,7 @@ export function CommunityCommentsSection({
       <CommunityReportSheet
         open={Boolean(reportTargetId)}
         onClose={() => setReportTargetId(null)}
-        targetLabel='이 댓글'
+        target='comment'
         submitting={reporting}
         onSubmit={handleReportSubmit}
       />
@@ -563,11 +590,16 @@ function CommentItem({
   onSaveEdit?: () => void
   onDelete?: () => void
 }) {
+  const t = useT('community')
+  const format = useCommunityFormat()
+  const translated = useTranslatedContent<CommunityComment, CommunityComment>(comment, 'comment')
+  const shownComment = translated.item
   const displayName = anonymousBoard
-    ? maskAnonymousDisplayName('익명')
+    ? maskAnonymousDisplayName(t('author.anonymous'))
     : getCommentAuthorDisplayName(
         comment,
         isAuthor ? viewerNickname : null,
+        t,
       )
   const initial = displayName.charAt(0).toUpperCase()
   const photoURL = anonymousBoard
@@ -599,8 +631,14 @@ function CommentItem({
               <SchoolBadge schoolId={comment.authorSchoolId} />
             )}
             <time className='text-[11px] text-[var(--muted)]'>
-              {formatCommunityRelativeTime(comment.createdAt)}
+              {format.relativeTime(comment.createdAt)}
             </time>
+            <TranslationNotice
+              i18n={comment.i18n}
+              showingOriginal={translated.showingOriginal}
+              onToggle={translated.toggle}
+              variant='comment'
+            />
           </div>
 
           {!editing && (
@@ -613,7 +651,7 @@ function CommentItem({
                       onClick={onStartEdit}
                       className='text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)]'
                     >
-                      수정
+                      {t('detail.edit')}
                     </button>
                   ) : null}
                   {onDelete ? (
@@ -623,7 +661,7 @@ function CommentItem({
                       disabled={deleting}
                       className='text-red-600 touch-manipulation hover:text-red-700 disabled:opacity-50'
                     >
-                      {deleting ? '삭제 중…' : '삭제'}
+                      {deleting ? t('comments.deleting') : t('detail.delete')}
                     </button>
                   ) : null}
                 </>
@@ -633,14 +671,14 @@ function CommentItem({
                   onClick={onReport}
                   className='text-[var(--muted)] touch-manipulation hover:text-red-600'
                 >
-                  신고
+                  {t('report.action')}
                 </button>
               ) : loginHref ? (
                 <Link
                   href={loginHref}
                   className='text-[var(--muted)] touch-manipulation hover:text-red-600'
                 >
-                  신고
+                  {t('report.action')}
                 </Link>
               ) : null}
             </div>
@@ -673,26 +711,27 @@ function CommentItem({
                 disabled={savingEdit}
                 className='h-8 rounded-full px-3 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--foreground)] disabled:opacity-50'
               >
-                취소
+                {t('comments.cancel')}
               </button>
               <button
                 type='submit'
                 disabled={savingEdit || !editDraft.trim()}
                 className='h-8 rounded-full bg-[var(--foreground)] px-3.5 text-[12px] font-semibold text-white touch-manipulation disabled:opacity-50'
               >
-                {savingEdit ? '저장 중…' : '수정 완료'}
+                {savingEdit ? t('comments.saving') : t('comments.saveEdit')}
               </button>
             </div>
           </form>
         ) : (
           <>
             <p
+              lang={translated.lang}
               className={cn(
                 'mt-1.5 whitespace-pre-wrap leading-relaxed text-[var(--foreground)]',
                 isReply ? 'text-[13px]' : 'text-[14px]',
               )}
             >
-              {comment.body}
+              {shownComment.body}
             </p>
 
             {onReply ? (
@@ -701,7 +740,7 @@ function CommentItem({
                 onClick={onReply}
                 className='mt-2 text-[12px] font-medium text-[var(--muted)] touch-manipulation hover:text-[var(--brand)]'
               >
-                답글 달기
+                {t('comments.reply')}
               </button>
             ) : null}
           </>
@@ -709,4 +748,11 @@ function CommentItem({
       </div>
     </div>
   )
+}
+
+/** `댓글을 쓰려면 {link}이 필요해요.` → ['댓글을 쓰려면 ', '이 필요해요.'] */
+function splitAroundLink(message: string): [string, string] {
+  const index = message.indexOf('{link}')
+  if (index < 0) return [`${message} `, '']
+  return [message.slice(0, index), message.slice(index + '{link}'.length)]
 }

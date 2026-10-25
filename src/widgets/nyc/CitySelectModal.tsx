@@ -10,6 +10,7 @@ import {
   replaceCityInPath,
   type CityId,
 } from '@lib/constants/cities'
+import { useT } from '@lib/i18n/client'
 
 type CitySelectModalProps = {
   open: boolean
@@ -24,6 +25,7 @@ export function CitySelectModal({
 }: CitySelectModalProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const t = useT('nav')
 
   function selectCity(nextCity: CityId) {
     if (nextCity !== currentCity) {
@@ -36,7 +38,7 @@ export function CitySelectModal({
     <BottomSheet
       open={open}
       onClose={onClose}
-      title='도시 선택'
+      title={t('selectCity')}
       scrollable={false}
     >
       <div className='space-y-2 px-4 pb-4'>
@@ -69,7 +71,7 @@ export function CitySelectModal({
                 </span>
               </span>
               {active ? (
-                <span className='text-[12px] font-semibold'>현재</span>
+                <span className='text-[12px] font-semibold'>{t('currentCity')}</span>
               ) : null}
             </button>
           )

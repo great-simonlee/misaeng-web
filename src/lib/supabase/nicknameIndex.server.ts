@@ -1,3 +1,4 @@
+import { ApiMessageError } from '@lib/i18n/apiError'
 import { getSupabaseAvatarBucket } from '@lib/supabase/server'
 
 /**
@@ -21,9 +22,9 @@ const BACKFILL_CONCURRENCY = 8
 /** 멤버 닉네임 규칙(영문·점)을 통과한 소문자 키만 색인 대상 */
 const INDEX_KEY_PATTERN = /^[a-z.]+$/
 
-export class NicknameTakenError extends Error {
+export class NicknameTakenError extends ApiMessageError {
   constructor() {
-    super('이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요.')
+    super('Nickname is already taken.', 'profile.nicknameTaken')
     this.name = 'NicknameTakenError'
   }
 }
@@ -49,8 +50,9 @@ async function storageFetch(path: string, init: RequestInit & { timeoutMs?: numb
   const url = getSupabaseUrl()
   const secretKey = getSupabaseSecretKey()
   if (!url || !secretKey) {
-    throw new Error(
-      'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.supabaseNotConfiguredDetail',
     )
   }
   const { timeoutMs = 8000, headers, ...rest } = init
@@ -73,7 +75,11 @@ async function readIndex(key: string): Promise<NicknameIndexRecord | null> {
   )
   if (res.status === 404 || res.status === 400) return null
   if (!res.ok) {
-    throw new Error(`닉네임 확인에 실패했어요. (HTTP ${res.status})`)
+    throw new ApiMessageError(
+      `Nickname index read failed (HTTP ${res.status})`,
+      'profile.nicknameCheckFailedStatus',
+      { status: res.status },
+    )
   }
   const data = (await res.json().catch(() => null)) as
     | Partial<NicknameIndexRecord>
@@ -122,7 +128,13 @@ async function listBucketFolders(): Promise<string[]> {
       body: JSON.stringify({ prefix: '', limit: LIST_PAGE_SIZE, offset }),
       timeoutMs: 15000,
     })
-    if (!res.ok) throw new Error(`프로필 목록 조회 실패 (HTTP ${res.status})`)
+    if (!res.ok) {
+      throw new ApiMessageError(
+        `Profile list request failed (HTTP ${res.status})`,
+        'profile.listFailed',
+        { status: res.status },
+      )
+    }
     const items = (await res.json().catch(() => null)) as
       | Array<{ name?: string; id?: string | null }>
       | null

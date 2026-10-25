@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "privacyDescription": "{brand} NYC 隐私政策：我们收集哪些信息、如何使用、保存和共享这些信息，以及匿名版块、Cookie、你的权利和联系方式。",
+    "termsDescription": "{brand} NYC 使用条款：社区规范、匿名版块、租房与室友、账号、责任限制及其他服务条款。"
+  },
+  "view": {
+    "reference": "参考译本",
+    "versionLine": "版本 {version} · 最后更新 {updated} · 生效日期 {effective}",
+    "translationIncomplete": "部分段落尚未翻译，因此仅显示英文原文。",
+    "tableOfContents": "目录",
+    "note": "注意：",
+    "back": "← 返回 {city}",
+    "privacyPolicy": "隐私政策",
+    "termsOfUse": "使用条款"
+  }
+}

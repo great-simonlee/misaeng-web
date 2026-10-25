@@ -1,4 +1,9 @@
 import { NextResponse } from 'next/server'
+import { finalizePost, localizePosts } from '@lib/translations/localize.server'
+
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { formatNumber } from '@lib/i18n/format'
+import { getRequestLocale, getRequestT, getT } from '@lib/i18n/server'
 
 import { resolveAuthenticatedUser } from '../agent-auth/lib/authHelpers'
 import { applyReviewBodyAccess } from '@lib/community/reviewAccess'
@@ -43,7 +48,6 @@ import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import {
   isIdentityVerified,
   SCHOOL_VERIFY_REQUIRED_CODE,
-  SCHOOL_VERIFY_REQUIRED_MESSAGE,
 } from '@lib/community/schoolGate'
 import {
   COMMUNITY_BODY_MAX,
@@ -79,24 +83,25 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
     const { searchParams } = new URL(request.url)
     const mine = searchParams.get('mine') === '1'
     const board = searchParams.get('board')?.trim() || undefined
     if (board && !isCommunityBoardId(board)) {
-      return NextResponse.json({ error: '잘못된 게시판입니다.' }, { status: 400 })
+      return NextResponse.json({ error: t('community.invalidBoard') }, { status: 400 })
     }
 
     if (mine) {
       if (!isCommunityStorageConfigured()) {
         return NextResponse.json(
-          { error: 'Supabase 설정이 필요해요.' },
+          { error: t('common.supabaseNotConfigured') },
           { status: 503 },
         )
       }
       const user = await resolveAuthenticatedUser()
       if (!user?.uid) {
-        return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+        return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
       }
       // 같은 이메일로 가입 없이 남긴 후기가 있으면 내 글로 연결 (크레딧 적립 포함)
       if (user.email) {
@@ -109,12 +114,14 @@ export async function GET(request: Request) {
           console.error('Guest post auto-claim error:', claimError)
         }
       }
-      const posts = await listStoredCommunityPostsByAuthor(user.uid)
+      const locale = await getRequestLocale(request)
+      const posts = localizePosts(await listStoredCommunityPostsByAuthor(user.uid), locale, {
+        hidePending: false,
+      })
       return NextResponse.json({
         posts: posts.map((item) =>
-          applyReviewBodyAccess(
-            sanitizeAnonymousCommunityPost(item, user.uid),
-            user,
+          finalizePost(
+            applyReviewBodyAccess(sanitizeAnonymousCommunityPost(item, user.uid), user),
           ),
         ),
       })
@@ -122,12 +129,12 @@ export async function GET(request: Request) {
 
     const user = await resolveAuthenticatedUser()
     const city = resolveCityId(searchParams.get('city'))
-    const posts = await listStoredCommunityPosts(board, city)
+    const locale = await getRequestLocale(request)
+    const posts = localizePosts(await listStoredCommunityPosts(board, city), locale)
     return NextResponse.json({
       posts: posts.map((item) =>
-        applyReviewBodyAccess(
-          sanitizeAnonymousCommunityPost(item, user?.uid),
-          user,
+        finalizePost(
+          applyReviewBodyAccess(sanitizeAnonymousCommunityPost(item, user?.uid), user),
         ),
       ),
     })
@@ -181,11 +188,12 @@ type CreateBody = {
 }
 
 export async function POST(request: Request) {
+  const locale = await getRequestLocale(request)
+  const t = await getT(locale, 'api')
   if (!isCommunityStorageConfigured()) {
     return NextResponse.json(
       {
-        error:
-          'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+        error: t('common.supabaseNotConfiguredDetail'),
       },
       { status: 503 },
     )
@@ -193,20 +201,20 @@ export async function POST(request: Request) {
 
   const user = await resolveAuthenticatedUser()
   if (!user?.uid || !user.email) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
 
   const profile = await getSupabaseProfile(user.uid)
   if (profile?.status === 'suspended') {
     return NextResponse.json(
-      { error: 'This account is suspended. / 이 계정은 이용 정지되었습니다.' },
+      { error: t('common.accountSuspended') },
       { status: 403 },
     )
   }
   if (!isIdentityVerified(profile)) {
     return NextResponse.json(
       {
-        error: SCHOOL_VERIFY_REQUIRED_MESSAGE,
+        error: t('common.identityVerificationRequired'),
         code: SCHOOL_VERIFY_REQUIRED_CODE,
       },
       { status: 403 },
@@ -216,7 +224,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as CreateBody | null
   const categoryId = String(body?.categoryId || '').trim()
   if (!isCommunityBoardId(categoryId)) {
-    return NextResponse.json({ error: '잘못된 게시판입니다.' }, { status: 400 })
+    return NextResponse.json({ error: t('community.invalidBoard') }, { status: 400 })
   }
 
   const title = String(body?.title || '').trim()
@@ -225,7 +233,7 @@ export async function POST(request: Request) {
   )
   if (!title || !contentHtml || contentHtml === '<p></p>') {
     return NextResponse.json(
-      { error: '제목과 본문을 입력해 주세요.' },
+      { error: t('community.write.titleBodyRequired') },
       { status: 400 },
     )
   }
@@ -233,7 +241,9 @@ export async function POST(request: Request) {
   if (plainLength > COMMUNITY_BODY_MAX) {
     return NextResponse.json(
       {
-        error: `본문은 ${COMMUNITY_BODY_MAX.toLocaleString('en-US')}자 이내로 작성해 주세요.`,
+        error: t('community.write.bodyTooLong', {
+          max: formatNumber(locale, COMMUNITY_BODY_MAX),
+        }),
       },
       { status: 400 },
     )
@@ -336,8 +346,7 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json(
         {
-          error:
-            '룸메이트·서블렛 글은 계정당 1개만 올릴 수 있어요. 기존 글을 수정하거나 삭제한 뒤 다시 올려 주세요.',
+          error: t('community.write.roommateOnePerAccount'),
           existingPostId: existing.id,
         },
         { status: 409 },
@@ -345,14 +354,16 @@ export async function POST(request: Request) {
     }
     if (!roommateLookingFor) {
       return NextResponse.json(
-        { error: '유형을 선택해 주세요.' },
+        { error: t('community.write.roommateTypeRequired') },
         { status: 400 },
       )
     }
     if (title.length > ROOMMATE_TITLE_MAX) {
       return NextResponse.json(
         {
-          error: `제목은 ${ROOMMATE_TITLE_MAX}자 이내로 작성해 주세요.`,
+          error: t('community.write.roommateTitleTooLong', {
+            max: formatNumber(locale, ROOMMATE_TITLE_MAX),
+          }),
         },
         { status: 400 },
       )
@@ -360,25 +371,25 @@ export async function POST(request: Request) {
     const formConfig = getRoommateFormConfig(roommateLookingFor)
     if (formConfig?.locationRequired && !String(body?.location || '').trim()) {
       return NextResponse.json(
-        { error: `${formConfig.locationLabel}을(를) 입력해 주세요.` },
+        { error: t(`community.roommate.required.${roommateLookingFor}.location`) },
         { status: 400 },
       )
     }
     if (formConfig?.budgetRequired && roommateBudgetMax == null) {
       return NextResponse.json(
-        { error: `${formConfig.budgetLabel}을(를) 입력해 주세요.` },
+        { error: t(`community.roommate.required.${roommateLookingFor}.budget`) },
         { status: 400 },
       )
     }
     if (formConfig?.moveInStartRequired && !roommateMoveInDate) {
       return NextResponse.json(
-        { error: `${formConfig.moveInStartLabel}을(를) 선택해 주세요.` },
+        { error: t(`community.roommate.required.${roommateLookingFor}.moveInStart`) },
         { status: 400 },
       )
     }
     if (formConfig?.moveInEndRequired && !roommateMoveOutDate) {
       return NextResponse.json(
-        { error: `${formConfig.moveInEndLabel}을(를) 선택해 주세요.` },
+        { error: t(`community.roommate.required.${roommateLookingFor}.moveInEnd`) },
         { status: 400 },
       )
     }
@@ -388,7 +399,7 @@ export async function POST(request: Request) {
       !roommateMoveOutDate
     ) {
       return NextResponse.json(
-        { error: '종료일은 시작일 이후로 선택해 주세요.' },
+        { error: t('community.write.endDateAfterStart') },
         { status: 400 },
       )
     }
@@ -397,37 +408,37 @@ export async function POST(request: Request) {
   if (isFood) {
     if (partySize == null) {
       return NextResponse.json(
-        { error: '방문 인원을 입력해 주세요.' },
+        { error: t('community.write.partySizeRequired') },
         { status: 400 },
       )
     }
     if (totalSpend == null) {
       return NextResponse.json(
-        { error: '총 금액을 입력해 주세요.' },
+        { error: t('community.write.totalSpendRequired') },
         { status: 400 },
       )
     }
     if (tipIncluded == null) {
       return NextResponse.json(
-        { error: '팁 포함 여부를 선택해 주세요.' },
+        { error: t('community.write.tipIncludedRequired') },
         { status: 400 },
       )
     }
     if (waitMinutes == null) {
       return NextResponse.json(
-        { error: '웨이팅 시간을 입력해 주세요. (없으면 0)' },
+        { error: t('community.write.waitMinutesRequired') },
         { status: 400 },
       )
     }
     if (!isFoodCategoryId(body?.foodCategory)) {
       return NextResponse.json(
-        { error: '카테고리를 선택해 주세요. (맛집·가성비·느좋·카공)' },
+        { error: t('community.write.foodCategoryRequired') },
         { status: 400 },
       )
     }
     if (latitude == null || longitude == null || !placeName) {
       return NextResponse.json(
-        { error: '주소와 음식점 이름을 확인해 주세요.' },
+        { error: t('community.write.placeRequired') },
         { status: 400 },
       )
     }
@@ -436,13 +447,13 @@ export async function POST(request: Request) {
   if (isCptOpt) {
     if (!cptOptType) {
       return NextResponse.json(
-        { error: 'CPT / OPT / STEM OPT / 비자 / 영주권 유형을 선택해 주세요.' },
+        { error: t('community.write.cptOptTypeRequired') },
         { status: 400 },
       )
     }
     if (cptOptTimeline.length === 0) {
       return NextResponse.json(
-        { error: '타임라인을 최소 1단계 이상 입력해 주세요.' },
+        { error: t('community.write.cptOptTimelineRequired') },
         { status: 400 },
       )
     }
@@ -451,24 +462,24 @@ export async function POST(request: Request) {
   if (isJobReview) {
     if (!jobReviewType) {
       return NextResponse.json(
-        { error: '인턴 / 신입 / 경력 / 계약 유형을 선택해 주세요.' },
+        { error: t('community.write.jobReviewTypeRequired') },
         { status: 400 },
       )
     }
     if (jobReviewTimeline.length === 0) {
       return NextResponse.json(
-        { error: '채용 단계를 최소 1건 이상 입력해 주세요.' },
+        { error: t('community.write.jobReviewTimelineRequired') },
         { status: 400 },
       )
     }
     if (!jobReviewSource) {
       return NextResponse.json(
-        { error: '어떻게 연락이 닿았는지 선택해 주세요. 학생회를 골랐다면 어느 학생회인지도 선택해 주세요.' },
+        { error: t('community.write.jobReviewSourceRequired') },
         { status: 400 },
       )
     }
     if (!jobReviewOutcome) {
-      return NextResponse.json({ error: '최종 결과를 선택해 주세요.' }, { status: 400 })
+      return NextResponse.json({ error: t('community.write.jobReviewOutcomeRequired') }, { status: 400 })
     }
   }
 
@@ -506,7 +517,7 @@ export async function POST(request: Request) {
     !city
   ) {
     return NextResponse.json(
-      { error: '도시를 확인해 주세요.' },
+      { error: t('community.write.cityRequired') },
       { status: 400 },
     )
   }
@@ -515,11 +526,13 @@ export async function POST(request: Request) {
     ? await resolveReviewCompanyId(body?.companyId)
     : ({ ok: true, companyId: null } as const)
   if (!companyResult.ok) {
-    return NextResponse.json({ error: companyResult.error }, { status: 400 })
+    return NextResponse.json({ error: t(companyResult.errorKey) }, { status: 400 })
   }
 
   const post: CommunityPost = {
     id,
+    // 작성 화면 언어 = 원문 언어 (번역이 다르면 ERP 번역 단계에서 바로잡는다)
+    sourceLocale: locale,
     categoryId,
     city,
     title,
@@ -606,10 +619,7 @@ export async function POST(request: Request) {
     console.error('Community create error:', error)
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : '게시글 저장에 실패했어요.',
+        error: apiErrorMessage(t, error, 'community.saveFailed'),
       },
       { status: 500 },
     )

@@ -7,13 +7,16 @@ import 'leaflet/dist/leaflet.css'
 
 import { useCity } from '@hooks/useCity'
 import { hrefForCommunityPost } from '@lib/constants/cities'
+import { useT } from '@lib/i18n/client'
 import {
   buildFoodMapPins,
   NYC_MAP_CENTER,
   NYC_MAP_DEFAULT_ZOOM,
   type FoodMapPin,
 } from '@lib/community/foodMap'
+import { useInView } from '@hooks/useInView'
 import { getLeafletTileConfig } from '@lib/community/leafletTiles'
+import { trackMapView } from '@lib/usage/client'
 import type { NycCommunityBoardId } from '@lib/constants/nyc'
 import { cn } from '@lib'
 import type { CommunityPost } from '@/types/nyc'
@@ -29,9 +32,12 @@ export function FoodPostsMap({
   posts,
   className,
 }: FoodPostsMapProps) {
+  const t = useT('food')
   const city = useCity()
   const pins = useMemo(() => buildFoodMapPins(posts), [posts])
   const containerRef = useRef<HTMLDivElement>(null)
+  // 화면에 보일 때만 지도를 만든다 (CARTO 타일 요청 절약)
+  const [setContainer, visible] = useInView(containerRef)
   const mapRef = useRef<LeafletMap | null>(null)
   const markersRef = useRef<Map<string, LeafletMarker>>(new Map())
   const selectedIdRef = useRef<string | null>(null)
@@ -46,7 +52,7 @@ export function FoodPostsMap({
   )
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return
+    if (!visible || !containerRef.current || mapRef.current) return
     let cancelled = false
     const markers = markersRef.current
 
@@ -72,6 +78,7 @@ export function FoodPostsMap({
       }).addTo(map)
 
       mapRef.current = map
+      trackMapView('food_posts')
       setReady(true)
       requestAnimationFrame(() => map.invalidateSize())
     })()
@@ -84,7 +91,7 @@ export function FoodPostsMap({
       mapRef.current = null
       setReady(false)
     }
-  }, [])
+  }, [visible])
 
   useEffect(() => {
     const map = mapRef.current
@@ -157,30 +164,30 @@ export function FoodPostsMap({
     if (!map || !ready) return
     const onResize = () => map.invalidateSize()
     window.addEventListener('resize', onResize)
-    const t = window.setTimeout(onResize, 80)
+    const timer = window.setTimeout(onResize, 80)
     return () => {
       window.removeEventListener('resize', onResize)
-      window.clearTimeout(t)
+      window.clearTimeout(timer)
     }
   }, [ready])
 
   return (
     <div className={cn('relative overflow-hidden', className)}>
       <div
-        ref={containerRef}
+        ref={setContainer}
         className='absolute inset-0 z-0 bg-[#e8eaee] [&_.leaflet-bottom]:mb-2 [&_.leaflet-control-attribution]:bg-white/80 [&_.leaflet-control-attribution]:text-[9px]'
         role='application'
-        aria-label='맛집 지도'
+        aria-label={t('map.postsMapLabel')}
       />
 
       {pins.length === 0 ? (
         <div className='pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-6'>
           <div className='rounded-2xl bg-white/95 px-5 py-4 text-center shadow-[0_8px_28px_rgba(15,23,42,0.12)] ring-1 ring-black/[0.06]'>
             <p className='text-[14px] font-semibold text-[var(--foreground)]'>
-              지도에 표시할 위치가 없어요
+              {t('map.emptyTitle')}
             </p>
             <p className='mt-1 text-[12px] text-[var(--muted)]'>
-              주소·위치가 저장된 맛집 후기만 핀으로 보여 줍니다
+              {t('map.emptyDescription')}
             </p>
           </div>
         </div>
@@ -192,7 +199,7 @@ export function FoodPostsMap({
             <div className='flex items-start justify-between gap-3 px-4 pt-3.5'>
               <div className='min-w-0'>
                 <p className='truncate text-[15px] font-semibold text-[var(--foreground)]'>
-                  {selected.name}
+                  {selected.name || t('map.unnamedPlace')}
                 </p>
                 {selected.address ? (
                   <p className='mt-0.5 line-clamp-1 text-[12px] text-[var(--muted)]'>
@@ -200,14 +207,14 @@ export function FoodPostsMap({
                   </p>
                 ) : null}
                 <p className='mt-1 text-[11px] font-medium tabular-nums text-[var(--brand)]'>
-                  후기 {selected.posts.length}개
+                  {t('map.reviewCount', { count: selected.posts.length })}
                 </p>
               </div>
               <button
                 type='button'
                 onClick={() => setSelectedId(null)}
                 className='inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f3f4f6] text-[var(--muted)] touch-manipulation hover:bg-[#e8eaee]'
-                aria-label='닫기'
+                aria-label={t('map.close')}
               >
                 ×
               </button>
@@ -234,7 +241,7 @@ export function FoodPostsMap({
                         {post.title}
                       </span>
                       <span className='mt-0.5 block truncate text-[11px] text-[var(--muted)]'>
-                        {post.description || '후기 보기'}
+                        {post.description || t('map.viewReview')}
                       </span>
                     </span>
                   </Link>
@@ -264,7 +271,7 @@ function makePinIcon(
 function pinMarkerHtml(pin: FoodMapPin, active: boolean) {
   const count = pin.posts.length
   const label = count > 1 ? String(count) : ''
-  const bg = active ? '#c2410c' : '#F64310'
+  const bg = active ? '#c2410c' : 'var(--brand)'
   const scale = active ? 'scale(1.1)' : 'scale(1)'
   return `
     <div style="transform:${scale};transform-origin:bottom center;transition:transform .15s ease">

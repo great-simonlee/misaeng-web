@@ -1,0 +1,153 @@
+{
+  "loading": "로딩 중이에요…",
+  "brandCity": "{brand} {city}",
+  "comingSoon": "곧 공개됩니다",
+  "cities": {
+    "nyc": {
+      "headline": "뉴욕에서 함께 살아가는 이야기",
+      "description": "유학생 · 직장인을 위한 New York City 정보 공유 공간이에요."
+    },
+    "boston": {
+      "headline": "보스턴에서 함께 살아가는 이야기",
+      "description": "유학생 · 직장인을 위한 Boston 정보 공유 공간이에요."
+    }
+  },
+  "magazine": {
+    "kicker": "NYC 매거진",
+    "title": "에디터가 고른 뉴욕 라이프",
+    "description": "게시판과 별개로, 맛집·이벤트·놀거리를 짧게 소개하는 콘텐츠예요.",
+    "items": {
+      "mag-1": {
+        "tag": "맛집",
+        "title": "플러싱에서 줄 서는 칼국수집",
+        "excerpt": "주말 브런치보다 든든한 한 끼, 현지 한인들이 가는 곳."
+      },
+      "mag-2": {
+        "tag": "이벤트",
+        "title": "이번 주 맨해튼 한인 네트워킹",
+        "excerpt": "유학생·주니어가 모이는 가벼운 저녁 모임 소식."
+      },
+      "mag-3": {
+        "tag": "놀거리",
+        "title": "비 오는 날 실내 코스",
+        "excerpt": "박물관부터 카페까지, 하루 코스로 묶어봤어요."
+      },
+      "mag-4": {
+        "tag": "동네",
+        "title": "아스토리아 한낮 산책",
+        "excerpt": "카페 골목부터 공원까지, 주말에 걷기 좋은 루트."
+      }
+    }
+  },
+  "professionals": {
+    "kicker": "전문가",
+    "title": "생활 파트너",
+    "description": "부동산, 변호사, 이사, 회계 — NYC에서 자주 찾는 전문가예요.",
+    "categoriesAria": "전문가 분야",
+    "categories": {
+      "real-estate": {
+        "title": "부동산",
+        "description": "임대·매매·브로커 상담"
+      },
+      "lawyer": {
+        "title": "변호사",
+        "description": "비자·이민·계약 법률"
+      },
+      "moving": {
+        "title": "이사업체",
+        "description": "NYC 이사·운반"
+      },
+      "accountant": {
+        "title": "회계사",
+        "description": "세금·세무·CPA"
+      }
+    },
+    "items": {
+      "re-1": {
+        "name": "예시 부동산",
+        "specialty": "맨해튼 · 브루클린 임대"
+      },
+      "re-2": {
+        "name": "예시 브로커",
+        "specialty": "학생·직장인 하우징"
+      },
+      "law-1": {
+        "name": "예시 법률사무소",
+        "specialty": "비자 · 이민법"
+      },
+      "law-2": {
+        "name": "예시 변호사",
+        "specialty": "임대차 · 계약"
+      },
+      "mv-1": {
+        "name": "예시 이사업체",
+        "specialty": "시내 · 근교 이사"
+      },
+      "mv-2": {
+        "name": "예시 무빙",
+        "specialty": "원룸 · 스튜디오"
+      },
+      "acc-1": {
+        "name": "예시 회계사무소",
+        "specialty": "개인 · 프리랜서 세금"
+      },
+      "acc-2": {
+        "name": "예시 CPA",
+        "specialty": "OPT · ITIN · 세금신고"
+      }
+    }
+  },
+  "introCarousel": {
+    "intro": {
+      "kicker": "{brand} NYC",
+      "headline": "뉴욕 유학생이라면 다 알아야 하는 곳",
+      "body": "각 학교 한인 유학생회와 손잡고 비자, 취업, 맛집, 이벤트 정보를 한곳에 모았습니다. 전문가 연결까지."
+    },
+    "status": {
+      "kicker": "비자 · 신분",
+      "headline": "이거 맞게 하고 있는 게 맞을까",
+      "body": "OPT, CPT, 비자, 영주권까지 먼저 겪어본 선배들이 남긴 스텝별 리얼 후기로 미리 준비해보세요."
+    },
+    "food": {
+      "kicker": "맛집",
+      "headline": "오늘 뭐 먹을지 고민할 필요 없이",
+      "body": "지역이 아닌 메뉴로 찾는 맛집 리스트로, 먹고 싶은 음식이 떠오르는 순간 바로 검색해서 찾아갈 수 있어요."
+    },
+    "housing": {
+      "kicker": "하우징 · 룸메이트",
+      "headline": "집 구하는 일, 더는 혼자 하지 않도록",
+      "body": "검증된 매물과 생활 패턴이 잘 맞는 룸메이트를 한 곳에서 비교하고 편하게 연결해보세요."
+    },
+    "anonymous": {
+      "kicker": "익명게시판",
+      "headline": "이름을 걸고 묻기엔 애매한 질문들",
+      "body": "비자든 인간관계든 이름을 걸고 묻기 애매한 질문도, 익명이라 더 솔직하게 나눌 수 있어요."
+    },
+    "credit": {
+      "kicker": "레퍼럴 크레딧",
+      "headline": "친구를 초대하고 후기를 남기면",
+      "body": "OPT, CPT, 비자 후기를 자세히 남기면 초대한 사람과 작성자 모두 크레딧을 함께 받습니다."
+    },
+    "expert": {
+      "kicker": "전문가 커넥트",
+      "headline": "모은 크레딧으로 전문가를 만나는 시간",
+      "body": "모은 크레딧으로 가고 싶은 분야의 현직 선배와 커피챗을, 전문가와는 직접 상담을 요청해보세요."
+    },
+    "cta": {
+      "kicker": "지금 시작하기",
+      "headline": "정보는 여기서, 답은 전문가에게",
+      "body": "{siteHost}/nyc 에서 유학생회 파트너 정보와 검증된 매물까지 지금 바로 확인해보세요."
+    }
+  },
+  "carouselTest": {
+    "kicker": "{brand} NYC · 캐러셀 시안",
+    "title": "소개 캐러셀",
+    "description": "사진 전체 배경 · 1080×1080 기준 · 좌우 스크롤. 슬라이드마다 주제별 분위기 오버레이를 다르게 적용했습니다.",
+    "photoNote": "배경은 Unsplash 뉴욕·라이프스타일 실사이며, 발행 전 고해상도 브랜드 사진으로 교체를 권장합니다.",
+    "backHome": "커뮤니티 홈으로"
+  },
+  "instagramDm": {
+    "body": "{message} {handle}로 DM 보내주세요.",
+    "button": "인스타그램 DM 보내기"
+  }
+}

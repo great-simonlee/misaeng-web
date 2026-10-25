@@ -1,0 +1,19 @@
+{
+  "agreeTerms": "我已阅读并同意{terms}。",
+  "agreePrivacy": "我已阅读并同意{privacy}。",
+  "agreeTermsAria": "使用条款复选框",
+  "agreePrivacyAria": "隐私政策复选框",
+  "termsLink": "使用条款",
+  "privacyLink": "隐私政策",
+  "arbitrationNotice": "本条款包含仲裁条款，你可以在 30 天内选择退出。详情请参阅{terms}。",
+  "languageNotice": "使用条款和隐私政策以英文版本为正式且具有约束力的版本。其他语言的译本仅供参考；如有不一致，以英文版本为准。",
+  "agreeError": "请同意使用条款和隐私政策后继续。",
+  "signUp": "注册",
+  "reconsentTitle": "条款已更新，需要你重新同意",
+  "reconsentBody": "我们的使用条款和隐私政策已变更。请同意后继续使用 {brand}。",
+  "reconsentConfirm": "同意并继续",
+  "reconsentVersions": "使用条款 {terms} · 隐私政策 {privacy}",
+  "optOutHint": "退出仲裁：请在同意后 30 天内发送电子邮件至 info@misaeng.com，邮件主题注明“Arbitration Opt-Out”。",
+  "saving": "保存中…",
+  "defaultSummary": "请查阅使用条款和隐私政策。本条款包含具有约束力的个人仲裁协议及放弃集体诉讼条款。"
+}

@@ -3,11 +3,12 @@
 import Link from 'next/link'
 
 import { useCityPath } from '@hooks/useCity'
-import { companyCopy } from '@lib/constants/companyCopy'
+import { useT } from '@lib/i18n/client'
 
 /** 면접·취업 게시판 소개 문구 아래 가로 배너 → 회사별 채용 페이지 */
 export function CompanyDirectoryBanner() {
   const href = useCityPath()
+  const t = useT('companies')
   return (
     <Link
       href={href('/companies')}
@@ -18,14 +19,14 @@ export function CompanyDirectoryBanner() {
       </span>
       <span className='min-w-0 flex-1'>
         <span className='block text-[14px] font-semibold tracking-tight text-[var(--foreground)] sm:text-[15px]'>
-          {companyCopy.bannerTitle}
+          {t('banner.title')}
         </span>
         <span className='mt-0.5 block truncate text-[12px] text-[var(--muted)] sm:text-[13px]'>
-          {companyCopy.bannerDescription}
+          {t('banner.description')}
         </span>
       </span>
       <span className='inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-[var(--brand)]'>
-        <span className='hidden sm:inline'>{companyCopy.bannerCta}</span>
+        <span className='hidden sm:inline'>{t('banner.cta')}</span>
         <ArrowIcon className='size-4 transition group-hover:translate-x-0.5' />
       </span>
     </Link>

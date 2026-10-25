@@ -1,3 +1,4 @@
+import { pickTranslationFields } from '@lib/translations/content'
 import type {
   HousingListing,
   HousingPartWall,
@@ -288,5 +289,6 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
     createdAt: asNumber(data.createdAt, Date.now()),
     updatedAt: asNumber(data.updatedAt, Date.now()),
     status,
+    ...pickTranslationFields(data),
   }
 }

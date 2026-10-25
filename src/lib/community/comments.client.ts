@@ -1,5 +1,9 @@
 import type { CommunityComment } from '@/types/nyc'
 import {
+  CommunityClientError,
+  throwCommunityRequestError,
+} from '@lib/community/client'
+import {
   buildCommentThreads,
   countOpenComments,
   listMockCommunityComments,
@@ -58,9 +62,9 @@ export async function createCommunityCommentRequest(input: {
   authorSchoolId?: string | null
 }): Promise<CommunityComment> {
   const body = input.body.trim()
-  if (!body) throw new Error('댓글을 입력해 주세요.')
+  if (!body) throw new CommunityClientError('errors.commentRequired')
   if (!input.authorUid || !input.authorEmail) {
-    throw new Error('로그인이 필요해요.')
+    throw new CommunityClientError('errors.loginRequired')
   }
 
   try {
@@ -88,20 +92,18 @@ export async function createCommunityCommentRequest(input: {
     }
 
     if (res.status === 401) {
-      throw new Error(data?.error || '로그인이 필요해요.')
+      throwCommunityRequestError(data?.error, 'errors.loginRequired')
     }
 
     if (res.status === 403) {
-      throw new Error(
-        data?.error || '글과 댓글을 작성하려면 학교 이메일 인증이 필요해요.',
-      )
+      throwCommunityRequestError(data?.error, 'errors.commentVerifyRequired')
     }
 
     if (res.status === 503 || input.postId.startsWith('mock-')) {
       return createLocalComment(input, body)
     }
 
-    throw new Error(data?.error || '댓글 등록에 실패했어요')
+    throwCommunityRequestError(data?.error, 'errors.commentCreateFailed')
   } catch (error) {
     if (input.postId.startsWith('mock-') || error instanceof TypeError) {
       return createLocalComment(input, body)
@@ -135,7 +137,7 @@ function createLocalComment(
     const parent = all.find(
       (item) => item.id === parentId && item.status === 'open',
     )
-    if (!parent) throw new Error('대댓글 대상 댓글을 찾을 수 없어요.')
+    if (!parent) throw new CommunityClientError('errors.replyParentNotFound')
     if (parent.parentId) parentId = parent.parentId
   }
 
@@ -165,9 +167,9 @@ export async function updateCommunityCommentRequest(input: {
   authorUid: string
 }): Promise<CommunityComment> {
   const body = input.body.trim()
-  if (!body) throw new Error('댓글을 입력해 주세요.')
-  if (!input.authorUid) throw new Error('로그인이 필요해요.')
-  if (!input.commentId) throw new Error('수정할 댓글을 지정해 주세요.')
+  if (!body) throw new CommunityClientError('errors.commentRequired')
+  if (!input.authorUid) throw new CommunityClientError('errors.loginRequired')
+  if (!input.commentId) throw new CommunityClientError('errors.commentEditTargetMissing')
 
   try {
     const res = await fetch(
@@ -191,20 +193,20 @@ export async function updateCommunityCommentRequest(input: {
     }
 
     if (res.status === 401) {
-      throw new Error(data?.error || '로그인이 필요해요.')
+      throwCommunityRequestError(data?.error, 'errors.loginRequired')
     }
     if (res.status === 403) {
-      throw new Error(data?.error || '본인이 작성한 댓글만 수정할 수 있어요.')
+      throwCommunityRequestError(data?.error, 'errors.commentEditForbidden')
     }
     if (res.status === 404) {
-      throw new Error(data?.error || '댓글을 찾을 수 없어요.')
+      throwCommunityRequestError(data?.error, 'errors.commentNotFound')
     }
 
     if (res.status === 503 || input.postId.startsWith('mock-')) {
       return updateLocalComment(input, body)
     }
 
-    throw new Error(data?.error || '댓글 수정에 실패했어요')
+    throwCommunityRequestError(data?.error, 'errors.commentUpdateFailed')
   } catch (error) {
     if (input.postId.startsWith('mock-') || error instanceof TypeError) {
       return updateLocalComment(input, body)
@@ -227,9 +229,9 @@ function updateLocalComment(
   const target = all.find(
     (item) => item.id === input.commentId && item.status === 'open',
   )
-  if (!target) throw new Error('댓글을 찾을 수 없어요.')
+  if (!target) throw new CommunityClientError('errors.commentNotFound')
   if (target.authorUid !== input.authorUid) {
-    throw new Error('본인이 작성한 댓글만 수정할 수 있어요.')
+    throw new CommunityClientError('errors.commentEditForbidden')
   }
   const updated: CommunityComment = {
     ...target,
@@ -244,8 +246,8 @@ export async function deleteCommunityCommentRequest(input: {
   commentId: string
   authorUid: string
 }): Promise<void> {
-  if (!input.authorUid) throw new Error('로그인이 필요해요.')
-  if (!input.commentId) throw new Error('삭제할 댓글을 지정해 주세요.')
+  if (!input.authorUid) throw new CommunityClientError('errors.loginRequired')
+  if (!input.commentId) throw new CommunityClientError('errors.commentDeleteTargetMissing')
 
   try {
     const res = await fetch(
@@ -262,13 +264,13 @@ export async function deleteCommunityCommentRequest(input: {
     }
 
     if (res.status === 401) {
-      throw new Error(data?.error || '로그인이 필요해요.')
+      throwCommunityRequestError(data?.error, 'errors.loginRequired')
     }
     if (res.status === 403) {
-      throw new Error(data?.error || '본인이 작성한 댓글만 삭제할 수 있어요.')
+      throwCommunityRequestError(data?.error, 'errors.commentDeleteForbidden')
     }
     if (res.status === 404) {
-      throw new Error(data?.error || '댓글을 찾을 수 없어요.')
+      throwCommunityRequestError(data?.error, 'errors.commentNotFound')
     }
 
     if (res.status === 503 || input.postId.startsWith('mock-')) {
@@ -276,7 +278,7 @@ export async function deleteCommunityCommentRequest(input: {
       return
     }
 
-    throw new Error(data?.error || '댓글 삭제에 실패했어요')
+    throwCommunityRequestError(data?.error, 'errors.commentDeleteFailed')
   } catch (error) {
     if (input.postId.startsWith('mock-') || error instanceof TypeError) {
       deleteLocalComment(input)
@@ -297,9 +299,9 @@ function deleteLocalComment(input: {
   const target = all.find(
     (item) => item.id === input.commentId && item.status === 'open',
   )
-  if (!target) throw new Error('댓글을 찾을 수 없어요.')
+  if (!target) throw new CommunityClientError('errors.commentNotFound')
   if (target.authorUid !== input.authorUid) {
-    throw new Error('본인이 작성한 댓글만 삭제할 수 있어요.')
+    throw new CommunityClientError('errors.commentDeleteForbidden')
   }
   markLocalCommunityCommentDeleted(input.postId, input.commentId)
 }

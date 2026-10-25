@@ -4,33 +4,42 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { useCityInfo, useCityPath } from '@hooks/useCity'
+import { BRAND_CONFIG, brandConfig } from '@lib/brand'
+import { useT } from '@lib/i18n/client'
 
+/** 문구: nav.footer.links.<key> */
 const COMMUNITY_LINK_PATHS = [
-  { path: '/housing', label: '하우징' },
-  { path: '/credit', label: '크레딧' },
-  { path: '/partners', label: '파트너' },
+  { path: '/housing', key: 'housing' },
+  { path: '/credit', key: 'credit' },
+  { path: '/partners', key: 'partners' },
 ] as const
 
+/** 회사 페이지. 회사 사이트가 없는 브랜드(ellieo)는 misaeng.com으로 보낸다. */
 const COMPANY_LINKS = [
-  { href: '/', label: '회사 사이트' },
-  { href: '/about', label: '회사 소개' },
-  { href: '/our-service', label: '서비스' },
-  { href: '/careers', label: '채용' },
+  { corporatePath: '/', key: 'companySite' },
+  { corporatePath: '/about', key: 'about' },
+  { corporatePath: '/our-service', key: 'service' },
+  { corporatePath: '/careers', key: 'careers' },
 ] as const
 
 const SUPPORT_LINK_PATHS = [
-  { href: '/contact', label: '문의하기' },
-  { path: '/me', label: '마이페이지' },
-  { path: '/terms-of-use', label: '이용약관' },
-  { path: '/privacy-policy', label: '개인정보처리방침' },
+  { corporatePath: '/contact', key: 'contact' },
+  { path: '/me', key: 'me' },
+  { path: '/terms-of-use', key: 'terms' },
+  { path: '/privacy-policy', key: 'privacy' },
   {
     href: 'mailto:info@misaeng.com?subject=%5BMisaeng%5D%20%EA%B4%91%EA%B3%A0%C2%B7%EC%A0%9C%ED%9C%B4',
-    label: '광고·제휴',
+    key: 'ads',
     external: true,
   },
 ] as const
 
-const SOCIAL_LINKS = [
+function corporateHref(path: string): string {
+  if (BRAND_CONFIG.hasCorporateSite) return path
+  return `${brandConfig('misaeng').siteUrl}${path === '/' ? '' : path}`
+}
+
+export const SOCIAL_LINKS = [
   { href: 'https://www.instagram.com/', label: 'Instagram', icon: InstagramIcon },
   { href: 'https://www.youtube.com/', label: 'YouTube', icon: YoutubeIcon },
   { href: 'https://www.facebook.com/', label: 'Facebook', icon: FacebookIcon },
@@ -39,21 +48,35 @@ const SOCIAL_LINKS = [
 export function NycFooter() {
   const cityInfo = useCityInfo()
   const href = useCityPath()
+  const t = useT('nav')
+  const brandCity = t('brandCity', {
+    brand: BRAND_CONFIG.name,
+    city: cityInfo.shortLabel,
+  })
   const communityLinks = COMMUNITY_LINK_PATHS.map((item) => ({
     href: href(item.path),
-    label: item.label,
+    label: t(`footer.links.${item.key}`),
+  }))
+  const companyLinks = COMPANY_LINKS.map((item) => ({
+    href: corporateHref(item.corporatePath),
+    label: t(`footer.links.${item.key}`),
   }))
   const supportLinks = SUPPORT_LINK_PATHS.map((item) => ({
-    href: 'href' in item && item.href ? item.href : href(item.path!),
-    label: item.label,
+    href:
+      'href' in item
+        ? item.href
+        : 'corporatePath' in item
+          ? corporateHref(item.corporatePath)
+          : href(item.path),
+    label: t(`footer.links.${item.key}`),
     external: 'external' in item ? item.external : undefined,
   }))
 
   return (
     <footer className='relative overflow-hidden bg-[#0b1220] text-white'>
       <div className='pointer-events-none absolute inset-0' aria-hidden>
-        <div className='absolute -left-16 top-0 h-40 w-40 rounded-full bg-[#F64310]/15 blur-3xl' />
-        <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F64310]/70 to-transparent' />
+        <div className='absolute -left-16 top-0 h-40 w-40 rounded-full bg-brand/15 blur-3xl' />
+        <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/70 to-transparent' />
       </div>
 
       <div className='relative mx-auto w-full max-w-7xl px-4 py-7 sm:px-6 sm:py-8 lg:px-8 lg:py-9'>
@@ -62,11 +85,11 @@ export function NycFooter() {
             <Link
               href={href()}
               className='inline-flex items-center gap-2 touch-manipulation'
-              aria-label={cityInfo.brand}
+              aria-label={brandCity}
             >
               <span className='inline-flex size-7 items-center justify-center overflow-hidden rounded-lg bg-white/95'>
                 <Image
-                  src='/img/logo_square.png'
+                  src={BRAND_CONFIG.assets.square}
                   alt=''
                   width={28}
                   height={28}
@@ -74,34 +97,43 @@ export function NycFooter() {
                 />
               </span>
               <span className='text-[15px] font-semibold tracking-tight text-white'>
-                Misaeng {cityInfo.shortLabel}
+                {brandCity}
               </span>
             </Link>
             <p className='mt-2 max-w-sm text-[13px] leading-snug text-white/45'>
-              유학생·직장인을 위한 {cityInfo.shortLabel} 커뮤니티
+              {t('footer.tagline', { city: cityInfo.shortLabel })}
             </p>
           </div>
 
           <div className='flex flex-wrap gap-2'>
             <a
               href='mailto:info@misaeng.com'
-              className='inline-flex h-9 items-center justify-center rounded-xl bg-[#F64310] px-3.5 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[#d93a0e]'
+              className='inline-flex h-9 items-center justify-center rounded-xl bg-brand px-3.5 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-brand-hover'
             >
               info@misaeng.com
             </a>
             <Link
-              href='/contact'
+              href={corporateHref('/contact')}
               className='inline-flex h-9 items-center justify-center rounded-xl border border-white/15 bg-white/[0.04] px-3.5 text-[13px] font-semibold text-white/85 touch-manipulation transition hover:border-white/30 hover:bg-white/[0.08]'
             >
-              문의하기
+              {t('footer.links.contact')}
             </Link>
           </div>
         </div>
 
         <div className='mt-6 grid grid-cols-3 gap-4 border-t border-white/10 pt-5 sm:mt-7 sm:gap-8 sm:pt-6'>
-          <FooterLinkGroup title='커뮤니티' links={communityLinks} />
-          <FooterLinkGroup title='회사' links={COMPANY_LINKS} />
-          <FooterLinkGroup title='지원' links={supportLinks} />
+          <FooterLinkGroup
+            title={t('footer.groups.community')}
+            links={communityLinks}
+          />
+          <FooterLinkGroup
+            title={t('footer.groups.company')}
+            links={companyLinks}
+          />
+          <FooterLinkGroup
+            title={t('footer.groups.support')}
+            links={supportLinks}
+          />
         </div>
 
         <div className='mt-5 flex flex-col gap-3 border-t border-white/10 pt-4 sm:mt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pt-5'>
@@ -138,7 +170,7 @@ export function NycFooter() {
                 target='_blank'
                 rel='noopener noreferrer'
                 aria-label={item.label}
-                className='inline-flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-white/65 touch-manipulation transition hover:border-[#F64310]/45 hover:bg-[#F64310]/15 hover:text-white'
+                className='inline-flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-white/65 touch-manipulation transition hover:border-brand/45 hover:bg-brand/15 hover:text-white'
               >
                 <item.icon className='size-3.5' />
               </a>
@@ -150,7 +182,7 @@ export function NycFooter() {
   )
 }
 
-function FooterLinkGroup({
+export function FooterLinkGroup({
   title,
   links,
 }: {

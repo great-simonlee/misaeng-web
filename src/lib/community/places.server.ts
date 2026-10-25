@@ -1,4 +1,21 @@
 import type { PlaceSearchResult } from '@/types/nyc'
+import { ApiMessageError } from '@lib/i18n/apiError'
+import { USAGE_METRICS } from '@lib/usage/metrics'
+import { recordUsage } from '@lib/usage/server'
+
+import { queryCacheKey, readPlaceCache, writePlaceCache } from './placeCache.server'
+
+/** 장소 좌표·이름은 거의 바뀌지 않는다 */
+const DETAILS_CACHE_MS = 30 * 24 * 60 * 60 * 1000
+/** 검색 결과는 일주일 */
+const SEARCH_CACHE_MS = 7 * 24 * 60 * 60 * 1000
+
+/**
+ * 검색 옵션 (비용 절감)
+ * - sessionToken: 자동완성 세션 — 입력 중 자동완성 + 마지막 상세 조회를 한 세션으로 과금
+ * - settled: 입력을 멈췄을 때만 true. 비싼 Text Search·Geocoding은 이때만 부른다 (타이핑 중엔 자동완성만)
+ */
+export type PlaceSearchOptions = { sessionToken?: string | null; settled?: boolean }
 
 const NYC_BIAS = {
   lat: 40.758,
@@ -20,13 +37,16 @@ export function isGoogleMapsConfigured() {
 }
 
 /** 식당·주소 자동완성 (Text Search + Autocomplete 병합) */
-export async function searchPlaces(query: string): Promise<PlaceSearchResult[]> {
+export async function searchPlaces(
+  query: string,
+  options: PlaceSearchOptions = {},
+): Promise<PlaceSearchResult[]> {
   const q = query.trim()
   if (q.length < 2) return []
 
   const key = getGoogleMapsApiKey()
   if (key) {
-    return searchGooglePlaces(q, key)
+    return searchGooglePlaces(q, key, options)
   }
   return searchNominatim(q)
 }
@@ -34,26 +54,33 @@ export async function searchPlaces(query: string): Promise<PlaceSearchResult[]> 
 /** 주소만 검색 — 정확한 주소 + 위경도용 */
 export async function searchAddresses(
   query: string,
+  options: PlaceSearchOptions = {},
 ): Promise<PlaceSearchResult[]> {
   const q = query.trim()
   if (q.length < 2) return []
 
   const key = getGoogleMapsApiKey()
   if (key) {
-    return searchGoogleAddresses(q, key)
+    return searchGoogleAddresses(q, key, options)
   }
   return searchNominatim(q)
 }
 
 export async function getPlaceDetails(
   placeId: string,
+  options: Pick<PlaceSearchOptions, 'sessionToken'> = {},
 ): Promise<PlaceSearchResult | null> {
   const id = placeId.trim()
   if (!id) return null
 
   const key = getGoogleMapsApiKey()
   if (key && !id.startsWith('osm:')) {
-    return detailsGooglePlace(id, key)
+    const cacheKey = `details:${id}`
+    const cached = await readPlaceCache<PlaceSearchResult>(cacheKey, DETAILS_CACHE_MS)
+    if (cached) return cached
+    const found = await detailsGooglePlace(id, key, options.sessionToken ?? null)
+    if (found) writePlaceCache(cacheKey, found)
+    return found
   }
   if (id.startsWith('osm:')) {
     return detailsNominatim(id.slice(4))
@@ -77,12 +104,17 @@ function withNycContext(query: string) {
 async function searchGooglePlaces(
   query: string,
   key: string,
+  { sessionToken = null, settled = true }: PlaceSearchOptions,
 ): Promise<PlaceSearchResult[]> {
   const contextualQuery = withNycContext(query)
 
   const [textResults, autocompleteResults] = await Promise.all([
-    searchGoogleText(contextualQuery, key).catch(() => [] as PlaceSearchResult[]),
-    searchGoogleAutocomplete(query, key, null).catch(
+    settled
+      ? cachedSearch('text', contextualQuery, () => searchGoogleText(contextualQuery, key)).catch(
+          () => [] as PlaceSearchResult[],
+        )
+      : Promise.resolve([] as PlaceSearchResult[]),
+    searchGoogleAutocomplete(query, key, null, sessionToken).catch(
       () => [] as PlaceSearchResult[],
     ),
   ])
@@ -95,16 +127,19 @@ async function searchGooglePlaces(
 async function searchGoogleAddresses(
   query: string,
   key: string,
+  { sessionToken = null, settled = true }: PlaceSearchOptions,
 ): Promise<PlaceSearchResult[]> {
   const contextualQuery = withNycContext(query)
 
   const [autocompleteResults, geocodeResults] = await Promise.all([
-    searchGoogleAutocomplete(query, key, 'address').catch(
+    searchGoogleAutocomplete(query, key, 'address', sessionToken).catch(
       () => [] as PlaceSearchResult[],
     ),
-    searchGoogleGeocode(contextualQuery, key).catch(
-      () => [] as PlaceSearchResult[],
-    ),
+    settled
+      ? cachedSearch('geocode', contextualQuery, () => searchGoogleGeocode(contextualQuery, key)).catch(
+          () => [] as PlaceSearchResult[],
+        )
+      : Promise.resolve([] as PlaceSearchResult[]),
   ])
 
   // Geocode 결과를 우선 (주소 + 좌표가 바로 있음)
@@ -118,6 +153,7 @@ async function searchGoogleGeocode(
   const url = new URL('https://maps.googleapis.com/maps/api/geocode/json')
   url.searchParams.set('address', query)
   url.searchParams.set('key', key)
+  recordUsage(USAGE_METRICS.geocode)
   url.searchParams.set('language', 'ko')
   url.searchParams.set('region', 'us')
   url.searchParams.set(
@@ -126,7 +162,7 @@ async function searchGoogleGeocode(
   )
 
   const res = await fetch(url.toString(), { cache: 'no-store' })
-  if (!res.ok) throw new Error('주소 검색에 실패했어요')
+  if (!res.ok) throw new Error('Address search failed')
   const data = (await res.json()) as {
     status?: string
     error_message?: string
@@ -142,7 +178,7 @@ async function searchGoogleGeocode(
     }>
   }
   if (data.status && data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-    throw new Error(data.error_message || `Geocoding 오류: ${data.status}`)
+    throw new Error(data.error_message || `Geocoding error: ${data.status}`)
   }
 
   return (data.results || [])
@@ -161,7 +197,7 @@ async function searchGoogleGeocode(
       const name =
         [number, street].filter(Boolean).join(' ').trim() ||
         address.split(',')[0]?.trim() ||
-        '주소'
+        ''
       return {
         placeId,
         name,
@@ -171,6 +207,20 @@ async function searchGoogleGeocode(
       } satisfies PlaceSearchResult
     })
     .filter((item): item is PlaceSearchResult => Boolean(item))
+}
+
+/** 같은 검색어의 Text Search·Geocoding 결과는 캐시에서 */
+async function cachedSearch(
+  kind: 'text' | 'geocode',
+  query: string,
+  run: () => Promise<PlaceSearchResult[]>,
+): Promise<PlaceSearchResult[]> {
+  const cacheKey = queryCacheKey(kind, query)
+  const cached = await readPlaceCache<PlaceSearchResult[]>(cacheKey, SEARCH_CACHE_MS)
+  if (cached) return cached
+  const results = await run()
+  writePlaceCache(cacheKey, results)
+  return results
 }
 
 function mergePlaceResults(
@@ -198,13 +248,14 @@ async function searchGoogleText(
   )
   url.searchParams.set('query', query)
   url.searchParams.set('key', key)
+  recordUsage(USAGE_METRICS.placesTextSearch)
   url.searchParams.set('language', 'ko')
   url.searchParams.set('region', 'us')
   url.searchParams.set('location', `${NYC_BIAS.lat},${NYC_BIAS.lng}`)
   url.searchParams.set('radius', String(NYC_BIAS.radiusMeters))
 
   const res = await fetch(url.toString(), { cache: 'no-store' })
-  if (!res.ok) throw new Error('장소 검색에 실패했어요')
+  if (!res.ok) throw new ApiMessageError('Place search failed', 'places.searchFailed')
   const data = (await res.json()) as {
     status?: string
     error_message?: string
@@ -216,7 +267,7 @@ async function searchGoogleText(
     }>
   }
   if (data.status && data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-    throw new Error(data.error_message || `Places 오류: ${data.status}`)
+    throw new Error(data.error_message || `Places error: ${data.status}`)
   }
 
   return (data.results || [])
@@ -227,7 +278,7 @@ async function searchGoogleText(
       const lng = Number(item.geometry?.location?.lng)
       return {
         placeId,
-        name: String(item.name || '').trim() || '장소',
+        name: String(item.name || '').trim(),
         address: String(item.formatted_address || '').trim(),
         latitude: Number.isFinite(lat) ? lat : null,
         longitude: Number.isFinite(lng) ? lng : null,
@@ -241,6 +292,7 @@ async function searchGoogleAutocomplete(
   query: string,
   key: string,
   types: 'address' | null,
+  sessionToken: string | null = null,
 ): Promise<PlaceSearchResult[]> {
   const url = new URL(
     'https://maps.googleapis.com/maps/api/place/autocomplete/json',
@@ -254,9 +306,11 @@ async function searchGoogleAutocomplete(
   if (types) {
     url.searchParams.set('types', types)
   }
+  if (sessionToken) url.searchParams.set('sessiontoken', sessionToken)
+  recordUsage(USAGE_METRICS.placesAutocomplete)
 
   const res = await fetch(url.toString(), { cache: 'no-store' })
-  if (!res.ok) throw new Error('장소 검색에 실패했어요')
+  if (!res.ok) throw new ApiMessageError('Place search failed', 'places.searchFailed')
   const data = (await res.json()) as {
     status?: string
     error_message?: string
@@ -270,7 +324,7 @@ async function searchGoogleAutocomplete(
     }>
   }
   if (data.status && data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-    throw new Error(data.error_message || `Places 오류: ${data.status}`)
+    throw new Error(data.error_message || `Places error: ${data.status}`)
   }
   return (data.predictions || []).map((item) => ({
     placeId: item.place_id,
@@ -285,6 +339,7 @@ async function searchGoogleAutocomplete(
 async function detailsGooglePlace(
   placeId: string,
   key: string,
+  sessionToken: string | null = null,
 ): Promise<PlaceSearchResult | null> {
   const url = new URL(
     'https://maps.googleapis.com/maps/api/place/details/json',
@@ -293,9 +348,12 @@ async function detailsGooglePlace(
   url.searchParams.set('key', key)
   url.searchParams.set('language', 'ko')
   url.searchParams.set('fields', 'place_id,name,formatted_address,geometry')
+  // 자동완성 세션을 끝내는 상세 조회 — 세션 안의 자동완성 요청이 한 번으로 과금된다
+  if (sessionToken) url.searchParams.set('sessiontoken', sessionToken)
+  recordUsage(USAGE_METRICS.placesDetails)
 
   const res = await fetch(url.toString(), { cache: 'no-store' })
-  if (!res.ok) throw new Error('장소 정보를 불러오지 못했어요')
+  if (!res.ok) throw new ApiMessageError('Place details request failed', 'places.detailsFailed')
   const data = (await res.json()) as {
     status?: string
     error_message?: string
@@ -307,7 +365,7 @@ async function detailsGooglePlace(
     }
   }
   if (data.status && data.status !== 'OK') {
-    throw new Error(data.error_message || `Places 오류: ${data.status}`)
+    throw new Error(data.error_message || `Places error: ${data.status}`)
   }
   const result = data.result
   if (!result) return null
@@ -361,7 +419,7 @@ async function fetchNominatim(
       'User-Agent': 'misaeng-nyc-community/1.0',
     },
   })
-  if (!res.ok) throw new Error('장소 검색에 실패했어요')
+  if (!res.ok) throw new ApiMessageError('Place search failed', 'places.searchFailed')
   const data = (await res.json()) as Array<{
     place_id?: number | string
     display_name?: string
@@ -378,7 +436,7 @@ async function fetchNominatim(
       String(item.display_name || '')
         .split(',')[0]
         ?.trim() ||
-      '장소'
+      ''
     return {
       placeId: `osm:${item.place_id}`,
       name,
@@ -422,7 +480,7 @@ async function detailsNominatim(
       String(item.display_name || '')
         .split(',')[0]
         ?.trim() ||
-      '장소',
+      '',
     address: String(item.display_name || ''),
     latitude: lat,
     longitude: lng,
@@ -442,6 +500,7 @@ export function buildStaticMapUrl(
 ) {
   const key = getGoogleMapsApiKey()
   if (key) {
+    recordUsage(USAGE_METRICS.staticMap)
     const url = new URL('https://maps.googleapis.com/maps/api/staticmap')
     url.searchParams.set('center', `${lat},${lng}`)
     url.searchParams.set('zoom', '16')

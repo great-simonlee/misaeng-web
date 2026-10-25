@@ -79,7 +79,8 @@ async function getJson<T>(url: string): Promise<T> {
   const res = await fetch(url, { cache: 'no-store' })
   const data = (await res.json().catch(() => ({}))) as T & { error?: string }
   if (!res.ok) {
-    const error = new Error(data.error || '요청에 실패했어요.') as Error & { status?: number }
+    // 서버 메시지가 없으면 빈 메시지 — 화면이 현재 언어의 기본 문구(companies.common.requestFailed)를 보여 준다
+    const error = new Error(data.error || '') as Error & { status?: number }
     error.status = res.status
     throw error
   }

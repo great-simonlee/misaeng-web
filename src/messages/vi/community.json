@@ -1,0 +1,485 @@
+{
+  "categories": {
+    "housing": {
+      "title": "Nhà ở",
+      "description": "Tin đăng nhà ở tại {city} do đội ngũ Misaeng đăng"
+    },
+    "events": {
+      "title": "Sự kiện",
+      "description": "Gặp gỡ, biểu diễn và sự kiện"
+    },
+    "food": {
+      "title": "Ăn uống",
+      "description": "Gợi ý nhà hàng và quán cà phê"
+    },
+    "marketplace": {
+      "title": "Mua bán",
+      "description": "Mua bán đồ dùng hằng ngày"
+    },
+    "status": {
+      "title": "OPT · Visa · Thẻ xanh",
+      "description": "Chuyện về visa, CPT/OPT và thẻ xanh"
+    },
+    "job-review": {
+      "title": "Phỏng vấn · Việc làm",
+      "description": "Chuyện phỏng vấn, tìm việc và nơi làm việc"
+    },
+    "roommate": {
+      "title": "Bạn cùng phòng · Sublet",
+      "description": "Tìm roommate, phòng và sublet"
+    },
+    "anonymous": {
+      "title": "Bảng tin ẩn danh",
+      "description": "Thoải mái trò chuyện mà không cần ghi tên"
+    },
+    "comingSoon": "Sắp ra mắt"
+  },
+  "boards": {
+    "events": {
+      "writeLabel": "Đăng sự kiện",
+      "listIntro": "Chia sẻ các buổi gặp gỡ, biểu diễn và sự kiện đang diễn ra ở {city}.",
+      "locationLabel": "Địa điểm",
+      "locationPlaceholder": "Manhattan / Online",
+      "detailLabel": "Ngày & giờ",
+      "titlePlaceholder": "Đêm networking cộng đồng Hàn Quốc",
+      "descriptionPlaceholder": "Thời gian, cách tham gia, giới thiệu ngắn"
+    },
+    "food": {
+      "writeLabel": "Gợi ý quán",
+      "listIntro": "Chia sẻ nhà hàng và quán cà phê bạn đã thử. Thêm ảnh và review theo cách bạn thích.",
+      "locationLabel": "Khu vực",
+      "locationPlaceholder": "Flushing / Koreatown",
+      "detailLabel": "Loại món",
+      "titlePlaceholder": "Tên nhà hàng",
+      "descriptionPlaceholder": "Menu, mức giá, thời gian chờ, điều bạn thích…"
+    },
+    "marketplace": {
+      "writeLabel": "Đăng bán đồ",
+      "listIntro": "Đồ bạn không cần, đồ bạn đang cần — trao đổi với hàng xóm nhé.",
+      "locationLabel": "Khu vực",
+      "locationPlaceholder": "Brooklyn / có thể gặp trực tiếp",
+      "detailLabel": "Giá mong muốn ($)",
+      "detailPlaceholder": "0",
+      "titlePlaceholder": "Kệ sách IKEA, cho tặng hoặc bán",
+      "descriptionPlaceholder": "Mô tả tình trạng, cách nhận hàng và cách bạn muốn giao dịch."
+    },
+    "status": {
+      "writeLabel": "Chia sẻ câu chuyện",
+      "listIntro": "Chia sẻ bạn đã chuẩn bị và nộp gì vào từng ngày, nhận kết quả ra sao và bước tiếp theo là gì.",
+      "locationLabel": "Trường / công ty / cơ quan (không bắt buộc)",
+      "locationPlaceholder": "VD: Công ty IT & phần mềm Hàn Quốc",
+      "detailLabel": "Loại",
+      "titlePlaceholder": "Timeline OPT của mình ở công ty tài chính",
+      "descriptionPlaceholder": "Chia sẻ những điều cần lưu ý để người sau không mắc lỗi tương tự."
+    },
+    "cpt-opt": {
+      "writeLabel": "Chia sẻ câu chuyện",
+      "listIntro": "Chia sẻ bạn đã chuẩn bị và nộp gì vào từng ngày, nhận kết quả ra sao và bước tiếp theo là gì.",
+      "locationLabel": "Trường / công ty / cơ quan (không bắt buộc)",
+      "locationPlaceholder": "VD: Công ty IT & phần mềm Hàn Quốc",
+      "detailLabel": "Loại",
+      "titlePlaceholder": "Timeline OPT của mình ở công ty tài chính",
+      "descriptionPlaceholder": "Chia sẻ những điều cần lưu ý để người sau không mắc lỗi tương tự."
+    },
+    "visa": {
+      "writeLabel": "Chia sẻ câu chuyện",
+      "listIntro": "Chia sẻ kinh nghiệm chuẩn bị và phỏng vấn visa của bạn.",
+      "locationLabel": "Địa điểm (không bắt buộc)",
+      "locationPlaceholder": "NY / đại sứ quán, v.v.",
+      "detailLabel": "Loại visa",
+      "detailPlaceholder": "F-1 / H-1B / O-1",
+      "titlePlaceholder": "Câu chuyện nộp đơn H-1B của mình",
+      "descriptionPlaceholder": "Timeline, giấy tờ, mẹo"
+    },
+    "job-review": {
+      "writeLabel": "Chia sẻ câu chuyện",
+      "listIntro": "Ghi lại các lần ứng tuyển, phỏng vấn và kết quả theo ngày. Bạn có thể tiếp tục bổ sung sau khi đăng.",
+      "locationLabel": "Công ty (không bắt buộc)",
+      "locationPlaceholder": "Nhập tên công ty",
+      "detailLabel": "Loại",
+      "titlePlaceholder": "Hành trình ứng tuyển thực tập ở công ty tài chính",
+      "descriptionPlaceholder": "Chia sẻ những điều cần lưu ý để người sau không mắc lỗi tương tự."
+    },
+    "roommate": {
+      "writeLabel": "Tạo bài viết",
+      "listIntro": "Đăng phòng (tìm roommate hoặc sublet) hoặc tìm roommate. Mỗi tài khoản được có một bài viết.",
+      "locationLabel": "Khu vực / vị trí",
+      "locationPlaceholder": "Flushing / Brooklyn / Manhattan",
+      "detailLabel": "Ngân sách / tiền thuê hàng tháng ($)",
+      "detailPlaceholder": "1500",
+      "titlePlaceholder": "Tìm roommate ở Brooklyn",
+      "descriptionPlaceholder": "Chia sẻ về lối sống, ngân sách và ngày dọn vào. Để lại link chat 1:1 KakaoTalk open chat để mọi người liên hệ."
+    },
+    "green-card": {
+      "writeLabel": "Chia sẻ câu chuyện",
+      "listIntro": "Chia sẻ hành trình xin thẻ xanh của bạn với cộng đồng.",
+      "locationLabel": "Diện (không bắt buộc)",
+      "locationPlaceholder": "EB-2 / kết hôn, v.v.",
+      "detailLabel": "Giai đoạn",
+      "detailPlaceholder": "I-140 / phỏng vấn, v.v.",
+      "titlePlaceholder": "Câu chuyện được duyệt EB-2 NIW của mình",
+      "descriptionPlaceholder": "Timeline, luật sư, mẹo"
+    },
+    "anonymous": {
+      "writeLabel": "Đăng ẩn danh",
+      "listIntro": "Bảng tin ẩn danh {city}, nơi bạn thoải mái trò chuyện mà không cần ghi tên.",
+      "locationLabel": "Chủ đề (không bắt buộc)",
+      "locationPlaceholder": "Chọn chủ đề",
+      "titlePlaceholder": "Một dòng về ngày hôm nay của bạn",
+      "descriptionPlaceholder": "Viết bất cứ điều gì bạn đang nghĩ. Bạn sẽ hiển thị là ẩn danh."
+    }
+  },
+  "errors": {
+    "createFailed": "Không thể đăng bài. Vui lòng thử lại.",
+    "claimGuestFailed": "Không thể liên kết bài viết khách của bạn.",
+    "myPostsLoadFailed": "Không thể tải bài viết của bạn.",
+    "mockEditBlocked": "Không thể sửa bài viết mẫu.",
+    "mockDeleteBlocked": "Không thể xóa bài viết mẫu.",
+    "updateFailed": "Không thể lưu thay đổi.",
+    "deleteFailed": "Không thể xóa bài viết.",
+    "uploadFailed": "Không thể tải ảnh lên.",
+    "commentRequired": "Vui lòng viết bình luận.",
+    "loginRequired": "Vui lòng đăng nhập trước.",
+    "commentVerifyRequired": "Bạn cần xác minh email trường để đăng bài và bình luận.",
+    "commentCreateFailed": "Không thể đăng bình luận.",
+    "replyParentNotFound": "Không tìm thấy bình luận bạn đang trả lời.",
+    "commentEditTargetMissing": "Chọn bình luận cần sửa.",
+    "commentEditForbidden": "Bạn chỉ có thể sửa bình luận của mình.",
+    "commentNotFound": "Không tìm thấy bình luận này.",
+    "commentUpdateFailed": "Không thể cập nhật bình luận.",
+    "commentDeleteTargetMissing": "Chọn bình luận cần xóa.",
+    "commentDeleteForbidden": "Bạn chỉ có thể xóa bình luận của mình.",
+    "commentDeleteFailed": "Không thể xóa bình luận.",
+    "recommendFailed": "Không thể lưu lượt thích.",
+    "reportReasonRequired": "Vui lòng chọn lý do.",
+    "alreadyReported": "Bạn đã báo cáo nội dung này rồi.",
+    "reportFailed": "Không thể gửi báo cáo.",
+    "beenThereFoodOnly": "Bạn chỉ có thể đánh dấu \"Đã đến\" cho bài viết ăn uống.",
+    "beenThereFailed": "Không thể lưu \"Đã đến\"."
+  },
+  "author": {
+    "member": "Thành viên",
+    "anonymous": "Ẩn danh"
+  },
+  "verify": {
+    "required": "Bạn cần xác minh là sinh viên hoặc người đi làm để đăng bài và bình luận.",
+    "cta": "Xác minh",
+    "linkLabel": "xác minh sinh viên hoặc người đi làm",
+    "suspended": "Tài khoản này đang bị tạm khóa."
+  },
+  "guidelines": {
+    "common": {
+      "noPersonalInfo": "Không đăng tên thật, thông tin liên lạc hay bất cứ thông tin nào có thể nhận diện một người.",
+      "noAbuse": "Không xúc phạm, thù ghét, phân biệt đối xử, đe dọa hay đưa thông tin sai sự thật.",
+      "noPrivacyViolation": "Vui lòng tránh tranh chấp cá nhân, xâm phạm quyền riêng tư hoặc chia sẻ ảnh chụp khi chưa được đồng ý.",
+      "violationPenalty": "Bài viết vi phạm các quy tắc này có thể bị gỡ và tài khoản của bạn có thể bị hạn chế."
+    },
+    "anonymous": {
+      "noTargeting": "Dù ẩn danh, bài viết nêu tên hoặc ám chỉ một người cụ thể, hay nói xấu sau lưng người khác đều không được phép.",
+      "stillResponsible": "Người khác không thấy tên, trường hay ảnh của bạn, nhưng bạn vẫn chịu trách nhiệm pháp lý về những gì mình đăng.",
+      "loginRequired": "Bạn cần đăng nhập để có thể sửa hoặc xóa bài viết. Đội ngũ của chúng tôi có thể kiểm tra người đăng khi xử lý báo cáo."
+    },
+    "commonTitle": "Nguyên tắc cộng đồng",
+    "anonymousTitle": "Nguyên tắc bảng tin ẩn danh"
+  },
+  "anonymousTopics": {
+    "opt": "OPT·CPT·STEM OPT",
+    "visa": "Visa & tình trạng cư trú",
+    "jobs": "Việc làm & thực tập",
+    "housing": "Nhà ở & bạn cùng phòng",
+    "campusLife": "Đời sống sinh viên",
+    "classes": "Lớp học & học tập",
+    "finance": "Tiền bạc, thuế & bảo hiểm",
+    "relationships": "Các mối quan hệ",
+    "mentalHealth": "Sức khỏe tinh thần & tâm sự",
+    "transportation": "Lái xe & phương tiện công cộng",
+    "lifeTips": "Mẹo cuộc sống",
+    "secondhand": "Đồ cũ & cho tặng",
+    "daily": "Đời sống hằng ngày",
+    "other": "Khác"
+  },
+  "report": {
+    "reasons": {
+      "spam": {
+        "label": "Spam · Quảng cáo",
+        "description": "Quảng bá, đăng tràn lan, link không liên quan"
+      },
+      "abuse": {
+        "label": "Xúc phạm · Quấy rối",
+        "description": "Lăng mạ, thù ghét hoặc đe dọa"
+      },
+      "inappropriate": {
+        "label": "Nội dung không phù hợp",
+        "description": "Nội dung tình dục, bạo lực hoặc vi phạm nguyên tắc cộng đồng"
+      },
+      "misinformation": {
+        "label": "Thông tin sai · Nghi lừa đảo",
+        "description": "Thông tin sai sự thật, nghi ngờ lừa đảo hoặc phishing"
+      },
+      "privacy": {
+        "label": "Lộ thông tin cá nhân",
+        "description": "Thông tin liên lạc, ảnh hoặc thông tin cá nhân bị chia sẻ khi chưa được đồng ý"
+      },
+      "other": {
+        "label": "Khác",
+        "description": "Lý do không có trong danh sách trên"
+      }
+    },
+    "action": "Báo cáo",
+    "title": "Báo cáo",
+    "cancel": "Hủy",
+    "submitting": "Đang gửi…",
+    "submit": "Gửi báo cáo",
+    "intro": {
+      "post": "Bạn đang báo cáo bài viết này. Quản trị viên sẽ xem xét và xử lý.",
+      "comment": "Bạn đang báo cáo bình luận này. Quản trị viên sẽ xem xét và xử lý.",
+      "generic": "Bạn đang báo cáo nội dung này. Quản trị viên sẽ xem xét và xử lý."
+    },
+    "detailLabelRequired": "Chi tiết (bắt buộc)",
+    "detailLabelOptional": "Chi tiết (không bắt buộc)",
+    "detailPlaceholder": "Cho chúng tôi biết thêm lý do bạn báo cáo",
+    "submitted": "Cảm ơn bạn, chúng tôi đã nhận được báo cáo. Quản trị viên sẽ xem xét."
+  },
+  "anonymousNotice": {
+    "close": "Đóng",
+    "eyebrow": "Trước khi bắt đầu",
+    "board": "Bảng tin ẩn danh",
+    "title": "Không gian ẩn danh mà chúng ta cùng giữ an toàn",
+    "body": "Để {brand} luôn là một cộng đồng lành mạnh và hữu ích, hãy tuân thủ quy tắc và tôn trọng nhau, kể cả trên bảng tin ẩn danh nhé!",
+    "confirm": "Đã hiểu",
+    "snooze24h": "Không hiện lại trong 24 giờ"
+  },
+  "detail": {
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "companyPageFallback": "Trang công ty",
+    "loadFailed": "Không thể tải bài viết này.",
+    "deleteConfirm": "Xóa \"{title}\"?\nKhông thể hoàn tác thao tác này.",
+    "deleted": "Đã xóa bài viết",
+    "loading": "Đang tải…",
+    "notFoundTitle": "Không tìm thấy bài viết",
+    "notFoundDescription": "Bài viết có thể đã bị xóa.",
+    "backToListAction": "Quay lại {board}",
+    "backToList": "{board}",
+    "roommateType": "Loại",
+    "roommateBudget": "Ngân sách / tiền thuê hàng tháng",
+    "perMonthValue": "{value}/tháng",
+    "roommateMoveIn": "Dọn vào / dọn ra",
+    "views": "{n} lượt xem"
+  },
+  "like": {
+    "like": "Thích",
+    "unlike": "Bỏ thích"
+  },
+  "engagement": {
+    "recommend": "Đề xuất",
+    "recommended": "Đã đề xuất",
+    "recommendCancelled": "Đã bỏ đề xuất",
+    "beenThere": "Mình đã đến",
+    "beenThereAdded": "Đã đánh dấu là đã đến",
+    "beenThereCancelled": "Đã bỏ \"đã đến\""
+  },
+  "card": {
+    "noPhoto": "Không có ảnh",
+    "beenThereCount_other": "{n} người đã đến đây",
+    "timelineSteps_other": "Timeline {count} bước",
+    "hiringSteps_other": "{count} bước tuyển dụng",
+    "hiringStepsWithMore_other": "{count} bước tuyển dụng · thêm {hidden}",
+    "period": "Thời gian {period}",
+    "perMonth": "/tháng",
+    "stepNumber": "Bước {n}",
+    "noStepInfo": "Chưa có chi tiết các bước",
+    "views": "Lượt xem"
+  },
+  "anonymous": {
+    "topicPlaceholder": "Chọn chủ đề",
+    "topicAria": "Chủ đề"
+  },
+  "toolbar": {
+    "filter": "Bộ lọc",
+    "filterApplied_other": "Đã áp dụng {count} bộ lọc"
+  },
+  "comments": {
+    "title": "Bình luận",
+    "loadFailed": "Không thể tải bình luận.",
+    "bodyRequired": "Vui lòng viết bình luận.",
+    "posted": "Đã đăng bình luận",
+    "replyPosted": "Đã đăng trả lời",
+    "deleteConfirm": "Xóa bình luận này?\nCác trả lời của bình luận cũng sẽ bị xóa.",
+    "deleted": "Đã xóa bình luận",
+    "updated": "Đã cập nhật bình luận",
+    "loginPrompt": "Vui lòng {link} để bình luận.",
+    "loginLink": "đăng nhập",
+    "verifyPrompt": "Để bình luận, vui lòng hoàn tất {link}.",
+    "checkingLogin": "Đang kiểm tra đăng nhập…",
+    "placeholder": "Để lại bình luận",
+    "submitting": "Đang đăng…",
+    "submit": "Đăng bình luận",
+    "loading": "Đang tải bình luận…",
+    "empty": "Chưa có bình luận nào. Hãy là người bình luận đầu tiên.",
+    "replyPlaceholder": "Viết trả lời",
+    "cancel": "Hủy",
+    "replySubmit": "Đăng trả lời",
+    "deleting": "Đang xóa…",
+    "saving": "Đang lưu…",
+    "saveEdit": "Lưu",
+    "reply": "Trả lời"
+  },
+  "share": {
+    "metaDescription": "Không cần đăng ký. Chia sẻ từng bước quá trình ứng tuyển, phỏng vấn và kết quả. Mỗi review giúp bạn nhận credit để dùng cho các buổi coffee chat với người trong ngành."
+  },
+  "wip": {
+    "title": "Sắp ra mắt",
+    "description": "Chúng tôi đang xây dựng bảng tin {board}. Chờ chút nhé!",
+    "homeAction": "Về trang chủ cộng đồng",
+    "otherBoards": "Tò mò về các bảng tin khác? Xem {link} trước nhé."
+  },
+  "list": {
+    "mapLoading": "Đang tải bản đồ…",
+    "foodVibeAria": "Không gian",
+    "all": "Tất cả",
+    "cuisineAria": "Loại món",
+    "allCuisines": "Tất cả loại món",
+    "loadFailed": "Không thể tải bài viết.",
+    "login": "Đăng nhập",
+    "suspended": "Bị tạm khóa",
+    "retry": "Thử lại",
+    "emptyTitle": "Chưa có bài viết {board} nào",
+    "noMatchTitle": "Không có bài viết nào phù hợp với bộ lọc",
+    "emptyCanWrite": "Hãy là người đầu tiên đăng bài và bắt đầu cuộc trò chuyện.",
+    "emptyNeedsVerify": "Xác minh là sinh viên hoặc người đi làm để đăng bài.",
+    "emptyNeedsLogin": "Đăng nhập để đăng bài.",
+    "noMatchFood": "Hãy thử không gian hoặc loại món khác.",
+    "noMatchCptOpt": "Hãy thử loại khác (CPT/OPT/STEM OPT).",
+    "noMatchJobReview": "Hãy thử loại hoặc công ty khác.",
+    "noMatchDefault": "Hãy thử đổi bộ lọc.",
+    "showMap": "Xem bản đồ",
+    "showList": "Xem danh sách",
+    "map": "Bản đồ",
+    "list": "Danh sách",
+    "clearAll": "Xóa tất cả",
+    "apply": "Áp dụng",
+    "filterType": "Loại",
+    "cptOptTypeAria": "Loại CPT/OPT",
+    "filterCity": "Thành phố",
+    "filterSchool": "Trường",
+    "jobReviewTypeAria": "Loại phỏng vấn và việc làm",
+    "search": "Tìm kiếm",
+    "searchPlaceholder": "Tìm theo tiêu đề, nội dung hoặc địa điểm",
+    "sort": "Sắp xếp",
+    "sortRecentlyUpdated": "Cập nhật gần đây",
+    "sortLeastRecentlyUpdated": "Cập nhật lâu nhất",
+    "sortNewest": "Mới nhất",
+    "sortOldest": "Cũ nhất",
+    "company": "Công ty",
+    "companyFilterAria": "Lọc theo công ty",
+    "companyName": "Tên công ty",
+    "companyCategory": "Loại công ty",
+    "companyNamePlaceholder": "Tìm theo tên công ty",
+    "companyCategoryPlaceholder": "Chọn loại",
+    "none": "Không chọn"
+  },
+  "write": {
+    "errors": {
+      "postNotFound": "Không tìm thấy bài viết này.",
+      "noEditPermission": "Bạn không có quyền sửa bài viết này.",
+      "titleRequired": "Vui lòng nhập tiêu đề.",
+      "titleTooLong": "Tiêu đề tối đa {max} ký tự.",
+      "bodyRequired": "Vui lòng viết nội dung.",
+      "bodyTooLong": "Nội dung tối đa {max} ký tự.",
+      "titleAndBodyRequired": "Vui lòng nhập tiêu đề và nội dung."
+    },
+    "updated": "Đã cập nhật bài viết",
+    "created": "Đã đăng bài viết",
+    "draftSaved": "Đã lưu nháp",
+    "draftSaveFailed": "Không thể lưu nháp.",
+    "redirectingToLogin": "Đang chuyển tới trang đăng nhập…",
+    "backToPost": "Quay lại bài viết",
+    "backToList": "Quay lại danh sách",
+    "titleLabel": "Tiêu đề",
+    "bodyLabel": "Nội dung",
+    "submit": "Đăng bài",
+    "publish": "Đăng",
+    "editEyebrow": "Sửa bài viết",
+    "untitled": "Chưa có tiêu đề",
+    "food": {
+      "menuMaxReached": "Bạn có thể thêm tối đa {max} món.",
+      "imagesOnly": "Chỉ có thể chọn tệp ảnh.",
+      "menuMaxPartial_other": "Bạn có thể thêm tối đa {max} món. Chỉ {count} ảnh sẽ được thêm.",
+      "uploadPartial": "Đã thêm {success}, thất bại {failed}.",
+      "menuUploadFailed": "Không thể tải ảnh menu lên.",
+      "galleryMaxReached": "Bạn có thể thêm tối đa {max} ảnh không gian.",
+      "galleryMaxPartial_other": "Bạn có thể thêm tối đa {max} ảnh không gian. Chỉ {count} ảnh sẽ được thêm.",
+      "galleryUploadFailed": "Không thể tải ảnh không gian lên.",
+      "errors": {
+        "addressRequired": "Tìm địa chỉ trên bản đồ và chọn địa chỉ đó.",
+        "coordinatesMissing": "Không tìm được vị trí cho địa chỉ này.",
+        "categoryRequired": "Vui lòng chọn danh mục.",
+        "cuisineRequired": "Vui lòng chọn loại món.",
+        "nameRequired": "Vui lòng nhập tên nhà hàng.",
+        "partySizeRange": "Nhập số người từ {min} đến {max}.",
+        "spendRange": "Nhập tổng tiền là số nguyên từ $0 đến {max}.",
+        "tipRequired": "Vui lòng chọn đã gồm tip hoặc chưa gồm tip.",
+        "waitRange": "Nhập thời gian chờ từ 0 đến {max} phút.",
+        "menuIncomplete": "Mỗi món cần có ảnh, tên và một dòng review."
+      },
+      "whereTitle": "Bạn đã ăn ở đâu?",
+      "whereDescription": "Chọn địa chỉ chính xác để chúng tôi lưu vị trí.",
+      "nameLabel": "Tên nhà hàng",
+      "categoryTitle": "Danh mục",
+      "cuisineTitle": "Loại món gì?",
+      "visitTitle": "Thông tin lần ghé",
+      "partySize": "Số người",
+      "partySizeHint": "Tối đa {max} người",
+      "partySizeUnit": "người",
+      "totalSpend": "Tổng chi",
+      "totalSpendHint": "$0 ~ {max} · số nguyên",
+      "tipAria": "Đã gồm tip",
+      "tipIncluded": "Gồm tip",
+      "tipExcluded": "Chưa gồm tip",
+      "wait": "Thời gian chờ",
+      "waitHint": "Nhập 0 nếu không chờ · tối đa {max} phút",
+      "waitUnit": "phút",
+      "galleryTitle": "Bên trong · Không gian",
+      "galleryDescription": "Ảnh bên trong, chỗ ngồi và không gian · tối đa {max} ảnh",
+      "galleryPick": "Chọn ảnh không gian",
+      "galleryPickHint": "Chọn cùng lúc tối đa {max} ảnh từ thư viện.",
+      "galleryAddMoreAria_other": "Thêm {count} ảnh không gian",
+      "galleryAddMore_other": "Thêm {count}",
+      "uploading": "Đang tải lên…",
+      "menuTitle": "Ảnh menu",
+      "menuDescription": "Thêm tên món và một dòng review cho mỗi ảnh.",
+      "coverNoticeTitle": "Ảnh menu đầu tiên sẽ là ảnh bìa",
+      "coverNoticeBody": "Ảnh này hiển thị lớn trên thẻ danh sách và ở đầu bài viết.",
+      "menuPick": "Chọn ảnh menu",
+      "menuPickHint": "Tối đa {max} · ảnh đầu tiên là ảnh bìa · bắt buộc có tên và review",
+      "menuNumber": "Món {n}",
+      "coverPhoto": "Ảnh bìa",
+      "photo": "Ảnh",
+      "cover": "Bìa",
+      "menuNamePlaceholder": "Tên món (bắt buộc)",
+      "menuNameAria": "Tên món {n}",
+      "menuCaptionPlaceholder": "Một dòng review (bắt buộc)",
+      "menuCaptionAria": "Một dòng review cho món {n}",
+      "missingNameAndCaption": "Vui lòng nhập tên món và một dòng review.",
+      "missingName": "Vui lòng nhập tên món.",
+      "missingCaption": "Vui lòng nhập một dòng review.",
+      "menuAddMore_other": "Thêm {count} ảnh menu",
+      "bodyDescription": "Chia sẻ điều bạn thích, cách đi đến và các mẹo hữu ích.",
+      "selectAddress": "Vui lòng chọn địa chỉ",
+      "checkingCoordinates": "Đang kiểm tra vị trí địa chỉ…",
+      "selectCuisine": "Vui lòng chọn loại món",
+      "submit": "Đăng"
+    }
+  },
+  "anonymousWrite": {
+    "topicTitle": "Chủ đề là gì?",
+    "topicDescription": "Bạn có thể bỏ qua mục này.",
+    "topicAria": "Chủ đề bảng tin ẩn danh",
+    "titleDescription": "Viết một tiêu đề ngắn để mọi người đọc là hiểu ngay.",
+    "bodyDescription": "Viết bất cứ điều gì bạn đang nghĩ. Bạn sẽ hiển thị là ẩn danh.",
+    "createTitle": "Đăng bài trên bảng tin ẩn danh",
+    "createDescription": "Tên, trường và ảnh của bạn sẽ được ẩn. Cứ thoải mái chia sẻ.",
+    "editTitle": "Sửa bài viết ẩn danh"
+  }
+}

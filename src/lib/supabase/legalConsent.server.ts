@@ -1,3 +1,4 @@
+import { BRAND } from '@lib/brand'
 import { DEFAULT_POLICY } from '@lib/consent/copy'
 import type {
   ConsentLog,
@@ -156,6 +157,7 @@ function normalizeLog(raw: unknown): ConsentLog | null {
           : null,
     consent_method: (method || 'signup_checkbox') as ConsentMethod,
     ui_language: isConsentUiLanguage(uiLanguage) ? uiLanguage : 'en',
+    brand: data.brand === 'ellieo' ? 'ellieo' : 'misaeng',
   }
 }
 
@@ -280,6 +282,7 @@ export async function appendConsentLog(input: {
     user_agent: input.userAgent || null,
     consent_method: input.consentMethod,
     ui_language: input.uiLanguage,
+    brand: BRAND,
   }
 
   const bucket = await resolveBucket()
@@ -360,9 +363,10 @@ export async function listLatestConsents(): Promise<ConsentLog[]> {
   return logs
 }
 
-export function bilingualError(en: string, ko: string) {
+/** localized를 주면 error는 요청 언어 문구 하나만 담는다 (errorEn·errorKo는 그대로) */
+export function bilingualError(en: string, ko: string, localized?: string) {
   return {
-    error: `${en} / ${ko}`,
+    error: localized ?? `${en} / ${ko}`,
     errorEn: en,
     errorKo: ko,
   }

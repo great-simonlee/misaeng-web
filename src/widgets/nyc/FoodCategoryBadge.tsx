@@ -1,4 +1,7 @@
+'use client'
+
 import { getFoodCategory } from '@lib/community/food'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import type { FoodCategoryId } from '@/types/nyc'
 
@@ -20,6 +23,7 @@ export function FoodCategoryBadge({
   className,
   showLabel = true,
 }: FoodCategoryBadgeProps) {
+  const t = useT('food')
   const meta = getFoodCategory(categoryId)
   if (!meta) return null
 
@@ -38,7 +42,7 @@ export function FoodCategoryBadge({
         categoryId={meta.id}
         className={size === 'sm' ? 'size-3' : 'size-3.5'}
       />
-      {showLabel ? meta.label : null}
+      {showLabel ? t(`categories.${meta.id}`) : null}
     </span>
   )
 }

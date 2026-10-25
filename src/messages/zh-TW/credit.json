@@ -1,0 +1,455 @@
+{
+  "meta": {
+    "description": "{brand} NYC 社群積分說明：如何獲得、使用、限制與常見問題。透過美食、OPT、求職評價與留言累積積分，再用來兌換 coffee chat、律師諮詢、職涯導師等。",
+    "reviewsDescription": "審核含最終結果貼文的額外積分申請。"
+  },
+  "header": {
+    "eyebrow": "{brand} NYC",
+    "title": "社群積分指南",
+    "intro": "用幫助社群賺到的積分，申請 coffee chat、移民律師諮詢等獎勵。積分無法兌換現金，且需要完成學生或上班族認證。",
+    "tagInteger": "僅限整數",
+    "tagNoCash": "無現金價值",
+    "tagVerification": "需完成學生或上班族認證",
+    "policyVersion": "v{version}"
+  },
+  "toc": {
+    "aria": "目錄",
+    "redeem": "獎勵",
+    "process": "申請方式",
+    "earn": "獲得方式",
+    "principles": "原則與流程",
+    "limits": "限制與收回",
+    "faq": "常見問題"
+  },
+  "redeem": {
+    "title": "可以用積分兌換的獎勵",
+    "description": "每次時長皆為 30 分鐘以內。為了負擔專家與媒合成本，所需積分設定得比獲得積分更高。",
+    "comingSoon": "即將推出",
+    "applySoon": "即將開放",
+    "callout": "在我的頁面確認積分餘額後，獎勵將分階段開放。coffee chat 和移民律師諮詢每月各可申請一次。",
+    "credits": "積分",
+    "includes": "包含",
+    "excludes": "不包含",
+    "monthlyCap_other": "每月 {count} 次",
+    "foodEquivalent_other": "≈ {count} 篇美食評價"
+  },
+  "process": {
+    "title": "申請方式",
+    "description": "從申請到完成，共四個步驟。",
+    "cancelNote": "媒合前取消可全額退還積分。排定時間後當天取消或未出席，可能無法退還。"
+  },
+  "earn": {
+    "title": "獲得積分",
+    "description": "完成學校信箱認證後，進行以下活動即可獲得積分。",
+    "colActivity": "活動",
+    "colEarn": "積分",
+    "colCoffeeChat": "Coffee chat",
+    "once": "一次",
+    "max": "最多 {amount}",
+    "maxParen": "（最多 {amount}）",
+    "unitWithMax": "{unit} · 最多 {amount}",
+    "detailsToggle": "查看獲得規則與積分",
+    "perUnit": "+{amount}/{unit}"
+  },
+  "principlesSection": {
+    "title": "原則 · 運作方式",
+    "description": "這個制度的核心原則，以及從第一篇貼文到獲得獎勵的流程。",
+    "flowTitle": "運作方式"
+  },
+  "limits": {
+    "title": "限制 · 收回",
+    "description": "維持公平的規則。",
+    "earnTitle": "獲得",
+    "spendTitle": "使用",
+    "commentCap": "留言與回覆：每天最多 {amount} 點積分",
+    "noSelfReply": "在自己的貼文或留言下回覆：不給積分",
+    "revokeOnDelete": "刪除貼文或留言會收回相應積分",
+    "oncePerAccount": "一次性獎勵：每個帳號一次",
+    "optionCap": "{label}：每月 {cap} · {duration}",
+    "times_other": "{count} 次",
+    "recentActivity": "建議申請前 {days} 天內至少有一次活動"
+  },
+  "faqSection": {
+    "title": "常見問題",
+    "glossaryTitle": "名詞解釋"
+  },
+  "footer": {
+    "disclaimer": "移民律師諮詢僅供資訊參考，與案件代理無關。我們可能會提前通知後變更本政策。",
+    "myPage": "我的頁面",
+    "writeFood": "撰寫美食評價"
+  },
+  "principles": {
+    "reward": {
+      "title": "貢獻就有回饋",
+      "body": "分享越多有幫助的貼文和留言，像是美食、簽證、求職評價，就能獲得越多積分。"
+    },
+    "notCash": {
+      "title": "換的是人脈，不是現金",
+      "body": "積分無法兌換成錢，而是用來換取與資深上班族及專家見面的機會。"
+    },
+    "cost": {
+      "title": "反映實際成本",
+      "body": "Misaeng 負擔 coffee chat 與移民律師諮詢的專家時間和媒合成本，因此使用所需的積分比獲得的更多。"
+    },
+    "quality": {
+      "title": "品質優先",
+      "body": "只為了累積積分而發的洗版、重複或不實貼文不會獲得積分，且可能被收回。"
+    }
+  },
+  "workflow": {
+    "verify": {
+      "title": "認證學校",
+      "description": "在我的頁面完成學校信箱認證。認證後才能發文、留言和獲得積分。"
+    },
+    "contribute": {
+      "title": "參與貢獻",
+      "description": "撰寫美食、OPT 或求職評價，或在別人的貼文下留言。符合條件時會自動發放積分。"
+    },
+    "balance": {
+      "title": "確認餘額",
+      "description": "在我的頁面查看積分總額與紀錄。因刪除或處分而收回的積分也會顯示在那裡。"
+    },
+    "redeem": {
+      "title": "申請獎勵",
+      "description": "積分足夠兌換獎勵時即可送出申請。媒合並排定時間後進行。"
+    }
+  },
+  "redeemProcess": {
+    "apply": {
+      "title": "申請",
+      "description": "在我的頁面或獎勵頁面選擇方案，並簡短說明你感興趣的方向與問題。"
+    },
+    "review": {
+      "title": "審核與扣除",
+      "description": "確認你的資格、餘額與每月上限後扣除積分。如需安排時間，我們會寄 Email 給你。"
+    },
+    "match": {
+      "title": "媒合",
+      "description": "Misaeng 從合作夥伴、導師和專家中為你找到合適的人。媒合失敗時會退還積分。"
+    },
+    "session": {
+      "title": "進行",
+      "description": "在約定時間線上或面對面進行。未出席或當天取消依政策可能無法退還。"
+    }
+  },
+  "earnRules": {
+    "food": {
+      "label": "美食評價",
+      "description": "發布包含照片、位置、菜單、價格等必要資訊的美食評價即可獲得。",
+      "conditions": {
+        "verified": "已完成學校信箱認證",
+        "requiredFields": "已填寫必填欄位：餐廳位置、名稱、分類、菜單、照片",
+        "oncePerPost": "首次發布時發放一次（編輯同一篇貼文不會再增加）"
+      },
+      "notEligible": {
+        "missingFields": "缺少必填欄位或內容敷衍",
+        "copied": "抄襲他人貼文或重複發文",
+        "repost": "刪除後重發相同內容（濫用）"
+      },
+      "tip": "附上照片以及具體的菜單或等候時間資訊，對其他學生最有幫助。"
+    },
+    "status": {
+      "label": "OPT、簽證與綠卡評價",
+      "unitLabel": "1 個時間軸步驟",
+      "description": "每個時間軸步驟 {entry} 點積分（每篇最多 {postMax}）。含最終結果的評價經 Misaeng 團隊審核後，最多可再獲得 {reviewBonus}（合計最多 {totalMax}）。",
+      "conditions": {
+        "verified": "已完成學校信箱認證",
+        "type": "選擇類型：CPT/OPT/STEM OPT/簽證/綠卡",
+        "perStep": "每個時間軸步驟 {entry} 點積分",
+        "postMax": "每篇自動發放最多 {postMax} 點積分",
+        "editAdds": "編輯貼文新增時間軸步驟可獲得更多（至上限為止）",
+        "reviewBonus": "加上最終結果後點選「申請額外積分」→ 團隊核准即 +{reviewBonus}"
+      },
+      "notEligible": {
+        "missingTimeline": "未填寫時間軸或類型",
+        "copied": "抄襲他人評價",
+        "privacy": "因暴露過多個人資訊而被移除的貼文",
+        "capReached": "貼文已達自動發放上限（新增步驟不再獲得積分）",
+        "noFinalResult": "沒有最終結果就申請審核獎勵"
+      },
+      "tip": "加上最終結果（核准、收到卡片等）即可申請團隊審核獎勵。"
+    },
+    "job-review": {
+      "label": "面試與求職",
+      "unitLabel": "1 個時間軸步驟",
+      "description": "每個招募步驟（時間軸）{entry} 點積分，每篇最多 {postMax}。加上 offer 或最終結果，經 Misaeng 團隊審核後最多可再獲得 {reviewBonus}（合計最多 {totalMax}）。",
+      "conditions": {
+        "verified": "已完成學校信箱認證",
+        "type": "選擇類型：實習/新鮮人/有經驗/約聘",
+        "perStep": "每個時間軸步驟 {entry} 點積分",
+        "postMax": "每篇自動發放最多 {postMax} 點積分",
+        "editAdds": "編輯貼文新增時間軸步驟可獲得更多（至上限為止）",
+        "reviewBonus": "加上最終結果後點選「申請額外積分」→ 團隊核准即 +{reviewBonus}"
+      },
+      "notEligible": {
+        "missingFields": "未填寫必要步驟或類型",
+        "falseInfo": "假的公司名稱或誇大內容",
+        "anonymous": "匿名看板的貼文（該看板不適用）",
+        "capReached": "貼文已達自動發放上限",
+        "noFinalResult": "沒有最終結果就申請審核獎勵"
+      }
+    },
+    "comment": {
+      "label": "留言與回覆",
+      "description": "在別人的貼文下每則留言或回覆可獲得 1 點積分。",
+      "conditions": {
+        "verified": "已完成學校信箱認證",
+        "publicOthers": "留在他人的公開貼文或留言下",
+        "dailyCap": "每天最多 {commentCap} 點積分"
+      },
+      "notEligible": {
+        "ownPost": "在自己的貼文或留言下回覆",
+        "deleted": "已刪除的留言",
+        "spam": "洗版、謾罵或無意義的重複字元",
+        "copyPaste": "重複貼上同一句話"
+      },
+      "tip": "回答問題或分享自身經驗的留言，對社群最有幫助。"
+    },
+    "referral": {
+      "label": "推薦碼被使用",
+      "description": "有人使用你的推薦碼時，你可獲得 {referral} 點積分。最多 {referralMax} 人。",
+      "conditions": {
+        "joined": "對方透過你的推薦連結註冊，或在我的頁面連結你的推薦碼",
+        "perPerson": "每人 {referral} 點積分",
+        "maxPeople": "每個帳號最多 {referralMax} 人",
+        "noSelf": "不能用自己的推薦碼推薦自己"
+      },
+      "notEligible": {
+        "self": "推薦自己",
+        "maxReached": "已有 {referralMax} 人使用你的推薦碼",
+        "alreadyLinked": "已連結其他推薦人的帳號"
+      },
+      "tip": "在我的頁面複製推薦連結，分享給同學和朋友吧。"
+    }
+  },
+  "bonusRules": {
+    "school-verify": {
+      "label": "學校信箱認證",
+      "description": "首次在我的頁面完成學校信箱（.edu 等）認證時，發放一次。"
+    },
+    "first-post": {
+      "label": "第一篇社群貼文",
+      "description": "在可獲得積分的看板（美食、OPT、求職評價等）發布第一篇貼文時發放一次（需符合條件）。"
+    }
+  },
+  "noEarn": {
+    "anonymous": "匿名看板的貼文與留言（為保護匿名性，不發放積分）",
+    "otherBoards": "室友、轉租、二手市集等其他看板（之後可能新增）",
+    "editOnly": "僅編輯或只更改後設資料",
+    "reactions": "僅有按讚、推薦、分享等反應",
+    "adminPosts": "租屋團隊或工作人員帳號發布的管理貼文"
+  },
+  "redeemOptions": {
+    "coffee-chat": {
+      "label": "目標領域 coffee chat",
+      "duration": "約 30 分鐘",
+      "description": "與在你感興趣的產業或職務中工作、就讀的人一對一聊聊。可以談職涯、產業文化、紐約生活訣竅等。",
+      "includes": {
+        "meeting": "線上或面對面一對一見面（Zoom 或 NYC）",
+        "questions": "事先寄來的 3–5 個問題會先幫你看過",
+        "scheduling": "由 Misaeng 團隊安排時間與媒合"
+      },
+      "excludes": {
+        "jobGuarantee": "保證錄取或內部推薦",
+        "resumeWriting": "代寫履歷或作品集",
+        "lawyer": "移民律師諮詢（另有方案）"
+      },
+      "eligibility": {
+        "verified": "已完成學校信箱認證",
+        "minCredits": "積分總額至少 {cost}",
+        "recentActivity": "最近 90 天內至少有一次社群活動",
+        "noSanctions": "帳號無處分紀錄"
+      },
+      "note": "導師以志工或合作夥伴身分參與，媒合與營運成本由 Misaeng 負擔。"
+    },
+    "lawyer-consult": {
+      "label": "移民律師諮詢",
+      "duration": "約 30 分鐘",
+      "description": "與移民律師進行 30 分鐘問答，主題為 F-1、OPT、H-1B、綠卡等美國移民與簽證問題。",
+      "includes": {
+        "qa": "與移民律師 30 分鐘問答",
+        "procedures": "簽證、身分及綠卡流程的一般說明",
+        "followUp": "如需進一步代理，另行說明"
+      },
+      "excludes": {
+        "representation": "案件代理或處理訴訟",
+        "paperwork": "代為準備或遞交文件",
+        "outcome": "保證結果（核准、身分變更等）",
+        "otherLaw": "移民以外的法律、刑事或民事諮詢"
+      },
+      "eligibility": {
+        "verified": "已完成學校信箱認證",
+        "minCredits": "積分總額至少 {cost}",
+        "summary": "申請時請附上移民或簽證問題的摘要與背景",
+        "noSanctions": "帳號無處分紀錄"
+      },
+      "note": "移民諮詢僅供資訊參考。建立律師與委託人關係可能需要另行簽約。"
+    },
+    "career-mentor": {
+      "label": "職涯導師",
+      "duration": "約 30 分鐘",
+      "description": "針對履歷、面試、轉換產業等提供職涯指導。所需積分反映與在職導師的媒合成本。",
+      "includes": {
+        "resume": "履歷與 LinkedIn 回饋（如有事先提供）",
+        "interview": "面試與人脈經營策略問答",
+        "advice": "各產業的實務建議"
+      },
+      "excludes": {
+        "applyForYou": "代為投遞申請",
+        "jobGuarantee": "保證就業",
+        "lawyer": "移民律師諮詢"
+      },
+      "eligibility": {
+        "verified": "已完成學校信箱認證",
+        "minCredits": "積分總額至少 {cost}"
+      }
+    }
+  },
+  "revocation": {
+    "deleted": "刪除貼文或留言時，相應積分會被收回",
+    "guidelines": "因違反社群規範而被隱藏或移除的內容",
+    "falseInfo": "經確認為不實或洗版的內容（先前的積分可能被收回）",
+    "abuse": "濫用行為（多重帳號、操縱）將導致停權並喪失餘額"
+  },
+  "faq": {
+    "cash": {
+      "q": "積分可以換現金嗎？",
+      "a": "不行。社群積分無法兌換現金、退款、轉讓、出售或移轉到其他帳號，只能用於 {brand} NYC 指定的獎勵方案。"
+    },
+    "comments": {
+      "q": "只靠留言可以賺很多積分嗎？",
+      "a": "每則留言或回覆可獲得 1 點積分，但每天最多 {commentCap} 點，在自己的貼文下留言不計。只靠留言的話，coffee chat（120）至少要 12 天，移民律師諮詢（400）要 40 天（以上限計算），所以寫評價更有效率。"
+    },
+    "delete": {
+      "q": "刪除貼文會失去積分嗎？",
+      "a": "會。被刪除、檢舉或因處分而隱藏的內容，其積分可能會被收回。如果需要收回已使用的積分，餘額可能會變成負數。"
+    },
+    "noVerify": {
+      "q": "沒有學校認證也能獲得積分嗎？",
+      "a": "不行。需要完成學校信箱認證才能發文、留言和獲得積分。完成認證時可獲得一次性 5 點積分獎勵。"
+    },
+    "timeline": {
+      "q": "OPT 和求職評價每篇只能獲得一次積分嗎？",
+      "a": "不是。每個時間軸步驟會自動發放 {entry} 點積分，每篇最多 {postMax}。加上最終結果並點選「申請額外積分」後，Misaeng 團隊審核核准即再加 {reviewBonus}，合計最多 {totalMax}。"
+    },
+    "sameRestaurant": {
+      "q": "同一間餐廳寫兩次評價，可以獲得兩次積分嗎？",
+      "a": "不同的貼文各可獲得一次，但重複、抄襲或洗版的內容不會獲得積分，且可能被收回。"
+    },
+    "schedule": {
+      "q": "申請獎勵後時間配合不了怎麼辦？",
+      "a": "媒合前取消可全額退還積分。確認後當天取消或未出席，可能無法退還。"
+    },
+    "lawyerGuarantee": {
+      "q": "移民律師諮詢能保證簽證核准或身分變更嗎？",
+      "a": "不能。諮詢僅涵蓋一般的移民與簽證資訊和流程，不保證任何結果。案件代理需另行簽約。不包含移民以外的法律與稅務諮詢。"
+    },
+    "policyChange": {
+      "q": "積分政策會變更嗎？",
+      "a": "會。獲得與使用規則、所需積分可能依營運情況調整。變更時我們會更新本頁面與政策版本。已獲得的積分原則上會保留。"
+    },
+    "when": {
+      "q": "什麼時候可以開始使用積分？",
+      "a": "參與社群活動時就會累積積分。coffee chat 與移民律師諮詢申請將分階段開放，你可以在我的頁面確認餘額。"
+    }
+  },
+  "glossary": {
+    "credit": {
+      "term": "積分",
+      "definition": "參與社群貢獻所獲得的整數點數。沒有現金價值，只能用來申請獎勵。"
+    },
+    "earn": {
+      "term": "獲得",
+      "definition": "透過發文、留言等活動取得積分。未符合條件則為 0。"
+    },
+    "revoke": {
+      "term": "收回",
+      "definition": "因刪除或違規等原因，收回已發放的積分。"
+    },
+    "reward": {
+      "term": "獎勵",
+      "definition": "Misaeng 提供或安排的非金錢方案，例如 coffee chat 與移民律師諮詢。"
+    },
+    "dailyCap": {
+      "term": "每日上限",
+      "definition": "留言與回覆每天最多可獲得 {commentCap} 點積分。"
+    },
+    "timeline": {
+      "term": "時間軸",
+      "definition": "OPT、簽證、綠卡與求職評價中的逐步紀錄。每個步驟 {entry} 點積分（自動發放最多 {postMax}）。有最終結果後，可申請最多 {reviewBonus} 的團隊審核獎勵。"
+    }
+  },
+  "efficiency": {
+    "food": {
+      "activity": "美食評價",
+      "unit": "篇",
+      "toCoffeeChat_other": "{count} 篇",
+      "toLawyer_other": "{count} 篇",
+      "note": "最容易賺積分的方式"
+    },
+    "timeline": {
+      "activity": "OPT、簽證與求職評價",
+      "unit": "個時間軸步驟",
+      "toCoffeeChat_other": "{count} 篇（達上限）",
+      "toLawyer_other": "{count} 篇（達上限）",
+      "note": "每步驟 +{entry} · 自動最多 {postMax} · 審核 +{reviewBonus}"
+    },
+    "comment": {
+      "activity": "留言與回覆",
+      "unit": "則留言",
+      "toCoffeeChat_other": "{count} 天（每日上限 {commentCap}）",
+      "toLawyer_other": "{count} 天（每日上限 {commentCap}）",
+      "note": "額外獲得 · 不含在自己貼文下的留言"
+    }
+  },
+  "ledger": {
+    "reasons": {
+      "food": "美食評價",
+      "status": "OPT、簽證與綠卡評價",
+      "job-review": "面試與求職",
+      "comment": "留言與回覆",
+      "school-verify": "學校信箱認證",
+      "first-post": "第一篇社群貼文",
+      "review-bonus": "最終結果審核獎勵",
+      "referral": "推薦碼被使用"
+    },
+    "timeline": "{label}（時間軸）",
+    "revoke": "收回{label}"
+  },
+  "referral": {
+    "bindFailed": "無法連結推薦碼"
+  },
+  "reviewCard": {
+    "title": "最終結果審核獎勵",
+    "description": "如果你的評價包含最終結果，Misaeng 團隊確認後可額外給你 {bonus} 點積分。（每篇含自動發放最多 {totalMax}）",
+    "bonusAmount": "+{amount}",
+    "notEligible": "在時間軸加上最終結果（核准、收到卡片、offer、未錄取等）後即可送出申請。",
+    "pending": "等待審核中 · Misaeng 團隊確認你的貼文後會發放積分。",
+    "approved": "已核准 · 已發放 +{amount} 額外積分。",
+    "rejected": "未核准。你可以更新貼文後再次申請。",
+    "rejectedWithReason": "未核准 · {reason}。你可以更新貼文後再次申請。",
+    "requesting": "傳送中…",
+    "requestButton": "申請額外積分",
+    "editTimeline": "編輯時間軸",
+    "loadFailed": "無法載入狀態",
+    "requestFailed": "申請送出失敗"
+  },
+  "reviews": {
+    "title": "積分審核",
+    "description": "審核含最終結果的 OPT 與求職貼文，並發放 +{amount} 額外積分。",
+    "filterPending": "待審核",
+    "filterAll": "全部",
+    "emptyPending": "沒有待審核的申請。",
+    "emptyAll": "還沒有申請。",
+    "rejectReasonLabel": "已駁回：{reason}",
+    "approveButton": "核准 +{amount}",
+    "rejectButton": "駁回",
+    "rejectPrompt": "駁回原因（選填）",
+    "approveConfirm": "要核准這篇貼文並發放 +{amount} 積分嗎？",
+    "approved": "已核准 · 已發放積分",
+    "rejected": "申請已駁回",
+    "loadFailed": "無法載入列表",
+    "actionFailed": "無法完成此操作",
+    "untitled": "無標題"
+  }
+}

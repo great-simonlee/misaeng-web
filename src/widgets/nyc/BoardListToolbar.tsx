@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 
 type BoardListToolbarProps = {
@@ -32,6 +33,7 @@ export function BoardListToolbar({
   className,
   children,
 }: BoardListToolbarProps) {
+  const t = useT('community')
   return (
     <header className={cn('pt-4 sm:pt-5 lg:pt-6', className)}>
       <div className='flex items-center justify-between gap-3'>
@@ -46,7 +48,9 @@ export function BoardListToolbar({
                 type='button'
                 onClick={onFilterClick}
                 aria-label={
-                  filterCount > 0 ? `필터 ${filterCount}개 적용됨` : '필터'
+                  filterCount > 0
+                    ? t('toolbar.filterApplied', { count: filterCount })
+                    : t('toolbar.filter')
                 }
                 className={cn(
                   'relative inline-flex h-9 w-9 items-center justify-center rounded-full border bg-white text-[13px] font-medium touch-manipulation transition sm:h-9 sm:w-auto sm:gap-1.5 sm:px-3.5',
@@ -56,7 +60,7 @@ export function BoardListToolbar({
                 )}
               >
                 <FiltersIcon className='size-3.5 shrink-0' />
-                <span className='hidden sm:inline'>필터</span>
+                <span className='hidden sm:inline'>{t('toolbar.filter')}</span>
                 {filterCount > 0 && (
                   <span className='absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--brand)] px-1 text-[10px] font-bold leading-none text-white sm:static sm:ml-0.5 sm:h-auto sm:min-w-4.5 sm:px-1.5 sm:py-0.5'>
                     {filterCount}
@@ -68,7 +72,7 @@ export function BoardListToolbar({
             {showWrite ? (
               <Link
                 href={writeHref}
-                className='inline-flex h-9 max-w-[10rem] items-center gap-1.5 rounded-full bg-[var(--brand)] px-3.5 text-[13px] font-semibold leading-none text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] hover:shadow-[0_6px_18px_rgba(246,67,16,0.34)] active:scale-[0.98] sm:max-w-none sm:px-4'
+                className='inline-flex h-9 max-w-[10rem] items-center gap-1.5 rounded-full bg-[var(--brand)] px-3.5 text-[13px] font-semibold leading-none text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] hover:shadow-[0_6px_18px_rgb(var(--brand-rgb)/0.34)] active:scale-[0.98] sm:max-w-none sm:px-4'
               >
                 <WriteIcon className='size-3.5 shrink-0' />
                 <span className='truncate'>{writeLabel}</span>

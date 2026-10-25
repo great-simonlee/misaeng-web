@@ -1,0 +1,338 @@
+{
+  "nickname": {
+    "checkFailed": "Couldn't check that nickname.",
+    "available": "This nickname is available",
+    "taken": "That nickname is already taken.",
+    "ruleHint": "Use only English letters and \".\"",
+    "errors": {
+      "tooShort": "Your nickname needs at least {min} characters",
+      "tooLong": "Your nickname can be up to {max} characters",
+      "invalidChars": "Use only English letters and \".\""
+    }
+  },
+  "profile": {
+    "gender": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
+    "occupation": {
+      "student": "Student",
+      "professional": "Working professional",
+      "other": "Other"
+    },
+    "changePhotoAria": "Change profile photo",
+    "title": "Profile",
+    "nicknameLabel": "Nickname",
+    "notSet": "Not set yet",
+    "edit": "Edit",
+    "set": "Set",
+    "saving": "Saving…",
+    "genderLabel": "Gender",
+    "occupationLabel": "Occupation",
+    "nicknamePlaceholder": "e.g. food.hunter",
+    "photoAlt": "{name}'s profile"
+  },
+  "statusEmployer": {
+    "fieldLabel": "School / company / organization (optional)",
+    "modeName": "Enter company name",
+    "modeCategory": "Choose a company category",
+    "namePlaceholder": "Enter the company name",
+    "categoryTitle": "Company category",
+    "categoryPlaceholder": "Choose a category",
+    "noSelection": "None",
+    "option": "{origin} {industry} company",
+    "other": "Other",
+    "origins": {
+      "korean": "Korean",
+      "us": "US",
+      "foreign": "Foreign"
+    },
+    "industries": {
+      "tech": "IT & Software",
+      "finance": "Finance & Fintech",
+      "consulting": "Consulting",
+      "healthcare": "Healthcare & Biotech",
+      "accounting": "Accounting & Tax",
+      "engineering": "Manufacturing & Engineering",
+      "marketing": "Marketing"
+    }
+  },
+  "verification": {
+    "errors": {
+      "sendFailed": "Couldn't send the verification email",
+      "confirmFailed": "Verification failed",
+      "emailNotConfigured": "Email isn't set up yet. Check {envVar}."
+    },
+    "phone": {
+      "errors": {
+        "required": "Enter your phone number",
+        "invalidFormat": "That phone number doesn't look right",
+        "unsupportedCountry": "Enter a US (+1) or Korean (+82) number",
+        "sendFailed": "Couldn't send the verification text",
+        "confirmFailed": "Phone verification failed"
+      },
+      "smsDisabledShort": "SMS off",
+      "afterSchool": "After school verification",
+      "rowLabel": "Phone",
+      "rowHint": "Verify with your phone number",
+      "smsDisabled": "Phone SMS verification is turned off right now.",
+      "verifiedToast": "Your phone is verified",
+      "unavailable": "Available once Supabase is connected",
+      "title": "Phone verification",
+      "description": "Verify by SMS with a US (+1) or Korean (+82) number. Limit {max} per day per account, with a {seconds}-second cooldown.",
+      "testOnly": "Only approved test numbers work right now.",
+      "getCode": "Text me a code",
+      "codeSentTo": "Enter the code we sent to {phone}.",
+      "codePlaceholder": "6-digit code",
+      "resendCode": "Resend text"
+    },
+    "workplace": {
+      "errors": {
+        "required": "Enter your work email.",
+        "invalidFormat": "Enter a valid email address.",
+        "personalDomain": "Personal email like Gmail can't be used. Enter the email you use at work.",
+        "companyRequired": "Enter your company name"
+      },
+      "pendingDetail": "Email verified · Waiting for Misaeng team review",
+      "retry": "Please verify again",
+      "rowHint": "Verify with your work email and company name",
+      "rowLabel": "Work verification",
+      "submittedToast": "Your email is verified. Work verification will be complete once the Misaeng team reviews it.",
+      "approvedTitle": "Work verification complete",
+      "pendingTitle": "Work verification in review",
+      "approvedDescription": "The Misaeng team has confirmed your work verification.",
+      "pendingDescription": "Your work email is verified. The Misaeng team is now reviewing your company info.",
+      "formDescription": "Your work email will be linked to the account you're signed in with, even if it's different from your sign-up email. After you enter the code, the Misaeng team double-checks your company info.",
+      "companyLabel": "Company name",
+      "companyPlaceholder": "e.g. Misaeng LLC",
+      "emailLabel": "Work email",
+      "confirmButton": "Verify email",
+      "editForm": "Change company or email"
+    },
+    "verifiedShort": "Verified",
+    "school": {
+      "rowLabel": "School email",
+      "rowHint": "Verify you're a student with your school email",
+      "verifiedWithSchool": "Verified with {school}",
+      "verifiedToast": "Your school email is verified",
+      "registrationSentToast": "We got your school registration request. We'll get back to you after we review it.",
+      "errors": {
+        "eduRequired": "Enter your .edu school email",
+        "unsupported": "We don't support this school yet. Send us a request to add it.",
+        "nameRequired": "Enter your school name",
+        "invalidDomain": "Enter a valid email domain (e.g. monroeu.com)",
+        "registrationFailed": "Couldn't send your school registration request"
+      },
+      "registerTitle": "Request a school",
+      "registerDescription": "If your school isn't listed, you can ask the Misaeng team to add it. Tell us the school name and email domain and we'll add it to {brand} and the app.",
+      "nameLabel": "School name",
+      "domainLabel": "School email domain",
+      "domainHint": "Domain only, without @ (e.g. monroeu.com)",
+      "registerSubmit": "Send request to the Misaeng team",
+      "backToVerify": "Back to school email verification",
+      "verifyTitle": "School email verification",
+      "formDescription": "Your school email will be linked to the account you're signed in with, even if it's different from your sign-up email. We'll send a 6-digit code to your school email.",
+      "notFoundRequest": "Can't find your school? Request it"
+    },
+    "instagram": {
+      "rowLabel": "Instagram",
+      "rowHint": "Connect your account"
+    },
+    "title": "Verification",
+    "description": "Your school or work email links to this account, even if it's different from the email you signed up with.",
+    "status": {
+      "soon": "Coming soon",
+      "verified": "Verified",
+      "inReview": "In review",
+      "verify": "Verify"
+    },
+    "chooser": {
+      "title": "Verify your identity",
+      "description": "Verify with your school or work email, whichever is easier. It links to this account even if it's different from the email you signed up with.",
+      "school": "Verify as a student with school email",
+      "workplace": "Verify as a professional with work email"
+    },
+    "clearInputAria": "Clear input",
+    "sending": "Sending…",
+    "getCode": "Get verification code",
+    "codeSentTo": "Enter the 6-digit code we sent to{br}{email}",
+    "checking": "Checking…",
+    "resendIn": "Resend in {seconds}s",
+    "resendCode": "Resend code",
+    "confirmButton": "Verify",
+    "digitAria": "Digit {position} of verification code"
+  },
+  "toasts": {
+    "loggedOut": "You're logged out",
+    "photoSaved": "Profile photo updated",
+    "photoFailed": "Couldn't upload the photo",
+    "nicknameSaved": "Nickname saved",
+    "nicknameFailed": "Couldn't save your nickname",
+    "mbtiSaved": "MBTI saved",
+    "mbtiCleared": "MBTI removed",
+    "mbtiFailed": "Couldn't save your MBTI",
+    "genderSaved": "Gender saved",
+    "genderFailed": "Couldn't save your gender",
+    "occupationSaved": "Occupation saved",
+    "occupationFailed": "Couldn't save your occupation",
+    "profileSaved": "Profile saved",
+    "profileFailed": "Couldn't save your profile"
+  },
+  "title": "My Page",
+  "suspendedNotice": "This account is suspended. You can still browse, but posting, comments, and credit requests are blocked.",
+  "nicknameSheet": {
+    "title": "Set nickname",
+    "minLength": "Min {min} characters"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "setupSheet": {
+    "title": "Complete your profile",
+    "description": "Fill in the profile info shown in the community. Your name (first/last) is for your account only, and your nickname is what the community sees.",
+    "firstNameLabel": "First name",
+    "lastNameLabel": "Last name",
+    "nicknameLabel": "Nickname (shown in the community)",
+    "later": "Later",
+    "save": "Save"
+  },
+  "logout": {
+    "title": "Log out",
+    "descriptionMobile": "Sign out of your account on this device",
+    "descriptionDesktop": "Sign out of your account"
+  },
+  "loadingAria": "Loading My Page",
+  "suspended": {
+    "title": "Your account is suspended",
+    "toMyPage": "Go to My Page"
+  },
+  "verificationRequired": {
+    "title": "Verification required",
+    "toCommunityHome": "Back to community home"
+  },
+  "cardAction": {
+    "profile": {
+      "title": "Complete your profile",
+      "description": "Set your nickname, MBTI, gender, and occupation",
+      "descriptionDesktop": "Set up your basic info"
+    },
+    "identity": {
+      "title": "Verify your identity",
+      "description": "Verify with your school or work email",
+      "descriptionDesktop": "Verify with school or work email"
+    },
+    "school": {
+      "title": "Verify your school email",
+      "description": "Complete student verification with your school email",
+      "descriptionDesktop": "Verify you're a student"
+    },
+    "workplace": {
+      "title": "Verify your workplace",
+      "description": "Verify with your work email and company name",
+      "descriptionDesktop": "Verify you're a professional"
+    },
+    "workplacePending": {
+      "title": "We're reviewing your work verification",
+      "description": "Your email is verified. Please wait for the Misaeng team to review it",
+      "descriptionDesktop": "Waiting for Misaeng team review"
+    }
+  },
+  "credit": {
+    "loadFailed": "Couldn't load your credits",
+    "ledgerLoadFailed": "Couldn't load your credit history",
+    "redeemComingSoon": "Reward requests are opening in stages. Check the credit guide for details.",
+    "loadFailedRetry": "Couldn't load credits · Retry",
+    "pillAria_other": "{count} community credits, view history",
+    "unit": "credits",
+    "history": "History",
+    "requestTitle": "Use credits",
+    "balanceLabel": "Your credits",
+    "requestDescription": "Pick a reward to use. After you request it, Misaeng will review and match you.",
+    "optionMeta_other": "{duration} · {count} times a month",
+    "needMore_other": "You need {count} more credits",
+    "redeemGuideLink": "Learn more about rewards",
+    "submit": "Request",
+    "historyTitle": "Credit history",
+    "guideLink": "View guide",
+    "retry": "Try again",
+    "emptyTitle": "No history yet",
+    "emptyDescription": "Earn credits with food spots, reviews, and comments.",
+    "writeFoodReview": "Write a food review",
+    "kinds": {
+      "earn": "Earned",
+      "revoke": "Revoked",
+      "spend": "Used",
+      "restore": "Restored",
+      "other": "Other"
+    },
+    "pillAria_one": "{count} community credit, view history",
+    "optionMeta_one": "{duration} · {count} time a month",
+    "needMore_one": "You need {count} more credit"
+  },
+  "referral": {
+    "linkCopied": "Referral link copied",
+    "copyFailed": "Couldn't copy the link. Please share your code directly.",
+    "errors": {
+      "invalidCode": "Enter the 8-character referral code",
+      "ownCode": "You can't use your own code"
+    },
+    "bound": "Referrer linked",
+    "title": "Referrals",
+    "description": "Each time someone uses your referral code, you get {credits}. Up to {max} people, and you can't refer yourself.",
+    "creditsAmount_other": "{count} credits",
+    "copying": "Copying…",
+    "shareButton": "Invite your friends",
+    "myCode": "My referral code",
+    "loading": "Loading…",
+    "usedCount": "Used by {used}/{max} people",
+    "enterReferrer": "Enter a referrer",
+    "boundTo": "Linked to referral code {code}.",
+    "codePlaceholder": "8-character referral code",
+    "binding": "Linking…",
+    "bind": "Link",
+    "creditsAmount_one": "{count} credit"
+  },
+  "posts": {
+    "loadFailed": "Couldn't load your posts",
+    "deleteConfirm": "Delete \"{title}\"?\nThis can't be undone.",
+    "deleted": "Post deleted",
+    "deleteFailed": "Couldn't delete the post",
+    "title": "My posts",
+    "description": "See your community posts by category, and edit or delete them",
+    "categoryAria": "Post categories",
+    "emptyAll": "You haven't posted anything yet",
+    "emptyCategory": "No posts in {category}",
+    "emptyAllHint": "Posts you write on any board show up here",
+    "emptyCategoryHint": "Posts you write on this board show up here",
+    "browseBoards": "Browse boards",
+    "edit": "Edit",
+    "deleting": "Deleting…",
+    "delete": "Delete"
+  },
+  "list": {
+    "redirectingToLogin": "Taking you to sign in…",
+    "totalCount_other": "All {count}",
+    "count_other": "{count} posts",
+    "categoryHeading": "Categories",
+    "all": "All",
+    "loading": "Loading posts…",
+    "thisCategory": "this category",
+    "viewBoard": "View {board}",
+    "viewDetail": "View details",
+    "count_one": "{count} post"
+  },
+  "likes": {
+    "title": "Posts I liked",
+    "description": "See posts you saved from Housing, Food, and OPT/Visa in one place",
+    "categoryAria": "Liked post categories",
+    "emptyAll": "You haven't liked any posts yet",
+    "emptyCategory": "No liked posts in {category}",
+    "emptyAllHint": "Tap the heart on posts you like and they'll show up here",
+    "emptyCategoryHint": "Tap the heart on this board's posts and they'll show up here",
+    "browseHousing": "Browse housing",
+    "rent": "{amount}/mo",
+    "rentWithNet": "{gross} / {net}/mo"
+  }
+}

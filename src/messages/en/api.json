@@ -1,0 +1,267 @@
+{
+  "places": {
+    "searchFailed": "Couldn't search places.",
+    "detailsFailed": "Couldn't load place details.",
+    "placeIdRequired": "placeId is required.",
+    "notFound": "We couldn't find that place.",
+    "invalidCoordinates": "Those coordinates aren't valid.",
+    "mapLoadFailed": "Couldn't load the map.",
+    "placeFallbackName": "Place",
+    "addressFallbackName": "Address",
+    "locationFallbackName": "Location",
+    "venuesCoordinatesRequired": "Latitude and longitude are required.",
+    "venuesLoadFailed": "Couldn't load the list of restaurants."
+  },
+  "common": {
+    "loginRequired": "Please log in first.",
+    "supabaseNotConfigured": "Supabase isn't configured.",
+    "supabaseNotConfiguredDetail": "Supabase isn't configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
+    "supabaseNotConfiguredLocal": "Supabase isn't configured. Locally, this is saved in your browser for now.",
+    "storageNotConfigured": "Supabase Storage isn't configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
+    "supabaseUrlInvalid": "NEXT_PUBLIC_SUPABASE_URL isn't a valid URL. Example: https://your-project.supabase.co",
+    "supabaseHostUnreachable": "Can't reach the Supabase project ({hostname}). Check the Project URL in Dashboard → Project Settings → API and update .env.local.",
+    "supabaseConnectFailed": "Couldn't connect to Supabase ({hostname}). Check the Project URL, API key, and your network.",
+    "forbidden": "You don't have permission to do that.",
+    "badRequest": "That request isn't valid.",
+    "postNotFound": "We couldn't find that post.",
+    "accountSuspended": "This account is suspended.",
+    "identityVerificationRequired": "To write posts and comments, verify your school or workplace first.",
+    "requestFailed": "Couldn't complete the request. Please try again."
+  },
+  "auth": {
+    "ellieoUnavailable": "Can't reach the Ellieo server. Please try again in a moment.",
+    "noAccessToken": "We didn't receive an access token.",
+    "loginFailed": "Login failed.",
+    "signupFailed": "Sign-up failed.",
+    "googleLoginFailed": "Google login failed.",
+    "googleSignupFailed": "Google sign-up failed.",
+    "agentGoogleSignupFailed": "Google sign-up failed.",
+    "appConnectMissing": "The APP_CONNECT_API_BASE_URL environment variable is required.",
+    "appConnectMissingLogin": "Login isn't available because the APP_CONNECT_API_BASE_URL environment variable is missing.",
+    "googleIdTokenRequired": "A Google idToken is required.",
+    "googleAccountHint": "You need a Google account registered with Ellieo.",
+    "googleAuthError": "Something went wrong during Google sign-in.",
+    "emailRequired": "Please enter your email.",
+    "passwordRequired": "Please enter your password.",
+    "passwordResetFailed": "Couldn't send the password reset request.",
+    "emailAuthError": "Something went wrong during email sign-in.",
+    "sessionExpired": "Your session has expired. Please log in again.",
+    "userInfoUnavailable": "You're logged in, but we couldn't load your account details.",
+    "appleIdTokenRequired": "Apple sign-in token is missing.",
+    "appleLoginFailed": "Couldn't sign in with Apple. Please try again.",
+    "appleSignupFailed": "Couldn't sign up with Apple. Please try again.",
+    "consentRequired": "Please agree to the Terms of Use and Privacy Policy to sign up.",
+    "refreshTokenRequired": "Refresh token is missing."
+  },
+  "profile": {
+    "nickname": {
+      "tooShort": "Your nickname must be at least {min} characters",
+      "tooLong": "Your nickname can be up to {max} characters",
+      "invalidChars": "Use only English letters and \".\""
+    },
+    "nicknameTaken": "That nickname is already taken. Please try another one.",
+    "nicknameTakenShort": "That nickname is already taken.",
+    "nicknameCheckFailed": "Couldn't check the nickname.",
+    "nicknameCheckFailedRetry": "Couldn't check the nickname. Please try again in a moment.",
+    "nicknameCheckFailedStatus": "Couldn't check the nickname. (HTTP {status})",
+    "listFailed": "Couldn't load the profile list (HTTP {status})",
+    "invalidGender": "Please choose a valid gender.",
+    "invalidOccupationType": "Please choose a valid occupation type.",
+    "saveFailed": "Couldn't save your profile.",
+    "saveFailedDetail": "Couldn't save your profile: {detail}"
+  },
+  "upload": {
+    "photoUrlRequired": "photoURL is required.",
+    "fileRequired": "Please choose a file to upload.",
+    "avatarUploadError": "Something went wrong while uploading your profile photo.",
+    "avatarBucketMissing": "Can't find the Supabase bucket \"{bucket}\". Create a public bucket in Storage.",
+    "storageUploadFailed": "Storage upload failed: {detail}",
+    "imageTypeUnsupported": "You can upload JPG, PNG, WEBP, or GIF images only.",
+    "imageTooLarge": "Images must be {max} or smaller.",
+    "imageBucketMissing": "Can't find the Supabase bucket \"{bucket}\". Check your buckets in Storage.",
+    "imageUploadFailedDetail": "Image upload failed: {detail}",
+    "imageUploadFailed": "Couldn't upload the image."
+  },
+  "verification": {
+    "codeSendFailed": "Couldn't send the verification code.",
+    "schoolDomainUnsupported": "We don't support this school email domain yet. Ask the Misaeng team to add your school.",
+    "codeInvalid": "The verification code is wrong or has expired.",
+    "schoolOtpDisabled": "School email verification is temporarily unavailable.",
+    "schoolEmailRequired": "Please enter your school email (.edu or a registered domain).",
+    "codeRequired": "Please enter the verification code.",
+    "schoolEmailError": "Something went wrong while verifying your school email.",
+    "companyNameRequired": "Please enter your company name.",
+    "companyNameTooLong": "Company name must be {max} characters or fewer.",
+    "workEmail": {
+      "required": "Please enter your work email.",
+      "invalidFormat": "Please enter a valid email address.",
+      "personalDomain": "Personal email like Gmail can't be used. Please enter the email you use at work."
+    },
+    "workplaceAlreadyApproved": "Your workplace is already verified.",
+    "workplacePending": "The Misaeng team is reviewing your workplace verification.",
+    "workplaceStorageMissing": "Workplace verification storage isn't configured.",
+    "workplaceSaveFailed": "Couldn't save the workplace verification request (HTTP {status})",
+    "workEmailError": "Something went wrong while verifying your work email."
+  },
+  "consent": {
+    "termsRequired": "Please agree to the Terms to continue.",
+    "storageNotConfigured": "Consent storage isn't configured.",
+    "policyOutdated": "The Terms or Privacy Policy have been updated. Please refresh and agree again."
+  },
+  "referral": {
+    "featureStorageMissing": "Referrals need storage to be configured.",
+    "loadFailed": "Couldn't load your referral info.",
+    "bindFailed": "Couldn't connect the referrer.",
+    "storageNotConfigured": "Referral code storage isn't configured.",
+    "saveFailed": "Couldn't save the referral code.",
+    "codeCreateFailed": "Couldn't create a referral code. Please try again in a moment.",
+    "codeInvalid": "Please check the 8-character referral code.",
+    "alreadyBound": "You already have a referrer.",
+    "ownCode": "You can't use your own referral code.",
+    "codeNotFound": "That referral code doesn't exist.",
+    "referrerNotFound": "We couldn't find that referrer.",
+    "maxUsesReached": "This referral code can be used by up to {max} people."
+  },
+  "credit": {
+    "loadFailed": "Couldn't load your credit info.",
+    "invalidUser": "That user isn't valid.",
+    "saveFailed": "Couldn't save credits (HTTP {status})",
+    "reviewListLoadFailed": "Couldn't load the review list.",
+    "reviewRequestNotFound": "We couldn't find that request.",
+    "reviewAlreadyProcessed": "This request has already been handled.",
+    "reviewPostMissing": "The post is missing or has been deleted.",
+    "awardFailed": "Couldn't award credits. Please check the storage settings.",
+    "processFailed": "Couldn't complete that action.",
+    "reviewSaveFailed": "Couldn't save the review request (HTTP {status})",
+    "reviewStatusLoadFailed": "Couldn't load the review request status.",
+    "reviewBoardIneligible": "Posts on this board can't request extra credits.",
+    "reviewFinalResultRequired": "Add the final result to your timeline first (approved, card received, offer, rejected, etc.).",
+    "reviewAlreadyAwarded": "This post has already received a review bonus.",
+    "reviewAlreadyPending": "This is already waiting for review.",
+    "reviewRequestFailed": "Couldn't request extra credits."
+  },
+  "postings": {
+    "loadFailed": "Couldn't load job postings."
+  },
+  "comments": {
+    "bodyRequired": "Please write a comment.",
+    "bodyTooLong": "Comments can be up to {max} characters.",
+    "parentNotFound": "We couldn't find the comment you're replying to.",
+    "createFailed": "Couldn't post your comment.",
+    "editTargetRequired": "Please choose a comment to edit.",
+    "notFound": "We couldn't find that comment.",
+    "editOwnOnly": "You can only edit your own comments.",
+    "updateFailed": "Couldn't update the comment.",
+    "deleteTargetRequired": "Please choose a comment to delete.",
+    "deleteOwnOnly": "You can only delete your own comments.",
+    "deleteFailed": "Couldn't delete the comment.",
+    "saveFailedRetry": "Couldn't save the comment. Please try again in a moment."
+  },
+  "community": {
+    "invalidBoard": "That board doesn't exist.",
+    "invalidPost": "That post isn't valid.",
+    "companyReselect": "Please choose the company again.",
+    "saveFailed": "Couldn't save your post.",
+    "saveFailedRetry": "Couldn't save your post. Please try again in a moment.",
+    "updateFailed": "Couldn't save your changes.",
+    "deleteFailed": "Couldn't delete it.",
+    "recommendFailed": "Couldn't update your like.",
+    "recommendSaveFailed": "Couldn't save your like. Please try again in a moment.",
+    "beenThereFoodOnly": "You can mark \"Been there\" on food posts only.",
+    "beenThereFailed": "Couldn't update \"Been there\".",
+    "beenThereSaveFailed": "Couldn't save \"Been there\". Please try again in a moment.",
+    "reportSaveFailed": "Couldn't save your report. Please try again in a moment.",
+    "notGuestPost": "This isn't a guest post.",
+    "guestPostLinkedElsewhere": "This post is already linked to another account.",
+    "guestClaimFailed": "Couldn't link your guest posts.",
+    "report": {
+      "reasonRequired": "Please choose a reason for reporting.",
+      "detailTooLong": "Details can be up to {max} characters.",
+      "otherDetailRequired": "If you choose \"Other\", please describe the reason.",
+      "alreadyReported": "You've already reported this post or comment.",
+      "failed": "Couldn't submit your report."
+    },
+    "write": {
+      "titleBodyRequired": "Please enter a title and body.",
+      "bodyTooLong": "The body can be up to {max} characters.",
+      "roommateTypeRequired": "Please choose a type.",
+      "roommateTitleTooLong": "The title can be up to {max} characters.",
+      "roommateOnePerAccount": "You can have only one roommate or sublet post per account. Edit or delete your existing post, then try again.",
+      "endDateAfterStart": "Please choose an end date after the start date.",
+      "partySizeRequired": "Please enter your party size.",
+      "totalSpendRequired": "Please enter the total amount spent.",
+      "tipIncludedRequired": "Please choose whether the tip is included.",
+      "waitMinutesRequired": "Please enter the wait time (0 if there was none).",
+      "foodCategoryRequired": "Please choose a category (Must-try, Great value, Good vibes, Study spot).",
+      "placeRequired": "Please check the address and restaurant name.",
+      "cptOptTypeRequired": "Please choose a type: CPT, OPT, STEM OPT, visa, or green card.",
+      "cptOptTimelineRequired": "Please add at least one timeline step.",
+      "jobReviewTypeRequired": "Please choose a type: internship, entry-level, experienced, or contract.",
+      "jobReviewTimelineRequired": "Please add at least one hiring step.",
+      "jobReviewSourceRequired": "Please choose how you got connected. If you picked a student association, choose which one too.",
+      "jobReviewOutcomeRequired": "Please choose the final result.",
+      "cityRequired": "Please check the city."
+    },
+    "roommate": {
+      "required": {
+        "has-room": {
+          "location": "Please enter your current neighborhood / location.",
+          "budget": "Please enter the roommate's monthly rent ($).",
+          "moveInStart": "Please choose the move-in date.",
+          "moveInEnd": "Please choose the move-out date."
+        },
+        "together": {
+          "location": "Please enter your preferred neighborhood.",
+          "budget": "Please enter your max monthly budget ($).",
+          "moveInStart": "Please choose your preferred move-in date.",
+          "moveInEnd": "Please choose the move-out date."
+        },
+        "room": {
+          "location": "Please enter your preferred neighborhood.",
+          "budget": "Please enter your max monthly budget ($).",
+          "moveInStart": "Please choose your preferred move-in date.",
+          "moveInEnd": "Please choose the move-out date."
+        },
+        "sublet": {
+          "location": "Please enter the sublet location.",
+          "budget": "Please enter the monthly rent ($).",
+          "moveInStart": "Please choose the sublet start date.",
+          "moveInEnd": "Please choose the sublet end date."
+        }
+      }
+    }
+  },
+  "guest": {
+    "invalidRequest": "Please check your request.",
+    "nicknameInvalid": "Please enter a display nickname of {min}–{max} characters (not an email address).",
+    "emailInvalid": "Please enter a valid email so we can send you gift card and credit updates.",
+    "linkedinRequired": "Please enter your LinkedIn profile URL. Example: linkedin.com/in/your-name",
+    "guidelinesRequired": "Please agree to the community posting guidelines.",
+    "titleRequired": "Please enter a title.",
+    "bodyRequired": "Please share what others should watch out for.",
+    "bodyTooLong": "\"Watch out for\" can be up to {max} characters.",
+    "jobReviewTypeRequired": "Please choose a type: internship, entry-level, experienced, job change, or contract.",
+    "rateLimited": "Please try again in a moment. (Too many requests in a short time)"
+  },
+  "push": {
+    "comment": {
+      "title": "New comment",
+      "body": "{name}: {preview}",
+      "onPost": "New comment on \"{title}\""
+    },
+    "reply": {
+      "title": "New reply",
+      "body": "{name} replied to your comment: {preview}"
+    },
+    "posting": {
+      "title": "New posting at {company}",
+      "body": "{title}"
+    },
+    "credit": {
+      "title": "+{amount} credits",
+      "body": "{label} · Balance {balance}"
+    },
+    "anonymous": "Anonymous",
+    "someone": "Someone"
+  }
+}

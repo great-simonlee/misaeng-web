@@ -1,4 +1,9 @@
 import { NextResponse } from 'next/server'
+import { finalizePost, localizePost } from '@lib/translations/localize.server'
+
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { formatNumber } from '@lib/i18n/format'
+import { getRequestLocale, getRequestT, getT } from '@lib/i18n/server'
 
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import { applyReviewBodyAccess } from '@lib/community/reviewAccess'
@@ -108,7 +113,7 @@ async function withPrivateJobReviewSource<T extends object>(post: T, id: string)
   return { ...post, jobReviewSource: source, jobReviewSourceOrgId: orgId }
 }
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(request: Request, context: RouteContext) {
   try {
     const { id } = await context.params
     const post = await getStoredCommunityPost(id)
@@ -122,9 +127,12 @@ export async function GET(_request: Request, context: RouteContext) {
       }
     }
     const user = await resolveAuthenticatedUser()
-    const visible = applyReviewBodyAccess(
-      sanitizeAnonymousCommunityPost(post, user?.uid),
-      user,
+    const locale = await getRequestLocale(request)
+    const visible = finalizePost(
+      applyReviewBodyAccess(
+        sanitizeAnonymousCommunityPost(localizePost(post, locale, { viewerUid: user?.uid }), user?.uid),
+        user,
+      ),
     )
     // 연락 경로는 비공개 — 수정 화면을 위해 작성자 본인에게만 내려준다.
     const isAuthor = Boolean(user?.uid && user.uid === post.authorUid)
@@ -141,32 +149,34 @@ export async function GET(_request: Request, context: RouteContext) {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
+  const locale = await getRequestLocale(request)
+  const t = await getT(locale, 'api')
   if (!isCommunityStorageConfigured()) {
     return NextResponse.json(
-      { error: 'Supabase 설정이 필요해요.' },
+      { error: t('common.supabaseNotConfigured') },
       { status: 503 },
     )
   }
 
   const user = await resolveAuthenticatedUser()
   if (!user?.uid) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
-  const suspended = await accountSuspendedResponse(user.uid)
+  const suspended = await accountSuspendedResponse(user.uid, t)
   if (suspended) return suspended
 
   const { id } = await context.params
   const existing = await getStoredCommunityPost(id)
   if (!existing) {
-    return NextResponse.json({ error: '글을 찾을 수 없어요.' }, { status: 404 })
+    return NextResponse.json({ error: t('common.postNotFound') }, { status: 404 })
   }
   if (existing.authorUid !== user.uid) {
-    return NextResponse.json({ error: '권한이 없어요.' }, { status: 403 })
+    return NextResponse.json({ error: t('common.forbidden') }, { status: 403 })
   }
 
   const body = (await request.json().catch(() => null)) as UpdateBody | null
   if (!body) {
-    return NextResponse.json({ error: '잘못된 요청이에요.' }, { status: 400 })
+    return NextResponse.json({ error: t('common.badRequest') }, { status: 400 })
   }
 
   // 내용 수정
@@ -176,7 +186,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   )
   if (!title || !contentHtml || contentHtml === '<p></p>') {
     return NextResponse.json(
-      { error: '제목과 본문을 입력해 주세요.' },
+      { error: t('community.write.titleBodyRequired') },
       { status: 400 },
     )
   }
@@ -184,7 +194,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (plainLength > COMMUNITY_BODY_MAX) {
     return NextResponse.json(
       {
-        error: `본문은 ${COMMUNITY_BODY_MAX.toLocaleString('en-US')}자 이내로 작성해 주세요.`,
+        error: t('community.write.bodyTooLong', {
+          max: formatNumber(locale, COMMUNITY_BODY_MAX),
+        }),
       },
       { status: 400 },
     )
@@ -329,7 +341,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   if (isRoommate && !roommateLookingFor) {
     return NextResponse.json(
-      { error: '유형을 선택해 주세요.' },
+      { error: t('community.write.roommateTypeRequired') },
       { status: 400 },
     )
   }
@@ -338,7 +350,9 @@ export async function PATCH(request: Request, context: RouteContext) {
     if (title.length > ROOMMATE_TITLE_MAX) {
       return NextResponse.json(
         {
-          error: `제목은 ${ROOMMATE_TITLE_MAX}자 이내로 작성해 주세요.`,
+          error: t('community.write.roommateTitleTooLong', {
+            max: formatNumber(locale, ROOMMATE_TITLE_MAX),
+          }),
         },
         { status: 400 },
       )
@@ -349,25 +363,25 @@ export async function PATCH(request: Request, context: RouteContext) {
     ).trim()
     if (formConfig?.locationRequired && !locationValue) {
       return NextResponse.json(
-        { error: `${formConfig.locationLabel}을(를) 입력해 주세요.` },
+        { error: t(`community.roommate.required.${roommateLookingFor}.location`) },
         { status: 400 },
       )
     }
     if (formConfig?.budgetRequired && roommateBudgetMax == null) {
       return NextResponse.json(
-        { error: `${formConfig.budgetLabel}을(를) 입력해 주세요.` },
+        { error: t(`community.roommate.required.${roommateLookingFor}.budget`) },
         { status: 400 },
       )
     }
     if (formConfig?.moveInStartRequired && !roommateMoveInDate) {
       return NextResponse.json(
-        { error: `${formConfig.moveInStartLabel}을(를) 선택해 주세요.` },
+        { error: t(`community.roommate.required.${roommateLookingFor}.moveInStart`) },
         { status: 400 },
       )
     }
     if (formConfig?.moveInEndRequired && !roommateMoveOutDate) {
       return NextResponse.json(
-        { error: `${formConfig.moveInEndLabel}을(를) 선택해 주세요.` },
+        { error: t(`community.roommate.required.${roommateLookingFor}.moveInEnd`) },
         { status: 400 },
       )
     }
@@ -377,7 +391,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       !roommateMoveOutDate
     ) {
       return NextResponse.json(
-        { error: '종료일은 시작일 이후로 선택해 주세요.' },
+        { error: t('community.write.endDateAfterStart') },
         { status: 400 },
       )
     }
@@ -386,37 +400,37 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (isFood) {
     if (partySize == null) {
       return NextResponse.json(
-        { error: '방문 인원을 입력해 주세요.' },
+        { error: t('community.write.partySizeRequired') },
         { status: 400 },
       )
     }
     if (totalSpend == null) {
       return NextResponse.json(
-        { error: '총 금액을 입력해 주세요.' },
+        { error: t('community.write.totalSpendRequired') },
         { status: 400 },
       )
     }
     if (tipIncluded == null) {
       return NextResponse.json(
-        { error: '팁 포함 여부를 선택해 주세요.' },
+        { error: t('community.write.tipIncludedRequired') },
         { status: 400 },
       )
     }
     if (waitMinutes == null) {
       return NextResponse.json(
-        { error: '웨이팅 시간을 입력해 주세요. (없으면 0)' },
+        { error: t('community.write.waitMinutesRequired') },
         { status: 400 },
       )
     }
     if (!foodCategory) {
       return NextResponse.json(
-        { error: '카테고리를 선택해 주세요. (맛집·가성비·느좋·카공)' },
+        { error: t('community.write.foodCategoryRequired') },
         { status: 400 },
       )
     }
     if (latitude == null || longitude == null || !placeName) {
       return NextResponse.json(
-        { error: '주소와 음식점 이름을 확인해 주세요.' },
+        { error: t('community.write.placeRequired') },
         { status: 400 },
       )
     }
@@ -425,13 +439,13 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (isCptOpt) {
     if (!cptOptType) {
       return NextResponse.json(
-        { error: 'CPT / OPT / STEM OPT / 비자 / 영주권 유형을 선택해 주세요.' },
+        { error: t('community.write.cptOptTypeRequired') },
         { status: 400 },
       )
     }
     if (cptOptTimeline.length === 0) {
       return NextResponse.json(
-        { error: '타임라인을 최소 1단계 이상 입력해 주세요.' },
+        { error: t('community.write.cptOptTimelineRequired') },
         { status: 400 },
       )
     }
@@ -440,24 +454,24 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (isJobReview) {
     if (!jobReviewType) {
       return NextResponse.json(
-        { error: '인턴 / 신입 / 경력 / 계약 유형을 선택해 주세요.' },
+        { error: t('community.write.jobReviewTypeRequired') },
         { status: 400 },
       )
     }
     if (jobReviewTimeline.length === 0) {
       return NextResponse.json(
-        { error: '채용 단계를 최소 1건 이상 입력해 주세요.' },
+        { error: t('community.write.jobReviewTimelineRequired') },
         { status: 400 },
       )
     }
     if (!jobReviewSource) {
       return NextResponse.json(
-        { error: '어떻게 연락이 닿았는지 선택해 주세요. 학생회를 골랐다면 어느 학생회인지도 선택해 주세요.' },
+        { error: t('community.write.jobReviewSourceRequired') },
         { status: 400 },
       )
     }
     if (!jobReviewOutcome) {
-      return NextResponse.json({ error: '최종 결과를 선택해 주세요.' }, { status: 400 })
+      return NextResponse.json({ error: t('community.write.jobReviewOutcomeRequired') }, { status: 400 })
     }
   }
 
@@ -465,7 +479,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     ? await resolveReviewCompanyId(body.companyId)
     : ({ ok: true, companyId: undefined } as const)
   if (!companyResult.ok) {
-    return NextResponse.json({ error: companyResult.error }, { status: 400 })
+    return NextResponse.json({ error: t(companyResult.errorKey) }, { status: 400 })
   }
 
   const next = {
@@ -549,42 +563,42 @@ export async function PATCH(request: Request, context: RouteContext) {
     console.error('Community update error:', error)
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : '수정에 실패했어요.',
+        error: apiErrorMessage(t, error, 'community.updateFailed'),
       },
       { status: 500 },
     )
   }
 }
 
-export async function DELETE(_request: Request, context: RouteContext) {
+export async function DELETE(request: Request, context: RouteContext) {
+  const t = await getRequestT(request, 'api')
   if (!isCommunityStorageConfigured()) {
     return NextResponse.json(
-      { error: 'Supabase 설정이 필요해요.' },
+      { error: t('common.supabaseNotConfigured') },
       { status: 503 },
     )
   }
 
   const user = await resolveAuthenticatedUser()
   if (!user?.uid) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
-  const suspended = await accountSuspendedResponse(user.uid)
+  const suspended = await accountSuspendedResponse(user.uid, t)
   if (suspended) return suspended
 
   const { id } = await context.params
   const existing = await getStoredCommunityPost(id)
   if (!existing) {
-    return NextResponse.json({ error: '글을 찾을 수 없어요.' }, { status: 404 })
+    return NextResponse.json({ error: t('common.postNotFound') }, { status: 404 })
   }
   if (existing.authorUid !== user.uid) {
-    return NextResponse.json({ error: '권한이 없어요.' }, { status: 403 })
+    return NextResponse.json({ error: t('common.forbidden') }, { status: 403 })
   }
 
   try {
     const ok = await deleteStoredCommunityPost(id)
     if (!ok) {
-      return NextResponse.json({ error: '삭제에 실패했어요.' }, { status: 500 })
+      return NextResponse.json({ error: t('community.deleteFailed') }, { status: 500 })
     }
     try {
       const { revokeSourceCredit } = await import('@lib/community/creditLedger')
@@ -601,8 +615,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     console.error('Community delete error:', error)
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : '삭제에 실패했어요.',
+        error: apiErrorMessage(t, error, 'community.deleteFailed'),
       },
       { status: 500 },
     )

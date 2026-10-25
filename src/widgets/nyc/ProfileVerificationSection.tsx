@@ -1,7 +1,7 @@
 'use client'
 
 import type { HTMLInputTypeAttribute, InputHTMLAttributes, ReactNode } from 'react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 
 import { BottomSheet, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
@@ -34,10 +34,21 @@ import {
   isSchoolEmail,
   isValidEmailFormat,
 } from '@lib/utils/verification'
-import { getWorkplaceEmailError } from '@lib/utils/workplaceEmail'
+import { getWorkplaceEmailErrorCode } from '@lib/utils/workplaceEmail'
+import { BRAND_CONFIG } from '@lib/brand'
+import { useT } from '@lib/i18n/client'
 import type { NycUserProfile } from '@/types/nyc'
 
 type VerifyKind = 'school' | 'workplace' | 'phone' | 'chooser' | null
+
+/** `{name}` 자리에 요소를 끼운다 (언어마다 어순이 달라서 문장을 쪼개지 않는다) */
+function renderWithSlots(template: string, slots: Record<string, ReactNode>) {
+  return template.split(/(\{\w+\})/g).map((part, index) => {
+    const name = part.match(/^\{(\w+)\}$/)?.[1]
+    if (name && name in slots) return <Fragment key={index}>{slots[name]}</Fragment>
+    return part
+  })
+}
 
 type Props = {
   profile: NycUserProfile | null
@@ -58,6 +69,7 @@ export function ProfileVerificationSection({
   openIdentityVerify = false,
   onIdentityVerifyOpenChange,
 }: Props) {
+  const t = useT('me')
   const { user, refreshSession, mergeStoredProfile } = useAuth()
   const { success, error: toastError } = useToast()
   const [active, setActive] = useState<VerifyKind>(null)
@@ -92,9 +104,9 @@ export function ProfileVerificationSection({
   const smsEnabled = isPhoneSmsEnabled()
   const schoolOk = Boolean(profile?.schoolEmailVerified)
   const phoneBlockedReason = !smsEnabled
-    ? 'SMS 비활성'
+    ? t('verification.phone.smsDisabledShort')
     : REQUIRE_SCHOOL_BEFORE_PHONE && !schoolOk
-      ? '학교 인증 후'
+      ? t('verification.phone.afterSchool')
       : null
 
   const workplaceStatus = profile?.workplaceStatus ?? 'none'
@@ -105,27 +117,27 @@ export function ProfileVerificationSection({
     workplaceApproved
       ? [profile?.workplaceCompanyName, profile?.workEmail]
           .filter(Boolean)
-          .join(' · ') || '인증됨'
+          .join(' · ') || t('verification.verifiedShort')
       : workplacePending
-        ? '이메일 인증 완료 · 미생 팀 확인 대기'
+        ? t('verification.workplace.pendingDetail')
         : workplaceStatus === 'rejected'
-          ? profile?.workplaceRejectReason || '다시 인증해 주세요'
-          : '직장 메일과 회사 이름으로 인증'
+          ? profile?.workplaceRejectReason || t('verification.workplace.retry')
+          : t('verification.workplace.rowHint')
 
   const items = [
     {
       id: 'school' as const,
-      label: '학교 이메일',
+      label: t('verification.school.rowLabel'),
       verified: Boolean(profile?.schoolEmailVerified),
       schoolId: profile?.verifiedSchoolId ?? null,
       detail: profile?.schoolEmailVerified
-        ? profile.schoolEmail || '인증됨'
-        : '학교 메일로 학생 인증',
+        ? profile.schoolEmail || t('verification.verifiedShort')
+        : t('verification.school.rowHint'),
       pending: false,
     },
     {
       id: 'workplace' as const,
-      label: '직장인 인증',
+      label: t('verification.workplace.rowLabel'),
       verified: workplaceApproved,
       schoolId: null as string | null,
       detail: workplaceDetail,
@@ -133,23 +145,23 @@ export function ProfileVerificationSection({
     },
     {
       id: 'phone' as const,
-      label: '휴대폰',
+      label: t('verification.phone.rowLabel'),
       verified: Boolean(profile?.phoneVerified),
       schoolId: null as string | null,
       detail: profile?.phoneVerified
         ? formatPhoneDisplay(profile.phone ?? '')
         : phoneBlockedReason
           ? phoneBlockedReason
-          : '번호로 본인 인증',
+          : t('verification.phone.rowHint'),
     },
     {
       id: 'instagram' as const,
-      label: '인스타그램',
+      label: t('verification.instagram.rowLabel'),
       verified: Boolean(profile?.instagramVerified),
       schoolId: null as string | null,
       detail: profile?.instagramVerified
         ? `@${profile.instagramHandle ?? ''}`
-        : '계정 연동',
+        : t('verification.instagram.rowHint'),
       soon: true,
     },
   ]
@@ -157,10 +169,10 @@ export function ProfileVerificationSection({
   return (
     <section className='mt-0'>
       <h2 className='mb-1.5 px-0.5 text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
-        인증
+        {t('verification.title')}
       </h2>
       <p className='mb-3 px-0.5 text-[11px] leading-relaxed text-[var(--muted)]'>
-        가입한 개인 메일과 다른 학교·직장 메일을 인증해도 이 계정에 연결돼요.
+        {t('verification.description')}
       </p>
       <ul className='overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>
         {items.map((item, index) => {
@@ -200,15 +212,15 @@ export function ProfileVerificationSection({
               </div>
               {soon ? (
                 <span className='shrink-0 text-[12px] text-[var(--muted)]'>
-                  준비 중
+                  {t('verification.status.soon')}
                 </span>
               ) : item.verified ? (
                 <span className='shrink-0 text-[12px] font-medium text-emerald-600'>
-                  인증 완료
+                  {t('verification.status.verified')}
                 </span>
               ) : pending ? (
                 <span className='shrink-0 text-[12px] font-medium text-amber-700'>
-                  검토 중
+                  {t('verification.status.inReview')}
                 </span>
               ) : phoneBlocked ? (
                 <span className='shrink-0 text-[12px] text-[var(--muted)]'>
@@ -216,7 +228,7 @@ export function ProfileVerificationSection({
                 </span>
               ) : (
                 <span className='shrink-0 text-[12px] font-medium text-[var(--brand)]'>
-                  인증
+                  {t('verification.status.verify')}
                 </span>
               )}
               {(canOpen || soon || phoneBlocked) && !item.verified && (
@@ -247,18 +259,17 @@ export function ProfileVerificationSection({
       </ul>
       {!smsEnabled && (
         <p className='mt-2.5 px-0.5 text-[11px] leading-relaxed text-[var(--muted)]'>
-          휴대폰 SMS 인증은 현재 비활성화되어 있어요.
+          {t('verification.phone.smsDisabled')}
         </p>
       )}
 
       {resolvedActive === 'chooser' && user ? (
         <VerifySheet
-          title='본인 인증'
+          title={t('verification.chooser.title')}
           onClose={() => closeVerify('chooser')}
         >
           <p className={verifyDescriptionClass}>
-            학교 메일 또는 직장 메일 중 편한 방법으로 인증해 주세요. 가입할 때
-            쓴 개인 메일과 달라도 이 계정에 연결돼요.
+            {t('verification.chooser.description')}
           </p>
           <button
             type='button'
@@ -268,7 +279,7 @@ export function ProfileVerificationSection({
             }}
             className={verifyPrimaryButtonClass}
           >
-            학교 이메일로 학생 인증
+            {t('verification.chooser.school')}
           </button>
           <button
             type='button'
@@ -278,7 +289,7 @@ export function ProfileVerificationSection({
             }}
             className={verifyGhostButtonClass}
           >
-            직장 이메일로 직장인 인증
+            {t('verification.chooser.workplace')}
           </button>
         </VerifySheet>
       ) : null}
@@ -300,9 +311,7 @@ export function ProfileVerificationSection({
             onSubmitted={(storedProfile) => {
               if (storedProfile) mergeStoredProfile(storedProfile)
               void refreshSession()
-              success(
-                '이메일 인증이 완료됐어요. 미생 팀 확인 후 직장인 인증이 완료돼요.',
-              )
+              success(t('verification.workplace.submittedToast'))
               closeVerify('workplace')
             }}
             onError={(msg) => toastError(msg)}
@@ -318,13 +327,13 @@ export function ProfileVerificationSection({
             void refreshSession()
             success(
               schoolName
-                ? `${schoolName}로 인증했어요`
-                : '학교 이메일 인증을 완료했어요',
+                ? t('verification.school.verifiedWithSchool', { school: schoolName })
+                : t('verification.school.verifiedToast'),
             )
             closeVerify('school')
           }}
           onRegistered={() => {
-            success('학교 등록 요청을 보냈어요. 검토 후 연락드릴게요.')
+            success(t('verification.school.registrationSentToast'))
             closeVerify('school')
           }}
           onError={(msg) => toastError(msg)}
@@ -338,7 +347,7 @@ export function ProfileVerificationSection({
             setActive(null)
           }}
           onVerified={() => {
-            success('휴대폰 인증을 완료했어요')
+            success(t('verification.phone.verifiedToast'))
             setActive(null)
           }}
           onError={(msg) => toastError(msg)}
@@ -525,7 +534,7 @@ const verifyPrimaryButtonClass =
   'flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[13px] font-semibold leading-none text-white touch-manipulation disabled:opacity-50'
 
 const verifyLinkButtonClass =
-  'flex h-9 w-full items-center justify-center text-[13px] font-medium leading-none text-[#F64310] touch-manipulation disabled:text-[var(--muted)]'
+  'flex h-9 w-full items-center justify-center text-[13px] font-medium leading-none text-brand touch-manipulation disabled:text-[var(--muted)]'
 
 const verifyGhostButtonClass =
   'flex h-9 w-full items-center justify-center text-[13px] font-medium leading-none text-[var(--muted-foreground)] touch-manipulation'
@@ -551,6 +560,7 @@ function VerifyClearableInput({
   autoCapitalize?: string
   autoCorrect?: string
 }) {
+  const t = useT('me')
   const showClear = Boolean(value.trim()) && !disabled
 
   return (
@@ -572,7 +582,7 @@ function VerifyClearableInput({
           type='button'
           onClick={() => onChange('')}
           className='absolute inset-y-0 right-0 flex items-center px-3.5 text-[12px] font-medium text-[var(--muted)]/60 touch-manipulation transition hover:text-[var(--muted-foreground)]'
-          aria-label='입력 지우기'
+          aria-label={t('verification.clearInputAria')}
         >
           Clear
         </button>
@@ -610,15 +620,20 @@ function WorkplaceStatusSheet({
   rejectReason?: string | null
   onClose: () => void
 }) {
+  const t = useT('me')
   return (
     <VerifySheet
-      title={approved ? '직장인 인증 완료' : '직장인 인증 검토 중'}
+      title={
+        approved
+          ? t('verification.workplace.approvedTitle')
+          : t('verification.workplace.pendingTitle')
+      }
       onClose={onClose}
     >
       <p className={verifyDescriptionClass}>
         {approved
-          ? '미생 팀에서 직장인 인증을 확인했어요.'
-          : '직장 이메일 인증은 끝났어요. 회사 정보를 미생 팀에서 확인하고 있어요.'}
+          ? t('verification.workplace.approvedDescription')
+          : t('verification.workplace.pendingDescription')}
       </p>
       {companyName ? (
         <p className='text-[14px] font-medium text-[var(--foreground)]'>
@@ -648,6 +663,8 @@ function WorkplaceEmailVerifyModal({
   onSubmitted: (profile: Record<string, unknown> | null) => void
   onError: (msg: string) => void
 }) {
+  const t = useT('me')
+  const tRoot = useT()
   const [step, setStep] = useState<'form' | 'code'>('form')
   const [email, setEmail] = useState(initialEmail ?? '')
   const [companyName, setCompanyName] = useState(initialCompanyName ?? '')
@@ -657,35 +674,38 @@ function WorkplaceEmailVerifyModal({
 
   useEffect(() => {
     if (cooldown <= 0) return
-    const t = window.setInterval(() => {
+    const timer = window.setInterval(() => {
       setCooldown((c) => (c <= 1 ? 0 : c - 1))
     }, 1000)
-    return () => window.clearInterval(t)
+    return () => window.clearInterval(timer)
   }, [cooldown])
 
   async function handleSend() {
     const trimmedEmail = email.trim().toLowerCase()
     const trimmedCompany = companyName.trim()
-    const emailError = getWorkplaceEmailError(trimmedEmail)
-    if (emailError) {
-      onError(emailError)
+    const emailErrorCode = getWorkplaceEmailErrorCode(trimmedEmail)
+    if (emailErrorCode) {
+      onError(t(`verification.workplace.errors.${emailErrorCode}`))
       return
     }
     if (trimmedCompany.length < 2) {
-      onError('회사 이름을 입력해 주세요')
+      onError(t('verification.workplace.errors.companyRequired'))
       return
     }
     setBusy(true)
     try {
-      await sendWorkplaceEmailVerification({
-        email: trimmedEmail,
-        companyName: trimmedCompany,
-      })
+      await sendWorkplaceEmailVerification(
+        {
+          email: trimmedEmail,
+          companyName: trimmedCompany,
+        },
+        tRoot,
+      )
       setCode('')
       setStep('code')
       setCooldown(Math.ceil(SCHOOL_OTP_COOLDOWN_MS / 1000))
     } catch (err) {
-      onError(getErrorMessage(err, '인증 메일 전송에 실패했어요'))
+      onError(getErrorMessage(err, t('verification.errors.sendFailed')))
     } finally {
       setBusy(false)
     }
@@ -694,35 +714,39 @@ function WorkplaceEmailVerifyModal({
   async function handleConfirm() {
     setBusy(true)
     try {
-      const result = await confirmWorkplaceEmailVerification({
-        email: email.trim().toLowerCase(),
-        companyName: companyName.trim(),
-        code,
-      })
+      const result = await confirmWorkplaceEmailVerification(
+        {
+          email: email.trim().toLowerCase(),
+          companyName: companyName.trim(),
+          code,
+        },
+        tRoot,
+      )
       onSubmitted(result.profile)
     } catch (err) {
-      onError(getErrorMessage(err, '인증에 실패했어요'))
+      onError(getErrorMessage(err, t('verification.errors.confirmFailed')))
     } finally {
       setBusy(false)
     }
   }
 
   return (
-    <VerifySheet title='직장인 인증' onClose={onClose}>
+    <VerifySheet title={t('verification.workplace.rowLabel')} onClose={onClose}>
       {step === 'form' ? (
         <>
           <p className={verifyDescriptionClass}>
-            지금 로그인한 계정에 직장 메일이 연결돼요. 가입 메일과 달라도
-            괜찮아요. 코드 확인 후 미생 팀이 회사 정보를 한 번 더 확인해요.
+            {t('verification.workplace.formDescription')}
           </p>
           <label className='block space-y-2'>
-            <span className={verifyLabelClass}>회사 이름</span>
+            <span className={verifyLabelClass}>
+              {t('verification.workplace.companyLabel')}
+            </span>
             <VerifyClearableInput
               value={companyName}
               onChange={(value) =>
                 setCompanyName(value.slice(0, WORKPLACE_COMPANY_MAX))
               }
-              placeholder='예: Misaeng LLC'
+              placeholder={t('verification.workplace.companyPlaceholder')}
               disabled={busy}
             />
             <span className={verifyHintClass}>
@@ -730,7 +754,9 @@ function WorkplaceEmailVerifyModal({
             </span>
           </label>
           <label className='block space-y-2'>
-            <span className={verifyLabelClass}>직장 이메일</span>
+            <span className={verifyLabelClass}>
+              {t('verification.workplace.emailLabel')}
+            </span>
             <VerifyClearableInput
               type='email'
               value={email}
@@ -746,15 +772,18 @@ function WorkplaceEmailVerifyModal({
             onClick={() => void handleSend()}
             className={verifyPrimaryButtonClass}
           >
-            {busy ? '전송 중…' : '인증 코드 받기'}
+            {busy ? t('verification.sending') : t('verification.getCode')}
           </button>
         </>
       ) : (
         <>
           <p className={`${verifyDescriptionClass} text-center`}>
-            <span className='font-medium text-[var(--foreground)]'>{email}</span>
-            <br />
-            으로 보낸 6자리 코드를 입력해 주세요
+            {renderWithSlots(t('verification.codeSentTo'), {
+              email: (
+                <span className='font-medium text-[var(--foreground)]'>{email}</span>
+              ),
+              br: <br />,
+            })}
           </p>
           <OtpDigitInputs value={code} onChange={setCode} disabled={busy} />
           <div className='space-y-2'>
@@ -764,7 +793,7 @@ function WorkplaceEmailVerifyModal({
               onClick={() => void handleConfirm()}
               className={verifyPrimaryButtonClass}
             >
-              {busy ? '확인 중…' : '이메일 인증 완료'}
+              {busy ? t('verification.checking') : t('verification.workplace.confirmButton')}
             </button>
             <button
               type='button'
@@ -772,7 +801,9 @@ function WorkplaceEmailVerifyModal({
               onClick={() => void handleSend()}
               className={verifyLinkButtonClass}
             >
-              {cooldown > 0 ? `재전송 ${cooldown}s` : '코드 다시 받기'}
+              {cooldown > 0
+                ? t('verification.resendIn', { seconds: cooldown })
+                : t('verification.resendCode')}
             </button>
             <button
               type='button'
@@ -780,7 +811,7 @@ function WorkplaceEmailVerifyModal({
               onClick={() => setStep('form')}
               className={verifyGhostButtonClass}
             >
-              회사·이메일 다시 입력
+              {t('verification.workplace.editForm')}
             </button>
           </div>
         </>
@@ -803,6 +834,8 @@ function SchoolEmailVerifyModal({
   onRegistered: () => void
   onError: (msg: string) => void
 }) {
+  const t = useT('me')
+  const tRoot = useT()
   const { user } = useAuth()
   const [step, setStep] = useState<'email' | 'code' | 'register'>('email')
   const [email, setEmail] = useState('')
@@ -821,10 +854,10 @@ function SchoolEmailVerifyModal({
 
   useEffect(() => {
     if (cooldown <= 0) return
-    const t = window.setInterval(() => {
+    const timer = window.setInterval(() => {
       setCooldown((c) => (c <= 1 ? 0 : c - 1))
     }, 1000)
-    return () => window.clearInterval(t)
+    return () => window.clearInterval(timer)
   }, [cooldown])
 
   function openRegisterStep(sourceEmail?: string) {
@@ -855,12 +888,12 @@ function SchoolEmailVerifyModal({
         openRegisterStep(trimmed)
         return
       }
-      onError('.edu 학교 이메일을 입력해 주세요')
+      onError(t('verification.school.errors.eduRequired'))
       return
     }
     setBusy(true)
     try {
-      await sendSchoolEmailVerification(trimmed)
+      await sendSchoolEmailVerification(trimmed, tRoot)
       setCode('')
       setStep('code')
       setCooldown(Math.ceil(SCHOOL_OTP_COOLDOWN_MS / 1000))
@@ -878,13 +911,13 @@ function SchoolEmailVerifyModal({
         onError(
           getErrorMessage(
             err,
-            '아직 지원하지 않는 학교예요. 등록 요청을 보내 주세요.',
+            t('verification.school.errors.unsupported'),
           ),
         )
         return
       }
 
-      onError(getErrorMessage(err, '인증 메일 전송에 실패했어요'))
+      onError(getErrorMessage(err, t('verification.errors.sendFailed')))
     } finally {
       setBusy(false)
     }
@@ -897,10 +930,11 @@ function SchoolEmailVerifyModal({
       const result = await confirmSchoolEmailVerification(
         email.trim().toLowerCase(),
         code,
+        tRoot,
       )
       onVerified(result.schoolName, result.profile)
     } catch (err) {
-      onError(getErrorMessage(err, '인증에 실패했어요'))
+      onError(getErrorMessage(err, t('verification.errors.confirmFailed')))
     } finally {
       setBusy(false)
     }
@@ -908,7 +942,7 @@ function SchoolEmailVerifyModal({
 
   async function handleRegisterSubmit() {
     if (!user?.email) {
-      onError('로그인이 필요해요')
+      onError(tRoot('auth.errors.loginRequired'))
       return
     }
 
@@ -916,25 +950,28 @@ function SchoolEmailVerifyModal({
     const emailDomain = normalizeSchoolDomain(emailDomainDraft)
 
     if (schoolName.length < 2) {
-      onError('학교 이름을 입력해 주세요')
+      onError(t('verification.school.errors.nameRequired'))
       return
     }
     if (!isValidSchoolDomain(emailDomain)) {
-      onError('올바른 이메일 도메인을 입력해 주세요 (예: monroeu.com)')
+      onError(t('verification.school.errors.invalidDomain'))
       return
     }
 
     setBusy(true)
     try {
-      await sendSchoolRegistrationRequest({
-        schoolName,
-        emailDomain,
-        requesterEmail: user.email,
-        requesterName: user.displayName,
-      })
+      await sendSchoolRegistrationRequest(
+        {
+          schoolName,
+          emailDomain,
+          requesterEmail: user.email,
+          requesterName: user.displayName,
+        },
+        tRoot,
+      )
       onRegistered()
     } catch (err) {
-      onError(getErrorMessage(err, '학교 등록 요청 전송에 실패했어요'))
+      onError(getErrorMessage(err, t('verification.school.errors.registrationFailed')))
     } finally {
       setBusy(false)
     }
@@ -942,14 +979,15 @@ function SchoolEmailVerifyModal({
 
   if (step === 'register') {
     return (
-      <VerifySheet title='학교 등록 요청' onClose={onClose}>
+      <VerifySheet title={t('verification.school.registerTitle')} onClose={onClose}>
         <p className={verifyDescriptionClass}>
-          목록에 없는 학교는 미생팀에 등록을 요청할 수 있어요. 학교 이름과
-          이메일 도메인을 알려주시면 Ellieo·앱에 반영해 드려요.
+          {t('verification.school.registerDescription', { brand: BRAND_CONFIG.name })}
         </p>
 
         <label className='block space-y-2'>
-          <span className={verifyLabelClass}>학교 이름</span>
+          <span className={verifyLabelClass}>
+            {t('verification.school.nameLabel')}
+          </span>
           <input
             type='text'
             value={schoolNameDraft}
@@ -960,7 +998,9 @@ function SchoolEmailVerifyModal({
         </label>
 
         <label className='block space-y-2'>
-          <span className={verifyLabelClass}>학교 이메일 도메인</span>
+          <span className={verifyLabelClass}>
+            {t('verification.school.domainLabel')}
+          </span>
           <input
             type='text'
             value={emailDomainDraft}
@@ -973,7 +1013,7 @@ function SchoolEmailVerifyModal({
             autoCorrect='off'
           />
           <span className={verifyHintClass}>
-            @ 없이 도메인만 입력 (예: monroeu.com)
+            {t('verification.school.domainHint')}
           </span>
         </label>
 
@@ -988,7 +1028,7 @@ function SchoolEmailVerifyModal({
             onClick={() => void handleRegisterSubmit()}
             className={verifyPrimaryButtonClass}
           >
-            {busy ? '전송 중…' : '미생팀에 등록 요청'}
+            {busy ? t('verification.sending') : t('verification.school.registerSubmit')}
           </button>
 
           <button
@@ -997,7 +1037,7 @@ function SchoolEmailVerifyModal({
             onClick={() => setStep('email')}
             className={verifyGhostButtonClass}
           >
-            학교 이메일 인증으로 돌아가기
+            {t('verification.school.backToVerify')}
           </button>
         </div>
       </VerifySheet>
@@ -1005,12 +1045,11 @@ function SchoolEmailVerifyModal({
   }
 
   return (
-    <VerifySheet title='학교 이메일 인증' onClose={onClose}>
+    <VerifySheet title={t('verification.school.verifyTitle')} onClose={onClose}>
       {step === 'email' ? (
         <>
           <p className={verifyDescriptionClass}>
-            지금 로그인한 계정에 학교 메일이 연결돼요. 가입 메일과 달라도
-            괜찮아요. 학교 메일로 6자리 코드를 보내 드려요.
+            {t('verification.school.formDescription')}
           </p>
           <VerifyClearableInput
             type='email'
@@ -1027,7 +1066,7 @@ function SchoolEmailVerifyModal({
               onClick={() => void handleSend()}
               className={verifyPrimaryButtonClass}
             >
-              {busy ? '전송 중…' : '인증 코드 받기'}
+              {busy ? t('verification.sending') : t('verification.getCode')}
             </button>
             <button
               type='button'
@@ -1035,16 +1074,19 @@ function SchoolEmailVerifyModal({
               onClick={() => openRegisterStep()}
               className={verifyLinkButtonClass}
             >
-              학교를 찾을 수 없어요 · 등록 요청
+              {t('verification.school.notFoundRequest')}
             </button>
           </div>
         </>
       ) : (
         <>
           <p className={`${verifyDescriptionClass} text-center`}>
-            <span className='font-medium text-[var(--foreground)]'>{email}</span>
-            <br />
-            으로 보낸 6자리 코드를 입력해 주세요
+            {renderWithSlots(t('verification.codeSentTo'), {
+              email: (
+                <span className='font-medium text-[var(--foreground)]'>{email}</span>
+              ),
+              br: <br />,
+            })}
           </p>
 
           <OtpDigitInputs value={code} onChange={setCode} disabled={busy} />
@@ -1056,7 +1098,7 @@ function SchoolEmailVerifyModal({
               onClick={() => void handleConfirm()}
               className={verifyPrimaryButtonClass}
             >
-              {busy ? '확인 중…' : '인증 완료'}
+              {busy ? t('verification.checking') : t('verification.confirmButton')}
             </button>
             <button
               type='button'
@@ -1064,7 +1106,9 @@ function SchoolEmailVerifyModal({
               onClick={() => void handleSend()}
               className={verifyLinkButtonClass}
             >
-              {cooldown > 0 ? `재전송 ${cooldown}s` : '코드 다시 받기'}
+              {cooldown > 0
+                ? t('verification.resendIn', { seconds: cooldown })
+                : t('verification.resendCode')}
             </button>
           </div>
         </>
@@ -1081,6 +1125,7 @@ function PhoneVerifyModal({
   onVerified: () => void
   onError: (msg: string) => void
 }) {
+  const t = useT('me')
   const { user } = useAuth()
   const [step] = useState<'phone' | 'code'>('phone')
   const [phone, setPhone] = useState('')
@@ -1091,10 +1136,10 @@ function PhoneVerifyModal({
 
   useEffect(() => {
     if (cooldown <= 0) return
-    const t = window.setInterval(() => {
+    const timer = window.setInterval(() => {
       setCooldown((c) => (c <= 1 ? 0 : c - 1))
     }, 1000)
-    return () => window.clearInterval(t)
+    return () => window.clearInterval(timer)
   }, [cooldown])
 
   async function handleSend() {
@@ -1102,7 +1147,7 @@ function PhoneVerifyModal({
     setBusy(true)
     try {
       // 임시: 파이어베이스 휴대폰 OTP 비활성화
-      throw new Error('Supabase 연동 후 이용할 수 있어요')
+      throw new Error(t('verification.phone.unavailable'))
       /*
       const normalized = normalizePhoneE164(phone)
       await sendPhoneOtp(user, normalized)
@@ -1112,7 +1157,7 @@ function PhoneVerifyModal({
       */
     } catch (err) {
       // resetPhoneVerification()
-      onError(getErrorMessage(err, '인증 문자 전송에 실패했어요'))
+      onError(getErrorMessage(err, t('verification.phone.errors.sendFailed')))
     } finally {
       setBusy(false)
     }
@@ -1123,28 +1168,28 @@ function PhoneVerifyModal({
     setBusy(true)
     try {
       // 임시: 파이어베이스 휴대폰 확인 비활성화
-      throw new Error('Supabase 연동 후 이용할 수 있어요')
+      throw new Error(t('verification.phone.unavailable'))
       /*
       await confirmPhoneOtp(user, code, e164)
       onVerified()
       */
     } catch (err) {
-      onError(getErrorMessage(err, '휴대폰 인증에 실패했어요'))
+      onError(getErrorMessage(err, t('verification.phone.errors.confirmFailed')))
     } finally {
       setBusy(false)
     }
   }
 
   return (
-    <VerifySheet title='휴대폰 인증' onClose={onClose}>
+    <VerifySheet title={t('verification.phone.title')} onClose={onClose}>
       {step === 'phone' ? (
         <>
           <p className={verifyDescriptionClass}>
-            미국(+1) 또는 한국(+82) 번호로 SMS 인증을 진행해요. 계정당 하루{' '}
-            {PHONE_OTP_DAILY_MAX}회, {Math.ceil(PHONE_OTP_COOLDOWN_MS / 1000)}초
-            쿨다운이 적용돼요.
-            {isPhoneTestOnly() &&
-              ' 지금은 테스트 허용 번호만 사용할 수 있어요.'}
+            {t('verification.phone.description', {
+              max: PHONE_OTP_DAILY_MAX,
+              seconds: Math.ceil(PHONE_OTP_COOLDOWN_MS / 1000),
+            })}
+            {isPhoneTestOnly() && ` ${t('verification.phone.testOnly')}`}
           </p>
           <input
             type='tel'
@@ -1160,23 +1205,26 @@ function PhoneVerifyModal({
             onClick={() => void handleSend()}
             className={verifyPrimaryButtonClass}
           >
-            {busy ? '전송 중…' : '인증 문자 받기'}
+            {busy ? t('verification.sending') : t('verification.phone.getCode')}
           </button>
         </>
       ) : (
         <>
           <p className={verifyDescriptionClass}>
-            <span className='font-medium text-[var(--foreground)]'>
-              {formatPhoneDisplay(e164)}
-            </span>
-            으로 보낸 코드를 입력해 주세요.
+            {renderWithSlots(t('verification.phone.codeSentTo'), {
+              phone: (
+                <span className='font-medium text-[var(--foreground)]'>
+                  {formatPhoneDisplay(e164)}
+                </span>
+              ),
+            })}
           </p>
           <input
             type='text'
             inputMode='numeric'
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            placeholder='6자리 코드'
+            placeholder={t('verification.phone.codePlaceholder')}
             className={`${verifyInputClass} text-center tracking-[0.3em]`}
             autoComplete='one-time-code'
           />
@@ -1187,7 +1235,7 @@ function PhoneVerifyModal({
               onClick={() => void handleConfirm()}
               className={verifyPrimaryButtonClass}
             >
-              {busy ? '확인 중…' : '인증 완료'}
+              {busy ? t('verification.checking') : t('verification.confirmButton')}
             </button>
             <button
               type='button'
@@ -1195,7 +1243,9 @@ function PhoneVerifyModal({
               onClick={() => void handleSend()}
               className={verifyLinkButtonClass}
             >
-              {cooldown > 0 ? `재전송 ${cooldown}s` : '문자 다시 받기'}
+              {cooldown > 0
+                ? t('verification.resendIn', { seconds: cooldown })
+                : t('verification.phone.resendCode')}
             </button>
           </div>
         </>
@@ -1213,6 +1263,7 @@ function OtpDigitInputs({
   onChange: (next: string) => void
   disabled?: boolean
 }) {
+  const t = useT('me')
   const refs = useRef<(HTMLInputElement | null)[]>([])
   const digits = Array.from({ length: 6 }, (_, i) => value[i] ?? '')
 
@@ -1243,7 +1294,7 @@ function OtpDigitInputs({
           maxLength={1}
           value={digit}
           disabled={disabled}
-          aria-label={`${index + 1}번째 인증 숫자`}
+          aria-label={t('verification.digitAria', { position: index + 1 })}
           onChange={(e) => {
             const v = e.target.value.replace(/\D/g, '')
             if (!v) {
@@ -1274,7 +1325,7 @@ function OtpDigitInputs({
             e.preventDefault()
             handlePaste(e.clipboardData.getData('text'))
           }}
-          className='h-12 w-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-center text-lg font-bold text-[var(--foreground)] shadow-sm outline-none transition focus:border-[#F64310] focus:bg-white focus:ring-2 focus:ring-[#F64310]/20 disabled:opacity-50 sm:h-13 sm:w-11'
+          className='h-12 w-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-center text-lg font-bold text-[var(--foreground)] shadow-sm outline-none transition focus:border-brand focus:bg-white focus:ring-2 focus:ring-brand/20 disabled:opacity-50 sm:h-13 sm:w-11'
         />
       ))}
     </div>

@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
+
 import { resolveAuthenticatedUser } from '../../../agent-auth/lib/authHelpers'
 import { accountSuspendedResponse } from '@lib/supabase/profile.server'
 import {
@@ -25,29 +28,30 @@ interface RouteContext {
   params: Promise<{ id: string }>
 }
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(request: Request, context: RouteContext) {
+  const t = await getRequestT(request, 'api')
   try {
     if (!isCreditReviewStorageConfigured()) {
       return NextResponse.json(
-        { error: 'Supabase 설정이 필요해요.' },
+        { error: t('common.supabaseNotConfigured') },
         { status: 503 },
       )
     }
 
     const user = await resolveAuthenticatedUser()
     if (!user?.uid) {
-      return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+      return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
     }
 
     const { id: postId } = await context.params
     const post = await getStoredCommunityPost(postId)
     if (!post) {
-      return NextResponse.json({ error: '글을 찾을 수 없어요.' }, { status: 404 })
+      return NextResponse.json({ error: t('common.postNotFound') }, { status: 404 })
     }
 
     const isAuthor = post.authorUid === user.uid
     if (!isAuthor) {
-      return NextResponse.json({ error: '권한이 없어요.' }, { status: 403 })
+      return NextResponse.json({ error: t('common.forbidden') }, { status: 403 })
     }
 
     const existing = await findCreditReviewByPostId(postId)
@@ -59,50 +63,50 @@ export async function GET(_request: Request, context: RouteContext) {
   } catch (error) {
     console.error('Credit review GET error:', error)
     return NextResponse.json(
-      { error: '리뷰 요청 상태를 불러오지 못했어요.' },
+      { error: t('credit.reviewStatusLoadFailed') },
       { status: 500 },
     )
   }
 }
 
-export async function POST(_request: Request, context: RouteContext) {
+export async function POST(httpRequest: Request, context: RouteContext) {
+  const t = await getRequestT(httpRequest, 'api')
   try {
     if (
       !isCommunityStorageConfigured() ||
       !isCreditReviewStorageConfigured()
     ) {
       return NextResponse.json(
-        { error: 'Supabase 설정이 필요해요.' },
+        { error: t('common.supabaseNotConfigured') },
         { status: 503 },
       )
     }
 
     const user = await resolveAuthenticatedUser()
     if (!user?.uid || !user.email) {
-      return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+      return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
     }
-    const suspended = await accountSuspendedResponse(user.uid)
+    const suspended = await accountSuspendedResponse(user.uid, t)
     if (suspended) return suspended
 
     const { id: postId } = await context.params
     const post = await getStoredCommunityPost(postId)
     if (!post || post.status !== 'open') {
-      return NextResponse.json({ error: '글을 찾을 수 없어요.' }, { status: 404 })
+      return NextResponse.json({ error: t('common.postNotFound') }, { status: 404 })
     }
     if (post.authorUid !== user.uid) {
-      return NextResponse.json({ error: '권한이 없어요.' }, { status: 403 })
+      return NextResponse.json({ error: t('common.forbidden') }, { status: 403 })
     }
     if (!isCreditReviewEligibleBoard(post.categoryId)) {
       return NextResponse.json(
-        { error: '이 게시판은 추가 크레딧 요청 대상이 아니에요.' },
+        { error: t('credit.reviewBoardIneligible') },
         { status: 400 },
       )
     }
     if (!postHasFinalResultForCreditReview(post)) {
       return NextResponse.json(
         {
-          error:
-            '타임라인에 최종 결과(승인·카드 수령·Offer·거절 등)를 먼저 기록해 주세요.',
+          error: t('credit.reviewFinalResultRequired'),
           code: 'FINAL_RESULT_REQUIRED',
         },
         { status: 400 },
@@ -112,13 +116,13 @@ export async function POST(_request: Request, context: RouteContext) {
     const existing = await findCreditReviewByPostId(postId)
     if (existing?.status === 'approved') {
       return NextResponse.json(
-        { error: '이미 리뷰 보너스가 지급된 글이에요.', request: existing },
+        { error: t('credit.reviewAlreadyAwarded'), request: existing },
         { status: 409 },
       )
     }
     if (existing?.status === 'pending') {
       return NextResponse.json(
-        { error: '이미 검토 대기 중이에요.', request: existing },
+        { error: t('credit.reviewAlreadyPending'), request: existing },
         { status: 409 },
       )
     }
@@ -152,10 +156,7 @@ export async function POST(_request: Request, context: RouteContext) {
     console.error('Credit review POST error:', error)
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : '추가 크레딧 요청에 실패했어요.',
+        error: apiErrorMessage(t, error, 'credit.reviewRequestFailed'),
       },
       { status: 500 },
     )

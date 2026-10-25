@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import { getRequestLocale, getRequestT } from '@lib/i18n/server'
+import { localizePosts } from '@lib/translations/localize.server'
 import { resolveAuthenticatedUser } from '@/app/api/agent-auth/lib/authHelpers'
 import { resolveCityId } from '@lib/constants/cities'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
@@ -22,7 +24,8 @@ type RouteContext = { params: Promise<{ slug: string }> }
 export async function GET(request: Request, context: RouteContext) {
   try {
     if (!isCompanyStorageConfigured()) {
-      return NextResponse.json({ error: 'Supabase 설정이 필요해요.' }, { status: 503 })
+      const t = await getRequestT(request, 'api')
+      return NextResponse.json({ error: t('common.supabaseNotConfigured') }, { status: 503 })
     }
     const { slug } = await context.params
     const company = await getActiveCompanyBySlug(slug)
@@ -44,7 +47,8 @@ export async function GET(request: Request, context: RouteContext) {
       resolveAuthenticatedUser(),
       listCompanyReviewPosts(city),
     ])
-    const reviews = posts
+    const locale = await getRequestLocale(request)
+    const reviews = localizePosts(posts, locale)
       .filter((post) => post.companyId && ids.has(post.companyId))
       .filter((post) => !type || post.jobReviewType === type)
       .sort((a, b) => b.createdAt - a.createdAt)

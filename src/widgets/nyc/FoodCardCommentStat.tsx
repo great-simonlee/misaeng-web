@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { fetchCommunityCommentCount } from '@lib/community/comments.client'
-import { formatCommunityCount } from '@lib/constants/communityMock'
+import { useFormat, useT } from '@lib/i18n/client'
 
 type FoodCardCommentStatProps = {
   postId: string
@@ -15,6 +15,8 @@ export function FoodCardCommentStat({
   postId,
   count: countProp,
 }: FoodCardCommentStatProps) {
+  const t = useT('food')
+  const format = useFormat()
   const [fetchedCount, setFetchedCount] = useState<number | null>(null)
   const count = countProp != null ? countProp : fetchedCount
 
@@ -34,9 +36,9 @@ export function FoodCardCommentStat({
     <span className='inline-flex items-center gap-1.5'>
       <CommentIcon className='size-3.5' />
       <span>
-        댓글{' '}
+        {t('card.comments')}{' '}
         <span className='tabular-nums'>
-          {count == null ? '…' : formatCommunityCount(count)}
+          {count == null ? '…' : format.number(Math.max(0, Math.floor(Number(count) || 0)), { notation: 'compact' })}
         </span>
       </span>
     </span>

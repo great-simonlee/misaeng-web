@@ -1,8 +1,5 @@
 'use client'
 
-import { CONSENT_COPY } from '@lib/consent/copy'
-import type { ConsentUiLanguage } from '@lib/consent/types'
-
 import { useConsentLocale } from './ConsentLocaleProvider'
 
 type BilingualLocaleTextProps = {
@@ -12,7 +9,7 @@ type BilingualLocaleTextProps = {
   className?: string
 }
 
-/** (b) Shows one language from navigator.language / EN-KO toggle. */
+/** (b) 페이지 언어가 한국어면 ko, 아니면 en */
 export function BilingualLocaleText({
   en,
   ko,
@@ -21,8 +18,4 @@ export function BilingualLocaleText({
 }: BilingualLocaleTextProps) {
   const { locale } = useConsentLocale()
   return <Tag className={className}>{locale === 'ko' ? ko : en}</Tag>
-}
-
-export function copyForLocale(locale: ConsentUiLanguage) {
-  return CONSENT_COPY[locale]
 }

@@ -7,11 +7,14 @@ import {
 } from '@lib/supabase/community.server'
 import { resolveCityId } from '@lib/constants/cities'
 import { listMockCommunityPosts } from '@lib/constants/communityMock'
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
     const { searchParams } = new URL(request.url)
     const lat = Number(searchParams.get('lat'))
@@ -20,13 +23,13 @@ export async function GET(request: Request) {
 
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
       return NextResponse.json(
-        { error: '위도·경도가 필요해요.', venues: [] },
+        { error: t('places.venuesCoordinatesRequired'), venues: [] },
         { status: 400 },
       )
     }
     if (Math.abs(lat) > 90 || Math.abs(lng) > 180) {
       return NextResponse.json(
-        { error: '잘못된 좌표예요.', venues: [] },
+        { error: t('places.invalidCoordinates'), venues: [] },
         { status: 400 },
       )
     }
@@ -51,10 +54,7 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         venues: [],
-        error:
-          error instanceof Error
-            ? error.message
-            : '기존 음식점 목록을 불러오지 못했어요.',
+        error: apiErrorMessage(t, error, 'places.venuesLoadFailed'),
       },
       { status: 500 },
     )

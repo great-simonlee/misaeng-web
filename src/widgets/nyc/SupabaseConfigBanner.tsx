@@ -1,8 +1,24 @@
 'use client'
 
 import Link from 'next/link'
+import { Fragment, type ReactNode } from 'react'
 
 import { useCityPath } from '@hooks/useCity'
+import { useT } from '@lib/i18n/client'
+
+const CODE_CLASS = 'break-all font-mono text-[11px] sm:text-xs'
+
+/** 문구 안 `{name}` 자리에 노드를 끼워 넣는다 */
+function withNodes(template: string, nodes: Record<string, ReactNode>) {
+  return template.split(/(\{\w+\})/).map((part, i) => {
+    const name = /^\{(\w+)\}$/.exec(part)?.[1]
+    return name && name in nodes ? (
+      <Fragment key={i}>{nodes[name]}</Fragment>
+    ) : (
+      part
+    )
+  })
+}
 
 interface SupabaseConfigBannerProps {
   className?: string
@@ -10,6 +26,7 @@ interface SupabaseConfigBannerProps {
 
 export function SupabaseConfigBanner({ className }: SupabaseConfigBannerProps) {
   const href = useCityPath()
+  const t = useT('common')
   return (
     <div
       className={
@@ -17,17 +34,15 @@ export function SupabaseConfigBanner({ className }: SupabaseConfigBannerProps) {
         'rounded-2xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-[13px] leading-relaxed text-amber-900 sm:px-4 sm:text-sm'
       }
     >
-      Supabase 연동 환경 변수가 아직 설정되지 않았습니다.{' '}
-      <code className='break-all font-mono text-[11px] sm:text-xs'>.env.local</code>
-      에 Supabase 값을 넣어 주세요 (
-      <code className='break-all font-mono text-[11px] sm:text-xs'>.env.example</code>{' '}
-      참고). 설정 전에는 화면은 볼 수 있지만 데이터 저장·프로필 사진 업로드는
-      동작하지 않습니다.{' '}
+      {withNodes(t('ui.supabaseConfigBanner.body'), {
+        envLocal: <code className={CODE_CLASS}>.env.local</code>,
+        envExample: <code className={CODE_CLASS}>.env.example</code>,
+      })}{' '}
       <Link
         href={href('/login')}
         className='font-semibold underline-offset-2 hover:underline'
       >
-        로그인 페이지
+        {t('ui.configBanner.loginPage')}
       </Link>
     </div>
   )

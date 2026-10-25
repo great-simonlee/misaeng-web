@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../lib/authHelpers'
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { parseLocale } from '@lib/i18n/locales'
+import { getRequestT } from '@lib/i18n/server'
 import {
-  getNicknameValidationError,
+  getNicknameValidationIssue,
   isProfileGender,
   isProfileOccupationType,
 } from '@lib/constants/profile'
@@ -27,6 +30,7 @@ type ProfilePatchBody = {
   lastName?: string
   gender?: string | null
   occupationType?: string | null
+  preferredLocale?: string | null
 }
 
 function asTrimmedString(value: unknown): string {
@@ -38,11 +42,11 @@ function asTrimmedString(value: unknown): string {
 }
 
 export async function PATCH(request: Request) {
+  const t = await getRequestT(request, 'api')
   if (!isSupabaseProfileConfigured()) {
     return NextResponse.json(
       {
-        error:
-          'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+        error: t('common.supabaseNotConfiguredDetail'),
       },
       { status: 503 },
     )
@@ -50,9 +54,9 @@ export async function PATCH(request: Request) {
 
   const user = await resolveAuthenticatedUser()
   if (!user?.uid) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
-  const suspended = await accountSuspendedResponse(user.uid)
+  const suspended = await accountSuspendedResponse(user.uid, t)
   if (suspended) return suspended
 
   const body = (await request.json()) as ProfilePatchBody
@@ -62,9 +66,17 @@ export async function PATCH(request: Request) {
   let nicknameChanged = false
   if (body.nickname !== undefined) {
     const nickname = asTrimmedString(body.nickname)
-    const nicknameError = getNicknameValidationError(nickname)
-    if (nicknameError) {
-      return NextResponse.json({ error: nicknameError }, { status: 400 })
+    const nicknameIssue = getNicknameValidationIssue(nickname)
+    if (nicknameIssue) {
+      return NextResponse.json(
+        {
+          error: t(`profile.nickname.${nicknameIssue.code}`, {
+            min: 'min' in nicknameIssue ? nicknameIssue.min : undefined,
+            max: 'max' in nicknameIssue ? nicknameIssue.max : undefined,
+          }),
+        },
+        { status: 400 },
+      )
     }
     const existing = await getSupabaseProfile(user.uid)
     previousNickname = existing?.nickname?.trim() || null
@@ -90,7 +102,7 @@ export async function PATCH(request: Request) {
     const gender = asTrimmedString(body.gender).toLowerCase()
     if (gender && !isProfileGender(gender)) {
       return NextResponse.json(
-        { error: '올바른 성별 값을 선택해 주세요.' },
+        { error: t('profile.invalidGender') },
         { status: 400 },
       )
     }
@@ -100,11 +112,22 @@ export async function PATCH(request: Request) {
     const occupationType = asTrimmedString(body.occupationType).toLowerCase()
     if (occupationType && !isProfileOccupationType(occupationType)) {
       return NextResponse.json(
-        { error: '올바른 직업 유형을 선택해 주세요.' },
+        { error: t('profile.invalidOccupationType') },
         { status: 400 },
       )
     }
     patch.occupationType = occupationType || null
+  }
+
+  if (body.preferredLocale !== undefined) {
+    const preferredLocale = parseLocale(asTrimmedString(body.preferredLocale))
+    if (body.preferredLocale && !preferredLocale) {
+      return NextResponse.json(
+        { error: 'Unsupported language.' },
+        { status: 400 },
+      )
+    }
+    patch.preferredLocale = preferredLocale
   }
 
   if (nicknameChanged && typeof patch.nickname === 'string') {
@@ -113,14 +136,13 @@ export async function PATCH(request: Request) {
     } catch (error) {
       if (error instanceof NicknameTakenError) {
         return NextResponse.json(
-          { error: error.message, code: 'NICKNAME_TAKEN' },
+          { error: t(error.key), code: 'NICKNAME_TAKEN' },
           { status: 409 },
         )
       }
       return NextResponse.json(
         {
-          error:
-            error instanceof Error ? error.message : '닉네임 확인에 실패했어요.',
+          error: apiErrorMessage(t, error, 'profile.nicknameCheckFailed'),
         },
         { status: 500 },
       )
@@ -141,20 +163,18 @@ export async function PATCH(request: Request) {
     }
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : '프로필 저장에 실패했어요.',
+        error: apiErrorMessage(t, error, 'profile.saveFailed'),
       },
       { status: 500 },
     )
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const user = await resolveAuthenticatedUser()
   if (!user?.uid) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    const t = await getRequestT(request, 'api')
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
 
   const profile = await getSupabaseProfile(user.uid)

@@ -1,4 +1,7 @@
+'use client'
+
 import { Skeleton, SkeletonCircle } from '@components/Skeleton'
+import { useT } from '@lib/i18n/client'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { cn } from '@lib'
 
@@ -7,6 +10,7 @@ type Props = {
 }
 
 export function MyPageSkeleton({ className }: Props) {
+  const t = useT('me')
   return (
     <div
       className={cn(
@@ -15,7 +19,7 @@ export function MyPageSkeleton({ className }: Props) {
       )}
       role='status'
       aria-live='polite'
-      aria-label='마이페이지를 불러오는 중이에요'
+      aria-label={t('loadingAria')}
     >
       <div
         className={cn(

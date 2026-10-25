@@ -1,6 +1,10 @@
+'use client'
+
 import Image from 'next/image'
+import { BRAND_CONFIG } from '@lib/brand'
 
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 const SIZE_MAP = {
   sm: {
@@ -36,8 +40,9 @@ export function LoadingSpinner({
   className,
   'aria-label': ariaLabel,
 }: LoadingSpinnerProps) {
+  const t = useT('common')
   const dims = SIZE_MAP[size]
-  const accessibleName = ariaLabel ?? label ?? '로딩 중이에요'
+  const accessibleName = ariaLabel ?? label ?? t('ui.loading.aria')
 
   return (
     <div
@@ -57,7 +62,7 @@ export function LoadingSpinner({
       >
         <span
           className={cn(
-            'misaeng-spinner-orbit absolute inset-0 rounded-full border-[#F64310]/20 border-t-[#F64310]',
+            'misaeng-spinner-orbit absolute inset-0 rounded-full border-brand/20 border-t-brand',
             dims.ring,
           )}
           aria-hidden
@@ -68,11 +73,15 @@ export function LoadingSpinner({
         >
           {/* 검정 배경은 lighten으로 밝게 처리되어 흰 배경에서 사라짐 */}
           <Image
-            src='/img/logo_square.png'
+            src={BRAND_CONFIG.assets.square}
             alt=''
             width={80}
             height={80}
-            className='size-full object-contain mix-blend-lighten'
+            className={cn(
+              'size-full object-contain',
+              // misaeng 아이콘은 검정 배경이라 lighten으로 지운다
+              BRAND_CONFIG.id === 'misaeng' && 'mix-blend-lighten',
+            )}
             priority
           />
         </span>
@@ -96,11 +105,12 @@ interface LoadingStateProps {
 }
 
 export function LoadingState({
-  label = '로딩 중이에요…',
+  label,
   size = 'md',
   className,
   fullPage = false,
 }: LoadingStateProps) {
+  const t = useT('common')
   return (
     <div
       className={cn(
@@ -111,7 +121,7 @@ export function LoadingState({
     >
       <LoadingSpinner
         size={fullPage ? 'lg' : size}
-        label={label}
+        label={label ?? t('ui.loading.label')}
         className={fullPage ? 'gap-3.5 sm:gap-4' : undefined}
       />
     </div>

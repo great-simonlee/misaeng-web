@@ -1,0 +1,455 @@
+{
+  "meta": {
+    "description": "Cara kerja kredit komunitas {brand} NYC: cara mendapatkan, memakai, batasan, dan FAQ. Kumpulkan kredit lewat ulasan kuliner, OPT, kerja, dan komentar, lalu pakai untuk coffee chat, konsultasi pengacara, mentoring karier, dan lainnya.",
+    "reviewsDescription": "Peninjauan permintaan kredit tambahan untuk postingan dengan hasil akhir."
+  },
+  "header": {
+    "eyebrow": "{brand} NYC",
+    "title": "Panduan Kredit Komunitas",
+    "intro": "Pakai kredit yang kamu dapat dari membantu komunitas untuk mengajukan hadiah seperti coffee chat dan konsultasi pengacara imigrasi. Kredit tidak bisa dicairkan, dan kamu perlu verifikasi pelajar atau profesional.",
+    "tagInteger": "Hanya bilangan bulat",
+    "tagNoCash": "Tidak bernilai uang",
+    "tagVerification": "Perlu verifikasi pelajar atau profesional",
+    "policyVersion": "v{version}"
+  },
+  "toc": {
+    "aria": "Daftar isi",
+    "redeem": "Hadiah",
+    "process": "Cara mengajukan",
+    "earn": "Cara mendapatkan",
+    "principles": "Prinsip & alur",
+    "limits": "Batasan & pencabutan",
+    "faq": "FAQ"
+  },
+  "redeem": {
+    "title": "Hadiah yang bisa kamu dapat dengan kredit",
+    "description": "Setiap sesi berlangsung maksimal 30 menit. Biaya kredit dibuat lebih tinggi dari nilai perolehan untuk menutup biaya pakar dan pencocokan.",
+    "comingSoon": "Segera hadir",
+    "applySoon": "Segera dibuka",
+    "callout": "Hadiah dibuka secara bertahap setelah kamu mengecek saldo di Halaman Saya. Kamu bisa mengajukan coffee chat dan konsultasi pengacara imigrasi masing-masing sekali sebulan.",
+    "credits": "kredit",
+    "includes": "Termasuk",
+    "excludes": "Tidak termasuk",
+    "monthlyCap_other": "{count} kali sebulan",
+    "foodEquivalent_other": "≈ {count} ulasan kuliner"
+  },
+  "process": {
+    "title": "Cara mengajukan",
+    "description": "Empat langkah dari pengajuan sampai sesi selesai.",
+    "cancelNote": "Kalau kamu membatalkan sebelum pencocokan, semua kredit akan dikembalikan. Pembatalan di hari yang sama atau tidak hadir setelah jadwal ditetapkan mungkin tidak dikembalikan."
+  },
+  "earn": {
+    "title": "Mendapatkan kredit",
+    "description": "Setelah verifikasi email kampus, kamu mendapat kredit dari aktivitas di bawah ini.",
+    "colActivity": "Aktivitas",
+    "colEarn": "Kredit",
+    "colCoffeeChat": "Coffee chat",
+    "once": "Sekali",
+    "max": "Maksimal {amount}",
+    "maxParen": "(maksimal {amount})",
+    "unitWithMax": "{unit} · maksimal {amount}",
+    "detailsToggle": "Lihat aturan dan nilai perolehan",
+    "perUnit": "+{amount}/{unit}"
+  },
+  "principlesSection": {
+    "title": "Prinsip · Cara kerja",
+    "description": "Prinsip utama program dan alur dari postingan pertama hingga hadiah.",
+    "flowTitle": "Cara kerja"
+  },
+  "limits": {
+    "title": "Batasan · Pencabutan",
+    "description": "Aturan agar semuanya tetap adil.",
+    "earnTitle": "Mendapatkan",
+    "spendTitle": "Memakai",
+    "commentCap": "Komentar & balasan: maksimal {amount} kredit per hari",
+    "noSelfReply": "Balasan di postingan atau komentar sendiri: tanpa kredit",
+    "revokeOnDelete": "Menghapus postingan atau komentar akan menarik kembali kreditnya",
+    "oncePerAccount": "Bonus satu kali: sekali per akun",
+    "optionCap": "{label}: {cap} sebulan · {duration}",
+    "times_other": "{count} kali",
+    "recentActivity": "Kami sarankan minimal satu aktivitas dalam {days} hari terakhir sebelum mengajukan"
+  },
+  "faqSection": {
+    "title": "FAQ",
+    "glossaryTitle": "Glosarium"
+  },
+  "footer": {
+    "disclaimer": "Konsultasi pengacara imigrasi hanya untuk informasi dan terpisah dari pendampingan kasus. Kebijakan ini dapat berubah dengan pemberitahuan sebelumnya.",
+    "myPage": "Halaman Saya",
+    "writeFood": "Tulis ulasan kuliner"
+  },
+  "principles": {
+    "reward": {
+      "title": "Hadiah untuk kontribusi",
+      "body": "Makin banyak postingan dan komentar bermanfaat yang kamu bagikan, seperti ulasan kuliner, visa, dan kerja, makin banyak kredit yang kamu dapat."
+    },
+    "notCash": {
+      "title": "Koneksi, bukan uang",
+      "body": "Kredit tidak bisa ditukar dengan uang. Sebagai gantinya, kamu menukarnya dengan kesempatan bertemu profesional berpengalaman dan para pakar."
+    },
+    "cost": {
+      "title": "Mencerminkan biaya nyata",
+      "body": "Misaeng menanggung waktu pakar dan biaya pencocokan untuk coffee chat dan konsultasi pengacara imigrasi, jadi memakai kredit butuh lebih banyak daripada mendapatkannya."
+    },
+    "quality": {
+      "title": "Kualitas nomor satu",
+      "body": "Postingan spam, duplikat, atau palsu yang dibuat hanya untuk menumpuk kredit tidak akan mendapat apa-apa dan kreditnya bisa ditarik kembali."
+    }
+  },
+  "workflow": {
+    "verify": {
+      "title": "Verifikasi kampus kamu",
+      "description": "Selesaikan verifikasi email kampus di Halaman Saya. Kamu baru bisa memposting, berkomentar, dan mendapat kredit setelah verifikasi."
+    },
+    "contribute": {
+      "title": "Berkontribusi",
+      "description": "Tulis ulasan kuliner, OPT, atau kerja, atau komentari postingan orang lain. Kredit otomatis ditambahkan saat syaratnya terpenuhi."
+    },
+    "balance": {
+      "title": "Cek saldo kamu",
+      "description": "Lihat total kredit dan riwayatnya di Halaman Saya. Kredit yang ditarik karena penghapusan atau sanksi juga tampil di sana."
+    },
+    "redeem": {
+      "title": "Ajukan hadiah",
+      "description": "Begitu kreditmu cukup untuk sebuah hadiah, kirim pengajuan. Sesi dilakukan setelah pencocokan dan penjadwalan."
+    }
+  },
+  "redeemProcess": {
+    "apply": {
+      "title": "Pengajuan",
+      "description": "Pilih program di Halaman Saya atau halaman hadiah, lalu kirim ringkasan singkat tentang minat dan pertanyaan kamu."
+    },
+    "review": {
+      "title": "Peninjauan & pemotongan",
+      "description": "Kami mengecek kelayakan, saldo, dan batas bulanan kamu, lalu memotong kreditnya. Kalau perlu menjadwalkan, kami akan mengirim email."
+    },
+    "match": {
+      "title": "Pencocokan",
+      "description": "Misaeng menghubungkan kamu dengan orang yang tepat dari partner, mentor, dan pakar kami. Kalau pencocokan gagal, kredit kamu dikembalikan."
+    },
+    "session": {
+      "title": "Sesi",
+      "description": "Bertemu online atau langsung pada waktu yang disepakati. Tidak hadir atau pembatalan di hari yang sama mungkin tidak dikembalikan, sesuai kebijakan kami."
+    }
+  },
+  "earnRules": {
+    "food": {
+      "label": "Ulasan kuliner",
+      "description": "Didapat saat kamu memposting ulasan kuliner dengan semua detail wajib, seperti foto, lokasi, menu, dan harga.",
+      "conditions": {
+        "verified": "Email kampus terverifikasi",
+        "requiredFields": "Kolom wajib terisi: lokasi restoran, nama, kategori, menu, foto",
+        "oncePerPost": "Diberikan sekali saat pertama diposting (mengedit postingan yang sama tidak menambah kredit)"
+      },
+      "notEligible": {
+        "missingFields": "Kolom wajib tidak lengkap atau isinya asal-asalan",
+        "copied": "Menyalin postingan orang lain atau memposting duplikat",
+        "repost": "Menghapus lalu memposting ulang konten yang sama (penyalahgunaan)"
+      },
+      "tip": "Foto dan detail spesifik soal menu atau waktu antre paling membantu pelajar lain."
+    },
+    "status": {
+      "label": "Ulasan OPT, visa & green card",
+      "unitLabel": "1 tahap timeline",
+      "description": "{entry} kredit per tahap timeline (maksimal {postMax} per postingan). Ulasan dengan hasil akhir bisa mendapat hingga {reviewBonus} lagi setelah ditinjau tim Misaeng (total maksimal {totalMax}).",
+      "conditions": {
+        "verified": "Email kampus terverifikasi",
+        "type": "Pilih jenis: CPT/OPT/STEM OPT/visa/green card",
+        "perStep": "{entry} kredit per tahap timeline",
+        "postMax": "Maksimal {postMax} kredit otomatis per postingan",
+        "editAdds": "Edit postingan untuk menambah tahap timeline dan dapat lebih banyak (hingga batas maksimal)",
+        "reviewBonus": "Setelah menambahkan hasil akhir, ketuk \"Ajukan kredit tambahan\" → +{reviewBonus} jika disetujui tim"
+      },
+      "notEligible": {
+        "missingTimeline": "Timeline atau jenis tidak diisi",
+        "copied": "Menyalin ulasan orang lain",
+        "privacy": "Postingan dihapus karena terlalu banyak membuka info pribadi",
+        "capReached": "Postingan sudah mencapai batas otomatis (tahap tambahan tidak mendapat kredit)",
+        "noFinalResult": "Mengajukan bonus peninjauan tanpa hasil akhir"
+      },
+      "tip": "Tambahkan hasil akhir kamu (approval, kartu diterima, dll.) untuk mengajukan bonus peninjauan tim."
+    },
+    "job-review": {
+      "label": "Interview & kerja",
+      "unitLabel": "1 tahap timeline",
+      "description": "{entry} kredit per tahap rekrutmen (timeline), maksimal {postMax} per postingan. Tambahkan offer atau hasil akhir untuk mendapat hingga {reviewBonus} lagi setelah ditinjau tim Misaeng (total maksimal {totalMax}).",
+      "conditions": {
+        "verified": "Email kampus terverifikasi",
+        "type": "Pilih jenis: magang/entry-level/berpengalaman/kontrak",
+        "perStep": "{entry} kredit per tahap timeline",
+        "postMax": "Maksimal {postMax} kredit otomatis per postingan",
+        "editAdds": "Edit postingan untuk menambah tahap timeline dan dapat lebih banyak (hingga batas maksimal)",
+        "reviewBonus": "Setelah menambahkan hasil akhir, ketuk \"Ajukan kredit tambahan\" → +{reviewBonus} jika disetujui tim"
+      },
+      "notEligible": {
+        "missingFields": "Tahap wajib atau jenis tidak diisi",
+        "falseInfo": "Nama perusahaan palsu atau detail yang dilebih-lebihkan",
+        "anonymous": "Postingan di forum anonim (forum ini dikecualikan)",
+        "capReached": "Postingan sudah mencapai batas otomatis",
+        "noFinalResult": "Mengajukan bonus peninjauan tanpa hasil akhir"
+      }
+    },
+    "comment": {
+      "label": "Komentar & balasan",
+      "description": "1 kredit untuk setiap komentar atau balasan di postingan orang lain.",
+      "conditions": {
+        "verified": "Email kampus terverifikasi",
+        "publicOthers": "Ditulis di postingan atau komentar publik milik orang lain",
+        "dailyCap": "Maksimal {commentCap} kredit per hari"
+      },
+      "notEligible": {
+        "ownPost": "Balasan di postingan atau komentar sendiri",
+        "deleted": "Komentar yang dihapus",
+        "spam": "Spam, kata kasar, atau karakter berulang tanpa makna",
+        "copyPaste": "Menempelkan kalimat yang sama berulang kali"
+      },
+      "tip": "Komentar yang menjawab pertanyaan atau menambahkan pengalaman pribadi paling membantu komunitas."
+    },
+    "referral": {
+      "label": "Kode referral dipakai",
+      "description": "Saat seseorang memakai kode referral kamu, kamu dapat {referral} kredit. Maksimal {referralMax} orang.",
+      "conditions": {
+        "joined": "Mereka mendaftar lewat link referral kamu atau menautkan kode kamu di Halaman Saya",
+        "perPerson": "{referral} kredit per orang",
+        "maxPeople": "Maksimal {referralMax} orang per akun",
+        "noSelf": "Kamu tidak bisa mereferensikan diri sendiri dengan kode sendiri"
+      },
+      "notEligible": {
+        "self": "Mereferensikan diri sendiri",
+        "maxReached": "Kode kamu sudah dipakai {referralMax} orang",
+        "alreadyLinked": "Akun yang sudah tertaut ke referrer lain"
+      },
+      "tip": "Salin link referral kamu di Halaman Saya dan bagikan ke teman sekelas dan teman-teman."
+    }
+  },
+  "bonusRules": {
+    "school-verify": {
+      "label": "Verifikasi email kampus",
+      "description": "Sekali, saat pertama kali memverifikasi email kampus (.edu, dll.) di Halaman Saya."
+    },
+    "first-post": {
+      "label": "Postingan komunitas pertama",
+      "description": "Sekali, untuk postingan pertama kamu di forum yang memberi kredit, seperti ulasan kuliner, OPT, atau kerja (jika memenuhi syarat)."
+    }
+  },
+  "noEarn": {
+    "anonymous": "Postingan dan komentar di forum anonim (tanpa kredit, demi menjaga anonimitas)",
+    "otherBoards": "Forum lain seperti roommate, sublet, dan jual beli (mungkin ditambahkan nanti)",
+    "editOnly": "Hanya edit atau perubahan metadata",
+    "reactions": "Hanya reaksi, seperti suka, upvote, atau bagikan",
+    "adminPosts": "Postingan admin dari tim hunian atau akun staf"
+  },
+  "redeemOptions": {
+    "coffee-chat": {
+      "label": "Coffee chat di bidangmu",
+      "duration": "Sekitar 30 mnt",
+      "description": "Ngobrol 1:1 dengan orang yang bekerja atau belajar di industri atau posisi yang kamu minati. Bahas karier, budaya industri, tips hidup di New York, dan lainnya.",
+      "includes": {
+        "meeting": "Pertemuan 1:1 online atau langsung (Zoom atau di NYC)",
+        "questions": "Kami meninjau 3–5 pertanyaan yang kamu kirim sebelumnya",
+        "scheduling": "Penjadwalan dan pencocokan oleh tim Misaeng"
+      },
+      "excludes": {
+        "jobGuarantee": "Jaminan diterima kerja atau referral internal",
+        "resumeWriting": "Menuliskan resume atau portofolio untukmu",
+        "lawyer": "Konsultasi pengacara imigrasi (program terpisah)"
+      },
+      "eligibility": {
+        "verified": "Email kampus terverifikasi",
+        "minCredits": "Total kredit minimal {cost}",
+        "recentActivity": "Minimal satu aktivitas komunitas dalam 90 hari terakhir",
+        "noSanctions": "Tidak ada sanksi akun"
+      },
+      "note": "Mentor bergabung sebagai relawan atau partner, dan Misaeng menanggung biaya pencocokan dan operasional."
+    },
+    "lawyer-consult": {
+      "label": "Konsultasi pengacara imigrasi",
+      "duration": "Sekitar 30 mnt",
+      "description": "Tanya jawab 30 menit dengan pengacara imigrasi seputar imigrasi dan visa AS, seperti F-1, OPT, H-1B, dan green card.",
+      "includes": {
+        "qa": "Tanya jawab 30 menit dengan pengacara imigrasi",
+        "procedures": "Panduan umum tentang proses visa, status, dan green card",
+        "followUp": "Panduan terpisah jika kamu butuh pendampingan lebih lanjut"
+      },
+      "excludes": {
+        "representation": "Mewakili kasus kamu atau menangani gugatan",
+        "paperwork": "Menyiapkan atau mengajukan dokumen untukmu",
+        "outcome": "Menjamin hasil (approval, perubahan status, dll.)",
+        "otherLaw": "Saran hukum non-imigrasi, pidana, atau perdata"
+      },
+      "eligibility": {
+        "verified": "Email kampus terverifikasi",
+        "minCredits": "Total kredit minimal {cost}",
+        "summary": "Kirim ringkasan pertanyaan imigrasi atau visa beserta latar belakangmu saat mengajukan",
+        "noSanctions": "Tidak ada sanksi akun"
+      },
+      "note": "Konsultasi imigrasi hanya untuk informasi. Hubungan pengacara-klien mungkin memerlukan perjanjian terpisah."
+    },
+    "career-mentor": {
+      "label": "Mentoring karier",
+      "duration": "Sekitar 30 mnt",
+      "description": "Mentoring karier soal resume, interview, pindah industri, dan lainnya. Biayanya mencerminkan pencocokan dengan mentor yang sedang bekerja.",
+      "includes": {
+        "resume": "Feedback resume dan LinkedIn (jika dikirim sebelumnya)",
+        "interview": "Tanya jawab strategi interview dan networking",
+        "advice": "Saran praktis yang spesifik untuk industri"
+      },
+      "excludes": {
+        "applyForYou": "Melamar atas nama kamu",
+        "jobGuarantee": "Jaminan penempatan kerja",
+        "lawyer": "Konsultasi pengacara imigrasi"
+      },
+      "eligibility": {
+        "verified": "Email kampus terverifikasi",
+        "minCredits": "Total kredit minimal {cost}"
+      }
+    }
+  },
+  "revocation": {
+    "deleted": "Jika kamu menghapus postingan atau komentar, kreditnya ditarik kembali",
+    "guidelines": "Konten yang disembunyikan atau dihapus karena melanggar pedoman komunitas",
+    "falseInfo": "Konten yang terbukti palsu atau spam (kredit sebelumnya bisa ditarik kembali)",
+    "abuse": "Penyalahgunaan (multi-akun, manipulasi) berujung pada penangguhan dan hangusnya saldo"
+  },
+  "faq": {
+    "cash": {
+      "q": "Apakah kredit bisa ditukar dengan uang?",
+      "a": "Tidak. Kredit komunitas tidak bisa dicairkan, dikembalikan, ditransfer, dijual, atau dipindahkan ke akun lain. Kredit hanya bisa dipakai untuk program hadiah yang ditetapkan {brand} NYC."
+    },
+    "comments": {
+      "q": "Apakah bisa dapat banyak hanya dari berkomentar?",
+      "a": "Setiap komentar atau balasan mendapat 1 kredit, tapi maksimal {commentCap} kredit per hari. Komentar di postingan sendiri tidak dihitung. Hanya dengan komentar, coffee chat (120) butuh minimal 12 hari dan konsultasi pengacara imigrasi (400) butuh 40 hari (dengan batas maksimal), jadi menulis ulasan lebih efisien."
+    },
+    "delete": {
+      "q": "Kalau saya menghapus postingan, apakah kreditnya hilang?",
+      "a": "Ya. Kredit dari konten yang dihapus, dilaporkan, atau disembunyikan karena sanksi bisa ditarik kembali. Jika kredit yang sudah dipakai perlu ditarik, saldo kamu bisa menjadi minus."
+    },
+    "noVerify": {
+      "q": "Apakah bisa dapat kredit tanpa verifikasi kampus?",
+      "a": "Tidak. Kamu perlu verifikasi email kampus untuk memposting, berkomentar, dan mendapat kredit. Kamu mendapat bonus satu kali 5 kredit saat verifikasi."
+    },
+    "timeline": {
+      "q": "Apakah ulasan OPT dan kerja hanya dapat kredit sekali per postingan?",
+      "a": "Tidak. Kamu otomatis mendapat {entry} kredit untuk setiap tahap timeline, maksimal {postMax} per postingan. Jika kamu menambahkan hasil akhir dan mengetuk \"Ajukan kredit tambahan\", tim Misaeng akan meninjaunya dan menambahkan {reviewBonus} jika disetujui, total maksimal {totalMax}."
+    },
+    "sameRestaurant": {
+      "q": "Kalau saya mengulas restoran yang sama dua kali, apakah dapat dua kali?",
+      "a": "Postingan terpisah masing-masing bisa dapat sekali, tapi duplikat, salinan, atau spam tidak dapat kredit dan bisa ditarik kembali."
+    },
+    "schedule": {
+      "q": "Bagaimana kalau jadwalnya tidak cocok setelah saya mengajukan hadiah?",
+      "a": "Kalau kamu membatalkan sebelum pencocokan, semua kredit dikembalikan. Pembatalan di hari yang sama atau tidak hadir setelah konfirmasi mungkin tidak dikembalikan."
+    },
+    "lawyerGuarantee": {
+      "q": "Apakah konsultasi pengacara imigrasi menjamin visa disetujui atau perubahan status?",
+      "a": "Tidak. Konsultasi ini hanya mencakup informasi dan proses umum seputar imigrasi dan visa, dan tidak menjamin hasil apa pun. Pendampingan kasus memerlukan perjanjian terpisah. Saran hukum dan pajak non-imigrasi tidak termasuk."
+    },
+    "policyChange": {
+      "q": "Apakah kebijakan kredit bisa berubah?",
+      "a": "Ya. Aturan perolehan dan pemakaian serta biaya kredit bisa berubah tergantung operasional. Jika berubah, kami akan memperbarui halaman ini dan versi kebijakannya. Kredit yang sudah kamu dapat umumnya tetap berlaku."
+    },
+    "when": {
+      "q": "Kapan saya bisa mulai memakai kredit?",
+      "a": "Kredit bertambah seiring kamu aktif di komunitas. Pengajuan coffee chat dan konsultasi pengacara imigrasi akan dibuka secara bertahap, dan kamu bisa mengecek saldo di Halaman Saya."
+    }
+  },
+  "glossary": {
+    "credit": {
+      "term": "Kredit",
+      "definition": "Poin bilangan bulat yang kamu dapat dari berkontribusi ke komunitas. Kredit tidak bernilai uang dan hanya dipakai untuk mengajukan hadiah."
+    },
+    "earn": {
+      "term": "Perolehan",
+      "definition": "Mendapat kredit lewat aktivitas seperti postingan dan komentar. Nilainya 0 jika syarat tidak terpenuhi."
+    },
+    "revoke": {
+      "term": "Pencabutan",
+      "definition": "Menarik kembali kredit yang sudah diterima, misalnya setelah penghapusan atau pelanggaran."
+    },
+    "reward": {
+      "term": "Hadiah",
+      "definition": "Program non-uang yang disediakan atau diatur Misaeng, seperti coffee chat dan konsultasi pengacara imigrasi."
+    },
+    "dailyCap": {
+      "term": "Batas harian",
+      "definition": "Komentar dan balasan mendapat maksimal {commentCap} kredit per hari."
+    },
+    "timeline": {
+      "term": "Timeline",
+      "definition": "Catatan tahap demi tahap dalam ulasan OPT, visa, green card, dan kerja. {entry} kredit per tahap (maksimal {postMax} otomatis). Setelah ada hasil akhir, bonus peninjauan tim hingga {reviewBonus} bisa didapat."
+    }
+  },
+  "efficiency": {
+    "food": {
+      "activity": "Ulasan kuliner",
+      "unit": "postingan",
+      "toCoffeeChat_other": "{count} postingan",
+      "toLawyer_other": "{count} postingan",
+      "note": "Cara termudah mendapat kredit"
+    },
+    "timeline": {
+      "activity": "Ulasan OPT, visa & kerja",
+      "unit": "tahap timeline",
+      "toCoffeeChat_other": "{count} postingan (maksimal)",
+      "toLawyer_other": "{count} postingan (maksimal)",
+      "note": "+{entry} per tahap · maksimal {postMax} otomatis · +{reviewBonus} dengan peninjauan"
+    },
+    "comment": {
+      "activity": "Komentar & balasan",
+      "unit": "komentar",
+      "toCoffeeChat_other": "{count} hari (batas {commentCap}/hari)",
+      "toLawyer_other": "{count} hari (batas {commentCap}/hari)",
+      "note": "Perolehan tambahan · komentar di postingan sendiri tidak dihitung"
+    }
+  },
+  "ledger": {
+    "reasons": {
+      "food": "Ulasan kuliner",
+      "status": "Ulasan OPT, visa & green card",
+      "job-review": "Interview & kerja",
+      "comment": "Komentar & balasan",
+      "school-verify": "Verifikasi email kampus",
+      "first-post": "Postingan komunitas pertama",
+      "review-bonus": "Bonus peninjauan hasil akhir",
+      "referral": "Kode referral dipakai"
+    },
+    "timeline": "{label} (timeline)",
+    "revoke": "{label} ditarik kembali"
+  },
+  "referral": {
+    "bindFailed": "Gagal menautkan kode referral"
+  },
+  "reviewCard": {
+    "title": "Bonus peninjauan hasil akhir",
+    "description": "Jika ulasan kamu mencantumkan hasil akhir, tim Misaeng bisa mengeceknya dan memberimu {bonus} kredit tambahan. (Maksimal {totalMax} per postingan, termasuk kredit otomatis)",
+    "bonusAmount": "+{amount}",
+    "notEligible": "Tambahkan hasil akhir ke timeline kamu (approval, kartu diterima, offer, ditolak, dll.) untuk mengirim pengajuan.",
+    "pending": "Menunggu peninjauan · Kredit akan ditambahkan setelah tim Misaeng mengecek postingan kamu.",
+    "approved": "Disetujui · +{amount} kredit tambahan sudah ditambahkan.",
+    "rejected": "Tidak disetujui. Kamu bisa memperbarui postingan dan mengajukan lagi.",
+    "rejectedWithReason": "Tidak disetujui · {reason}. Kamu bisa memperbarui postingan dan mengajukan lagi.",
+    "requesting": "Mengirim…",
+    "requestButton": "Ajukan kredit tambahan",
+    "editTimeline": "Edit timeline",
+    "loadFailed": "Gagal memuat status",
+    "requestFailed": "Gagal mengirim pengajuan"
+  },
+  "reviews": {
+    "title": "Peninjauan kredit",
+    "description": "Tinjau postingan OPT dan kerja yang punya hasil akhir, lalu berikan +{amount} kredit tambahan.",
+    "filterPending": "Menunggu",
+    "filterAll": "Semua",
+    "emptyPending": "Tidak ada pengajuan yang menunggu.",
+    "emptyAll": "Belum ada pengajuan.",
+    "rejectReasonLabel": "Ditolak: {reason}",
+    "approveButton": "Setujui +{amount}",
+    "rejectButton": "Tolak",
+    "rejectPrompt": "Alasan penolakan (opsional)",
+    "approveConfirm": "Setujui postingan ini dan berikan +{amount} kredit?",
+    "approved": "Disetujui · kredit ditambahkan",
+    "rejected": "Pengajuan ditolak",
+    "loadFailed": "Gagal memuat daftar",
+    "actionFailed": "Gagal menyelesaikan tindakan itu",
+    "untitled": "Tanpa judul"
+  }
+}

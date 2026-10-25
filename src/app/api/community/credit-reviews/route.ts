@@ -11,6 +11,8 @@ import {
   saveStoredCreditReviewRequest,
 } from '@lib/supabase/communityCreditReview.server'
 import { getStoredCommunityPost } from '@lib/supabase/community.server'
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -22,17 +24,18 @@ type DecideBody = {
 }
 
 export async function GET(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
     if (!isCreditReviewStorageConfigured()) {
       return NextResponse.json(
-        { error: 'Supabase 설정이 필요해요.' },
+        { error: t('common.supabaseNotConfigured') },
         { status: 503 },
       )
     }
 
     const user = await resolveAuthenticatedUser()
     if (!user?.uid || !isMisaengEmail(user.email)) {
-      return NextResponse.json({ error: '권한이 없어요.' }, { status: 403 })
+      return NextResponse.json({ error: t('common.forbidden') }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -50,43 +53,44 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Credit reviews list error:', error)
     return NextResponse.json(
-      { error: '리뷰 목록을 불러오지 못했어요.' },
+      { error: t('credit.reviewListLoadFailed') },
       { status: 500 },
     )
   }
 }
 
 export async function POST(request: Request) {
+  const t = await getRequestT(request, 'api')
   try {
     if (!isCreditReviewStorageConfigured()) {
       return NextResponse.json(
-        { error: 'Supabase 설정이 필요해요.' },
+        { error: t('common.supabaseNotConfigured') },
         { status: 503 },
       )
     }
 
     const user = await resolveAuthenticatedUser()
     if (!user?.uid || !user.email || !isMisaengEmail(user.email)) {
-      return NextResponse.json({ error: '권한이 없어요.' }, { status: 403 })
+      return NextResponse.json({ error: t('common.forbidden') }, { status: 403 })
     }
 
     const body = (await request.json().catch(() => null)) as DecideBody | null
     const requestId = String(body?.requestId || '').trim()
     const action = body?.action
     if (!requestId || (action !== 'approve' && action !== 'reject')) {
-      return NextResponse.json({ error: '잘못된 요청이에요.' }, { status: 400 })
+      return NextResponse.json({ error: t('common.badRequest') }, { status: 400 })
     }
 
     const existing = await getStoredCreditReviewRequest(requestId)
     if (!existing) {
       return NextResponse.json(
-        { error: '요청을 찾을 수 없어요.' },
+        { error: t('credit.reviewRequestNotFound') },
         { status: 404 },
       )
     }
     if (existing.status !== 'pending') {
       return NextResponse.json(
-        { error: '이미 처리된 요청이에요.', request: existing },
+        { error: t('credit.reviewAlreadyProcessed'), request: existing },
         { status: 409 },
       )
     }
@@ -94,7 +98,7 @@ export async function POST(request: Request) {
     const post = await getStoredCommunityPost(existing.postId)
     if (!post || post.status !== 'open') {
       return NextResponse.json(
-        { error: '대상 글이 없거나 삭제되었어요.' },
+        { error: t('credit.reviewPostMissing') },
         { status: 404 },
       )
     }
@@ -117,7 +121,7 @@ export async function POST(request: Request) {
     })
     if (!credited) {
       return NextResponse.json(
-        { error: '크레딧 지급에 실패했어요. 저장소 설정을 확인해 주세요.' },
+        { error: t('credit.awardFailed') },
         { status: 500 },
       )
     }
@@ -141,8 +145,7 @@ export async function POST(request: Request) {
     console.error('Credit review decide error:', error)
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : '처리에 실패했어요.',
+        error: apiErrorMessage(t, error, 'credit.processFailed'),
       },
       { status: 500 },
     )

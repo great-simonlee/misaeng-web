@@ -1,13 +1,17 @@
+import type { ConsentUiLanguage } from '@lib/consent/types'
 import {
   assertSupabaseReachable,
   isSupabaseStorageConfigured,
 } from '@lib/supabase/avatar.server'
 import { getSupabaseAvatarBucket } from '@lib/supabase/server'
+import { invalidateListProfile } from '@lib/supabase/listCache.server'
 import { NextResponse } from 'next/server'
+
+import { ApiMessageError } from '@lib/i18n/apiError'
+import type { Translate } from '@lib/i18n/translate'
 
 import {
   ACCOUNT_SUSPENDED_CODE,
-  ACCOUNT_SUSPENDED_MESSAGE,
   isAccountSuspended,
 } from '@lib/community/schoolGate'
 
@@ -38,7 +42,7 @@ export type SupabaseProfileRecord = {
   termsVersion?: string | null
   privacyVersion?: string | null
   consentedAt?: string | null
-  consentUiLanguage?: 'en' | 'ko' | null
+  consentUiLanguage?: ConsentUiLanguage | null
   writeGuidelinesVersion?: string | null
   writeGuidelinesConsentedAt?: string | null
   writeGuidelinesSource?:
@@ -48,6 +52,8 @@ export type SupabaseProfileRecord = {
     | 'anonymous'
     | null
   status?: 'active' | 'suspended' | null
+  /** 선호 언어 (BCP 47, src/lib/i18n/locales.ts) */
+  preferredLocale?: string | null
   /** 공개 추천 코드 (8자) */
   referralCode?: string | null
   /** 연결된 추천인 uid */
@@ -114,8 +120,9 @@ export async function upsertSupabaseProfile(
   const secretKey = getSupabaseSecretKey()
 
   if (!url || !secretKey) {
-    throw new Error(
-      'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.supabaseNotConfiguredDetail',
     )
   }
 
@@ -157,17 +164,22 @@ export async function upsertSupabaseProfile(
       payload?.error ||
       `HTTP ${response.status}`
 
-    throw new Error(`프로필 저장 실패: ${detail}`)
+    throw new ApiMessageError(`Profile save failed: ${detail}`, 'profile.saveFailedDetail', { detail })
   }
 
+  invalidateListProfile(uid)
   return next
 }
 
-export async function accountSuspendedResponse(uid: string) {
+/** t는 `getRequestT(request, 'api')` — 정지 안내를 요청 언어로 보낸다 */
+export async function accountSuspendedResponse(uid: string, t: Translate) {
   const profile = await getSupabaseProfile(uid)
   if (!isAccountSuspended(profile)) return null
   return NextResponse.json(
-    { error: ACCOUNT_SUSPENDED_MESSAGE, code: ACCOUNT_SUSPENDED_CODE },
+    {
+      error: t('common.accountSuspended'),
+      code: ACCOUNT_SUSPENDED_CODE,
+    },
     { status: 403 },
   )
 }

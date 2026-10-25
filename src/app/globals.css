@@ -16,23 +16,44 @@
   --slate: #475569;
   --slate-light: #64748b;
   --slate-muted: #94a3b8;
+  /* 브랜드 색 — misaeng 기본. ellieo는 아래 [data-brand='ellieo']에서 덮는다 (src/lib/brand와 같게) */
+  --brand-rgb: 246 67 16;
   --brand: #F64310;
   --brand-hover: #d93a0e;
-  --brand-light: #fff5f2;
-  --brand-muted: rgba(246, 67, 16, 0.12);
-  --accent: #F64310;
-  --accent-muted: #fff5f2;
-  --btn-primary-bg: #F64310;
-  --btn-primary-hover: #d93a0e;
+  --brand-deep: #df390e;
+  --brand-bright: #ff4c14;
+  --brand-soft: #fff8f5;
+  --brand-subtle: #fff1ed;
+  --brand-light: var(--brand-soft);
+  --brand-muted: rgb(var(--brand-rgb) / 0.12);
+  --accent: var(--brand);
+  --accent-muted: var(--brand-soft);
+  --btn-primary-bg: var(--brand);
+  --btn-primary-hover: var(--brand-hover);
   --btn-secondary-border: #e2e8f0;
   --btn-secondary-bg: #ffffff;
   --btn-secondary-hover: #f1f5f9;
+}
+
+[data-brand='ellieo'] {
+  --brand-rgb: 47 109 246;
+  --brand: #2f6df6;
+  --brand-hover: #2455c4;
+  --brand-deep: #1f4fc0;
+  --brand-bright: #4a82ff;
+  --brand-soft: #f5f8ff;
+  --brand-subtle: #ebf1ff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-bright: var(--brand-bright);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-subtle: var(--brand-subtle);
   --color-navy: var(--navy);
   --color-navy-light: var(--navy-light);
   --color-navy-muted: var(--navy-muted);
@@ -43,6 +64,17 @@
   --color-accent-muted: var(--accent-muted);
   --font-sans: var(--font-pretendard);
   --font-mono: var(--font-geist-mono);
+}
+
+/* 일본어·중국어는 그 언어 한자 모양 글꼴을 Pretendard보다 앞에 둔다 (src/lib/fonts/cjk.ts) */
+:lang(ja) {
+  font-family: var(--font-noto-jp), var(--font-pretendard), system-ui, sans-serif;
+}
+:lang(zh-CN) {
+  font-family: var(--font-noto-sc), var(--font-pretendard), system-ui, sans-serif;
+}
+:lang(zh-TW) {
+  font-family: var(--font-noto-tc), var(--font-pretendard), system-ui, sans-serif;
 }
 
 body {

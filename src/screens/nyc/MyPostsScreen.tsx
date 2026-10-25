@@ -16,6 +16,7 @@ import {
 import {
   deleteCommunityPostRequest,
   fetchMyCommunityPosts,
+  localizeCommunityError,
 } from '@lib/community/client'
 import {
   getCityCategories,
@@ -25,6 +26,8 @@ import {
   resolveMergedCommunityBoardId,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
+import { useT } from '@lib/i18n/client'
+import type { Translate } from '@lib/i18n/translate'
 import { cn } from '@lib'
 import type { CommunityPost } from '@/types/nyc'
 import {
@@ -49,7 +52,6 @@ type MyPostItem = {
   href: string
   editHref: string | null
   categoryId: NycCommunityBoardId
-  boardLabel: string
   authorSchoolId: string | null
   status: 'open' | 'closed'
   canManage: boolean
@@ -58,6 +60,10 @@ type MyPostItem = {
 type CategoryFilter = 'all' | NycCommunityBoardId
 
 export function MyPostsScreen() {
+  const t = useT('me')
+  const tCommunity = useT('community')
+  const tRoot = useT()
+  const boardTitle = (id: string) => tRoot(`community.categories.${id}.title`)
   const { user, loading } = useAuth()
   const city = useCity()
   const href = useCityPath()
@@ -84,14 +90,14 @@ export function MyPostsScreen() {
     setLoadingPosts(true)
     try {
       const community = await fetchMyCommunityPosts()
-      setPosts(mapCommunity(community, city))
+      setPosts(mapCommunity(community, city, t))
     } catch (err) {
-      toastError(getErrorMessage(err, '내 글을 불러오지 못했어요'))
+      toastError(getErrorMessage(localizeCommunityError(err, tCommunity), t('posts.loadFailed')))
       setPosts([])
     } finally {
       setLoadingPosts(false)
     }
-  }, [user, toastError, city])
+  }, [user, toastError, city, t, tCommunity])
 
   useEffect(() => {
     if (loading || !user) return
@@ -101,16 +107,16 @@ export function MyPostsScreen() {
   async function handleDelete(post: MyPostItem) {
     if (!post.canManage) return
     const ok = window.confirm(
-      `"${post.title}" 글을 삭제할까요?\n삭제하면 되돌릴 수 없어요.`,
+      t('posts.deleteConfirm', { title: post.title }),
     )
     if (!ok) return
     setDeletingId(post.id)
     try {
       await deleteCommunityPostRequest(post.id)
       setPosts((prev) => prev.filter((item) => item.id !== post.id))
-      success('글을 삭제했어요')
+      success(t('posts.deleted'))
     } catch (err) {
-      toastError(getErrorMessage(err, '삭제에 실패했어요'))
+      toastError(getErrorMessage(localizeCommunityError(err, tCommunity), t('posts.deleteFailed')))
     } finally {
       setDeletingId(null)
     }
@@ -152,7 +158,7 @@ export function MyPostsScreen() {
   }
 
   if (!user) {
-    return <LoadingState fullPage label='로그인 페이지로 이동 중…' />
+    return <LoadingState fullPage label={t('list.redirectingToLogin')} />
   }
 
   return (
@@ -169,18 +175,18 @@ export function MyPostsScreen() {
               ACCOUNT
             </p>
             <h1 className='mt-1.5 text-[1.5rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] lg:text-[1.75rem]'>
-              내가 올린 글
+              {t('posts.title')}
             </h1>
             <p className='mt-1.5 text-[14px] text-[var(--muted-foreground)]'>
-              커뮤니티 게시판 글을 카테고리별로 모아 보고, 수정·삭제할 수 있어요
+              {t('posts.description')}
             </p>
           </div>
           <span className='rounded-full bg-white px-3 py-1.5 text-[13px] tabular-nums text-[var(--muted)] ring-1 ring-black/[0.06]'>
             {loadingPosts
               ? '…'
               : category === 'all'
-                ? `전체 ${posts.length}`
-                : `${filteredPosts.length}개`}
+                ? t('list.totalCount', { count: posts.length })
+                : t('list.count', { count: filteredPosts.length })}
           </span>
         </div>
 
@@ -188,11 +194,11 @@ export function MyPostsScreen() {
           <aside className='hidden lg:block'>
             <div className='sticky top-24 overflow-hidden rounded-[1.25rem] bg-white p-2 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>
               <p className='px-3 pb-2 pt-2.5 text-[11px] font-medium tracking-[0.14em] text-[var(--muted)]'>
-                카테고리
+                {t('list.categoryHeading')}
               </p>
-              <nav className='flex flex-col gap-0.5' aria-label='글 카테고리'>
+              <nav className='flex flex-col gap-0.5' aria-label={t('posts.categoryAria')}>
                 <AccountCategorySideItem
-                  label='전체'
+                  label={t('list.all')}
                   count={posts.length}
                   active={category === 'all'}
                   onClick={() => setCategory('all')}
@@ -200,7 +206,7 @@ export function MyPostsScreen() {
                 {sortedBoards.map((board) => (
                   <AccountCategorySideItem
                     key={board.id}
-                    label={board.title}
+                    label={boardTitle(board.id)}
                     count={counts[board.id]}
                     active={category === board.id}
                     onClick={() => setCategory(board.id)}
@@ -214,11 +220,11 @@ export function MyPostsScreen() {
             {!loadingPosts && (
               <div className='mb-5 shrink-0 lg:hidden'>
                 <ChipScrollRow
-                  ariaLabel='글 카테고리'
+                  ariaLabel={t('posts.categoryAria')}
                   leading={
                     <AccountCategoryChip
                       variant='lead'
-                      label='전체'
+                      label={t('list.all')}
                       active={category === 'all'}
                       count={posts.length}
                       onClick={() => setCategory('all')}
@@ -228,7 +234,7 @@ export function MyPostsScreen() {
                   {sortedBoards.map((board) => (
                     <AccountCategoryChip
                       key={board.id}
-                      label={board.title}
+                      label={boardTitle(board.id)}
                       active={category === board.id}
                       count={counts[board.id]}
                       onClick={() => setCategory(board.id)}
@@ -241,27 +247,31 @@ export function MyPostsScreen() {
             {loadingPosts ? (
               <LoadingState
                 className='flex-1 py-16'
-                label='글을 불러오는 중이에요…'
+                label={t('list.loading')}
               />
             ) : filteredPosts.length === 0 ? (
               <div className='flex flex-1 flex-col items-center justify-center rounded-[1.25rem] bg-white px-6 py-14 text-center shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04] lg:py-20'>
                 <p className='text-[15px] font-semibold tracking-tight text-[var(--foreground)] lg:text-base'>
                   {category === 'all'
-                    ? '아직 올린 글이 없어요'
-                    : `${selectedBoard?.title ?? '이 카테고리'}에 올린 글이 없어요`}
+                    ? t('posts.emptyAll')
+                    : t('posts.emptyCategory', {
+                        category: selectedBoard
+                          ? boardTitle(selectedBoard.id)
+                          : t('list.thisCategory'),
+                      })}
                 </p>
                 <p className='mt-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
                   {category === 'all'
-                    ? '각 게시판에서 글을 올리면 여기에 모여요'
-                    : '해당 게시판에서 글을 올리면 여기에 보여요'}
+                    ? t('posts.emptyAllHint')
+                    : t('posts.emptyCategoryHint')}
                 </p>
                 <Link
                   href={selectedBoard?.href ?? href()}
                   className='mt-5 inline-flex h-10 items-center rounded-full bg-[var(--foreground)] px-5 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--navy-light)]'
                 >
                   {selectedBoard
-                    ? `${selectedBoard.title} 게시판 보기`
-                    : '게시판 둘러보기'}
+                    ? t('list.viewBoard', { board: boardTitle(selectedBoard.id) })
+                    : t('posts.browseBoards')}
                 </Link>
               </div>
             ) : (
@@ -282,7 +292,7 @@ export function MyPostsScreen() {
                         <div className='flex flex-wrap items-center gap-1.5'>
                           {category === 'all' && (
                             <span className='text-[11px] font-medium tracking-wide text-[var(--brand)]'>
-                              {post.boardLabel}
+                              {boardTitle(post.categoryId)}
                             </span>
                           )}
                         </div>
@@ -309,7 +319,7 @@ export function MyPostsScreen() {
                               href={post.editHref}
                               className='inline-flex h-8 items-center rounded-full bg-[#f3f4f6] px-3 text-[12px] font-semibold text-[var(--foreground)] touch-manipulation transition hover:bg-[#e8eaee]'
                             >
-                              수정
+                              {t('posts.edit')}
                             </Link>
                           ) : null}
                           <button
@@ -318,7 +328,7 @@ export function MyPostsScreen() {
                             onClick={() => void handleDelete(post)}
                             className='inline-flex h-8 items-center rounded-full px-3 text-[12px] font-semibold text-red-600 touch-manipulation transition hover:bg-red-50 disabled:opacity-50'
                           >
-                            {deletingId === post.id ? '삭제 중…' : '삭제'}
+                            {deletingId === post.id ? t('posts.deleting') : t('posts.delete')}
                           </button>
                         </div>
                       ) : null}
@@ -334,7 +344,11 @@ export function MyPostsScreen() {
   )
 }
 
-function mapCommunity(posts: CommunityPost[], city: CityId): MyPostItem[] {
+function mapCommunity(
+  posts: CommunityPost[],
+  city: CityId,
+  t: Translate,
+): MyPostItem[] {
   return posts.map((post) => {
     const mergedId =
       resolveMergedCommunityBoardId(post.categoryId) ?? post.categoryId
@@ -345,11 +359,11 @@ function mapCommunity(posts: CommunityPost[], city: CityId): MyPostItem[] {
       id: post.id,
       title: post.title,
       meta:
-        [post.location, post.detail].filter(Boolean).join(' · ') || '상세 보기',
+        [post.location, post.detail].filter(Boolean).join(' · ') ||
+        t('list.viewDetail'),
       href: hrefForCommunityPost(post, city),
       editHref: isMock ? null : hrefForCommunityPost(post, city, 'edit'),
       categoryId,
-      boardLabel: category?.title ?? categoryId,
       authorSchoolId: post.authorSchoolId,
       status: post.status === 'closed' ? 'closed' : 'open',
       canManage: !isMock,

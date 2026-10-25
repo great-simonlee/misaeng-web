@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { getRequestT } from '@lib/i18n/server'
+
 import { resolveAuthenticatedUser } from '../../../agent-auth/lib/authHelpers'
 import { accountSuspendedResponse } from '@lib/supabase/profile.server'
 import {
@@ -59,11 +62,11 @@ type ToggleBody = {
 }
 
 export async function POST(request: Request, context: RouteContext) {
+  const t = await getRequestT(request, 'api')
   if (!isCommunityEngagementStorageConfigured()) {
     return NextResponse.json(
       {
-        error:
-          'Supabase 설정이 필요해요. 로컬에서는 브라우저에 임시 저장돼요.',
+        error: t('common.supabaseNotConfiguredLocal'),
         code: 'STORAGE_UNAVAILABLE',
       },
       { status: 503 },
@@ -72,9 +75,9 @@ export async function POST(request: Request, context: RouteContext) {
 
   const user = await resolveAuthenticatedUser()
   if (!user?.uid) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
-  const suspended = await accountSuspendedResponse(user.uid)
+  const suspended = await accountSuspendedResponse(user.uid, t)
   if (suspended) return suspended
 
   const { id: postId } = await context.params
@@ -83,7 +86,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   if (boardId !== 'food') {
     return NextResponse.json(
-      { error: '맛집 게시글만 가봤어요를 표시할 수 있어요.' },
+      { error: t('community.beenThereFoodOnly') },
       { status: 400 },
     )
   }
@@ -119,10 +122,7 @@ export async function POST(request: Request, context: RouteContext) {
     console.error('Community been-there toggle error:', error)
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : '가봤어요 처리에 실패했어요.',
+        error: apiErrorMessage(t, error, 'community.beenThereFailed'),
       },
       { status: 500 },
     )

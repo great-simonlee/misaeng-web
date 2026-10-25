@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { useToast } from '@hooks/useToast'
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 type CopyLinkButtonProps = {
   url?: string
@@ -17,6 +18,7 @@ export function CopyLinkButton({
   className,
 }: CopyLinkButtonProps) {
   const { success, error } = useToast()
+  const t = useT('common')
   const [copied, setCopied] = useState(false)
 
   async function handleCopy() {
@@ -26,11 +28,11 @@ export function CopyLinkButton({
     try {
       await navigator.clipboard.writeText(value)
       setCopied(true)
-      success('링크를 복사했어요')
+      success(t('ui.copyLink.copiedToast'))
       window.setTimeout(() => setCopied(false), 2000)
     } catch {
       setCopied(false)
-      error('링크 복사에 실패했어요')
+      error(t('ui.copyLink.failedToast'))
     }
   }
 
@@ -39,7 +41,7 @@ export function CopyLinkButton({
       <button
         type='button'
         onClick={handleCopy}
-        aria-label={copied ? '링크 복사됨' : '링크 복사'}
+        aria-label={copied ? t('ui.copyLink.linkCopied') : t('ui.copyLink.copyLink')}
         className={cn(
           'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/[0.06] bg-white text-[var(--muted-foreground)] shadow-sm touch-manipulation transition hover:border-black/12 hover:text-[var(--foreground)] active:scale-[0.97]',
           copied && 'border-emerald-200 text-emerald-600',
@@ -63,7 +65,7 @@ export function CopyLinkButton({
         )}
       >
         {copied ? <CheckIcon /> : <LinkIcon />}
-        {copied ? '복사됨' : '공유'}
+        {copied ? t('ui.copyLink.copied') : t('ui.copyLink.share')}
       </button>
     )
   }
@@ -79,7 +81,7 @@ export function CopyLinkButton({
         )}
       >
         {copied ? <CheckIcon /> : <LinkIcon />}
-        {copied ? '복사됨' : '링크 복사'}
+        {copied ? t('ui.copyLink.copied') : t('ui.copyLink.copyLink')}
       </button>
     )
   }
@@ -93,7 +95,7 @@ export function CopyLinkButton({
         className,
       )}
     >
-      {copied ? '링크 복사됨' : '링크 복사'}
+      {copied ? t('ui.copyLink.linkCopied') : t('ui.copyLink.copyLink')}
     </button>
   )
 }

@@ -1,5 +1,8 @@
+'use client'
+
 import { cn } from '@lib'
 import type { NicknameAvailability } from '@hooks/useNicknameAvailability'
+import { useT } from '@lib/i18n/client'
 
 interface NicknameAvailabilityHintProps {
   availability: NicknameAvailability
@@ -11,6 +14,7 @@ export function NicknameAvailabilityHint({
   availability,
   className,
 }: NicknameAvailabilityHintProps) {
+  const t = useT('common')
   const { status, message } = availability
   if (status === 'idle') return null
 
@@ -26,7 +30,7 @@ export function NicknameAvailabilityHint({
         className,
       )}
     >
-      {status === 'checking' ? '중복 확인 중…' : message}
+      {status === 'checking' ? t('ui.nickname.checking') : message}
     </p>
   )
 }

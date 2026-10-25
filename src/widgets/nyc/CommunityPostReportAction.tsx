@@ -7,7 +7,9 @@ import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { cityLoginPath } from '@lib/constants/cities'
+import { localizeCommunityError } from '@lib/community/client'
 import { createCommunityReportRequest } from '@lib/community/engagement.client'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import type { CommunityReportReason } from '@/types/nyc'
 import { CommunityReportSheet } from '@widgets/nyc/CommunityReportSheet'
@@ -25,6 +27,7 @@ export function CommunityPostReportAction({
   loginNext,
   className,
 }: CommunityPostReportActionProps) {
+  const t = useT('community')
   const city = useCity()
   const href = useCityPath()
   const { user, loading: authLoading } = useAuth()
@@ -57,9 +60,14 @@ export function CommunityPostReportAction({
         },
       })
       setReportOpen(false)
-      success('신고가 접수되었어요. 관리자가 확인합니다.')
+      success(t('report.submitted'))
     } catch (err) {
-      toastError(getErrorMessage(err, '신고에 실패했어요'))
+      toastError(
+        getErrorMessage(
+          localizeCommunityError(err, t),
+          t('errors.reportFailed'),
+        ),
+      )
     } finally {
       setReporting(false)
     }
@@ -74,7 +82,7 @@ export function CommunityPostReportAction({
     <>
       {!authLoading && !user ? (
         <Link href={loginHref} className={actionClass}>
-          신고
+          {t('report.action')}
         </Link>
       ) : (
         <button
@@ -83,14 +91,14 @@ export function CommunityPostReportAction({
           disabled={authLoading}
           className={actionClass}
         >
-          신고
+          {t('report.action')}
         </button>
       )}
 
       <CommunityReportSheet
         open={reportOpen}
         onClose={() => setReportOpen(false)}
-        targetLabel='이 게시글'
+        target='post'
         submitting={reporting}
         onSubmit={handleReportSubmit}
       />

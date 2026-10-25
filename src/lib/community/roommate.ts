@@ -1,4 +1,11 @@
+import type { Translate } from '@lib/i18n/translate'
 import type { RoommateLookingFor } from '@/types/nyc'
+
+/**
+ * 화면 표시 문구는 `housing` 네임스페이스의 `roommate.*`에 있다 (`const t = useT('housing')`).
+ * - 유형: `roommate.intents.<id>.*`, `roommate.lookingFor.<id>.*`, 작성 폼: `roommate.form.<id>.*`
+ * ROOMMATE_LOOKING_FOR_OPTIONS의 한국어 label은 글의 detail 저장값이라 번역하지 않는다.
+ */
 
 export type { RoommateLookingFor }
 
@@ -9,22 +16,17 @@ export const ROOMMATE_GALLERY_MAX = 6
 /** 작성 1단계: 방 올리기 vs 룸메·방 찾기 */
 export type RoommateIntent = 'offer-room' | 'seek'
 
+/** 문구: housing `roommate.intents.<id>.*` */
 export const ROOMMATE_INTENT_OPTIONS: {
   id: RoommateIntent
-  label: string
-  description: string
   lookingForIds: readonly RoommateLookingFor[]
 }[] = [
   {
     id: 'offer-room',
-    label: '방 올리기',
-    description: '있는 방에 룸메를 구하거나 서블렛을 올려요',
     lookingForIds: ['has-room', 'sublet'],
   },
   {
     id: 'seek',
-    label: '룸메 찾기',
-    description: '같이 구할 룸메나 들어갈 방을 찾아요',
     lookingForIds: ['together', 'room'],
   },
 ]
@@ -32,127 +34,80 @@ export const ROOMMATE_INTENT_OPTIONS: {
 export const ROOMMATE_LOOKING_FOR_OPTIONS: {
   id: RoommateLookingFor
   intent: RoommateIntent
-  /** 작성·상세·필터 시트용 */
+  /** detail 저장값 (한국어 원문). 화면 문구는 housing `roommate.lookingFor.<id>.*` */
   label: string
-  /** 목록 빠른 필터 칩용 짧은 라벨 */
-  shortLabel: string
-  description: string
 }[] = [
   {
     id: 'has-room',
     intent: 'offer-room',
     label: '저희 방에 입주할 룸메 찾아요',
-    shortLabel: '방 있음',
-    description: '이미 방이 있고, 함께 살 사람을 구해요',
   },
   {
     id: 'sublet',
     intent: 'offer-room',
     label: '제 방에 잠깐 지내실 서블렛 올려요',
-    shortLabel: '서블렛',
-    description: '단기 임대·서블렛으로 방을 빌려드려요',
   },
   {
     id: 'together',
     intent: 'seek',
     label: '같이 입주할 방 찾을 룸메 구해요',
-    shortLabel: '같이 구함',
-    description: '아직 방이 없고, 같이 구할 룸메를 찾아요',
   },
   {
     id: 'room',
     intent: 'seek',
     label: '입주할 수 있는 방만 구해요',
-    shortLabel: '방 구함',
-    description: '룸메 없이 들어갈 방·집만 찾아요',
   },
 ]
 
-export type RoommateFormConfig = {
-  locationLabel: string
-  locationPlaceholder: string
+/** 작성 폼 구조 (필수 여부). 문구는 housing `roommate.form.<id>.*` */
+export type RoommateFormRules = {
   locationRequired: boolean
-  budgetLabel: string
-  budgetPlaceholder: string
   budgetRequired: boolean
-  moveInStartLabel: string
-  moveInEndLabel: string
   moveInStartRequired: boolean
   moveInEndRequired: boolean
   photosRecommended: boolean
+}
+
+export type RoommateFormConfig = RoommateFormRules & {
+  locationLabel: string
+  locationPlaceholder: string
+  budgetLabel: string
+  budgetPlaceholder: string
+  moveInStartLabel: string
+  moveInEndLabel: string
   photosHint: string
   titlePlaceholder: string
   bodyPlaceholder: string
 }
 
-const FORM_CONFIG: Record<RoommateLookingFor, RoommateFormConfig> = {
+const FORM_CONFIG: Record<RoommateLookingFor, RoommateFormRules> = {
   'has-room': {
-    locationLabel: '현재 동네 / 위치',
-    locationPlaceholder: '예: Brooklyn Bushwick',
     locationRequired: true,
-    budgetLabel: '룸메 월세 ($)',
-    budgetPlaceholder: '예: 1400',
     budgetRequired: true,
-    moveInStartLabel: '입주 가능일',
-    moveInEndLabel: '이사 나가는 날',
     moveInStartRequired: true,
     moveInEndRequired: false,
     photosRecommended: true,
-    photosHint: '방·집 사진 권장 · 최대 6장 · 첫 장이 대표',
-    titlePlaceholder: '예: Bushwick 2bed 룸메이트 구해요',
-    bodyPlaceholder:
-      '방 구조, 생활 패턴, 유틸·보증금을 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요.',
   },
   together: {
-    locationLabel: '희망 동네',
-    locationPlaceholder: '예: Queens Astoria / Brooklyn',
     locationRequired: false,
-    budgetLabel: '월 예산 상한 ($)',
-    budgetPlaceholder: '예: 1600',
     budgetRequired: true,
-    moveInStartLabel: '입주 희망일',
-    moveInEndLabel: '이사 나가는 날',
     moveInStartRequired: true,
     moveInEndRequired: false,
     photosRecommended: false,
-    photosHint: '참고 사진이 있으면 올려 주세요 · 최대 6장',
-    titlePlaceholder: '예: 9월 입주, Astoria 같이 구해요',
-    bodyPlaceholder:
-      '예산, 희망 동네, 생활 패턴을 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요.',
   },
   room: {
-    locationLabel: '희망 동네',
-    locationPlaceholder: '예: Manhattan UES / Jersey City',
     locationRequired: false,
-    budgetLabel: '월 예산 상한 ($)',
-    budgetPlaceholder: '예: 1800',
     budgetRequired: true,
-    moveInStartLabel: '입주 희망일',
-    moveInEndLabel: '이사 나가는 날',
     moveInStartRequired: true,
     moveInEndRequired: false,
     photosRecommended: false,
-    photosHint: '참고 사진이 있으면 올려 주세요 · 최대 6장',
-    titlePlaceholder: '예: Midtown 근처 방 구해요',
-    bodyPlaceholder:
-      '예산, 희망 위치, 입주 시기를 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요.',
   },
   sublet: {
-    locationLabel: '서블렛 위치',
-    locationPlaceholder: '예: Upper East Side',
     locationRequired: true,
-    budgetLabel: '월세 ($)',
-    budgetPlaceholder: '예: 2200',
     budgetRequired: true,
-    moveInStartLabel: '서블렛 시작일',
-    moveInEndLabel: '서블렛 종료일',
     moveInStartRequired: true,
     moveInEndRequired: true,
     photosRecommended: true,
-    photosHint: '방·집 사진 권장 · 최대 6장 · 첫 장이 대표',
-    titlePlaceholder: '예: UES 스튜디오 9~11월 서블렛',
-    bodyPlaceholder:
-      '기간, 가구 포함 여부, 교통, 유틸·보증금을 적어 주세요. 연락은 카카오톡 1:1 오픈채팅 링크를 남겨 주세요.',
   },
 }
 
@@ -227,21 +182,25 @@ export function normalizeRoommateLookingFor(
   return null
 }
 
+/** t(`housing` 네임스페이스)를 넘기면 현재 언어, 없으면 한국어 원문 (API detail 저장값 — 번역하지 않는다) */
 export function getRoommateLookingForLabel(
   value: RoommateLookingFor | null | undefined,
+  t?: Translate,
 ) {
+  if (t) return isRoommateLookingFor(value) ? t(`roommate.lookingFor.${value}.label`) : ''
   return (
     ROOMMATE_LOOKING_FOR_OPTIONS.find((item) => item.id === value)?.label ?? ''
   )
 }
 
+/** t는 `useT('housing')` */
 export function getRoommateLookingForShortLabel(
   value: RoommateLookingFor | null | undefined,
+  t: Translate,
 ) {
-  return (
-    ROOMMATE_LOOKING_FOR_OPTIONS.find((item) => item.id === value)
-      ?.shortLabel ?? ''
-  )
+  return isRoommateLookingFor(value)
+    ? t(`roommate.lookingFor.${value}.shortLabel`)
+    : ''
 }
 
 export function getRoommateLookingForStyle(
@@ -283,9 +242,37 @@ export function roommateMatchesIntent(
 
 export function getRoommateFormConfig(
   lookingFor: RoommateLookingFor | null | undefined,
-): RoommateFormConfig | null {
+): RoommateFormRules | null {
   if (!lookingFor || !(lookingFor in FORM_CONFIG)) return null
   return FORM_CONFIG[lookingFor]
+}
+
+const FORM_TEXT_FIELDS = [
+  'locationLabel',
+  'locationPlaceholder',
+  'budgetLabel',
+  'budgetPlaceholder',
+  'moveInStartLabel',
+  'moveInEndLabel',
+  'photosHint',
+  'titlePlaceholder',
+  'bodyPlaceholder',
+] as const
+
+/** 작성 폼 설정 + 현재 언어 문구. t는 `useT('housing')` */
+export function getRoommateFormConfigText(
+  lookingFor: RoommateLookingFor | null | undefined,
+  t: Translate,
+): RoommateFormConfig | null {
+  const config = getRoommateFormConfig(lookingFor)
+  if (!config || !lookingFor) return null
+  const text = Object.fromEntries(
+    FORM_TEXT_FIELDS.map((field) => [
+      field,
+      t(`roommate.form.${lookingFor}.${field}`),
+    ]),
+  ) as Record<(typeof FORM_TEXT_FIELDS)[number], string>
+  return { ...config, ...text }
 }
 
 export function normalizeRoommateBudgetMax(raw: unknown): number | null {

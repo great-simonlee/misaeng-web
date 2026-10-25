@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom'
 import { useAnchoredPosition } from '@hooks/useAnchoredPosition'
 import { useCity } from '@hooks/useCity'
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 import type { FoodVenueOption } from '@lib/community/venues'
 
 type RestaurantNameFieldProps = {
@@ -27,8 +28,9 @@ export function RestaurantNameField({
   placeId,
   className,
   inputClassName,
-  placeholder = '음식점 이름',
+  placeholder,
 }: RestaurantNameFieldProps) {
+  const t = useT('food')
   const city = useCity()
   const listId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
@@ -140,7 +142,7 @@ export function RestaurantNameField({
                     {item.name}
                   </span>
                   <span className='shrink-0 text-[11px] tabular-nums text-[var(--muted)]'>
-                    후기 {item.count}
+                    {t('restaurantName.reviewCount', { count: item.count })}
                   </span>
                 </button>
               </li>
@@ -164,7 +166,7 @@ export function RestaurantNameField({
           if (venues.length > 0) setOpen(true)
         }}
         className={inputClassName}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('restaurantName.placeholder')}
         maxLength={80}
         autoComplete='off'
         role='combobox'
@@ -174,20 +176,19 @@ export function RestaurantNameField({
 
       {loading ? (
         <p className='mt-1.5 text-[12px] text-[var(--muted)]'>
-          이 위치의 기존 음식점을 확인하는 중…
+          {t('restaurantName.checking')}
         </p>
       ) : venues.length > 0 ? (
         <p className='mt-1.5 text-[12px] text-[var(--muted)]'>
-          이 위치에서 등록된 음식점 {venues.length}곳 · 아래에서 고르거나 새로
-          입력하세요
+          {t('restaurantName.existing', { count: venues.length })}
         </p>
       ) : latitude != null ? (
         <p className='mt-1.5 text-[12px] text-[var(--muted)]'>
-          이 위치에 등록된 음식점이 없어요. 새 이름을 입력해 주세요
+          {t('restaurantName.none')}
         </p>
       ) : (
         <p className='mt-1.5 text-[12px] text-[var(--muted)]'>
-          목록·상세 페이지에 표시되는 이름이에요
+          {t('restaurantName.hint')}
         </p>
       )}
 

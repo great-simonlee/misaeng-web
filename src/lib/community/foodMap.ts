@@ -36,7 +36,7 @@ export type FoodPlacePoint = {
   longitude: number
 }
 
-/** 상세 페이지용 단일 식당 좌표 */
+/** 상세 페이지용 단일 식당 좌표. 이름이 없으면 name은 '' (화면에서 `t('map.unnamedPlace')`) */
 export function resolveFoodPlacePoint(
   post: Pick<
     CommunityPost,
@@ -49,7 +49,7 @@ export function resolveFoodPlacePoint(
       post.placeName?.trim() ||
       post.title?.trim() ||
       post.location?.trim() ||
-      '맛집',
+      '',
     address: post.location?.trim() || '',
     latitude: post.latitude as number,
     longitude: post.longitude as number,
@@ -68,11 +68,11 @@ function pinName(post: CommunityPost) {
     post.placeName?.trim() ||
     post.title?.trim() ||
     post.location?.trim() ||
-    '맛집'
+    ''
   )
 }
 
-/** 좌표 있는 맛집 후기를 식당 단위로 묶어 지도 핀 생성 */
+/** 좌표 있는 맛집 후기를 식당 단위로 묶어 지도 핀 생성. 이름이 없으면 name은 '' */
 export function buildFoodMapPins(posts: CommunityPost[]): FoodMapPin[] {
   const byKey = new Map<string, FoodMapPin>()
 
@@ -82,7 +82,7 @@ export function buildFoodMapPins(posts: CommunityPost[]): FoodMapPin[] {
     const existing = byKey.get(key)
     if (existing) {
       existing.posts.push(post)
-      if (!existing.name.trim() || existing.name === '맛집') {
+      if (!existing.name.trim()) {
         existing.name = pinName(post)
       }
       if (!existing.address.trim() && post.location?.trim()) {

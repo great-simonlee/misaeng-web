@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { Hero } from '@widgets/Hero'
+import Link from 'next/link';
+import Image from 'next/image';
+import { Hero } from '@widgets/Hero';
 
 /** 아이콘: 검증 배지 */
 function IconVerified() {
@@ -18,7 +18,7 @@ function IconVerified() {
         d='M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z'
       />
     </svg>
-  )
+  );
 }
 
 /** 아이콘: 사람들 */
@@ -37,7 +37,7 @@ function IconRoommates() {
         d='M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z'
       />
     </svg>
-  )
+  );
 }
 
 /** 아이콘: 방/집 */
@@ -56,7 +56,7 @@ function IconHome() {
         d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'
       />
     </svg>
-  )
+  );
 }
 
 /**
@@ -75,11 +75,11 @@ export function HomeScreen() {
         className='relative overflow-hidden bg-[var(--foreground)] py-12 sm:py-20 md:py-24'
         aria-labelledby='careers-heading'
       >
-        <div className='absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_0%,rgba(246,67,16,0.2),transparent)]' />
+        <div className='absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_0%,rgb(var(--brand-rgb)/0.2),transparent)]' />
         <div className='relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <div className='flex flex-col items-center gap-5 text-center sm:flex-row sm:justify-between sm:gap-8 sm:text-left'>
             <div>
-              <p className='text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]'>
+              <p className='text-[10px] font-semibold uppercase tracking-[0.28em] text-brand'>
                 We&apos;re hiring
               </p>
               <h2
@@ -90,14 +90,15 @@ export function HomeScreen() {
               </h2>
               <p className='mt-1 max-w-xl text-sm text-white/80 sm:mt-1.5'>
                 Partnership & Operations Intern. <br className='sm:hidden' />
-                Marketing & Content Strategy Intern. <br className='sm:hidden' />
+                Marketing & Content Strategy Intern.{' '}
+                <br className='sm:hidden' />
                 <br className='sm:hidden' />
                 Grow with us from the ground up.{' '}
               </p>
             </div>
             <Link
               href='/careers'
-              className='shrink-0 rounded-full border-2 border-white bg-white px-5 py-2.5 text-sm font-semibold text-[var(--foreground)] transition active:scale-[0.98] hover:bg-white/95 hover:border-white/90 sm:px-6 sm:py-3'
+              className='shrink-0 rounded-full border-2 border-white bg-white px-5 py-2.5 text-sm font-semibold text-[var(--foreground)] transition active:scale-[0.98] hover:border-white/90 hover:bg-white/95 sm:px-6 sm:py-3'
             >
               View open positions →
             </Link>
@@ -114,7 +115,7 @@ export function HomeScreen() {
         <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <div className='grid gap-8 text-center sm:gap-12 sm:text-left lg:grid-cols-12 lg:gap-16'>
             <div className='lg:col-span-5'>
-              <span className='inline-block text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]'>
+              <span className='inline-block text-[10px] font-semibold uppercase tracking-[0.28em] text-brand'>
                 What is Ellieo?
               </span>
               <h2
@@ -123,16 +124,19 @@ export function HomeScreen() {
               >
                 Next-gen housing,
                 <br />
-                <span className='text-[#F64310]'>built for trust.</span>
+                <span className='text-brand'>built for trust.</span>
               </h2>
             </div>
             <div className='space-y-4 sm:space-y-5 lg:col-span-7 lg:pt-2'>
               <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base sm:text-lg'>
-                <strong className='font-semibold text-[var(--foreground)]'>Ellieo</strong> is
-                Misaeng’s flagship app for
-                <br className='sm:hidden' /> students and professionals in New York City.
-                <br className='sm:hidden' /> We combine verified listings, identity-checked
-                roommates, and scam-resistant flows
+                <strong className='font-semibold text-[var(--foreground)]'>
+                  Ellieo
+                </strong>{' '}
+                is Misaeng’s flagship app for
+                <br className='sm:hidden' /> students and professionals in New
+                York City.
+                <br className='sm:hidden' /> We combine verified listings,
+                identity-checked roommates, and scam-resistant flows
                 <br className='sm:hidden' />
                 so you can find a place and roommates.
               </p>
@@ -140,7 +144,8 @@ export function HomeScreen() {
                 No fake ads. No surprise fees.
                 <br className='sm:hidden' />
                 Just transparent, secure housing search
-                <br className='sm:hidden' /> and matching backed by identity verification
+                <br className='sm:hidden' /> and matching backed by identity
+                verification
                 <br className='sm:hidden' /> and the focus on safety first.
               </p>
               <div className='hidden sm:flex flex-wrap justify-center gap-2 pt-1  sm:justify-start sm:gap-3 sm:pt-2'>
@@ -206,7 +211,8 @@ export function HomeScreen() {
                 <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base'>
                   Every listing is vetted. <br className='sm:hidden' />
                   We verify properties and landlords
-                  <br className='sm:hidden' /> so you avoid scams and hidden fees
+                  <br className='sm:hidden' /> so you avoid scams and hidden
+                  fees
                   <br className='sm:hidden' />
                   from search to lease.
                 </p>
@@ -222,9 +228,10 @@ export function HomeScreen() {
                 </div>
                 <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base'>
                   Get matched with roommates
-                  <br className='sm:hidden' /> based on lifestyle, budget, and location.
-                  <br className='sm:hidden' /> Identity verification keeps everyone{' '}
-                  <br className='sm:hidden' /> accountable and safe.
+                  <br className='sm:hidden' /> based on lifestyle, budget, and
+                  location.
+                  <br className='sm:hidden' /> Identity verification keeps
+                  everyone <br className='sm:hidden' /> accountable and safe.
                 </p>
               </div>
               <div className='space-y-2'>
@@ -250,11 +257,12 @@ export function HomeScreen() {
       {/* New York City First — horizontal layout */}
       <section
         id='roadmap'
-        className='relative overflow-hidden border-t border-[var(--border)] bg-[var(--surface)] pt-12 sm:pt-20 md:pt-24'
+        className='relative border-t border-[var(--border)] bg-[var(--surface)] pt-12 pb-10 sm:pt-20 sm:pb-14 md:pt-24 md:pb-16'
         aria-labelledby='roadmap-heading'
       >
         <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <div className='grid grid-cols-1 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] shadow-xl md:grid-cols-[1.1fr_1fr]'>
+          <div className='rounded-2xl shadow-[0_20px_50px_-16px_rgba(15,23,42,0.18)]'>
+            <div className='grid grid-cols-1 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] md:grid-cols-[1.1fr_1fr]'>
             <div className='relative aspect-[16/10] w-full min-h-[180px] sm:min-h-[200px] md:aspect-auto md:min-h-[260px]'>
               <Image
                 src='/img/banner_1.png'
@@ -265,12 +273,12 @@ export function HomeScreen() {
                 priority={false}
               />
               <div className='absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/20 md:to-transparent' />
-              <span className='absolute bottom-3 left-3 rounded-full bg-[#F64310] px-2.5 py-1 text-xs font-semibold text-white shadow-md sm:bottom-4 sm:left-4 sm:px-3 sm:py-1.5'>
-                New York City · 2026
+              <span className='absolute bottom-3 left-3 rounded-full bg-brand px-2.5 py-1 text-xs font-semibold text-white shadow-md sm:bottom-4 sm:left-4 sm:px-3 sm:py-1.5'>
+                New York City · Live now
               </span>
             </div>
             <div className='flex flex-col justify-center p-4 sm:p-6 md:p-7 lg:p-8'>
-              <p className='text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]'>
+              <p className='text-[10px] font-semibold uppercase tracking-[0.28em] text-brand'>
                 Roadmap
               </p>
               <h2
@@ -280,33 +288,51 @@ export function HomeScreen() {
                 New York City first—then we scale
               </h2>
               <p className='mt-2 text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-3 sm:text-base'>
-                Ellieo launches in New York City in 2026. <br className='sm:hidden' /> We’re
-                building density and trust in one market first, then expanding to Boston, Chicago,
-                and LA. Our roadmap is built for national scale—one city at a time.
+                Ellieo is live in New York City.{' '}
+                <br className='sm:hidden' /> We&apos;re building density and trust in
+                one market first, then expanding to Boston, Chicago, and LA. Our
+                roadmap is built for national scale—one city at a time.
               </p>
-              <div className='mt-4 flex flex-wrap gap-2 sm:mt-5'>
+              <div className='mt-4 flex flex-wrap items-center gap-2 sm:mt-5'>
                 <span className='inline-flex items-center gap-1.5 rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)] sm:px-3.5 sm:py-2 sm:text-sm'>
-                  <span className='h-1.5 w-1.5 rounded-full bg-[#F64310]' aria-hidden />
+                  <span
+                    className='h-1.5 w-1.5 rounded-full bg-brand'
+                    aria-hidden
+                  />
                   Boston
                 </span>
                 <span className='inline-flex items-center gap-1.5 rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)] sm:px-3.5 sm:py-2 sm:text-sm'>
-                  <span className='h-1.5 w-1.5 rounded-full bg-[#F64310]' aria-hidden />
+                  <span
+                    className='h-1.5 w-1.5 rounded-full bg-brand'
+                    aria-hidden
+                  />
                   Chicago
                 </span>
                 <span className='inline-flex items-center gap-1.5 rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)] sm:px-3.5 sm:py-2 sm:text-sm'>
-                  <span className='h-1.5 w-1.5 rounded-full bg-[#F64310]' aria-hidden />
+                  <span
+                    className='h-1.5 w-1.5 rounded-full bg-brand'
+                    aria-hidden
+                  />
                   LA
                 </span>
+                <Link
+                  href='/roadmap'
+                  className='inline-flex items-center gap-1 text-xs font-semibold text-brand transition hover:text-brand-hover sm:text-sm'
+                >
+                  Full roadmap
+                  <span aria-hidden>→</span>
+                </Link>
               </div>
             </div>
           </div>
+        </div>
         </div>
       </section>
 
       {/* Partners — light CTA */}
       <section
         id='partners'
-        className='relative overflow-hidden bg-[var(--surface)] py-12 sm:py-20 md:py-24'
+        className='relative bg-[var(--surface)] pt-10 pb-6 sm:pt-14 sm:pb-8 md:pt-16 md:pb-10'
         aria-labelledby='partners-heading'
       >
         <div className='mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8'>
@@ -317,25 +343,25 @@ export function HomeScreen() {
             Partner with Ellieo
           </h2>
           <p className='mt-3 text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-4 sm:text-base sm:text-lg'>
-            Landlords and strategic partners: <br className='sm:hidden' /> we’re building the future
-            of verified, <br className='sm:hidden' /> student-friendly housing together. <br />
+            Landlords and strategic partners: <br className='sm:hidden' /> we’re
+            building the future of verified, <br className='sm:hidden' />{' '}
+            student-friendly housing together. <br />
             <br className='sm:hidden' /> Get in touch to list properties,{' '}
-            <br className='sm:hidden' /> explore integrations, or join our ecosystem.
+            <br className='sm:hidden' /> explore integrations, or join our
+            ecosystem.
           </p>
           <Link
-            href='https://ellieo.com/#early'
-            target='_blank'
-            rel='noopener noreferrer'
-            className='mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full bg-[#F64310] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#F64310]/25 transition active:scale-[0.98] hover:bg-[#d93a0e] hover:shadow-xl hover:shadow-[#F64310]/30 sm:mt-8 sm:px-8 sm:py-3.5'
+            href='/contact'
+            className='mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand/25 transition active:scale-[0.98] hover:bg-brand-hover hover:shadow-xl hover:shadow-brand/30 sm:mt-8 sm:px-8 sm:py-3.5'
           >
-            Join Early Access
+            Partner Inquiry
           </Link>
-          <p className='mt-4 text-xs text-[var(--muted-foreground)] sm:mt-6'>
-            Partner & partnership inquiries and early access <br className='sm:hidden' /> are
-            handled on Ellieo.
+          <p className='mt-3 text-xs text-[var(--muted-foreground)] sm:mt-4'>
+            Partner & partnership inquiries{' '}
+            <br className='sm:hidden' /> are handled on Ellieo.
           </p>
         </div>
       </section>
     </div>
-  )
+  );
 }

@@ -1,3 +1,4 @@
+import type { Translate } from '@lib/i18n/translate'
 import type {
   HousingCreditOffer,
   HousingListing,
@@ -338,20 +339,21 @@ export function sortHousingRooms(rooms: HousingRoom[]): HousingRoom[] {
   })
 }
 
-export function getHousingRoomTypeLabel(roomType: HousingRoomType): string {
-  const labels: Record<HousingRoomType, string> = {
-    'master-w-bath': 'Master w/ Bath',
-    'master-wo-bath': 'Master w/o Bath',
-    'regular-bedroom': 'Regular',
-    flexroom: 'Flex',
-    entire: '유닛 전체',
-    studio: 'Studio',
-  }
-  return labels[roomType] ?? roomType
+/**
+ * 화면 표시 문구는 `housing` 네임스페이스에 있다 (`const t = useT('housing')`).
+ * 아래 format/label 함수의 t는 그 번역기다.
+ */
+
+/** `roomTypes.<id>` */
+export function getHousingRoomTypeLabel(
+  roomType: HousingRoomType,
+  t: Translate,
+): string {
+  return t(`roomTypes.${roomType}`)
 }
 
-export function getHousingRoomLabel(room: HousingRoom): string {
-  return getHousingRoomTypeLabel(room.type)
+export function getHousingRoomLabel(room: HousingRoom, t: Translate): string {
+  return getHousingRoomTypeLabel(room.type, t)
 }
 
 export function getRoomSelectionKey(room: HousingRoom, index: number): string {
@@ -529,7 +531,13 @@ export function formatHousingAvailableDate(value: string): string {
 
 export function formatHousingCreditOfferLabel(
   offer: HousingCreditOffer,
+  t?: Translate,
 ): string {
+  if (t) {
+    return offer.kind === 'months-free'
+      ? t('credit.monthsFree', { count: offer.months })
+      : t('credit.dollarCredit', { amount: offer.amount.toLocaleString('en-US') })
+  }
   if (offer.kind === 'months-free') return `${offer.months}개월 무료`
   return `$${offer.amount.toLocaleString()} 크레딧`
 }
@@ -544,21 +552,32 @@ export function formatListingBedBath(listing: HousingListing): string {
 
 export function formatPropertyAmenityFee(
   property: HousingProperty,
+  t: Translate,
 ): string {
   const fee = property.amenityFee
   const amount = fee?.amount
   if (amount == null || !Number.isFinite(amount) || amount < 0) {
-    return '아직 모름'
+    return t('amenityFee.unknown')
   }
-  if (amount === 0) return '무료'
-  const period = fee?.period === 'yearly' ? '년' : '월'
-  const prefix = fee?.type === 'mandatory' ? '필수' : '옵션'
-  const per = fee?.per === 'person' ? '인당' : '유닛당'
-  return `${prefix} · ${per} $${amount.toLocaleString()}/${period}`
+  if (amount === 0) return t('amenityFee.free')
+  const kind = fee?.type === 'mandatory' ? 'mandatory' : 'optional'
+  const per = fee?.per === 'person' ? 'Person' : 'Unit'
+  const period = fee?.period === 'yearly' ? 'Yearly' : 'Monthly'
+  return t(`amenityFee.${kind}${per}${period}`, {
+    amount: amount.toLocaleString('en-US'),
+  })
+}
+
+const PART_WALL_KEYS: Record<string, string> = {
+  'Full wall': 'fullWall',
+  'Regular wall': 'regularWall',
+  'Curtain only': 'curtainOnly',
+  Curtain: 'curtainOnly',
 }
 
 export function formatHousingPartWall(
   partWall: HousingProperty['partWall'] | string | string[] | null | undefined,
+  t: Translate,
 ): string | null {
   const items = Array.isArray(partWall)
     ? partWall
@@ -567,29 +586,88 @@ export function formatHousingPartWall(
         .map((s) => s.trim())
         .filter(Boolean)
   if (items.length === 0) return null
-  const labels: Record<string, string> = {
-    'Full wall': '풀 월',
-    'Regular wall': '레귤러 월',
-    'Curtain only': '커튼만',
-    Curtain: '커튼만',
-  }
   const formatted = items
-    .map((item) => labels[item] || item)
+    .map((item) =>
+      PART_WALL_KEYS[item] ? t(`partWall.${PART_WALL_KEYS[item]}`) : item,
+    )
     .filter(Boolean)
   return formatted.length > 0 ? formatted.join(' · ') : null
 }
 
 export function formatPropertyIncomeRequirements(
   property: HousingProperty,
+  t: Translate,
 ): string {
   const income = property.incomeRequirements
   const parts: string[] = []
   if (income?.personalIncome) {
-    parts.push(`개인 ${income.personalIncome}x`)
+    parts.push(t('income.personal', { multiple: income.personalIncome }))
   }
   if (income?.personalGuarantor) {
-    parts.push(`게런터 ${income.personalGuarantor}x`)
+    parts.push(t('income.guarantor', { multiple: income.personalGuarantor }))
   }
-  parts.push('보증 회사 가능')
+  parts.push(t('income.guarantorCompany'))
   return parts.join(' · ')
+}
+
+/** 건물 어메니티·유틸리티·가전 원문(ERP 영어) → 메시지 키 조각. `children's playroom` → `childrensPlayroom` */
+export function housingFeatureKey(value: string): string {
+  const words = value
+    .trim()
+    .toLowerCase()
+    .replace(/['’]/g, '')
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
+  return words
+    .map((word, index) =>
+      index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1),
+    )
+    .join('')
+}
+
+/**
+ * 건물 정보 원문 목록을 현재 언어 라벨로 (중복 제거).
+ * known: 표시할 원문 키 집합(소문자) — 모르는 값은 예전처럼 숨긴다.
+ * group: `amenities` | `utilities` | `appliances` (housing 네임스페이스)
+ */
+export function translateHousingFeatureLabels(
+  values: string[],
+  known: Record<string, unknown>,
+  group: 'amenities' | 'utilities' | 'appliances',
+  t: Translate,
+): string[] {
+  const labels: string[] = []
+  const seen = new Set<string>()
+  for (const item of values) {
+    const normalized = item.trim().toLowerCase()
+    if (!normalized || !(normalized in known)) continue
+    const label = t(`${group}.${housingFeatureKey(normalized)}`).trim()
+    const dedupeKey = label.toLowerCase()
+    if (!label || seen.has(dedupeKey)) continue
+    seen.add(dedupeKey)
+    labels.push(label)
+  }
+  return labels
+}
+
+/**
+ * 카드·상세 혜택 뱃지 라벨을 현재 언어로.
+ * badges는 housingMock `getListingCardBadges` 결과 (key = perk id 또는 `credit-offer-<index>`).
+ */
+export function translateListingCardBadges(
+  listing: HousingListing,
+  badges: { key: string; label: string }[],
+  t: Translate,
+): { key: string; label: string }[] {
+  const offers = getListingCreditOffers(listing)
+  return badges.map((badge) => {
+    const creditMatch = badge.key.match(/^credit-offer-(\d+)$/)
+    if (creditMatch) {
+      const offer = offers[Number(creditMatch[1])]
+      return offer
+        ? { key: badge.key, label: formatHousingCreditOfferLabel(offer, t) }
+        : badge
+    }
+    return { key: badge.key, label: t(`perks.${badge.key}`) }
+  })
 }

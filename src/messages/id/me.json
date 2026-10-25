@@ -1,0 +1,333 @@
+{
+  "nickname": {
+    "checkFailed": "Gagal mengecek nama panggilan itu.",
+    "available": "Nama panggilan ini tersedia",
+    "taken": "Nama panggilan itu sudah dipakai.",
+    "ruleHint": "Gunakan hanya huruf Latin dan \".\"",
+    "errors": {
+      "tooShort": "Nama panggilan minimal {min} karakter",
+      "tooLong": "Nama panggilan maksimal {max} karakter",
+      "invalidChars": "Gunakan hanya huruf Latin dan \".\""
+    }
+  },
+  "profile": {
+    "gender": {
+      "male": "Laki-laki",
+      "female": "Perempuan",
+      "other": "Lainnya"
+    },
+    "occupation": {
+      "student": "Pelajar",
+      "professional": "Profesional",
+      "other": "Lainnya"
+    },
+    "changePhotoAria": "Ganti foto profil",
+    "title": "Profil",
+    "nicknameLabel": "Nama panggilan",
+    "notSet": "Belum diatur",
+    "edit": "Edit",
+    "set": "Atur",
+    "saving": "Menyimpan…",
+    "genderLabel": "Jenis kelamin",
+    "occupationLabel": "Pekerjaan",
+    "nicknamePlaceholder": "mis. food.hunter",
+    "photoAlt": "Profil {name}"
+  },
+  "statusEmployer": {
+    "fieldLabel": "Sekolah / perusahaan / organisasi (opsional)",
+    "modeName": "Masukkan nama perusahaan",
+    "modeCategory": "Pilih kategori perusahaan",
+    "namePlaceholder": "Masukkan nama perusahaan",
+    "categoryTitle": "Kategori perusahaan",
+    "categoryPlaceholder": "Pilih kategori",
+    "noSelection": "Tidak ada",
+    "option": "Perusahaan {industry} {origin}",
+    "other": "Lainnya",
+    "origins": {
+      "korean": "Korea",
+      "us": "AS",
+      "foreign": "asing"
+    },
+    "industries": {
+      "tech": "IT & Software",
+      "finance": "Keuangan & Fintech",
+      "consulting": "Konsultan",
+      "healthcare": "Kesehatan & Bioteknologi",
+      "accounting": "Akuntansi & Pajak",
+      "engineering": "Manufaktur & Teknik",
+      "marketing": "Marketing"
+    }
+  },
+  "verification": {
+    "errors": {
+      "sendFailed": "Gagal mengirim email verifikasi",
+      "confirmFailed": "Verifikasi gagal",
+      "emailNotConfigured": "Email belum diatur. Periksa {envVar}."
+    },
+    "phone": {
+      "errors": {
+        "required": "Masukkan nomor HP kamu",
+        "invalidFormat": "Nomor HP sepertinya tidak benar",
+        "unsupportedCountry": "Masukkan nomor AS (+1) atau Korea (+82)",
+        "sendFailed": "Gagal mengirim SMS verifikasi",
+        "confirmFailed": "Verifikasi nomor HP gagal"
+      },
+      "smsDisabledShort": "SMS nonaktif",
+      "afterSchool": "Setelah verifikasi sekolah",
+      "rowLabel": "Nomor HP",
+      "rowHint": "Verifikasi dengan nomor HP kamu",
+      "smsDisabled": "Verifikasi SMS sedang dinonaktifkan.",
+      "verifiedToast": "Nomor HP kamu sudah terverifikasi",
+      "unavailable": "Tersedia setelah Supabase terhubung",
+      "title": "Verifikasi nomor HP",
+      "description": "Verifikasi lewat SMS dengan nomor AS (+1) atau Korea (+82). Maksimal {max} kali per hari per akun, dengan jeda {seconds} detik.",
+      "testOnly": "Saat ini hanya nomor uji yang disetujui yang bisa digunakan.",
+      "getCode": "Kirim kode via SMS",
+      "codeSentTo": "Masukkan kode yang kami kirim ke {phone}.",
+      "codePlaceholder": "Kode 6 digit",
+      "resendCode": "Kirim ulang SMS"
+    },
+    "workplace": {
+      "errors": {
+        "required": "Masukkan email kantor kamu.",
+        "invalidFormat": "Masukkan alamat email yang valid.",
+        "personalDomain": "Email pribadi seperti Gmail tidak bisa digunakan. Masukkan email yang kamu pakai di kantor.",
+        "companyRequired": "Masukkan nama perusahaan kamu"
+      },
+      "pendingDetail": "Email terverifikasi · Menunggu peninjauan tim Misaeng",
+      "retry": "Silakan verifikasi ulang",
+      "rowHint": "Verifikasi dengan email kantor dan nama perusahaan",
+      "rowLabel": "Verifikasi kerja",
+      "submittedToast": "Email kamu sudah terverifikasi. Verifikasi kerja akan selesai setelah ditinjau tim Misaeng.",
+      "approvedTitle": "Verifikasi kerja selesai",
+      "pendingTitle": "Verifikasi kerja sedang ditinjau",
+      "approvedDescription": "Tim Misaeng sudah mengonfirmasi verifikasi kerja kamu.",
+      "pendingDescription": "Email kantor kamu sudah terverifikasi. Tim Misaeng sedang meninjau info perusahaan kamu.",
+      "formDescription": "Email kantor kamu akan ditautkan ke akun yang sedang kamu pakai, meskipun berbeda dari email pendaftaran. Setelah kamu memasukkan kode, tim Misaeng akan mengecek ulang info perusahaan kamu.",
+      "companyLabel": "Nama perusahaan",
+      "companyPlaceholder": "mis. Misaeng LLC",
+      "emailLabel": "Email kantor",
+      "confirmButton": "Verifikasi email",
+      "editForm": "Ubah perusahaan atau email"
+    },
+    "verifiedShort": "Terverifikasi",
+    "school": {
+      "rowLabel": "Email kampus",
+      "rowHint": "Verifikasi status pelajar dengan email kampus",
+      "verifiedWithSchool": "Terverifikasi dengan {school}",
+      "verifiedToast": "Email kampus kamu sudah terverifikasi",
+      "registrationSentToast": "Permintaan pendaftaran kampus kamu sudah kami terima. Kami akan menghubungimu setelah meninjaunya.",
+      "errors": {
+        "eduRequired": "Masukkan email kampus .edu kamu",
+        "unsupported": "Kampus ini belum didukung. Kirim permintaan ke kami untuk menambahkannya.",
+        "nameRequired": "Masukkan nama kampus kamu",
+        "invalidDomain": "Masukkan domain email yang valid (mis. monroeu.com)",
+        "registrationFailed": "Gagal mengirim permintaan pendaftaran kampus"
+      },
+      "registerTitle": "Ajukan kampus",
+      "registerDescription": "Kalau kampus kamu belum ada di daftar, kamu bisa minta tim Misaeng untuk menambahkannya. Beri tahu nama kampus dan domain emailnya, nanti kami tambahkan ke {brand} dan aplikasi.",
+      "nameLabel": "Nama kampus",
+      "domainLabel": "Domain email kampus",
+      "domainHint": "Hanya domain, tanpa @ (mis. monroeu.com)",
+      "registerSubmit": "Kirim permintaan ke tim Misaeng",
+      "backToVerify": "Kembali ke verifikasi email kampus",
+      "verifyTitle": "Verifikasi email kampus",
+      "formDescription": "Email kampus kamu akan ditautkan ke akun yang sedang kamu pakai, meskipun berbeda dari email pendaftaran. Kami akan mengirim kode 6 digit ke email kampus kamu.",
+      "notFoundRequest": "Kampus kamu tidak ada? Ajukan di sini"
+    },
+    "instagram": {
+      "rowLabel": "Instagram",
+      "rowHint": "Hubungkan akun kamu"
+    },
+    "title": "Verifikasi",
+    "description": "Email kampus atau kantor kamu akan ditautkan ke akun ini, meskipun berbeda dari email yang kamu pakai untuk mendaftar.",
+    "status": {
+      "soon": "Segera hadir",
+      "verified": "Terverifikasi",
+      "inReview": "Sedang ditinjau",
+      "verify": "Verifikasi"
+    },
+    "chooser": {
+      "title": "Verifikasi identitas kamu",
+      "description": "Verifikasi dengan email kampus atau email kantor, mana yang lebih mudah. Email ini akan ditautkan ke akun ini meskipun berbeda dari email pendaftaran.",
+      "school": "Verifikasi sebagai pelajar dengan email kampus",
+      "workplace": "Verifikasi sebagai profesional dengan email kantor"
+    },
+    "clearInputAria": "Hapus isian",
+    "sending": "Mengirim…",
+    "getCode": "Dapatkan kode verifikasi",
+    "codeSentTo": "Masukkan kode 6 digit yang kami kirim ke{br}{email}",
+    "checking": "Mengecek…",
+    "resendIn": "Kirim ulang dalam {seconds} dtk",
+    "resendCode": "Kirim ulang kode",
+    "confirmButton": "Verifikasi",
+    "digitAria": "Digit ke-{position} kode verifikasi"
+  },
+  "toasts": {
+    "loggedOut": "Kamu sudah keluar",
+    "photoSaved": "Foto profil diperbarui",
+    "photoFailed": "Gagal mengunggah foto",
+    "nicknameSaved": "Nama panggilan disimpan",
+    "nicknameFailed": "Gagal menyimpan nama panggilan",
+    "mbtiSaved": "MBTI disimpan",
+    "mbtiCleared": "MBTI dihapus",
+    "mbtiFailed": "Gagal menyimpan MBTI",
+    "genderSaved": "Jenis kelamin disimpan",
+    "genderFailed": "Gagal menyimpan jenis kelamin",
+    "occupationSaved": "Pekerjaan disimpan",
+    "occupationFailed": "Gagal menyimpan pekerjaan",
+    "profileSaved": "Profil disimpan",
+    "profileFailed": "Gagal menyimpan profil"
+  },
+  "title": "Halaman Saya",
+  "suspendedNotice": "Akun ini sedang ditangguhkan. Kamu masih bisa melihat-lihat, tapi membuat postingan, komentar, dan permintaan kredit diblokir.",
+  "nicknameSheet": {
+    "title": "Atur nama panggilan",
+    "minLength": "Min. {min} karakter"
+  },
+  "actions": {
+    "cancel": "Batal",
+    "save": "Simpan"
+  },
+  "setupSheet": {
+    "title": "Lengkapi profil kamu",
+    "description": "Isi info profil yang ditampilkan di komunitas. Nama (depan/belakang) hanya untuk akun kamu, sedangkan nama panggilan yang dilihat komunitas.",
+    "firstNameLabel": "Nama depan",
+    "lastNameLabel": "Nama belakang",
+    "nicknameLabel": "Nama panggilan (tampil di komunitas)",
+    "later": "Nanti",
+    "save": "Simpan"
+  },
+  "logout": {
+    "title": "Keluar",
+    "descriptionMobile": "Keluar dari akun kamu di perangkat ini",
+    "descriptionDesktop": "Keluar dari akun kamu"
+  },
+  "loadingAria": "Memuat Halaman Saya",
+  "suspended": {
+    "title": "Akun kamu ditangguhkan",
+    "toMyPage": "Ke Halaman Saya"
+  },
+  "verificationRequired": {
+    "title": "Perlu verifikasi",
+    "toCommunityHome": "Kembali ke beranda komunitas"
+  },
+  "cardAction": {
+    "profile": {
+      "title": "Lengkapi profil kamu",
+      "description": "Atur nama panggilan, MBTI, jenis kelamin, dan pekerjaan",
+      "descriptionDesktop": "Atur info dasar kamu"
+    },
+    "identity": {
+      "title": "Verifikasi identitas kamu",
+      "description": "Verifikasi dengan email kampus atau email kantor",
+      "descriptionDesktop": "Verifikasi dengan email kampus atau kantor"
+    },
+    "school": {
+      "title": "Verifikasi email kampus",
+      "description": "Selesaikan verifikasi pelajar dengan email kampus",
+      "descriptionDesktop": "Verifikasi status pelajar"
+    },
+    "workplace": {
+      "title": "Verifikasi tempat kerja",
+      "description": "Verifikasi dengan email kantor dan nama perusahaan",
+      "descriptionDesktop": "Verifikasi status profesional"
+    },
+    "workplacePending": {
+      "title": "Verifikasi kerja kamu sedang kami tinjau",
+      "description": "Email kamu sudah terverifikasi. Tunggu peninjauan dari tim Misaeng ya",
+      "descriptionDesktop": "Menunggu peninjauan tim Misaeng"
+    }
+  },
+  "credit": {
+    "loadFailed": "Gagal memuat kredit kamu",
+    "ledgerLoadFailed": "Gagal memuat riwayat kredit",
+    "redeemComingSoon": "Penukaran hadiah dibuka secara bertahap. Cek panduan kredit untuk detailnya.",
+    "loadFailedRetry": "Gagal memuat kredit · Coba lagi",
+    "pillAria_other": "{count} kredit komunitas, lihat riwayat",
+    "unit": "kredit",
+    "history": "Riwayat",
+    "requestTitle": "Pakai kredit",
+    "balanceLabel": "Kredit kamu",
+    "requestDescription": "Pilih hadiah yang ingin dipakai. Setelah kamu mengajukan, Misaeng akan meninjau dan mencarikan pasangan yang cocok.",
+    "optionMeta_other": "{duration} · {count} kali sebulan",
+    "needMore_other": "Kamu butuh {count} kredit lagi",
+    "redeemGuideLink": "Pelajari lebih lanjut tentang hadiah",
+    "submit": "Ajukan",
+    "historyTitle": "Riwayat kredit",
+    "guideLink": "Lihat panduan",
+    "retry": "Coba lagi",
+    "emptyTitle": "Belum ada riwayat",
+    "emptyDescription": "Dapatkan kredit dari tempat makan, ulasan, dan komentar.",
+    "writeFoodReview": "Tulis ulasan kuliner",
+    "kinds": {
+      "earn": "Didapat",
+      "revoke": "Dicabut",
+      "spend": "Dipakai",
+      "restore": "Dikembalikan",
+      "other": "Lainnya"
+    }
+  },
+  "referral": {
+    "linkCopied": "Link referral disalin",
+    "copyFailed": "Gagal menyalin link. Bagikan kode kamu secara langsung.",
+    "errors": {
+      "invalidCode": "Masukkan kode referral 8 karakter",
+      "ownCode": "Kamu tidak bisa memakai kode sendiri"
+    },
+    "bound": "Referrer terhubung",
+    "title": "Referral",
+    "description": "Setiap kali ada yang memakai kode referral kamu, kamu dapat {credits}. Maksimal {max} orang, dan kamu tidak bisa mereferensikan diri sendiri.",
+    "creditsAmount_other": "{count} kredit",
+    "copying": "Menyalin…",
+    "shareButton": "Undang teman kamu",
+    "myCode": "Kode referral saya",
+    "loading": "Memuat…",
+    "usedCount": "Dipakai {used}/{max} orang",
+    "enterReferrer": "Masukkan referrer",
+    "boundTo": "Terhubung ke kode referral {code}.",
+    "codePlaceholder": "Kode referral 8 karakter",
+    "binding": "Menghubungkan…",
+    "bind": "Hubungkan"
+  },
+  "posts": {
+    "loadFailed": "Gagal memuat postingan kamu",
+    "deleteConfirm": "Hapus \"{title}\"?\nTindakan ini tidak bisa dibatalkan.",
+    "deleted": "Postingan dihapus",
+    "deleteFailed": "Gagal menghapus postingan",
+    "title": "Postingan saya",
+    "description": "Lihat postingan komunitas kamu per kategori, lalu edit atau hapus",
+    "categoryAria": "Kategori postingan",
+    "emptyAll": "Kamu belum membuat postingan apa pun",
+    "emptyCategory": "Tidak ada postingan di {category}",
+    "emptyAllHint": "Postingan yang kamu tulis di forum mana pun akan muncul di sini",
+    "emptyCategoryHint": "Postingan yang kamu tulis di forum ini akan muncul di sini",
+    "browseBoards": "Jelajahi forum",
+    "edit": "Edit",
+    "deleting": "Menghapus…",
+    "delete": "Hapus"
+  },
+  "list": {
+    "redirectingToLogin": "Mengarahkan ke halaman masuk…",
+    "totalCount_other": "Semua {count}",
+    "count_other": "{count} postingan",
+    "categoryHeading": "Kategori",
+    "all": "Semua",
+    "loading": "Memuat postingan…",
+    "thisCategory": "kategori ini",
+    "viewBoard": "Lihat {board}",
+    "viewDetail": "Lihat detail"
+  },
+  "likes": {
+    "title": "Postingan yang saya suka",
+    "description": "Lihat postingan yang kamu simpan dari Hunian, Kuliner, dan OPT/Visa di satu tempat",
+    "categoryAria": "Kategori postingan yang disukai",
+    "emptyAll": "Kamu belum menyukai postingan apa pun",
+    "emptyCategory": "Tidak ada postingan yang disukai di {category}",
+    "emptyAllHint": "Ketuk ikon hati di postingan yang kamu suka, nanti muncul di sini",
+    "emptyCategoryHint": "Ketuk ikon hati di postingan forum ini, nanti muncul di sini",
+    "browseHousing": "Jelajahi hunian",
+    "rent": "{amount}/bln",
+    "rentWithNet": "{gross} / {net}/bln"
+  }
+}

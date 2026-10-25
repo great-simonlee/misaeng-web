@@ -1,0 +1,54 @@
+{
+  "brandCity": "{brand} {city}",
+  "links": {
+    "housing": "하우징",
+    "food": "맛집",
+    "marketplace": "중고거래",
+    "status": "CPT·OPT·비자·영주권",
+    "jobReview": "면접·취업",
+    "roommate": "룸메이트·서블렛",
+    "anonymous": "익명게시판"
+  },
+  "account": {
+    "me": "마이페이지",
+    "myPosts": "내가 올린 글",
+    "myLikes": "내가 좋아요 누른 글",
+    "creditReviews": "크레딧 리뷰"
+  },
+  "accountMenu": "계정 메뉴",
+  "openAccountMenu": "계정 메뉴 열기",
+  "closeAccountMenu": "계정 메뉴 닫기",
+  "openMenu": "메뉴 열기",
+  "closeMenu": "메뉴 닫기",
+  "menuAria": "{city} 메뉴",
+  "mobileMenuAria": "{city} 모바일 메뉴",
+  "homeAria": "{city} 커뮤니티 홈",
+  "communityHome": "커뮤니티 홈",
+  "login": "로그인",
+  "selectCity": "도시 선택",
+  "currentCity": "현재",
+  "profileAlt": "{name} 프로필",
+  "profileAltFallback": "프로필",
+  "footer": {
+    "tagline": "유학생·직장인을 위한 {city} 커뮤니티",
+    "groups": {
+      "community": "커뮤니티",
+      "company": "회사",
+      "support": "지원"
+    },
+    "links": {
+      "housing": "하우징",
+      "credit": "크레딧",
+      "partners": "파트너",
+      "companySite": "회사 사이트",
+      "about": "회사 소개",
+      "service": "서비스",
+      "careers": "채용",
+      "contact": "문의하기",
+      "me": "마이페이지",
+      "terms": "이용약관",
+      "privacy": "개인정보처리방침",
+      "ads": "광고·제휴"
+    }
+  }
+}

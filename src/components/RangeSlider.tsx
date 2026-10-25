@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 interface RangeSliderProps {
   min: number
@@ -23,6 +24,7 @@ export function RangeSlider({
   formatValue = (value) => String(value),
   className,
 }: RangeSliderProps) {
+  const t = useT('common')
   const span = Math.max(max - min, 1)
   const leftPct = ((valueMin - min) / span) * 100
   const rightPct = ((valueMax - min) / span) * 100
@@ -65,7 +67,7 @@ export function RangeSlider({
           max={max}
           step={step}
           value={valueMin}
-          aria-label='최소 가격'
+          aria-label={t('ui.rangeSlider.minPrice')}
           onChange={(event) => handleMin(Number(event.target.value))}
           className={rangeThumbClass}
         />
@@ -75,7 +77,7 @@ export function RangeSlider({
           max={max}
           step={step}
           value={valueMax}
-          aria-label='최대 가격'
+          aria-label={t('ui.rangeSlider.maxPrice')}
           onChange={(event) => handleMax(Number(event.target.value))}
           className={rangeThumbClass}
         />

@@ -1,0 +1,240 @@
+{
+  "places": {
+    "searchFailed": "場所を検索できませんでした。",
+    "detailsFailed": "場所の詳細を読み込めませんでした。",
+    "placeIdRequired": "placeIdが必要です。",
+    "notFound": "その場所が見つかりませんでした。",
+    "invalidCoordinates": "座標が正しくありません。",
+    "mapLoadFailed": "地図を読み込めませんでした。",
+    "placeFallbackName": "場所",
+    "addressFallbackName": "住所",
+    "locationFallbackName": "位置",
+    "venuesCoordinatesRequired": "緯度と経度が必要です。",
+    "venuesLoadFailed": "お店の一覧を読み込めませんでした。"
+  },
+  "common": {
+    "loginRequired": "先にログインしてください。",
+    "supabaseNotConfigured": "Supabaseが設定されていません。",
+    "supabaseNotConfiguredDetail": "Supabaseが設定されていません。NEXT_PUBLIC_SUPABASE_URLとSUPABASE_SERVICE_ROLE_KEYを確認してください。",
+    "supabaseNotConfiguredLocal": "Supabaseが設定されていません。ローカル環境では、当面ブラウザに保存されます。",
+    "storageNotConfigured": "Supabase Storageが設定されていません。NEXT_PUBLIC_SUPABASE_URLとSUPABASE_SERVICE_ROLE_KEYを確認してください。",
+    "supabaseUrlInvalid": "NEXT_PUBLIC_SUPABASE_URLが有効なURLではありません。例：https://your-project.supabase.co",
+    "supabaseHostUnreachable": "Supabaseプロジェクト（{hostname}）に接続できません。Dashboard → Project Settings → APIでProject URLを確認し、.env.localを更新してください。",
+    "supabaseConnectFailed": "Supabase（{hostname}）に接続できませんでした。Project URL、APIキー、ネットワークを確認してください。",
+    "forbidden": "この操作を行う権限がありません。",
+    "badRequest": "リクエストが正しくありません。",
+    "postNotFound": "投稿が見つかりませんでした。",
+    "accountSuspended": "このアカウントは利用停止中です。",
+    "identityVerificationRequired": "投稿やコメントを書くには、先に学校または勤務先の認証をしてください。"
+  },
+  "auth": {
+    "ellieoUnavailable": "Ellieoのサーバーに接続できません。しばらくしてからもう一度お試しください。",
+    "noAccessToken": "アクセストークンを受け取れませんでした。",
+    "loginFailed": "ログインに失敗しました。",
+    "signupFailed": "登録に失敗しました。",
+    "googleLoginFailed": "Googleログインに失敗しました。",
+    "googleSignupFailed": "Googleでの登録に失敗しました。",
+    "agentGoogleSignupFailed": "Googleでの新規登録に失敗しました。",
+    "appConnectMissing": "環境変数APP_CONNECT_API_BASE_URLが必要です。",
+    "appConnectMissingLogin": "環境変数APP_CONNECT_API_BASE_URLが設定されていないため、ログインできません。",
+    "googleIdTokenRequired": "GoogleのidTokenが必要です。",
+    "googleAccountHint": "Ellieoに登録済みのGoogleアカウントが必要です。",
+    "googleAuthError": "Googleログイン中に問題が発生しました。",
+    "emailRequired": "メールアドレスを入力してください。",
+    "passwordRequired": "パスワードを入力してください。",
+    "passwordResetFailed": "パスワード再設定のリクエストを送信できませんでした。",
+    "emailAuthError": "メールでのログイン中に問題が発生しました。",
+    "sessionExpired": "セッションの有効期限が切れました。もう一度ログインしてください。",
+    "userInfoUnavailable": "ログインはできましたが、アカウント情報を読み込めませんでした。"
+  },
+  "profile": {
+    "nickname": {
+      "tooShort": "ニックネームは{min}文字以上にしてください",
+      "tooLong": "ニックネームは{max}文字以内にしてください",
+      "invalidChars": "英字と「.」のみ使用できます"
+    },
+    "nicknameTaken": "このニックネームはすでに使われています。別のニックネームをお試しください。",
+    "nicknameTakenShort": "このニックネームはすでに使われています。",
+    "nicknameCheckFailed": "ニックネームを確認できませんでした。",
+    "nicknameCheckFailedRetry": "ニックネームを確認できませんでした。しばらくしてからもう一度お試しください。",
+    "nicknameCheckFailedStatus": "ニックネームを確認できませんでした。（HTTP {status}）",
+    "listFailed": "プロフィール一覧を読み込めませんでした（HTTP {status}）",
+    "invalidGender": "有効な性別を選択してください。",
+    "invalidOccupationType": "有効な職業の種類を選択してください。",
+    "saveFailed": "プロフィールを保存できませんでした。",
+    "saveFailedDetail": "プロフィールを保存できませんでした：{detail}"
+  },
+  "upload": {
+    "photoUrlRequired": "photoURLが必要です。",
+    "fileRequired": "アップロードするファイルを選択してください。",
+    "avatarUploadError": "プロフィール写真のアップロード中に問題が発生しました。",
+    "avatarBucketMissing": "Supabaseのバケット「{bucket}」が見つかりません。Storageで公開バケットを作成してください。",
+    "storageUploadFailed": "Storageへのアップロードに失敗しました：{detail}",
+    "imageTypeUnsupported": "アップロードできる画像はJPG、PNG、WEBP、GIFのみです。",
+    "imageTooLarge": "画像は{max}以下にしてください。",
+    "imageBucketMissing": "Supabaseのバケット「{bucket}」が見つかりません。Storageのバケットを確認してください。",
+    "imageUploadFailedDetail": "画像のアップロードに失敗しました：{detail}",
+    "imageUploadFailed": "画像をアップロードできませんでした。"
+  },
+  "verification": {
+    "codeSendFailed": "認証コードを送信できませんでした。",
+    "schoolDomainUnsupported": "この学校のメールドメインにはまだ対応していません。Misaengチームに学校の追加をリクエストしてください。",
+    "codeInvalid": "認証コードが間違っているか、有効期限が切れています。",
+    "schoolOtpDisabled": "学校メール認証は一時的に利用できません。",
+    "schoolEmailRequired": "学校のメールアドレス（.eduまたは登録済みドメイン）を入力してください。",
+    "codeRequired": "認証コードを入力してください。",
+    "schoolEmailError": "学校メールの認証中に問題が発生しました。",
+    "companyNameRequired": "会社名を入力してください。",
+    "companyNameTooLong": "会社名は{max}文字以内にしてください。",
+    "workEmail": {
+      "required": "勤務先のメールアドレスを入力してください。",
+      "invalidFormat": "有効なメールアドレスを入力してください。",
+      "personalDomain": "Gmailなどの個人メールは使用できません。勤務先で使っているメールアドレスを入力してください。"
+    },
+    "workplaceAlreadyApproved": "勤務先はすでに認証済みです。",
+    "workplacePending": "Misaengチームが勤務先認証を確認しています。",
+    "workplaceStorageMissing": "勤務先認証のストレージが設定されていません。",
+    "workplaceSaveFailed": "勤務先認証のリクエストを保存できませんでした（HTTP {status}）",
+    "workEmailError": "勤務先メールの認証中に問題が発生しました。"
+  },
+  "consent": {
+    "termsRequired": "続行するには利用規約に同意してください。",
+    "storageNotConfigured": "同意情報のストレージが設定されていません。",
+    "policyOutdated": "利用規約またはプライバシーポリシーが更新されました。ページを再読み込みして、もう一度同意してください。"
+  },
+  "referral": {
+    "featureStorageMissing": "紹介機能を使うにはストレージの設定が必要です。",
+    "loadFailed": "紹介情報を読み込めませんでした。",
+    "bindFailed": "紹介者と連携できませんでした。",
+    "storageNotConfigured": "紹介コードのストレージが設定されていません。",
+    "saveFailed": "紹介コードを保存できませんでした。",
+    "codeCreateFailed": "紹介コードを作成できませんでした。しばらくしてからもう一度お試しください。",
+    "codeInvalid": "8文字の紹介コードを確認してください。",
+    "alreadyBound": "紹介者はすでに登録されています。",
+    "ownCode": "自分の紹介コードは使用できません。",
+    "codeNotFound": "その紹介コードは存在しません。",
+    "referrerNotFound": "紹介者が見つかりませんでした。",
+    "maxUsesReached": "この紹介コードは最大{max}人まで使用できます。"
+  },
+  "credit": {
+    "loadFailed": "クレジット情報を読み込めませんでした。",
+    "invalidUser": "ユーザーが正しくありません。",
+    "saveFailed": "クレジットを保存できませんでした（HTTP {status}）",
+    "reviewListLoadFailed": "審査リストを読み込めませんでした。",
+    "reviewRequestNotFound": "そのリクエストが見つかりませんでした。",
+    "reviewAlreadyProcessed": "このリクエストはすでに処理されています。",
+    "reviewPostMissing": "投稿が存在しないか、削除されています。",
+    "awardFailed": "クレジットを付与できませんでした。ストレージの設定を確認してください。",
+    "processFailed": "処理を完了できませんでした。",
+    "reviewSaveFailed": "審査リクエストを保存できませんでした（HTTP {status}）",
+    "reviewStatusLoadFailed": "審査リクエストの状況を読み込めませんでした。",
+    "reviewBoardIneligible": "この掲示板の投稿は追加クレジットを申請できません。",
+    "reviewFinalResultRequired": "先にタイムラインに最終結果（承認、カード受領、オファー、不合格など）を追加してください。",
+    "reviewAlreadyAwarded": "この投稿はすでにレビューボーナスを受け取っています。",
+    "reviewAlreadyPending": "すでに審査待ちです。",
+    "reviewRequestFailed": "追加クレジットを申請できませんでした。"
+  },
+  "postings": {
+    "loadFailed": "求人を読み込めませんでした。"
+  },
+  "comments": {
+    "bodyRequired": "コメントを入力してください。",
+    "bodyTooLong": "コメントは{max}文字以内にしてください。",
+    "parentNotFound": "返信先のコメントが見つかりませんでした。",
+    "createFailed": "コメントを投稿できませんでした。",
+    "editTargetRequired": "編集するコメントを選択してください。",
+    "notFound": "コメントが見つかりませんでした。",
+    "editOwnOnly": "自分のコメントのみ編集できます。",
+    "updateFailed": "コメントを更新できませんでした。",
+    "deleteTargetRequired": "削除するコメントを選択してください。",
+    "deleteOwnOnly": "自分のコメントのみ削除できます。",
+    "deleteFailed": "コメントを削除できませんでした。",
+    "saveFailedRetry": "コメントを保存できませんでした。しばらくしてからもう一度お試しください。"
+  },
+  "community": {
+    "invalidBoard": "その掲示板は存在しません。",
+    "invalidPost": "投稿が正しくありません。",
+    "companyReselect": "もう一度会社を選択してください。",
+    "saveFailed": "投稿を保存できませんでした。",
+    "saveFailedRetry": "投稿を保存できませんでした。しばらくしてからもう一度お試しください。",
+    "updateFailed": "変更を保存できませんでした。",
+    "deleteFailed": "削除できませんでした。",
+    "recommendFailed": "いいねを更新できませんでした。",
+    "recommendSaveFailed": "いいねを保存できませんでした。しばらくしてからもう一度お試しください。",
+    "beenThereFoodOnly": "「行ったことある」はグルメの投稿にのみ付けられます。",
+    "beenThereFailed": "「行ったことある」を更新できませんでした。",
+    "beenThereSaveFailed": "「行ったことある」を保存できませんでした。しばらくしてからもう一度お試しください。",
+    "reportSaveFailed": "通報を保存できませんでした。しばらくしてからもう一度お試しください。",
+    "notGuestPost": "ゲスト投稿ではありません。",
+    "guestPostLinkedElsewhere": "この投稿はすでに別のアカウントに紐づけられています。",
+    "guestClaimFailed": "ゲスト投稿を紐づけできませんでした。",
+    "report": {
+      "reasonRequired": "通報の理由を選択してください。",
+      "detailTooLong": "詳細は{max}文字以内にしてください。",
+      "otherDetailRequired": "「その他」を選んだ場合は、理由を入力してください。",
+      "alreadyReported": "この投稿またはコメントはすでに通報済みです。",
+      "failed": "通報を送信できませんでした。"
+    },
+    "write": {
+      "titleBodyRequired": "タイトルと本文を入力してください。",
+      "bodyTooLong": "本文は{max}文字以内にしてください。",
+      "roommateTypeRequired": "種類を選択してください。",
+      "roommateTitleTooLong": "タイトルは{max}文字以内にしてください。",
+      "roommateOnePerAccount": "ルームメイト・サブレットの投稿は1アカウントにつき1件までです。既存の投稿を編集または削除してから、もう一度お試しください。",
+      "endDateAfterStart": "終了日は開始日より後の日付を選んでください。",
+      "partySizeRequired": "人数を入力してください。",
+      "totalSpendRequired": "合計金額を入力してください。",
+      "tipIncludedRequired": "チップが含まれているかを選択してください。",
+      "waitMinutesRequired": "待ち時間を入力してください（なかった場合は0）。",
+      "foodCategoryRequired": "カテゴリー（必食、コスパ最強、雰囲気◎、勉強スポット）を選択してください。",
+      "placeRequired": "住所とお店の名前を確認してください。",
+      "cptOptTypeRequired": "種類を選択してください：CPT、OPT、STEM OPT、ビザ、グリーンカード。",
+      "cptOptTimelineRequired": "タイムラインのステップを1つ以上追加してください。",
+      "jobReviewTypeRequired": "種類を選択してください：インターン、新卒、経験者、契約。",
+      "jobReviewTimelineRequired": "選考ステップを1つ以上追加してください。",
+      "jobReviewSourceRequired": "応募経路を選択してください。学生会を選んだ場合は、どの学生会かも選択してください。",
+      "jobReviewOutcomeRequired": "最終結果を選択してください。",
+      "cityRequired": "都市を確認してください。"
+    },
+    "roommate": {
+      "required": {
+        "has-room": {
+          "location": "現在のエリア・場所を入力してください。",
+          "budget": "ルームメイトの月額家賃（$）を入力してください。",
+          "moveInStart": "入居日を選択してください。",
+          "moveInEnd": "退去日を選択してください。"
+        },
+        "together": {
+          "location": "希望エリアを入力してください。",
+          "budget": "月額予算の上限（$）を入力してください。",
+          "moveInStart": "希望入居日を選択してください。",
+          "moveInEnd": "退去日を選択してください。"
+        },
+        "room": {
+          "location": "希望エリアを入力してください。",
+          "budget": "月額予算の上限（$）を入力してください。",
+          "moveInStart": "希望入居日を選択してください。",
+          "moveInEnd": "退去日を選択してください。"
+        },
+        "sublet": {
+          "location": "サブレットの場所を入力してください。",
+          "budget": "月額家賃（$）を入力してください。",
+          "moveInStart": "サブレットの開始日を選択してください。",
+          "moveInEnd": "サブレットの終了日を選択してください。"
+        }
+      }
+    }
+  },
+  "guest": {
+    "invalidRequest": "リクエスト内容を確認してください。",
+    "nicknameInvalid": "表示用のニックネームを{min}〜{max}文字で入力してください（メールアドレスは不可）。",
+    "emailInvalid": "ギフトカードやクレジットのお知らせをお送りするため、有効なメールアドレスを入力してください。",
+    "linkedinRequired": "LinkedInのプロフィールURLを入力してください。例：linkedin.com/in/your-name",
+    "guidelinesRequired": "コミュニティの投稿ガイドラインに同意してください。",
+    "titleRequired": "タイトルを入力してください。",
+    "bodyRequired": "ほかの人に気をつけてほしいことを書いてください。",
+    "bodyTooLong": "「注意点」は{max}文字以内にしてください。",
+    "jobReviewTypeRequired": "種類を選択してください：インターン、新卒、経験者、転職、契約。",
+    "rateLimited": "しばらくしてからもう一度お試しください。（短時間にリクエストが多すぎます）"
+  }
+}

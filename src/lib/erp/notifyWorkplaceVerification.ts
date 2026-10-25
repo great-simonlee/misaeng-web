@@ -12,7 +12,7 @@ export async function notifyErpWorkplaceVerification(args: {
   if (!secret) return
 
   try {
-    const nickname = args.userNickname?.trim() || args.userEmail || '사용자'
+    const nickname = args.userNickname?.trim() || args.userEmail || 'User'
     await fetch(`${baseUrl}/api/misaeng-admin/notify`, {
       method: 'POST',
       headers: {
@@ -21,7 +21,7 @@ export async function notifyErpWorkplaceVerification(args: {
       },
       body: JSON.stringify({
         type: 'workplace_verification',
-        title: '직장인 인증 요청',
+        title: 'Workplace verification request',
         body: `${nickname} · ${args.companyName} · ${args.workEmail}`,
         requestId: args.requestId,
       }),

@@ -5,23 +5,23 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
   eyebrow: 'LEGAL',
   title: 'Privacy Policy',
   titleKo: '개인정보처리방침',
-  version: '2026-08-30',
-  lastUpdated: 'August 30, 2026',
-  lastUpdatedKo: '2026년 8월 30일',
-  effectiveDate: 'August 30, 2026',
-  effectiveDateKo: '2026년 8월 30일',
+  version: '2026-11-23',
+  lastUpdated: 'October 23, 2026',
+  lastUpdatedKo: '2026년 10월 23일',
+  effectiveDate: 'November 23, 2026',
+  effectiveDateKo: '2026년 11월 23일',
   contactEmail: 'info@misaeng.com',
   companyName: 'Misaeng LLC',
   companyAddress:
     '45 Rockefeller Plaza, Fl 20, New York, NY 10111, United States',
   languageNotice: {
-    en: 'The English version of this Privacy Policy is the official and controlling version. The Korean text is provided for convenience only. If there is any conflict or inconsistency between the English and Korean versions, the English version prevails.',
-    ko: '본 개인정보처리방침의 영문본이 공식·기준 문서입니다. 한글은 참고용 번역이며, 영문과 한글에 차이·불일치가 있을 경우 영문본이 우선합니다.',
+    en: 'The English version of this Privacy Policy is the official and controlling version. Versions in other languages (Korean, Vietnamese, Japanese, Simplified Chinese, Traditional Chinese, and Indonesian) are reference translations provided for convenience only. If there is any conflict or inconsistency between the English version and any translation, the English version prevails.',
+    ko: '본 개인정보처리방침의 영문본이 공식·기준 문서입니다. 다른 언어(한국어, 베트남어, 일본어, 중국어 간체·번체, 인도네시아어) 번역본은 이해를 돕기 위한 참고용이며, 영문본과 번역본에 차이·불일치가 있을 경우 영문본이 우선합니다.',
   },
   intro: [
     {
-      en: 'Misaeng LLC (“Company,” “we,” “us,” or “Misaeng”) provides this Privacy Policy (the “Policy”) to explain how we collect, use, store, and share personal information in connection with the Misaeng NYC website and related services (the “Services”).',
-      ko: 'Misaeng LLC(이하 “회사”, “당사”, “Misaeng”)는 Misaeng NYC 웹사이트 및 관련 서비스(이하 “서비스”)를 제공하면서 이용자의 개인정보를 소중히 다루기 위해 본 개인정보처리방침(이하 “본 방침”)을 공개합니다.',
+      en: 'Misaeng LLC (“Company,” “we,” “us,” or “Misaeng”) provides this Privacy Policy (the “Policy”) to explain how we collect, use, store, and share personal information in connection with the Misaeng NYC website, its multilingual edition Ellieo, and related services (the “Services”). Misaeng NYC and Ellieo share one account system and one database, so this Policy applies to both.',
+      ko: 'Misaeng LLC(이하 “회사”, “당사”, “Misaeng”)는 Misaeng NYC 웹사이트, 그 다국어 서비스 Ellieo 및 관련 서비스(이하 “서비스”)를 제공하면서 이용자의 개인정보를 소중히 다루기 위해 본 개인정보처리방침(이하 “본 방침”)을 공개합니다. Misaeng NYC와 Ellieo는 하나의 계정 체계와 데이터베이스를 공유하므로 본 방침은 두 서비스 모두에 적용됩니다.',
     },
     {
       en: 'This Policy describes what information we collect, how we use it, what choices and rights you may have, and how to contact us. In some cases, continued use of the Services may be treated as acceptance of the processing described here. If you do not agree, please stop using the Services.',
@@ -110,16 +110,16 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
           type: 'ul',
           items: [
             {
-              en: 'Account and profile: email address, display name/nickname, profile photo, bio, and preference settings',
-              ko: '계정·프로필: 이메일 주소, 표시 이름/닉네임, 프로필 사진, 자기소개, 선호 설정',
+              en: 'Account and profile: email address, display name/nickname, profile photo, bio, and preference settings, including your preferred language',
+              ko: '계정·프로필: 이메일 주소, 표시 이름/닉네임, 프로필 사진, 자기소개, 선호 설정(선호 언어 포함)',
             },
             {
               en: 'Verification-related: school (or recognized institution) email, verification status, school name/identifier, and confirmation details submitted during verification',
               ko: '인증 관련: 학교(또는 인정 기관) 이메일, 인증 상태, 소속 학교명·식별자, 인증 과정에서 제출하는 확인 정보',
             },
             {
-              en: 'Posts and communications: post titles, body text, images/attachments, comments, report reasons and details, inquiry messages, and feedback',
-              ko: '게시·소통: 게시글 제목·본문·이미지·첨부, 댓글, 신고 사유·내용, 문의 메시지, 피드백',
+              en: 'Posts and communications: post titles, body text, images/attachments, comments, report reasons and details, inquiry messages, and feedback, together with the language they were written in and their translations',
+              ko: '게시·소통: 게시글 제목·본문·이미지·첨부, 댓글, 신고 사유·내용, 문의 메시지, 피드백 및 작성 언어와 번역문',
             },
             {
               en: 'Listing/recruitment details you choose to include: roommate/sublet conditions, contact methods you voluntarily disclose, preferred areas, budget, and similar',
@@ -246,6 +246,10 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '게시·댓글·찜·알림·검색 등 커뮤니티 기능 제공',
             },
             {
+              en: 'Translating posts, comments, and listings into other languages and showing them on Misaeng NYC and Ellieo in your preferred language (see the Terms of Use, Section 6)',
+              ko: '게시물·댓글·매물을 다른 언어로 번역하여 Misaeng NYC와 Ellieo에서 이용자의 선호 언어로 표시(이용약관 제6조 참고)',
+            },
+            {
               en: 'Managing School Email Verification and posting permissions',
               ko: '학교 이메일 인증 및 작성 권한 관리',
             },
@@ -337,6 +341,10 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '서비스 제공 업체(호스팅, 데이터베이스, 이메일 발송, 고객지원, 보안·모니터링, 분석, 지도/장소 API, 로그인 제공자 등) — 업무 수행에 필요한 범위, 계약상 보호조치 하에',
             },
             {
+              en: 'AI translation provider: to translate posts, comments, and listings, the text of that Content (not your account details such as email address) is processed by an AI service provider, currently Anthropic, PBC (United States). We use settings under which this text is not used to train the provider’s models, and we do not send Content that we identify as containing private contact details for translation',
+              ko: 'AI 번역 제공자: 게시물·댓글·매물을 번역하기 위해 해당 콘텐츠의 텍스트(이메일 주소 등 계정 정보는 제외)가 AI 서비스 제공자(현재 미국 Anthropic, PBC)에 의해 처리됩니다. 회사는 해당 텍스트가 제공자의 모델 학습에 사용되지 않는 설정을 사용하며, 개인 연락처가 포함된 것으로 확인된 게시물은 번역에 보내지 않습니다',
+            },
+            {
               en: 'Partner brokerages and affiliated licensed real-estate professionals (which may include Fact Real Estate or another New York–licensed brokerage): when you inquire about, tour, apply for, or otherwise pursue a housing opportunity involving licensed brokerage activity, we may share information reasonably needed to provide that service—such as your name, email, phone number, preferred neighborhoods/budget/move-in timing, and related inquiry details—with the applicable brokerage and its licensees under their professional and confidentiality obligations',
               ko: '파트너 브로커리지 및 제휴 면허 부동산 전문가(Fact Real Estate 등 뉴욕주 면허 브로커리지 포함 가능): 면허 중개 활동이 수반되는 하우징 문의·투어·신청·진행 시, 해당 서비스 제공에 합리적으로 필요한 정보(이름, 이메일, 전화번호, 희망 지역·예산·입주 시기 및 관련 문의 내용 등)를 해당 브로커리지와 그 라이선스 소지자에게, 그들의 직무·비밀유지 의무하에 제공할 수 있습니다',
             },
@@ -417,8 +425,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '계정 정보: 계정 유지 기간 및 삭제 요청 후 처리에 필요한 기간',
             },
             {
-              en: 'Posts and comments: until User deletion or operational removal; backups, logs, and report records may follow different shorter or longer cycles',
-              ko: '게시물·댓글: 이용자 삭제 또는 운영 삭제 시까지. 다만 백업·로그·신고 기록은 더 짧은/긴 주기로 별도 관리될 수 있음',
+              en: 'Posts and comments, and their translations: until User deletion or operational removal (translations are deleted with the original); backups, logs, and report records may follow different shorter or longer cycles',
+              ko: '게시물·댓글 및 그 번역문: 이용자 삭제 또는 운영 삭제 시까지(번역문은 원문과 함께 삭제). 다만 백업·로그·신고 기록은 더 짧은/긴 주기로 별도 관리될 수 있음',
             },
             {
               en: 'Verification and security logs: for a reasonable period needed for abuse prevention and audit',
@@ -469,8 +477,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
       blocks: [
         {
           type: 'p',
-          en: 'We operate primarily from the United States. Depending on cloud and vendor infrastructure, your information may be transferred to, stored in, or processed in countries other than your country of residence. Where required by applicable law, we work to implement appropriate safeguards (such as contractual clauses).',
-          ko: '회사는 미국을 중심으로 서비스를 운영하며, 클라우드·벤더 인프라의 위치에 따라 이용자 정보가 이용자 거주국 외로 이전·저장·처리될 수 있습니다. 이 경우 회사는 적용 법령이 요구하는 범위에서 적절한 보호장치(계약 조항 등)를 마련하기 위해 노력합니다.',
+          en: 'We operate primarily from the United States. Depending on cloud and vendor infrastructure, your information may be transferred to, stored in, or processed in countries other than your country of residence. Where required by applicable law, we work to implement appropriate safeguards (such as contractual clauses). For example, Content sent for translation is processed by our AI translation provider in the United States (see Section 7).',
+          ko: '회사는 미국을 중심으로 서비스를 운영하며, 클라우드·벤더 인프라의 위치에 따라 이용자 정보가 이용자 거주국 외로 이전·저장·처리될 수 있습니다. 이 경우 회사는 적용 법령이 요구하는 범위에서 적절한 보호장치(계약 조항 등)를 마련하기 위해 노력합니다. 예를 들어 번역을 위해 보내는 게시물 텍스트는 미국에 있는 AI 번역 제공자가 처리합니다(제7조 참고).',
         },
       ],
     },
@@ -594,8 +602,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
       blocks: [
         {
           type: 'p',
-          en: 'We may use automated rules or tools for spam/abuse detection, ranking, and verifying posting permissions (such as verification status). We do not intend to make solely automated decisions that produce legal or similarly significant effects based only on profiling. You may raise concerns through our inquiry channels.',
-          ko: '회사는 스팸·부정 이용 탐지, 추천·정렬, 작성 권한(인증 여부) 확인 등을 위해 자동화된 규칙·도구를 사용할 수 있습니다. 이것이 이용자에게 법적 또는 이와 유사하게 중대한 효과를 미치는 프로파일링만을 목적으로 하는 단독 자동결정은 의도하지 않습니다. 관련 이의는 문의 채널로 제기할 수 있습니다.',
+          en: 'We may use automated rules or tools for spam/abuse detection, ranking, and verifying posting permissions (such as verification status). We may also use AI tools to translate Content and to flag possible spam or personal information during translation; a person on our team makes the final decision on removing or restricting Content. We do not intend to make solely automated decisions that produce legal or similarly significant effects based only on profiling. You may raise concerns through our inquiry channels.',
+          ko: '회사는 스팸·부정 이용 탐지, 추천·정렬, 작성 권한(인증 여부) 확인 등을 위해 자동화된 규칙·도구를 사용할 수 있습니다. 또한 게시물 번역과 번역 과정에서의 스팸·개인정보 의심 표시에 AI 도구를 사용할 수 있으며, 게시물 삭제·제한의 최종 판단은 회사 담당자가 합니다. 이것이 이용자에게 법적 또는 이와 유사하게 중대한 효과를 미치는 프로파일링만을 목적으로 하는 단독 자동결정은 의도하지 않습니다. 관련 이의는 문의 채널로 제기할 수 있습니다.',
         },
       ],
     },

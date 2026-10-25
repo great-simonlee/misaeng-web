@@ -1,5 +1,7 @@
 import { send } from '@emailjs/browser'
 
+import type { Translate } from '@lib/i18n/translate'
+
 const EMAILJS_SERVICE_ID =
   process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_2q2yz67'
 
@@ -13,13 +15,17 @@ export type SchoolRegistrationRequestInput = {
   requesterName?: string | null
 }
 
+/** t는 네임스페이스 없는 번역기(`useT()`). 운영팀에게 가는 메일 본문은 한국어 그대로 둔다. */
 export async function sendSchoolRegistrationRequest(
   input: SchoolRegistrationRequestInput,
+  t: Translate,
 ) {
   const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
   if (!publicKey) {
     throw new Error(
-      '이메일 설정이 필요해요. NEXT_PUBLIC_EMAILJS_PUBLIC_KEY를 확인해 주세요.',
+      t('me.verification.errors.emailNotConfigured', {
+        envVar: 'NEXT_PUBLIC_EMAILJS_PUBLIC_KEY',
+      }),
     )
   }
 

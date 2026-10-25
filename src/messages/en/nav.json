@@ -1,0 +1,54 @@
+{
+  "brandCity": "{brand} {city}",
+  "links": {
+    "housing": "Housing",
+    "food": "Food",
+    "marketplace": "Marketplace",
+    "status": "CPT·OPT·Visa·Green Card",
+    "jobReview": "Interviews·Jobs",
+    "roommate": "Roommates·Sublets",
+    "anonymous": "Anonymous"
+  },
+  "account": {
+    "me": "My page",
+    "myPosts": "My posts",
+    "myLikes": "Posts I liked",
+    "creditReviews": "Credit reviews"
+  },
+  "accountMenu": "Account menu",
+  "openAccountMenu": "Open account menu",
+  "closeAccountMenu": "Close account menu",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu",
+  "menuAria": "{city} menu",
+  "mobileMenuAria": "{city} mobile menu",
+  "homeAria": "{city} community home",
+  "communityHome": "Community home",
+  "login": "Log in",
+  "selectCity": "Choose a city",
+  "currentCity": "Current",
+  "profileAlt": "{name}'s profile",
+  "profileAltFallback": "Profile",
+  "footer": {
+    "tagline": "The {city} community for international students and professionals",
+    "groups": {
+      "community": "Community",
+      "company": "Company",
+      "support": "Support"
+    },
+    "links": {
+      "housing": "Housing",
+      "credit": "Credits",
+      "partners": "Partners",
+      "companySite": "Company site",
+      "about": "About us",
+      "service": "Services",
+      "careers": "Careers",
+      "contact": "Contact us",
+      "me": "My page",
+      "terms": "Terms of Use",
+      "privacy": "Privacy Policy",
+      "ads": "Ads & partnerships"
+    }
+  }
+}

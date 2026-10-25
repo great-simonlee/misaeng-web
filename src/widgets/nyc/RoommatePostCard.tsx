@@ -12,10 +12,7 @@ import {
   getRoommateLookingForLabel,
   getRoommateLookingForStyle,
 } from '@lib/community/roommate'
-import {
-  formatCommunityCount,
-  formatCommunityRelativeTime,
-} from '@lib/constants/communityMock'
+import { useFormat, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import type { CommunityPost } from '@/types/nyc'
 import { BoardSurface } from '@widgets/nyc/BoardPageShell'
@@ -35,8 +32,11 @@ interface RoommatePostCardProps {
 
 /** 취업 후기·OPT 보드와 같은 텍스트 중심 목록 카드 */
 export function RoommatePostCard({ post }: RoommatePostCardProps) {
+  const t = useT('housing')
+  const tCommunity = useT('community')
+  const format = useFormat()
   const city = useCity()
-  const typeLabel = getRoommateLookingForLabel(post.roommateLookingFor)
+  const typeLabel = getRoommateLookingForLabel(post.roommateLookingFor, t)
   const typeStyle = getRoommateLookingForStyle(post.roommateLookingFor)
   const budget = formatRoommateBudget(post.roommateBudgetMax)
   const moveIn = formatRoommateMoveInRange(
@@ -45,7 +45,7 @@ export function RoommatePostCard({ post }: RoommatePostCardProps) {
   )
   const thumbnail = getRoommateThumbnail(post)
   const location = post.location?.trim() || null
-  const authorName = getCommunityAuthorDisplayName(post)
+  const authorName = getCommunityAuthorDisplayName(post, null, tCommunity)
   const authorInitial = authorName.charAt(0).toUpperCase()
   const authorPhoto = post.authorPhotoURL?.trim() || null
 
@@ -126,12 +126,12 @@ export function RoommatePostCard({ post }: RoommatePostCardProps) {
             <p className='mt-1 flex items-center gap-1.5 text-[11px] font-medium text-[var(--muted)]'>
               <EyeIcon className='size-3.5 shrink-0' />
               <span className='tabular-nums'>
-                {formatCommunityCount(post.viewCount)}
+                {format.number(Math.max(0, Math.floor(Number(post.viewCount) || 0)), { notation: 'compact' })}
               </span>
               <span className='text-black/20' aria-hidden>
                 ·
               </span>
-              <span>{formatCommunityRelativeTime(post.createdAt)}</span>
+              <span>{format.relative(post.createdAt)}</span>
             </p>
           </div>
 
@@ -139,8 +139,10 @@ export function RoommatePostCard({ post }: RoommatePostCardProps) {
             <div className='shrink-0 text-right'>
               {budget ? (
                 <p className='text-[13px] font-semibold tabular-nums leading-none text-[var(--foreground)]'>
-                  {budget}
-                  <span className='font-medium text-[var(--muted)]'>/월</span>
+                  <PricePerMonth
+                    price={budget}
+                    template={t('roommate.card.pricePerMonth')}
+                  />
                 </p>
               ) : null}
               {moveIn ? (
@@ -158,6 +160,22 @@ export function RoommatePostCard({ post }: RoommatePostCardProps) {
         </div>
       </Link>
     </BoardSurface>
+  )
+}
+
+/** `{price}/월` 문구에서 가격 뒤 단위만 연하게 */
+function PricePerMonth({ price, template }: { price: string; template: string }) {
+  const [before, after = ''] = template.split('{price}')
+  return (
+    <>
+      {before ? (
+        <span className='font-medium text-[var(--muted)]'>{before}</span>
+      ) : null}
+      {price}
+      {after ? (
+        <span className='font-medium text-[var(--muted)]'>{after}</span>
+      ) : null}
+    </>
   )
 }
 

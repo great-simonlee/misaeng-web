@@ -1,0 +1,445 @@
+{
+  "amenities": {
+    "24HourAttendedLobby": "Doorman 24 giờ",
+    "conciergeService": "Lễ tân concierge",
+    "elevator": "Thang máy",
+    "fitnessCenter": "Phòng gym",
+    "mailRoom": "Phòng thư",
+    "laundryRoom": "Phòng giặt",
+    "residentLounge": "Lounge",
+    "rooftopOutdoorSpace": "Không gian ngoài trời trên sân thượng",
+    "rooftopLounge": "Lounge sân thượng",
+    "petFriendly": "Cho nuôi thú cưng",
+    "garageParking": "Gara đỗ xe",
+    "sauna": "Phòng xông hơi",
+    "pool": "Hồ bơi",
+    "swimmingPool": "Hồ bơi",
+    "indoorPool": "Hồ bơi trong nhà",
+    "outdoorPool": "Hồ bơi ngoài trời",
+    "workingSpace": "Không gian học tập/làm việc",
+    "businessMeetingRoom": "Phòng họp",
+    "pilatesStudio": "Phòng Pilates",
+    "yogaStudio": "Phòng yoga",
+    "recoveryRoom": "Phòng phục hồi",
+    "indoorBasketballCourt": "Sân bóng rổ trong nhà",
+    "indoorPickleballCourt": "Sân pickleball trong nhà",
+    "indoorGolfSimulator": "Phòng golf 3D",
+    "bowlingAlley": "Sân bowling",
+    "pokerRoom": "Phòng poker",
+    "billiardsRoom": "Phòng bi-a",
+    "arcadeRoom": "Phòng game",
+    "pingPongTable": "Bàn bóng bàn",
+    "tennisCourts": "Sân tennis",
+    "bbqGrills": "Bếp nướng BBQ",
+    "bbqGrill": "Bếp nướng BBQ",
+    "sundeck": "Không gian ngoài trời",
+    "dogRun": "Khu chơi cho chó",
+    "childrensPlayroom": "Phòng chơi trẻ em",
+    "mediaRoom": "Phòng chiếu phim",
+    "garden": "Vườn",
+    "bikeRoom": "Chỗ để xe đạp",
+    "storageSpace": "Kho chứa đồ",
+    "valetService": "Đỗ xe valet",
+    "liveInSuper": "Quản lý tòa nhà ở tại chỗ",
+    "wheelchairAccess": "Có lối đi cho xe lăn",
+    "indoorSquashCourt": "Sân squash trong nhà"
+  },
+  "utilities": {
+    "heat": "Bao sưởi",
+    "hotWater": "Bao nước nóng",
+    "gas": "Bao gas",
+    "electricity": "Bao điện",
+    "water": "Bao nước",
+    "sewer": "Bao phí nước thải"
+  },
+  "appliances": {
+    "dishwasher": "Máy rửa bát",
+    "microwave": "Lò vi sóng",
+    "oven": "Lò nướng",
+    "refrigerator": "Tủ lạnh",
+    "washer": "Máy giặt",
+    "dryer": "Máy sấy",
+    "airConditioning": "Điều hòa",
+    "inUnitWasher": "Máy giặt"
+  },
+  "perks": {
+    "roommate-waiting": "Có roommate đang chờ",
+    "no-broker-fee": "Không broker fee",
+    "no-guarantor": "Không cần guarantor",
+    "free-credit": "Ưu đãi miễn phí",
+    "doorman-24h": "Doorman 24 giờ",
+    "washer-dryer": "Máy giặt/máy sấy",
+    "terrace": "Sân hiên",
+    "gym": "Phòng gym",
+    "pool": "Hồ bơi",
+    "wall-ok": "Được dựng vách ngăn",
+    "package-storage": "Phòng nhận bưu kiện",
+    "mail-room": "Phòng thư",
+    "rooftop": "Sân thượng",
+    "bbq-grill": "Bếp nướng BBQ",
+    "work-study": "Không gian làm việc & học tập",
+    "sauna": "Phòng xông hơi"
+  },
+  "roomTypes": {
+    "master-w-bath": "Master w/ Bath",
+    "master-wo-bath": "Master w/o Bath",
+    "regular-bedroom": "Regular",
+    "flexroom": "Flex",
+    "entire": "Nguyên căn",
+    "studio": "Studio"
+  },
+  "unitTypes": {
+    "studio": "Studio",
+    "1b1b": "1B1B",
+    "2b1b": "2B1B",
+    "2b2b": "2B2B",
+    "3b1b": "3B1B",
+    "3b2b": "3B2B",
+    "4-plus": "4+ phòng ngủ",
+    "unknown": "Chưa xác định loại"
+  },
+  "credit": {
+    "monthsFree_other": "Miễn phí {count} tháng",
+    "dollarCredit": "Ưu đãi ${amount}"
+  },
+  "amenityFee": {
+    "unknown": "Chưa rõ",
+    "free": "Miễn phí",
+    "mandatoryPersonMonthly": "Bắt buộc · ${amount}/tháng mỗi người",
+    "mandatoryPersonYearly": "Bắt buộc · ${amount}/năm mỗi người",
+    "mandatoryUnitMonthly": "Bắt buộc · ${amount}/tháng mỗi căn",
+    "mandatoryUnitYearly": "Bắt buộc · ${amount}/năm mỗi căn",
+    "optionalPersonMonthly": "Tùy chọn · ${amount}/tháng mỗi người",
+    "optionalPersonYearly": "Tùy chọn · ${amount}/năm mỗi người",
+    "optionalUnitMonthly": "Tùy chọn · ${amount}/tháng mỗi căn",
+    "optionalUnitYearly": "Tùy chọn · ${amount}/năm mỗi căn"
+  },
+  "partWall": {
+    "fullWall": "Vách kín",
+    "regularWall": "Vách thường",
+    "curtainOnly": "Chỉ có rèm"
+  },
+  "income": {
+    "personal": "Thu nhập gấp {multiple} lần",
+    "guarantor": "Guarantor gấp {multiple} lần",
+    "guarantorCompany": "Chấp nhận công ty guarantor"
+  },
+  "roommatePreferences": {
+    "master-w-bath": "Muốn phòng Master",
+    "master-wo-bath": "Muốn phòng Master w/o Bath",
+    "regular-bedroom": "Muốn phòng Regular",
+    "flexroom": "Muốn phòng Flex",
+    "any": "Phòng nào cũng được"
+  },
+  "price": {
+    "gross": "Gross",
+    "net": "Net"
+  },
+  "card": {
+    "photoLabel": "Ảnh {number} của {address}",
+    "noPhoto": "Không có ảnh",
+    "moveIn": "Dọn vào {date}",
+    "moveInTbd": "Chưa xác định",
+    "composition": {
+      "male_other": "{count} nam",
+      "female_other": "{count} nữ"
+    },
+    "loadingLabel": "Đang tải tin đăng",
+    "loadingDescription": "Đang tải tin đăng…"
+  },
+  "roommateIntro": {
+    "title": "Roommate đang chờ",
+    "introFallback": "Chúng tôi sẽ chia sẻ thêm chi tiết khi bạn liên hệ.",
+    "male": "Nam",
+    "female": "Nữ",
+    "worker": "Người đi làm"
+  },
+  "map": {
+    "location": "Vị trí",
+    "directions": "Chỉ đường",
+    "openInGoogleMaps": "Xem {name} trên Google Maps",
+    "viewInGoogleMaps": "Xem vị trí trên Google Maps"
+  },
+  "detail": {
+    "toasts": {
+      "notAvailableYet": "Tính năng này sẽ sớm có",
+      "kakaoNotReady": "Link hỏi đáp qua KakaoTalk chưa sẵn sàng",
+      "linkCopied": "Đã sao chép link",
+      "linkCopyFailed": "Không thể sao chép link"
+    },
+    "notFound": {
+      "title": "Không tìm thấy tin đăng",
+      "description": "Tin đăng có thể đã đóng hoặc bị xóa.",
+      "action": "Quay lại Nhà ở"
+    },
+    "mailSubject": "[{brand} Nhà ở] {address}",
+    "backToList": "Nhà ở",
+    "noPhotos": "Chưa có ảnh",
+    "previousPhoto": "Ảnh trước",
+    "nextPhoto": "Ảnh tiếp theo",
+    "layout": "Mặt bằng",
+    "watchVideo": "Xem video",
+    "photoNumber": "Ảnh {number}",
+    "previousThumbnails": "Xem ảnh thu nhỏ trước",
+    "moreThumbnails": "Xem thêm ảnh thu nhỏ",
+    "benefits": "Ưu đãi",
+    "roomOptions": "Lựa chọn phòng",
+    "amenities": "Tiện ích",
+    "utilities": "Điện nước",
+    "appliances": "Thiết bị",
+    "emailInquiry": "Gửi email",
+    "kakaoInquiry": "Hỏi qua KakaoTalk",
+    "share": "Chia sẻ",
+    "closeListing": "Đóng tin đăng",
+    "description": "Chi tiết",
+    "property": {
+      "title": "Thông tin tòa nhà",
+      "zipcode": "Mã ZIP",
+      "wall": "Lựa chọn vách ngăn",
+      "amenityFee": "Phí tiện ích",
+      "income": "Yêu cầu thu nhập",
+      "subway": "Tàu điện ngầm"
+    }
+  },
+  "listingKinds": {
+    "unit": {
+      "label": "Nguyên căn",
+      "description": "Tìm thuê cả căn hộ"
+    },
+    "room": {
+      "label": "Phòng riêng",
+      "description": "Chỉ tìm một phòng"
+    }
+  },
+  "list": {
+    "title": "Nhà ở",
+    "subtitle": "Tin đăng ở NYC do {brand} chọn lọc · Tìm nguyên căn và phòng riêng ở cùng một nơi.",
+    "filters": "Bộ lọc",
+    "quickFilters": "Lọc nhanh",
+    "previousFilters": "Xem bộ lọc trước",
+    "moreFilters": "Xem thêm bộ lọc",
+    "price": {
+      "upTo": "Tối đa ${amount}",
+      "atLeast": "Từ ${amount}",
+      "range": "${min} – ${max}"
+    },
+    "summaryAll_other": "{count} tin đăng",
+    "summaryFiltered_other": "{filters} · {count} tin đăng",
+    "empty": {
+      "title": "Không có tin đăng nào phù hợp với bộ lọc",
+      "description": "Hãy thử đổi bộ lọc và tìm lại.",
+      "action": "Đặt lại bộ lọc"
+    },
+    "sheet": {
+      "clearAll": "Xóa tất cả",
+      "showResults_other": "Xem {count} tin đăng",
+      "lookingFor": "Bạn đang tìm gì?",
+      "unitType": "Loại căn hộ",
+      "roomType": "Loại phòng",
+      "all": "Tất cả",
+      "price": "Giá",
+      "unitRent": "Tiền thuê hàng tháng cả căn",
+      "roomRent": "Tiền thuê hàng tháng mỗi phòng",
+      "benefits": "Ưu đãi",
+      "amenities": "Tiện ích",
+      "area": "Khu vực"
+    }
+  },
+  "new": {
+    "errors": {
+      "loginRequired": "Vui lòng đăng nhập trước",
+      "submitFailed": "Không thể đăng tin"
+    },
+    "redirectingToLogin": "Đang chuyển tới trang đăng nhập…",
+    "teamOnly": {
+      "title": "Chỉ dành cho tài khoản nội bộ",
+      "description": "Chỉ có thể đăng tin nhà ở bằng email {domain}. Bạn đang đăng nhập bằng: {email}",
+      "unknownEmail": "không xác định"
+    },
+    "breadcrumb": "Đăng mới",
+    "title": "Đăng tin nhà ở mới",
+    "signedInAs": "Đang đăng nhập bằng {email}",
+    "fields": {
+      "streetAddress": "Địa chỉ",
+      "neighborhood": "Khu vực",
+      "unitRent": "Tiền thuê hàng tháng cả căn ($)",
+      "unitRentPlaceholder": "Tổng giá tất cả các phòng",
+      "roomRent": "Tiền thuê hàng tháng mỗi phòng ($)",
+      "bedrooms": "Số phòng ngủ",
+      "availableFrom": "Ngày dọn vào",
+      "availableTo": "Ngày dọn ra",
+      "contactEmail": "Email liên hệ",
+      "description": "Mô tả",
+      "descriptionPlaceholder": "Điều kiện lease, tiện ích, phù hợp với ai, v.v."
+    },
+    "submitting": "Đang đăng…",
+    "submit": "Đăng"
+  },
+  "roommate": {
+    "intents": {
+      "offer-room": {
+        "label": "Cho thuê phòng",
+        "description": "Tìm roommate cho chỗ ở của bạn hoặc đăng sublet"
+      },
+      "seek": {
+        "label": "Tìm roommate",
+        "description": "Tìm người cùng tìm nhà, hoặc tìm phòng để dọn vào"
+      }
+    },
+    "lookingFor": {
+      "has-room": {
+        "label": "Tìm roommate ở cùng chỗ của mình",
+        "shortLabel": "Đã có phòng",
+        "description": "Bạn đã có chỗ ở và cần người ở cùng"
+      },
+      "sublet": {
+        "label": "Sublet phòng của mình một thời gian",
+        "shortLabel": "Sublet",
+        "description": "Cho thuê lại phòng ngắn hạn theo hình thức sublet"
+      },
+      "together": {
+        "label": "Tìm roommate để cùng tìm nhà",
+        "shortLabel": "Cùng tìm nhà",
+        "description": "Chưa có chỗ ở; tìm roommate để cùng tìm nhà"
+      },
+      "room": {
+        "label": "Chỉ tìm phòng để dọn vào",
+        "shortLabel": "Cần phòng",
+        "description": "Tìm phòng hoặc căn hộ mà không cần roommate"
+      }
+    },
+    "form": {
+      "has-room": {
+        "locationLabel": "Khu vực / vị trí hiện tại",
+        "locationPlaceholder": "VD: Brooklyn Bushwick",
+        "budgetLabel": "Tiền thuê hàng tháng của roommate ($)",
+        "budgetPlaceholder": "VD: 1400",
+        "moveInStartLabel": "Có thể dọn vào từ",
+        "moveInEndLabel": "Ngày dọn ra",
+        "photosHint": "Nên có ảnh phòng/căn hộ · Tối đa 6 ảnh · Ảnh đầu tiên là ảnh bìa",
+        "titlePlaceholder": "VD: Tìm roommate cho căn 2 phòng ngủ ở Bushwick",
+        "bodyPlaceholder": "Mô tả bố cục căn hộ, lối sống của bạn, điện nước và tiền cọc. Để lại link chat 1:1 KakaoTalk open chat để mọi người liên hệ."
+      },
+      "together": {
+        "locationLabel": "Khu vực mong muốn",
+        "locationPlaceholder": "VD: Queens Astoria / Brooklyn",
+        "budgetLabel": "Ngân sách tối đa hàng tháng ($)",
+        "budgetPlaceholder": "VD: 1600",
+        "moveInStartLabel": "Ngày dọn vào mong muốn",
+        "moveInEndLabel": "Ngày dọn ra",
+        "photosHint": "Thêm ảnh tham khảo nếu có · Tối đa 6 ảnh",
+        "titlePlaceholder": "VD: Dọn vào tháng 9, cùng tìm nhà ở Astoria",
+        "bodyPlaceholder": "Chia sẻ ngân sách, khu vực mong muốn và lối sống của bạn. Để lại link chat 1:1 KakaoTalk open chat để mọi người liên hệ."
+      },
+      "room": {
+        "locationLabel": "Khu vực mong muốn",
+        "locationPlaceholder": "VD: Manhattan UES / Jersey City",
+        "budgetLabel": "Ngân sách tối đa hàng tháng ($)",
+        "budgetPlaceholder": "VD: 1800",
+        "moveInStartLabel": "Ngày dọn vào mong muốn",
+        "moveInEndLabel": "Ngày dọn ra",
+        "photosHint": "Thêm ảnh tham khảo nếu có · Tối đa 6 ảnh",
+        "titlePlaceholder": "VD: Tìm phòng gần Midtown",
+        "bodyPlaceholder": "Chia sẻ ngân sách, vị trí mong muốn và thời gian dọn vào. Để lại link chat 1:1 KakaoTalk open chat để mọi người liên hệ."
+      },
+      "sublet": {
+        "locationLabel": "Vị trí sublet",
+        "locationPlaceholder": "VD: Upper East Side",
+        "budgetLabel": "Tiền thuê hàng tháng ($)",
+        "budgetPlaceholder": "VD: 2200",
+        "moveInStartLabel": "Ngày bắt đầu sublet",
+        "moveInEndLabel": "Ngày kết thúc sublet",
+        "photosHint": "Nên có ảnh phòng/căn hộ · Tối đa 6 ảnh · Ảnh đầu tiên là ảnh bìa",
+        "titlePlaceholder": "VD: Sublet studio UES, tháng 9–11",
+        "bodyPlaceholder": "Mô tả thời gian, có nội thất hay không, phương tiện đi lại, điện nước và tiền cọc. Để lại link chat 1:1 KakaoTalk open chat để mọi người liên hệ."
+      }
+    },
+    "card": {
+      "pricePerMonth": "{price}/tháng"
+    },
+    "list": {
+      "budgetPresets": {
+        "under-1500": "Tối đa $1,500",
+        "1500-2000": "$1,500–2,000",
+        "2000-2500": "$2,000–2,500",
+        "2500-plus": "Từ $2,500"
+      },
+      "loadFailed": "Không thể tải bài viết",
+      "summaryAll_other": "{count} bài viết",
+      "summaryFiltered_other": "{filters} · {count} bài viết",
+      "login": "Đăng nhập",
+      "suspended": "Tài khoản bị tạm khóa",
+      "breadcrumb": "Bạn cùng phòng · Sublet",
+      "empty": {
+        "noPostsTitle": "Chưa có bài viết tìm roommate hay sublet nào",
+        "noMatchTitle": "Không có bài viết nào phù hợp với bộ lọc",
+        "firstPost": "Hãy là người đầu tiên đăng bài nhé.",
+        "verifyToPost": "Xác minh là sinh viên hoặc người đi làm để đăng bài.",
+        "loginToPost": "Đăng nhập để đăng bài."
+      },
+      "showResults_other": "Xem {count} bài viết",
+      "category": "Danh mục",
+      "monthlyBudget": "Ngân sách hàng tháng",
+      "neighborhood": "Khu vực"
+    },
+    "write": {
+      "errors": {
+        "alreadyPosted": "Bạn đã có một bài viết tìm roommate/sublet. Đang chuyển bạn tới trang chỉnh sửa.",
+        "notFound": "Không tìm thấy bài viết",
+        "noPermission": "Bạn không có quyền sửa bài viết này",
+        "loadFailed": "Không thể tải bài viết",
+        "typeRequired": "Vui lòng chọn loại",
+        "titleRequired": "Vui lòng nhập tiêu đề",
+        "titleTooLong": "Tiêu đề tối đa {max} ký tự",
+        "bodyRequired": "Vui lòng viết nội dung",
+        "bodyTooLong": "Nội dung tối đa {max} ký tự",
+        "fieldRequired": "Vui lòng điền: {field}",
+        "fieldSelect": "Vui lòng chọn: {field}",
+        "budgetRange": "Vui lòng nhập số tiền từ $0 đến ${max}",
+        "endBeforeStart": "Ngày kết thúc phải sau ngày bắt đầu",
+        "updateFailed": "Không thể lưu thay đổi",
+        "draftSaveFailed": "Không thể lưu nháp"
+      },
+      "updated": "Đã cập nhật bài viết",
+      "created": "Đã đăng bài viết",
+      "draftSaved": "Đã lưu nháp",
+      "checkingExisting": "Đang kiểm tra bài viết hiện có…",
+      "backToPost": "Quay lại bài viết",
+      "backToList": "Quay lại {board}",
+      "onePostNotice": "Trong Bạn cùng phòng · Sublet, bạn chỉ được đăng {limit}. Nếu có thay đổi, hãy sửa hoặc xóa bài viết hiện có rồi đăng lại.",
+      "onePostLimit": "một bài viết mỗi tài khoản",
+      "steps": {
+        "type": "Đây là loại bài viết nào?",
+        "basics": "Thông tin cơ bản",
+        "basicsDescription": "Thêm tiêu đề, vị trí, ngân sách và thời gian",
+        "photos": "Ảnh",
+        "photosDescription": "{hint} · Nhấn giữ và kéo để sắp xếp · {current}/{max}",
+        "details": "Chi tiết",
+        "detailsDescription": "Chia sẻ lối sống và điều kiện của bạn. Bạn nên tạo một KakaoTalk open chat 1:1 và để lại link để mọi người liên hệ."
+      },
+      "subtype": "Chi tiết loại",
+      "fields": {
+        "title": "Tiêu đề"
+      },
+      "pickSubtypeHint": "Chọn loại để hiện các mục vị trí, ngân sách và ngày dọn vào.",
+      "pickIntentHint": "Chọn Cho thuê phòng hoặc Tìm roommate.",
+      "photosDefaultHint": "Tối đa {max} ảnh · Ảnh đầu tiên là ảnh bìa",
+      "addPhoto": "Thêm",
+      "saving": "Đang lưu…",
+      "saveEdit": "Lưu thay đổi",
+      "submit": "Đăng bài",
+      "backToListShort": "Quay lại danh sách",
+      "createHero": {
+        "title": "Đăng bài trong Bạn cùng phòng · Sublet",
+        "description": "Chọn Cho thuê phòng hoặc Tìm roommate, sau đó thêm vị trí và thời gian.",
+        "photoTip": "Ảnh ngang tỉ lệ 4:3 sẽ đẹp nhất."
+      },
+      "updateHero": {
+        "eyebrow": "Sửa bài viết",
+        "title": "Sửa bài viết của bạn",
+        "description": "Nếu có thay đổi, hãy cập nhật loại, vị trí hoặc thời gian."
+      },
+      "untitled": "Chưa có tiêu đề"
+    }
+  }
+}

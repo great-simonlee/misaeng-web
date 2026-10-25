@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 import type { Map as LeafletMap, Marker as LeafletMarker } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
+import { useInView } from '@hooks/useInView'
 import { getLeafletTileConfig } from '@lib/community/leafletTiles'
+import { trackMapView } from '@lib/usage/client'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import { BoardSurface } from '@widgets/nyc/BoardPageShell'
 
@@ -30,7 +33,10 @@ export function HousingLocationMap({
   neighborhood,
   className,
 }: HousingLocationMapProps) {
+  const t = useT('housing')
   const containerRef = useRef<HTMLDivElement>(null)
+  // 화면에 보일 때만 지도를 만든다 (CARTO 타일 요청 절약)
+  const [setContainer, visible] = useInView(containerRef)
   const mapRef = useRef<LeafletMap | null>(null)
   const markerRef = useRef<LeafletMarker | null>(null)
   const [payload, setPayload] = useState<HousingMapPayload | null>(null)
@@ -91,7 +97,7 @@ export function HousingLocationMap({
   }, [listingId, address, neighborhood, fallbackMapsUrl])
 
   useEffect(() => {
-    if (!hasCoords || !containerRef.current) return
+    if (!visible || !hasCoords || !containerRef.current) return
 
     let cancelled = false
     mapRef.current?.remove()
@@ -125,6 +131,7 @@ export function HousingLocationMap({
       })
 
       mapRef.current = map
+      trackMapView('housing')
       setReady(true)
       requestAnimationFrame(() => map.invalidateSize())
     })()
@@ -137,7 +144,7 @@ export function HousingLocationMap({
       mapRef.current = null
       setReady(false)
     }
-  }, [hasCoords, latitude, longitude, mapsUrl, listingId])
+  }, [visible, hasCoords, latitude, longitude, mapsUrl, listingId])
 
   useEffect(() => {
     if (!ready || !mapRef.current || !hasCoords || latitude == null || longitude == null) {
@@ -178,10 +185,10 @@ export function HousingLocationMap({
     const map = mapRef.current
     const onResize = () => map.invalidateSize()
     window.addEventListener('resize', onResize)
-    const t = window.setTimeout(onResize, 120)
+    const timer = window.setTimeout(onResize, 120)
     return () => {
       window.removeEventListener('resize', onResize)
-      window.clearTimeout(t)
+      window.clearTimeout(timer)
     }
   }, [ready])
 
@@ -190,7 +197,7 @@ export function HousingLocationMap({
       <div className='flex items-start justify-between gap-3 px-4 pt-4 sm:px-5 sm:pt-5'>
         <div className='min-w-0'>
           <p className='text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]'>
-            위치
+            {t('map.location')}
           </p>
           <p className='mt-1 truncate text-[14px] font-semibold text-[var(--foreground)]'>
             {title}
@@ -205,7 +212,7 @@ export function HousingLocationMap({
           rel='noopener noreferrer'
           className='shrink-0 rounded-full bg-[#f3f4f6] px-3 py-1.5 text-[11px] font-semibold text-[var(--foreground)] touch-manipulation transition hover:bg-[#e8eaee]'
         >
-          길찾기
+          {t('map.directions')}
         </a>
       </div>
 
@@ -214,11 +221,11 @@ export function HousingLocationMap({
           <div className='absolute inset-0 animate-pulse bg-[#e8eaee]' />
         ) : hasCoords ? (
           <div
-            ref={containerRef}
+            ref={setContainer}
             className='absolute inset-0 z-0 h-full w-full cursor-pointer [&_.leaflet-control-attribution]:bg-white/80 [&_.leaflet-control-attribution]:text-[9px] [&_.leaflet-control-zoom]:cursor-default'
             role='link'
             tabIndex={0}
-            aria-label={`${title} 구글 맵스에서 보기`}
+            aria-label={t('map.openInGoogleMaps', { name: title })}
             onKeyDown={(event) => {
               if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault()
@@ -234,7 +241,7 @@ export function HousingLocationMap({
             className='absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 text-center touch-manipulation'
           >
             <span className='text-[13px] font-semibold text-[var(--foreground)]'>
-              구글 맵스에서 위치 보기
+              {t('map.viewInGoogleMaps')}
             </span>
             <span className='text-[12px] text-[var(--muted)]'>{subtitle}</span>
           </a>
@@ -252,7 +259,7 @@ function placePinHtml() {
       filter:drop-shadow(0 1px 2px rgba(15,23,42,0.28));
     ">
       <svg width="24" height="30" viewBox="0 0 36 44" aria-hidden="true">
-        <path d="M18 0C8.6 0 1 7.6 1 17c0 11.4 14.2 25.2 15.5 26.4a2 2 0 0 0 2.9 0C20.8 42.2 35 28.4 35 17 35 7.6 27.4 0 18 0z" fill="#F64310"/>
+        <path d="M18 0C8.6 0 1 7.6 1 17c0 11.4 14.2 25.2 15.5 26.4a2 2 0 0 0 2.9 0C20.8 42.2 35 28.4 35 17 35 7.6 27.4 0 18 0z" style="fill:var(--brand)"/>
         <circle cx="18" cy="16" r="7.5" fill="#fff"/>
       </svg>
     </div>

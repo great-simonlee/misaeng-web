@@ -1,3 +1,5 @@
+import { pickTranslationFields } from '@lib/translations/content'
+import { ApiMessageError } from '@lib/i18n/apiError'
 import {
   normalizeFoodCategory,
   normalizeFoodGalleryPhotos,
@@ -41,6 +43,12 @@ import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import type { CommunityPost, JobReviewSourceId } from '@/types/nyc'
 import { listStoredCommunityComments } from '@lib/supabase/communityComments.server'
 import { listStoredRecommends } from '@lib/supabase/communityEngagement.server'
+import {
+  COMMUNITY_POSTS_TTL_MS,
+  TtlCache,
+  listProfileCache,
+  postCountsCache,
+} from '@lib/supabase/listCache.server'
 
 const DEFAULT_BUCKET = 'housing'
 const FALLBACK_BUCKET = 'avatars'
@@ -236,6 +244,8 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       : isSharedCommunityBoard(categoryId)
         ? null
         : resolveCityId(typeof data.city === 'string' ? data.city : null),
+    // 번역(ERP Translations 탭이 저장) — 다시 저장할 때 잃지 않도록 같이 읽는다
+    ...pickTranslationFields(data),
   }
 }
 
@@ -296,8 +306,38 @@ async function writeRawPostJson(
   return Boolean(res?.ok)
 }
 
-async function listAllStoredCommunityPosts(): Promise<CommunityPost[]> {
+const allPostsCache = new TtlCache<CommunityPost[]>(COMMUNITY_POSTS_TTL_MS, 1)
+const ALL_POSTS_KEY = 'all'
+
+/** 이 서버에서 글을 쓰거나 지웠을 때 — 다음 목록 요청이 Storage에서 다시 읽는다 */
+function invalidateAllPosts() {
+  allPostsCache.delete(ALL_POSTS_KEY)
+}
+
+/** 조회수 등 목록에 영향 없는 필드만 바뀐 경우 캐시를 고쳐 둔다 */
+function patchCachedPost(id: string, patch: Partial<CommunityPost>) {
+  allPostsCache.patch(ALL_POSTS_KEY, (posts) =>
+    posts.map((post) => (post.id === id ? { ...post, ...patch } : post)),
+  )
+}
+
+/**
+ * 공개 글 전체. 글 하나당 JSON 하나라 매번 읽으면 요청 수가 글 수만큼 늘어나므로
+ * 60초 동안 메모리에 둔다. 반환 배열은 복사본이라 호출 쪽에서 정렬·필터해도 된다.
+ */
+async function listAllStoredCommunityPosts(
+  { fresh = false }: { fresh?: boolean } = {},
+): Promise<CommunityPost[]> {
   if (!isCommunityStorageConfigured()) return []
+  // 내 글·크레딧·중복 확인처럼 방금 쓴 내용이 꼭 보여야 하는 곳은 캐시를 거치지 않는다
+  if (fresh) return loadAllStoredCommunityPosts().catch(() => [])
+  const posts = await allPostsCache
+    .get(ALL_POSTS_KEY, loadAllStoredCommunityPosts)
+    .catch(() => [] as CommunityPost[])
+  return posts.slice()
+}
+
+async function loadAllStoredCommunityPosts(): Promise<CommunityPost[]> {
 
   const bucket = await resolveBucket()
   const res = await storageFetch(`/storage/v1/object/list/${bucket}`, {
@@ -310,7 +350,8 @@ async function listAllStoredCommunityPosts(): Promise<CommunityPost[]> {
       sortBy: { column: 'updated_at', order: 'desc' },
     }),
   })
-  if (!res?.ok) return []
+  // 목록 실패는 캐시하지 않는다 (빈 목록이 60초 동안 보이지 않도록)
+  if (!res?.ok) throw new Error('Community post list failed')
 
   const items = (await res.json().catch(() => null)) as
     | Array<{ name?: string }>
@@ -336,15 +377,20 @@ async function listAllStoredCommunityPosts(): Promise<CommunityPost[]> {
 export async function enrichStoredCommunityPostCounts(
   post: CommunityPost,
 ): Promise<CommunityPost> {
-  const [recommends, comments] = await Promise.all([
-    listStoredRecommends(post.id),
-    listStoredCommunityComments(post.id),
-  ])
-  const recommendCount = recommends.filter(
-    (item) => item.targetType === 'post' && item.targetId === post.id,
-  ).length
-  const commentCount = comments.filter((item) => item.status === 'open').length
-  return { ...post, recommendCount, commentCount }
+  // 댓글·추천을 이 서버에서 저장하면 invalidatePostCounts로 바로 비워진다
+  const counts = await postCountsCache.get(post.id, async () => {
+    const [recommends, comments] = await Promise.all([
+      listStoredRecommends(post.id),
+      listStoredCommunityComments(post.id),
+    ])
+    return {
+      recommendCount: recommends.filter(
+        (item) => item.targetType === 'post' && item.targetId === post.id,
+      ).length,
+      commentCount: comments.filter((item) => item.status === 'open').length,
+    }
+  })
+  return { ...post, ...counts }
 }
 
 export async function listStoredCommunityPosts(
@@ -369,10 +415,10 @@ export async function listStoredCommunityPosts(
       ? await Promise.all(filtered.map(enrichStoredCommunityPostCounts))
       : filtered
 
-  // 목록에서도 최신 프로필 사진·닉네임 반영 (저장은 상세 조회 시)
+  // 목록에서도 최신 프로필 사진·닉네임 반영 (프로필은 5분 캐시, 작성자당 한 번만 읽음)
   return Promise.all(
     withCounts.map((item) =>
-      enrichCommunityPostAuthor(item, { persist: false }),
+      enrichCommunityPostAuthor(item, { persist: false, cachedProfile: true }),
     ),
   )
 }
@@ -397,7 +443,7 @@ export async function listStoredUnlinkedGuestPostsByEmail(
 ): Promise<CommunityPost[]> {
   const target = normalizeGuestEmail(email)
   if (!target) return []
-  const posts = await listAllStoredCommunityPosts()
+  const posts = await listAllStoredCommunityPosts({ fresh: true })
   return posts.filter(
     (post) =>
       isUnlinkedGuestCommunityPost(post) &&
@@ -411,19 +457,22 @@ export async function listStoredCommunityPostsByAuthor(
 ): Promise<CommunityPost[]> {
   const uid = String(authorUid || '').trim()
   if (!uid) return []
-  const posts = await listAllStoredCommunityPosts()
+  const posts = await listAllStoredCommunityPosts({ fresh: true })
   return posts.filter((post) => post.authorUid === uid)
 }
 
 async function enrichCommunityPostAuthor(
   post: CommunityPost,
-  options?: { persist?: boolean },
+  options?: { persist?: boolean; cachedProfile?: boolean },
 ): Promise<CommunityPost> {
   if (isAnonymousBoard(post.categoryId)) return post
   // 게스트 글(계정 미연결)은 조회할 프로필이 없다.
   if (!post.authorUid) return post
 
-  const profile = await getSupabaseProfile(post.authorUid)
+  const uid = post.authorUid
+  const profile = options?.cachedProfile
+    ? await listProfileCache.get(uid, () => getSupabaseProfile(uid))
+    : await getSupabaseProfile(uid)
   const profileNickname = profile?.nickname?.trim() || null
   const profilePhoto =
     typeof profile?.photoURL === 'string' && profile.photoURL.trim()
@@ -494,8 +543,9 @@ export async function saveStoredCommunityPost(
   adminFields?: Partial<Record<(typeof ADMIN_ONLY_POST_KEYS)[number], unknown>>,
 ): Promise<CommunityPost> {
   if (!isCommunityStorageConfigured()) {
-    throw new Error(
-      'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.supabaseNotConfiguredDetail',
     )
   }
 
@@ -525,13 +575,12 @@ export async function saveStoredCommunityPost(
     const payload = (await res?.json().catch(() => null)) as
       | { message?: string; error?: string }
       | null
-    throw new Error(
-      payload?.message ||
-        payload?.error ||
-        '게시글 저장에 실패했어요. 잠시 후 다시 시도해 주세요.',
-    )
+    const detail = payload?.message || payload?.error
+    if (detail) throw new Error(detail)
+    throw new ApiMessageError('Post save failed', 'community.saveFailedRetry')
   }
 
+  invalidateAllPosts()
   return post
 }
 
@@ -552,6 +601,7 @@ export async function incrementStoredCommunityViewCount(
     viewCount: nextView,
   })
   if (!ok) return null
+  patchCachedPost(postId, { viewCount: nextView })
   return normalizeCommunityPost({ ...raw, viewCount: nextView })
 }
 
@@ -571,13 +621,15 @@ export async function setStoredCommunityBeenThereCount(
     beenThereCount,
   })
   if (!ok) return null
+  patchCachedPost(postId, { beenThereCount })
   return normalizeCommunityPost({ ...raw, beenThereCount })
 }
 
 export async function deleteStoredCommunityPost(id: string): Promise<boolean> {
   if (!isCommunityStorageConfigured()) {
-    throw new Error(
-      'Supabase 설정이 필요해요. NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY를 확인해 주세요.',
+    throw new ApiMessageError(
+      'Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      'common.supabaseNotConfiguredDetail',
     )
   }
   const postId = String(id || '').trim()
@@ -592,6 +644,7 @@ export async function deleteStoredCommunityPost(id: string): Promise<boolean> {
     },
   )
   if (!res) return false
+  if (res.status === 404 || res.ok) invalidateAllPosts()
   if (res.status === 404) return true
   return res.ok
 }

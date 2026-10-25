@@ -15,18 +15,17 @@ import {
 import {
   deleteCommunityPostRequest,
   fetchCommunityPost,
+  localizeCommunityError,
 } from '@lib/community/client'
 import { recordCommunityView } from '@lib/community/engagement.client'
 import {
-  formatCommunityCount,
-  formatCommunityRelativeTime,
-} from '@lib/constants/communityMock'
-import {
   NYC_COMMUNITY_BOARD_META,
+  communityBoardKey,
   isAnonymousBoard,
   isStatusCommunityBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
+import { useT } from '@lib/i18n/client'
 import type { CommunityPost } from '@/types/nyc'
 import {
   formatRoommateBudget,
@@ -43,6 +42,8 @@ import {
 import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 import { CommunityCommentsSection } from '@widgets/nyc/CommunityCommentsSection'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
+import { useCommunityFormat } from '@widgets/nyc/CommunityPostCard'
+import { TranslationNotice, useTranslatedContent } from '@widgets/TranslationNotice'
 import { FoodDetailContent } from '@widgets/nyc/FoodDetailContent'
 import { CptOptDetailContent } from '@widgets/nyc/CptOptDetailContent'
 import { JobReviewDetailContent } from '@widgets/nyc/JobReviewDetailContent'
@@ -59,6 +60,9 @@ export function CommunityDetailScreen({
   title,
   postId,
 }: CommunityDetailScreenProps) {
+  const t = useT('community')
+  const tHousing = useT('housing')
+  const format = useCommunityFormat()
   const city = useCity()
   const href = useCityPath()
   const meta = NYC_COMMUNITY_BOARD_META[boardId]
@@ -70,8 +74,12 @@ export function CommunityDetailScreen({
   const fromCompany = parseFromCompany(
     searchParams.get('company'),
     searchParams.get('companyName'),
+    t('detail.companyPageFallback'),
   )
-  const [post, setPost] = useState<CommunityPost | null>(null)
+  const [storedPost, setPost] = useState<CommunityPost | null>(null)
+  // 번역된 글이면 "원문 보기"로 원문과 번역을 오간다
+  const translated = useTranslatedContent<CommunityPost, CommunityPost | null>(storedPost, 'post')
+  const post = translated.item
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -86,7 +94,10 @@ export function CommunityDetailScreen({
         setPost(data)
         setError(null)
       } catch (err) {
-        const msg = getErrorMessage(err, '글을 불러오지 못했어요')
+        const msg = getErrorMessage(
+          localizeCommunityError(err, t),
+          t('detail.loadFailed'),
+        )
         setError(msg)
         if (!opts?.silent) toastError(msg)
         throw err
@@ -94,7 +105,7 @@ export function CommunityDetailScreen({
         setLoading(false)
       }
     },
-    [postId, toastError],
+    [postId, t, toastError],
   )
 
   useEffect(() => {
@@ -128,15 +139,20 @@ export function CommunityDetailScreen({
   async function handleDelete() {
     if (!post || !user) return
     const ok = window.confirm(
-      `"${post.title}" 글을 삭제할까요?\n삭제하면 되돌릴 수 없어요.`,
+      t('detail.deleteConfirm', { title: post.title }),
     )
     if (!ok) return
     try {
       await deleteCommunityPostRequest(post.id)
-      success('글을 삭제했어요')
+      success(t('detail.deleted'))
       router.push(href('/me/posts'))
     } catch (err) {
-      toastError(getErrorMessage(err, '삭제에 실패했어요'))
+      toastError(
+        getErrorMessage(
+          localizeCommunityError(err, t),
+          t('errors.deleteFailed'),
+        ),
+      )
     }
   }
 
@@ -147,7 +163,7 @@ export function CommunityDetailScreen({
     return (
       <PullToRefresh onRefresh={refreshPost}>
         <BoardPageShell width={shellWidth}>
-          <LoadingState fullPage label='글을 불러오는 중이에요…' />
+          <LoadingState fullPage label={t('detail.loading')} />
         </BoardPageShell>
       </PullToRefresh>
     )
@@ -172,10 +188,10 @@ export function CommunityDetailScreen({
       <PullToRefresh onRefresh={refreshPost}>
         <BoardPageShell width={shellWidth} className='py-12'>
           <EmptyState
-            title='게시글을 찾을 수 없습니다'
-            description={error ?? '삭제된 글일 수 있습니다.'}
+            title={t('detail.notFoundTitle')}
+            description={error ?? t('detail.notFoundDescription')}
             actionHref={href(`/${boardId}`)}
-            actionLabel={`${title} 목록으로`}
+            actionLabel={t('detail.backToListAction', { board: title })}
           />
         </BoardPageShell>
       </PullToRefresh>
@@ -189,31 +205,41 @@ export function CommunityDetailScreen({
   const isJobReview = boardId === 'job-review'
   const isRoommate = boardId === 'roommate'
   const bodyHtml = post.contentHtml || `<p>${post.description}</p>`
+  const translationNotice = (
+    <TranslationNotice
+      i18n={post.i18n}
+      showingOriginal={translated.showingOriginal}
+      onToggle={translated.toggle}
+    />
+  )
   const tone = boardToneForId(boardId)
   const roommateBudget = formatRoommateBudget(post.roommateBudgetMax)
   const roommateMoveIn = formatRoommateMoveInRange(
     post.roommateMoveInDate,
     post.roommateMoveOutDate,
   )
-  const roommateType = getRoommateLookingForLabel(post.roommateLookingFor)
+  const roommateType = getRoommateLookingForLabel(post.roommateLookingFor, tHousing)
   const metaBits = [
     post.location && {
-      label: meta.locationLabel,
+      label: t(communityBoardKey(boardId, 'locationLabel')),
       value: post.location,
     },
     isRoommate && roommateType
-      ? { label: '유형', value: roommateType }
+      ? { label: t('detail.roommateType'), value: roommateType }
       : post.detail &&
-          meta.detailLabel && {
-            label: meta.detailLabel,
+          meta.hasDetail && {
+            label: t(communityBoardKey(boardId, 'detailLabel')),
             value:
               boardId === 'marketplace' ? `$${post.detail}` : post.detail,
           },
     isRoommate && roommateBudget
-      ? { label: '월 예산·월세', value: `${roommateBudget}/월` }
+      ? {
+          label: t('detail.roommateBudget'),
+          value: t('detail.perMonthValue', { value: roommateBudget }),
+        }
       : null,
     isRoommate && roommateMoveIn
-      ? { label: '입주·이사', value: roommateMoveIn }
+      ? { label: t('detail.roommateMoveIn'), value: roommateMoveIn }
       : null,
   ].filter(Boolean) as { label: string; value: string }[]
 
@@ -237,7 +263,11 @@ export function CommunityDetailScreen({
                   ? href(`/companies/${fromCompany.slug}`)
                   : href(`/${boardId}`)
               }
-              label={fromCompany ? fromCompany.name : `${title} 목록`}
+              label={
+                fromCompany
+                  ? fromCompany.name
+                  : t('detail.backToList', { board: title })
+              }
               className={isCptOpt || isJobReview ? 'mb-4 px-1 sm:px-0' : 'mb-4'}
             />
           ) : null}
@@ -245,6 +275,8 @@ export function CommunityDetailScreen({
           {isFood ? (
             <FoodDetailContent
               post={post}
+              translationNotice={translationNotice}
+              contentLang={translated.lang}
               boardId={boardId}
               boardTitle={title}
               isAuthor={isAuthor}
@@ -253,6 +285,8 @@ export function CommunityDetailScreen({
           ) : isCptOpt ? (
             <CptOptDetailContent
               post={post}
+              translationNotice={translationNotice}
+              contentLang={translated.lang}
               boardId={boardId}
               boardTitle={title}
               isAuthor={isAuthor}
@@ -261,6 +295,8 @@ export function CommunityDetailScreen({
           ) : isJobReview ? (
             <JobReviewDetailContent
               post={post}
+              translationNotice={translationNotice}
+              contentLang={translated.lang}
               boardId={boardId}
               boardTitle={title}
               isAuthor={isAuthor}
@@ -273,21 +309,27 @@ export function CommunityDetailScreen({
                   <div className='flex flex-wrap items-center gap-2'>
                     <BoardMetaChip tone={tone}>{title}</BoardMetaChip>
                     {anonymous ? (
-                      <BoardMetaChip>익명</BoardMetaChip>
+                      <BoardMetaChip>{t('author.anonymous')}</BoardMetaChip>
                     ) : (
                       <SchoolBadge schoolId={post.authorSchoolId} />
                     )}
                     <span className='text-[12px] text-[var(--muted)]'>
-                      {formatCommunityRelativeTime(post.createdAt)}
+                      {format.relativeTime(post.createdAt)}
                     </span>
                     <span className='text-[12px] text-[var(--muted)]'>
-                      조회 {formatCommunityCount(post.viewCount)}
+                      {t('detail.views', { n: format.count(post.viewCount) })}
                     </span>
                   </div>
 
-                  <h1 className='mt-3.5 text-[1.55rem] font-semibold leading-[1.25] tracking-[-0.035em] text-[var(--foreground)] sm:text-[1.9rem]'>
+                  <h1
+                    lang={translated.lang}
+                    className='mt-3.5 text-[1.55rem] font-semibold leading-[1.25] tracking-[-0.035em] text-[var(--foreground)] sm:text-[1.9rem]'
+                  >
                     {post.title}
                   </h1>
+                  {post.i18n && post.i18n.state !== 'original' ? (
+                    <div className='mt-1.5'>{translationNotice}</div>
+                  ) : null}
 
                   {metaBits.length > 0 && (
                     <div className='mt-4 grid gap-2 sm:grid-cols-2'>
@@ -308,7 +350,7 @@ export function CommunityDetailScreen({
                   )}
                 </div>
 
-                <div className='px-5 py-6 sm:px-8 sm:py-8'>
+                <div lang={translated.lang} className='px-5 py-6 sm:px-8 sm:py-8'>
                   <CommunityRichBody html={bodyHtml} />
                 </div>
 
@@ -336,7 +378,11 @@ export function CommunityDetailScreen({
   )
 }
 
-function parseFromCompany(slug: string | null, name: string | null) {
+function parseFromCompany(
+  slug: string | null,
+  name: string | null,
+  fallbackName: string,
+) {
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) return null
-  return { slug, name: name?.trim() || '회사 페이지' }
+  return { slug, name: name?.trim() || fallbackName }
 }

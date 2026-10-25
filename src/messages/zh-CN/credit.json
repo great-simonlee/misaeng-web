@@ -1,0 +1,455 @@
+{
+  "meta": {
+    "description": "{brand} NYC 社区积分说明：获取、使用、限制和常见问题。通过美食、OPT 和求职经验分享以及评论积累积分，再用来兑换 coffee chat、律师咨询、职业辅导等。",
+    "reviewsDescription": "审核最终结果帖子的额外积分申请。"
+  },
+  "header": {
+    "eyebrow": "{brand} NYC",
+    "title": "社区积分指南",
+    "intro": "用帮助社区获得的积分申请 coffee chat、移民律师咨询等奖励。积分不能兑换现金，并且需要完成学生或职场人验证。",
+    "tagInteger": "仅限整数",
+    "tagNoCash": "无现金价值",
+    "tagVerification": "需完成学生或职场人验证",
+    "policyVersion": "v{version}"
+  },
+  "toc": {
+    "aria": "目录",
+    "redeem": "奖励",
+    "process": "申请流程",
+    "earn": "获取方式",
+    "principles": "原则与流程",
+    "limits": "限制与收回",
+    "faq": "常见问题"
+  },
+  "redeem": {
+    "title": "积分可兑换的奖励",
+    "description": "每次时长不超过 30 分钟。为覆盖专家和匹配成本，兑换所需积分高于获取标准。",
+    "comingSoon": "即将上线",
+    "applySoon": "即将开放申请",
+    "callout": "在个人中心确认积分余额后，奖励将分阶段开放。coffee chat 和移民律师咨询每月各可申请一次。",
+    "credits": "积分",
+    "includes": "包含",
+    "excludes": "不包含",
+    "monthlyCap_other": "每月 {count} 次",
+    "foodEquivalent_other": "≈ {count} 篇美食经验分享"
+  },
+  "process": {
+    "title": "申请流程",
+    "description": "从申请到完成只需四步。",
+    "cancelNote": "匹配前取消将全额退还积分。确定时间后当天取消或爽约，可能无法退还。"
+  },
+  "earn": {
+    "title": "获取积分",
+    "description": "完成学校邮箱验证后，参与以下活动即可获得积分。",
+    "colActivity": "活动",
+    "colEarn": "积分",
+    "colCoffeeChat": "Coffee chat",
+    "once": "一次性",
+    "max": "最多 {amount}",
+    "maxParen": "（最多 {amount}）",
+    "unitWithMax": "{unit} · 最多 {amount}",
+    "detailsToggle": "查看获取规则和标准",
+    "perUnit": "+{amount}/{unit}"
+  },
+  "principlesSection": {
+    "title": "原则 · 运作方式",
+    "description": "积分计划的核心原则，以及从第一篇帖子到获得奖励的路径。",
+    "flowTitle": "运作方式"
+  },
+  "limits": {
+    "title": "限制 · 收回",
+    "description": "保证公平的规则。",
+    "earnTitle": "获取",
+    "spendTitle": "使用",
+    "commentCap": "评论和回复：每天最多 {amount} 积分",
+    "noSelfReply": "回复自己的帖子或评论：不获得积分",
+    "revokeOnDelete": "删除帖子或评论会收回相应积分",
+    "oncePerAccount": "一次性奖励：每个账号限一次",
+    "optionCap": "{label}：每月 {cap} · {duration}",
+    "times_other": "{count} 次",
+    "recentActivity": "建议申请前 {days} 天内至少参与过一次活动"
+  },
+  "faqSection": {
+    "title": "常见问题",
+    "glossaryTitle": "术语说明"
+  },
+  "footer": {
+    "disclaimer": "移民律师咨询仅提供信息参考，与案件代理无关。我们可能会在提前通知后修改本政策。",
+    "myPage": "个人中心",
+    "writeFood": "写美食经验分享"
+  },
+  "principles": {
+    "reward": {
+      "title": "贡献就有回报",
+      "body": "分享越多有帮助的帖子和评论，比如美食、签证和求职经验分享，获得的积分就越多。"
+    },
+    "notCash": {
+      "title": "换的是人脉，不是现金",
+      "body": "积分不能兑换成钱，而是用来换取与资深职场人和专家交流的机会。"
+    },
+    "cost": {
+      "title": "反映真实成本",
+      "body": "Misaeng 承担 coffee chat 和移民律师咨询的专家时间与匹配成本，所以使用积分所需的数量多于获取的数量。"
+    },
+    "quality": {
+      "title": "质量优先",
+      "body": "只为刷积分而发布的垃圾、重复或虚假帖子不会获得积分，还可能被收回。"
+    }
+  },
+  "workflow": {
+    "verify": {
+      "title": "验证学校",
+      "description": "在个人中心完成学校邮箱验证。验证后才能发帖、评论和获得积分。"
+    },
+    "contribute": {
+      "title": "参与贡献",
+      "description": "写美食、OPT 或求职经验分享，或评论别人的帖子。满足条件后会自动发放积分。"
+    },
+    "balance": {
+      "title": "查看余额",
+      "description": "在个人中心查看积分总额和明细。因删除或处罚被收回的积分也会显示在这里。"
+    },
+    "redeem": {
+      "title": "申请奖励",
+      "description": "积分足够兑换某项奖励时即可提交申请。匹配并确定时间后进行。"
+    }
+  },
+  "redeemProcess": {
+    "apply": {
+      "title": "申请",
+      "description": "在个人中心或奖励页面选择项目，并简要说明你感兴趣的方向和问题。"
+    },
+    "review": {
+      "title": "审核与扣除",
+      "description": "我们会确认你的资格、余额和每月限额，然后扣除积分。如需安排时间，会通过邮件联系你。"
+    },
+    "match": {
+      "title": "匹配",
+      "description": "Misaeng 会从合作伙伴、导师和专家中为你匹配合适的人。匹配失败将退还积分。"
+    },
+    "session": {
+      "title": "进行",
+      "description": "在约定时间线上或线下见面。按照政策，爽约或当天取消可能无法退还积分。"
+    }
+  },
+  "earnRules": {
+    "food": {
+      "label": "美食经验分享",
+      "description": "发布包含照片、位置、菜单和价格等所有必填信息的美食经验分享即可获得。",
+      "conditions": {
+        "verified": "已完成学校邮箱验证",
+        "requiredFields": "已填写必填项：餐厅位置、名称、分类、菜单、照片",
+        "oncePerPost": "首次发布时发放一次（编辑同一帖子不会追加）"
+      },
+      "notEligible": {
+        "missingFields": "缺少必填项或内容敷衍",
+        "copied": "抄袭他人帖子或重复发布",
+        "repost": "删除后重新发布相同内容（滥用）"
+      },
+      "tip": "照片以及具体的菜品或等位时间信息对其他同学最有帮助。"
+    },
+    "status": {
+      "label": "OPT、签证和绿卡经验分享",
+      "unitLabel": "1 个时间线步骤",
+      "description": "每个时间线步骤 {entry} 积分（每篇最多 {postMax}）。包含最终结果的经验分享经 Misaeng 团队审核后最多可再得 {reviewBonus}（合计最多 {totalMax}）。",
+      "conditions": {
+        "verified": "已完成学校邮箱验证",
+        "type": "选择类型：CPT/OPT/STEM OPT/签证/绿卡",
+        "perStep": "每个时间线步骤 {entry} 积分",
+        "postMax": "每篇帖子自动发放最多 {postMax} 积分",
+        "editAdds": "编辑帖子添加时间线步骤可获得更多积分（不超过上限）",
+        "reviewBonus": "添加最终结果后，点击“申请额外积分”→ 团队审核通过后 +{reviewBonus}"
+      },
+      "notEligible": {
+        "missingTimeline": "未填写时间线或类型",
+        "copied": "抄袭他人的经验分享",
+        "privacy": "因泄露过多个人信息而被删除的帖子",
+        "capReached": "帖子已达自动发放上限（额外步骤不再获得积分）",
+        "noFinalResult": "没有最终结果就申请审核奖励"
+      },
+      "tip": "添加最终结果（获批、收到卡等）后即可申请团队审核奖励。"
+    },
+    "job-review": {
+      "label": "面试与求职",
+      "unitLabel": "1 个时间线步骤",
+      "description": "每个招聘环节（时间线）{entry} 积分，每篇最多 {postMax}。添加 offer 或最终结果，经 Misaeng 团队审核后最多可再得 {reviewBonus}（合计最多 {totalMax}）。",
+      "conditions": {
+        "verified": "已完成学校邮箱验证",
+        "type": "选择类型：实习/应届/社招/合同工",
+        "perStep": "每个时间线步骤 {entry} 积分",
+        "postMax": "每篇帖子自动发放最多 {postMax} 积分",
+        "editAdds": "编辑帖子添加时间线步骤可获得更多积分（不超过上限）",
+        "reviewBonus": "添加最终结果后，点击“申请额外积分”→ 团队审核通过后 +{reviewBonus}"
+      },
+      "notEligible": {
+        "missingFields": "未填写必需的环节或类型",
+        "falseInfo": "虚构公司名称或夸大内容",
+        "anonymous": "匿名版块的帖子（该版块不计入）",
+        "capReached": "帖子已达自动发放上限",
+        "noFinalResult": "没有最终结果就申请审核奖励"
+      }
+    },
+    "comment": {
+      "label": "评论和回复",
+      "description": "在他人帖子下每发一条评论或回复得 1 积分。",
+      "conditions": {
+        "verified": "已完成学校邮箱验证",
+        "publicOthers": "评论在他人的公开帖子或评论下",
+        "dailyCap": "每天最多 {commentCap} 积分"
+      },
+      "notEligible": {
+        "ownPost": "回复自己的帖子或评论",
+        "deleted": "已删除的评论",
+        "spam": "垃圾信息、辱骂或无意义的重复字符",
+        "copyPaste": "反复粘贴同一句话"
+      },
+      "tip": "回答问题或补充自己经历的评论对社区最有帮助。"
+    },
+    "referral": {
+      "label": "推荐码被使用",
+      "description": "有人使用你的推荐码时，你将获得 {referral} 积分，最多 {referralMax} 人。",
+      "conditions": {
+        "joined": "对方通过你的推荐链接注册，或在个人中心绑定了你的推荐码",
+        "perPerson": "每人 {referral} 积分",
+        "maxPeople": "每个账号最多 {referralMax} 人",
+        "noSelf": "不能用自己的推荐码推荐自己"
+      },
+      "notEligible": {
+        "self": "推荐自己",
+        "maxReached": "已有 {referralMax} 人使用了你的推荐码",
+        "alreadyLinked": "已绑定其他推荐人的账号"
+      },
+      "tip": "在个人中心复制你的推荐链接，分享给同学和朋友吧。"
+    }
+  },
+  "bonusRules": {
+    "school-verify": {
+      "label": "学校邮箱验证",
+      "description": "首次在个人中心验证学校邮箱（.edu 等）时发放一次。"
+    },
+    "first-post": {
+      "label": "首次社区发帖",
+      "description": "在美食、OPT 或求职经验分享等可获得积分的版块首次发帖时发放一次（需满足条件）。"
+    }
+  },
+  "noEarn": {
+    "anonymous": "匿名版块的帖子和评论（为保护匿名性，不发放积分）",
+    "otherBoards": "室友、转租、二手市场等其他版块（以后可能会加入）",
+    "editOnly": "仅编辑或仅修改元数据",
+    "reactions": "仅点赞、顶帖或分享等互动",
+    "adminPosts": "租房团队或工作人员账号发布的管理帖子"
+  },
+  "redeemOptions": {
+    "coffee-chat": {
+      "label": "目标领域 coffee chat",
+      "duration": "约 30 分钟",
+      "description": "与你感兴趣的行业或岗位的从业者或在读者一对一交流。可以聊职业发展、行业文化、纽约生活小贴士等。",
+      "includes": {
+        "meeting": "线上或线下一对一见面（Zoom 或在 NYC）",
+        "questions": "我们会提前查看你发来的 3–5 个问题",
+        "scheduling": "由 Misaeng 团队安排时间和匹配"
+      },
+      "excludes": {
+        "jobGuarantee": "保证录用或内推",
+        "resumeWriting": "代写简历或作品集",
+        "lawyer": "移民律师咨询（另有项目）"
+      },
+      "eligibility": {
+        "verified": "已完成学校邮箱验证",
+        "minCredits": "积分总额至少 {cost}",
+        "recentActivity": "最近 90 天内至少参与过一次社区活动",
+        "noSanctions": "账号无处罚记录"
+      },
+      "note": "导师以志愿者或合作伙伴身份参与，Misaeng 承担匹配和运营成本。"
+    },
+    "lawyer-consult": {
+      "label": "移民律师咨询",
+      "duration": "约 30 分钟",
+      "description": "与移民律师进行 30 分钟问答，咨询 F-1、OPT、H-1B、绿卡等美国移民和签证问题。",
+      "includes": {
+        "qa": "与移民律师 30 分钟问答",
+        "procedures": "签证、身份和绿卡流程的一般性指导",
+        "followUp": "如需进一步代理，会另行说明"
+      },
+      "excludes": {
+        "representation": "代理案件或处理诉讼",
+        "paperwork": "代为准备或提交材料",
+        "outcome": "保证结果（获批、身份变更等）",
+        "otherLaw": "非移民类法律、刑事或民事咨询"
+      },
+      "eligibility": {
+        "verified": "已完成学校邮箱验证",
+        "minCredits": "积分总额至少 {cost}",
+        "summary": "申请时提交你的移民或签证问题及背景概要",
+        "noSanctions": "账号无处罚记录"
+      },
+      "note": "移民咨询仅供信息参考。建立律师与客户关系可能需要另行签订协议。"
+    },
+    "career-mentor": {
+      "label": "职业辅导",
+      "duration": "约 30 分钟",
+      "description": "关于简历、面试、转行等方面的职业辅导。所需积分反映了与在职导师匹配的成本。",
+      "includes": {
+        "resume": "简历和 LinkedIn 反馈（需提前发送）",
+        "interview": "面试和社交策略问答",
+        "advice": "针对行业的实用建议"
+      },
+      "excludes": {
+        "applyForYou": "代为申请职位",
+        "jobGuarantee": "保证就业",
+        "lawyer": "移民律师咨询"
+      },
+      "eligibility": {
+        "verified": "已完成学校邮箱验证",
+        "minCredits": "积分总额至少 {cost}"
+      }
+    }
+  },
+  "revocation": {
+    "deleted": "删除帖子或评论后，相应积分将被收回",
+    "guidelines": "因违反社区规范被隐藏或删除的内容",
+    "falseInfo": "被确认为虚假或垃圾信息的内容（之前获得的积分可能被收回）",
+    "abuse": "滥用行为（多账号、刷分）将导致账号停用并清零余额"
+  },
+  "faq": {
+    "cash": {
+      "q": "积分可以兑换现金吗？",
+      "a": "不可以。社区积分不能兑现、退款、转让、出售或转移到其他账号，只能用于 {brand} NYC 设定的奖励项目。"
+    },
+    "comments": {
+      "q": "只靠评论能赚很多积分吗？",
+      "a": "每条评论或回复得 1 积分，但每天最多 {commentCap} 积分，评论自己的帖子不计入。只靠评论的话，coffee chat（120）至少需要 12 天，移民律师咨询（400）需要 40 天（按上限计算），所以写经验分享效率更高。"
+    },
+    "delete": {
+      "q": "删除帖子会失去积分吗？",
+      "a": "会。被删除、被举报或因处罚被隐藏的内容，其积分可能被收回。如果需要收回的积分已经用掉，余额可能会变成负数。"
+    },
+    "noVerify": {
+      "q": "不做学校验证也能获得积分吗？",
+      "a": "不能。发帖、评论和获得积分都需要完成学校邮箱验证。验证时还会一次性获得 5 积分奖励。"
+    },
+    "timeline": {
+      "q": "OPT 和求职经验分享每篇只能得一次积分吗？",
+      "a": "不是。每个时间线步骤自动获得 {entry} 积分，每篇最多 {postMax}。添加最终结果并点击“申请额外积分”后，Misaeng 团队会进行审核，通过后再加 {reviewBonus}，合计最多 {totalMax}。"
+    },
+    "sameRestaurant": {
+      "q": "同一家餐厅写两次经验分享，能得两次积分吗？",
+      "a": "不同的帖子各自可以获得一次，但重复、抄袭或垃圾内容不会获得积分，还可能被收回。"
+    },
+    "schedule": {
+      "q": "申请奖励后时间对不上怎么办？",
+      "a": "匹配前取消将全额退还积分。确认后当天取消或爽约，可能无法退还。"
+    },
+    "lawyerGuarantee": {
+      "q": "移民律师咨询能保证签证获批或身份变更吗？",
+      "a": "不能。咨询仅涵盖一般性的移民和签证信息及流程，不保证任何结果。代理案件需另行签订协议。不包括非移民类法律和税务咨询。"
+    },
+    "policyChange": {
+      "q": "积分政策会变吗？",
+      "a": "会。获取和使用规则以及所需积分可能会根据运营情况调整。届时我们会更新本页面和政策版本。已获得的积分原则上保留。"
+    },
+    "when": {
+      "q": "什么时候可以开始使用积分？",
+      "a": "参与社区活动即可获得积分。coffee chat 和移民律师咨询申请将分阶段开放，你可以在个人中心查看余额。"
+    }
+  },
+  "glossary": {
+    "credit": {
+      "term": "积分",
+      "definition": "通过为社区做贡献获得的整数点数。没有现金价值，仅用于申请奖励。"
+    },
+    "earn": {
+      "term": "获取",
+      "definition": "通过发帖、评论等活动获得积分。不满足条件则为 0。"
+    },
+    "revoke": {
+      "term": "收回",
+      "definition": "因删除或违规等原因，收回已发放的积分。"
+    },
+    "reward": {
+      "term": "奖励",
+      "definition": "Misaeng 提供或安排的非现金项目，如 coffee chat 和移民律师咨询。"
+    },
+    "dailyCap": {
+      "term": "每日上限",
+      "definition": "评论和回复每天最多获得 {commentCap} 积分。"
+    },
+    "timeline": {
+      "term": "时间线",
+      "definition": "OPT、签证、绿卡和求职经验分享中的分步记录。每步 {entry} 积分（自动发放最多 {postMax}）。有最终结果后，可申请最多 {reviewBonus} 的团队审核奖励。"
+    }
+  },
+  "efficiency": {
+    "food": {
+      "activity": "美食经验分享",
+      "unit": "篇",
+      "toCoffeeChat_other": "{count} 篇",
+      "toLawyer_other": "{count} 篇",
+      "note": "最容易获得积分的方式"
+    },
+    "timeline": {
+      "activity": "OPT、签证和求职经验分享",
+      "unit": "个时间线步骤",
+      "toCoffeeChat_other": "{count} 篇（满额）",
+      "toLawyer_other": "{count} 篇（满额）",
+      "note": "每步 +{entry} · 自动最多 {postMax} · 审核通过 +{reviewBonus}"
+    },
+    "comment": {
+      "activity": "评论和回复",
+      "unit": "条评论",
+      "toCoffeeChat_other": "{count} 天（每日上限 {commentCap}）",
+      "toLawyer_other": "{count} 天（每日上限 {commentCap}）",
+      "note": "额外获取 · 不含自己帖子下的评论"
+    }
+  },
+  "ledger": {
+    "reasons": {
+      "food": "美食经验分享",
+      "status": "OPT、签证和绿卡经验分享",
+      "job-review": "面试与求职",
+      "comment": "评论和回复",
+      "school-verify": "学校邮箱验证",
+      "first-post": "首次社区发帖",
+      "review-bonus": "最终结果审核奖励",
+      "referral": "推荐码被使用"
+    },
+    "timeline": "{label}（时间线）",
+    "revoke": "{label}已收回"
+  },
+  "referral": {
+    "bindFailed": "推荐码绑定失败"
+  },
+  "reviewCard": {
+    "title": "最终结果审核奖励",
+    "description": "如果你的经验分享包含最终结果，Misaeng 团队审核后可额外给你 {bonus} 积分。（每篇最多 {totalMax}，含自动发放的积分）",
+    "bonusAmount": "+{amount}",
+    "notEligible": "在时间线中添加最终结果（获批、收到卡、拿到 offer、被拒等）后即可申请。",
+    "pending": "等待审核 · Misaeng 团队确认你的帖子后会发放积分。",
+    "approved": "已通过 · 已额外发放 +{amount} 积分。",
+    "rejected": "未通过。你可以更新帖子后重新申请。",
+    "rejectedWithReason": "未通过 · {reason}。你可以更新帖子后重新申请。",
+    "requesting": "发送中…",
+    "requestButton": "申请额外积分",
+    "editTimeline": "编辑时间线",
+    "loadFailed": "无法加载状态",
+    "requestFailed": "申请发送失败"
+  },
+  "reviews": {
+    "title": "积分审核",
+    "description": "审核带有最终结果的 OPT 和求职帖子，然后额外发放 +{amount} 积分。",
+    "filterPending": "待审核",
+    "filterAll": "全部",
+    "emptyPending": "没有待审核的申请。",
+    "emptyAll": "还没有申请。",
+    "rejectReasonLabel": "已拒绝：{reason}",
+    "approveButton": "通过 +{amount}",
+    "rejectButton": "拒绝",
+    "rejectPrompt": "拒绝原因（选填）",
+    "approveConfirm": "确定通过该帖子并发放 +{amount} 积分吗？",
+    "approved": "已通过 · 积分已发放",
+    "rejected": "申请已拒绝",
+    "loadFailed": "无法加载列表",
+    "actionFailed": "操作未能完成",
+    "untitled": "无标题"
+  }
+}

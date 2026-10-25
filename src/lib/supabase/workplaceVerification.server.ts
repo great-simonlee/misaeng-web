@@ -1,3 +1,4 @@
+import { ApiMessageError } from '@lib/i18n/apiError'
 import {
   normalizeWorkplaceStatus,
   type WorkplaceVerificationStatus,
@@ -139,7 +140,7 @@ export async function saveStoredWorkplaceVerification(
   request: WorkplaceVerificationRequest,
 ): Promise<WorkplaceVerificationRequest> {
   if (!isWorkplaceVerificationStorageConfigured()) {
-    throw new Error('Supabase 설정이 필요해요.')
+    throw new ApiMessageError('Supabase is not configured.', 'common.supabaseNotConfigured')
   }
   const next = { ...request, updatedAt: Date.now() }
   const bucket = await resolveBucket()
@@ -156,7 +157,11 @@ export async function saveStoredWorkplaceVerification(
     },
   )
   if (!res?.ok) {
-    throw new Error(`직장인 인증 요청 저장 실패 (HTTP ${res?.status ?? 'unknown'})`)
+    throw new ApiMessageError(
+      `Workplace verification save failed (HTTP ${res?.status ?? 'unknown'})`,
+      'verification.workplaceSaveFailed',
+      { status: res?.status ?? 'unknown' },
+    )
   }
   return next
 }

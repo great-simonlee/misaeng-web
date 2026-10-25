@@ -1,9 +1,11 @@
 'use client'
 
+import { BRAND_CONFIG } from '@lib/brand'
 import {
   NYC_INTRO_CAROUSEL_SLIDES,
   type NycIntroCarouselSlide,
 } from '@lib/constants/nycIntroCarousel'
+import { useT } from '@lib/i18n/client'
 
 export function NycIntroCarousel() {
   return (
@@ -32,7 +34,15 @@ function CarouselSlide({
   index: number
   total: number
 }) {
+  const t = useT('hub')
   const pageLabel = `${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`
+  const kicker = t(`introCarousel.${slide.id}.kicker`, {
+    brand: BRAND_CONFIG.name.toUpperCase(),
+  })
+  const headline = t(`introCarousel.${slide.id}.headline`)
+  const body = t(`introCarousel.${slide.id}.body`, {
+    siteHost: new URL(BRAND_CONFIG.siteUrl).host,
+  })
 
   return (
     <article
@@ -43,7 +53,7 @@ function CarouselSlide({
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
-      aria-label={`${slide.kicker}: ${slide.headline}`}
+      aria-label={`${kicker}: ${headline}`}
     >
       <div
         className='absolute inset-0'
@@ -67,7 +77,7 @@ function CarouselSlide({
       <div className='relative z-[2] flex h-full flex-col justify-between px-6 pb-9 pt-[22px]'>
         <div className='flex items-start justify-between'>
           <span className='text-[11px] font-medium tracking-[0.04em] text-[#e8b84b]'>
-            {slide.kicker}
+            {kicker}
           </span>
           <span className='text-[11px] font-medium text-[#faf8f4]/60'>
             {pageLabel}
@@ -76,10 +86,10 @@ function CarouselSlide({
 
         <div className='mt-auto'>
           <h3 className='m-0 text-[19px] font-bold leading-[1.35] tracking-[-0.2px]'>
-            {slide.headline}
+            {headline}
           </h3>
           <p className='mt-2 line-clamp-2 max-w-[322px] text-[12px] font-medium leading-[1.65] text-[#faf8f4]/95'>
-            {slide.body}
+            {body}
           </p>
 
           {slide.schools && slide.schools.length > 0 ? (

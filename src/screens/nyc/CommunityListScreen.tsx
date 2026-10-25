@@ -15,7 +15,10 @@ import { BottomSheet, BottomSheetSelect, LoadingState, PullToRefresh } from '@co
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
-import { fetchCommunityPosts } from '@lib/community/client'
+import {
+  fetchCommunityPosts,
+  localizeCommunityError,
+} from '@lib/community/client'
 import {
   CITY_IDS,
   cityLoginPath,
@@ -25,7 +28,6 @@ import {
 } from '@lib/constants/cities'
 import { VERIFIED_SCHOOLS } from '@lib/constants/schools'
 import {
-  getIdentityVerifyCtaLabel,
   getIdentityVerifyHref,
   isAccountSuspended,
   isIdentityVerified,
@@ -45,11 +47,12 @@ import {
 import {
   FOOD_CATEGORIES,
   FOOD_CUISINES,
+  getFoodCuisineLabel,
   normalizeFoodCuisine,
   type FoodCuisineId,
 } from '@lib/community/food'
 import {
-  getCommunityBoardMeta,
+  communityBoardKey,
   isAnonymousBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
@@ -60,8 +63,10 @@ import {
   matchesEmployerFilter,
   STATUS_EMPLOYER_OPTIONS,
   STATUS_EMPLOYER_OTHER_VALUE,
+  translateStatusEmployerOption,
   type EmployerFilter,
 } from '@lib/constants/statusEmployer'
+import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import type { CommunityPost, FoodCategoryId } from '@/types/nyc'
 import {
@@ -81,13 +86,18 @@ const FoodPostsMap = dynamic(
   () => import('@widgets/nyc/FoodPostsMap').then((mod) => mod.FoodPostsMap),
   {
     ssr: false,
-    loading: () => (
-      <div className='flex h-full items-center justify-center bg-[#e8eaee]'>
-        <LoadingState label='지도를 불러오는 중…' />
-      </div>
-    ),
+    loading: () => <FoodPostsMapLoading />,
   }
 )
+
+function FoodPostsMapLoading() {
+  const t = useT('community')
+  return (
+    <div className='flex h-full items-center justify-center bg-[#e8eaee]'>
+      <LoadingState label={t('list.mapLoading')} />
+    </div>
+  )
+}
 
 type SortOption = 'newest' | 'oldest'
 type FoodViewMode = 'list' | 'map'
@@ -109,6 +119,8 @@ function FoodCategoryStickyBar({
   foodCuisine: FoodCuisineId | 'all'
   setFoodCuisine: Dispatch<SetStateAction<FoodCuisineId | 'all'>>
 }) {
+  const t = useT('community')
+  const tFood = useT('food')
   const sentinelRef = useRef<HTMLDivElement>(null)
   const barRef = useRef<HTMLDivElement>(null)
   const [stuck, setStuck] = useState(false)
@@ -164,11 +176,11 @@ function FoodCategoryStickyBar({
   const chips = (
     <div className='space-y-2'>
       <ChipScrollRow
-        ariaLabel='맛집 분위기'
+        ariaLabel={t('list.foodVibeAria')}
         edgeColor='#ffffff'
         leading={
           <BoardQuickChip
-            label='전체'
+            label={t('list.all')}
             active={foodCategory === 'all'}
             onClick={() => setFoodCategory('all')}
           />
@@ -177,7 +189,7 @@ function FoodCategoryStickyBar({
         {FOOD_CATEGORIES.map((cat) => (
           <BoardQuickChip
             key={cat.id}
-            label={cat.label}
+            label={tFood(`categories.${cat.id}`)}
             active={foodCategory === cat.id}
             onClick={() => setFoodCategory(cat.id)}
             icon={<FoodCategoryIcon categoryId={cat.id} className='size-3.5' />}
@@ -185,11 +197,11 @@ function FoodCategoryStickyBar({
         ))}
       </ChipScrollRow>
       <ChipScrollRow
-        ariaLabel='음식 종류'
+        ariaLabel={t('list.cuisineAria')}
         edgeColor='#ffffff'
         leading={
           <BoardQuickChip
-            label='음식 전체'
+            label={t('list.allCuisines')}
             active={foodCuisine === 'all'}
             onClick={() => setFoodCuisine('all')}
           />
@@ -198,7 +210,7 @@ function FoodCategoryStickyBar({
         {FOOD_CUISINES.map((cuisine) => (
           <BoardQuickChip
             key={cuisine.id}
-            label={cuisine.label}
+            label={getFoodCuisineLabel(cuisine.id, tFood) ?? cuisine.label}
             active={foodCuisine === cuisine.id}
             onClick={() => setFoodCuisine(cuisine.id)}
           />
@@ -238,7 +250,8 @@ export function CommunityListScreen({ boardId, title }: CommunityListScreenProps
 function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) {
   const city = useCity()
   const href = useCityPath()
-  const meta = getCommunityBoardMeta(boardId, city)
+  const t = useT('community')
+  const tRoot = useT()
   const { user, profile, loading: authLoading } = useAuth()
   const { error: toastError } = useToast()
   const [posts, setPosts] = useState<CommunityPost[]>([])
@@ -307,7 +320,10 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
         setPosts(data)
         setError(null)
       } catch (err) {
-        const msg = getErrorMessage(err, '목록을 불러오지 못했어요')
+        const msg = getErrorMessage(
+          localizeCommunityError(err, t),
+          t('list.loadFailed'),
+        )
         setError(msg)
         if (!opts?.silent) toastError(msg)
         throw err
@@ -315,7 +331,7 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
         setLoading(false)
       }
     },
-    [boardId, city, toastError]
+    [boardId, city, t, toastError]
   )
 
   useEffect(() => {
@@ -489,7 +505,8 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
   const identityVerified = isIdentityVerified(profile)
   const suspended = isAccountSuspended(profile)
   const canWrite = Boolean(user) && identityVerified && !suspended
-  const verifyCta = getIdentityVerifyCtaLabel()
+  const verifyCta = t('verify.cta')
+  const writeLabel = t(communityBoardKey(boardId, 'writeLabel'))
   const postHref = !user
     ? loginNext
     : suspended
@@ -498,44 +515,48 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
         ? newPath
         : getIdentityVerifyHref(newPath)
   const writeCtaLabel = !user
-    ? '로그인'
+    ? t('list.login')
     : suspended
-      ? '이용 정지'
+      ? t('list.suspended')
       : identityVerified
-        ? meta.writeLabel
+        ? writeLabel
         : verifyCta
   const showWriteCta = !authLoading && Boolean(user) && !suspended
 
   const listSection = (
     <section className={cn('pt-4 sm:pt-5', isFoodBoard ? 'pb-20 sm:pb-24' : 'pb-14 sm:pb-16')}>
-      {loading && <LoadingState className='py-20' label='글을 불러오는 중이에요…' />}
+      {loading && <LoadingState className='py-20' label={t('detail.loading')} />}
 
       {!loading && error && (
         <EmptyState
-          title='목록을 불러오지 못했어요'
+          title={t('list.loadFailed')}
           description={error}
           actionHref={href(`/${boardId}`)}
-          actionLabel='다시 시도'
+          actionLabel={t('list.retry')}
         />
       )}
 
       {!loading && !error && filteredPosts.length === 0 && (
         <EmptyState
-          title={posts.length === 0 ? `아직 ${title} 글이 없습니다` : '조건에 맞는 글이 없어요'}
+          title={
+            posts.length === 0
+              ? t('list.emptyTitle', { board: title })
+              : t('list.noMatchTitle')
+          }
           description={
             posts.length === 0
               ? canWrite
-                ? '첫 글을 올려 커뮤니티를 시작해 보세요.'
+                ? t('list.emptyCanWrite')
                 : user
-                  ? '학생 또는 직장인 인증 후 글을 올릴 수 있어요.'
-                  : '로그인 후 글을 올릴 수 있어요.'
+                  ? t('list.emptyNeedsVerify')
+                  : t('list.emptyNeedsLogin')
               : isFoodBoard
-                ? '다른 분위기 · 음식 종류를 선택해 보세요.'
+                ? t('list.noMatchFood')
                 : isCptOptBoard
-                  ? '다른 유형(CPT/OPT/STEM OPT)을 선택해 보세요.'
+                  ? t('list.noMatchCptOpt')
                   : isJobReviewBoard
-                    ? '다른 유형이나 회사를 선택해 보세요.'
-                    : '필터를 바꿔 다시 찾아 보세요.'
+                    ? t('list.noMatchJobReview')
+                    : t('list.noMatchDefault')
           }
           actionHref={posts.length === 0 ? postHref : undefined}
           actionLabel={posts.length === 0 ? writeCtaLabel : undefined}
@@ -562,9 +583,11 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
     <BoardPageShell width={isFoodBoard ? 'wide' : 'narrow'}>
       <BoardListToolbar
         breadcrumbLabel={title}
-        intro={meta.listIntro}
+        intro={t(communityBoardKey(boardId, 'listIntro'), {
+          city: getCity(city).name,
+        })}
         writeHref={postHref}
-        writeLabel={identityVerified ? meta.writeLabel : verifyCta}
+        writeLabel={identityVerified ? writeLabel : verifyCta}
         showWrite={showWriteCta}
         showFilter={!isFoodBoard}
         onFilterClick={isFoodBoard ? undefined : openFilters}
@@ -586,14 +609,14 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
         <section className='relative mt-3 pb-[5.5rem]'>
           {loading ? (
             <div className='flex h-[min(70vh,calc(100dvh-14rem))] items-center justify-center rounded-2xl bg-[#e8eaee]'>
-              <LoadingState label='글을 불러오는 중이에요…' />
+              <LoadingState label={t('detail.loading')} />
             </div>
           ) : error ? (
             <EmptyState
-              title='목록을 불러오지 못했어요'
+              title={t('list.loadFailed')}
               description={error}
               actionHref={href(`/${boardId}`)}
-              actionLabel='다시 시도'
+              actionLabel={t('list.retry')}
             />
           ) : (
             <FoodPostsMap
@@ -621,17 +644,17 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
             disabled={mapFabHidden}
             onClick={() => setViewMode((mode) => (mode === 'list' ? 'map' : 'list'))}
             className='pointer-events-auto inline-flex h-12 items-center gap-2 rounded-full bg-white px-5 text-[14px] font-semibold text-[var(--foreground)] shadow-[0_4px_6px_rgba(15,23,42,0.06),0_12px_28px_rgba(15,23,42,0.14)] ring-1 ring-black/[0.06] touch-manipulation transition hover:bg-[#fafbfc] active:scale-[0.98] disabled:pointer-events-none'
-            aria-label={viewMode === 'list' ? '지도로 보기' : '리스트로 보기'}
+            aria-label={viewMode === 'list' ? t('list.showMap') : t('list.showList')}
           >
             {viewMode === 'list' ? (
               <>
                 <MapIcon className='size-4 text-[var(--brand)]' />
-                지도
+                {t('list.map')}
               </>
             ) : (
               <>
                 <ListIcon className='size-4 text-[var(--brand)]' />
-                리스트
+                {t('list.list')}
               </>
             )}
           </button>
@@ -642,7 +665,7 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
         <BottomSheet
           open={filtersOpen}
           onClose={() => setFiltersOpen(false)}
-          title='필터'
+          title={t('toolbar.filter')}
           footer={
             <div className='flex items-center justify-between gap-3 px-5 py-4'>
               <button
@@ -650,14 +673,14 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
                 onClick={clearFilters}
                 className='text-[14px] font-semibold text-[var(--foreground)] underline underline-offset-2 touch-manipulation'
               >
-                전체 해제
+                {t('list.clearAll')}
               </button>
               <button
                 type='button'
                 onClick={applyFilters}
                 className='inline-flex h-11 min-w-[140px] items-center justify-center rounded-full bg-[var(--foreground)] px-5 text-[14px] font-semibold text-white touch-manipulation hover:bg-[var(--navy-light)]'
               >
-                적용하기
+                {t('list.apply')}
               </button>
             </div>
           }
@@ -666,23 +689,23 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
             {isCptOptBoard ? (
               <>
                 <FilterChipSection
-                  title='유형'
-                  ariaLabel='CPT OPT 유형'
+                  title={t('list.filterType')}
+                  ariaLabel={t('list.cptOptTypeAria')}
                   options={[
-                    { id: 'all', label: '전체' },
+                    { id: 'all', label: t('list.all') },
                     ...CPT_OPT_TYPES.map((item) => ({
                       id: item.id,
-                      label: item.label,
+                      label: tRoot(`reviews.cptOpt.types.${item.id}.label`),
                     })),
                   ]}
                   value={draftCptOptType}
                   onChange={setDraftCptOptType}
                 />
                 <FilterChipSection
-                  title='도시'
-                  ariaLabel='도시'
+                  title={t('list.filterCity')}
+                  ariaLabel={t('list.filterCity')}
                   options={[
-                    { id: 'all', label: '전체' },
+                    { id: 'all', label: t('list.all') },
                     ...CITY_IDS.map((id) => ({
                       id,
                       label: getCity(id).shortLabel,
@@ -692,10 +715,10 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
                   onChange={setDraftStatusCity}
                 />
                 <FilterChipSection
-                  title='학교'
-                  ariaLabel='학교'
+                  title={t('list.filterSchool')}
+                  ariaLabel={t('list.filterSchool')}
                   options={[
-                    { id: 'all', label: '전체' },
+                    { id: 'all', label: t('list.all') },
                     ...VERIFIED_SCHOOLS.map((school) => ({
                       id: school.id,
                       label: school.shortName,
@@ -710,13 +733,13 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
             {isJobReviewBoard ? (
               <>
                 <FilterChipSection
-                  title='유형'
-                  ariaLabel='면접·취업 유형'
+                  title={t('list.filterType')}
+                  ariaLabel={t('list.jobReviewTypeAria')}
                   options={[
-                    { id: 'all', label: '전체' },
+                    { id: 'all', label: t('list.all') },
                     ...JOB_REVIEW_TYPES.map((item) => ({
                       id: item.id,
-                      label: item.label,
+                      label: tRoot(`reviews.jobReview.types.${item.id}.label`),
                     })),
                   ]}
                   value={draftJobReviewType}
@@ -730,26 +753,30 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
             ) : null}
 
             <section>
-              <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>검색</h4>
+              <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>
+                {t('list.search')}
+              </h4>
               <input
                 value={draftQuery}
                 onChange={(e) => setDraftQuery(e.target.value)}
-                placeholder='제목, 내용, 지역으로 검색'
+                placeholder={t('list.searchPlaceholder')}
                 className='mt-2 h-11 w-full rounded-xl border border-black/[0.08] bg-[#fafbfc] px-3.5 text-[15px] outline-none transition placeholder:text-[var(--muted)] focus:border-black/20 focus:bg-white'
               />
             </section>
 
             <section>
-              <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>정렬</h4>
+              <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>
+                {t('list.sort')}
+              </h4>
               <div className='mt-2 grid grid-cols-2 gap-2'>
                 {(isCptOptBoard || isJobReviewBoard
                   ? ([
-                      { id: 'newest', label: '최근 업데이트순' },
-                      { id: 'oldest', label: '오래된 업데이트순' },
+                      { id: 'newest', label: t('list.sortRecentlyUpdated') },
+                      { id: 'oldest', label: t('list.sortLeastRecentlyUpdated') },
                     ] as const)
                   : ([
-                      { id: 'newest', label: '최신순' },
-                      { id: 'oldest', label: '오래된순' },
+                      { id: 'newest', label: t('list.sortNewest') },
+                      { id: 'oldest', label: t('list.sortOldest') },
                     ] as const)
                 ).map((option) => {
                   const active = draftSort === option.id
@@ -793,26 +820,33 @@ function EmployerFilterSection({
   value: EmployerFilter
   onChange: (next: EmployerFilter) => void
 }) {
+  const t = useT('community')
+  const tRoot = useT()
   const categoryOptions = STATUS_EMPLOYER_OPTIONS.filter(
     (option) => option.value !== STATUS_EMPLOYER_OTHER_VALUE
-  )
+  ).map((option) => ({
+    ...option,
+    label: translateStatusEmployerOption(tRoot, option.value),
+  }))
 
   return (
     <section>
-      <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>회사</h4>
-      <div className='mt-2 flex flex-wrap gap-1.5' aria-label='회사 필터'>
+      <h4 className='text-[14px] font-semibold text-[var(--foreground)]'>
+        {t('list.company')}
+      </h4>
+      <div className='mt-2 flex flex-wrap gap-1.5' aria-label={t('list.companyFilterAria')}>
         <BoardQuickChip
-          label='전체'
+          label={t('list.all')}
           active={value.mode === 'all'}
           onClick={() => onChange(EMPTY_EMPLOYER_FILTER)}
         />
         <BoardQuickChip
-          label='회사명'
+          label={t('list.companyName')}
           active={value.mode === 'name'}
           onClick={() => onChange({ mode: 'name', name: value.name, category: '' })}
         />
         <BoardQuickChip
-          label='회사 카테고리'
+          label={t('list.companyCategory')}
           active={value.mode === 'category'}
           onClick={() => onChange({ mode: 'category', name: '', category: value.category })}
         />
@@ -821,19 +855,19 @@ function EmployerFilterSection({
         <input
           value={value.name}
           onChange={(e) => onChange({ ...value, mode: 'name', name: e.target.value })}
-          placeholder='회사명으로 검색'
+          placeholder={t('list.companyNamePlaceholder')}
           className='mt-2 h-11 w-full rounded-xl border border-black/[0.08] bg-[#fafbfc] px-3.5 text-[15px] outline-none transition placeholder:text-[var(--muted)] focus:border-black/20 focus:bg-white'
         />
       ) : null}
       {value.mode === 'category' ? (
         <div className='mt-2'>
           <BottomSheetSelect
-            title='회사 카테고리'
+            title={t('list.companyCategory')}
             value={value.category}
             options={categoryOptions}
             onChange={(category) => onChange({ mode: 'category', name: '', category })}
-            placeholder='카테고리를 선택해 주세요'
-            emptyOption={{ value: '', label: '선택 안 함' }}
+            placeholder={t('list.companyCategoryPlaceholder')}
+            emptyOption={{ value: '', label: t('list.none') }}
             overlayClassName='z-[10060]'
           />
         </div>

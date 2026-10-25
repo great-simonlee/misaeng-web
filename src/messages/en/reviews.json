@@ -1,0 +1,695 @@
+{
+  "activity": {
+    "updated": "Updated {time}",
+    "posted": "Posted {time}",
+    "firstPosted": "First posted {time}"
+  },
+  "cptOpt": {
+    "types": {
+      "cpt": {
+        "label": "CPT",
+        "description": "Work permission while you're in school",
+        "summary": "Apply through OGS and get a new I-20"
+      },
+      "opt": {
+        "label": "OPT",
+        "description": "1 year of work permission after graduation",
+        "summary": "OGS recommendation, then USCIS I-765 and your EAD"
+      },
+      "stem-opt": {
+        "label": "STEM OPT",
+        "description": "STEM OPT extension",
+        "summary": "I-983 and OGS review, then SEVP validation reports"
+      },
+      "visa": {
+        "label": "Visa",
+        "description": "F-1, H-1B, O-1 and more",
+        "summary": "From paperwork and interview to approval"
+      },
+      "green-card": {
+        "label": "Green card",
+        "description": "Employment, marriage and other paths",
+        "summary": "Petition, interview, approval and getting your card"
+      }
+    },
+    "fields": {
+      "prepared": {
+        "label": "What you prepared",
+        "shortLabel": "Prepared",
+        "hint": "Documents you gathered and requirements you checked"
+      },
+      "submitted": {
+        "label": "How you submitted",
+        "shortLabel": "Submitted",
+        "hint": "Where and how you sent it in"
+      },
+      "resultReceived": {
+        "label": "How you got the result",
+        "shortLabel": "Result",
+        "hint": "Email, mail, portal: how it arrived and what it said"
+      },
+      "nextStep": {
+        "label": "What's next",
+        "shortLabel": "Next step",
+        "hint": "What you still need to do or are waiting on"
+      }
+    },
+    "placeholders": {
+      "cpt": {
+        "prepared": "e.g. Finished the CPT module, offer letter, OGS checklist",
+        "submitted": "e.g. Uploaded the CPT form and offer letter to the OGS portal",
+        "resultReceived": "e.g. Got the new I-20 PDF by school email",
+        "nextStep": "e.g. Print and sign the I-20, line up the start date"
+      },
+      "opt": {
+        "prepared": "e.g. OGS OPT workshop, I-765, passport photos, proof of graduation",
+        "submitted": "e.g. Filed the I-765 online with USCIS after OGS recommendation, paid the fee",
+        "resultReceived": "e.g. EAD card arrived by mail, approval showed in my account",
+        "nextStep": "e.g. Put the EAD expiration and STEM extension requirements on my calendar"
+      },
+      "stem-opt": {
+        "prepared": "e.g. I-983, company info, contacted OGS/DSO",
+        "submitted": "e.g. Filed the STEM OPT extension after OGS review",
+        "resultReceived": "e.g. Got the I-797 approval notice by email/mail",
+        "nextStep": "e.g. Schedule the 6/12/18-month validation reports"
+      },
+      "visa": {
+        "prepared": "e.g. DS-160, financial documents, practiced interview questions",
+        "submitted": "e.g. Booked the embassy interview and submitted documents",
+        "resultReceived": "e.g. Visa approved, got my passport back",
+        "nextStep": "e.g. Enter the US, check I-94, register with SEVIS/school"
+      },
+      "green-card": {
+        "prepared": "e.g. I-140/I-485 paperwork, medical exam, lawyer meeting",
+        "submitted": "e.g. Filed the USCIS petition online/by mail, attended the interview",
+        "resultReceived": "e.g. Approval notice, then the green card arrived by mail",
+        "nextStep": "e.g. Confirm the card, check re-entry and renewal dates"
+      }
+    },
+    "quickSteps": {
+      "cpt": {
+        "module": {
+          "label": "Finished CPT module",
+          "prepared": "Completed the CPT module (orientation)",
+          "nextStep": "Wait for the offer letter, check the checklist"
+        },
+        "offerLetter": {
+          "label": "Got job offer letter",
+          "prepared": "Received the job offer letter",
+          "nextStep": "Fill out the OGS CPT application"
+        },
+        "apply": {
+          "label": "Submitted CPT application",
+          "prepared": "Offer letter, CPT application",
+          "submitted": "Submitted the application on the OGS portal",
+          "nextStep": "Wait for the new I-20"
+        },
+        "newI20": {
+          "label": "Got new I-20",
+          "resultReceived": "Got the new I-20 by email",
+          "nextStep": "Sign it and start work"
+        }
+      },
+      "opt": {
+        "recommendation": {
+          "label": "OGS recommendation",
+          "prepared": "Checked OPT documents and graduation requirements",
+          "submitted": "Requested the OPT recommendation from OGS",
+          "nextStep": "Get ready to file the I-765"
+        },
+        "i765": {
+          "label": "Filed I-765",
+          "prepared": "I-765, photos, fee",
+          "submitted": "Filed online with USCIS",
+          "nextStep": "Check the case status regularly"
+        },
+        "ead": {
+          "label": "Got EAD",
+          "resultReceived": "EAD card arrived by mail",
+          "nextStep": "Start work, check STEM extension requirements"
+        }
+      },
+      "stem-opt": {
+        "i983": {
+          "label": "Submitted I-983",
+          "prepared": "I-983, company info",
+          "submitted": "Submitted the I-983 to OGS",
+          "nextStep": "Check approval and validation report dates"
+        },
+        "approved": {
+          "label": "Extension approved",
+          "resultReceived": "STEM OPT extension approved",
+          "nextStep": "Set reminders for report deadlines"
+        }
+      },
+      "visa": {
+        "interview": {
+          "label": "Booked interview",
+          "prepared": "DS-160, document packet",
+          "submitted": "Booked the embassy interview",
+          "nextStep": "Prep for the interview, final document check"
+        },
+        "approved": {
+          "label": "Visa approved",
+          "resultReceived": "Visa approved, got my passport back",
+          "nextStep": "Enter the US, register with school/employer"
+        }
+      },
+      "green-card": {
+        "petition": {
+          "label": "Filed petition",
+          "prepared": "Petition document package",
+          "submitted": "Filed the petition with USCIS",
+          "nextStep": "Wait for the receipt and interview date"
+        },
+        "card": {
+          "label": "Got card",
+          "resultReceived": "Received the green card",
+          "nextStep": "Check renewal and re-entry documents"
+        }
+      }
+    },
+    "detail": {
+      "authorTitle": "This is an ongoing record",
+      "authorBody": "When there's a new date, just add one entry on the update screen. Once you save, your post moves to the top of the list.",
+      "addEntry": "Add new entry",
+      "timelineTitle_other": "{count} progress entries",
+      "tipsTitle": "Watch out for",
+      "timelineTitle_one": "{count} progress entry"
+    },
+    "write": {
+      "errors": {
+        "typeRequired": "Choose a type: CPT, OPT, STEM OPT, Visa or Green card",
+        "tipsEmptyEdit": "\"Watch out for\" is empty. Please check it in post details",
+        "tipsRequired": "Please fill in \"Watch out for\"",
+        "tipsTooLong": "Keep \"Watch out for\" under {max} characters",
+        "timelineRequiredEdit": "Please keep at least 1 progress entry",
+        "timelineRequired": "Please add at least 1 progress entry (date + details)"
+      },
+      "updated": "Your progress is updated. It's now at the top of the list",
+      "created": "Your review is posted. You can keep adding progress later",
+      "moreSettingsTitle": "Edit post details",
+      "moreSettingsHint": "Open this only if you want to change the title, place or \"Watch out for\"",
+      "tipsTitle": "Watch out for",
+      "tipsDescription": "Tips you really want the next person to know so they don't make the same mistakes",
+      "tipsPlaceholder": "e.g. Send your documents to OGS 2–3 weeks before your start date. Every school's portal is different, so check the OGS checklist first.",
+      "updateSubmit": "Update progress",
+      "typeSection": "What type is it?",
+      "basicSection": "Basic info",
+      "basicSectionDescription": "Add a title and the company or organization",
+      "timelineSection": "Progress",
+      "createFootnote": "You can keep adding and editing progress after you post.",
+      "createIntro": "Pick a type and log your progress by date. You can keep adding after you post.",
+      "updateEyebrow": "Progress update",
+      "updateTitle": "Add a new progress entry"
+    },
+    "timeline": {
+      "editingDescription": "Edit Prepared, Submitted, Result or Next step, then tap \"Done editing\".",
+      "stageReviewHint": "Share what happened that day: wait times, tips, mistakes, anything.",
+      "stageReviewPlaceholder": "e.g. The OGS portal upload kept failing, so I compressed the PDF and tried again. Matching the offer letter date took a day."
+    }
+  },
+  "jobReview": {
+    "types": {
+      "intern": {
+        "label": "Internship",
+        "description": "Summer / Winter / semester",
+        "summary": "From application to interviews to offer"
+      },
+      "new-grad": {
+        "label": "New grad",
+        "description": "Full-time after graduation",
+        "summary": "Campus recruiting and online applications"
+      },
+      "experienced": {
+        "label": "Experienced",
+        "description": "Mid / Senior hiring",
+        "summary": "From recruiter outreach to multi-round interviews"
+      },
+      "job-change": {
+        "label": "Job change",
+        "description": "Switching jobs, employed or between jobs",
+        "summary": "Applying while working, through offer negotiation"
+      },
+      "contract": {
+        "label": "Contract",
+        "description": "Contract · Freelance",
+        "summary": "Short-term and project-based hiring"
+      }
+    },
+    "fields": {
+      "stageLabel": {
+        "label": "Which stage",
+        "shortLabel": "Stage",
+        "hint": "Application, Phone, Onsite, Offer, etc."
+      },
+      "platform": {
+        "label": "Where you applied",
+        "shortLabel": "Platform",
+        "hint": "LinkedIn, Handshake, Referral, company careers page"
+      },
+      "documentsSubmitted": {
+        "label": "What you submitted",
+        "shortLabel": "Documents",
+        "hint": "Resume, Cover letter, Portfolio, Transcript"
+      },
+      "interviewRound": {
+        "label": "Which interview round",
+        "shortLabel": "Interview",
+        "hint": "1st Recruiter, 2nd Tech, Panel, HM, etc.",
+        "guide": "Interview notes: besides the round, share what you were asked and how you answered. Specific questions and answers you remember really help the next person."
+      },
+      "outcome": {
+        "label": "How it went",
+        "shortLabel": "Result",
+        "hint": "Pass, Reject, Pending, Offer, etc."
+      }
+    },
+    "placeholders": {
+      "intern": {
+        "stageLabel": "e.g. Phone Screen",
+        "platform": "e.g. Handshake → company careers page",
+        "documentsSubmitted": "e.g. Resume, Transcript, Cover letter",
+        "interviewRound": "e.g. 1st Recruiter screen. Q: Why this intern role? → I said I'd tried ~ in class and wanted to do more.",
+        "outcome": "e.g. Pass → next round scheduled"
+      },
+      "new-grad": {
+        "stageLabel": "e.g. Application",
+        "platform": "e.g. LinkedIn Easy Apply",
+        "documentsSubmitted": "e.g. Resume PDF, GitHub link",
+        "interviewRound": "e.g. 2nd Tech. Q. Where did you get stuck on a recent project? A. … here's how I answered.",
+        "outcome": "e.g. Reject (email 2 weeks later)"
+      },
+      "experienced": {
+        "stageLabel": "e.g. Recruiter reach-out",
+        "platform": "e.g. LinkedIn InMail",
+        "documentsSubmitted": "e.g. Updated resume",
+        "interviewRound": "e.g. HM 1:1. Q. Why this role? A. Because the team is heading toward ~ …",
+        "outcome": "e.g. Onsite invite"
+      },
+      "job-change": {
+        "stageLabel": "e.g. Recruiter screen",
+        "platform": "e.g. LinkedIn / Referral",
+        "documentsSubmitted": "e.g. Resume, LinkedIn",
+        "interviewRound": "e.g. 2nd HM + Team. Q. How do you handle conflict? A. …",
+        "outcome": "e.g. Offer · salary negotiation"
+      },
+      "contract": {
+        "stageLabel": "e.g. Agency application",
+        "platform": "e.g. Recruiter referral",
+        "documentsSubmitted": "e.g. Resume, rate card",
+        "interviewRound": "e.g. Client intro. Q. When can you start? A. In 2 weeks.",
+        "outcome": "e.g. Contract offer"
+      }
+    },
+    "quickSteps": {
+      "intern": {
+        "apply": {
+          "label": "Applied",
+          "stageLabel": "Application",
+          "platform": "Handshake / LinkedIn",
+          "documentsSubmitted": "Resume, Transcript"
+        },
+        "interview": {
+          "label": "Interview",
+          "stageLabel": "Technical Interview",
+          "interviewRound": "1st Tech"
+        },
+        "offer": {
+          "label": "Offer",
+          "stageLabel": "Offer",
+          "outcome": "Offer received"
+        }
+      },
+      "new-grad": {
+        "apply": {
+          "label": "Applied",
+          "stageLabel": "Application",
+          "platform": "Company careers portal",
+          "documentsSubmitted": "Resume, Cover letter"
+        },
+        "phone": {
+          "label": "Phone",
+          "stageLabel": "Phone Screen",
+          "interviewRound": "1st HR"
+        },
+        "onsite": {
+          "label": "Onsite",
+          "stageLabel": "Onsite / Virtual onsite",
+          "interviewRound": "Final round"
+        }
+      },
+      "experienced": {
+        "recruiter": {
+          "label": "Recruiter",
+          "stageLabel": "Recruiter screen",
+          "platform": "LinkedIn InMail"
+        },
+        "hm": {
+          "label": "HM",
+          "stageLabel": "Hiring Manager",
+          "interviewRound": "HM 1:1"
+        },
+        "panel": {
+          "label": "Panel",
+          "stageLabel": "Panel interview",
+          "interviewRound": "Team panel"
+        }
+      },
+      "job-change": {
+        "apply": {
+          "label": "Applied",
+          "stageLabel": "Application",
+          "platform": "LinkedIn / Referral",
+          "documentsSubmitted": "Resume"
+        },
+        "interview": {
+          "label": "Interview",
+          "stageLabel": "Hiring Manager",
+          "interviewRound": "HM + Team"
+        },
+        "offer": {
+          "label": "Offer",
+          "stageLabel": "Offer · Negotiation",
+          "outcome": "Offer received"
+        }
+      },
+      "contract": {
+        "documents": {
+          "label": "Documents",
+          "stageLabel": "Documents submitted",
+          "documentsSubmitted": "Resume"
+        },
+        "client": {
+          "label": "Client",
+          "stageLabel": "Client interview",
+          "interviewRound": "Intro call"
+        }
+      }
+    },
+    "sources": {
+      "misaeng": {
+        "label": "Through {brand}",
+        "description": "I saw the {brand} site or social media"
+      },
+      "student-org": {
+        "label": "Through a student group",
+        "description": "A student group at my school reached out"
+      },
+      "referral": {
+        "label": "Through someone I know",
+        "description": "Someone I know introduced me"
+      },
+      "other": {
+        "label": "Other",
+        "description": "Some other way"
+      }
+    },
+    "sourcePicker": {
+      "orgQuestion": "Which student group?"
+    },
+    "outcomes": {
+      "offer": {
+        "label": "Got an offer",
+        "description": "I passed and got an offer"
+      },
+      "rejected": {
+        "label": "Rejected",
+        "description": "I didn't pass, midway or at the end"
+      },
+      "in-progress": {
+        "label": "In progress",
+        "description": "I'm still waiting on the result"
+      },
+      "withdrew": {
+        "label": "Withdrew",
+        "description": "I stopped the process myself"
+      }
+    },
+    "detail": {
+      "authorTitle": "This is an ongoing hiring record",
+      "authorBody": "When there's a new stage, just add one entry on the update screen. Once you save, your post moves to the top of the list.",
+      "addEntry": "Add new stage",
+      "timelineTitle_other": "{count} hiring stages",
+      "emptySection": "Hiring stages",
+      "emptyTitle": "No hiring stages yet",
+      "emptyBody": "Your progress by date, like applications, interviews and results, will stack up here as Step 1, Step 2 and so on.",
+      "emptyCta": "Add a hiring stage",
+      "tipsTitle": "For the next applicant",
+      "timelineTitle_one": "{count} hiring stage"
+    },
+    "timeline": {
+      "editingDescription": "Edit Stage, Platform, Documents, Interview or Result, then tap \"Done editing\".",
+      "stageReviewHint": "Share what you went through at this stage: questions, vibe, prep tips, feedback, anything.",
+      "stageReviewPlaceholder": "e.g. The phone screen was about 30 minutes, mostly a resume deep dive + behavioral questions.",
+      "autoCommitHint": "Once you add a date and details and move to the next field, the entry is added and saved automatically. No button needed."
+    },
+    "write": {
+      "errors": {
+        "typeRequired": "Choose a type: Internship, New grad, Experienced, Job change or Contract",
+        "tipsEmptyEdit": "\"Watch out for\" is empty. Please check it in post details",
+        "tipsRequired": "Please fill in \"Watch out for\"",
+        "tipsTooLong": "Keep \"Watch out for\" under {max} characters",
+        "timelineRequiredEdit": "Please keep at least 1 progress entry. Add a date and details, then tap \"Add this entry\"",
+        "timelineRequired": "Add at least 1 progress entry (date + details), then tap \"Add this entry\"",
+        "outcomeRequired": "Please choose the final result",
+        "orgRequired": "Please choose which student group connected you",
+        "sourceRequired": "Please choose how you got connected"
+      },
+      "updated": "Your progress is updated. It's now at the top of the list",
+      "created": "Your review is posted. You can keep adding progress later",
+      "moreSettingsTitle": "Edit post details",
+      "moreSettingsHint": "Open this only if you want to change the title, company or \"Watch out for\"",
+      "tipsTitle": "Watch out for",
+      "tipsDescription": "Tips you really want the next person to know so they don't make the same mistakes",
+      "tipsPlaceholder": "e.g. Look up the team's recent projects before your interview. LinkedIn referrals got a much better response rate than Handshake.",
+      "outcomeSection": "What was the final result?",
+      "outcomeEditHint": "If things change, update it here too",
+      "outcomeSectionDescription": "If it's still going, choose \"In progress\". You can change it later",
+      "sourceSection": "How did you get connected?",
+      "sourceSectionDescription": "Tell us how you came to write this review. Other people won't see this",
+      "selectSourceFirst": "Please choose how you got connected",
+      "updateSubmit": "Update progress",
+      "typeSection": "What type is it?",
+      "basicSection": "Basic info",
+      "basicSectionDescription": "Add a title and the company",
+      "timelineSection": "Progress",
+      "createFootnote": "You can keep adding and editing progress after you post.",
+      "createIntro": "Pick a type and log your progress by date. You can keep adding after you post.",
+      "updateEyebrow": "Progress update",
+      "updateTitle": "Add a new progress entry"
+    }
+  },
+  "detail": {
+    "noDate": "No date",
+    "stageReview": "Stage notes",
+    "views": "{views} views",
+    "accordionHint": "Tap a step to open or close it. Only one opens at a time.",
+    "editLabel": "Update"
+  },
+  "orientation": {
+    "defaultEyebrow": "Write a review",
+    "title": "Before you start",
+    "subtitleWithGuide": "Please read the writing guide and community guidelines, then agree.",
+    "subtitle": "Please read the community guidelines, then agree.",
+    "guideTitle": "Writing guide",
+    "communityTitle": "Community guidelines",
+    "saving": "Saving…",
+    "agree": "Agree and start writing",
+    "backToList": "Back to list",
+    "saveFailed": "We couldn't save your agreement. Please try again.",
+    "roommateEyebrow": "Roommates · Sublets",
+    "anonymousEyebrow": "Anonymous board",
+    "cptOpt": {
+      "step1": {
+        "title": "A review you log by date",
+        "body": "Log your CPT, OPT, STEM OPT, visa or green card progress one date at a time, so others can follow it step by step later."
+      },
+      "step2": {
+        "title": "Date → field → details",
+        "body": "In the form below, pick a date, choose only the fields you need (Prepared, Submitted, Result, Next step), then write the details."
+      },
+      "step3": {
+        "title": "\"Add this entry\" stacks it above",
+        "body": "When you're done, tap \"Add this entry\" and it moves to the list above the form. Keep going with the next date in the form below."
+      }
+    },
+    "jobReview": {
+      "step1": {
+        "title": "A review you log by date",
+        "body": "Log your internship, new grad, experienced, job change or contract hiring process one date at a time, so others can follow it from application to offer."
+      },
+      "step2": {
+        "title": "Date → field → details",
+        "body": "In the form below, pick a date, choose only the fields you need (Stage, Platform, Documents, Interview, Result), then write the details."
+      },
+      "step3": {
+        "title": "\"Add this entry\" stacks it above",
+        "body": "When you're done, tap \"Add this entry\" and it moves to the list above the form. Keep going with the next date in the form below."
+      }
+    }
+  },
+  "write": {
+    "notFound": "We couldn't find this post",
+    "noPermission": "You don't have permission to edit this",
+    "loadFailed": "We couldn't load the post",
+    "errors": {
+      "timelineIncomplete": "Please add both a date and details to the entry you're writing"
+    },
+    "saveFailed": "We couldn't save it",
+    "draftSaved": "Draft saved",
+    "draftSaveFailed": "We couldn't save your draft",
+    "checkingLogin": "Checking your login…",
+    "loadingPost": "Loading the post…",
+    "backToPost": "Back to post",
+    "boardList": "{board} list",
+    "collapse": "Close",
+    "expand": "Open",
+    "titleLabel": "Title",
+    "updating": "Updating…",
+    "updateFootnote": "Once you save, your post moves to the top of the list and everyone sees your latest progress.",
+    "timelineSectionDescription": "Add, edit or delete as many entries by date as you like",
+    "submitting": "Posting…",
+    "selectTypeFirst": "Please choose a type",
+    "submit": "Post review",
+    "backToList": "Back to list",
+    "createEyebrow": "New post",
+    "updateIntro": "Just add the date and details for now. Once you save, your post moves to the top of the list.",
+    "untitled": "Untitled",
+    "existingCount_other": "{count} entries so far",
+    "restoredAutosave": "We restored the edits you autosaved before submitting",
+    "draftEmpty": "There's nothing to save yet",
+    "existingCount_one": "{count} entry so far"
+  },
+  "timeline": {
+    "addedTitle_other": "{count} entries added",
+    "savedTitle_other": "{count} saved entries",
+    "savedDescription": "They stack above the form. Edit or delete to manage each date",
+    "editingSelected": "Edit selected entry",
+    "cancel": "Cancel",
+    "finishEdit": "Done editing",
+    "addEntry": "Add this entry",
+    "clearDraft": "Clear form",
+    "limitReached": "You've reached the entry limit. Delete an entry to add a new one.",
+    "updateGuide": {
+      "editingTitle": "Editing an existing entry",
+      "addTitle": "Add progress",
+      "addDescription": "Pick a new date, write the details, then tap \"Add this entry\". You can add several in a row."
+    },
+    "newEntry": "New progress entry",
+    "editHint": "Tap \"Done editing\" when you're finished",
+    "maxCanAdd": "You can add up to {max} entries",
+    "maxReached": "The limit is {max} entries",
+    "noDate": "No date",
+    "edit": "Edit",
+    "editing": "Editing",
+    "delete": "Delete",
+    "date": "Date",
+    "selectFields": "Choose what to log",
+    "selectFieldsHint": "Pick only what applies. You can choose more than one.",
+    "incompleteEmpty": "Add a date and either a selected field or stage notes",
+    "incompleteDate": "Please add both a date and details",
+    "quickInput": "Quick fill",
+    "removeField": "Remove",
+    "addedTitle_one": "{count} entry added",
+    "savedTitle_one": "{count} saved entry"
+  },
+  "guest": {
+    "signedIn": "You're logged in. Your review will go straight to this account",
+    "claimLinked": "You're signed up! The review you just wrote is now linked to your account",
+    "claimDone": "You're signed up",
+    "claimFailed": "We couldn't link your review",
+    "googleFailed": "Google login didn't work",
+    "errors": {
+      "nicknameLength": "Please enter a display nickname of {min}–{max} characters",
+      "nicknameTaken": "That nickname is taken. Please try another one",
+      "emailInvalid": "Please enter a valid email",
+      "linkedinInvalid": "Please check your LinkedIn profile URL (e.g. linkedin.com/in/your-name)",
+      "titleRequired": "Please enter a title",
+      "guidelinesRequired": "Please agree to the community guidelines"
+    },
+    "created": "Your review is posted. Thank you!",
+    "createFailed": "We couldn't post your review",
+    "backToList": "Interview & job reviews",
+    "checkingDraft": "Checking for your saved draft…",
+    "authorSection": "About you",
+    "authorSectionMember": "Your nickname is public. LinkedIn is only used to confirm where you work",
+    "authorSectionGuest": "Only your nickname is public. Your email and LinkedIn are seen only by our team and never posted",
+    "nicknameLabel": "Nickname",
+    "nicknameHint": "Shown on your post · Public",
+    "nicknamePlaceholder": "e.g. NYCWorker",
+    "emailLabel": "Email",
+    "emailHintMember": "Account email · Private",
+    "emailHintGuest": "For gift card and credit updates · Private",
+    "linkedinLabel": "LinkedIn profile URL",
+    "linkedinHint": "To confirm where you work · Private",
+    "coffeeChatLabel": "I'm open to coffee chat requests from people starting out",
+    "optional": "(optional)",
+    "coffeeChatHint": "Your contact info stays private even if you check this. When a request comes in, our team checks with you first before connecting you.",
+    "guidelinesAgree": "I've read the community guidelines above, and this review is based on my real experience.",
+    "submitGuest": "Post review without signing up",
+    "footnoteBefore": "No sign-up needed.",
+    "footnoteLink": "Sign up with Google and post",
+    "footnoteAfter": " to get credits in your account right away.",
+    "footnoteMember": "After posting, you can keep adding and editing progress from My posts.",
+    "choose": {
+      "eyebrow": "Share your experience",
+      "title": "You can post a review without signing up",
+      "intro": "Walk through each step, from application to interviews to results. It's a huge help to people preparing for the same path. It only takes 5 minutes.",
+      "recommended": "Recommended",
+      "googleTitle": "Sign up with Google and post",
+      "googlePitch1": "Credits go straight to your account",
+      "googlePitch2": "You can keep adding progress after you post",
+      "guestTitle": "Post without signing up",
+      "guestPitch1": "Just your nickname, email and LinkedIn URL",
+      "guestPitch2": "We'll hold your credits and add them automatically when you sign up later with the same email",
+      "guestCta": "Post a review without signing up"
+    },
+    "creditPitch": {
+      "title": "Earn credits for your review",
+      "perStep": "{perStep} credits per hiring stage (up to {max} per post)",
+      "perStepWithBonus": "{perStep} credits per hiring stage (up to {max} per post) · First post +{bonus}",
+      "review": "Detailed reviews get extra credits after the Misaeng team reviews them",
+      "coffeeChat": "Use your credits ({cost}) for a 1:1 coffee chat with people in your industry or company, or in other industries too",
+      "optionalSignup": "Signing up is optional. Once you sign up, you can use credits and receive coffee chat requests"
+    },
+    "hero": {
+      "memberEyebrow": "Post with my account",
+      "memberIntro": "Credits go to this account as soon as you post. You can also receive coffee chat requests.",
+      "guestIntro": "No sign-up needed. We'll hold your credits and add them automatically when you sign up later with the same email."
+    },
+    "preview": {
+      "count_other": "{count} hiring stages added so far",
+      "member": "You'll earn {credit} credits",
+      "memberWithBonus": "You'll earn {credit} credits (+{bonus} first post)",
+      "guest": "{credit} credits when you sign up",
+      "guestWithBonus": "{credit} credits when you sign up (+{bonus} first post)",
+      "count_one": "{count} hiring stage added so far"
+    },
+    "done": {
+      "eyebrow": "Posted",
+      "title": "Thank you for sharing your review",
+      "body_other": "\"{title}\" is now on the Interview & job reviews board. Its {count} hiring stages will help people coming after you.",
+      "awarded": "{credit} credits were added to your account",
+      "linked": "Your review is linked to your account",
+      "coffeeChat": "Use credits for coffee chats ({cost} credits) with people in your industry or company, or in other industries too.",
+      "pending": "Sign up and get {credit} credits right away",
+      "breakdown_other": "{count} hiring stages = {credit} credits. Sign up with the Google account that matches the email in your review, and it links automatically.",
+      "breakdownWithBonus_other": "{count} hiring stages = {credit} credits + {bonus} first post bonus. Sign up with the Google account that matches the email in your review, and it links automatically.",
+      "viewPost": "View my review",
+      "viewCredit": "View my credits",
+      "toList": "Back to list",
+      "optional": "Optional",
+      "signupTitle": "Sign up for {brand} to receive coffee chat requests from people starting out",
+      "signupPitch1": "The review you just wrote and {credit} credits link to your account right away",
+      "signupPitch2": "Use credits for 1:1 coffee chats with people in your industry or company, or in other industries",
+      "signupPitch3": "You can keep adding and editing your progress",
+      "emailMismatch": "Your account email is different from the one in your review, so we couldn't link them automatically. Our team will check your LinkedIn and email, then link it to your account.",
+      "skipNote": "Your review stays posted even if you don't sign up now.",
+      "skip": "Maybe later",
+      "body_one": "\"{title}\" is now on the Interview & job reviews board. Its {count} hiring stage will help people coming after you.",
+      "breakdown_one": "{count} hiring stage = {credit} credits. Sign up with the Google account that matches the email in your review, and it links automatically.",
+      "breakdownWithBonus_one": "{count} hiring stage = {credit} credits + {bonus} first post bonus. Sign up with the Google account that matches the email in your review, and it links automatically."
+    }
+  }
+}

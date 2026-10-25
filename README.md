@@ -48,9 +48,11 @@ npm run lint
 misaeng_temp_web/
 ├── src/
 │   ├── app/              # App Router (라우팅만) → screens만 import
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
+│   │   ├── (corporate)/  # 회사 페이지 루트 layout (영어)
+│   │   ├── (service)/[locale]/[city]/  # 도시 서비스 루트 layout (언어별)
+│   │   ├── api/
 │   │   └── globals.css
+│   ├── messages/          # 화면 문구 {locale}/{namespace}.json
 │   ├── screens/           # 화면 단위 (한 페이지/플로우) → widgets, components 사용
 │   ├── widgets/           # 복합 UI 블록 (Header, Card 등) → components 사용
 │   ├── components/        # 원자 UI (Button, Input 등)
@@ -71,6 +73,34 @@ misaeng_temp_web/
 **의존성 방향**: `app` → `screens` → `widgets` → `components` (상위만 하위 참조)
 
 - 경로 별칭: `@screens`, `@widgets`, `@components`, `@lib`, `@hooks`, `@types` (tsconfig 참고)
+
+## 브랜드(misaeng · ellieo)와 다국어
+
+한 코드베이스를 Vercel 프로젝트 두 개로 배포한다. 차이는 `src/lib/brand/index.ts` 한 곳에만 둔다.
+
+| | misaeng (misaeng.com) | ellieo |
+|---|---|---|
+| `NEXT_PUBLIC_BRAND` | `misaeng` (기본) | `ellieo` |
+| 회사 페이지 (`/about` 등) | 영어 | 없음 → misaeng.com으로 이동 |
+| 도시 서비스 (`/nyc/...`) | 한국어 기본 + 영어 | 영어 기본 + ko, vi, ja, zh-CN, zh-TW, id |
+| 검색 노출 언어 | ko | ko 제외 6개 |
+| 기타 | | 파란 테마, `/mobile-app` |
+
+- **URL**: 기본 언어는 접두사 없이 `/nyc/...`, 다른 언어는 `/vi/nyc/...`. `src/proxy.ts`가 rewrite·redirect하고,
+  canonical·hreflang을 HTTP `Link` 헤더로 붙인다 (한 언어는 한 도메인에서만 검색되게).
+- **화면 문구**: `src/messages/{locale}/{namespace}.json`. 클라이언트 `useT('ns')`, 서버 `getT(locale, 'ns')`,
+  API `getRequestT(request, 'api')` (`src/lib/i18n`). 한국어 조사는 `{brand|을/를}`처럼 쓴다.
+- **사용자 콘텐츠 번역**: 글·댓글·매물은 ellieo-erp Misaeng → Translations 탭에서 매일 claude.ai로 번역해
+  같은 Storage JSON에 저장한다 (`translations`, `sourceLocale`). 웹은 API 응답 직전에
+  `src/lib/translations/localize.server.ts`로 보는 언어로 바꾸고, 화면에 "원문 보기"(`TranslationNotice`)를 붙인다.
+  segment·해시 규칙은 ellieo-erp `src/app/util/contentTranslations.mjs`와 같아야 한다.
+- **약관·개인정보처리방침**: 영문이 기준. ko는 문서 안에, 다른 언어는 `src/lib/legal/translations/*.json`
+  (영어 문단 해시 → 번역). 영어를 고친 뒤 `node scripts/legal-translation-source.mjs <dir> <locale>`로
+  번역할 문단만 뽑아 다시 번역한다.
+- **선호 언어**: 프로필 `preferredLocale` (두 브랜드 공통 계정). 언어 메뉴·마이페이지·가입 후 프로필 설정에서 바꾼다.
+
+배포: `.github/workflows/vercel-preview.yml`이 브랜드별로 빌드한다. ellieo는 Secret `VERCEL_PROJECT_ID_ELLIEO`와
+Variable `APP_ENV_JSON_ELLIEO`(형식은 `APP_ENV_JSON`과 같고 `NEXT_PUBLIC_SITE_URL`에 ellieo 주소)를 넣으면 배포된다.
 
 ## 참고 자료
 
@@ -169,3 +199,13 @@ npm run release -- --release-as 1.0.0     # 버전을 직접 지정
 
 - Supabase 버킷 `avatars`는 public URL 조회가 가능해야 합니다.
 - Vercel 환경 변수는 `Production/Preview/Development` 모두 동일하게 맞춰 주세요.
+
+## App push notifications (misaeng-app)
+
+- Tables: run `supabase/push.sql` (push_devices, push_preferences, company_follows).
+- Env: `APNS_TEAM_ID` (K75A78VM5H); production key `APNS_KEY_ID` + `APNS_KEY`; sandbox key (Xcode builds)
+  `APNS_SANDBOX_KEY_ID` + `APNS_SANDBOX_KEY` (contents of the .p8 keys, `\n` for newlines; both keys are
+  topic-specific to com.misaeng.nyc); `APNS_BUNDLE_ID` (default `com.misaeng.nyc`); `INTERNAL_PUSH_SECRET` (shared with ellieo-erp).
+- Without the APNs env vars nothing is sent; everything else keeps working.
+- Sent from: comments (`api/community/[id]/comments`), credits (`lib/community/creditLedger.ts`), and
+  ellieo-erp via `POST /api/internal/push` (posting approved, admin credit awards).

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 
 import { useBodyScrollLock } from '@hooks/useBodyScrollLock'
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 type BottomSheetProps = {
   open: boolean
@@ -34,6 +35,7 @@ export function BottomSheet({
   scrollable = true,
   className,
 }: BottomSheetProps) {
+  const t = useT('common')
   useBodyScrollLock(open)
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export function BottomSheet({
     >
       <button
         type='button'
-        aria-label='닫기'
+        aria-label={t('actions.close')}
         className='absolute inset-0 touch-none bg-black/40 backdrop-blur-[2px] nyc-sheet-backdrop'
         onClick={onClose}
         onWheel={(e) => e.preventDefault()}
@@ -87,7 +89,7 @@ export function BottomSheet({
               onClick={onClose}
               className='shrink-0 px-1 py-1 text-[13px] font-medium leading-none text-[var(--muted)] touch-manipulation transition hover:text-[var(--foreground)]'
             >
-              닫기
+              {t('actions.close')}
             </button>
           </div>
         </div>

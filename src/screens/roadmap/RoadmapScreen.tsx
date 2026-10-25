@@ -3,17 +3,17 @@ import Link from 'next/link'
 
 /* ─── Single source of truth: roadmap data (update here for future edits) ─── */
 const ROADMAP = {
-  launchCity: { city: 'New York City', year: 2026 },
+  launchCity: { city: 'New York City', year: 'Live now' },
   nextMarkets: ['Boston', 'Chicago', 'LA'],
   trustSystem:
-    '.edu email verification, LinkedIn verification, and Verified agent and licensed professional standards.',
+    '.edu email verification, LinkedIn verification, and verified agents and licensed professional standards.',
   cityPhases: [
     {
       year: '2026',
       label: 'Launch & Prove',
       title: 'New York City',
       description:
-        'Full launch in New York City. We build density and trust first, then replicate our verified operations-first playbook in every new market.',
+        'Ellieo is live in New York City. We build density and trust first, then replicate our verified operations-first playbook in every new market.',
       microLine: 'Density before geography.',
     },
     {
@@ -72,7 +72,7 @@ const ROADMAP = {
     },
   ],
   kpis: [
-    { label: 'Launch city', value: 'New York City', sub: '2026', targetLabel: 'Target' },
+    { label: 'Launch city', value: 'New York City', sub: 'Live now', targetLabel: 'Target' },
     { label: 'Target cities', value: 'Nationwide', sub: 'By 2029+', targetLabel: 'New York City → Boston → Chicago, LA → Nationwide' },
     { label: 'Ellieo professional agents', value: '20+', sub: 'By 2026', targetLabel: 'Target' },
     { label: 'Gross Lease Value (GLV)', value: '$5M+', sub: 'Target', targetLabel: 'Target' },
@@ -82,9 +82,9 @@ const ROADMAP = {
   growthPillars: [
     {
       title: 'Supply density',
-      subheadline: 'Verified Agents and verified listings first.',
+      subheadline: 'Verified agents and verified listings first.',
       description:
-        'We onboard Verified Agents and prioritize verified listings before expanding demand—building inventory depth and consistent quality in each neighborhood.',
+        'We onboard verified agents and prioritize verified listings before expanding demand—building inventory depth and consistent quality in each neighborhood.',
       microLine: 'Operations-first supply in every new city.',
       icon: 'building',
     },
@@ -186,7 +186,7 @@ export function RoadmapScreen() {
             <br className="sm:hidden" />
             Then we scale.
           </h1>
-          <p className="mt-2 text-sm font-medium text-[#F64310] sm:text-base">
+          <p className="mt-2 text-sm font-medium text-brand sm:text-base">
             Rental is the backbone of real estate
             <br className="sm:hidden" />
             cash flow and client relationships.
@@ -196,8 +196,8 @@ export function RoadmapScreen() {
             trust, and operational control.
           </p>
           <p className="mt-3 max-w-xl text-sm leading-[1.65] text-[var(--muted-foreground)] sm:mt-4 sm:text-base sm:leading-[1.7]">
-            We prove density, trust, and operational playbooks in New York before expanding to
-            Boston, Chicago, and LA—one verified city at a time. Our trust system is built on{' '}
+            We prove density, trust, and operational playbooks in New York City before expanding to
+            Boston, Chicago, and LA—one verified city at a time. Our trust system includes{' '}
             {ROADMAP.trustSystem}
           </p>
         </div>
@@ -222,17 +222,17 @@ export function RoadmapScreen() {
               priority={false}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/20 md:to-transparent" />
-            <span className="absolute bottom-3 left-3 rounded-full bg-[#F64310] px-2.5 py-1 text-xs font-semibold text-white shadow-md sm:bottom-4 sm:left-4 sm:px-3 sm:py-1.5">
+            <span className="absolute bottom-3 left-3 rounded-full bg-brand px-2.5 py-1 text-xs font-semibold text-white shadow-md sm:bottom-4 sm:left-4 sm:px-3 sm:py-1.5">
               {ROADMAP.launchCity.city} · {ROADMAP.launchCity.year}
             </span>
           </div>
           <div className="flex min-w-0 flex-col justify-center p-4 sm:p-6 md:p-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#F64310]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand">
               Next markets
             </p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-3 sm:text-base">
-              Expansion to Boston, Chicago, and LA happens only after New York City density and operating
-              playbooks are proven. Same verified, operations-first approach in each city.
+              Expansion to Boston, Chicago, and LA happens only after New York City density and
+              operating playbooks are proven. Same verified, operations-first approach in each city.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               {ROADMAP.nextMarkets.map((city) => (
@@ -240,18 +240,16 @@ export function RoadmapScreen() {
                   key={city}
                   className="inline-flex items-center gap-1.5 rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)] sm:px-3.5 sm:py-2 sm:text-sm"
                 >
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#F64310]" aria-hidden />
+                  <span className="h-1.5 w-1.5 rounded-full bg-brand" aria-hidden />
                   {city}
                 </span>
               ))}
             </div>
             <Link
-              href="https://ellieo.com/#early"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex min-h-[44px] w-full items-center justify-center rounded-xl bg-[#F64310] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#d93a0e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F64310] focus-visible:ring-offset-2 sm:w-auto"
+              href="/mobile-app"
+              className="mt-6 inline-flex min-h-[44px] w-full items-center justify-center rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:w-auto"
             >
-              Join Early Access
+              Download Ellieo
             </Link>
           </div>
         </div>
@@ -268,14 +266,14 @@ export function RoadmapScreen() {
         />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center sm:text-left">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-brand">
               Future growth
             </p>
             <h2 id="phases-heading" className="mt-2 text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl lg:text-4xl">
               From one city to many
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base">
-              Prove rental density and operational control in New York City (2025 Q4 MVP through 2026 full service), then replicate city by city. Product milestones and city expansion aligned.
+              Prove rental density and operational control in New York City (2025 Q4 MVP through 2026 full service), then replicate city by city. Product milestones and city expansion are aligned.
             </p>
           </div>
 
@@ -288,7 +286,7 @@ export function RoadmapScreen() {
                   className="relative flex flex-col gap-4 pb-12 last:pb-0 sm:gap-6 lg:flex-col lg:gap-4 lg:pb-0"
                 >
                   <div className="relative z-10 flex shrink-0 items-center justify-center gap-4 sm:justify-start lg:flex-col lg:items-start lg:gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#F64310] bg-[var(--background)] text-[#F64310] lg:h-16 lg:w-16 lg:border-[3px]">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-brand bg-[var(--background)] text-brand lg:h-16 lg:w-16 lg:border-[3px]">
                       <span className="text-xs font-bold sm:text-sm lg:text-base">{phase.year}</span>
                     </div>
                     <div className="min-w-0 flex-none sm:flex-1 lg:flex-none">
@@ -304,7 +302,7 @@ export function RoadmapScreen() {
                     {phase.description}
                   </p>
                   {'microLine' in phase && phase.microLine && (
-                    <p className="mt-2 text-xs font-semibold text-[#F64310]">
+                    <p className="mt-2 text-xs font-semibold text-brand">
                       {phase.microLine}
                     </p>
                   )}
@@ -339,7 +337,7 @@ export function RoadmapScreen() {
                         {cities.map((city) => (
                           <span
                             key={city}
-                            className="min-w-0 truncate rounded-lg bg-[#F64310] px-2 py-2 text-center text-xs font-semibold text-white sm:px-3 sm:text-sm"
+                            className="min-w-0 truncate rounded-lg bg-brand px-2 py-2 text-center text-xs font-semibold text-white sm:px-3 sm:text-sm"
                           >
                             {city}
                           </span>
@@ -374,7 +372,7 @@ export function RoadmapScreen() {
                     key={m.time}
                     className="flex min-w-0 shrink-0 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--background)] px-4 py-3 sm:flex-1 sm:min-w-[140px]"
                   >
-                    <span className="text-xs font-bold tabular-nums text-[#F64310] sm:text-sm">
+                    <span className="text-xs font-bold tabular-nums text-brand sm:text-sm">
                       {m.time}
                     </span>
                     <div className="min-w-0 flex-1">
@@ -398,7 +396,7 @@ export function RoadmapScreen() {
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center sm:text-left">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-brand">
               By the numbers
             </p>
             <h2 id="key-numbers-heading" className="mt-1.5 text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl lg:text-3xl">
@@ -429,7 +427,7 @@ export function RoadmapScreen() {
                   {item.sub}
                 </p>
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-[var(--border)]" aria-hidden>
-                  <div className="h-full w-full rounded-r-full bg-[#F64310]" />
+                  <div className="h-full w-full rounded-r-full bg-brand" />
                 </div>
               </div>
             ))}
@@ -444,7 +442,7 @@ export function RoadmapScreen() {
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center sm:text-left">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F64310]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-brand">
               Four pillars
             </p>
             <h2 id="pillars-heading" className="mt-1.5 text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl lg:text-3xl">
@@ -467,11 +465,11 @@ export function RoadmapScreen() {
             className="relative mt-6 overflow-hidden rounded-xl bg-[var(--foreground)] py-4 px-5 sm:mt-8 sm:py-5 sm:px-6"
             aria-hidden
           >
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,rgba(246,67,16,0.15),transparent_60%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,rgb(var(--brand-rgb)/0.15),transparent_60%)]" />
             <p className="relative flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-center text-xs font-medium tracking-wide text-white sm:gap-x-2 sm:text-sm">
               {ROADMAP.growthLoop.split(/\s*→\s*/).map((part, i) => (
                 <span key={i}>
-                  {i > 0 && <span className="text-[#F64310]" aria-hidden> → </span>}
+                  {i > 0 && <span className="text-brand" aria-hidden> → </span>}
                   <span>{part}</span>
                 </span>
               ))}
@@ -488,7 +486,7 @@ export function RoadmapScreen() {
                   className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-4"
                 >
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F64310]/10 text-[#F64310]">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
                       <PhaseIcon icon={pillar.icon} />
                     </div>
                     <h3 className="text-sm font-bold text-[var(--foreground)]">{pillar.title}</h3>
@@ -500,7 +498,7 @@ export function RoadmapScreen() {
                     {pillar.description}
                   </p>
                   {'microLine' in pillar && pillar.microLine && (
-                    <p className="mt-2 text-[11px] font-semibold text-[#F64310]">{pillar.microLine}</p>
+                    <p className="mt-2 text-[11px] font-semibold text-brand">{pillar.microLine}</p>
                   )}
                 </div>
               ))}
@@ -515,7 +513,7 @@ export function RoadmapScreen() {
                     key={`${pillar.title}-head`}
                     className={`flex flex-col items-center border-b border-[var(--border)] bg-[var(--surface)] px-4 py-4 text-center ${i < 3 ? 'border-r border-[var(--border)]' : ''}`}
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#F64310]/10 text-[#F64310]">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10 text-brand">
                       <PhaseIcon icon={pillar.icon} />
                     </div>
                     <h3 className="mt-2 text-sm font-bold tracking-tight text-[var(--foreground)]">
@@ -544,7 +542,7 @@ export function RoadmapScreen() {
                       {pillar.description}
                     </p>
                     {'microLine' in pillar && pillar.microLine && (
-                      <p className="mt-2 text-[11px] font-semibold text-[#F64310]">
+                      <p className="mt-2 text-[11px] font-semibold text-brand">
                         {pillar.microLine}
                       </p>
                     )}
@@ -562,7 +560,7 @@ export function RoadmapScreen() {
         aria-labelledby="milestones-heading"
       >
         <div
-          className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(246,67,16,0.12),transparent_60%)]"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgb(var(--brand-rgb)/0.12),transparent_60%)]"
           aria-hidden
         />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -606,24 +604,23 @@ export function RoadmapScreen() {
             id="roadmap-cta-heading"
             className="text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl"
           >
-            Stay ahead of our expansion
+            Get Ellieo on your phone
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base">
-            Access verified listings and structured roommate matching before public scale.
+            Download Ellieo on iOS and Android for verified listings and structured roommate
+            matching.
           </p>
           <div className="mt-8 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-center">
             <Link
-              href="https://ellieo.com/#early"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#F64310] px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-[#F64310]/25 transition hover:bg-[#d93a0e] hover:shadow-[#F64310]/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F64310] focus-visible:ring-offset-2 sm:w-auto"
+              href="/mobile-app"
+              className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-brand px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-brand/25 transition hover:bg-brand-hover hover:shadow-brand/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:w-auto"
             >
-              Join New York City Early Access
+              Download Ellieo
               <span aria-hidden>→</span>
             </Link>
             <Link
               href="/contact"
-              className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-8 py-3 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F64310] focus-visible:ring-offset-2 sm:w-auto"
+              className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-8 py-3 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:w-auto"
             >
               Partner Inquiry
             </Link>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 interface ChipScrollRowProps {
   children: ReactNode
@@ -22,6 +23,7 @@ export function ChipScrollRow({
   edgeColor = '#ffffff',
 }: ChipScrollRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const t = useT('common')
   const [edge, setEdge] = useState({ left: false, right: false })
 
   function updateEdge() {
@@ -102,7 +104,7 @@ export function ChipScrollRow({
             />
             <button
               type='button'
-              aria-label='이전 보기'
+              aria-label={t('ui.chipScroll.previous')}
               onClick={() => scrollByDir('left')}
               className='pointer-events-auto relative ml-0.5 inline-flex size-6 items-center justify-center rounded-full border border-[#dddddd] bg-white text-[var(--foreground)] shadow-sm touch-manipulation'
             >
@@ -127,7 +129,7 @@ export function ChipScrollRow({
             />
             <button
               type='button'
-              aria-label='더 보기'
+              aria-label={t('ui.chipScroll.next')}
               onClick={() => scrollByDir('right')}
               className='pointer-events-auto relative mr-0.5 inline-flex size-6 items-center justify-center rounded-full border border-[#dddddd] bg-white text-[var(--foreground)] shadow-sm touch-manipulation'
             >

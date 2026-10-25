@@ -4,6 +4,7 @@ import { useId, useState, type ReactNode } from 'react'
 
 import { BottomSheet } from './BottomSheet'
 import { cn } from '@lib'
+import { useT } from '@lib/i18n/client'
 
 export type BottomSheetSelectOption = {
   value: string
@@ -41,7 +42,7 @@ export function BottomSheetSelect({
   value,
   options,
   onChange,
-  placeholder = '선택하기',
+  placeholder,
   emptyOption,
   triggerClassName,
   children,
@@ -50,6 +51,7 @@ export function BottomSheetSelect({
   disabled,
   overlayClassName,
 }: BottomSheetSelectProps) {
+  const t = useT('common')
   const listId = useId()
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
   const isControlled = controlledOpen !== undefined
@@ -62,7 +64,7 @@ export function BottomSheetSelect({
 
   const allOptions = emptyOption ? [emptyOption, ...options] : options
   const selected = allOptions.find((o) => o.value === value)
-  const displayLabel = selected?.label ?? placeholder
+  const displayLabel = selected?.label ?? placeholder ?? t('ui.bottomSheetSelect.placeholder')
   const hasValue = Boolean(selected) && value !== ''
 
   return (

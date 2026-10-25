@@ -1,0 +1,153 @@
+{
+  "loading": "加载中…",
+  "brandCity": "{brand} {city}",
+  "comingSoon": "即将上线",
+  "cities": {
+    "nyc": {
+      "headline": "一起把纽约生活过好",
+      "description": "留学生和职场人分享纽约生活攻略的地方。"
+    },
+    "boston": {
+      "headline": "一起把波士顿生活过好",
+      "description": "留学生和职场人分享波士顿生活攻略的地方。"
+    }
+  },
+  "magazine": {
+    "kicker": "NYC Magazine",
+    "title": "编辑精选的纽约生活",
+    "description": "独立于版块之外，关于美食、活动和好去处的短篇文章。",
+    "items": {
+      "mag-1": {
+        "tag": "美食",
+        "title": "Flushing 门口排长队的刀削面馆",
+        "excerpt": "比周末早午餐更扎实的一餐，本地韩国人常去的地方。"
+      },
+      "mag-2": {
+        "tag": "活动",
+        "title": "本周曼哈顿韩国人社交活动",
+        "excerpt": "面向学生和职场新人的轻松晚间聚会。"
+      },
+      "mag-3": {
+        "tag": "好去处",
+        "title": "下雨天的室内路线",
+        "excerpt": "从博物馆到咖啡馆，一天逛完。"
+      },
+      "mag-4": {
+        "tag": "街区",
+        "title": "午后漫步 Astoria",
+        "excerpt": "从咖啡街到公园，超适合周末的散步路线。"
+      }
+    }
+  },
+  "professionals": {
+    "kicker": "专家",
+    "title": "生活伙伴",
+    "description": "房产、律师、搬家、会计：在纽约最常被找的专家。",
+    "categoriesAria": "专家分类",
+    "categories": {
+      "real-estate": {
+        "title": "房产",
+        "description": "租房、买房和中介咨询"
+      },
+      "lawyer": {
+        "title": "律师",
+        "description": "签证、移民和合同法律"
+      },
+      "moving": {
+        "title": "搬家",
+        "description": "纽约搬家和货运"
+      },
+      "accountant": {
+        "title": "会计",
+        "description": "报税和 CPA 服务"
+      }
+    },
+    "items": {
+      "re-1": {
+        "name": "Sample Realty",
+        "specialty": "Manhattan · Brooklyn 租房"
+      },
+      "re-2": {
+        "name": "Sample Broker",
+        "specialty": "学生和职场人住房"
+      },
+      "law-1": {
+        "name": "Sample Law Office",
+        "specialty": "签证 · 移民法"
+      },
+      "law-2": {
+        "name": "Sample Attorney",
+        "specialty": "租约 · 合同"
+      },
+      "mv-1": {
+        "name": "Sample Movers",
+        "specialty": "本地及周边搬家"
+      },
+      "mv-2": {
+        "name": "Sample Moving",
+        "specialty": "Studio · 一室一厅"
+      },
+      "acc-1": {
+        "name": "Sample Accounting",
+        "specialty": "个人及自由职业者报税"
+      },
+      "acc-2": {
+        "name": "Sample CPA",
+        "specialty": "OPT · ITIN · 报税"
+      }
+    }
+  },
+  "introCarousel": {
+    "intro": {
+      "kicker": "{brand} NYC",
+      "headline": "纽约留学生都该知道的地方",
+      "body": "我们与各校韩国学生会合作，把签证、求职、美食和活动信息汇集在一起，还能对接专家。"
+    },
+    "status": {
+      "kicker": "签证 · 身份",
+      "headline": "我这样办对吗？",
+      "body": "看看已经办过 OPT、CPT、签证和绿卡的人分享的真实分步经验，提前做好准备。"
+    },
+    "food": {
+      "kicker": "美食",
+      "headline": "再也不用纠结今天吃什么",
+      "body": "美食列表按菜品而不是街区分类，想吃什么，一搜就能去。"
+    },
+    "housing": {
+      "kicker": "租房 · 室友",
+      "headline": "找房不用再一个人奔波",
+      "body": "在一个地方比较已验证的房源和生活习惯合拍的室友。"
+    },
+    "anonymous": {
+      "kicker": "匿名版块",
+      "headline": "那些不想署名问的问题",
+      "body": "无论是签证还是感情，匿名时更容易说真话。"
+    },
+    "credit": {
+      "kicker": "邀请积分",
+      "headline": "邀请好友，分享经验",
+      "body": "写一篇详细的 OPT、CPT 或签证经验分享，你和邀请你的好友都能获得积分。"
+    },
+    "expert": {
+      "kicker": "专家对接",
+      "headline": "用积分约见专家",
+      "body": "用积分和目标行业的从业者来一场 coffee chat，或预约专家咨询。"
+    },
+    "cta": {
+      "kicker": "开始使用",
+      "headline": "在这里找信息，向专家要答案",
+      "body": "前往 {siteHost}/nyc 查看合作学生会和已验证的房源。"
+    }
+  },
+  "carouselTest": {
+    "kicker": "{brand} NYC · 轮播草稿",
+    "title": "介绍轮播",
+    "description": "全幅照片背景 · 1080×1080 · 左右滑动。每张幻灯片都有与主题匹配的氛围遮罩。",
+    "photoNote": "背景使用的是 Unsplash 上的纽约和生活方式照片。建议正式发布前替换为高清品牌照片。",
+    "backHome": "返回社区首页"
+  },
+  "instagramDm": {
+    "body": "{message}：请私信 {handle}。",
+    "button": "发送 Instagram 私信"
+  }
+}

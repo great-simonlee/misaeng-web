@@ -1,3 +1,5 @@
+import type { Locale } from '@lib/i18n/locales'
+import type { ContentI18n, TranslationFields } from '@lib/translations/content'
 import type { CityId } from '@lib/constants/cities'
 
 export type PostStatus = 'open' | 'closed'
@@ -171,7 +173,7 @@ export type HousingRoommateWaiting = {
  * Misaeng 공개 리스팅 — ERP Property + Unit 스냅샷
  * Supabase 업로드 계약: property + unit + roommateWaiting + sourcePropertyId/sourceUnitId
  */
-export interface HousingListing {
+export interface HousingListing extends TranslationFields {
   id: string
   /** 도시 전용 매물. 없으면 NYC 레거시 */
   city: CityId | null
@@ -189,6 +191,8 @@ export interface HousingListing {
   createdAt: number
   updatedAt: number
   status: PostStatus
+  /** 보는 언어로 바꾼 결과 (API 응답에만 있음, src/lib/translations) */
+  i18n?: ContentI18n
 }
 
 /** @deprecated HousingListing 사용 */
@@ -262,7 +266,7 @@ export type CommunityBoardId =
   | 'anonymous'
   | 'roommate'
 
-export interface CommunityPost {
+export interface CommunityPost extends TranslationFields {
   id: string
   categoryId: CommunityBoardId
   /** 도시 전용 글은 필수. status는 필터용 도시, job-review는 null */
@@ -356,6 +360,8 @@ export interface CommunityPost {
    * 계정에 연결되면 authorUid가 채워지고 linkedUid/linkedAt이 기록된다.
    */
   guestAuthor: CommunityGuestAuthor | null
+  /** 보는 언어로 바꾼 결과 (API 응답에만 있음, src/lib/translations) */
+  i18n?: ContentI18n
 }
 
 /** 가입 없이 글을 남긴 작성자 연락처·연결 상태 */
@@ -463,7 +469,7 @@ export interface PlaceSearchResult {
 /** 댓글/대댓글 — parentId가 있으면 대댓글(1단만 허용) */
 export type CommunityCommentStatus = 'open' | 'deleted'
 
-export interface CommunityComment {
+export interface CommunityComment extends TranslationFields {
   id: string
   postId: string
   /** null = 댓글, string = 해당 댓글에 대한 대댓글 */
@@ -477,6 +483,8 @@ export interface CommunityComment {
   createdAt: number
   updatedAt: number
   status: CommunityCommentStatus
+  /** 보는 언어로 바꾼 결과 (API 응답에만 있음, src/lib/translations) */
+  i18n?: ContentI18n
 }
 
 export type CommunityCommentInput = {
@@ -628,6 +636,8 @@ export interface NycUserProfile {
   /** 인스타그램 인증 (예정) */
   instagramHandle: string | null
   instagramVerified: boolean
+  /** 선호 언어 (가입·마이페이지·언어 메뉴에서 고름). misaeng·ellieo가 같이 쓴다 */
+  preferredLocale: Locale | null
   /** ERP 관리 상태 */
   status: 'active' | 'suspended' | null
   /** 인증 발송 쿼터 (비용 방지) */

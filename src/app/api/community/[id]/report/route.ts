@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
 
+import { apiErrorMessage } from '@lib/i18n/apiError'
+import { formatNumber } from '@lib/i18n/format'
+import { getRequestLocale, getT } from '@lib/i18n/server'
+
 import { resolveAuthenticatedUser } from '../../../agent-auth/lib/authHelpers'
 import { accountSuspendedResponse } from '@lib/supabase/profile.server'
 import { COMMUNITY_REPORT_REASONS } from '@lib/constants/communityEngagement'
@@ -34,11 +38,12 @@ type CreateBody = {
 }
 
 export async function POST(request: Request, context: RouteContext) {
+  const locale = await getRequestLocale(request)
+  const t = await getT(locale, 'api')
   if (!isCommunityEngagementStorageConfigured()) {
     return NextResponse.json(
       {
-        error:
-          'Supabase 설정이 필요해요. 로컬에서는 브라우저에 임시 저장돼요.',
+        error: t('common.supabaseNotConfiguredLocal'),
         code: 'STORAGE_UNAVAILABLE',
       },
       { status: 503 },
@@ -47,9 +52,9 @@ export async function POST(request: Request, context: RouteContext) {
 
   const user = await resolveAuthenticatedUser()
   if (!user?.uid || !user.email) {
-    return NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 })
+    return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
   }
-  const suspended = await accountSuspendedResponse(user.uid)
+  const suspended = await accountSuspendedResponse(user.uid, t)
   if (suspended) return suspended
 
   const { id: postId } = await context.params
@@ -65,21 +70,21 @@ export async function POST(request: Request, context: RouteContext) {
 
   if (!REASON_SET.has(reason as CommunityReportReason)) {
     return NextResponse.json(
-      { error: '신고 사유를 선택해 주세요.' },
+      { error: t('community.report.reasonRequired') },
       { status: 400 },
     )
   }
 
   if (detail.length > 1000) {
     return NextResponse.json(
-      { error: '상세 내용은 1000자 이내로 작성해 주세요.' },
+      { error: t('community.report.detailTooLong', { max: formatNumber(locale, 1000) }) },
       { status: 400 },
     )
   }
 
   if (reason === 'other' && !detail) {
     return NextResponse.json(
-      { error: '기타 사유는 내용을 적어 주세요.' },
+      { error: t('community.report.otherDetailRequired') },
       { status: 400 },
     )
   }
@@ -94,7 +99,7 @@ export async function POST(request: Request, context: RouteContext) {
   )
   if (duplicated) {
     return NextResponse.json(
-      { error: '이미 신고한 글/댓글이에요.' },
+      { error: t('community.report.alreadyReported') },
       { status: 409 },
     )
   }
@@ -125,8 +130,7 @@ export async function POST(request: Request, context: RouteContext) {
     console.error('Community report create error:', error)
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : '신고 접수에 실패했어요.',
+        error: apiErrorMessage(t, error, 'community.report.failed'),
       },
       { status: 500 },
     )

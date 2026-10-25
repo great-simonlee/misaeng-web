@@ -1,0 +1,686 @@
+{
+  "activity": {
+    "updated": "{time}更新",
+    "posted": "{time}发布",
+    "firstPosted": "首次发布于{time}"
+  },
+  "cptOpt": {
+    "types": {
+      "cpt": {
+        "label": "CPT",
+        "description": "在读期间的工作许可",
+        "summary": "通过 OGS 申请并获取新的 I-20"
+      },
+      "opt": {
+        "label": "OPT",
+        "description": "毕业后 1 年的工作许可",
+        "summary": "OGS 推荐，然后递交 USCIS I-765 并拿到 EAD"
+      },
+      "stem-opt": {
+        "label": "STEM OPT",
+        "description": "STEM OPT 延期",
+        "summary": "I-983 和 OGS 审核，之后提交 SEVP validation report"
+      },
+      "visa": {
+        "label": "签证",
+        "description": "F-1、H-1B、O-1 等",
+        "summary": "从准备材料、面签到获批"
+      },
+      "green-card": {
+        "label": "绿卡",
+        "description": "职业移民、婚姻移民等途径",
+        "summary": "递交申请、面谈、获批到拿卡"
+      }
+    },
+    "fields": {
+      "prepared": {
+        "label": "准备了什么",
+        "shortLabel": "准备",
+        "hint": "收集的材料和确认过的要求"
+      },
+      "submitted": {
+        "label": "如何提交",
+        "shortLabel": "提交",
+        "hint": "在哪里、以什么方式提交"
+      },
+      "resultReceived": {
+        "label": "如何收到结果",
+        "shortLabel": "结果",
+        "hint": "邮件、信件、网站：怎么收到的，内容是什么"
+      },
+      "nextStep": {
+        "label": "下一步",
+        "shortLabel": "下一步",
+        "hint": "还需要做什么或在等什么"
+      }
+    },
+    "placeholders": {
+      "cpt": {
+        "prepared": "例：完成 CPT module、offer letter、OGS checklist",
+        "submitted": "例：在 OGS 网站上传 CPT 表格和 offer letter",
+        "resultReceived": "例：通过学校邮箱收到新的 I-20 PDF",
+        "nextStep": "例：打印并签署 I-20，确认入职日期"
+      },
+      "opt": {
+        "prepared": "例：OGS OPT workshop、I-765、证件照、毕业证明",
+        "submitted": "例：OGS 推荐后在 USCIS 网上递交 I-765 并缴费",
+        "resultReceived": "例：EAD 卡寄到了，账户里显示已批准",
+        "nextStep": "例：把 EAD 到期日和 STEM 延期要求记到日历上"
+      },
+      "stem-opt": {
+        "prepared": "例：I-983、公司信息、联系 OGS/DSO",
+        "submitted": "例：OGS 审核后递交 STEM OPT 延期申请",
+        "resultReceived": "例：通过邮件/信件收到 I-797 批准通知",
+        "nextStep": "例：安排 6/12/18 个月的 validation report"
+      },
+      "visa": {
+        "prepared": "例：DS-160、资金证明、练习面签问题",
+        "submitted": "例：预约使馆面签并提交材料",
+        "resultReceived": "例：签证获批，护照已寄回",
+        "nextStep": "例：入境美国，查看 I-94，在 SEVIS/学校报到"
+      },
+      "green-card": {
+        "prepared": "例：I-140/I-485 材料、体检、与律师会面",
+        "submitted": "例：在线/邮寄向 USCIS 递交申请，参加面谈",
+        "resultReceived": "例：收到批准通知，绿卡随后寄到",
+        "nextStep": "例：确认卡片信息，查看再入境和续卡日期"
+      }
+    },
+    "quickSteps": {
+      "cpt": {
+        "module": {
+          "label": "完成 CPT module",
+          "prepared": "完成 CPT module（orientation）",
+          "nextStep": "等待 offer letter，核对 checklist"
+        },
+        "offerLetter": {
+          "label": "收到 offer letter",
+          "prepared": "收到 job offer letter",
+          "nextStep": "填写 OGS CPT 申请"
+        },
+        "apply": {
+          "label": "提交 CPT 申请",
+          "prepared": "Offer letter、CPT 申请表",
+          "submitted": "在 OGS 网站提交申请",
+          "nextStep": "等待新的 I-20"
+        },
+        "newI20": {
+          "label": "拿到新 I-20",
+          "resultReceived": "通过邮件收到新的 I-20",
+          "nextStep": "签字后开始工作"
+        }
+      },
+      "opt": {
+        "recommendation": {
+          "label": "OGS 推荐",
+          "prepared": "确认 OPT 材料和毕业要求",
+          "submitted": "向 OGS 申请 OPT 推荐",
+          "nextStep": "准备递交 I-765"
+        },
+        "i765": {
+          "label": "递交 I-765",
+          "prepared": "I-765、照片、申请费",
+          "submitted": "在 USCIS 网上递交",
+          "nextStep": "定期查看 case 状态"
+        },
+        "ead": {
+          "label": "拿到 EAD",
+          "resultReceived": "EAD 卡已寄到",
+          "nextStep": "开始工作，确认 STEM 延期要求"
+        }
+      },
+      "stem-opt": {
+        "i983": {
+          "label": "提交 I-983",
+          "prepared": "I-983、公司信息",
+          "submitted": "向 OGS 提交 I-983",
+          "nextStep": "确认获批情况和 validation report 日期"
+        },
+        "approved": {
+          "label": "延期获批",
+          "resultReceived": "STEM OPT 延期获批",
+          "nextStep": "为 report 截止日期设置提醒"
+        }
+      },
+      "visa": {
+        "interview": {
+          "label": "预约面签",
+          "prepared": "DS-160、材料包",
+          "submitted": "预约使馆面签",
+          "nextStep": "准备面签，最后核对材料"
+        },
+        "approved": {
+          "label": "签证获批",
+          "resultReceived": "签证获批，护照已寄回",
+          "nextStep": "入境美国，在学校/雇主处报到"
+        }
+      },
+      "green-card": {
+        "petition": {
+          "label": "递交申请",
+          "prepared": "申请材料包",
+          "submitted": "向 USCIS 递交申请",
+          "nextStep": "等待收据和面谈日期"
+        },
+        "card": {
+          "label": "拿到绿卡",
+          "resultReceived": "收到绿卡",
+          "nextStep": "确认续卡和再入境所需材料"
+        }
+      }
+    },
+    "detail": {
+      "authorTitle": "这是一份持续更新的记录",
+      "authorBody": "有新进展时，只需在更新页面添加一条记录。保存后，你的帖子会移到列表顶部。",
+      "addEntry": "添加新记录",
+      "timelineTitle_other": "{count} 条进度记录",
+      "tipsTitle": "注意事项"
+    },
+    "write": {
+      "errors": {
+        "typeRequired": "请选择类型：CPT、OPT、STEM OPT、签证或绿卡",
+        "tipsEmptyEdit": "“注意事项”为空，请在帖子详情中检查",
+        "tipsRequired": "请填写“注意事项”",
+        "tipsTooLong": "“注意事项”请控制在 {max} 个字符以内",
+        "timelineRequiredEdit": "请至少保留 1 条进度记录",
+        "timelineRequired": "请至少添加 1 条进度记录（日期 + 详情）"
+      },
+      "updated": "进度已更新，帖子已移到列表顶部",
+      "created": "经验分享已发布，之后可以继续添加进度",
+      "moreSettingsTitle": "编辑帖子详情",
+      "moreSettingsHint": "只有想修改标题、地点或“注意事项”时才需要打开",
+      "tipsTitle": "注意事项",
+      "tipsDescription": "最想告诉后来者的小贴士，让他们少走弯路",
+      "tipsPlaceholder": "例：请在入职日期前 2–3 周把材料交给 OGS。每个学校的网站都不一样，先看看 OGS checklist。",
+      "updateSubmit": "更新进度",
+      "typeSection": "是什么类型？",
+      "basicSection": "基本信息",
+      "basicSectionDescription": "填写标题和公司或机构",
+      "timelineSection": "进度",
+      "createFootnote": "发布后也可以继续添加和编辑进度。",
+      "createIntro": "选择类型，按日期记录进度。发布后也可以继续补充。",
+      "updateEyebrow": "进度更新",
+      "updateTitle": "添加新的进度记录"
+    },
+    "timeline": {
+      "editingDescription": "编辑准备、提交、结果或下一步，然后点击“完成编辑”。",
+      "stageReviewHint": "分享当天发生的事：等待时间、小贴士、踩过的坑，什么都可以。",
+      "stageReviewPlaceholder": "例：OGS 网站上传一直失败，压缩 PDF 后重试才成功。核对 offer letter 日期花了一天。"
+    }
+  },
+  "jobReview": {
+    "types": {
+      "intern": {
+        "label": "实习",
+        "description": "暑期 / 寒假 / 学期中",
+        "summary": "从投递、面试到拿 offer"
+      },
+      "new-grad": {
+        "label": "应届",
+        "description": "毕业后全职",
+        "summary": "校园招聘和网申"
+      },
+      "experienced": {
+        "label": "社招",
+        "description": "中高级岗位招聘",
+        "summary": "从 recruiter 联系到多轮面试"
+      },
+      "job-change": {
+        "label": "跳槽",
+        "description": "在职或离职期间换工作",
+        "summary": "边工作边投递，直到 offer 谈判"
+      },
+      "contract": {
+        "label": "合同工",
+        "description": "合同工 · 自由职业",
+        "summary": "短期和项目制招聘"
+      }
+    },
+    "fields": {
+      "stageLabel": {
+        "label": "哪个阶段",
+        "shortLabel": "阶段",
+        "hint": "网申、电面、Onsite、Offer 等"
+      },
+      "platform": {
+        "label": "在哪里投递",
+        "shortLabel": "渠道",
+        "hint": "LinkedIn、Handshake、内推、公司招聘页面"
+      },
+      "documentsSubmitted": {
+        "label": "提交了什么",
+        "shortLabel": "材料",
+        "hint": "简历、Cover letter、作品集、成绩单"
+      },
+      "interviewRound": {
+        "label": "第几轮面试",
+        "shortLabel": "面试",
+        "hint": "一面 Recruiter、二面技术面、Panel、HM 等",
+        "guide": "面试笔记：除了轮次，也分享一下被问了什么、你是怎么回答的。你记得的具体问题和回答，对后来的人帮助非常大。"
+      },
+      "outcome": {
+        "label": "结果如何",
+        "shortLabel": "结果",
+        "hint": "通过、被拒、等待中、Offer 等"
+      }
+    },
+    "placeholders": {
+      "intern": {
+        "stageLabel": "例：Phone Screen",
+        "platform": "例：Handshake → 公司招聘页面",
+        "documentsSubmitted": "例：简历、成绩单、Cover letter",
+        "interviewRound": "例：一面 Recruiter screen。Q：为什么申请这个实习？→ 我说在课上尝试过 ~，想做更多。",
+        "outcome": "例：通过 → 已约下一轮"
+      },
+      "new-grad": {
+        "stageLabel": "例：网申",
+        "platform": "例：LinkedIn Easy Apply",
+        "documentsSubmitted": "例：简历 PDF、GitHub 链接",
+        "interviewRound": "例：二面技术面。Q. 最近的项目中卡在了哪里？A. …我是这样回答的。",
+        "outcome": "例：被拒（2 周后收到邮件）"
+      },
+      "experienced": {
+        "stageLabel": "例：Recruiter 主动联系",
+        "platform": "例：LinkedIn InMail",
+        "documentsSubmitted": "例：更新后的简历",
+        "interviewRound": "例：HM 1:1。Q. 为什么选这个岗位？A. 因为团队正在往 ~ 方向发展…",
+        "outcome": "例：收到 Onsite 邀请"
+      },
+      "job-change": {
+        "stageLabel": "例：Recruiter screen",
+        "platform": "例：LinkedIn / 内推",
+        "documentsSubmitted": "例：简历、LinkedIn",
+        "interviewRound": "例：二面 HM + 团队。Q. 你如何处理冲突？A. …",
+        "outcome": "例：Offer · 薪资谈判"
+      },
+      "contract": {
+        "stageLabel": "例：通过中介申请",
+        "platform": "例：Recruiter 推荐",
+        "documentsSubmitted": "例：简历、报价单",
+        "interviewRound": "例：客户初次沟通。Q. 什么时候可以开始？A. 2 周后。",
+        "outcome": "例：合同 offer"
+      }
+    },
+    "quickSteps": {
+      "intern": {
+        "apply": {
+          "label": "已投递",
+          "stageLabel": "网申",
+          "platform": "Handshake / LinkedIn",
+          "documentsSubmitted": "简历、成绩单"
+        },
+        "interview": {
+          "label": "面试",
+          "stageLabel": "技术面试",
+          "interviewRound": "一面技术面"
+        },
+        "offer": {
+          "label": "Offer",
+          "stageLabel": "Offer",
+          "outcome": "拿到 offer"
+        }
+      },
+      "new-grad": {
+        "apply": {
+          "label": "已投递",
+          "stageLabel": "网申",
+          "platform": "公司招聘网站",
+          "documentsSubmitted": "简历、Cover letter"
+        },
+        "phone": {
+          "label": "电面",
+          "stageLabel": "Phone Screen",
+          "interviewRound": "一面 HR"
+        },
+        "onsite": {
+          "label": "Onsite",
+          "stageLabel": "Onsite / Virtual onsite",
+          "interviewRound": "终面"
+        }
+      },
+      "experienced": {
+        "recruiter": {
+          "label": "Recruiter",
+          "stageLabel": "Recruiter screen",
+          "platform": "LinkedIn InMail"
+        },
+        "hm": {
+          "label": "HM",
+          "stageLabel": "Hiring Manager",
+          "interviewRound": "HM 1:1"
+        },
+        "panel": {
+          "label": "Panel",
+          "stageLabel": "Panel 面试",
+          "interviewRound": "团队 Panel"
+        }
+      },
+      "job-change": {
+        "apply": {
+          "label": "已投递",
+          "stageLabel": "网申",
+          "platform": "LinkedIn / 内推",
+          "documentsSubmitted": "简历"
+        },
+        "interview": {
+          "label": "面试",
+          "stageLabel": "Hiring Manager",
+          "interviewRound": "HM + 团队"
+        },
+        "offer": {
+          "label": "Offer",
+          "stageLabel": "Offer · 谈判",
+          "outcome": "拿到 offer"
+        }
+      },
+      "contract": {
+        "documents": {
+          "label": "材料",
+          "stageLabel": "已提交材料",
+          "documentsSubmitted": "简历"
+        },
+        "client": {
+          "label": "客户",
+          "stageLabel": "客户面试",
+          "interviewRound": "初次沟通电话"
+        }
+      }
+    },
+    "sources": {
+      "misaeng": {
+        "label": "通过 {brand}",
+        "description": "我看到了 {brand} 网站或社交媒体"
+      },
+      "student-org": {
+        "label": "通过学生组织",
+        "description": "我们学校的学生组织联系了我"
+      },
+      "referral": {
+        "label": "通过熟人",
+        "description": "认识的人介绍的"
+      },
+      "other": {
+        "label": "其他",
+        "description": "其他途径"
+      }
+    },
+    "sourcePicker": {
+      "orgQuestion": "哪个学生组织？"
+    },
+    "outcomes": {
+      "offer": {
+        "label": "拿到 offer",
+        "description": "通过了并拿到 offer"
+      },
+      "rejected": {
+        "label": "被拒",
+        "description": "中途或最后没有通过"
+      },
+      "in-progress": {
+        "label": "进行中",
+        "description": "还在等结果"
+      },
+      "withdrew": {
+        "label": "主动放弃",
+        "description": "我自己中止了流程"
+      }
+    },
+    "detail": {
+      "authorTitle": "这是一份持续更新的求职记录",
+      "authorBody": "有新的阶段时，只需在更新页面添加一条记录。保存后，你的帖子会移到列表顶部。",
+      "addEntry": "添加新阶段",
+      "timelineTitle_other": "{count} 个招聘环节",
+      "emptySection": "招聘环节",
+      "emptyTitle": "还没有招聘环节",
+      "emptyBody": "按日期记录的投递、面试和结果等进度，会以第 1 步、第 2 步……的形式依次显示在这里。",
+      "emptyCta": "添加招聘环节",
+      "tipsTitle": "给下一位求职者"
+    },
+    "timeline": {
+      "editingDescription": "编辑阶段、渠道、材料、面试或结果，然后点击“完成编辑”。",
+      "stageReviewHint": "分享你在这个阶段的经历：问题、氛围、准备技巧、反馈，什么都可以。",
+      "stageReviewPlaceholder": "例：电面大约 30 分钟，主要是深挖简历 + behavioral 问题。",
+      "autoCommitHint": "填写日期和详情并切换到下一栏后，记录会自动添加并保存，无需点击按钮。"
+    },
+    "write": {
+      "errors": {
+        "typeRequired": "请选择类型：实习、应届、社招、跳槽或合同工",
+        "tipsEmptyEdit": "“注意事项”为空，请在帖子详情中检查",
+        "tipsRequired": "请填写“注意事项”",
+        "tipsTooLong": "“注意事项”请控制在 {max} 个字符以内",
+        "timelineRequiredEdit": "请至少保留 1 条进度记录。填写日期和详情后，点击“添加这条记录”",
+        "timelineRequired": "请至少添加 1 条进度记录（日期 + 详情），然后点击“添加这条记录”",
+        "outcomeRequired": "请选择最终结果",
+        "orgRequired": "请选择是哪个学生组织介绍的",
+        "sourceRequired": "请选择求职渠道"
+      },
+      "updated": "进度已更新，帖子已移到列表顶部",
+      "created": "经验分享已发布，之后可以继续添加进度",
+      "moreSettingsTitle": "编辑帖子详情",
+      "moreSettingsHint": "只有想修改标题、公司或“注意事项”时才需要打开",
+      "tipsTitle": "注意事项",
+      "tipsDescription": "最想告诉后来者的小贴士，让他们少走弯路",
+      "tipsPlaceholder": "例：面试前查一下团队最近的项目。LinkedIn 内推的回复率比 Handshake 高很多。",
+      "outcomeSection": "最终结果如何？",
+      "outcomeEditHint": "如有变化，也请在这里更新",
+      "outcomeSectionDescription": "如果还在进行中，请选择“进行中”，之后可以修改",
+      "sourceSection": "你是通过什么渠道来的？",
+      "sourceSectionDescription": "告诉我们你是怎么来写这篇经验分享的，其他人看不到",
+      "selectSourceFirst": "请选择求职渠道",
+      "updateSubmit": "更新进度",
+      "typeSection": "是什么类型？",
+      "basicSection": "基本信息",
+      "basicSectionDescription": "填写标题和公司",
+      "timelineSection": "进度",
+      "createFootnote": "发布后也可以继续添加和编辑进度。",
+      "createIntro": "选择类型，按日期记录进度。发布后也可以继续补充。",
+      "updateEyebrow": "进度更新",
+      "updateTitle": "添加新的进度记录"
+    }
+  },
+  "detail": {
+    "noDate": "无日期",
+    "stageReview": "阶段笔记",
+    "views": "{views} 次浏览",
+    "accordionHint": "点击步骤可展开或收起，每次只展开一个。",
+    "editLabel": "更新"
+  },
+  "orientation": {
+    "defaultEyebrow": "写经验分享",
+    "title": "开始之前",
+    "subtitleWithGuide": "请阅读写作指南和社区规范，然后同意。",
+    "subtitle": "请阅读社区规范，然后同意。",
+    "guideTitle": "写作指南",
+    "communityTitle": "社区规范",
+    "saving": "保存中…",
+    "agree": "同意并开始写",
+    "backToList": "返回列表",
+    "saveFailed": "同意记录保存失败，请重试。",
+    "roommateEyebrow": "室友 · 转租",
+    "anonymousEyebrow": "匿名版块",
+    "cptOpt": {
+      "step1": {
+        "title": "按日期记录的经验分享",
+        "body": "按日期逐条记录你的 CPT、OPT、STEM OPT、签证或绿卡进度，方便其他人日后一步步参考。"
+      },
+      "step2": {
+        "title": "日期 → 项目 → 详情",
+        "body": "在下方表单中选择日期，只勾选需要的项目（准备、提交、结果、下一步），然后填写详情。"
+      },
+      "step3": {
+        "title": "点击“添加这条记录”后会叠加在上方",
+        "body": "填写完后点击“添加这条记录”，它会移到表单上方的列表中。然后在下方表单继续填写下一个日期。"
+      }
+    },
+    "jobReview": {
+      "step1": {
+        "title": "按日期记录的经验分享",
+        "body": "按日期逐条记录你的实习、应届、社招、跳槽或合同工招聘流程，方便其他人从投递到 offer 一步步参考。"
+      },
+      "step2": {
+        "title": "日期 → 项目 → 详情",
+        "body": "在下方表单中选择日期，只勾选需要的项目（阶段、渠道、材料、面试、结果），然后填写详情。"
+      },
+      "step3": {
+        "title": "点击“添加这条记录”后会叠加在上方",
+        "body": "填写完后点击“添加这条记录”，它会移到表单上方的列表中。然后在下方表单继续填写下一个日期。"
+      }
+    }
+  },
+  "write": {
+    "notFound": "找不到该帖子",
+    "noPermission": "你没有编辑权限",
+    "loadFailed": "帖子加载失败",
+    "errors": {
+      "timelineIncomplete": "请为正在填写的记录添加日期和详情"
+    },
+    "saveFailed": "保存失败",
+    "draftSaved": "草稿已保存",
+    "draftSaveFailed": "草稿保存失败",
+    "checkingLogin": "正在确认登录状态…",
+    "loadingPost": "正在加载帖子…",
+    "backToPost": "返回帖子",
+    "boardList": "{board}列表",
+    "collapse": "收起",
+    "expand": "展开",
+    "titleLabel": "标题",
+    "updating": "更新中…",
+    "updateFootnote": "保存后，你的帖子会移到列表顶部，大家都能看到你的最新进度。",
+    "timelineSectionDescription": "按日期随意添加、编辑或删除记录",
+    "submitting": "发布中…",
+    "selectTypeFirst": "请选择类型",
+    "submit": "发布经验分享",
+    "backToList": "返回列表",
+    "createEyebrow": "新帖子",
+    "updateIntro": "现在只需填写日期和详情。保存后，你的帖子会移到列表顶部。",
+    "untitled": "无标题",
+    "existingCount_other": "目前共 {count} 条记录",
+    "restoredAutosave": "已恢复你提交前自动保存的编辑内容",
+    "draftEmpty": "还没有可保存的内容"
+  },
+  "timeline": {
+    "addedTitle_other": "已添加 {count} 条记录",
+    "savedTitle_other": "{count} 条已保存的记录",
+    "savedDescription": "记录会叠加在表单上方，可编辑或删除各日期的记录",
+    "editingSelected": "编辑所选记录",
+    "cancel": "取消",
+    "finishEdit": "完成编辑",
+    "addEntry": "添加这条记录",
+    "clearDraft": "清空表单",
+    "limitReached": "已达到记录上限。删除一条记录后才能添加新的。",
+    "updateGuide": {
+      "editingTitle": "正在编辑已有记录",
+      "addTitle": "添加进度",
+      "addDescription": "选择新的日期，填写详情，然后点击“添加这条记录”。可以连续添加多条。"
+    },
+    "newEntry": "新的进度记录",
+    "editHint": "编辑完成后请点击“完成编辑”",
+    "maxCanAdd": "最多可添加 {max} 条记录",
+    "maxReached": "上限为 {max} 条记录",
+    "noDate": "无日期",
+    "edit": "编辑",
+    "editing": "编辑中",
+    "delete": "删除",
+    "date": "日期",
+    "selectFields": "选择要记录的项目",
+    "selectFieldsHint": "只选适用的项目，可以多选。",
+    "incompleteEmpty": "请填写日期，并选择一个项目或填写阶段笔记",
+    "incompleteDate": "请同时填写日期和详情",
+    "quickInput": "快速填写",
+    "removeField": "移除"
+  },
+  "guest": {
+    "signedIn": "你已登录，经验分享将直接发布到这个账号",
+    "claimLinked": "注册成功！你刚写的经验分享已关联到你的账号",
+    "claimDone": "注册成功",
+    "claimFailed": "经验分享关联失败",
+    "googleFailed": "Google 登录失败",
+    "errors": {
+      "nicknameLength": "请输入 {min}–{max} 个字符的显示昵称",
+      "nicknameTaken": "该昵称已被使用，请换一个",
+      "emailInvalid": "请输入有效的邮箱",
+      "linkedinInvalid": "请检查你的 LinkedIn 个人主页链接（例：linkedin.com/in/your-name）",
+      "titleRequired": "请输入标题",
+      "guidelinesRequired": "请同意社区规范"
+    },
+    "created": "经验分享已发布，谢谢你！",
+    "createFailed": "经验分享发布失败",
+    "backToList": "面试·求职经验分享",
+    "checkingDraft": "正在查找你保存的草稿…",
+    "authorSection": "关于你",
+    "authorSectionMember": "你的昵称会公开显示。LinkedIn 仅用于确认你的工作单位",
+    "authorSectionGuest": "只有昵称会公开。邮箱和 LinkedIn 仅我们团队可见，绝不会公开",
+    "nicknameLabel": "昵称",
+    "nicknameHint": "显示在帖子上 · 公开",
+    "nicknamePlaceholder": "例：NYCWorker",
+    "emailLabel": "邮箱",
+    "emailHintMember": "账号邮箱 · 不公开",
+    "emailHintGuest": "用于礼品卡和积分通知 · 不公开",
+    "linkedinLabel": "LinkedIn 个人主页链接",
+    "linkedinHint": "用于确认你的工作单位 · 不公开",
+    "coffeeChatLabel": "我愿意接受职场新人的 coffee chat 邀请",
+    "optional": "（选填）",
+    "coffeeChatHint": "即使勾选，你的联系方式也不会公开。收到邀请时，我们团队会先征求你的意见再为你们牵线。",
+    "guidelinesAgree": "我已阅读上述社区规范，本经验分享基于我的真实经历。",
+    "submitGuest": "免注册发布经验分享",
+    "footnoteBefore": "无需注册。",
+    "footnoteLink": "使用 Google 注册并发布",
+    "footnoteAfter": "，积分会立即存入你的账号。",
+    "footnoteMember": "发布后，可以在“我的帖子”中继续添加和编辑进度。",
+    "choose": {
+      "eyebrow": "分享你的经验",
+      "title": "无需注册也能发布经验分享",
+      "intro": "从投递、面试到结果，一步步记录下来，对走同样道路的人帮助巨大。只需 5 分钟。",
+      "recommended": "推荐",
+      "googleTitle": "使用 Google 注册并发布",
+      "googlePitch1": "积分直接存入你的账号",
+      "googlePitch2": "发布后可以继续添加进度",
+      "guestTitle": "免注册发布",
+      "guestPitch1": "只需昵称、邮箱和 LinkedIn 链接",
+      "guestPitch2": "我们会为你保留积分，日后用同一邮箱注册时自动发放",
+      "guestCta": "免注册发布经验分享"
+    },
+    "creditPitch": {
+      "title": "发布经验分享，赚取积分",
+      "perStep": "每个招聘环节 {perStep} 积分（每篇最多 {max}）",
+      "perStepWithBonus": "每个招聘环节 {perStep} 积分（每篇最多 {max}）· 首次发帖 +{bonus}",
+      "review": "详细的经验分享经 Misaeng 团队审核后可获得额外积分",
+      "coffeeChat": "用积分（{cost}）和你所在行业或公司、或其他行业的从业者进行一对一 coffee chat",
+      "optionalSignup": "注册是可选的。注册后即可使用积分并接收 coffee chat 邀请"
+    },
+    "hero": {
+      "memberEyebrow": "用我的账号发布",
+      "memberIntro": "发布后积分立即存入该账号，你还可以接收 coffee chat 邀请。",
+      "guestIntro": "无需注册。我们会为你保留积分，日后用同一邮箱注册时自动发放。"
+    },
+    "preview": {
+      "count_other": "目前已添加 {count} 个招聘环节",
+      "member": "你将获得 {credit} 积分",
+      "memberWithBonus": "你将获得 {credit} 积分（首次发帖 +{bonus}）",
+      "guest": "注册后获得 {credit} 积分",
+      "guestWithBonus": "注册后获得 {credit} 积分（首次发帖 +{bonus}）"
+    },
+    "done": {
+      "eyebrow": "已发布",
+      "title": "感谢你分享经验",
+      "body_other": "“{title}”已发布到面试·求职经验分享版块。其中的 {count} 个招聘环节将帮助后来的人。",
+      "awarded": "已向你的账号发放 {credit} 积分",
+      "linked": "经验分享已关联到你的账号",
+      "coffeeChat": "用积分（{cost} 积分）和你所在行业或公司、或其他行业的从业者进行 coffee chat。",
+      "pending": "注册即可立即获得 {credit} 积分",
+      "breakdown_other": "{count} 个招聘环节 = {credit} 积分。使用与经验分享中邮箱一致的 Google 账号注册，即可自动关联。",
+      "breakdownWithBonus_other": "{count} 个招聘环节 = {credit} 积分 + {bonus} 首次发帖奖励。使用与经验分享中邮箱一致的 Google 账号注册，即可自动关联。",
+      "viewPost": "查看我的经验分享",
+      "viewCredit": "查看我的积分",
+      "toList": "返回列表",
+      "optional": "可选",
+      "signupTitle": "注册 {brand}，接收职场新人的 coffee chat 邀请",
+      "signupPitch1": "你刚写的经验分享和 {credit} 积分会立即关联到你的账号",
+      "signupPitch2": "用积分和你所在行业或公司、或其他行业的从业者进行一对一 coffee chat",
+      "signupPitch3": "可以继续添加和编辑你的进度",
+      "emailMismatch": "你的账号邮箱与经验分享中的邮箱不同，无法自动关联。我们团队会核实你的 LinkedIn 和邮箱后，再关联到你的账号。",
+      "skipNote": "即使现在不注册，你的经验分享也会保留。",
+      "skip": "以后再说"
+    }
+  }
+}

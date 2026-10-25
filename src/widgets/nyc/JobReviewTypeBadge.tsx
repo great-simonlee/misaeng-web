@@ -3,10 +3,10 @@
 import { cn } from '@lib'
 import {
   JOB_REVIEW_TYPES,
-  getJobReviewTypeLabel,
   getJobReviewTypeStyle,
   type JobReviewTypeId,
 } from '@lib/community/jobReview'
+import { useT } from '@lib/i18n/client'
 
 type JobReviewTypeBadgeProps = {
   type: JobReviewTypeId | null | undefined
@@ -14,8 +14,9 @@ type JobReviewTypeBadgeProps = {
 }
 
 export function JobReviewTypeBadge({ type, className }: JobReviewTypeBadgeProps) {
-  const label = getJobReviewTypeLabel(type)
-  if (!label) return null
+  const t = useT('reviews')
+  if (!type || !JOB_REVIEW_TYPES.some((item) => item.id === type)) return null
+  const label = t(`jobReview.types.${type}.label`)
   const style = getJobReviewTypeStyle(type)
   return (
     <span
@@ -36,6 +37,7 @@ type JobReviewTypePickerProps = {
 }
 
 export function JobReviewTypePicker({ value, onChange }: JobReviewTypePickerProps) {
+  const t = useT('reviews')
   return (
     <div className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
       {JOB_REVIEW_TYPES.map((item) => {
@@ -61,10 +63,10 @@ export function JobReviewTypePicker({ value, onChange }: JobReviewTypePickerProp
               </span>
             ) : null}
             <span className='block text-[15px] font-semibold text-[var(--foreground)]'>
-              {item.label}
+              {t(`jobReview.types.${item.id}.label`)}
             </span>
             <span className='mt-1 block text-[12px] font-light leading-snug text-[var(--muted-foreground)]'>
-              {item.description}
+              {t(`jobReview.types.${item.id}.description`)}
             </span>
           </button>
         )

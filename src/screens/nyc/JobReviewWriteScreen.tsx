@@ -15,6 +15,7 @@ import {
   createCommunityPostRequest,
   fetchCommunityPost,
   updateCommunityPostRequest,
+  localizeCommunityError,
 } from '@lib/community/client'
 import {
   JOB_REVIEW_TIPS_MAX,
@@ -26,6 +27,7 @@ import {
   normalizeJobReviewTimeline,
   type JobReviewTimelineEntry,
 } from '@lib/community/jobReview'
+import { useFormat, useT } from '@lib/i18n/client'
 import {
   clearWriteDraft,
   loadWriteDraft,
@@ -35,7 +37,7 @@ import { COMMUNITY_BODY_MAX } from '@lib/community/food'
 import { htmlToPlainText } from '@lib/community/html'
 import { isAccountSuspended, isIdentityVerified } from '@lib/community/schoolGate'
 import {
-  NYC_COMMUNITY_BOARD_META,
+  communityBoardKey,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { cn } from '@lib'
@@ -83,7 +85,6 @@ export function JobReviewWriteScreen({
   const city = useCity()
   const href = useCityPath()
   const boardId: NycCommunityBoardId = 'job-review'
-  const meta = NYC_COMMUNITY_BOARD_META[boardId]
   const isEdit = Boolean(editPostId)
   const loginNext = editPostId
     ? href(`/${boardId}/${editPostId}/edit`)
@@ -91,6 +92,9 @@ export function JobReviewWriteScreen({
   const { user, profile, loading, isAuthenticated } =
     useRequireAuth(loginNext)
   const { error: toastError, success } = useToast()
+  const t = useT('reviews')
+  const tCommunity = useT('community')
+  const format = useFormat()
   const router = useRouter()
 
   const [submitting, setSubmitting] = useState(false)
@@ -199,12 +203,12 @@ export function JobReviewWriteScreen({
         const post = await fetchCommunityPost(postId)
         if (signal.cancelled) return
         if (!post || !isJobReviewBoard(post.categoryId)) {
-          toastError('글을 찾을 수 없어요')
+          toastError(t('write.notFound'))
           router.replace(href('/me/posts'))
           return
         }
         if (post.authorUid !== uid) {
-          toastError('수정 권한이 없어요')
+          toastError(t('write.noPermission'))
           router.replace(hrefForCommunityPost(post, city))
           return
         }
@@ -250,14 +254,14 @@ export function JobReviewWriteScreen({
               : fromPost.timeline,
           })
           setDraftSavedAt(stored.savedAt)
-          success('제출 전에 자동 저장된 수정 내용을 불러왔어요')
+          success(t('write.restoredAutosave'))
           return
         }
         if (stored) clearWriteDraft('job-review', city, editDraftUid)
         applyDraftData(fromPost)
       } catch (err) {
         if (!signal.cancelled) {
-          toastError(getErrorMessage(err, '글을 불러오지 못했어요'))
+          toastError(getErrorMessage(localizeCommunityError(err, tCommunity), t('write.loadFailed')))
           router.replace(href('/me/posts'))
         }
       } finally {
@@ -281,7 +285,7 @@ export function JobReviewWriteScreen({
     if (!user?.email) return
 
     if (!jobReviewType) {
-      toastError('인턴 / 신입 / 경력 / 이직 / 계약 중 유형을 선택해 주세요')
+      toastError(t('jobReview.write.errors.typeRequired'))
       return
     }
 
@@ -289,14 +293,16 @@ export function JobReviewWriteScreen({
     if (!plain) {
       toastError(
         isEdit
-          ? '조심해야 할 점이 비어 있어요. 글 정보에서 확인해 주세요'
-          : '조심해야 할 점을 입력해 주세요',
+          ? t('jobReview.write.errors.tipsEmptyEdit')
+          : t('jobReview.write.errors.tipsRequired'),
       )
       return
     }
     if (plain.length > COMMUNITY_BODY_MAX) {
       toastError(
-        `조심해야 할 점은 ${COMMUNITY_BODY_MAX.toLocaleString('en-US')}자 이내로 작성해 주세요`,
+        t('jobReview.write.errors.tipsTooLong', {
+          max: format.number(COMMUNITY_BODY_MAX),
+        }),
       )
       return
     }
@@ -307,8 +313,8 @@ export function JobReviewWriteScreen({
     if (normalizedTimeline.length === 0) {
       toastError(
         isEdit
-          ? '진행 기록을 최소 1건 남겨 주세요. 날짜와 내용을 입력한 뒤 「이 기록 추가」를 눌러 주세요'
-          : '진행 기록(날짜 + 내용)을 최소 1건 입력한 뒤 「이 기록 추가」를 눌러 주세요',
+          ? t('jobReview.write.errors.timelineRequiredEdit')
+          : t('jobReview.write.errors.timelineRequired'),
       )
       return
     }
@@ -318,18 +324,18 @@ export function JobReviewWriteScreen({
         !isJobReviewTimelineEntryComplete(entry),
     )
     if (incomplete) {
-      toastError('작성 중인 기록에 날짜와 내용을 함께 입력해 주세요')
+      toastError(t('write.errors.timelineIncomplete'))
       return
     }
     if (!jobReviewOutcome) {
-      toastError('최종 결과를 선택해 주세요')
+      toastError(t('jobReview.write.errors.outcomeRequired'))
       return
     }
     if (!jobReviewSource || !sourceComplete) {
       toastError(
         jobReviewSource === 'student-org'
-          ? '어느 학생회를 통해 연락이 닿았는지 선택해 주세요'
-          : '어떻게 연락이 닿았는지 선택해 주세요',
+          ? t('jobReview.write.errors.orgRequired')
+          : t('jobReview.write.errors.sourceRequired'),
       )
       return
     }
@@ -368,12 +374,12 @@ export function JobReviewWriteScreen({
       if (draftKeyUid) clearWriteDraft('job-review', city, draftKeyUid)
       success(
         isEdit
-          ? '진행 기록을 업데이트했어요. 목록 맨 위로 올라갔습니다'
-          : '후기를 등록했어요. 나중에 진행 상황을 이어서 추가할 수 있어요',
+          ? t('jobReview.write.updated')
+          : t('jobReview.write.created'),
       )
       router.push(hrefForCommunityPost(post, city))
     } catch (err) {
-      toastError(getErrorMessage(err, '저장에 실패했어요'))
+      toastError(getErrorMessage(localizeCommunityError(err, tCommunity), t('write.saveFailed')))
     } finally {
       setSubmitting(false)
     }
@@ -381,17 +387,17 @@ export function JobReviewWriteScreen({
 
   function handleSaveDraft() {
     try {
-      if (persistDraft()) success('임시 저장했어요')
-      else toastError('저장할 내용이 아직 없어요')
+      if (persistDraft()) success(t('write.draftSaved'))
+      else toastError(t('write.draftEmpty'))
     } catch {
-      toastError('임시 저장에 실패했어요')
+      toastError(t('write.draftSaveFailed'))
     }
   }
 
   if (loading || !isAuthenticated || !draftHydrated) {
     return (
       <BoardPageShell width='narrow'>
-        <LoadingState fullPage label='로그인 확인 중…' />
+        <LoadingState fullPage label={t('write.checkingLogin')} />
       </BoardPageShell>
     )
   }
@@ -407,7 +413,7 @@ export function JobReviewWriteScreen({
   if (loadingEdit) {
     return (
       <BoardPageShell width='narrow'>
-        <LoadingState fullPage label='글을 불러오는 중…' />
+        <LoadingState fullPage label={t('write.loadingPost')} />
       </BoardPageShell>
     )
   }
@@ -421,7 +427,7 @@ export function JobReviewWriteScreen({
               ? href(`/${boardId}/${editPostId}`)
               : href(`/${boardId}`)
           }
-          label={isEdit ? '글로 돌아가기' : `${title} 목록`}
+          label={isEdit ? t('write.backToPost') : t('write.boardList', { board: title })}
           className='mb-5'
         />
 
@@ -433,7 +439,7 @@ export function JobReviewWriteScreen({
             recordCount={existingTimelineIds.length}
           />
         ) : (
-          <CreateHero writeLabel={meta.writeLabel} />
+          <CreateHero writeLabel={tCommunity(communityBoardKey(boardId, 'writeLabel'))} />
         )}
 
         <form
@@ -466,25 +472,25 @@ export function JobReviewWriteScreen({
                 >
                   <div>
                     <p className='text-[14px] font-semibold text-[var(--foreground)]'>
-                      글 정보 수정
+                      {t('jobReview.write.moreSettingsTitle')}
                     </p>
                     <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
-                      제목·회사·조심해야 할 점을 바꾸고 싶을 때만 열어 주세요
+                      {t('jobReview.write.moreSettingsHint')}
                     </p>
                   </div>
                   <span className='text-[12px] font-medium text-[var(--brand)]'>
-                    {showMoreSettings ? '접기' : '열기'}
+                    {showMoreSettings ? t('write.collapse') : t('write.expand')}
                   </span>
                 </button>
                 {showMoreSettings ? (
                   <div className='space-y-5 border-t border-black/[0.04] bg-white p-4 sm:p-5'>
-                    <Field label='제목' required>
+                    <Field label={t('write.titleLabel')} required>
                       <input
                         required
                         value={postTitle}
                         onChange={(e) => setPostTitle(e.target.value)}
                         className={inputClass}
-                        placeholder={meta.titlePlaceholder}
+                        placeholder={tCommunity(communityBoardKey(boardId, 'titlePlaceholder'))}
                       />
                     </Field>
                     <StatusEmployerSelect
@@ -493,20 +499,20 @@ export function JobReviewWriteScreen({
                         setLocation(next)
                         requestSave()
                       }}
-                      label={meta.locationLabel}
+                      label={tCommunity(communityBoardKey(boardId, 'locationLabel'))}
                     />
                     <div>
                       <p className='text-[13px] font-medium text-[var(--foreground)]'>
-                        조심해야 할 점
+                        {t('jobReview.write.tipsTitle')}
                       </p>
                       <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
-                        다음 사람이 실수하지 않도록 꼭 알려주고 싶은 팁
+                        {t('jobReview.write.tipsDescription')}
                       </p>
                       <div className='mt-1.5'>
                         <TipTapEditor
                           value={contentHtml}
                           onChange={setContentHtml}
-                          placeholder='예: 인터뷰 전에 팀의 최근 프로젝트를 꼭 찾아보세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.'
+                          placeholder={t('jobReview.write.tipsPlaceholder')}
                           minHeightClassName='min-h-[160px]'
                           contentClassName='!text-[13px] !leading-[1.65]'
                           simpleToolbar
@@ -523,11 +529,11 @@ export function JobReviewWriteScreen({
                 className='rounded-2xl p-4 ring-1 ring-black/[0.06] sm:p-5'
               >
                 <p className='text-[14px] font-semibold text-[var(--foreground)]'>
-                  최종 결과는 어떻게 됐나요?
+                  {t('jobReview.write.outcomeSection')}
                   <span className='text-[var(--brand)]'> *</span>
                 </p>
                 <p className='mb-3 mt-0.5 text-[11px] text-[var(--muted)]'>
-                  진행 상황이 바뀌면 여기서 함께 바꿔 주세요
+                  {t('jobReview.write.outcomeEditHint')}
                 </p>
                 <JobReviewOutcomePicker value={jobReviewOutcome} onChange={setJobReviewOutcome} />
               </section>
@@ -537,11 +543,11 @@ export function JobReviewWriteScreen({
                 className='rounded-2xl p-4 ring-1 ring-black/[0.06] sm:p-5'
               >
                 <p className='text-[14px] font-semibold text-[var(--foreground)]'>
-                  어떻게 연락이 닿았나요?
+                  {t('jobReview.write.sourceSection')}
                   <span className='text-[var(--brand)]'> *</span>
                 </p>
                 <p className='mb-3 mt-0.5 text-[11px] text-[var(--muted)]'>
-                  후기를 남기게 된 경로를 알려주세요. 다른 사람에게는 보이지 않아요
+                  {t('jobReview.write.sourceSectionDescription')}
                 </p>
                 <JobReviewSourcePicker
                   value={jobReviewSource}
@@ -558,24 +564,23 @@ export function JobReviewWriteScreen({
                 disabled={
                   submitting || !postTitle.trim() || !jobReviewType || !jobReviewOutcome || !sourceComplete
                 }
-                className='inline-flex h-12 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[15px] font-semibold text-white shadow-[0_4px_14px_rgba(246,67,16,0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-50'
+                className='inline-flex h-12 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[15px] font-semibold text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-50'
               >
                 {submitting
-                  ? '업데이트 중…'
+                  ? t('write.updating')
                   : !jobReviewOutcome
-                    ? '최종 결과를 선택해 주세요'
+                    ? t('jobReview.write.errors.outcomeRequired')
                     : !sourceComplete
-                      ? '연락 경로를 선택해 주세요'
-                      : '진행 기록 업데이트'}
+                      ? t('jobReview.write.selectSourceFirst')
+                      : t('jobReview.write.updateSubmit')}
               </button>
               <p className='text-center text-[12px] leading-relaxed text-[var(--muted)]'>
-                저장하면 목록 맨 위로 올라가고, 다른 사람에게도 최신 진행
-                상황이 보입니다.
+                {t('write.updateFootnote')}
               </p>
             </>
           ) : (
             <>
-              <CreateSection step={1} title='어떤 유형인가요?'>
+              <CreateSection step={1} title={t('jobReview.write.typeSection')}>
                 <JobReviewTypePicker
                   value={jobReviewType}
                   onChange={(next) => {
@@ -587,16 +592,16 @@ export function JobReviewWriteScreen({
 
               <CreateSection
                 step={2}
-                title='기본 정보'
-                description='제목과 회사를 입력해 주세요'
+                title={t('jobReview.write.basicSection')}
+                description={t('jobReview.write.basicSectionDescription')}
               >
-                <Field label='제목' required>
+                <Field label={t('write.titleLabel')} required>
                   <input
                     required
                     value={postTitle}
                     onChange={(e) => setPostTitle(e.target.value)}
                     className={inputClass}
-                    placeholder={meta.titlePlaceholder}
+                    placeholder={tCommunity(communityBoardKey(boardId, 'titlePlaceholder'))}
                   />
                 </Field>
                 <StatusEmployerSelect
@@ -606,14 +611,14 @@ export function JobReviewWriteScreen({
                     setLocation(next)
                     requestSave()
                   }}
-                  label={meta.locationLabel}
+                  label={tCommunity(communityBoardKey(boardId, 'locationLabel'))}
                 />
               </CreateSection>
 
               <CreateSection
                 step={3}
-                title='진행 기록'
-                description='날짜별로 여러 건을 추가·수정·삭제할 수 있어요'
+                title={t('jobReview.write.timelineSection')}
+                description={t('write.timelineSectionDescription')}
               >
                 <JobReviewTimelineEditor
                   value={timeline}
@@ -626,13 +631,13 @@ export function JobReviewWriteScreen({
 
               <CreateSection
                 step={4}
-                title='조심해야 할 점'
-                description='다음 사람이 실수하지 않도록 꼭 알려주고 싶은 팁'
+                title={t('jobReview.write.tipsTitle')}
+                description={t('jobReview.write.tipsDescription')}
               >
                 <TipTapEditor
                   value={contentHtml}
                   onChange={setContentHtml}
-                  placeholder='예: 인터뷰 전에 팀의 최근 프로젝트를 꼭 찾아보세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.'
+                  placeholder={t('jobReview.write.tipsPlaceholder')}
                   minHeightClassName='min-h-[200px]'
                   contentClassName='!text-[13px] !leading-[1.65]'
                   simpleToolbar
@@ -642,16 +647,16 @@ export function JobReviewWriteScreen({
 
               <CreateSection
                 step={5}
-                title='최종 결과는 어떻게 됐나요?'
-                description='아직 진행 중이면 「진행 중」을 골라 주세요. 나중에 바꿀 수 있어요'
+                title={t('jobReview.write.outcomeSection')}
+                description={t('jobReview.write.outcomeSectionDescription')}
               >
                 <JobReviewOutcomePicker value={jobReviewOutcome} onChange={setJobReviewOutcome} />
               </CreateSection>
 
               <CreateSection
                 step={6}
-                title='어떻게 연락이 닿았나요?'
-                description='후기를 남기게 된 경로를 알려주세요. 다른 사람에게는 보이지 않아요'
+                title={t('jobReview.write.sourceSection')}
+                description={t('jobReview.write.sourceSectionDescription')}
               >
                 <JobReviewSourcePicker
                   value={jobReviewSource}
@@ -676,18 +681,18 @@ export function JobReviewWriteScreen({
                   className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
                 >
                   {submitting
-                    ? '등록 중…'
+                    ? t('write.submitting')
                     : !jobReviewType
-                      ? '유형을 선택해 주세요'
+                      ? t('write.selectTypeFirst')
                       : !jobReviewOutcome
-                        ? '최종 결과를 선택해 주세요'
+                        ? t('jobReview.write.errors.outcomeRequired')
                         : !sourceComplete
-                          ? '연락 경로를 선택해 주세요'
-                          : '후기 등록하기'}
+                          ? t('jobReview.write.selectSourceFirst')
+                          : t('write.submit')}
                 </button>
               </WriteDraftActions>
               <p className='text-center text-[12px] text-[var(--muted)]'>
-                등록 후에도 진행 기록을 이어서 추가·수정할 수 있어요.
+                {t('jobReview.write.createFootnote')}
               </p>
             </>
           )}
@@ -697,7 +702,7 @@ export function JobReviewWriteScreen({
               href={href(`/${boardId}`)}
               className='underline-offset-2 hover:underline'
             >
-              목록으로 돌아가기
+              {t('write.backToList')}
             </Link>
           </p>
         </form>
@@ -717,17 +722,17 @@ export function JobReviewWriteScreen({
 }
 
 function CreateHero({ writeLabel }: { writeLabel: string }) {
+  const t = useT('reviews')
   return (
     <div>
       <p className='text-[11px] font-semibold tracking-[0.08em] text-[var(--muted)]'>
-        최초 등록
+        {t('write.createEyebrow')}
       </p>
       <h1 className='mt-1.5 text-[1.35rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.55rem]'>
         {writeLabel}
       </h1>
       <p className='mt-2 text-[13px] leading-relaxed text-[var(--muted)]'>
-        유형을 고르고 날짜별 진행 기록을 남겨 주세요. 등록 후에도 이어서 추가할
-        수 있어요.
+        {t('jobReview.write.createIntro')}
       </p>
     </div>
   )
@@ -744,6 +749,7 @@ function UpdateHero({
   jobReviewType: JobReviewTypeId | null
   recordCount: number
 }) {
+  const t = useT('reviews')
   const style = getJobReviewTypeStyle(jobReviewType)
   return (
     <div
@@ -755,20 +761,19 @@ function UpdateHero({
           className='text-[11px] font-semibold tracking-[0.08em]'
           style={{ color: style.accent }}
         >
-          진행 업데이트
+          {t('jobReview.write.updateEyebrow')}
         </p>
         <h1 className='mt-1.5 text-[1.25rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.4rem]'>
-          새 진행 기록 추가
+          {t('jobReview.write.updateTitle')}
         </h1>
         <p className='mt-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-          지금 추가할 날짜와 내용만 적어 주세요. 저장하면 목록 맨 위로
-          올라갑니다.
+          {t('write.updateIntro')}
         </p>
       </div>
       <div className='flex flex-wrap items-center gap-2 bg-white/75 px-4 py-3 sm:px-5'>
         <JobReviewTypeBadge type={jobReviewType} />
         <span className='min-w-0 truncate text-[13px] font-medium text-[var(--foreground)]'>
-          {title || '제목 없음'}
+          {title || t('write.untitled')}
         </span>
         {location.trim() ? (
           <span className='text-[12px] text-[var(--muted)]'>
@@ -776,7 +781,7 @@ function UpdateHero({
           </span>
         ) : null}
         <span className='ml-auto text-[11px] font-medium text-[var(--muted)]'>
-          기존 {recordCount}건
+          {t('write.existingCount', { count: recordCount })}
         </span>
       </div>
     </div>

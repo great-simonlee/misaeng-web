@@ -1,0 +1,54 @@
+{
+  "brandCity": "{brand} {city}",
+  "links": {
+    "housing": "住まい",
+    "food": "グルメ",
+    "marketplace": "フリマ",
+    "status": "CPT·OPT·ビザ·グリーンカード",
+    "jobReview": "面接·就職",
+    "roommate": "ルームメイト·サブレット",
+    "anonymous": "匿名"
+  },
+  "account": {
+    "me": "マイページ",
+    "myPosts": "自分の投稿",
+    "myLikes": "いいねした投稿",
+    "creditReviews": "クレジット審査"
+  },
+  "accountMenu": "アカウントメニュー",
+  "openAccountMenu": "アカウントメニューを開く",
+  "closeAccountMenu": "アカウントメニューを閉じる",
+  "openMenu": "メニューを開く",
+  "closeMenu": "メニューを閉じる",
+  "menuAria": "{city}メニュー",
+  "mobileMenuAria": "{city}モバイルメニュー",
+  "homeAria": "{city}コミュニティホーム",
+  "communityHome": "コミュニティホーム",
+  "login": "ログイン",
+  "selectCity": "都市を選択",
+  "currentCity": "現在地",
+  "profileAlt": "{name}さんのプロフィール",
+  "profileAltFallback": "プロフィール",
+  "footer": {
+    "tagline": "{city}で暮らす留学生・社会人のためのコミュニティ",
+    "groups": {
+      "community": "コミュニティ",
+      "company": "会社",
+      "support": "サポート"
+    },
+    "links": {
+      "housing": "住まい",
+      "credit": "クレジット",
+      "partners": "パートナー",
+      "companySite": "企業サイト",
+      "about": "会社概要",
+      "service": "サービス",
+      "careers": "採用情報",
+      "contact": "お問い合わせ",
+      "me": "マイページ",
+      "terms": "利用規約",
+      "privacy": "プライバシーポリシー",
+      "ads": "広告・提携"
+    }
+  }
+}

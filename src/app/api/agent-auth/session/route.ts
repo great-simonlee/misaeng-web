@@ -1,14 +1,10 @@
 import { NextResponse } from 'next/server'
 
-import {
-  normalizeUserFromAccessToken,
-} from '../lib/authHelpers'
+import { resolveAuthenticatedUser } from '../lib/authHelpers'
 import {
   ellieoUpstreamFetch,
   getEllieoAccessToken,
   getEllieoBaseUrl,
-  getEllieoRefreshToken,
-  refreshEllieoAccessToken,
   clearEllieoSession,
 } from '../lib/ellieoServer'
 import {
@@ -20,8 +16,6 @@ import { getSupabaseProfile } from '@lib/supabase/profile.server'
 
 export async function GET() {
   const baseUrl = getEllieoBaseUrl()
-  let accessToken = await getEllieoAccessToken()
-  const refreshToken = await getEllieoRefreshToken()
 
   if (!baseUrl) {
     return NextResponse.json({
@@ -31,25 +25,13 @@ export async function GET() {
     })
   }
 
-  if (!accessToken && refreshToken) {
-    accessToken = (await refreshEllieoAccessToken()) || null
-  }
-
-  if (!accessToken) {
-    return NextResponse.json({
-      configured: true,
-      connected: false,
-      user: null,
-    })
-  }
-
-  const user = normalizeUserFromAccessToken(accessToken)
+  // Ellieo가 확인한 토큰만 로그인으로 본다 (만료 시 리프레시 토큰으로 갱신)
+  const user = await resolveAuthenticatedUser()
   if (!user) {
     return NextResponse.json({
       configured: true,
       connected: false,
       user: null,
-      warning: '로그인은 되었지만 사용자 정보를 확인하지 못했어요.',
     })
   }
 
