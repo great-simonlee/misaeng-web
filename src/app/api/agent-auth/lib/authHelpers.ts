@@ -1,4 +1,7 @@
+import { createHash } from 'node:crypto'
+
 import { isMisaengEmail } from '@lib/constants/nyc'
+import type { Translate } from '@lib/i18n/translate'
 
 import {
   ellieoUpstreamFetch,
@@ -6,16 +9,19 @@ import {
   getEllieoAccessToken,
   getEllieoRefreshToken,
   getOrCreateDeviceId,
+  getRequestBearerToken,
+  isEllieoTokenAccepted,
   refreshEllieoAccessToken,
   setEllieoSession,
 } from './ellieoServer'
 
-export function getAuthErrorMessage(data: unknown, fallback: string) {
+/** 업스트림 응답의 오류 문구. t는 `getRequestT(request, 'api')` */
+export function getAuthErrorMessage(t: Translate, data: unknown, fallback: string) {
   if (!data || typeof data !== 'object') return fallback
   if ('message' in data && typeof data.message === 'string') return data.message
   if ('error' in data && typeof data.error === 'string') return data.error
   if ('raw' in data && typeof data.raw === 'string' && data.raw.includes('502')) {
-    return 'Ellieo 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.'
+    return t('auth.ellieoUnavailable')
   }
   return fallback
 }
@@ -169,13 +175,14 @@ export function normalizeUserFromAccessToken(accessToken: string) {
 }
 
 export async function persistAuthSession(
+  t: Translate,
   loginData: unknown,
   deviceId: string,
   hints?: { email?: string | null; name?: string | null },
 ) {
   const tokens = extractEllieoTokens(loginData)
   if (!tokens.accessToken) {
-    return { ok: false as const, error: '액세스 토큰을 받지 못했어요.' }
+    return { ok: false as const, error: t('auth.noAccessToken') }
   }
 
   await setEllieoSession({
@@ -186,6 +193,8 @@ export async function persistAuthSession(
 
   return {
     ok: true as const,
+    // 네이티브 앱 로그인(/api/app-auth/*)은 쿠키 대신 이 토큰을 받아 키체인에 둔다
+    tokens,
     user: buildAuthUserFromHints(hints ?? {}, {
       payload: loginData,
       accessToken: tokens.accessToken,
@@ -194,14 +203,22 @@ export async function persistAuthSession(
   }
 }
 
-export async function loginWithEmail(email: string, password: string) {
-  const deviceId = await getOrCreateDeviceId()
+/** `deviceId`: the native app passes its own fixed id so login and /api/app-auth/refresh use the same device. */
+type AuthOptions = { deviceId?: string }
+
+export async function loginWithEmail(
+  t: Translate,
+  email: string,
+  password: string,
+  options?: AuthOptions,
+) {
+  const deviceId = options?.deviceId || (await getOrCreateDeviceId())
   const candidates = [
     { email, password, platform: 'web' },
     { email, password },
   ]
 
-  let lastError = '로그인에 실패했어요.'
+  let lastError = t('auth.loginFailed')
   for (const body of candidates) {
     const { res, data } = await ellieoUpstreamFetch('auth/login', {
       method: 'POST',
@@ -210,11 +227,11 @@ export async function loginWithEmail(email: string, password: string) {
     })
 
     if (!res.ok) {
-      lastError = getAuthErrorMessage(data, lastError)
+      lastError = getAuthErrorMessage(t, data, lastError)
       continue
     }
 
-    const session = await persistAuthSession(data, deviceId, { email })
+    const session = await persistAuthSession(t, data, deviceId, { email })
     if (session.ok) return session
     lastError = session.error
   }
@@ -223,17 +240,19 @@ export async function loginWithEmail(email: string, password: string) {
 }
 
 export async function registerWithEmail(
+  t: Translate,
   email: string,
   password: string,
   name?: string,
+  options?: AuthOptions,
 ) {
-  const deviceId = await getOrCreateDeviceId()
+  const deviceId = options?.deviceId || (await getOrCreateDeviceId())
   const displayName = name?.trim() || email.split('@')[0]
   const registerPaths = isMisaengEmail(email)
     ? ['auth/register/agent', 'auth/register']
     : ['auth/register', 'auth/register/agent']
 
-  let signupError = '회원가입에 실패했어요.'
+  let signupError = t('auth.signupFailed')
   for (const path of registerPaths) {
     const { res, data } = await ellieoUpstreamFetch(path, {
       method: 'POST',
@@ -244,7 +263,7 @@ export async function registerWithEmail(
     if (res.ok) {
       const tokens = extractEllieoTokens(data)
       if (tokens.accessToken) {
-        return persistAuthSession(data, deviceId, {
+        return persistAuthSession(t, data, deviceId, {
           email,
           name: displayName,
         })
@@ -252,10 +271,10 @@ export async function registerWithEmail(
       break
     }
 
-    signupError = getAuthErrorMessage(data, signupError)
+    signupError = getAuthErrorMessage(t, data, signupError)
   }
 
-  const login = await loginWithEmail(email, password)
+  const login = await loginWithEmail(t, email, password, options)
   if (login.ok) return login
 
   return { ok: false as const, error: login.error || signupError }
@@ -278,12 +297,14 @@ function buildGoogleBodies(
 }
 
 export async function loginWithGoogle(
+  t: Translate,
   idToken: string,
   email?: string | null,
   name?: string | null,
+  options?: AuthOptions,
 ) {
-  const deviceId = await getOrCreateDeviceId()
-  let lastError = 'Google 로그인에 실패했어요.'
+  const deviceId = options?.deviceId || (await getOrCreateDeviceId())
+  let lastError = t('auth.googleLoginFailed')
   let lastStatus = 401
 
   for (const body of buildGoogleBodies(idToken, email, name)) {
@@ -295,14 +316,14 @@ export async function loginWithGoogle(
 
     if (!res.ok) {
       lastStatus = res.status
-      lastError = getAuthErrorMessage(data, lastError)
+      lastError = getAuthErrorMessage(t, data, lastError)
       if (isUpstreamUnavailable(res.status)) {
         return { ok: false as const, error: lastError, status: lastStatus }
       }
       continue
     }
 
-    const session = await persistAuthSession(data, deviceId, { email, name })
+    const session = await persistAuthSession(t, data, deviceId, { email, name })
     if (session.ok) return session
     lastError = session.error
   }
@@ -311,20 +332,22 @@ export async function loginWithGoogle(
 }
 
 export async function registerWithGoogle(
+  t: Translate,
   idToken: string,
   email?: string | null,
   name?: string | null,
   asAgent = false,
+  options?: AuthOptions,
 ) {
-  const deviceId = await getOrCreateDeviceId()
+  const deviceId = options?.deviceId || (await getOrCreateDeviceId())
   const registerPath = asAgent
     ? 'auth/register/google/agent'
     : 'auth/register/google'
 
   const registerBodies = buildGoogleBodies(idToken, email, name)
   let lastError = asAgent
-    ? '에이전트 Google 회원가입에 실패했어요.'
-    : 'Google 회원가입에 실패했어요.'
+    ? t('auth.agentGoogleSignupFailed')
+    : t('auth.googleSignupFailed')
   let lastStatus = 401
 
   for (const body of registerBodies) {
@@ -336,18 +359,18 @@ export async function registerWithGoogle(
 
     if (!res.ok) {
       lastStatus = res.status
-      lastError = getAuthErrorMessage(data, lastError)
+      lastError = getAuthErrorMessage(t, data, lastError)
       if (isUpstreamUnavailable(res.status)) {
         return { ok: false as const, error: lastError, status: lastStatus }
       }
       continue
     }
 
-    const session = await persistAuthSession(data, deviceId, { email, name })
+    const session = await persistAuthSession(t, data, deviceId, { email, name })
     if (session.ok) return session
   }
 
-  const login = await loginWithGoogle(idToken, email, name)
+  const login = await loginWithGoogle(t, idToken, email, name, options)
   if (login.ok) return login
 
   return {
@@ -358,16 +381,17 @@ export async function registerWithGoogle(
 }
 
 export async function loginOrRegisterWithGoogle(
+  t: Translate,
   idToken: string,
   email?: string | null,
   name?: string | null,
-  options?: {
+  options?: AuthOptions & {
     loginOnly?: boolean
     skipLoginAttempt?: boolean
   },
 ) {
   if (!options?.skipLoginAttempt) {
-    const login = await loginWithGoogle(idToken, email, name)
+    const login = await loginWithGoogle(t, idToken, email, name, options)
     if (login.ok) {
       return { ...login, registered: false }
     }
@@ -382,7 +406,7 @@ export async function loginOrRegisterWithGoogle(
   }
 
   const asAgent = isMisaengEmail(email)
-  const register = await registerWithGoogle(idToken, email, name, asAgent)
+  const register = await registerWithGoogle(t, idToken, email, name, asAgent, options)
   if (register.ok) {
     return { ...register, registered: true }
   }
@@ -390,13 +414,47 @@ export async function loginOrRegisterWithGoogle(
   return register
 }
 
-/** Ellieo 로그인 세션(액세스 토큰)만으로 현재 사용자 확인 — 프로필 API 호출 없음 */
+/** Ellieo가 확인해 준 액세스 토큰 (sha256 → 유효 기한). 같은 토큰을 요청마다 다시 묻지 않도록 */
+const verifiedTokens = new Map<string, number>()
+const VERIFIED_TTL_MS = 5 * 60_000
+
+/**
+ * 액세스 토큰을 믿어도 되는지. JWT 내용은 누구나 만들 수 있으므로 Ellieo 서버가 받아 준 토큰만 쓴다.
+ * 만료(exp)가 지났거나, Ellieo가 거절했거나, 확인할 수 없으면 false.
+ */
+export async function verifyEllieoAccessToken(accessToken: string): Promise<boolean> {
+  const payload = decodeJwtPayload(accessToken)
+  const expMs = typeof payload?.exp === 'number' ? payload.exp * 1000 : null
+  const now = Date.now()
+  if (expMs !== null && expMs <= now) return false
+
+  const key = createHash('sha256').update(accessToken).digest('hex')
+  const until = verifiedTokens.get(key)
+  if (until && until > now) return true
+
+  const accepted = await isEllieoTokenAccepted(accessToken)
+  if (!accepted) return false
+  if (verifiedTokens.size > 5000) verifiedTokens.clear()
+  verifiedTokens.set(key, Math.min(now + VERIFIED_TTL_MS, expMs ?? Infinity))
+  return true
+}
+
+/** 현재 요청의 사용자. 앱은 Bearer 토큰, 웹은 쿠키(만료 시 리프레시 토큰으로 갱신). */
 export async function resolveAuthenticatedUser() {
+  const bearer = await getRequestBearerToken()
+  if (bearer) {
+    return (await verifyEllieoAccessToken(bearer)) ? normalizeUserFromAccessToken(bearer) : null
+  }
+
   let accessToken = await getEllieoAccessToken()
   const refreshToken = await getEllieoRefreshToken()
 
+  if (accessToken && !(await verifyEllieoAccessToken(accessToken))) {
+    accessToken = null
+  }
   if (!accessToken && refreshToken) {
-    accessToken = (await refreshEllieoAccessToken()) || null
+    const refreshed = (await refreshEllieoAccessToken()) || null
+    accessToken = refreshed && (await verifyEllieoAccessToken(refreshed)) ? refreshed : null
   }
 
   if (!accessToken) return null
