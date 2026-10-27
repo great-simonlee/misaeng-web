@@ -15,9 +15,11 @@ export const dynamic = 'force-dynamic'
 
 /**
  * My coffee chat mentor card (app).
- * GET    → { eligible, offers: [{ submissionId, company }], mentor: Mentor & { active, submissionId, consentVersion } | null,
- *            consent: { text, version } }. Eligible = an approved 'offer' review verification.
- * PUT    { submissionId, role, intro, topics, active, agreed: true, consentVersion } → mentor (403 MENTOR_NOT_ELIGIBLE)
+ * GET    → { eligible, offers: [{ submissionId, company }],
+ *            mentor: Mentor & { active, submissionId, consentVersion, linkedinUrl } | null, consent: { text, version } }.
+ *            Eligible = an approved 'offer' review verification. linkedinUrl is only ever returned here (never on cards).
+ * PUT    { submissionId, role, intro, topics, active, agreed: true, consentVersion, linkedinUrl? } → mentor
+ *            (403 MENTOR_NOT_ELIGIBLE). linkedinUrl: omitted = unchanged, '' / null = cleared.
  * DELETE → { ok, declined } stop being a mentor; unanswered requests are declined (holds released).
  */
 export async function GET(request: Request) {

@@ -380,7 +380,7 @@
       "notFound": "找不到 coffee chat 申請。",
       "invalidTransition": "目前的狀態無法變更。",
       "cannotCancel": "已排定時間的 coffee chat 無法在此取消，請聯絡營運團隊。",
-      "mentorConsent": "導師須知與同意\n· 你在論壇發布的心得分享仍會保持匿名。但在咖啡聊天中，對方可能會看到你的臉和姓名。\n· 擔任導師沒有任何報酬，包括點數。\n· Zoom 連結由導師自行建立並分享。Misaeng 只負責媒合。\n· 職涯建議僅代表個人意見，Misaeng 不對對話內容負責。",
+      "mentorConsent": "導師須知與同意\n· 你在論壇發布的心得分享仍會保持匿名。但在咖啡聊天中，對方可能會看到你的臉和姓名。\n· 擔任導師沒有任何報酬，包括點數。公司內推獎勵依各公司的制度而定。\n· Zoom 連結由導師自行建立並分享。Misaeng 只負責媒合。\n· 職涯建議僅代表個人意見，Misaeng 不對對話內容負責。\n· 接受後，你的 LinkedIn 會公開給申請人。\n· 你寫的面試·求職心得上也會顯示咖啡聊天申請按鈕。",
       "mentorRequired": "請選擇要申請咖啡聊天的導師。",
       "mentorUnavailable": "目前無法向這位導師申請咖啡聊天。",
       "selfRequest": "不能向自己申請咖啡聊天。",
@@ -401,7 +401,10 @@
       "mentorRoleTooLong": "職位或職稱最多可輸入 {max} 個字元。",
       "mentorIntroTooLong": "簡介最多可輸入 {max} 個字元。",
       "mentorTopicsInvalid": "主題最多 {max} 個，每個不超過 {chars} 個字元。",
-      "nicknameRequired": "註冊為導師前，請先設定暱稱。"
+      "nicknameRequired": "註冊為導師前，請先設定暱稱。",
+      "linkedinRequired": "請輸入你的 LinkedIn 個人檔案連結。",
+      "linkedinInvalid": "請輸入有效的 LinkedIn 個人檔案連結（https://www.linkedin.com/in/…）。",
+      "requestDisclaimer": "咖啡聊天是與導師之間的自願交流。Misaeng 不保證任何內推、面試或就業結果。內推完全由導師個人決定，並須遵守導師所屬公司的政策。Misaeng 不會從咖啡聊天或內推中獲得任何金錢利益，導師也不會從 Misaeng 獲得報酬。送出申請後，你的 LinkedIn 會分享給導師。"
     },
     "push": {
       "earned": {

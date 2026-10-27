@@ -5,9 +5,13 @@ import {
   assertCoffeeChatEnabled,
   DECLINE_REASON_MAX,
   getChat,
+  linkedinInvalid,
+  parseLinkedinUrl,
   parseZoomLink,
+  REPORT_REASON_CODES,
   REPORT_REASON_MAX,
   type ChatAction,
+  type ReportReasonCode,
 } from '@lib/points/coffeeChatMentors.server'
 import { PointsError } from '@lib/points/errors'
 import { pointsErrorResponse, pointsJson } from '@lib/points/http.server'
@@ -40,7 +44,13 @@ function parseAction(body: Record<string, unknown>): ChatAction {
     case 'accept': {
       const zoomLink = parseZoomLink(body.zoomLink)
       if (!zoomLink) throw new PointsError('Invalid Zoom link', 'points.coffeeChat.zoomLinkInvalid', 400, undefined, 'ZOOM_LINK_INVALID')
-      return { action: 'accept', scheduledAt: text(body.scheduledAt), zoomLink }
+      // required: shared with the requester once scheduled (see the mentor consent)
+      if (!text(body.linkedinUrl)) {
+        throw new PointsError('LinkedIn required', 'points.coffeeChat.linkedinRequired', 400, undefined, 'LINKEDIN_REQUIRED')
+      }
+      const linkedinUrl = parseLinkedinUrl(body.linkedinUrl)
+      if (!linkedinUrl) throw linkedinInvalid()
+      return { action: 'accept', scheduledAt: text(body.scheduledAt), zoomLink, linkedinUrl }
     }
     case 'decline': {
       const reason = text(body.reason)
@@ -52,12 +62,18 @@ function parseAction(body: Record<string, unknown>): ChatAction {
     case 'cancel':
       return { action: 'cancel' }
     case 'report': {
+      // reasonCode (optional) is a preset reason; free text is then optional. Unknown codes count as "other".
+      const reasonCode = REPORT_REASON_CODES.includes(body.reasonCode as ReportReasonCode)
+        ? (body.reasonCode as ReportReasonCode)
+        : null
       const reason = text(body.reason)
-      if (!reason) throw new PointsError('Reason required', 'points.coffeeChat.reportReasonRequired', 400, undefined, 'REASON_REQUIRED')
+      if (!reason && !reasonCode) {
+        throw new PointsError('Reason required', 'points.coffeeChat.reportReasonRequired', 400, undefined, 'REASON_REQUIRED')
+      }
       if (reason.length > REPORT_REASON_MAX) {
         throw new PointsError('Reason too long', 'points.coffeeChat.reasonTooLong', 400, { max: REPORT_REASON_MAX }, 'REASON_TOO_LONG')
       }
-      return { action: 'report', reason }
+      return { action: 'report', reason, reasonCode }
     }
     default:
       throw new PointsError('Invalid action', 'points.coffeeChat.invalidAction', 400, undefined, 'INVALID_ACTION')
@@ -65,8 +81,9 @@ function parseAction(body: Record<string, unknown>): ChatAction {
 }
 
 /**
- * { action: 'accept', scheduledAt, zoomLink } (mentor) | { action: 'decline', reason? } (mentor)
- * | { action: 'cancel' } (either side; requester only > 6h before the start) | { action: 'report', reason } → Chat
+ * { action: 'accept', scheduledAt, zoomLink, linkedinUrl } (mentor; current mentor consent required → 409 CONSENT_OUTDATED)
+ * | { action: 'decline', reason? } (mentor) | { action: 'cancel' } (either side; requester only > 6h before the start)
+ * | { action: 'report', reason?, reasonCode? ('linkedin_not_owner'); reason required without a code } → Chat
  */
 export async function POST(request: Request, context: RouteContext) {
   const t = await getRequestT(request, 'api')

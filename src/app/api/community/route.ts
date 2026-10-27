@@ -8,6 +8,7 @@ import { getRequestLocale, getRequestT, getT } from '@lib/i18n/server'
 import { resolveAuthenticatedUser } from '../agent-auth/lib/authHelpers'
 import { applyReviewBodyAccess } from '@lib/community/reviewAccess'
 import { resolveReviewCompanyId } from '@lib/supabase/companies.server'
+import { getOfferVerifiedPostIds } from '@lib/supabase/reviewVerification.server'
 import {
   normalizeCptOptTimeline,
   normalizeCptOptTips,
@@ -166,6 +167,9 @@ export async function GET(request: Request) {
             return ua < ub ? 1 : -1
           })
         : visible
+    // 면접·취업 후기: 작성자가 그 글로 합격 인증을 받았는지 (authorUid는 익명 정리 전 원본으로 확인)
+    const offerVerified =
+      board === 'job-review' ? await getOfferVerifiedPostIds(ordered) : null
     const posts = localizePosts(ordered, locale)
     return NextResponse.json({
       posts: posts.map((item) => {
@@ -173,7 +177,8 @@ export async function GET(request: Request) {
           applyReviewBodyAccess(sanitizeAnonymousCommunityPost(item, user?.uid), user),
         )
         const boostedUntil = boosts?.get(item.id)
-        return boostedUntil ? { ...finalized, boostedUntil } : finalized
+        const withBoost = boostedUntil ? { ...finalized, boostedUntil } : finalized
+        return offerVerified ? { ...withBoost, offerVerified: offerVerified.has(item.id) } : withBoost
       }),
     })
   } catch (error) {

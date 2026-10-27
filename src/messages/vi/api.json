@@ -380,7 +380,7 @@
       "notFound": "Không tìm thấy yêu cầu coffee chat.",
       "invalidTransition": "Không thể thay đổi ở trạng thái hiện tại.",
       "cannotCancel": "Không thể tự hủy coffee chat đã có lịch. Vui lòng liên hệ đội ngũ vận hành.",
-      "mentorConsent": "Thông báo và đồng ý dành cho mentor\n· Các bài review của bạn trên diễn đàn vẫn được giữ ẩn danh. Tuy nhiên, trong buổi coffee chat, người kia có thể thấy khuôn mặt và tên của bạn.\n· Làm mentor không có bất kỳ phần thưởng nào, kể cả điểm.\n· Mentor tự tạo và chia sẻ link Zoom của mình. Misaeng chỉ giúp kết nối.\n· Lời khuyên nghề nghiệp là ý kiến cá nhân, và Misaeng không chịu trách nhiệm về nội dung cuộc trò chuyện.",
+      "mentorConsent": "Thông báo và đồng ý dành cho mentor\n· Các bài review của bạn trên diễn đàn vẫn được giữ ẩn danh. Tuy nhiên, trong buổi coffee chat, người kia có thể thấy khuôn mặt và tên của bạn.\n· Làm mentor không có bất kỳ phần thưởng nào, kể cả điểm. Thưởng giới thiệu (referral) của công ty tuân theo chính sách riêng của từng công ty.\n· Mentor tự tạo và chia sẻ link Zoom của mình. Misaeng chỉ giúp kết nối.\n· Lời khuyên nghề nghiệp là ý kiến cá nhân, và Misaeng không chịu trách nhiệm về nội dung cuộc trò chuyện.\n· Khi bạn chấp nhận, LinkedIn của bạn sẽ được hiển thị cho người gửi yêu cầu.\n· Nút gửi yêu cầu coffee chat cũng hiển thị trên các bài review phỏng vấn và việc làm bạn đã viết.",
       "mentorRequired": "Vui lòng chọn mentor cho buổi coffee chat.",
       "mentorUnavailable": "Hiện bạn không thể đăng ký coffee chat với mentor này.",
       "selfRequest": "Bạn không thể đăng ký coffee chat với chính mình.",
@@ -401,7 +401,10 @@
       "mentorRoleTooLong": "Vị trí hoặc chức danh tối đa {max} ký tự.",
       "mentorIntroTooLong": "Phần giới thiệu tối đa {max} ký tự.",
       "mentorTopicsInvalid": "Tối đa {max} chủ đề, mỗi chủ đề không quá {chars} ký tự.",
-      "nicknameRequired": "Vui lòng đặt biệt danh trước khi đăng ký làm mentor."
+      "nicknameRequired": "Vui lòng đặt biệt danh trước khi đăng ký làm mentor.",
+      "linkedinRequired": "Hãy nhập link hồ sơ LinkedIn của bạn.",
+      "linkedinInvalid": "Hãy nhập link hồ sơ LinkedIn hợp lệ (https://www.linkedin.com/in/…).",
+      "requestDisclaimer": "Coffee chat là cuộc trò chuyện tự nguyện với mentor. Misaeng không đảm bảo bất kỳ kết quả giới thiệu, phỏng vấn hay việc làm nào. Mọi sự giới thiệu hoàn toàn do mentor tự quyết định và tuân theo chính sách của công ty mentor. Misaeng không nhận bất kỳ lợi ích tài chính nào từ coffee chat hay việc giới thiệu, và mentor không được Misaeng trả thù lao. Khi gửi yêu cầu, LinkedIn của bạn sẽ được chia sẻ với mentor."
     },
     "push": {
       "earned": {

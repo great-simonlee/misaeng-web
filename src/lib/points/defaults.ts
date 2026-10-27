@@ -139,5 +139,13 @@ export const COFFEE_CHAT_DISCLAIMER =
  * Coffee chat v2: consent a peer mentor agrees to (required checkbox). The text itself is localized
  * (api.points.coffeeChat.mentorConsent in src/messages/<locale>/api.json); bump the version whenever it changes.
  */
-export const COFFEE_CHAT_MENTOR_CONSENT_VERSION = '2026-10-27'
+export const COFFEE_CHAT_MENTOR_CONSENT_VERSION = '2026-10-27-linkedin'
 export const COFFEE_CHAT_MENTOR_CONSENT_KEY = 'points.coffeeChat.mentorConsent'
+
+/**
+ * Coffee chat v2: disclaimer the requester agrees to (required checkbox on the app's request sheet). Same content as
+ * COFFEE_CHAT_DISCLAIMER plus the LinkedIn exchange, localized (api.points.coffeeChat.requestDisclaimer in
+ * src/messages/<locale>/api.json). Bump the version whenever it changes.
+ */
+export const COFFEE_CHAT_REQUEST_DISCLAIMER_VERSION = '2026-10-27-linkedin'
+export const COFFEE_CHAT_REQUEST_DISCLAIMER_KEY = 'points.coffeeChat.requestDisclaimer'

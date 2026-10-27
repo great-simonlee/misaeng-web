@@ -52,6 +52,8 @@ export class TtlCache<T> {
 export const COMMUNITY_POSTS_TTL_MS = 60_000
 /** 목록에 붙이는 작성자 프로필 (닉네임·사진) */
 export const LIST_PROFILE_TTL_MS = 5 * 60_000
+/** "합격 인증" badge on job reviews (approved offer verification of the post's author) */
+export const OFFER_VERIFIED_TTL_MS = 60_000
 /** 맛집 목록의 댓글·추천 수 */
 export const POST_COUNTS_TTL_MS = 60_000
 

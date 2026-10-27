@@ -7,9 +7,9 @@ import { pointsTierOf } from './account.server'
 import { COFFEE_MESSAGE_MAX, COFFEE_TOPIC_MAX, transitionCoffeeChat, type CoffeeChatStatus } from './coffeeChat.server'
 import { getPointsConfig, ruleAmount, ruleCap, type PointsConfig } from './config.server'
 import {
-  COFFEE_CHAT_DISCLAIMER_VERSION,
   COFFEE_CHAT_MENTOR_CONSENT_KEY,
   COFFEE_CHAT_MENTOR_CONSENT_VERSION,
+  COFFEE_CHAT_REQUEST_DISCLAIMER_VERSION,
 } from './defaults'
 import { isPointsLedgerActive } from './engine.server'
 import { pointsErrors, PointsError } from './errors'
@@ -26,6 +26,10 @@ import { enc, inList, pointsRest, pointsRpc, PointsStoreError, type PointsRpcRes
  *   * Lazy upkeep on every read: requests whose proposed times are all past → cancelled ('admin', note 'expired');
  *     scheduled chats 90 minutes past the start → completed (hold captured).
  * Mentor cards never link to a review (reviews stay anonymous).
+ *
+ * LinkedIn exchange (supabase/coffee_chat_linkedin.sql): the requester sends a LinkedIn URL with every request, the
+ * mentor gives one when accepting. Visibility is decided here (see linkedinVisible), never by the client; a mentor's
+ * LinkedIn never appears in mentor lists / cards / profiles.
  */
 
 // MARK: limits
@@ -37,6 +41,7 @@ export const MENTOR_TOPIC_CHARS = 30
 export const DECLINE_REASON_MAX = 200
 export const REPORT_REASON_MAX = 1000
 export const ZOOM_LINK_MAX = 300
+export const LINKEDIN_MAX = 200
 const MIN_LEAD_MS = 12 * 60 * 60 * 1000
 const MAX_AHEAD_MS = 30 * 24 * 60 * 60 * 1000
 const COMPLETE_AFTER_MS = 90 * 60 * 1000
@@ -55,9 +60,14 @@ type MentorRow = {
   agreed_at: string
   created_at: string
   updated_at: string
+  /** Only selected for the mentor themself (MENTOR_OWN_SELECT); never read for lists or cards. */
+  linkedin?: string | null
 }
 
+/** Public card columns: no LinkedIn (a mentor's LinkedIn must never reach lists / cards / profiles). */
 const MENTOR_SELECT = 'user_id,submission_id,company,role,intro,topics,active,consent_version,agreed_at,created_at,updated_at'
+/** The mentor's own row (GET mentor/me, accept). */
+const MENTOR_OWN_SELECT = `${MENTOR_SELECT},linkedin`
 
 type ChatRow = {
   id: string
@@ -76,11 +86,13 @@ type ChatRow = {
   cancelled_by: 'user' | 'mentor' | 'admin' | null
   reported_at: string | null
   report_reason: string | null
+  requester_linkedin: string | null
+  mentor_linkedin: string | null
   created_at: string
 }
 
 const CHAT_SELECT =
-  'id,user_id,mentor_id,topic,message,status,amount,hold_id,proposed_times,scheduled_at,zoom_link,accepted_at,declined_at,cancelled_by,reported_at,report_reason,created_at'
+  'id,user_id,mentor_id,topic,message,status,amount,hold_id,proposed_times,scheduled_at,zoom_link,accepted_at,declined_at,cancelled_by,reported_at,report_reason,requester_linkedin,mentor_linkedin,created_at'
 
 export type MentorView = {
   userId: string
@@ -94,7 +106,12 @@ export type MentorView = {
   schoolVerified: boolean
 }
 
-export type MyMentorView = MentorView & { active: boolean; submissionId: string; consentVersion: string }
+export type MyMentorView = MentorView & {
+  active: boolean
+  submissionId: string
+  consentVersion: string
+  linkedinUrl: string | null
+}
 
 export type ChatView = {
   id: string
@@ -107,7 +124,11 @@ export type ChatView = {
     company: string | null
     role: string | null
     schoolVerified: boolean
+    /** null whenever I may not see it (see linkedinVisible). */
+    linkedinUrl: string | null
   }
+  /** The LinkedIn I gave on this chat (requester: with the request; mentor: when accepting). */
+  myLinkedinUrl: string | null
   topic: string
   message: string | null
   proposedTimes: string[]
@@ -190,14 +211,85 @@ function toMentor(row: MentorRow, profile: SupabaseProfileRecord | null | undefi
   }
 }
 
+function toMyMentor(row: MentorRow, profile: SupabaseProfileRecord | null | undefined): MyMentorView {
+  return {
+    ...toMentor(row, profile),
+    active: row.active,
+    submissionId: row.submission_id,
+    consentVersion: row.consent_version,
+    linkedinUrl: row.linkedin ?? null,
+  }
+}
+
 function storeError(error: unknown): never {
   if (error instanceof PointsStoreError && error.setupRequired) throw pointsErrors.notConfigured()
   throw error
 }
 
-async function getMentorRow(uid: string): Promise<MentorRow | null> {
-  const rows = await pointsRest<MentorRow[]>(`coffee_chat_mentors?user_id=eq.${enc(uid)}&select=${MENTOR_SELECT}`)
+/** `own` adds the LinkedIn column: only for the mentor themself. */
+async function getMentorRow(uid: string, own = false): Promise<MentorRow | null> {
+  const select = own ? MENTOR_OWN_SELECT : MENTOR_SELECT
+  const rows = await pointsRest<MentorRow[]>(`coffee_chat_mentors?user_id=eq.${enc(uid)}&select=${select}`)
   return rows?.[0] ?? null
+}
+
+// MARK: LinkedIn
+
+/**
+ * LinkedIn profile URL → normalized `https://<host>/in/<slug>` or null when invalid. Accepts a missing scheme and
+ * http (upgraded), www.linkedin.com / country subdomains (kr.linkedin.com) / bare linkedin.com (→ www); the path must be
+ * /in/<slug> (optional trailing slash); query and fragment are dropped. At most 200 characters.
+ * Mirrors CoffeeChatFormat.linkedinURL in misaeng-app.
+ */
+export function parseLinkedinUrl(raw: unknown): string | null {
+  let value = typeof raw === 'string' ? raw.trim() : ''
+  if (!value) return null
+  if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(value)) value = `https://${value}`
+  let url: URL
+  try {
+    url = new URL(value)
+  } catch {
+    return null
+  }
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return null
+  if (url.username || url.password || url.port) return null
+  const host = url.hostname.toLowerCase()
+  if (!/^(?:(?:www|[a-z]{2})\.)?linkedin\.com$/.test(host)) return null
+  const match = /^\/in\/([A-Za-z0-9_%-]{2,150})\/?$/.exec(url.pathname)
+  if (!match) return null
+  const normalized = `https://${host === 'linkedin.com' ? 'www.linkedin.com' : host}/in/${match[1]}`
+  return normalized.length <= LINKEDIN_MAX ? normalized : null
+}
+
+export const linkedinInvalid = () =>
+  new PointsError('Invalid LinkedIn URL', 'points.coffeeChat.linkedinInvalid', 400, { max: LINKEDIN_MAX }, 'LINKEDIN_INVALID')
+
+/**
+ * Who sees the other side's LinkedIn on a chat:
+ *   requested → the mentor sees the requester's; the requester does not see the mentor's (there is none yet).
+ *   scheduled / completed → both see each other's.
+ *   declined, cancelled, expired, no_show → nobody.
+ */
+function linkedinVisible(row: ChatRow, viewerRole: 'requester' | 'mentor') {
+  if (row.status === 'scheduled' || row.status === 'completed') return true
+  return row.status === 'requested' && viewerRole === 'mentor'
+}
+
+/** Requester's last used LinkedIn (prefills the next request); the mentor card's is the fallback and vice versa. */
+export async function getMyLinkedin(uid: string) {
+  const [profiles, mentor] = await Promise.all([
+    pointsRest<{ linkedin: string | null }[]>(`coffee_chat_profiles?user_id=eq.${enc(uid)}&select=linkedin`),
+    getMentorRow(uid, true),
+  ]).catch(storeError)
+  return { linkedinUrl: profiles?.[0]?.linkedin ?? null, mentorLinkedinUrl: mentor?.linkedin ?? null }
+}
+
+async function saveLastLinkedin(uid: string, linkedin: string) {
+  await pointsRest(`coffee_chat_profiles?on_conflict=user_id`, {
+    method: 'POST',
+    prefer: 'resolution=merge-duplicates,return=minimal',
+    body: JSON.stringify({ user_id: uid, linkedin, updated_at: new Date().toISOString() }),
+  }).catch(storeError)
 }
 
 async function getChatRow(id: string): Promise<ChatRow | null> {
@@ -248,15 +340,67 @@ export async function listMentors(viewerUid: string, company?: string | null): P
     .map((row) => toMentor(row, profiles.get(row.user_id)))
 }
 
+export type PostMentorView = { mentorId: string; company: string; role: string }
+
+/**
+ * Coffee chat entry on a job review, for the review's own author only (the one exception to "mentor cards never
+ * link to a review" — it goes review → mentor, never mentor card → review). Null unless all of these hold: the
+ * feature is on, the post is a visible job review (not on an anonymous board), the viewer is not the author, the
+ * author is an active mentor who agreed to the current consent (it says the button shows on their reviews), the
+ * mentor row's offer verification is still approved, and neither side blocked the other. The author uid is only
+ * returned when all of that holds.
+ */
+export async function mentorForPost(viewerUid: string, postId: string): Promise<PostMentorView | null> {
+  const config = await getPointsConfig()
+  if (!config.settings['coffee_chat.enabled'] || !config.tablesReady) return null
+  const id = postId.trim()
+  if (!id || id.length > 200) return null
+  const [{ getStoredCommunityPost }, { isAnonymousBoard }, { isModerationHidden }] = await Promise.all([
+    import('@lib/supabase/community.server'),
+    import('@lib/constants/nyc'),
+    import('@lib/community/moderation'),
+  ])
+  const post = await getStoredCommunityPost(id).catch(() => null)
+  const authorUid = post?.authorUid?.trim() || ''
+  if (
+    !post ||
+    !authorUid ||
+    authorUid === viewerUid ||
+    post.categoryId !== 'job-review' ||
+    isAnonymousBoard(post.categoryId) ||
+    post.status === 'closed' ||
+    isModerationHidden(post)
+  ) {
+    return null
+  }
+  const row = await getMentorRow(authorUid).catch(() => null)
+  if (!row?.active || row.consent_version !== COFFEE_CHAT_MENTOR_CONSENT_VERSION) return null
+  const [offers, authorProfile, viewerProfile, myBlocked] = await Promise.all([
+    listApprovedOffers(authorUid),
+    profileOf(authorUid),
+    profileOf(viewerUid),
+    getViewerBlockedUids(viewerUid),
+  ])
+  if (!offers.some((offer) => offer.submissionId === row.submission_id)) return null
+  if (
+    !authorProfile ||
+    isGone(authorProfile) ||
+    myBlocked.has(authorUid) ||
+    blocks(authorProfile, viewerUid) ||
+    blocks(viewerProfile, authorUid)
+  ) {
+    return null
+  }
+  return { mentorId: authorUid, company: row.company, role: row.role }
+}
+
 export async function getMyMentorState(uid: string, t: Translate) {
   const [offers, row, profile] = await Promise.all([
     listApprovedOffers(uid),
-    getMentorRow(uid).catch(storeError),
+    getMentorRow(uid, true).catch(storeError),
     profileOf(uid),
   ])
-  const mentor: MyMentorView | null = row
-    ? { ...toMentor(row, profile), active: row.active, submissionId: row.submission_id, consentVersion: row.consent_version }
-    : null
+  const mentor: MyMentorView | null = row ? toMyMentor(row, profile) : null
   return { eligible: offers.length > 0, offers, mentor, consent: mentorConsent(t) }
 }
 
@@ -268,6 +412,8 @@ export type MentorInput = {
   active: boolean
   agreed: boolean
   consentVersion: string
+  /** undefined = leave as is (older apps don't send it); null = clear. */
+  linkedinUrl: string | null | undefined
 }
 
 /** Parses + validates the PUT body (PointsError with api keys on failure). */
@@ -300,7 +446,15 @@ export function parseMentorInput(body: Record<string, unknown>): MentorInput {
       'TOPICS_INVALID',
     )
   }
+  let linkedinUrl: string | null | undefined
+  if (body.linkedinUrl === null || (typeof body.linkedinUrl === 'string' && !body.linkedinUrl.trim())) {
+    linkedinUrl = null
+  } else if (body.linkedinUrl !== undefined) {
+    linkedinUrl = parseLinkedinUrl(body.linkedinUrl)
+    if (!linkedinUrl) throw linkedinInvalid()
+  }
   return {
+    linkedinUrl,
     submissionId: typeof body.submissionId === 'string' ? body.submissionId.trim() : '',
     role,
     intro,
@@ -322,7 +476,7 @@ export async function saveMentor(uid: string, input: MentorInput): Promise<MyMen
     throw new PointsError('Nickname required', 'points.coffeeChat.nicknameRequired', 400, undefined, 'NICKNAME_REQUIRED')
   }
   const now = new Date().toISOString()
-  const rows = await pointsRest<MentorRow[]>(`coffee_chat_mentors?on_conflict=user_id&select=${MENTOR_SELECT}`, {
+  const rows = await pointsRest<MentorRow[]>(`coffee_chat_mentors?on_conflict=user_id&select=${MENTOR_OWN_SELECT}`, {
     method: 'POST',
     prefer: 'resolution=merge-duplicates,return=representation',
     body: JSON.stringify({
@@ -336,11 +490,13 @@ export async function saveMentor(uid: string, input: MentorInput): Promise<MyMen
       consent_version: input.consentVersion,
       agreed_at: now,
       updated_at: now,
+      // merge-duplicates only updates the columns sent: leaving it out keeps the stored LinkedIn
+      ...(input.linkedinUrl === undefined ? {} : { linkedin: input.linkedinUrl }),
     }),
   }).catch(storeError)
   const row = rows?.[0]
   if (!row) throw new Error('coffee_chat_mentors upsert returned nothing')
-  return { ...toMentor(row, profile), active: row.active, submissionId: row.submission_id, consentVersion: row.consent_version }
+  return toMyMentor(row, profile)
 }
 
 /** Stops being a mentor: open (unanswered) requests are declined (holds released), then the card is deleted. */
@@ -426,6 +582,7 @@ async function toChats(rows: ChatRow[], viewerUid: string, t: Translate): Promis
     const profile = profiles.get(otherUid)
     const deleted = profile?.status === 'deleted'
     const mentor = role === 'requester' ? mentors.get(otherUid) : undefined
+    const otherLinkedin = role === 'mentor' ? row.requester_linkedin : row.mentor_linkedin
     return {
       id: row.id,
       status: row.status,
@@ -437,7 +594,9 @@ async function toChats(rows: ChatRow[], viewerUid: string, t: Translate): Promis
         company: mentor?.company ?? null,
         role: mentor?.role ?? null,
         schoolVerified: !deleted && Boolean(profile?.schoolEmailVerified),
+        linkedinUrl: !deleted && linkedinVisible(row, role) ? otherLinkedin ?? null : null,
       },
+      myLinkedinUrl: (role === 'mentor' ? row.mentor_linkedin : row.requester_linkedin) ?? null,
       topic: row.topic,
       message: row.message,
       proposedTimes: (row.proposed_times ?? []).map((time) => new Date(time).toISOString()),
@@ -492,6 +651,8 @@ export async function requestMentorChat(input: {
   topic: string
   message: string | null
   proposedTimes: string[]
+  /** Normalized (parseLinkedinUrl); required. */
+  linkedinUrl: string
   requestKey: string | null
   t: Translate
 }): Promise<{ chat: ChatView; duplicate: boolean }> {
@@ -516,6 +677,10 @@ export async function requestMentorChat(input: {
     throw new PointsError('Mentor unavailable', 'points.coffeeChat.mentorUnavailable', 409, undefined, 'MENTOR_UNAVAILABLE')
   }
 
+  // last used LinkedIn (prefills the next request). Also fails early (503) when coffee_chat_linkedin.sql hasn't run,
+  // before any points are held.
+  await saveLastLinkedin(uid, input.linkedinUrl)
+
   const amount = coffeeChatCost(config)
   // a hold needs the points ledger; before the cutover only a free coffee chat (spend.coffee_chat off) works
   if (amount > 0) {
@@ -531,7 +696,7 @@ export async function requestMentorChat(input: {
     p_message: input.message ? input.message.slice(0, COFFEE_MESSAGE_MAX) : null,
     p_preferred_times: null,
     p_mentor_id: mentorId,
-    p_disclaimer_version: COFFEE_CHAT_DISCLAIMER_VERSION,
+    p_disclaimer_version: COFFEE_CHAT_REQUEST_DISCLAIMER_VERSION,
     p_idempotency_key: key,
     p_proposed_times: input.proposedTimes,
   }).catch(storeError)
@@ -554,6 +719,12 @@ export async function requestMentorChat(input: {
     }
   }
   const requestId = String(result.request_id)
+  // request_coffee_chat doesn't know the column; set it right away (before the mentor is told). A repeated
+  // requestKey keeps the LinkedIn sent first.
+  await pointsRest(
+    `coffee_chat_requests?id=eq.${enc(requestId)}&user_id=eq.${enc(uid)}&requester_linkedin=is.null`,
+    { method: 'PATCH', prefer: 'return=minimal', body: JSON.stringify({ requester_linkedin: input.linkedinUrl }) },
+  ).catch(storeError)
   if (!result.duplicate) {
     notifyCoffeeChatMentor({
       kind: 'request',
@@ -582,11 +753,14 @@ export function parseZoomLink(raw: unknown): string | null {
   }
 }
 
+export const REPORT_REASON_CODES = ['linkedin_not_owner'] as const
+export type ReportReasonCode = (typeof REPORT_REASON_CODES)[number]
+
 export type ChatAction =
-  | { action: 'accept'; scheduledAt: string; zoomLink: string }
+  | { action: 'accept'; scheduledAt: string; zoomLink: string; linkedinUrl: string }
   | { action: 'decline'; reason: string | null }
   | { action: 'cancel' }
-  | { action: 'report'; reason: string }
+  | { action: 'report'; reason: string; reasonCode: ReportReasonCode | null }
 
 export async function actOnChat(uid: string, id: string, input: ChatAction, t: Translate): Promise<ChatView> {
   await assertCoffeeChatEnabled()
@@ -603,6 +777,11 @@ export async function actOnChat(uid: string, id: string, input: ChatAction, t: T
     if (!match || wanted <= Date.now()) {
       throw new PointsError('Pick one of the proposed times', 'points.coffeeChat.scheduledAtInvalid', 400, undefined, 'SCHEDULED_AT_INVALID')
     }
+    // accepting shares the mentor's LinkedIn: the mentor must have agreed to the current consent (which says so)
+    const mentorRow = await getMentorRow(uid, true).catch(storeError)
+    if (mentorRow?.consent_version !== COFFEE_CHAT_MENTOR_CONSENT_VERSION) {
+      throw new PointsError('Consent outdated', 'points.coffeeChat.mentorConsentOutdated', 409, undefined, 'CONSENT_OUTDATED')
+    }
     const result = await transitionCoffeeChat({
       id,
       action: 'schedule',
@@ -612,6 +791,20 @@ export async function actOnChat(uid: string, id: string, input: ChatAction, t: T
       zoomLink: input.zoomLink,
       notify: false,
     })
+    // after the transition (nothing is stored when it fails), before the requester is told
+    await pointsRest(`coffee_chat_requests?id=eq.${enc(id)}&mentor_id=eq.${enc(uid)}&status=eq.scheduled`, {
+      method: 'PATCH',
+      prefer: 'return=minimal',
+      body: JSON.stringify({ mentor_linkedin: input.linkedinUrl }),
+    }).catch(storeError)
+    // the mentor card keeps the latest one to prefill the next accept
+    if (mentorRow.linkedin !== input.linkedinUrl) {
+      await pointsRest(`coffee_chat_mentors?user_id=eq.${enc(uid)}`, {
+        method: 'PATCH',
+        prefer: 'return=minimal',
+        body: JSON.stringify({ linkedin: input.linkedinUrl, updated_at: new Date().toISOString() }),
+      }).catch((error) => console.error('Coffee chat mentor LinkedIn save failed:', error))
+    }
     if (!result.duplicate) notifyCoffeeChatMentor({ kind: 'accepted', to: row.user_id, chatId: id, actorName: myName })
   } else if (input.action === 'decline' || (input.action === 'cancel' && isMentor && row.status === 'requested')) {
     // a mentor cancelling an unanswered request is a decline
@@ -651,7 +844,8 @@ export async function actOnChat(uid: string, id: string, input: ChatAction, t: T
     }
   } else if (input.action === 'report') {
     const reporterRole = isRequester ? 'requester' : 'mentor'
-    const entry = `${reporterRole}: ${input.reason}`
+    const text = input.reasonCode ? `[${input.reasonCode}]${input.reason ? ` ${input.reason}` : ''}` : input.reason
+    const entry = `${reporterRole}: ${text}`
     const reason = (row.report_reason ? `${row.report_reason}\n${entry}` : entry).slice(0, REPORT_REASON_MAX)
     await pointsRest(`coffee_chat_requests?id=eq.${enc(id)}`, {
       method: 'PATCH',
@@ -665,7 +859,7 @@ export async function actOnChat(uid: string, id: string, input: ChatAction, t: T
       reporterUid: uid,
       reportedUid: isRequester ? row.mentor_id : row.user_id,
       status: row.status,
-      reason: input.reason,
+      reason: text,
     })
   }
   return getChat(uid, id, t)
@@ -739,7 +933,31 @@ export async function cleanupCoffeeChatsForDeletedUser(uid: string): Promise<str
     // coffee_chat_mentors.sql not run yet: nothing to clean up
     if (!(error instanceof PointsError && error.code === 'POINTS_NOT_CONFIGURED')) throw error
   }
-  const summary = `${cancelled} cancelled, ${declined} declined`
+  // stored LinkedIn values: the last used one and the copies on this user's chats (the mentor card is gone above)
+  let linkedin = 'ok'
+  try {
+    await Promise.all([
+      pointsRest(`coffee_chat_profiles?user_id=eq.${enc(uid)}`, { method: 'DELETE', prefer: 'return=minimal' }),
+      pointsRest(`coffee_chat_requests?user_id=eq.${enc(uid)}&requester_linkedin=not.is.null`, {
+        method: 'PATCH',
+        prefer: 'return=minimal',
+        body: JSON.stringify({ requester_linkedin: null }),
+      }),
+      pointsRest(`coffee_chat_requests?mentor_id=eq.${enc(uid)}&mentor_linkedin=not.is.null`, {
+        method: 'PATCH',
+        prefer: 'return=minimal',
+        body: JSON.stringify({ mentor_linkedin: null }),
+      }),
+    ])
+  } catch (error) {
+    // coffee_chat_linkedin.sql not run yet: nothing stored
+    if (!(error instanceof PointsStoreError && error.setupRequired)) {
+      failed += 1
+      linkedin = 'failed'
+      console.error('Account deletion: coffee chat LinkedIn wipe failed', error)
+    }
+  }
+  const summary = `${cancelled} cancelled, ${declined} declined, linkedin ${linkedin}`
   if (failed > 0) return `failed (${failed} failed, ${summary})`
   return cancelled + declined > 0 ? `ok (${summary})` : 'skipped'
 }

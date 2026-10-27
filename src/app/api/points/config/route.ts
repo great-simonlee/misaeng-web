@@ -8,6 +8,8 @@ import {
   COFFEE_CHAT_DISCLAIMER_VERSION,
   COFFEE_CHAT_MENTOR_CONSENT_KEY,
   COFFEE_CHAT_MENTOR_CONSENT_VERSION,
+  COFFEE_CHAT_REQUEST_DISCLAIMER_KEY,
+  COFFEE_CHAT_REQUEST_DISCLAIMER_VERSION,
 } from '@lib/points/defaults'
 import { getPointsEngineState } from '@lib/points/engine.server'
 import { POINTS_NAME_KEY } from '@lib/points/notify.server'
@@ -46,6 +48,11 @@ export async function GET(request: Request) {
         // v2 peer mentors (app): off until point setting coffee_chat.enabled is turned on
         enabled: config.settings['coffee_chat.enabled'] && config.tablesReady,
         mentorConsent: { text: t(`api.${COFFEE_CHAT_MENTOR_CONSENT_KEY}`), version: COFFEE_CHAT_MENTOR_CONSENT_VERSION },
+        // v2 requester disclaimer (localized; includes the LinkedIn exchange)
+        requestDisclaimer: {
+          text: t(`api.${COFFEE_CHAT_REQUEST_DISCLAIMER_KEY}`),
+          version: COFFEE_CHAT_REQUEST_DISCLAIMER_VERSION,
+        },
         // requester cost in points (0 = free)
         cost: coffeeChatCost(config),
       },

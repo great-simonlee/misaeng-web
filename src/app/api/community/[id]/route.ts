@@ -7,6 +7,7 @@ import { getRequestLocale, getRequestT, getT } from '@lib/i18n/server'
 
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import { applyReviewBodyAccess } from '@lib/community/reviewAccess'
+import { getOfferVerifiedPostIds } from '@lib/supabase/reviewVerification.server'
 import { resolveReviewCompanyId } from '@lib/supabase/companies.server'
 import { accountSuspendedResponse } from '@lib/supabase/profile.server'
 import {
@@ -164,12 +165,13 @@ export async function GET(request: Request, context: RouteContext) {
     )
     // 연락 경로는 비공개 — 수정 화면을 위해 작성자 본인에게만 내려준다.
     const isAuthor = Boolean(user?.uid && user.uid === post.authorUid)
-    return NextResponse.json({
-      post:
-        isAuthor && post.categoryId === 'job-review'
-          ? await withPrivateJobReviewSource(visible, id)
-          : visible,
-    })
+    if (post.categoryId !== 'job-review') return NextResponse.json({ post: visible })
+    // "합격 인증": the author's approved offer verification for this post (checked on the stored authorUid)
+    const [withSource, offerVerified] = await Promise.all([
+      isAuthor ? withPrivateJobReviewSource(visible, id) : visible,
+      getOfferVerifiedPostIds([post]).then((ids) => ids.has(post.id)),
+    ])
+    return NextResponse.json({ post: { ...withSource, offerVerified } })
   } catch (error) {
     console.error('Community get error:', error)
     return NextResponse.json({ error: 'Failed to load post.' }, { status: 500 })

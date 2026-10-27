@@ -405,7 +405,7 @@
       "notFound": "Coffee chat request not found.",
       "invalidTransition": "This request cannot be changed in its current state.",
       "cannotCancel": "A scheduled coffee chat cannot be cancelled here. Please contact our team.",
-      "mentorConsent": "Mentor notice and consent\n· Your reviews on the boards stay anonymous. In a coffee chat, however, the other person may see your face and name.\n· Mentoring comes with no reward of any kind, including points.\n· You create and share your own Zoom link. Misaeng only helps you connect.\n· Career advice is your personal opinion, and Misaeng is not responsible for what is said in the conversation.",
+      "mentorConsent": "Mentor notice and consent\n· Your reviews on the boards stay anonymous. In a coffee chat, however, the other person may see your face and name.\n· Mentoring comes with no reward of any kind, including points. Company referral bonuses follow each company's own program.\n· You create and share your own Zoom link. Misaeng only helps you connect.\n· Career advice is your personal opinion, and Misaeng is not responsible for what is said in the conversation.\n· When you accept, your LinkedIn is shown to the requester.\n· A coffee chat request button also appears on the interview and job reviews you wrote.",
       "mentorRequired": "Please choose a mentor for your coffee chat.",
       "mentorUnavailable": "You can't request a coffee chat with this mentor right now.",
       "selfRequest": "You can't request a coffee chat with yourself.",
@@ -426,7 +426,10 @@
       "mentorRoleTooLong": "The role or title can be up to {max} characters.",
       "mentorIntroTooLong": "The intro can be up to {max} characters.",
       "mentorTopicsInvalid": "Add up to {max} topics, each up to {chars} characters.",
-      "nicknameRequired": "Please set a nickname before registering as a mentor."
+      "nicknameRequired": "Please set a nickname before registering as a mentor.",
+      "linkedinRequired": "Enter your LinkedIn profile URL.",
+      "linkedinInvalid": "Enter a valid LinkedIn profile URL (https://www.linkedin.com/in/…).",
+      "requestDisclaimer": "Coffee chats are voluntary conversations with mentors. Misaeng does not guarantee any referral, interview, or employment outcome. Any referral is made solely at the mentor's personal discretion and is subject to the policies of the mentor's employer. Misaeng does not receive any monetary benefit from coffee chats or referrals, and mentors are not compensated by Misaeng. When you send a request, your LinkedIn is shared with the mentor."
     },
     "push": {
       "earned": {

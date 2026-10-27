@@ -380,7 +380,7 @@
       "notFound": "Permintaan coffee chat tidak ditemukan.",
       "invalidTransition": "Tidak bisa diubah pada status saat ini.",
       "cannotCancel": "Coffee chat yang sudah dijadwalkan tidak bisa dibatalkan di sini. Hubungi tim kami.",
-      "mentorConsent": "Pemberitahuan dan persetujuan mentor\n· Ulasanmu di forum tetap anonim. Namun dalam coffee chat, lawan bicaramu mungkin dapat melihat wajah dan namamu.\n· Menjadi mentor tidak mendapatkan imbalan apa pun, termasuk poin.\n· Mentor membuat dan membagikan link Zoom sendiri. Misaeng hanya membantu mempertemukan.\n· Saran karier adalah pendapat pribadi, dan Misaeng tidak bertanggung jawab atas isi percakapan.",
+      "mentorConsent": "Pemberitahuan dan persetujuan mentor\n· Ulasanmu di forum tetap anonim. Namun dalam coffee chat, lawan bicaramu mungkin dapat melihat wajah dan namamu.\n· Menjadi mentor tidak mendapatkan imbalan apa pun, termasuk poin. Bonus referral perusahaan mengikuti kebijakan masing-masing perusahaan.\n· Mentor membuat dan membagikan link Zoom sendiri. Misaeng hanya membantu mempertemukan.\n· Saran karier adalah pendapat pribadi, dan Misaeng tidak bertanggung jawab atas isi percakapan.\n· Jika kamu menerima, LinkedIn-mu akan ditampilkan kepada pengirim permintaan.\n· Tombol permintaan coffee chat juga muncul di ulasan wawancara dan pekerjaan yang kamu tulis.",
       "mentorRequired": "Silakan pilih mentor untuk coffee chat.",
       "mentorUnavailable": "Saat ini kamu tidak dapat mengajukan coffee chat dengan mentor ini.",
       "selfRequest": "Kamu tidak dapat mengajukan coffee chat dengan dirimu sendiri.",
@@ -401,7 +401,10 @@
       "mentorRoleTooLong": "Posisi atau jabatan maksimal {max} karakter.",
       "mentorIntroTooLong": "Perkenalan maksimal {max} karakter.",
       "mentorTopicsInvalid": "Maksimal {max} topik, masing-masing paling banyak {chars} karakter.",
-      "nicknameRequired": "Silakan atur nama panggilan sebelum mendaftar sebagai mentor."
+      "nicknameRequired": "Silakan atur nama panggilan sebelum mendaftar sebagai mentor.",
+      "linkedinRequired": "Masukkan URL profil LinkedIn-mu.",
+      "linkedinInvalid": "Masukkan URL profil LinkedIn yang valid (https://www.linkedin.com/in/…).",
+      "requestDisclaimer": "Coffee chat adalah percakapan sukarela dengan mentor. Misaeng tidak menjamin hasil rujukan, wawancara, atau pekerjaan apa pun. Setiap rujukan sepenuhnya merupakan keputusan pribadi mentor dan tunduk pada kebijakan perusahaan mentor. Misaeng tidak menerima keuntungan finansial apa pun dari coffee chat atau rujukan, dan mentor tidak menerima imbalan dari Misaeng. Saat kamu mengirim permintaan, LinkedIn-mu akan dibagikan kepada mentor."
     },
     "push": {
       "earned": {

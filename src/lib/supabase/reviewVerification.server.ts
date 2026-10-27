@@ -11,6 +11,7 @@ import {
   type ReviewDocStatus,
   type ReviewDocSubmission,
 } from '@lib/verification/reviewDocs'
+import { OFFER_VERIFIED_TTL_MS, TtlCache } from '@lib/supabase/listCache.server'
 
 /*
  * Review verification documents (supabase/verification.sql): tables through PostgREST and files in the private
@@ -348,6 +349,56 @@ export async function hasApprovedVerification(postId: string): Promise<boolean> 
     `verification_submissions?post_id=eq.${enc(postId)}&status=eq.approved&select=id&limit=1`,
   ).catch(() => null)
   return Boolean(rows?.length)
+}
+
+/** postId:authorUid → the author has an approved offer verification for that post. Cached briefly per instance. */
+const offerVerifiedCache = new TtlCache<boolean>(OFFER_VERIFIED_TTL_MS, 5000)
+/** Post ids per PostgREST `in.(...)` request (keeps the URL short on long lists). */
+const OFFER_VERIFIED_CHUNK = 100
+
+/**
+ * Ids of the posts whose author has an approved 'offer' verification for that same post ("합격 인증" badge).
+ * One batched query for the uncached posts. Nothing else from the submission leaves this function.
+ * Missing tables or Supabase config = feature off (no badges); other failures also give no badge.
+ */
+export async function getOfferVerifiedPostIds(
+  posts: ReadonlyArray<{ id: string; authorUid?: string | null }>,
+): Promise<Set<string>> {
+  const candidates = posts.filter((post) => post.id && post.authorUid)
+  if (!candidates.length || !isReviewDocStoreConfigured()) return new Set()
+
+  const missing: { id: string; authorUid: string }[] = []
+  let batch: Promise<Set<string>> | undefined
+  // Every cache miss registers itself synchronously below; the batch runs once they all have.
+  const loadBatch = () =>
+    (batch ??= Promise.resolve().then(async () => {
+      const approved = new Set<string>()
+      for (let i = 0; i < missing.length; i += OFFER_VERIFIED_CHUNK) {
+        const ids = missing.slice(i, i + OFFER_VERIFIED_CHUNK).map((post) => `"${post.id.replace(/"/g, '')}"`)
+        const rows = await rest<{ post_id: string | null; user_id: string }[]>(
+          `verification_submissions?post_id=in.(${enc(ids.join(','))})&kind=eq.offer&status=eq.approved&select=post_id,user_id`,
+        ).catch((error: unknown) => {
+          if (error instanceof ReviewDocStoreError && error.setupRequired) return []
+          throw error
+        })
+        for (const row of rows ?? []) if (row.post_id) approved.add(`${row.post_id}:${row.user_id}`)
+      }
+      return approved
+    }))
+
+  const results = await Promise.all(
+    candidates.map((post) => {
+      const key = `${post.id}:${post.authorUid}`
+      return offerVerifiedCache
+        .get(key, () => {
+          missing.push({ id: post.id, authorUid: post.authorUid as string })
+          return loadBatch().then((approved) => approved.has(key))
+        })
+        .then((verified) => (verified ? post.id : null))
+        .catch(() => null)
+    }),
+  )
+  return new Set(results.filter((id): id is string => Boolean(id)))
 }
 
 export async function countRecentSubmissions(userId: string, sinceIso: string) {

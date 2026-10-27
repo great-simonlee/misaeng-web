@@ -380,7 +380,7 @@
       "notFound": "找不到 coffee chat 申请。",
       "invalidTransition": "当前状态下无法更改。",
       "cannotCancel": "已安排时间的 coffee chat 无法在此取消，请联系运营团队。",
-      "mentorConsent": "导师须知与同意\n· 你在论坛发布的经验分享仍将保持匿名。但在咖啡聊天中，对方可能会看到你的面孔和姓名。\n· 担任导师没有任何报酬，包括积分。\n· Zoom 链接由导师自行创建并分享。Misaeng 仅提供匹配。\n· 职业建议仅代表个人观点，Misaeng 不对对话内容承担责任。",
+      "mentorConsent": "导师须知与同意\n· 你在论坛发布的经验分享仍将保持匿名。但在咖啡聊天中，对方可能会看到你的面孔和姓名。\n· 担任导师没有任何报酬，包括积分。公司内推奖励以各公司的制度为准。\n· Zoom 链接由导师自行创建并分享。Misaeng 仅提供匹配。\n· 职业建议仅代表个人观点，Misaeng 不对对话内容承担责任。\n· 接受后，你的 LinkedIn 将对申请人公开。\n· 你写的面试·求职经验分享上也会显示咖啡聊天申请按钮。",
       "mentorRequired": "请选择要申请咖啡聊天的导师。",
       "mentorUnavailable": "目前无法向这位导师申请咖啡聊天。",
       "selfRequest": "不能向自己申请咖啡聊天。",
@@ -401,7 +401,10 @@
       "mentorRoleTooLong": "职位或职务最多可输入 {max} 个字符。",
       "mentorIntroTooLong": "简介最多可输入 {max} 个字符。",
       "mentorTopicsInvalid": "主题最多 {max} 个，每个不超过 {chars} 个字符。",
-      "nicknameRequired": "注册为导师前，请先设置昵称。"
+      "nicknameRequired": "注册为导师前，请先设置昵称。",
+      "linkedinRequired": "请输入你的 LinkedIn 个人主页链接。",
+      "linkedinInvalid": "请输入有效的 LinkedIn 个人主页链接（https://www.linkedin.com/in/…）。",
+      "requestDisclaimer": "咖啡聊天是与导师之间的自愿交流。Misaeng 不保证任何内推、面试或就业结果。内推完全由导师个人决定，并须遵守导师所在公司的政策。Misaeng 不会从咖啡聊天或内推中获得任何金钱利益，导师也不会从 Misaeng 获得报酬。发送申请后，你的 LinkedIn 将分享给导师。"
     },
     "push": {
       "earned": {

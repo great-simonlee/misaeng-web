@@ -3,7 +3,9 @@ import { getRequestT } from '@lib/i18n/server'
 import { COFFEE_MESSAGE_MAX, COFFEE_TOPIC_MAX } from '@lib/points/coffeeChat.server'
 import {
   assertCoffeeChatEnabled,
+  linkedinInvalid,
   listChats,
+  parseLinkedinUrl,
   parseProposedTimes,
   requestMentorChat,
 } from '@lib/points/coffeeChatMentors.server'
@@ -30,8 +32,8 @@ export async function GET(request: Request) {
 
 /**
  * Request a coffee chat with a mentor:
- * { mentorId, topic, message?, proposedTimes: [ISO] (1–3, each ≥ now+12h and ≤ now+30d), agreed: true, requestKey }
- * → 201 Chat (200 on a repeated requestKey). Holds spend.coffee_chat (free when that rule is off).
+ * { mentorId, topic, message?, proposedTimes: [ISO] (1–3, each ≥ now+12h and ≤ now+30d), linkedinUrl, agreed: true,
+ *   requestKey } → 201 Chat (200 on a repeated requestKey). Holds spend.coffee_chat (free when that rule is off).
  */
 export async function POST(request: Request) {
   const t = await getRequestT(request, 'api')
@@ -53,6 +55,12 @@ export async function POST(request: Request) {
     if (message.length > COFFEE_MESSAGE_MAX) {
       throw new PointsError('Message too long', 'points.coffeeChat.messageTooLong', 400, { max: COFFEE_MESSAGE_MAX }, 'MESSAGE_TOO_LONG')
     }
+    // required: shared with the mentor (see the request disclaimer)
+    if (typeof body.linkedinUrl !== 'string' || !body.linkedinUrl.trim()) {
+      throw new PointsError('LinkedIn required', 'points.coffeeChat.linkedinRequired', 400, undefined, 'LINKEDIN_REQUIRED')
+    }
+    const linkedinUrl = parseLinkedinUrl(body.linkedinUrl)
+    if (!linkedinUrl) throw linkedinInvalid()
 
     const result = await requestMentorChat({
       uid: user.uid,
@@ -60,6 +68,7 @@ export async function POST(request: Request) {
       topic,
       message: message || null,
       proposedTimes: parseProposedTimes(body.proposedTimes),
+      linkedinUrl,
       requestKey: typeof body.requestKey === 'string' ? body.requestKey.slice(0, 100) : null,
       t,
     })
