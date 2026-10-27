@@ -4,10 +4,12 @@ import { parseLocale, type Locale } from '@lib/i18n/locales'
 import type { Translate } from '@lib/i18n/translate'
 import { getT } from '@lib/i18n/server'
 import { isApnsConfigured, sendApns, type ApnsMessage } from './apns.server'
+import { recordNotifications } from './inbox.server'
 import { deletePushDevices, listPushDevices, usersWithTypeOff, type PushType } from './store.server'
 
 /**
- * Sends a push to users' devices (misaeng-app), in each device's language, respecting their preferences.
+ * Sends a push to users' devices (misaeng-app), in each device's language, respecting their preferences, and stores
+ * the same notification in the in-app inbox (bell on Home) for every user — even without a device or with that push off.
  * Runs after the response (`after()`), never throws, and never blocks the action that caused it.
  * `build` gets the translator for the device language (all namespaces; push texts are `api.push.*`).
  */
@@ -17,11 +19,12 @@ export function notifyUsers(input: {
   userIds: string[]
   build: (t: Translate, locale: Locale) => ApnsMessage
 }) {
-  if (!isApnsConfigured()) return
   const userIds = [...new Set(input.userIds.map((id) => String(id || '').trim()).filter(Boolean))]
   if (userIds.length === 0) return
 
   const run = async () => {
+    await recordNotifications({ type: input.type, userIds, build: input.build })
+    if (!isApnsConfigured()) return
     try {
       const [devices, off] = await Promise.all([
         listPushDevices(userIds),
