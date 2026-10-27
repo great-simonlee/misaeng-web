@@ -40,6 +40,7 @@ import {
 } from '@lib/constants/cities'
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile, type SupabaseProfileRecord } from '@lib/supabase/profile.server'
+import { isModerationHidden, normalizeModeration } from '@lib/community/moderation'
 import type { CommunityPost, JobReviewSourceId } from '@/types/nyc'
 import { listStoredCommunityComments } from '@lib/supabase/communityComments.server'
 import { listStoredRecommends } from '@lib/supabase/communityEngagement.server'
@@ -154,9 +155,12 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       typeof data.authorSchoolId === 'string' ? data.authorSchoolId : null,
     authorSchoolName:
       typeof data.authorSchoolName === 'string' ? data.authorSchoolName : null,
+    ...(data.authorDeleted === true ? { authorDeleted: true } : {}),
     createdAt: Number(data.createdAt) || Date.now(),
     updatedAt: Number(data.updatedAt) || Date.now(),
     status: data.status === 'closed' ? 'closed' : 'open',
+    // 신고 3건 자동 숨김·ERP 숨김 (src/lib/community/moderation.ts). 다시 저장할 때 잃지 않도록 읽는다
+    moderation: normalizeModeration(data.moderation),
     viewCount: Math.max(0, Math.floor(Number(data.viewCount) || 0)),
     recommendCount: Math.max(0, Math.floor(Number(data.recommendCount) || 0)),
     commentCount: Math.max(0, Math.floor(Number(data.commentCount) || 0)),
@@ -399,7 +403,7 @@ export async function listStoredCommunityPosts(
 ): Promise<CommunityPost[]> {
   const posts = await listAllStoredCommunityPosts()
   const filtered = posts
-    .filter((post) => post.status === 'open')
+    .filter((post) => post.status === 'open' && !isModerationHidden(post))
     .filter((post) => {
       if (!boardId) return true
       const boardMatch = isStatusCommunityBoard(boardId)
@@ -461,6 +465,16 @@ export async function listStoredCommunityPostsByAuthor(
   return posts.filter((post) => post.authorUid === uid)
 }
 
+/** 탈퇴한 작성자의 글·댓글에 덮어쓰는 표시 필드 */
+export const DELETED_AUTHOR_FIELDS = {
+  authorDeleted: true,
+  authorPhotoURL: null,
+  authorSchoolId: null,
+  authorSchoolName: null,
+  authorWorkplaceVerified: false,
+  authorInstagramVerified: false,
+} as const
+
 /** 후기 게시판은 "어느 학교에서의 경험인가"가 내용이라 글쓴 시점의 학교를 그대로 보여 준다 */
 const SNAPSHOT_SCHOOL_BOARDS = new Set(['status', 'cpt-opt', 'visa', 'green-card', 'job-review'])
 
@@ -476,6 +490,10 @@ async function enrichCommunityPostAuthor(
   const profile = options?.cachedProfile
     ? await listProfileCache.get(uid, () => getSupabaseProfile(uid))
     : await getSupabaseProfile(uid)
+  // 탈퇴한 회원: 사진·배지 없이 (이름은 응답 직전에 보는 언어로 "탈퇴한 회원" — localize.server.ts)
+  if (post.authorDeleted || profile?.status === 'deleted') {
+    return { ...post, ...DELETED_AUTHOR_FIELDS }
+  }
   const profileNickname = profile?.nickname?.trim() || null
   const profilePhoto =
     typeof profile?.photoURL === 'string' && profile.photoURL.trim()
@@ -647,6 +665,31 @@ export async function setStoredCommunityBeenThereCount(
   if (!ok) return null
   patchCachedPost(postId, { beenThereCount })
   return normalizeCommunityPost({ ...raw, beenThereCount })
+}
+
+/**
+ * Patches the stored JSON of one post without normalizing (keeps admin-only and unknown fields).
+ * Used for moderation (hide/restore) and account deletion (anonymize the author). Returns false when missing.
+ */
+export async function patchStoredCommunityPost(
+  id: string,
+  patch: Record<string, unknown>,
+): Promise<boolean> {
+  if (!isCommunityStorageConfigured()) return false
+  const postId = String(id || '').trim()
+  if (!postId) return false
+  const bucket = await resolveBucket()
+  const raw = await fetchRawPostJson(bucket, objectPath(postId))
+  if (!raw) return false
+  const ok = await writeRawPostJson(bucket, postId, { ...raw, ...patch })
+  if (ok) invalidateAllPosts()
+  return ok
+}
+
+/** Every stored post id (open and closed), fresh from Storage. For account deletion. */
+export async function listAllStoredCommunityPostIds(): Promise<string[]> {
+  const posts = await listAllStoredCommunityPosts({ fresh: true })
+  return posts.map((post) => post.id)
 }
 
 export async function deleteStoredCommunityPost(id: string): Promise<boolean> {

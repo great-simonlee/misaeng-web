@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { refuseDeletedWebSignIn } from '@lib/account/deletedAccount.server'
 import { persistConsentRecord, assertAcceptedCurrentPolicy } from '@lib/consent/recordConsent'
 import { apiErrorMessage } from '@lib/i18n/apiError'
 import { getRequestT } from '@lib/i18n/server'
@@ -74,6 +75,8 @@ export async function POST(request: Request) {
       if (!result.ok) {
         return NextResponse.json({ error: result.error }, { status: 401 })
       }
+      const deleted = await refuseDeletedWebSignIn(result.user?.uid, t)
+      if (deleted) return deleted
 
       return NextResponse.json({
         ok: true,
@@ -99,6 +102,8 @@ export async function POST(request: Request) {
         { status: 'emailInUse' in result && result.emailInUse ? 409 : 400 },
       )
     }
+    const deletedAccount = await refuseDeletedWebSignIn(result.user?.uid, t)
+    if (deletedAccount) return deletedAccount
 
     if (result.user?.uid) {
       const consent = await persistConsentRecord({

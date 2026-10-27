@@ -253,6 +253,10 @@
       "limit": "Kamu dapat memblokir hingga {max} pengguna.",
       "notFound": "Pengguna ini tidak ada di daftar blokirmu.",
       "blockedPost": "Ini postingan dari pengguna yang kamu blokir."
+    },
+    "contentBlocked": "Teks kamu mengandung bahasa yang tidak diizinkan (kata kasar, ujaran kebencian, atau pelecehan seksual). Silakan ubah lalu coba lagi.",
+    "moderation": {
+      "hidden": "Konten ini disembunyikan karena laporan atau sudah tidak tersedia."
     }
   },
   "guest": {
@@ -376,5 +380,10 @@
         }
       }
     }
+  },
+  "account": {
+    "deleted": "Akun ini telah dihapus. Kamu tidak dapat masuk lagi dengan akun ini.",
+    "deleteFailed": "Akun tidak dapat dihapus. Silakan coba lagi nanti.",
+    "deletedUser": "Pengguna yang dihapus"
   }
 }

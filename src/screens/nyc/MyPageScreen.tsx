@@ -215,6 +215,26 @@ export function MyPageScreen() {
     router.push(href())
   }
 
+  /** 회원 탈퇴 (DELETE /api/app/me — 웹은 쿠키 세션). 글은 "탈퇴한 회원"으로 남고 룸메이트 글·인증 파일은 지워진다 */
+  async function handleDeleteAccount() {
+    if (!window.confirm(t('deleteAccount.confirm'))) return
+    try {
+      const res = await fetch('/api/app/me', {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+      })
+      const data = (await res.json().catch(() => null)) as { error?: string } | null
+      if (!res.ok) throw new Error(data?.error || t('deleteAccount.failed'))
+      await logout()
+      success(t('deleteAccount.done'))
+      router.push(href())
+    } catch (err) {
+      toastError(getErrorMessage(err, t('deleteAccount.failed')))
+    }
+  }
+
   async function handlePhotoChange(file: File | undefined) {
     if (!file) return
     setUploading(true)
@@ -463,6 +483,7 @@ export function MyPageScreen() {
 
             <LogoutSection
               onLogout={() => void handleLogout()}
+              onDeleteAccount={() => void handleDeleteAccount()}
               className='hidden lg:block'
             />
           </div>
@@ -691,6 +712,7 @@ export function MyPageScreen() {
 
           <LogoutSection
             onLogout={() => void handleLogout()}
+            onDeleteAccount={() => void handleDeleteAccount()}
             className='mt-2 sm:mt-4 lg:hidden'
           />
         </div>
@@ -1033,9 +1055,11 @@ function CameraIcon() {
 
 function LogoutSection({
   onLogout,
+  onDeleteAccount,
   className,
 }: {
   onLogout: () => void
+  onDeleteAccount: () => void
   className?: string
 }) {
   const t = useT('me')
@@ -1062,6 +1086,15 @@ function LogoutSection({
         </span>
         <ChevronIcon />
       </button>
+      <div className='mt-3 flex justify-end px-1'>
+        <button
+          type='button'
+          onClick={onDeleteAccount}
+          className='text-[12px] text-[var(--muted-foreground)] underline-offset-2 hover:text-[#b91c1c] hover:underline'
+        >
+          {t('deleteAccount.title')}
+        </button>
+      </div>
     </section>
   )
 }

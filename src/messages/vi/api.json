@@ -253,6 +253,10 @@
       "limit": "Bạn có thể chặn tối đa {max} người dùng.",
       "notFound": "Người dùng này không có trong danh sách chặn.",
       "blockedPost": "Đây là bài viết của người dùng bạn đã chặn."
+    },
+    "contentBlocked": "Nội dung có từ ngữ không được phép (chửi thề, phát ngôn thù ghét hoặc quấy rối tình dục). Vui lòng sửa lại rồi thử lại.",
+    "moderation": {
+      "hidden": "Nội dung này đã bị ẩn do bị báo cáo hoặc không còn khả dụng."
     }
   },
   "guest": {
@@ -376,5 +380,10 @@
         }
       }
     }
+  },
+  "account": {
+    "deleted": "Tài khoản này đã bị xóa. Bạn không thể đăng nhập lại bằng tài khoản này.",
+    "deleteFailed": "Không thể xóa tài khoản. Vui lòng thử lại sau.",
+    "deletedUser": "Người dùng đã xóa tài khoản"
   }
 }

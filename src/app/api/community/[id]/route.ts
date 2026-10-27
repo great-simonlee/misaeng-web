@@ -49,6 +49,10 @@ import { parseCityId } from '@lib/constants/cities'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import { BLOCKED_USER_CODE, getViewerBlockedUids } from '@lib/community/blocks.server'
+import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/contentFilter'
+import { CONTENT_HIDDEN_CODE, isModerationHidden, reportKey } from '@lib/community/moderation'
+import { getViewerReportedKeys } from '@lib/community/reports.server'
+import { isMisaengEmail } from '@lib/constants/nyc'
 import {
   deleteStoredCommunityPost,
   getStoredCommunityPost,
@@ -129,6 +133,18 @@ export async function GET(request: Request, context: RouteContext) {
     }
     const user = await resolveAuthenticatedUser()
     const locale = await getRequestLocale(request)
+    // 신고로 숨겨진 글(작성자·운영팀만 볼 수 있음)이나 내가 신고한 글
+    const isAuthorViewer = Boolean(user?.uid && user.uid === post.authorUid)
+    const hiddenForViewer =
+      (isModerationHidden(post) && !isAuthorViewer && !isMisaengEmail(user?.email)) ||
+      (!isAuthorViewer && (await getViewerReportedKeys(user?.uid)).has(reportKey('post', post.id)))
+    if (hiddenForViewer) {
+      const t = await getT(locale, 'api')
+      return NextResponse.json(
+        { error: t('community.moderation.hidden'), code: CONTENT_HIDDEN_CODE, hidden: true },
+        { status: 404 },
+      )
+    }
     // 차단한 사용자의 글: 내용 대신 "차단한 사용자의 글이에요"를 보여 주도록 코드만 내려준다
     if (user?.uid && post.authorUid && post.authorUid !== user.uid) {
       const blocked = await getViewerBlockedUids(user.uid)
@@ -210,6 +226,27 @@ export async function PATCH(request: Request, context: RouteContext) {
           max: formatNumber(locale, COMMUNITY_BODY_MAX),
         }),
       },
+      { status: 400 },
+    )
+  }
+  // 욕설·혐오·성희롱 표현 (src/lib/community/contentFilter.ts)
+  if (
+    findBlockedContent(
+      title,
+      htmlToPlainText(contentHtml),
+      body.location,
+      body.detail,
+      body.placeName,
+      body.menuItems,
+      body.galleryPhotos,
+      body.cptOptTimeline,
+      body.cptOptTips,
+      body.jobReviewTimeline,
+      body.jobReviewTips,
+    )
+  ) {
+    return NextResponse.json(
+      { error: t('community.contentBlocked'), code: CONTENT_BLOCKED_CODE },
       { status: 400 },
     )
   }

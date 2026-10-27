@@ -5,6 +5,8 @@ import { resolveAuthenticatedUser } from '@/app/api/agent-auth/lib/authHelpers'
 import { resolveCityId } from '@lib/constants/cities'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import { getViewerBlockedUids, withoutBlockedAuthors } from '@lib/community/blocks.server'
+import { withoutModeratedPosts } from '@lib/community/moderation'
+import { getViewerReportedKeys } from '@lib/community/reports.server'
 import { splitReviewForViewer } from '@lib/community/reviewAccess'
 import {
   getActiveCompanyBySlug,
@@ -48,9 +50,13 @@ export async function GET(request: Request, context: RouteContext) {
       resolveAuthenticatedUser(),
       listCompanyReviewPosts(city),
     ])
-    const blocked = await getViewerBlockedUids(viewer?.uid)
+    const [blocked, reported] = await Promise.all([
+      getViewerBlockedUids(viewer?.uid),
+      getViewerReportedKeys(viewer?.uid),
+    ])
     const locale = await getRequestLocale(request)
-    const reviews = localizePosts(withoutBlockedAuthors(posts, blocked), locale)
+    // 신고로 숨겨진 후기·내가 신고한 후기는 뺀다
+    const reviews = localizePosts(withoutModeratedPosts(withoutBlockedAuthors(posts, blocked), reported), locale)
       .filter((post) => post.companyId && ids.has(post.companyId))
       .filter((post) => !type || post.jobReviewType === type)
       .sort((a, b) => b.createdAt - a.createdAt)

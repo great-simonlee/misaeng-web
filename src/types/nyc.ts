@@ -6,6 +6,20 @@ import type { VerifiedSchoolEntry } from '@lib/verification/verifiedSchools'
 
 export type PostStatus = 'open' | 'closed'
 
+/**
+ * Moderation state of a community post or comment (src/lib/community/moderation.ts).
+ * hidden: true → nobody but the author and the team sees it (auto-hidden at 3 distinct reporters, or by the ERP).
+ * The ERP restores it with hidden: false (restoredAt/restoredBy).
+ */
+export type ContentModeration = {
+  hidden: boolean
+  reason: 'reports' | 'admin'
+  at: number
+  reportCount?: number | null
+  restoredAt?: number | null
+  restoredBy?: string | null
+}
+
 /** 면접/취업 후기: 연락 경로 (JOB_REVIEW_SOURCES). 예전 값 'kiso'는 student-org + nyu-kiso로 읽음 */
 export type JobReviewSourceId = 'misaeng' | 'student-org' | 'referral' | 'other'
 
@@ -292,9 +306,13 @@ export interface CommunityPost extends TranslationFields {
   authorWorkplaceVerified?: boolean
   /** 작성자 인스타그램 인증 (응답에만 있음, 아이디는 내보내지 않음) */
   authorInstagramVerified?: boolean
+  /** The author deleted their account: shown as "Deleted user" without photo or badges (src/lib/account) */
+  authorDeleted?: boolean
   createdAt: number
   updatedAt: number
   status: PostStatus
+  /** Reports / ERP moderation. Absent = visible */
+  moderation?: ContentModeration | null
   /** 상세 조회 수 */
   viewCount: number
   /** 추천 수 (목록 카드용) */
@@ -493,9 +511,13 @@ export interface CommunityComment extends TranslationFields {
   authorInstagramVerified?: boolean
   /** 보는 사람이 쓴 댓글인지 (GET 응답에만 있음) */
   isMine?: boolean
+  /** The author deleted their account (src/lib/account) */
+  authorDeleted?: boolean
   createdAt: number
   updatedAt: number
   status: CommunityCommentStatus
+  /** Reports / ERP moderation. Absent = visible */
+  moderation?: ContentModeration | null
   /** 보는 언어로 바꾼 결과 (API 응답에만 있음, src/lib/translations) */
   i18n?: ContentI18n
 }

@@ -46,6 +46,9 @@ import {
 } from '@lib/constants/nyc'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import { getViewerBlockedUids, withoutBlockedAuthors } from '@lib/community/blocks.server'
+import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/contentFilter'
+import { withoutModeratedPosts } from '@lib/community/moderation'
+import { getViewerReportedKeys } from '@lib/community/reports.server'
 import {
   isIdentityVerified,
   SCHOOL_VERIFY_REQUIRED_CODE,
@@ -145,11 +148,13 @@ export async function GET(request: Request) {
     const city = resolveCityId(searchParams.get('city'))
     const locale = await getRequestLocale(request)
     // 차단한 작성자는 캐시된 목록을 꺼낸 뒤 보는 사람마다 거른다 (익명 정리 전에)
-    const [stored, blocked] = await Promise.all([
+    const [stored, blocked, reported] = await Promise.all([
       listStoredCommunityPosts(board, city),
       getViewerBlockedUids(user?.uid),
+      getViewerReportedKeys(user?.uid),
     ])
-    const visible = withoutBlockedAuthors(stored, blocked)
+    // 숨김 글은 목록 캐시에서 이미 빠진다. 내가 신고한 글은 보는 사람마다 뺀다 (차단과 같은 방식)
+    const visible = withoutModeratedPosts(withoutBlockedAuthors(stored, blocked), reported)
     // 룸메이트 게시판: 포인트로 부스트한 글을 위로 (부스트는 전환 후에만 생긴다, WIRING.md 5)
     const boosts = board === 'roommate' ? await loadRoommateBoosts() : null
     const ordered =
@@ -278,6 +283,27 @@ export async function POST(request: Request) {
           max: formatNumber(locale, COMMUNITY_BODY_MAX),
         }),
       },
+      { status: 400 },
+    )
+  }
+  // 욕설·혐오·성희롱 표현 (src/lib/community/contentFilter.ts)
+  if (
+    findBlockedContent(
+      title,
+      htmlToPlainText(contentHtml),
+      body?.location,
+      body?.detail,
+      body?.placeName,
+      body?.menuItems,
+      body?.galleryPhotos,
+      body?.cptOptTimeline,
+      body?.cptOptTips,
+      body?.jobReviewTimeline,
+      body?.jobReviewTips,
+    )
+  ) {
+    return NextResponse.json(
+      { error: t('community.contentBlocked'), code: CONTENT_BLOCKED_CODE },
       { status: 400 },
     )
   }

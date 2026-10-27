@@ -494,5 +494,11 @@
       "loadFailed": "Không tải được lịch sử xác minh.",
       "retry": "Thử lại"
     }
+  },
+  "deleteAccount": {
+    "title": "Xóa tài khoản",
+    "confirm": "Bạn chắc chắn muốn xóa tài khoản?\n\n• Hồ sơ, thông tin xác minh và thông báo sẽ bị xóa ngay\n• Bài đăng tìm bạn cùng phòng/sublet sẽ bị xóa; các bài viết và bình luận khác vẫn còn dưới tên \"Người dùng đã xóa tài khoản\"\n• Bạn không thể đăng nhập lại bằng tài khoản này",
+    "done": "Đã xóa tài khoản",
+    "failed": "Không thể xóa tài khoản. Vui lòng thử lại sau."
   }
 }

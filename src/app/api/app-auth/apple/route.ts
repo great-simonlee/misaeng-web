@@ -1,4 +1,6 @@
-import { NextResponse } from 'next/server'
+import { after, NextResponse } from 'next/server'
+
+import { rememberAppleRefreshToken } from '@lib/account/appleRevoke.server'
 
 import { persistConsentRecord } from '@lib/consent/recordConsent'
 import { apiErrorMessage } from '@lib/i18n/apiError'
@@ -7,6 +9,7 @@ import {
   buildAuthUserFromHints,
   getAuthErrorMessage,
   isUpstreamUnavailable,
+  normalizeUserFromAccessToken,
 } from '../../agent-auth/lib/authHelpers'
 import {
   ellieoUpstreamFetch,
@@ -48,11 +51,18 @@ export async function POST(request: Request) {
     })
     const loginTokens = login.res.ok ? extractEllieoTokens(login.data) : null
     if (loginTokens?.accessToken) {
-      return appSessionResponse({
+      const response = await appSessionResponse({
         tokens: loginTokens,
         user: buildAuthUserFromHints(body, { payload: login.data, accessToken: loginTokens.accessToken }),
         registered: false,
-      })
+      }, t)
+      // Ellieo's login does not use the authorization code: exchange it for an Apple refresh token so account
+      // deletion can revoke Sign in with Apple (no-op unless APPLE_SIWA_* keys are set)
+      const uid = normalizeUserFromAccessToken(loginTokens.accessToken)?.uid
+      if (response.ok && uid && authorizationCode) {
+        after(() => rememberAppleRefreshToken(uid, authorizationCode))
+      }
+      return response
     }
     if (isUpstreamUnavailable(login.res.status)) {
       return NextResponse.json({ error: t('auth.ellieoUnavailable') }, { status: 503 })
@@ -109,7 +119,7 @@ export async function POST(request: Request) {
       if (!consent.ok) return NextResponse.json(consent.body, { status: consent.status })
     }
 
-    return appSessionResponse({ tokens, user, registered: true })
+    return appSessionResponse({ tokens, user, registered: true }, t)
   } catch (error) {
     console.error('App Apple auth error:', error)
     return NextResponse.json({ error: apiErrorMessage(t, error, 'auth.appleLoginFailed') }, { status: 500 })

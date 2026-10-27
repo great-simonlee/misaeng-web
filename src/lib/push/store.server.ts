@@ -173,3 +173,18 @@ export async function listCompanyFollowers(companyId: string): Promise<string[]>
   ).catch(() => null)
   return (rows ?? []).map((r) => r.user_id)
 }
+
+// MARK: account deletion
+
+/** Removes the user's devices, preferences and company follows. Missing tables (push.sql not run) = nothing to delete. */
+export async function deletePushDataForUser(userId: string) {
+  if (!userId) return
+  const id = encodeURIComponent(userId)
+  for (const table of ['push_devices', 'push_preferences', 'company_follows']) {
+    try {
+      await rest(`${table}?user_id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' })
+    } catch (error) {
+      if (!(error instanceof PushStoreError && error.setupRequired)) throw error
+    }
+  }
+}

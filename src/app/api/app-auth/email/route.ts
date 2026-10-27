@@ -64,7 +64,7 @@ export async function POST(request: Request) {
         // code: 'auth.invalidCredentials' | 'auth.accountNotFound' | … — the app shows "sign up" / "forgot password" from it
         return NextResponse.json({ error: login.error, code: login.errorKey }, { status: 401 })
       }
-      return appSessionResponse({ ...login, registered: false })
+      return appSessionResponse({ ...login, registered: false }, t)
     }
 
     if (body.acceptedTerms !== true) return consentRequiredResponse(t)
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
       if (!consent.ok) return NextResponse.json(consent.body, { status: consent.status })
     }
 
-    return appSessionResponse({ ...result, registered: true })
+    return appSessionResponse({ ...result, registered: true }, t)
   } catch (error) {
     console.error('App email auth error:', error)
     return NextResponse.json({ error: apiErrorMessage(t, error, 'auth.emailAuthError') }, { status: 500 })

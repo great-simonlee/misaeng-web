@@ -10,10 +10,14 @@ import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import { getSupabaseAvatarBucket } from '@lib/supabase/server'
 import { instagramStateFromProfile } from '@lib/verification/instagram'
 import { listVerifiedSchools, MAX_VERIFIED_SCHOOLS } from '@lib/verification/verifiedSchools'
-import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
+import { deleteMisaengAccount } from '@lib/account/deleteAccount.server'
+import { resolveAuthenticatedSession, resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
+import { clearEllieoSession, getRequestBearerToken } from '../../agent-auth/lib/ellieoServer'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+// account deletion walks the user's posts and files
+export const maxDuration = 60
 
 /**
  * Everything the app's My page shows, already resolved (school names, affiliation, completeness),
@@ -104,4 +108,42 @@ export async function GET(request: Request) {
     },
     { headers: { 'Cache-Control': 'no-store' } },
   )
+}
+
+/**
+ * Delete my account (App Store guideline 5.1.1(v)). App: Bearer token · web: cookie session.
+ * DELETE, optional JSON { reason?: string, authorizationCode?: string (fresh Sign in with Apple code, optional) }
+ * → 200 { ok: true } · 401 { error, code: 'auth.loginRequired' } when not signed in · 500 { error, code: 'ACCOUNT_DELETE_FAILED' }.
+ * Idempotent: calling it again for an already deleted account re-runs the cleanup and answers 200.
+ * The web session cookies are cleared; the app clears its Keychain session itself.
+ * What is deleted / anonymized: src/lib/account/deleteAccount.server.ts
+ */
+export async function DELETE(request: Request) {
+  const t = await getRequestT(request, 'api')
+  const session = await resolveAuthenticatedSession({ allowDeleted: true })
+  // Never act on the server's own APP_CONNECT_API_KEY fallback token (no cookie, no Bearer)
+  const serverKey = (process.env.APP_CONNECT_API_KEY || '').trim()
+  if (!session?.user?.uid || (serverKey && session.accessToken === serverKey && !(await getRequestBearerToken()))) {
+    return NextResponse.json({ error: t('common.loginRequired'), code: 'auth.loginRequired' }, { status: 401 })
+  }
+
+  const body = ((await request.json().catch(() => null)) || {}) as { reason?: unknown; authorizationCode?: unknown }
+  const reason = typeof body.reason === 'string' ? body.reason : null
+  const authorizationCode = typeof body.authorizationCode === 'string' ? body.authorizationCode.trim() || null : null
+
+  try {
+    await deleteMisaengAccount({
+      uid: session.user.uid,
+      reason,
+      accessToken: session.accessToken,
+      appleAuthorizationCode: authorizationCode,
+    })
+  } catch (error) {
+    console.error('Account deletion error:', error)
+    return NextResponse.json({ error: t('account.deleteFailed'), code: 'ACCOUNT_DELETE_FAILED' }, { status: 500 })
+  }
+
+  // web: sign out right away (the app forgets its own tokens)
+  await clearEllieoSession().catch(() => undefined)
+  return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
 }

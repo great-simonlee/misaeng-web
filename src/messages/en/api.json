@@ -259,6 +259,10 @@
       "limit": "You can block up to {max} users.",
       "notFound": "This user is not in your blocked list.",
       "blockedPost": "This post is from a user you blocked."
+    },
+    "contentBlocked": "Your text contains language that isn’t allowed (profanity, hate speech or sexual harassment). Please edit it and try again.",
+    "moderation": {
+      "hidden": "This content was hidden after reports or is no longer available."
     }
   },
   "guest": {
@@ -401,5 +405,10 @@
         }
       }
     }
+  },
+  "account": {
+    "deleted": "This account has been deleted. You can’t sign in with it again.",
+    "deleteFailed": "We couldn’t delete your account. Please try again in a moment.",
+    "deletedUser": "Deleted user"
   }
 }

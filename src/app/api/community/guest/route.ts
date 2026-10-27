@@ -21,6 +21,7 @@ import {
   firstPostBonusAmount,
 } from '@lib/community/guestLink.server'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
+import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/contentFilter'
 import {
   getJobReviewTypeLabel,
   isJobReviewOutcomeId,
@@ -181,6 +182,13 @@ export async function POST(request: Request) {
     return bad(t('community.write.jobReviewTimelineRequired'))
   }
   const jobReviewTips = normalizeJobReviewTips(body.jobReviewTips) || null
+  // 욕설·혐오·성희롱 표현 (src/lib/community/contentFilter.ts)
+  if (findBlockedContent(nickname, title, plain, body.jobReviewTimeline, jobReviewTips, body.jobReviewIndustry)) {
+    return NextResponse.json(
+      { error: t('community.contentBlocked'), code: CONTENT_BLOCKED_CODE },
+      { status: 400 },
+    )
+  }
   const jobReviewIndustry = String(body.jobReviewIndustry || '').trim() || null
   const jobReviewSource = parseJobReviewSourceInput(
     body.jobReviewSource,

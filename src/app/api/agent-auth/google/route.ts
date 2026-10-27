@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { refuseDeletedWebSignIn } from '@lib/account/deletedAccount.server'
 import { persistConsentRecord, assertAcceptedCurrentPolicy } from '@lib/consent/recordConsent'
 import { apiErrorMessage } from '@lib/i18n/apiError'
 import { getRequestT } from '@lib/i18n/server'
@@ -8,6 +9,7 @@ import {
   getAuthErrorMessage,
   isUpstreamUnavailable,
   loginOrRegisterWithGoogle,
+  normalizeUserFromAccessToken,
 } from '../lib/authHelpers'
 import {
   ellieoUpstreamFetch,
@@ -98,6 +100,11 @@ export async function POST(request: Request) {
         { email: body.email, name: body.name },
         { payload: loginData, accessToken: tokens.accessToken },
       )
+      const deleted = await refuseDeletedWebSignIn(
+        normalizeUserFromAccessToken(tokens.accessToken)?.uid ?? user?.uid,
+        t,
+      )
+      if (deleted) return deleted
 
       return NextResponse.json({
         ok: true,
@@ -126,6 +133,8 @@ export async function POST(request: Request) {
     )
 
     if (registerResult.ok) {
+      const deleted = await refuseDeletedWebSignIn(registerResult.user?.uid, t)
+      if (deleted) return deleted
       if (registerResult.registered && registerResult.user?.uid) {
         const consent = await persistConsentRecord({
           request,

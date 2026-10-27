@@ -31,6 +31,10 @@ import { resolveCommunityNickname, sanitizeCommunityNickname } from '@lib/commun
 import type { CommunityComment } from '@/types/nyc'
 import { localizeComments } from '@lib/translations/localize.server'
 import { getViewerBlockedUids, withoutBlockedAuthors } from '@lib/community/blocks.server'
+import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/contentFilter'
+import { moderateComments } from '@lib/community/moderation'
+import { getViewerReportedKeys } from '@lib/community/reports.server'
+import { isMisaengEmail } from '@lib/constants/nyc'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -82,6 +86,13 @@ export async function GET(request: Request, context: RouteContext) {
       comments = await attachCommentBadges(comments)
     }
 
+    // 신고로 숨겨진 댓글·내가 신고한 댓글 (운영팀은 모두 본다). 익명 정리 전에 (authorUid 필요)
+    comments = moderateComments(comments, {
+      reported: await getViewerReportedKeys(user?.uid),
+      viewerUid: user?.uid,
+      canSeeHidden: isMisaengEmail(user?.email),
+    })
+
     if (isAnonymous) {
       comments = comments.map((item) =>
         sanitizeAnonymousCommunityComment(item, user?.uid),
@@ -116,6 +127,16 @@ async function attachCommentBadges(comments: CommunityComment[]): Promise<Commun
   return comments.map((item) => {
     const profile = profiles.get(item.authorUid)
     if (!profile) return item
+    if (item.authorDeleted || profile.status === 'deleted') {
+      return {
+        ...item,
+        authorDeleted: true,
+        authorPhotoURL: null,
+        authorSchoolId: null,
+        authorWorkplaceVerified: false,
+        authorInstagramVerified: false,
+      }
+    }
     const schoolId = profile.schoolEmailVerified ? profile.verifiedSchoolId?.trim() || null : null
     return {
       ...item,
@@ -130,7 +151,7 @@ async function enrichCommentAuthors(
   comments: CommunityComment[],
 ): Promise<CommunityComment[]> {
   const needsEnrich = comments.filter((item) => {
-    if (item.status !== 'open') return false
+    if (item.status !== 'open' || item.authorDeleted) return false
     if (!item.authorPhotoURL?.trim()) return true
     const nick = item.authorNickname?.trim() || ''
     if (!nick) return true
@@ -153,7 +174,7 @@ async function enrichCommentAuthors(
 
   return comments.map((item) => {
     const profile = byUid.get(item.authorUid)
-    if (!profile) return item
+    if (!profile || profile.status === 'deleted') return item
     const email =
       (typeof profile.email === 'string' ? profile.email : null) ||
       item.authorEmail
@@ -244,6 +265,12 @@ export async function POST(request: Request, context: RouteContext) {
   if (body.length > 2000) {
     return NextResponse.json(
       { error: t('comments.bodyTooLong', { max: formatNumber(locale, 2000) }) },
+      { status: 400 },
+    )
+  }
+  if (findBlockedContent(body)) {
+    return NextResponse.json(
+      { error: t('community.contentBlocked'), code: CONTENT_BLOCKED_CODE },
       { status: 400 },
     )
   }
@@ -406,6 +433,12 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (body.length > 2000) {
     return NextResponse.json(
       { error: t('comments.bodyTooLong', { max: formatNumber(locale, 2000) }) },
+      { status: 400 },
+    )
+  }
+  if (findBlockedContent(body)) {
+    return NextResponse.json(
+      { error: t('community.contentBlocked'), code: CONTENT_BLOCKED_CODE },
       { status: 400 },
     )
   }

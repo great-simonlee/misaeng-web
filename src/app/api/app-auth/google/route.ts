@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     }
 
     const login = await loginWithGoogle(t, idToken, body.email, body.name, { deviceId: APP_DEVICE_ID })
-    if (login.ok) return appSessionResponse({ ...login, registered: false })
+    if (login.ok) return appSessionResponse({ ...login, registered: false }, t)
     if (login.status && login.status >= 500) {
       return NextResponse.json({ error: login.error }, { status: 503 })
     }
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       if (!consent.ok) return NextResponse.json(consent.body, { status: consent.status })
     }
 
-    return appSessionResponse(result)
+    return appSessionResponse(result, t)
   } catch (error) {
     console.error('App Google auth error:', error)
     return NextResponse.json({ error: apiErrorMessage(t, error, 'auth.googleAuthError') }, { status: 500 })

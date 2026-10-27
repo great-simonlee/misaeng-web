@@ -494,5 +494,11 @@
       "loadFailed": "Riwayat verifikasi tidak dapat dimuat.",
       "retry": "Coba lagi"
     }
+  },
+  "deleteAccount": {
+    "title": "Hapus akun",
+    "confirm": "Yakin ingin menghapus akun?\n\n• Profil, verifikasi, dan notifikasi langsung dihapus\n• Postingan roommate/sublet dihapus; postingan dan komentar lain tetap ada sebagai \"Pengguna yang dihapus\"\n• Kamu tidak dapat masuk lagi dengan akun ini",
+    "done": "Akun kamu telah dihapus",
+    "failed": "Akun tidak dapat dihapus. Silakan coba lagi nanti."
   }
 }

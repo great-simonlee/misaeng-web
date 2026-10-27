@@ -2,6 +2,7 @@ import { pickTranslationFields } from '@lib/translations/content'
 import type { CommunityComment } from '@/types/nyc'
 import { ApiMessageError } from '@lib/i18n/apiError'
 import { invalidatePostCounts } from '@lib/supabase/listCache.server'
+import { normalizeModeration } from '@lib/community/moderation'
 
 const DEFAULT_BUCKET = 'housing'
 const FALLBACK_BUCKET = 'avatars'
@@ -95,9 +96,12 @@ function normalizeComment(raw: unknown): CommunityComment | null {
         : null,
     authorSchoolId:
       typeof data.authorSchoolId === 'string' ? data.authorSchoolId : null,
+    ...(data.authorDeleted === true ? { authorDeleted: true } : {}),
     createdAt: Number(data.createdAt) || Date.now(),
     updatedAt: Number(data.updatedAt) || Date.now(),
     status: data.status === 'deleted' ? 'deleted' : 'open',
+    // 신고 자동 숨김·ERP 숨김 (src/lib/community/moderation.ts)
+    moderation: normalizeModeration(data.moderation),
     ...pickTranslationFields(data),
   }
 }

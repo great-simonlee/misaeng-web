@@ -31,13 +31,30 @@ function pruneOriginal<T extends object>(item: WithI18n<T>): WithI18n<T> {
   return { ...item, i18n: { ...item.i18n, original: kept } }
 }
 
+/** Author name of a deleted account, in the viewer's language (same text as api `account.deletedUser`). */
+const DELETED_USER_LABEL: Record<Locale, string> = {
+  ko: '탈퇴한 회원',
+  en: 'Deleted user',
+  ja: '退会したユーザー',
+  'zh-CN': '已注销用户',
+  'zh-TW': '已註銷使用者',
+  vi: 'Người dùng đã xóa tài khoản',
+  id: 'Pengguna yang dihapus',
+}
+
+export function deletedUserLabel(locale: Locale) {
+  return DELETED_USER_LABEL[locale] ?? DELETED_USER_LABEL.en
+}
+
 function localize<T extends object>(
   item: T,
   kind: ContentKind,
   locale: Locale,
   includeOriginal: boolean,
 ): WithI18n<T> {
-  return localizeContent(item as T & Record<string, unknown>, kind, locale, { includeOriginal }) as WithI18n<T>
+  const localized = localizeContent(item as T & Record<string, unknown>, kind, locale, { includeOriginal }) as WithI18n<T>
+  if ((item as { authorDeleted?: boolean }).authorDeleted !== true) return localized
+  return { ...localized, authorNickname: deletedUserLabel(locale), authorPhotoURL: null }
 }
 
 /** misaeng 한국어 목록에서 숨길 글인가 */

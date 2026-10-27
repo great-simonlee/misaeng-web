@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { accountDeletedResponse } from '@lib/account/deletedAccount.server'
+import { normalizeUserFromAccessToken } from '../../agent-auth/lib/authHelpers'
 import { getLegalPolicy } from '@lib/supabase/legalConsent.server'
 import type { Translate } from '@lib/i18n/translate'
 
@@ -22,11 +24,25 @@ export type AppSignInBody = {
   uiLanguage?: string
 }
 
-export function appSessionResponse(result: {
-  tokens: { accessToken: string | null; refreshToken: string | null }
-  user: unknown
-  registered?: boolean
-}) {
+/**
+ * 200 with the tokens, or 403 { error, code: 'ACCOUNT_DELETED' } when this account was deleted in Misaeng
+ * (the Ellieo account may still accept the password; Misaeng refuses it).
+ */
+export async function appSessionResponse(
+  result: {
+    tokens: { accessToken: string | null; refreshToken: string | null }
+    user: unknown
+    registered?: boolean
+  },
+  t: Translate,
+) {
+  // the profile is keyed by the access token's uid (resolveAuthenticatedUser); check the payload's uid too
+  const tokenUid = result.tokens.accessToken ? normalizeUserFromAccessToken(result.tokens.accessToken)?.uid : null
+  const payloadUid = (result.user as { uid?: unknown } | null)?.uid
+  for (const uid of new Set([tokenUid, typeof payloadUid === 'string' ? payloadUid : null])) {
+    const deleted = await accountDeletedResponse(uid, t)
+    if (deleted) return deleted
+  }
   return NextResponse.json(
     {
       ok: true,

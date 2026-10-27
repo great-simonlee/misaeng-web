@@ -283,6 +283,11 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
           ko: '서비스는 상호 존중과 안전한 정보 공유를 전제로 합니다. 이용자는 다음 행위를 해서는 안 됩니다. 위반 시 게시물 삭제, 기능 제한, 계정 정지·해지, 수사기관 신고 등 조치가 취해질 수 있습니다. 이 규칙은 모든 언어로 작성된 게시물에 적용되며, 회사는 게시물 검토·관리에 번역문(자동 번역 포함)을 이용할 수 있습니다.',
         },
         {
+          type: 'p',
+          en: 'There is zero tolerance for objectionable content or abusive users. Objectionable content (including hate speech, harassment, sexual content, threats, and slurs) is removed, and the accounts that post it or that abuse other Users may be suspended or terminated without prior notice.',
+          ko: '회사는 불쾌하거나 부적절한 콘텐츠와 다른 이용자를 괴롭히는 이용자를 절대 용납하지 않습니다(무관용 원칙). 혐오 표현, 괴롭힘, 성적 콘텐츠, 위협, 욕설·비하 표현 등 부적절한 콘텐츠는 삭제되며, 이를 게시하거나 다른 이용자를 괴롭힌 계정은 사전 통지 없이 이용 정지 또는 해지될 수 있습니다.',
+        },
+        {
           type: 'ul',
           items: [
             {
@@ -618,6 +623,11 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
           type: 'p',
           en: 'The Company may review Content and accounts based on User reports, automated or manual review, and lawful requests. The Company has no duty to pre- or post-screen all Content and retains discretion over whether, when, and how to act.',
           ko: '회사는 이용자 신고, 자동/수동 검토, 법령상 요청에 따라 콘텐츠와 계정을 검토할 수 있습니다. 회사는 모든 콘텐츠를 사전·사후 검열할 의무가 없으며, 조치 여부·시점·방법에 관한 재량을 보유합니다.',
+        },
+        {
+          type: 'p',
+          en: 'You can report any post or comment and block any User directly in the Services. Reported content is hidden from the reporting User right away, content reported by several Users is hidden automatically pending review, and the Company reviews reports within 24 hours, removing objectionable content and suspending or terminating the accounts responsible. The Services also automatically reject posts and comments that contain certain prohibited words.',
+          ko: '이용자는 서비스 안에서 모든 게시물·댓글을 신고하고 다른 이용자를 차단할 수 있습니다. 신고한 콘텐츠는 신고한 이용자에게 즉시 보이지 않게 되고, 여러 이용자가 신고한 콘텐츠는 검토 전까지 자동으로 숨겨지며, 회사는 신고를 24시간 이내에 검토하여 부적절한 콘텐츠를 삭제하고 해당 계정을 이용 정지 또는 해지합니다. 또한 서비스는 일부 금지어가 포함된 게시물·댓글의 등록을 자동으로 제한합니다.',
         },
         {
           type: 'ul',

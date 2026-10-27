@@ -70,7 +70,12 @@ export type SupabaseProfileRecord = {
     | 'roommate'
     | 'anonymous'
     | null
-  status?: 'active' | 'suspended' | null
+  /** deleted: the user deleted their account (src/lib/account/deleteAccount.server.ts). Sign-in is refused. */
+  status?: 'active' | 'suspended' | 'deleted' | null
+  /** Account deletion time (ms) */
+  deletedAt?: number | null
+  /** Optional reason the user gave when deleting the account */
+  deletionReason?: string | null
   /** 선호 언어 (BCP 47, src/lib/i18n/locales.ts) */
   preferredLocale?: string | null
   /** 공개 추천 코드 (8자) */

@@ -171,3 +171,13 @@ export async function markNotificationsRead(uid: string, ids: string[] | 'all'):
     if (!(error instanceof InboxMissing)) throw error
   }
 }
+
+/** Account deletion: removes every notification of the user. Missing table = nothing to delete. */
+export async function deleteNotificationsForUser(uid: string): Promise<void> {
+  if (!uid) return
+  try {
+    await rest(`${TABLE}?user_id=eq.${encodeURIComponent(uid)}`, { method: 'DELETE', prefer: 'return=minimal' })
+  } catch (error) {
+    if (!(error instanceof InboxMissing)) throw error
+  }
+}

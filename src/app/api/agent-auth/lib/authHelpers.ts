@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 
+import { isAccountDeleted } from '@lib/account/deletedAccount.server'
 import { isMisaengEmail } from '@lib/constants/nyc'
 import type { Translate } from '@lib/i18n/translate'
 
@@ -441,25 +442,36 @@ export async function verifyEllieoAccessToken(accessToken: string): Promise<bool
   return true
 }
 
-/** 현재 요청의 사용자. 앱은 Bearer 토큰, 웹은 쿠키(만료 시 리프레시 토큰으로 갱신). */
-export async function resolveAuthenticatedUser() {
+/**
+ * 현재 요청의 사용자와 Ellieo 액세스 토큰. 앱은 Bearer 토큰, 웹은 쿠키(만료 시 리프레시 토큰으로 갱신).
+ * 탈퇴한 계정(프로필 status 'deleted')은 로그인하지 않은 것으로 본다 — `allowDeleted`는 탈퇴 요청을 다시 보낼 때만.
+ */
+export async function resolveAuthenticatedSession(options: { allowDeleted?: boolean } = {}) {
   const bearer = await getRequestBearerToken()
+  let accessToken: string | null = null
   if (bearer) {
-    return (await verifyEllieoAccessToken(bearer)) ? normalizeUserFromAccessToken(bearer) : null
-  }
+    accessToken = (await verifyEllieoAccessToken(bearer)) ? bearer : null
+  } else {
+    accessToken = await getEllieoAccessToken()
+    const refreshToken = await getEllieoRefreshToken()
 
-  let accessToken = await getEllieoAccessToken()
-  const refreshToken = await getEllieoRefreshToken()
-
-  if (accessToken && !(await verifyEllieoAccessToken(accessToken))) {
-    accessToken = null
-  }
-  if (!accessToken && refreshToken) {
-    const refreshed = (await refreshEllieoAccessToken()) || null
-    accessToken = refreshed && (await verifyEllieoAccessToken(refreshed)) ? refreshed : null
+    if (accessToken && !(await verifyEllieoAccessToken(accessToken))) {
+      accessToken = null
+    }
+    if (!accessToken && refreshToken) {
+      const refreshed = (await refreshEllieoAccessToken()) || null
+      accessToken = refreshed && (await verifyEllieoAccessToken(refreshed)) ? refreshed : null
+    }
   }
 
   if (!accessToken) return null
+  const user = normalizeUserFromAccessToken(accessToken)
+  if (!user) return null
+  if (!options.allowDeleted && (await isAccountDeleted(user.uid))) return null
+  return { user, accessToken }
+}
 
-  return normalizeUserFromAccessToken(accessToken)
+/** 현재 요청의 사용자. 앱은 Bearer 토큰, 웹은 쿠키(만료 시 리프레시 토큰으로 갱신). 탈퇴한 계정은 null. */
+export async function resolveAuthenticatedUser() {
+  return (await resolveAuthenticatedSession())?.user ?? null
 }
