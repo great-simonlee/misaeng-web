@@ -25,8 +25,10 @@ import {
   getRoommateLookingForLabel,
   getRoommateLookingForOptionsByIntent,
   getRoommateLookingForStyle,
+  getRoommateStayLength,
   isRoommateLookingFor,
   normalizeRoommateLookingFor,
+  roommateToday,
   ROOMMATE_BUDGET_MAX,
   ROOMMATE_GALLERY_MAX,
   ROOMMATE_INTENT_OPTIONS,
@@ -58,6 +60,7 @@ import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SortablePhotoGrid } from '@widgets/nyc/SortablePhotoGrid'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
+import { RoommatePostCard, type RoommateCardPost } from '@widgets/nyc/RoommatePostCard'
 
 type RoommateWriteDraft = {
   postTitle: string
@@ -70,6 +73,9 @@ type RoommateWriteDraft = {
   moveOutDate: string
   photoUrls: string[]
 }
+
+/** 입력 칸 id (`roommate-field-<name>`) — 검증 실패 시 그 칸으로 스크롤 */
+type RoommateField = 'type' | 'title' | 'location' | 'budget' | 'moveIn' | 'moveOut' | 'body'
 
 interface RoommateWriteScreenProps {
   title: string
@@ -108,6 +114,9 @@ export function RoommateWriteScreen({
   const [photoUrls, setPhotoUrls] = useState<string[]>([])
   const [draftHydrated, setDraftHydrated] = useState(isEdit)
   const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<RoommateField, string>>
+  >({})
   const orientation = useRoommateWriteOrientation(!isEdit)
 
   useEffect(() => {
@@ -149,6 +158,53 @@ export function RoommateWriteScreen({
     () => getRoommateLookingForOptionsByIntent(intent),
     [intent],
   )
+  const stayLength = getRoommateStayLength(moveInDate, moveOutDate)
+  const [previewCreatedAt] = useState(() => Date.now())
+  /** 목록 카드 미리보기 — 유형과 제목이 있으면 */
+  const previewPost = useMemo<RoommateCardPost | null>(() => {
+    if (!lookingFor || !postTitle.trim()) return null
+    const budget = budgetMax.trim() ? Number(budgetMax) : null
+    return {
+      id: editPostId ?? 'preview',
+      categoryId: boardId,
+      city,
+      title: postTitle.trim(),
+      description: htmlToPlainText(contentHtml).slice(0, 200),
+      location: location.trim(),
+      detail: '',
+      roommateLookingFor: lookingFor,
+      roommateBudgetMax: budget != null && Number.isFinite(budget) ? budget : null,
+      roommateMoveInDate: moveInDate || null,
+      roommateMoveOutDate: moveOutDate || null,
+      galleryPhotos: photoUrls.map((imageUrl, index) => ({
+        id: `preview_${index}`,
+        imageUrl,
+        caption: '',
+      })),
+      thumbnailUrl: photoUrls[0] ?? null,
+      authorNickname: profile?.nickname?.trim() || null,
+      authorPhotoURL: profile?.photoURL?.trim() || null,
+      authorSchoolId: profile?.verifiedSchoolId ?? null,
+      viewCount: 0,
+      createdAt: previewCreatedAt,
+    }
+  }, [
+    lookingFor,
+    postTitle,
+    budgetMax,
+    editPostId,
+    boardId,
+    city,
+    contentHtml,
+    location,
+    moveInDate,
+    moveOutDate,
+    photoUrls,
+    profile?.nickname,
+    profile?.photoURL,
+    profile?.verifiedSchoolId,
+    previewCreatedAt,
+  ])
 
   function selectIntent(next: RoommateIntent) {
     setIntent(next)
@@ -245,41 +301,50 @@ export function RoommateWriteScreen({
     }
   }, [city, editPostId, href, user?.uid, boardId, router, toastError, t, tCommunity])
 
+  function clearFieldError(field: RoommateField) {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev
+      const next = { ...prev }
+      delete next[field]
+      return next
+    })
+  }
+
+  /** 칸 아래에 문구를 띄우고 그 칸으로 스크롤 (토스트도 같이) */
+  function failField(field: RoommateField, message: string) {
+    setFieldErrors({ [field]: message })
+    toastError(message)
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById(`roommate-field-${field}`)
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if (el instanceof HTMLInputElement) el.focus({ preventScroll: true })
+    }
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    setFieldErrors({})
     if (!user?.email) {
       toastError(t('new.errors.loginRequired'))
       router.replace(cityLoginPath(city, loginNext))
       return
     }
     if (!lookingFor || !formConfig) {
-      toastError(t('roommate.write.errors.typeRequired'))
+      failField('type', t('roommate.write.errors.typeRequired'))
       return
     }
     const trimmedTitle = postTitle.trim()
     if (!trimmedTitle) {
-      toastError(t('roommate.write.errors.titleRequired'))
+      failField('title', t('roommate.write.errors.titleRequired'))
       return
     }
     if (trimmedTitle.length > ROOMMATE_TITLE_MAX) {
-      toastError(t('roommate.write.errors.titleTooLong', { max: ROOMMATE_TITLE_MAX }))
-      return
-    }
-    const plain = htmlToPlainText(contentHtml)
-    if (!plain) {
-      toastError(t('roommate.write.errors.bodyRequired'))
-      return
-    }
-    if (plain.length > COMMUNITY_BODY_MAX) {
-      toastError(
-        t('roommate.write.errors.bodyTooLong', {
-          max: COMMUNITY_BODY_MAX.toLocaleString('en-US'),
-        }),
-      )
+      failField('title', t('roommate.write.errors.titleTooLong', { max: ROOMMATE_TITLE_MAX }))
       return
     }
     if (formConfig.locationRequired && !location.trim()) {
-      toastError(
+      failField(
+        'location',
         t('roommate.write.errors.fieldRequired', { field: formConfig.locationLabel }),
       )
       return
@@ -289,7 +354,8 @@ export function RoommateWriteScreen({
       ? Number(budgetMax.replace(/,/g, ''))
       : null
     if (formConfig.budgetRequired && budgetValue == null) {
-      toastError(
+      failField(
+        'budget',
         t('roommate.write.errors.fieldRequired', { field: formConfig.budgetLabel }),
       )
       return
@@ -300,7 +366,8 @@ export function RoommateWriteScreen({
         budgetValue < 0 ||
         budgetValue > ROOMMATE_BUDGET_MAX)
     ) {
-      toastError(
+      failField(
+        'budget',
         t('roommate.write.errors.budgetRange', {
           max: ROOMMATE_BUDGET_MAX.toLocaleString('en-US'),
         }),
@@ -311,19 +378,40 @@ export function RoommateWriteScreen({
     const start = moveInDate.trim()
     const end = moveOutDate.trim()
     if (formConfig.moveInStartRequired && !start) {
-      toastError(
+      failField(
+        'moveIn',
         t('roommate.write.errors.fieldSelect', { field: formConfig.moveInStartLabel }),
       )
       return
     }
+    if (!isEdit && start && start < roommateToday()) {
+      failField('moveIn', t('roommate.write.errors.moveInPast'))
+      return
+    }
     if (formConfig.moveInEndRequired && !end) {
-      toastError(
+      failField(
+        'moveOut',
         t('roommate.write.errors.fieldSelect', { field: formConfig.moveInEndLabel }),
       )
       return
     }
     if (start && end && end < start) {
-      toastError(t('roommate.write.errors.endBeforeStart'))
+      failField('moveOut', t('roommate.write.errors.endBeforeStart'))
+      return
+    }
+    // 본문은 맨 아래 칸이라 위 칸들을 먼저 확인한다
+    const plain = htmlToPlainText(contentHtml)
+    if (!plain) {
+      failField('body', t('roommate.write.errors.bodyRequired'))
+      return
+    }
+    if (plain.length > COMMUNITY_BODY_MAX) {
+      failField(
+        'body',
+        t('roommate.write.errors.bodyTooLong', {
+          max: COMMUNITY_BODY_MAX.toLocaleString('en-US'),
+        }),
+      )
       return
     }
 
@@ -476,16 +564,20 @@ export function RoommateWriteScreen({
           </div>
         ) : null}
 
-        <form onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
+        {/* 브라우저 기본 말풍선 대신 칸 아래 문구로 안내 (handleSubmit에서 모두 검사) */}
+        <form noValidate onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
           <CreateSection step={1} title={t('roommate.write.steps.type')}>
-            <div className='grid grid-cols-2 gap-2'>
+            <div id='roommate-field-type' className='grid scroll-mt-24 grid-cols-2 gap-2'>
               {ROOMMATE_INTENT_OPTIONS.map((option) => {
                 const active = intent === option.id
                 return (
                   <button
                     key={option.id}
                     type='button'
-                    onClick={() => selectIntent(option.id)}
+                    onClick={() => {
+                      selectIntent(option.id)
+                      clearFieldError('type')
+                    }}
                     className={cn(
                       'relative rounded-2xl px-3.5 py-3.5 text-left ring-1 touch-manipulation transition',
                       active
@@ -524,7 +616,10 @@ export function RoommateWriteScreen({
                       <button
                         key={option.id}
                         type='button'
-                        onClick={() => setLookingFor(option.id)}
+                        onClick={() => {
+                          setLookingFor(option.id)
+                          clearFieldError('type')
+                        }}
                         className={cn(
                           'relative rounded-2xl px-3.5 py-3.5 text-left ring-1 touch-manipulation transition',
                           active
@@ -556,6 +651,7 @@ export function RoommateWriteScreen({
                 </div>
               </div>
             ) : null}
+            <FieldError message={fieldErrors.type} />
           </CreateSection>
 
           <CreateSection
@@ -567,15 +663,19 @@ export function RoommateWriteScreen({
               label={t('roommate.write.fields.title')}
               required
               hint={`${postTitle.length}/${ROOMMATE_TITLE_MAX}`}
+              error={fieldErrors.title}
             >
               <input
+                id='roommate-field-title'
                 required
                 value={postTitle}
                 maxLength={ROOMMATE_TITLE_MAX}
-                onChange={(e) =>
+                aria-invalid={Boolean(fieldErrors.title) || undefined}
+                onChange={(e) => {
                   setPostTitle(e.target.value.slice(0, ROOMMATE_TITLE_MAX))
-                }
-                className={inputClass}
+                  clearFieldError('title')
+                }}
+                className={cn(inputClass, fieldErrors.title && inputErrorClass)}
                 placeholder={
                   formConfig?.titlePlaceholder ?? tCommunity(communityBoardKey(boardId, 'titlePlaceholder'))
                 }
@@ -588,12 +688,18 @@ export function RoommateWriteScreen({
                   label={formConfig.locationLabel}
                   required={formConfig.locationRequired}
                   className='mt-4'
+                  error={fieldErrors.location}
                 >
                   <input
+                    id='roommate-field-location'
                     required={formConfig.locationRequired}
                     value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className={inputClass}
+                    aria-invalid={Boolean(fieldErrors.location) || undefined}
+                    onChange={(e) => {
+                      setLocation(e.target.value)
+                      clearFieldError('location')
+                    }}
+                    className={cn(inputClass, fieldErrors.location && inputErrorClass)}
                     placeholder={formConfig.locationPlaceholder}
                   />
                 </Field>
@@ -601,51 +707,98 @@ export function RoommateWriteScreen({
                   label={formConfig.budgetLabel}
                   required={formConfig.budgetRequired}
                   className='mt-4'
+                  error={fieldErrors.budget}
                 >
-                  <input
-                    type='number'
-                    required={formConfig.budgetRequired}
-                    min={0}
-                    max={ROOMMATE_BUDGET_MAX}
-                    value={budgetMax}
-                    onChange={(e) => setBudgetMax(e.target.value)}
-                    className={inputClass}
-                    placeholder={formConfig.budgetPlaceholder}
-                  />
+                  <span className='relative mt-1.5 block'>
+                    <span
+                      className='pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] font-medium text-[var(--muted)]'
+                      aria-hidden
+                    >
+                      $
+                    </span>
+                    {/* type=number는 e·소수점이 들어가고 스크롤로 값이 바뀌어서 숫자만 받는 text로 */}
+                    <input
+                      id='roommate-field-budget'
+                      type='text'
+                      inputMode='numeric'
+                      autoComplete='off'
+                      required={formConfig.budgetRequired}
+                      value={budgetMax ? Number(budgetMax).toLocaleString('en-US') : ''}
+                      aria-invalid={Boolean(fieldErrors.budget) || undefined}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, 6)
+                        setBudgetMax(digits)
+                        clearFieldError('budget')
+                      }}
+                      className={cn(
+                        inputClass,
+                        '!mt-0 pl-7 pr-14 tabular-nums',
+                        fieldErrors.budget && inputErrorClass,
+                      )}
+                      placeholder={budgetPlaceholder(formConfig.budgetPlaceholder)}
+                    />
+                    <span
+                      className='pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[13px] font-medium text-[var(--muted)]'
+                      aria-hidden
+                    >
+                      {t('roommate.write.perMonth')}
+                    </span>
+                  </span>
                 </Field>
                 <div className='mt-4 grid gap-4 sm:grid-cols-2'>
                   <Field
                     label={formConfig.moveInStartLabel}
                     required={formConfig.moveInStartRequired}
+                    error={fieldErrors.moveIn}
                   >
+                    {/* 새 글은 지난 날짜를 막는다 (예전 글 수정은 저장되도록 그대로) */}
                     <input
+                      id='roommate-field-moveIn'
                       type='date'
                       required={formConfig.moveInStartRequired}
                       value={moveInDate}
+                      min={isEdit ? undefined : roommateToday()}
+                      aria-invalid={Boolean(fieldErrors.moveIn) || undefined}
                       onChange={(e) => {
                         const next = e.target.value
                         setMoveInDate(next)
+                        clearFieldError('moveIn')
                         if (moveOutDate && next && moveOutDate < next) {
                           setMoveOutDate('')
                         }
                       }}
-                      className={inputClass}
+                      className={cn(inputClass, fieldErrors.moveIn && inputErrorClass)}
                     />
                   </Field>
                   <Field
                     label={formConfig.moveInEndLabel}
                     required={formConfig.moveInEndRequired}
+                    error={fieldErrors.moveOut}
                   >
                     <input
+                      id='roommate-field-moveOut'
                       type='date'
                       required={formConfig.moveInEndRequired}
                       value={moveOutDate}
-                      min={moveInDate || undefined}
-                      onChange={(e) => setMoveOutDate(e.target.value)}
-                      className={inputClass}
+                      min={moveInDate || (isEdit ? undefined : roommateToday())}
+                      aria-invalid={Boolean(fieldErrors.moveOut) || undefined}
+                      onChange={(e) => {
+                        setMoveOutDate(e.target.value)
+                        clearFieldError('moveOut')
+                      }}
+                      className={cn(inputClass, fieldErrors.moveOut && inputErrorClass)}
                     />
                   </Field>
                 </div>
+                {stayLength ? (
+                  <p className='mt-2 text-[12px] font-medium text-[var(--muted-foreground)]'>
+                    {t('roommate.write.stayLength', {
+                      length: t(`roommate.card.stay.${stayLength.unit}`, {
+                        count: stayLength.count,
+                      }),
+                    })}
+                  </p>
+                ) : null}
               </>
             ) : (
               <p className='mt-4 rounded-xl bg-[#f7f8fa] px-4 py-3 text-[13px] text-[var(--muted)]'>
@@ -692,6 +845,11 @@ export function RoommateWriteScreen({
                 ) : null
               }
             />
+            {formConfig?.photosRecommended && photoUrls.length === 0 ? (
+              <p className='mt-3 rounded-xl bg-brand-soft px-3.5 py-2.5 text-[12px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--brand)]/15'>
+                {t('roommate.write.photosNudge')}
+              </p>
+            ) : null}
           </CreateSection>
 
           <CreateSection
@@ -699,18 +857,33 @@ export function RoommateWriteScreen({
             title={t('roommate.write.steps.details')}
             description={t('roommate.write.steps.detailsDescription')}
           >
-            <TipTapEditor
-              value={contentHtml}
-              onChange={setContentHtml}
-              placeholder={
-                formConfig?.bodyPlaceholder ?? tCommunity(communityBoardKey(boardId, 'descriptionPlaceholder'))
-              }
-              minHeightClassName='min-h-[200px]'
-              contentClassName='!text-[13px] !leading-[1.65]'
-              simpleToolbar
-              maxLength={COMMUNITY_BODY_MAX}
-            />
+            <div id='roommate-field-body' className='scroll-mt-24'>
+              <TipTapEditor
+                value={contentHtml}
+                onChange={(html) => {
+                  setContentHtml(html)
+                  clearFieldError('body')
+                }}
+                placeholder={
+                  formConfig?.bodyPlaceholder ?? tCommunity(communityBoardKey(boardId, 'descriptionPlaceholder'))
+                }
+                minHeightClassName='min-h-[200px]'
+                contentClassName='!text-[13px] !leading-[1.65]'
+                simpleToolbar
+                maxLength={COMMUNITY_BODY_MAX}
+              />
+            </div>
+            <FieldError message={fieldErrors.body} />
           </CreateSection>
+
+          {previewPost ? (
+            <section>
+              <h2 className='mb-2.5 text-[13px] font-semibold text-[var(--muted)]'>
+                {t('roommate.write.previewTitle')}
+              </h2>
+              <RoommatePostCard post={previewPost} preview />
+            </section>
+          ) : null}
 
           {isEdit ? (
             <button
@@ -864,18 +1037,28 @@ function CreateSection({
 }
 
 const inputClass =
-  'mt-1.5 h-11 w-full rounded-xl bg-white px-3.5 text-[15px] outline-none ring-1 ring-black/[0.08] transition placeholder:text-[var(--muted)] focus:ring-black/20'
+  'mt-1.5 h-11 w-full scroll-mt-24 rounded-xl bg-white px-3.5 text-[15px] outline-none ring-1 ring-black/[0.08] transition placeholder:text-[var(--muted)] focus:ring-black/20'
+
+const inputErrorClass = '!ring-red-400 focus:!ring-red-500'
+
+/** "예: 1400" → "1,400" ($ 기호와 /월은 칸 양옆에 따로 보인다) */
+function budgetPlaceholder(text: string) {
+  const digits = text.match(/\d[\d,]*/)?.[0]?.replace(/,/g, '')
+  return digits ? Number(digits).toLocaleString('en-US') : text
+}
 
 function Field({
   label,
   required,
   hint,
+  error,
   className,
   children,
 }: {
   label: string
   required?: boolean
   hint?: string
+  error?: string
   className?: string
   children: ReactNode
 }) {
@@ -893,6 +1076,16 @@ function Field({
         ) : null}
       </span>
       {children}
+      <FieldError message={error} />
     </label>
+  )
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null
+  return (
+    <span role='alert' className='mt-1.5 block text-[12px] font-medium text-red-600'>
+      {message}
+    </span>
   )
 }

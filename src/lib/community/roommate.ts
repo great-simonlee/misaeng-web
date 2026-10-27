@@ -330,3 +330,171 @@ export function formatRoommateMoveInRange(
 export function isRoommateBoard(id: string) {
   return id === 'roommate'
 }
+
+/** 'YYYY-MM-DD' → 그 날 0시 (현지). new Date('2026-09-01')은 UTC 0시라 뉴욕에선 하루 전날이 된다 */
+export function parseRoommateDate(value: string | null | undefined): Date | null {
+  const match = String(value || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!match) return null
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
+/** 오늘 날짜 'YYYY-MM-DD' (보는 사람 기준) */
+export function roommateToday(now: Date = new Date()): string {
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const d = String(now.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+/** 방 올리기(has-room·sublet)면 금액은 월세, 찾는 글(together·room)이면 예산 상한 */
+export function isRoommateOffer(value: RoommateLookingFor | null | undefined) {
+  return getRoommateIntent(value) === 'offer-room'
+}
+
+/**
+ * 입주 상태: 종료일이 지났으면 ended, 입주일이 오늘이거나 지났으면 availableNow.
+ * 날짜는 'YYYY-MM-DD' 문자열이라 그대로 비교한다.
+ */
+export function getRoommateTimeline(
+  post: { roommateMoveInDate?: string | null; roommateMoveOutDate?: string | null },
+  today: string = roommateToday(),
+) {
+  const start = normalizeRoommateMoveInDate(post.roommateMoveInDate)
+  const end = normalizeRoommateMoveInDate(post.roommateMoveOutDate)
+  const ended = Boolean(end && end < today)
+  return { ended, availableNow: !ended && Boolean(start && start <= today) }
+}
+
+/** 시작~종료 기간: 8주 미만은 주, 그 이상은 개월 (번역: housing `roommate.card.stay.<unit>`) */
+export function getRoommateStayLength(
+  start: string | null | undefined,
+  end: string | null | undefined,
+): { unit: 'weeks' | 'months'; count: number } | null {
+  const from = parseRoommateDate(start)
+  const to = parseRoommateDate(end)
+  if (!from || !to) return null
+  const days = Math.round((to.getTime() - from.getTime()) / 86_400_000)
+  if (days <= 0) return null
+  if (days < 56) return { unit: 'weeks', count: Math.max(1, Math.round(days / 7)) }
+  return { unit: 'months', count: Math.max(2, Math.round(days / 30.44)) }
+}
+
+/** 상단 노출이 아직 진행 중인지 (목록 응답의 boostedUntil) */
+export function isRoommateBoostActive(
+  post: { boostedUntil?: string | null },
+  now: number = Date.now(),
+) {
+  const until = post.boostedUntil ? Date.parse(post.boostedUntil) : NaN
+  return Number.isFinite(until) && until > now
+}
+
+type DateFormatter = {
+  date: (value: Date, options?: Intl.DateTimeFormatOptions) => string
+}
+
+/** 'YYYY-MM-DD' → 현재 언어의 짧은 날짜 (올해가 아니면 연도까지). format은 `useFormat()` */
+export function formatRoommateDateShort(
+  format: DateFormatter,
+  value: string | null | undefined,
+  now: Date = new Date(),
+) {
+  const date = parseRoommateDate(value)
+  if (!date) return null
+  return format.date(date, {
+    month: 'short',
+    day: 'numeric',
+    ...(date.getFullYear() !== now.getFullYear() ? { year: 'numeric' } : {}),
+  })
+}
+
+/**
+ * 동네 묶음 필터. 글의 location은 자유 입력(한/영 섞임)이라 별칭을 부분 일치로 찾는다.
+ * 영문 별칭은 단어 단위로만 맞춘다 (les ≠ Los Angeles). 이름: housing `roommate.areas.<id>`
+ */
+export const ROOMMATE_AREA_GROUPS: Record<string, { id: string; aliases: string[] }[]> = {
+  nyc: [
+    {
+      id: 'manhattan',
+      aliases: [
+        'manhattan', '맨해튼', '맨하탄', '맨하튼', 'ues', 'uws', 'upper east', 'upper west', 'midtown', '미드타운',
+        'harlem', '할렘', 'chelsea', '첼시', 'soho', 'noho', 'tribeca', 'east village', 'west village',
+        'greenwich', 'les', 'lower east', 'fidi', 'financial district', 'murray hill', 'kips bay', 'gramercy',
+        'hell\'s kitchen', 'hells kitchen', 'morningside', 'washington heights', 'inwood', 'koreatown', 'k-town',
+        '코리아타운', '한인타운', 'columbia', '컬럼비아', 'nyu', 'roosevelt island', '루즈벨트',
+      ],
+    },
+    {
+      id: 'brooklyn',
+      aliases: [
+        'brooklyn', '브루클린', '브룩클린', 'williamsburg', '윌리엄스버그', 'bushwick', '부시윅', 'greenpoint',
+        '그린포인트', 'park slope', 'dumbo', 'bed-stuy', 'bedford', 'crown heights', 'prospect', 'sunset park',
+        'bay ridge', 'clinton hill', 'fort greene', 'cobble hill', 'carroll gardens', 'boerum hill',
+      ],
+    },
+    {
+      id: 'queens',
+      aliases: [
+        'queens', '퀸즈', '퀸스', 'flushing', '플러싱', 'astoria', '아스토리아', 'long island city', 'lic',
+        '롱아일랜드시티', '롱아일랜드 시티', 'sunnyside', '서니사이드', 'woodside', '우드사이드', 'jackson heights',
+        'elmhurst', '엘름허스트', 'forest hills', 'bayside', '베이사이드', 'fresh meadows',
+        'rego park', 'corona', 'little neck', 'douglaston',
+      ],
+    },
+    { id: 'bronx', aliases: ['bronx', '브롱스', '브롱크스', 'riverdale', 'fordham'] },
+    { id: 'staten-island', aliases: ['staten', '스태튼', '스테이튼'] },
+    {
+      id: 'new-jersey',
+      aliases: [
+        'new jersey', 'jersey', 'nj', '뉴저지', '저지시티', '저지 시티', 'hoboken', '호보켄', 'fort lee', '포트리',
+        'edgewater', '엣지워터', '에지워터', 'weehawken', '위호켄', 'palisades park', '팰팍', '팰리세이드',
+        'newport', '뉴포트', 'cliffside', 'englewood', '잉글우드', 'ridgefield', 'leonia',
+      ],
+    },
+  ],
+  boston: [
+    {
+      id: 'boston',
+      aliases: [
+        'boston', '보스턴', 'back bay', '백베이', 'fenway', '펜웨이', 'allston', '올스턴', '올스톤', 'brighton',
+        '브라이튼', 'jamaica plain', 'south end', 'beacon hill', 'mission hill', 'seaport', 'north end',
+        'south boston', 'southie', 'charlestown', 'bu', 'northeastern', 'longwood',
+      ],
+    },
+    {
+      id: 'cambridge',
+      aliases: [
+        'cambridge', '캠브리지', '케임브리지', 'harvard', '하버드', 'mit', 'kendall', 'central square',
+        'porter', 'inman',
+      ],
+    },
+    { id: 'somerville', aliases: ['somerville', '서머빌', '소머빌', 'davis square', 'union square'] },
+    { id: 'brookline', aliases: ['brookline', '브루클라인', 'coolidge'] },
+  ],
+}
+
+export function getRoommateAreaGroups(city: string | null | undefined) {
+  return ROOMMATE_AREA_GROUPS[city || ''] ?? []
+}
+
+function aliasMatches(haystack: string, alias: string) {
+  const needle = alias.trim()
+  if (!needle) return false
+  // 한글 등 영문이 아닌 별칭은 부분 일치
+  if (!/^[a-z0-9 .'&-]+$/.test(needle)) return haystack.includes(needle)
+  const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`(^|[^a-z0-9])${escaped}($|[^a-z0-9])`).test(haystack)
+}
+
+/** 글 위치가 동네 묶음에 속하는지 */
+export function roommateLocationInArea(
+  location: string | null | undefined,
+  city: string | null | undefined,
+  areaId: string,
+) {
+  const haystack = String(location || '').toLowerCase()
+  if (!haystack.trim()) return false
+  const group = getRoommateAreaGroups(city).find((item) => item.id === areaId)
+  if (!group) return false
+  return group.aliases.some((alias) => aliasMatches(haystack, alias.toLowerCase()))
+}

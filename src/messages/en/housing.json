@@ -361,7 +361,21 @@
       }
     },
     "card": {
-      "pricePerMonth": "{price}/mo"
+      "pricePerMonth": "{price}/mo",
+      "budgetUpTo": "Up to {price}/mo",
+      "pinned": "Pinned",
+      "availableNow": "Available now",
+      "ended": "Ended",
+      "from": "From {date}",
+      "until": "Until {date}",
+      "stay": {
+        "weeks_one": "{count} week",
+        "weeks_other": "{count} weeks",
+        "months_one": "{count} month",
+        "months_other": "{count} months"
+      },
+      "photoCount_one": "{count} photo",
+      "photoCount_other": "{count} photos"
     },
     "list": {
       "budgetPresets": {
@@ -389,7 +403,16 @@
       "showResults_other": "Show {count} posts",
       "category": "Category",
       "monthlyBudget": "Monthly budget",
-      "neighborhood": "Neighborhood"
+      "neighborhood": "Neighborhood",
+      "sortOptions": {
+        "newest": "Newest",
+        "moveInSoon": "Move-in soonest",
+        "priceLow": "Price: low to high",
+        "priceHigh": "Price: high to low"
+      },
+      "moveIn": "Move-in",
+      "moveInLater": "{month} or later",
+      "moveInHint": "Rooms you can move into already are counted in this month."
     },
     "write": {
       "errors": {
@@ -407,7 +430,8 @@
         "budgetRange": "Please enter an amount between $0 and ${max}",
         "endBeforeStart": "The end date must be after the start date",
         "updateFailed": "Couldn't save your changes",
-        "draftSaveFailed": "Couldn't save the draft"
+        "draftSaveFailed": "Couldn't save the draft",
+        "moveInPast": "Choose a move-in date from today onward"
       },
       "updated": "Post updated",
       "created": "Post published",
@@ -448,7 +472,72 @@
         "title": "Edit your post",
         "description": "If things change, update the type, location or dates."
       },
-      "untitled": "Untitled"
+      "untitled": "Untitled",
+      "perMonth": "/mo",
+      "stayLength": "Length: {length}",
+      "photosNudge": "Posts with room photos get far more messages. Try adding at least one.",
+      "previewTitle": "How it looks in the list"
+    },
+    "areas": {
+      "manhattan": "Manhattan",
+      "brooklyn": "Brooklyn",
+      "queens": "Queens",
+      "bronx": "Bronx",
+      "staten-island": "Staten Island",
+      "new-jersey": "New Jersey",
+      "boston": "Boston",
+      "cambridge": "Cambridge",
+      "somerville": "Somerville",
+      "brookline": "Brookline"
+    },
+    "detail": {
+      "type": "Type",
+      "rent": "Rent",
+      "budget": "Max budget",
+      "stay": "Length",
+      "photos": "Photos",
+      "viewPhoto": "View photo",
+      "contactTitle": "How to get in touch",
+      "contactBody": "Use the open chat link in the post or leave a comment below to reach the author."
+    },
+    "safety": {
+      "title": "Before you send a deposit",
+      "item1": "Don't send a deposit or rent until you've seen the room in person or on a video call.",
+      "item2": "If someone asks you to pay first by Zelle, Venmo or gift card, it is very likely a scam.",
+      "item3": "Check the lease and make sure the landlord allows the sublet or roommate.",
+      "item4": "Be extra careful if the price is far below market or you are rushed to decide.",
+      "report": "Report suspicious posts with the report button below."
+    },
+    "boost": {
+      "title": "Pin to top",
+      "description": "Shows at the top of the roommate & sublet list for {days} days.",
+      "cta": "Pin to top",
+      "activeTitle": "Pinned · until {date}",
+      "activeBody": "It's showing at the top of the list. When it ends, it goes back to its usual place.",
+      "blocked": {
+        "cooldown": "You can pin it again from {date}",
+        "monthlyCap": "You've used all {max} pins this month · You can pin again next month",
+        "slotsFull": "All {total} top spots are taken · A spot opens on {date}",
+        "slotsFullNoDate": "All {total} top spots are taken",
+        "insufficient": "Not enough points · You have {available}, need {cost}"
+      },
+      "points": "{amount} pts",
+      "meta": "{cost} · {days} days",
+      "confirmTitle": "Pin this post to the top?",
+      "confirmCost": "Points used",
+      "confirmPeriod": "Pinned for",
+      "confirmPeriodValue": "{days} days · until {date}",
+      "confirmBalance": "Points left after",
+      "confirmMonthly": "Used this month",
+      "confirmMonthlyValue": "{used}/{max}",
+      "confirmSlots": "Top spots now",
+      "confirmSlotsValue": "{used} of {total} in use",
+      "confirmNote": "Points are taken right away and aren't refunded if you delete the post or the deal ends while it's pinned. After the pin ends, the same post can be pinned again in {days} days.",
+      "confirmSubmit": "Use {cost} and pin",
+      "cancel": "Cancel",
+      "submitting": "Pinning…",
+      "success": "Pinned to the top · until {date}",
+      "failed": "Couldn't pin the post. Please try again in a moment."
     }
   }
 }

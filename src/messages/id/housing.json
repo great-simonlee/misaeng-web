@@ -355,7 +355,18 @@
       }
     },
     "card": {
-      "pricePerMonth": "{price}/bln"
+      "pricePerMonth": "{price}/bln",
+      "budgetUpTo": "Maks. {price}/bln",
+      "pinned": "Disematkan",
+      "availableNow": "Bisa langsung masuk",
+      "ended": "Sudah berakhir",
+      "from": "Mulai {date}",
+      "until": "Sampai {date}",
+      "stay": {
+        "weeks_other": "{count} minggu",
+        "months_other": "{count} bulan"
+      },
+      "photoCount_other": "{count} foto"
     },
     "list": {
       "budgetPresets": {
@@ -380,7 +391,16 @@
       "showResults_other": "Tampilkan {count} postingan",
       "category": "Kategori",
       "monthlyBudget": "Budget bulanan",
-      "neighborhood": "Lingkungan"
+      "neighborhood": "Lingkungan",
+      "sortOptions": {
+        "newest": "Terbaru",
+        "moveInSoon": "Masuk paling cepat",
+        "priceLow": "Harga terendah",
+        "priceHigh": "Harga tertinggi"
+      },
+      "moveIn": "Waktu masuk",
+      "moveInLater": "{month} dan setelahnya",
+      "moveInHint": "Kamar yang sudah bisa ditempati dihitung di bulan ini."
     },
     "write": {
       "errors": {
@@ -398,7 +418,8 @@
         "budgetRange": "Masukkan jumlah antara $0 dan ${max}",
         "endBeforeStart": "Tanggal selesai harus setelah tanggal mulai",
         "updateFailed": "Gagal menyimpan perubahan kamu",
-        "draftSaveFailed": "Gagal menyimpan draf"
+        "draftSaveFailed": "Gagal menyimpan draf",
+        "moveInPast": "Pilih tanggal masuk mulai hari ini"
       },
       "updated": "Postingan diperbarui",
       "created": "Postingan dipublikasikan",
@@ -439,7 +460,72 @@
         "title": "Edit postingan kamu",
         "description": "Kalau ada perubahan, perbarui jenis, lokasi, atau tanggal."
       },
-      "untitled": "Tanpa judul"
+      "untitled": "Tanpa judul",
+      "perMonth": "/bln",
+      "stayLength": "Durasi: {length}",
+      "photosNudge": "Postingan dengan foto kamar jauh lebih banyak dihubungi. Tambahkan minimal satu foto.",
+      "previewTitle": "Tampilan di daftar"
+    },
+    "areas": {
+      "manhattan": "Manhattan",
+      "brooklyn": "Brooklyn",
+      "queens": "Queens",
+      "bronx": "Bronx",
+      "staten-island": "Staten Island",
+      "new-jersey": "New Jersey",
+      "boston": "Boston",
+      "cambridge": "Cambridge",
+      "somerville": "Somerville",
+      "brookline": "Brookline"
+    },
+    "detail": {
+      "type": "Jenis",
+      "rent": "Sewa",
+      "budget": "Anggaran maks.",
+      "stay": "Durasi",
+      "photos": "Foto",
+      "viewPhoto": "Lihat foto",
+      "contactTitle": "Cara menghubungi",
+      "contactBody": "Hubungi penulis lewat tautan open chat di postingan atau tinggalkan komentar di bawah."
+    },
+    "safety": {
+      "title": "Cek dulu sebelum kirim deposit",
+      "item1": "Jangan kirim deposit atau sewa sebelum melihat kamar langsung atau lewat video call.",
+      "item2": "Jika diminta membayar duluan lewat Zelle, Venmo, atau kartu hadiah, kemungkinan besar itu penipuan.",
+      "item3": "Periksa kontrak sewa dan pastikan pemilik mengizinkan sublet atau roommate.",
+      "item4": "Waspadalah jika harganya jauh di bawah pasaran atau kamu didesak untuk cepat memutuskan.",
+      "report": "Laporkan postingan mencurigakan dengan tombol lapor di bawah."
+    },
+    "boost": {
+      "title": "Sematkan di atas",
+      "description": "Tampil paling atas di daftar roommate & sublet selama {days} hari.",
+      "cta": "Sematkan di atas",
+      "activeTitle": "Disematkan · sampai {date}",
+      "activeBody": "Postingan tampil paling atas. Setelah berakhir, kembali ke urutan biasa.",
+      "blocked": {
+        "cooldown": "Bisa disematkan lagi mulai {date}",
+        "monthlyCap": "Jatah {max} kali bulan ini sudah habis · Bisa lagi bulan depan",
+        "slotsFull": "Semua {total} slot atas sudah terisi · Slot kosong pada {date}",
+        "slotsFullNoDate": "Semua {total} slot atas sudah terisi",
+        "insufficient": "Poin tidak cukup · Punya {available} / Perlu {cost}"
+      },
+      "points": "{amount} poin",
+      "meta": "{cost} · {days} hari",
+      "confirmTitle": "Sematkan postingan ini di atas?",
+      "confirmCost": "Poin dipakai",
+      "confirmPeriod": "Lama tampil",
+      "confirmPeriodValue": "{days} hari · sampai {date}",
+      "confirmBalance": "Sisa poin setelahnya",
+      "confirmMonthly": "Terpakai bulan ini",
+      "confirmMonthlyValue": "{used}/{max} kali",
+      "confirmSlots": "Slot atas saat ini",
+      "confirmSlotsValue": "{used} dari {total} terpakai",
+      "confirmNote": "Poin langsung dipotong dan tidak dikembalikan jika kamu menghapus postingan atau transaksi selesai saat disematkan. Setelah sematan berakhir, postingan yang sama bisa disematkan lagi setelah {days} hari.",
+      "confirmSubmit": "Pakai {cost} dan sematkan",
+      "cancel": "Batal",
+      "submitting": "Menyematkan…",
+      "success": "Disematkan di atas · sampai {date}",
+      "failed": "Gagal menyematkan. Coba lagi sebentar lagi."
     }
   }
 }

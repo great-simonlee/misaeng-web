@@ -355,7 +355,18 @@
       }
     },
     "card": {
-      "pricePerMonth": "{price}/월"
+      "pricePerMonth": "{price}/월",
+      "budgetUpTo": "최대 {price}/월",
+      "pinned": "상단 노출",
+      "availableNow": "바로 입주",
+      "ended": "기간 지남",
+      "from": "{date}부터",
+      "until": "{date}까지",
+      "stay": {
+        "weeks_other": "{count}주",
+        "months_other": "{count}개월"
+      },
+      "photoCount_other": "사진 {count}장"
     },
     "list": {
       "budgetPresets": {
@@ -380,7 +391,16 @@
       "showResults_other": "글 {count}개 보기",
       "category": "분류",
       "monthlyBudget": "월 예산",
-      "neighborhood": "동네"
+      "neighborhood": "동네",
+      "sortOptions": {
+        "newest": "최신순",
+        "moveInSoon": "입주 빠른순",
+        "priceLow": "가격 낮은순",
+        "priceHigh": "가격 높은순"
+      },
+      "moveIn": "입주 시기",
+      "moveInLater": "{month} 이후",
+      "moveInHint": "이미 입주할 수 있는 방은 이번 달에 들어가요."
     },
     "write": {
       "errors": {
@@ -398,7 +418,8 @@
         "budgetRange": "금액은 $0~${max} 사이로 입력해 주세요",
         "endBeforeStart": "종료일은 시작일 이후로 선택해 주세요",
         "updateFailed": "수정에 실패했어요",
-        "draftSaveFailed": "임시 저장에 실패했어요"
+        "draftSaveFailed": "임시 저장에 실패했어요",
+        "moveInPast": "입주일은 오늘 이후 날짜로 선택해 주세요"
       },
       "updated": "글을 수정했어요",
       "created": "글을 등록했어요",
@@ -439,7 +460,72 @@
         "title": "올린 글 수정하기",
         "description": "상황 바뀌면 유형·위치·기간을 업데이트해 주세요."
       },
-      "untitled": "제목 없음"
+      "untitled": "제목 없음",
+      "perMonth": "/월",
+      "stayLength": "기간 {length}",
+      "photosNudge": "방 사진이 있는 글이 훨씬 많이 연락받아요. 한 장이라도 올려 보세요.",
+      "previewTitle": "목록에서 이렇게 보여요"
+    },
+    "areas": {
+      "manhattan": "맨해튼",
+      "brooklyn": "브루클린",
+      "queens": "퀸즈",
+      "bronx": "브롱스",
+      "staten-island": "스태튼아일랜드",
+      "new-jersey": "뉴저지",
+      "boston": "보스턴",
+      "cambridge": "케임브리지",
+      "somerville": "서머빌",
+      "brookline": "브루클라인"
+    },
+    "detail": {
+      "type": "유형",
+      "rent": "월세",
+      "budget": "월 예산 (최대)",
+      "stay": "기간",
+      "photos": "사진",
+      "viewPhoto": "사진 크게 보기",
+      "contactTitle": "연락하는 방법",
+      "contactBody": "본문에 남긴 오픈채팅 링크나 아래 댓글로 작성자에게 연락해 보세요."
+    },
+    "safety": {
+      "title": "보증금 보내기 전에 꼭 확인하세요",
+      "item1": "방을 직접 보거나 영상 통화로 확인하기 전에는 보증금·월세를 보내지 마세요.",
+      "item2": "Zelle·Venmo·기프트카드로 먼저 돈을 보내 달라고 하면 사기일 가능성이 높아요.",
+      "item3": "리스 계약서를 보고, 서블렛·룸메 입주를 집주인이 허락했는지 확인하세요.",
+      "item4": "시세보다 지나치게 싸거나 결정을 재촉하면 한 번 더 의심해 보세요.",
+      "report": "수상한 글은 아래 신고 버튼으로 알려 주세요."
+    },
+    "boost": {
+      "title": "상단에 올리기",
+      "description": "{days}일 동안 룸메이트·서블렛 목록 맨 위에 보여요.",
+      "cta": "상단에 올리기",
+      "activeTitle": "상단 노출 중 · {date}까지",
+      "activeBody": "목록 맨 위에 보이고 있어요. 기간이 끝나면 원래 순서로 돌아가요.",
+      "blocked": {
+        "cooldown": "{date}부터 다시 올릴 수 있어요",
+        "monthlyCap": "이번 달 {max}번 모두 사용했어요 · 다음 달에 다시 올릴 수 있어요",
+        "slotsFull": "상단 자리 {total}개가 모두 찼어요 · {date}에 자리가 나요",
+        "slotsFullNoDate": "상단 자리 {total}개가 모두 찼어요",
+        "insufficient": "포인트가 부족해요 · 보유 {available} / 필요 {cost}"
+      },
+      "points": "{amount}P",
+      "meta": "{cost} · {days}일",
+      "confirmTitle": "이 글을 상단에 올릴까요?",
+      "confirmCost": "사용 포인트",
+      "confirmPeriod": "노출 기간",
+      "confirmPeriodValue": "{days}일 · {date}까지",
+      "confirmBalance": "사용 후 남는 포인트",
+      "confirmMonthly": "이번 달 사용",
+      "confirmMonthlyValue": "{used}/{max}번",
+      "confirmSlots": "지금 상단 자리",
+      "confirmSlotsValue": "{used}/{total}개 사용 중",
+      "confirmNote": "포인트는 바로 차감돼요. 상단 노출 후 글을 지우거나 거래가 끝나도 포인트는 돌려드리지 않아요. 노출이 끝난 뒤 같은 글은 {days}일이 지나야 다시 올릴 수 있어요.",
+      "confirmSubmit": "{cost} 쓰고 올리기",
+      "cancel": "취소",
+      "submitting": "올리는 중…",
+      "success": "상단에 올렸어요 · {date}까지",
+      "failed": "상단에 올리지 못했어요. 잠시 후 다시 시도해 주세요."
     }
   }
 }

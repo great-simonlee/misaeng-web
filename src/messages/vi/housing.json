@@ -355,7 +355,18 @@
       }
     },
     "card": {
-      "pricePerMonth": "{price}/tháng"
+      "pricePerMonth": "{price}/tháng",
+      "budgetUpTo": "Tối đa {price}/tháng",
+      "pinned": "Đã ghim",
+      "availableNow": "Vào ở ngay",
+      "ended": "Đã hết hạn",
+      "from": "Từ {date}",
+      "until": "Đến {date}",
+      "stay": {
+        "weeks_other": "{count} tuần",
+        "months_other": "{count} tháng"
+      },
+      "photoCount_other": "{count} ảnh"
     },
     "list": {
       "budgetPresets": {
@@ -380,7 +391,16 @@
       "showResults_other": "Xem {count} bài viết",
       "category": "Danh mục",
       "monthlyBudget": "Ngân sách hàng tháng",
-      "neighborhood": "Khu vực"
+      "neighborhood": "Khu vực",
+      "sortOptions": {
+        "newest": "Mới nhất",
+        "moveInSoon": "Vào ở sớm nhất",
+        "priceLow": "Giá thấp đến cao",
+        "priceHigh": "Giá cao đến thấp"
+      },
+      "moveIn": "Thời gian vào ở",
+      "moveInLater": "Từ {month} trở đi",
+      "moveInHint": "Phòng đã có thể vào ở được tính vào tháng này."
     },
     "write": {
       "errors": {
@@ -398,7 +418,8 @@
         "budgetRange": "Vui lòng nhập số tiền từ $0 đến ${max}",
         "endBeforeStart": "Ngày kết thúc phải sau ngày bắt đầu",
         "updateFailed": "Không thể lưu thay đổi",
-        "draftSaveFailed": "Không thể lưu nháp"
+        "draftSaveFailed": "Không thể lưu nháp",
+        "moveInPast": "Vui lòng chọn ngày vào ở từ hôm nay trở đi"
       },
       "updated": "Đã cập nhật bài viết",
       "created": "Đã đăng bài viết",
@@ -439,7 +460,72 @@
         "title": "Sửa bài viết của bạn",
         "description": "Nếu có thay đổi, hãy cập nhật loại, vị trí hoặc thời gian."
       },
-      "untitled": "Chưa có tiêu đề"
+      "untitled": "Chưa có tiêu đề",
+      "perMonth": "/tháng",
+      "stayLength": "Thời hạn: {length}",
+      "photosNudge": "Bài có ảnh phòng nhận được nhiều liên hệ hơn hẳn. Hãy thêm ít nhất một ảnh.",
+      "previewTitle": "Bài sẽ hiển thị trong danh sách như thế này"
+    },
+    "areas": {
+      "manhattan": "Manhattan",
+      "brooklyn": "Brooklyn",
+      "queens": "Queens",
+      "bronx": "Bronx",
+      "staten-island": "Staten Island",
+      "new-jersey": "New Jersey",
+      "boston": "Boston",
+      "cambridge": "Cambridge",
+      "somerville": "Somerville",
+      "brookline": "Brookline"
+    },
+    "detail": {
+      "type": "Loại",
+      "rent": "Tiền thuê",
+      "budget": "Ngân sách tối đa",
+      "stay": "Thời hạn",
+      "photos": "Ảnh",
+      "viewPhoto": "Xem ảnh lớn",
+      "contactTitle": "Cách liên hệ",
+      "contactBody": "Hãy liên hệ người đăng qua đường link chat trong bài hoặc để lại bình luận bên dưới."
+    },
+    "safety": {
+      "title": "Kiểm tra kỹ trước khi đặt cọc",
+      "item1": "Đừng chuyển tiền cọc hay tiền thuê trước khi xem phòng trực tiếp hoặc qua video call.",
+      "item2": "Nếu bị yêu cầu chuyển tiền trước qua Zelle, Venmo hay thẻ quà tặng, rất có thể đó là lừa đảo.",
+      "item3": "Xem hợp đồng thuê và xác nhận chủ nhà cho phép sublet hoặc ở ghép.",
+      "item4": "Hãy cẩn thận hơn nếu giá rẻ bất thường so với thị trường hoặc bạn bị hối thúc quyết định.",
+      "report": "Hãy báo cáo bài đăng đáng ngờ bằng nút báo cáo bên dưới."
+    },
+    "boost": {
+      "title": "Ghim lên đầu",
+      "description": "Hiển thị ở đầu danh sách ở ghép · sublet trong {days} ngày.",
+      "cta": "Ghim lên đầu",
+      "activeTitle": "Đang ghim · đến {date}",
+      "activeBody": "Bài đang hiển thị ở đầu danh sách. Khi hết hạn, bài sẽ trở về vị trí cũ.",
+      "blocked": {
+        "cooldown": "Có thể ghim lại từ {date}",
+        "monthlyCap": "Bạn đã dùng hết {max} lượt ghim tháng này · Có thể ghim lại vào tháng sau",
+        "slotsFull": "Cả {total} vị trí ghim đều đã kín · Sẽ có chỗ trống vào {date}",
+        "slotsFullNoDate": "Cả {total} vị trí ghim đều đã kín",
+        "insufficient": "Không đủ điểm · Đang có {available} / Cần {cost}"
+      },
+      "points": "{amount} điểm",
+      "meta": "{cost} · {days} ngày",
+      "confirmTitle": "Ghim bài này lên đầu?",
+      "confirmCost": "Điểm sử dụng",
+      "confirmPeriod": "Thời gian ghim",
+      "confirmPeriodValue": "{days} ngày · đến {date}",
+      "confirmBalance": "Điểm còn lại sau khi dùng",
+      "confirmMonthly": "Đã dùng tháng này",
+      "confirmMonthlyValue": "{used}/{max} lần",
+      "confirmSlots": "Vị trí ghim hiện tại",
+      "confirmSlotsValue": "Đang dùng {used}/{total}",
+      "confirmNote": "Điểm sẽ bị trừ ngay. Điểm không được hoàn lại nếu bạn xóa bài hoặc giao dịch kết thúc trong thời gian ghim. Sau khi hết thời gian ghim, bạn có thể ghim lại bài này sau {days} ngày.",
+      "confirmSubmit": "Dùng {cost} để ghim",
+      "cancel": "Hủy",
+      "submitting": "Đang ghim…",
+      "success": "Đã ghim lên đầu · đến {date}",
+      "failed": "Không thể ghim bài. Vui lòng thử lại sau."
     }
   }
 }

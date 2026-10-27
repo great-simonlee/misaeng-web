@@ -355,7 +355,18 @@
       }
     },
     "card": {
-      "pricePerMonth": "{price}/月"
+      "pricePerMonth": "{price}/月",
+      "budgetUpTo": "最大 {price}/月",
+      "pinned": "上位表示",
+      "availableNow": "すぐ入居可",
+      "ended": "期間終了",
+      "from": "{date}から",
+      "until": "{date}まで",
+      "stay": {
+        "weeks_other": "{count}週間",
+        "months_other": "{count}か月"
+      },
+      "photoCount_other": "写真{count}枚"
     },
     "list": {
       "budgetPresets": {
@@ -380,7 +391,16 @@
       "showResults_other": "投稿{count}件を表示",
       "category": "カテゴリー",
       "monthlyBudget": "月額予算",
-      "neighborhood": "エリア"
+      "neighborhood": "エリア",
+      "sortOptions": {
+        "newest": "新着順",
+        "moveInSoon": "入居が早い順",
+        "priceLow": "価格が安い順",
+        "priceHigh": "価格が高い順"
+      },
+      "moveIn": "入居時期",
+      "moveInLater": "{month}以降",
+      "moveInHint": "すでに入居できる部屋は今月に含まれます。"
     },
     "write": {
       "errors": {
@@ -398,7 +418,8 @@
         "budgetRange": "$0〜${max}の金額を入力してください",
         "endBeforeStart": "終了日は開始日より後にしてください",
         "updateFailed": "変更を保存できませんでした",
-        "draftSaveFailed": "下書きを保存できませんでした"
+        "draftSaveFailed": "下書きを保存できませんでした",
+        "moveInPast": "入居日は今日以降の日付を選んでください"
       },
       "updated": "投稿を更新しました",
       "created": "投稿を公開しました",
@@ -439,7 +460,72 @@
         "title": "投稿を編集する",
         "description": "状況が変わったら、種類・場所・日程を更新してください。"
       },
-      "untitled": "無題"
+      "untitled": "無題",
+      "perMonth": "/月",
+      "stayLength": "期間 {length}",
+      "photosNudge": "部屋の写真がある投稿はずっと多く連絡が来ます。1枚だけでも載せてみましょう。",
+      "previewTitle": "一覧ではこう表示されます"
+    },
+    "areas": {
+      "manhattan": "マンハッタン",
+      "brooklyn": "ブルックリン",
+      "queens": "クイーンズ",
+      "bronx": "ブロンクス",
+      "staten-island": "スタテンアイランド",
+      "new-jersey": "ニュージャージー",
+      "boston": "ボストン",
+      "cambridge": "ケンブリッジ",
+      "somerville": "サマービル",
+      "brookline": "ブルックライン"
+    },
+    "detail": {
+      "type": "タイプ",
+      "rent": "家賃",
+      "budget": "月の予算 (上限)",
+      "stay": "期間",
+      "photos": "写真",
+      "viewPhoto": "写真を拡大",
+      "contactTitle": "連絡方法",
+      "contactBody": "本文のオープンチャットのリンクか、下のコメントで投稿者に連絡してみましょう。"
+    },
+    "safety": {
+      "title": "デポジットを送る前に必ず確認",
+      "item1": "部屋を直接見るかビデオ通話で確認するまで、デポジットや家賃は送らないでください。",
+      "item2": "Zelle・Venmo・ギフトカードで先に送金を求められたら、詐欺の可能性が高いです。",
+      "item3": "リース契約書を確認し、大家さんがサブレットやルームメイトの入居を許可しているか確かめましょう。",
+      "item4": "相場より極端に安い、または決断を急かされる場合はもう一度疑ってみてください。",
+      "report": "怪しい投稿は下の通報ボタンから知らせてください。"
+    },
+    "boost": {
+      "title": "上位に表示する",
+      "description": "{days}日間、ルームメイト・サブレット一覧のいちばん上に表示されます。",
+      "cta": "上位に表示する",
+      "activeTitle": "上位表示中 · {date}まで",
+      "activeBody": "一覧のいちばん上に表示されています。期間が終わると元の順番に戻ります。",
+      "blocked": {
+        "cooldown": "{date}から再び上位に表示できます",
+        "monthlyCap": "今月の{max}回をすべて使いました · 来月また使えます",
+        "slotsFull": "上位枠{total}つがすべて埋まっています · {date}に空きが出ます",
+        "slotsFullNoDate": "上位枠{total}つがすべて埋まっています",
+        "insufficient": "ポイントが足りません · 保有 {available} / 必要 {cost}"
+      },
+      "points": "{amount}P",
+      "meta": "{cost} · {days}日",
+      "confirmTitle": "この投稿を上位に表示しますか？",
+      "confirmCost": "使用ポイント",
+      "confirmPeriod": "表示期間",
+      "confirmPeriodValue": "{days}日 · {date}まで",
+      "confirmBalance": "使用後の残りポイント",
+      "confirmMonthly": "今月の使用",
+      "confirmMonthlyValue": "{used}/{max}回",
+      "confirmSlots": "現在の上位枠",
+      "confirmSlotsValue": "{total}つ中{used}つ使用中",
+      "confirmNote": "ポイントはすぐに差し引かれます。上部表示の後に投稿を削除したり取引が終わったりしても、ポイントは返却されません。表示終了後、同じ投稿は{days}日経つと再び上部に表示できます。",
+      "confirmSubmit": "{cost}を使って表示",
+      "cancel": "キャンセル",
+      "submitting": "処理中…",
+      "success": "上位に表示しました · {date}まで",
+      "failed": "上位に表示できませんでした。しばらくしてからもう一度お試しください。"
     }
   }
 }

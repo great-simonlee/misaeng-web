@@ -355,7 +355,18 @@
       }
     },
     "card": {
-      "pricePerMonth": "{price}/月"
+      "pricePerMonth": "{price}/月",
+      "budgetUpTo": "最高 {price}/月",
+      "pinned": "置頂",
+      "availableNow": "可立即入住",
+      "ended": "已結束",
+      "from": "{date}起",
+      "until": "至{date}",
+      "stay": {
+        "weeks_other": "{count}週",
+        "months_other": "{count}個月"
+      },
+      "photoCount_other": "{count}張照片"
     },
     "list": {
       "budgetPresets": {
@@ -380,7 +391,16 @@
       "showResults_other": "顯示 {count} 篇貼文",
       "category": "分類",
       "monthlyBudget": "每月預算",
-      "neighborhood": "區域"
+      "neighborhood": "區域",
+      "sortOptions": {
+        "newest": "最新",
+        "moveInSoon": "入住最早",
+        "priceLow": "價格由低到高",
+        "priceHigh": "價格由高到低"
+      },
+      "moveIn": "入住時間",
+      "moveInLater": "{month}以後",
+      "moveInHint": "已經可以入住的房間算在本月。"
     },
     "write": {
       "errors": {
@@ -398,7 +418,8 @@
         "budgetRange": "請輸入 $0 到 ${max} 之間的金額",
         "endBeforeStart": "結束日期必須晚於開始日期",
         "updateFailed": "無法儲存變更",
-        "draftSaveFailed": "草稿儲存失敗"
+        "draftSaveFailed": "草稿儲存失敗",
+        "moveInPast": "請選擇今天或之後的入住日期"
       },
       "updated": "貼文已更新",
       "created": "貼文已發布",
@@ -439,7 +460,72 @@
         "title": "編輯你的貼文",
         "description": "如果情況有變，可以更新類型、地點或日期。"
       },
-      "untitled": "無標題"
+      "untitled": "無標題",
+      "perMonth": "/月",
+      "stayLength": "期間 {length}",
+      "photosNudge": "有房間照片的貼文會收到更多聯絡。至少上傳一張吧。",
+      "previewTitle": "在列表中的樣子"
+    },
+    "areas": {
+      "manhattan": "曼哈頓",
+      "brooklyn": "布魯克林",
+      "queens": "皇后區",
+      "bronx": "布朗克斯",
+      "staten-island": "史泰登島",
+      "new-jersey": "紐澤西",
+      "boston": "波士頓",
+      "cambridge": "劍橋",
+      "somerville": "薩默維爾",
+      "brookline": "布魯克萊恩"
+    },
+    "detail": {
+      "type": "類型",
+      "rent": "月租",
+      "budget": "每月預算（上限）",
+      "stay": "期間",
+      "photos": "照片",
+      "viewPhoto": "查看大圖",
+      "contactTitle": "聯絡方式",
+      "contactBody": "可以透過內文的開放聊天連結，或在下方留言聯絡發文者。"
+    },
+    "safety": {
+      "title": "付押金前請務必確認",
+      "item1": "在親自看房或視訊看房之前，不要支付押金或房租。",
+      "item2": "如果對方要求先用 Zelle、Venmo 或禮物卡付款，很可能是詐騙。",
+      "item3": "查看租約，並確認房東允許轉租或室友入住。",
+      "item4": "價格明顯低於行情，或催促你快點決定時，請多加小心。",
+      "report": "發現可疑貼文，請用下方的檢舉按鈕告訴我們。"
+    },
+    "boost": {
+      "title": "置頂",
+      "description": "在室友·轉租列表最上方顯示 {days} 天。",
+      "cta": "置頂",
+      "activeTitle": "置頂中 · 至{date}",
+      "activeBody": "貼文正顯示在列表最上方，結束後會回到原本的位置。",
+      "blocked": {
+        "cooldown": "{date}起可以再次置頂",
+        "monthlyCap": "本月 {max} 次已全部用完 · 下個月可再次置頂",
+        "slotsFull": "{total} 個置頂位置已滿 · {date}會空出位置",
+        "slotsFullNoDate": "{total} 個置頂位置已滿",
+        "insufficient": "點數不足 · 現有 {available} / 需要 {cost}"
+      },
+      "points": "{amount}點",
+      "meta": "{cost} · {days}天",
+      "confirmTitle": "要把這篇貼文置頂嗎？",
+      "confirmCost": "使用點數",
+      "confirmPeriod": "置頂期間",
+      "confirmPeriodValue": "{days}天 · 至{date}",
+      "confirmBalance": "使用後剩餘點數",
+      "confirmMonthly": "本月已用",
+      "confirmMonthlyValue": "{used}/{max}次",
+      "confirmSlots": "目前置頂位置",
+      "confirmSlotsValue": "已用 {used}/{total}",
+      "confirmNote": "積分會立即扣除。置頂後即使刪除貼文或交易結束，積分也不會退還。置頂結束後，同一篇貼文需等待{days}天才能再次置頂。",
+      "confirmSubmit": "使用{cost}置頂",
+      "cancel": "取消",
+      "submitting": "置頂中…",
+      "success": "已置頂 · 至{date}",
+      "failed": "無法置頂，請稍後再試。"
     }
   }
 }
