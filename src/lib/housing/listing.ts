@@ -416,8 +416,10 @@ function normalizeAmenityKey(value: string) {
   return value.trim().toLowerCase()
 }
 
-/** 세탁기 기준 매칭 (식기세척기 제외). 건조기만 있는 매물은 제외 */
+/** 세탁기 기준 매칭 (식기세척기 제외). 건조기만 있는 매물은 제외. ERP unit option first */
 export function listingHasWasher(listing: HousingListing): boolean {
+  const features = listing.unit.features
+  if (features) return features.washerDryer
   const strings = [
     ...listing.property.amenities,
     ...listing.property.appliances,
@@ -445,8 +447,11 @@ export function listingHasNoGuarantor(listing: HousingListing): boolean {
   return guarantor === '0' || guarantor === 'none'
 }
 
-/** Full wall / Regular wall = 플렉스 벽 가능. Curtain only 는 제외 */
+/** Full wall / Regular wall = 플렉스 벽 가능. Curtain only 는 제외. ERP unit option first */
 export function listingHasFlexWall(listing: HousingListing): boolean {
+  const flexWall = listing.unit.features?.flexWall
+  if (flexWall === 'allowed') return true
+  if (flexWall === 'not_allowed') return false
   const walls = listing.property.partWall ?? []
   return walls.includes('Full wall') || walls.includes('Regular wall')
 }
@@ -468,6 +473,13 @@ export function getListingDerivedPerks(listing: HousingListing): HousingPerkId[]
     if (perk) perks.add(perk)
   }
 
+  // ERP unit options replace the building-text guesses for these three filters.
+  if (listing.unit.features) {
+    perks.delete('washer-dryer')
+    perks.delete('wall-ok')
+    perks.delete('terrace')
+    if (listing.unit.features.outdoor !== 'none') perks.add('terrace')
+  }
   if (listingHasWasher(listing)) perks.add('washer-dryer')
   if (listingHasFlexWall(listing)) perks.add('wall-ok')
 

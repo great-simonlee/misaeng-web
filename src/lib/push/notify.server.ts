@@ -18,13 +18,15 @@ export function notifyUsers(input: {
   type: PushType | 'account'
   userIds: string[]
   build: (t: Translate, locale: Locale) => ApnsMessage
+  /** false = inbox only, no push (throttled notifications). Default true. */
+  push?: boolean
 }) {
   const userIds = [...new Set(input.userIds.map((id) => String(id || '').trim()).filter(Boolean))]
   if (userIds.length === 0) return
 
   const run = async () => {
     await recordNotifications({ type: input.type, userIds, build: input.build })
-    if (!isApnsConfigured()) return
+    if (input.push === false || !isApnsConfigured()) return
     try {
       const [devices, off] = await Promise.all([
         listPushDevices(userIds),

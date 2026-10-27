@@ -92,6 +92,16 @@ export interface HousingProperty {
   latestMoveInAllowedDays?: number | null
 }
 
+/** Unit-level features set in the ERP (What to Post ⚙). Absent = derive from building text */
+export type HousingUnitFeatures = {
+  /** In-unit washer/dryer */
+  washerDryer: boolean
+  /** Private outdoor space */
+  outdoor: 'none' | 'balcony' | 'terrace' | 'patio'
+  /** inherit = building partWall setting */
+  flexWall: 'inherit' | 'allowed' | 'not_allowed'
+}
+
 /** ERP units 문서 — 호수·가격·룸 분할 */
 export interface HousingUnit {
   unitNumber?: string | null
@@ -114,6 +124,8 @@ export interface HousingUnit {
   listingUrl?: string | null
   /** 업로드 시 스냅샷 (없으면 beds/baths에서 파생) */
   unitType?: HousingUnitType | null
+  /** Unit options from the ERP; filters use these first when present */
+  features?: HousingUnitFeatures | null
 }
 
 /** ERP units.rooms[] 원소 */

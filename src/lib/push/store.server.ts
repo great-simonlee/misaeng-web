@@ -5,7 +5,10 @@ import type { ApnsEnvironment } from './apns.server'
  * Missing tables (SQL not run yet) behave like "nothing stored": reads return empty, writes report not configured.
  */
 
-export const PUSH_TYPES = ['comment', 'reply', 'posting', 'credit'] as const
+/** post_recommend / post_save: someone recommended / saved my community post (columns added by supabase/post_saves.sql) */
+export const PUSH_TYPES = ['comment', 'reply', 'posting', 'credit', 'post_recommend', 'post_save'] as const
+/** The columns of the original push.sql, for databases where post_saves.sql has not run yet */
+const LEGACY_PUSH_TYPES: readonly PushType[] = ['comment', 'reply', 'posting', 'credit']
 export type PushType = (typeof PUSH_TYPES)[number]
 export type PushPreferences = Record<PushType, boolean>
 
@@ -17,7 +20,14 @@ export type PushDevice = {
   locale: string
 }
 
-const ALL_ON: PushPreferences = { comment: true, reply: true, posting: true, credit: true }
+const ALL_ON: PushPreferences = {
+  comment: true,
+  reply: true,
+  posting: true,
+  credit: true,
+  post_recommend: true,
+  post_save: true,
+}
 
 function config() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
@@ -29,6 +39,7 @@ export class PushStoreError extends Error {
   constructor(
     message: string,
     readonly setupRequired = false,
+    readonly code?: string,
   ) {
     super(message)
   }
@@ -55,7 +66,7 @@ async function rest<T>(path: string, init: RequestInit & { prefer?: string } = {
     if (code === 'PGRST205' || code === '42P01' || code === '42501') {
       throw new PushStoreError('Run supabase/push.sql in the Supabase SQL Editor.', true)
     }
-    throw new PushStoreError(`Push store request failed (${res.status}).`)
+    throw new PushStoreError(`Push store request failed (${res.status}).`, false, code)
   }
   return data as T
 }
@@ -108,7 +119,8 @@ export async function listPushDevices(userIds: string[]): Promise<PushDevice[]> 
 
 export async function getPushPreferences(userId: string): Promise<PushPreferences> {
   const rows = await rest<(PushPreferences & { user_id: string })[]>(
-    `push_preferences?user_id=eq.${encodeURIComponent(userId)}&select=user_id,${PUSH_TYPES.join(',')}`,
+    // select=* so a table without the newer columns (post_saves.sql not run) still returns the saved switches
+    `push_preferences?user_id=eq.${encodeURIComponent(userId)}&select=*`,
   ).catch(() => null)
   return { ...ALL_ON, ...pickPreferences(rows?.[0]) }
 }
@@ -125,11 +137,19 @@ export async function usersWithTypeOff(userIds: string[], type: PushType): Promi
 
 export async function savePushPreferences(userId: string, patch: Partial<PushPreferences>) {
   const next = { ...(await getPushPreferences(userId)), ...pickPreferences(patch) }
-  await rest('push_preferences?on_conflict=user_id', {
-    method: 'POST',
-    prefer: 'resolution=merge-duplicates,return=minimal',
-    body: JSON.stringify({ user_id: userId, ...next, updated_at: new Date().toISOString() }),
-  })
+  const save = (prefs: Partial<PushPreferences>) =>
+    rest('push_preferences?on_conflict=user_id', {
+      method: 'POST',
+      prefer: 'resolution=merge-duplicates,return=minimal',
+      body: JSON.stringify({ user_id: userId, ...prefs, updated_at: new Date().toISOString() }),
+    })
+  try {
+    await save(next)
+  } catch (error) {
+    // Unknown column (post_saves.sql not run yet): save the original switches only.
+    if (!(error instanceof PushStoreError && (error.code === 'PGRST204' || error.code === '42703'))) throw error
+    await save(Object.fromEntries(LEGACY_PUSH_TYPES.map((type) => [type, next[type]])))
+  }
   return next
 }
 

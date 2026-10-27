@@ -301,6 +301,35 @@
         "title": "心得認證未通過",
         "body": "請到 我的 > 認證紀錄 查看原因。文件將在 72 小時內永久刪除。"
       }
+    },
+    "postRecommend": {
+      "title": "有人推薦了你的貼文",
+      "body": "{title}",
+      "bodyNoTitle": "點一下查看你的貼文。"
+    },
+    "postSave": {
+      "title": "有人收藏了你的貼文",
+      "body": "{title}",
+      "bodyNoTitle": "點一下查看你的貼文。"
+    },
+    "coffeeChat": {
+      "request": {
+        "title": "新的咖啡聊天申請",
+        "body": "{name} 申請了咖啡聊天：{topic}"
+      },
+      "accepted": {
+        "title": "咖啡聊天已確定",
+        "body": "{name} 接受了你的咖啡聊天。請在 App 中查看時間和 Zoom 連結。"
+      },
+      "declined": {
+        "title": "咖啡聊天申請未被接受",
+        "body": "{name} 這次無法接受你的咖啡聊天申請。"
+      },
+      "cancelled": {
+        "title": "咖啡聊天已取消",
+        "body": "{name} 取消了咖啡聊天。"
+      },
+      "refunded": "預留的 {amount} 點已退還。"
     }
   },
   "reviewDocs": {
@@ -350,7 +379,29 @@
       "monthlyCap": "每月最多可申請 {max} 次 coffee chat。",
       "notFound": "找不到 coffee chat 申請。",
       "invalidTransition": "目前的狀態無法變更。",
-      "cannotCancel": "已排定時間的 coffee chat 無法在此取消，請聯絡營運團隊。"
+      "cannotCancel": "已排定時間的 coffee chat 無法在此取消，請聯絡營運團隊。",
+      "mentorConsent": "導師須知與同意\n· 你在論壇發布的心得分享仍會保持匿名。但在咖啡聊天中，對方可能會看到你的臉和姓名。\n· 擔任導師沒有任何報酬，包括點數。\n· Zoom 連結由導師自行建立並分享。Misaeng 只負責媒合。\n· 職涯建議僅代表個人意見，Misaeng 不對對話內容負責。",
+      "mentorRequired": "請選擇要申請咖啡聊天的導師。",
+      "mentorUnavailable": "目前無法向這位導師申請咖啡聊天。",
+      "selfRequest": "不能向自己申請咖啡聊天。",
+      "mentorBusy": "這位導師目前有很多待回覆的申請，請稍後再試。",
+      "duplicateOpen": "你已有一個等待這位導師回覆的申請。",
+      "timesRequired": "請選擇 1 到 3 個希望的時間。",
+      "timesInvalid": "希望的時間須在現在起 12 小時之後、30 天之內。",
+      "scheduledAtInvalid": "請從申請人提議的時間中選擇一個尚未過去的時間。",
+      "zoomLinkInvalid": "請輸入有效的 Zoom 連結（以 https:// 開頭的 zoom.us 網址）。",
+      "cancelTooLate": "開始前 6 小時內無法取消。",
+      "invalidAction": "不支援此請求。",
+      "reasonTooLong": "原因最多可輸入 {max} 個字元。",
+      "reportReasonRequired": "請輸入檢舉原因。",
+      "mentorNotEligible": "只有錄取（就職）心得認證已通過的使用者才能註冊為導師。",
+      "mentorConsentRequired": "請同意導師須知。",
+      "mentorConsentOutdated": "須知內容已更新，請查看最新內容後重新同意。",
+      "mentorRoleRequired": "請輸入職位或職稱。",
+      "mentorRoleTooLong": "職位或職稱最多可輸入 {max} 個字元。",
+      "mentorIntroTooLong": "簡介最多可輸入 {max} 個字元。",
+      "mentorTopicsInvalid": "主題最多 {max} 個，每個不超過 {chars} 個字元。",
+      "nicknameRequired": "註冊為導師前，請先設定暱稱。"
     },
     "push": {
       "earned": {
@@ -385,5 +436,11 @@
     "deleted": "此帳號已註銷，無法再以此帳號登入。",
     "deleteFailed": "無法完成帳號註銷，請稍後再試。",
     "deletedUser": "已註銷使用者"
+  },
+  "saves": {
+    "invalidTarget": "找不到要收藏的貼文。",
+    "loadFailed": "無法載入收藏的貼文，請稍後再試。",
+    "saveFailed": "收藏失敗，請稍後再試。",
+    "tooMany": "一次最多可轉移 {max} 筆收藏。"
   }
 }

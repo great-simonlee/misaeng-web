@@ -20,6 +20,7 @@ import { BRAND_CONFIG } from '@lib/brand'
 import { isMisaengEmail } from '@lib/constants/nyc'
 import { useT } from '@lib/i18n/client'
 import { parseLocale, type Locale } from '@lib/i18n/locales'
+import { syncPostLikesWithAccount } from '@lib/utils/postLikes'
 import type { AuthUser } from '@/types/auth'
 import type { NycUserProfile } from '@/types/nyc'
 
@@ -303,6 +304,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cancelled = true
     }
   }, [loadSession])
+
+  // Saved posts (찜) follow the account: merge this device's once, then the server list is the source of truth
+  const uid = user?.uid ?? null
+  useEffect(() => {
+    if (loading) return
+    void syncPostLikesWithAccount(uid)
+  }, [uid, loading])
 
   const signInEmailFn = useCallback(async (email: string, password: string) => {
     const response = await fetch('/api/agent-auth/email', {

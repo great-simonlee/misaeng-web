@@ -3,6 +3,7 @@ import type {
   HousingListing,
   HousingPartWall,
   HousingRoomType,
+  HousingUnitFeatures,
 } from '@/types/nyc'
 import { resolveCityId } from '@lib/constants/cities'
 import { normalizeErpRoomType } from './listing'
@@ -145,6 +146,24 @@ function normalizePromotions(value: unknown): HousingListing['unit']['promotions
     })
 }
 
+const OUTDOOR_OPTIONS = new Set(['none', 'balcony', 'terrace', 'patio'])
+const FLEX_WALL_OPTIONS = new Set(['inherit', 'allowed', 'not_allowed'])
+
+/** ERP unit options (What to Post ⚙). null when the unit has none saved */
+export function normalizeUnitFeatures(value: unknown): HousingUnitFeatures | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+  const raw = value as Record<string, unknown>
+  return {
+    washerDryer: raw.washerDryer === true,
+    outdoor: OUTDOOR_OPTIONS.has(String(raw.outdoor))
+      ? (raw.outdoor as HousingUnitFeatures['outdoor'])
+      : 'none',
+    flexWall: FLEX_WALL_OPTIONS.has(String(raw.flexWall))
+      ? (raw.flexWall as HousingUnitFeatures['flexWall'])
+      : 'inherit',
+  }
+}
+
 function asStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return []
   return value
@@ -273,6 +292,7 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
       unitType: UNIT_TYPES.has(unitType)
         ? (unitType as HousingListing['unit']['unitType'])
         : null,
+      features: normalizeUnitFeatures(unitRaw.features),
     },
     description: String(data.description || '').trim(),
     roommateWaiting:

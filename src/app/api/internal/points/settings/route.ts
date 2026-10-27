@@ -11,6 +11,7 @@ export const dynamic = 'force-dynamic'
 function validSetting(key: PointSettingKey, raw: unknown): boolean {
   switch (key) {
     case 'paywall.enabled':
+    case 'coffee_chat.enabled':
       return typeof raw === 'boolean'
     case 'paywall.start_date':
       return raw === null || (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw))
@@ -26,7 +27,8 @@ function validSetting(key: PointSettingKey, raw: unknown): boolean {
 /**
  * Update settings (ERP). Header `x-internal-secret`, `x-admin-id`.
  * { settings: { 'paywall.enabled'?: boolean, 'paywall.start_date'?: 'YYYY-MM-DD'|null,
- *               'paywall.notice_days'?: number, 'points.cutover_at'?: ISO|null }, note? }
+ *               'paywall.notice_days'?: number, 'points.cutover_at'?: ISO|null,
+ *               'coffee_chat.enabled'?: boolean }, note? }
  * Setting `points.cutover_at` switches every server to the new ledger at that instant (config cache ≤ 30 s).
  * Each change is written to point_rules_history (target 'setting').
  */

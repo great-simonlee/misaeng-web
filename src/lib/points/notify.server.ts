@@ -1,5 +1,5 @@
 import { BRAND } from '@lib/brand'
-import { notifyUsers } from '@lib/push/notify.server'
+import { notifyUsers, previewText } from '@lib/push/notify.server'
 import type { Translate } from '@lib/i18n/translate'
 
 /**
@@ -55,5 +55,38 @@ export function notifyCoffeeChat(uid: string, status: CoffeeChatPushStatus, requ
       data: { type: 'coffee_chat', requestId },
       threadId: 'coffee-chat',
     }),
+  })
+}
+
+/** Coffee chat v2 (peer mentors) pushes. Texts: api.push.coffeeChat.* ; data `{ type: 'coffee_chat_<kind>', chatId }`. */
+export type CoffeeChatMentorPush = 'request' | 'accepted' | 'declined' | 'cancelled'
+
+export function notifyCoffeeChatMentor(input: {
+  kind: CoffeeChatMentorPush
+  to: string
+  chatId: string
+  /** nickname of whoever caused it (null → "someone" / deleted user in the reader's language) */
+  actorName: string | null
+  actorDeleted?: boolean
+  topic?: string | null
+  /** points released back to the requester (declined / cancelled), 0 = none */
+  refunded?: number
+}) {
+  notifyUsers({
+    type: 'account',
+    userIds: [input.to],
+    build: (t) => {
+      const name = input.actorDeleted
+        ? t('api.account.deletedUser')
+        : input.actorName?.trim() || t('api.push.someone')
+      const base = t(`api.push.coffeeChat.${input.kind}.body`, { name, topic: previewText(input.topic ?? '', 60) })
+      const refund = input.refunded && input.refunded > 0 ? t('api.push.coffeeChat.refunded', { amount: input.refunded }) : ''
+      return {
+        title: t(`api.push.coffeeChat.${input.kind}.title`),
+        body: refund ? `${base} ${refund}` : base,
+        data: { type: `coffee_chat_${input.kind}`, chatId: input.chatId },
+        threadId: 'coffee-chat',
+      }
+    },
   })
 }

@@ -326,6 +326,35 @@
         "title": "Your review couldn't be verified",
         "body": "See the reason in Account > Verification History. Your documents will be permanently deleted within 72 hours."
       }
+    },
+    "postRecommend": {
+      "title": "Someone recommended your post",
+      "body": "{title}",
+      "bodyNoTitle": "Tap to see your post."
+    },
+    "postSave": {
+      "title": "Someone saved your post",
+      "body": "{title}",
+      "bodyNoTitle": "Tap to see your post."
+    },
+    "coffeeChat": {
+      "request": {
+        "title": "New coffee chat request",
+        "body": "{name} requested a coffee chat: {topic}"
+      },
+      "accepted": {
+        "title": "Coffee chat confirmed",
+        "body": "{name} accepted your coffee chat. Check the time and Zoom link in the app."
+      },
+      "declined": {
+        "title": "Coffee chat request not accepted",
+        "body": "{name} couldn't accept your coffee chat request this time."
+      },
+      "cancelled": {
+        "title": "Coffee chat cancelled",
+        "body": "{name} cancelled the coffee chat."
+      },
+      "refunded": "The {amount} points on hold have been returned."
     }
   },
   "reviewDocs": {
@@ -375,7 +404,29 @@
       "monthlyCap": "You can request up to {max} coffee chats a month.",
       "notFound": "Coffee chat request not found.",
       "invalidTransition": "This request cannot be changed in its current state.",
-      "cannotCancel": "A scheduled coffee chat cannot be cancelled here. Please contact our team."
+      "cannotCancel": "A scheduled coffee chat cannot be cancelled here. Please contact our team.",
+      "mentorConsent": "Mentor notice and consent\n· Your reviews on the boards stay anonymous. In a coffee chat, however, the other person may see your face and name.\n· Mentoring comes with no reward of any kind, including points.\n· You create and share your own Zoom link. Misaeng only helps you connect.\n· Career advice is your personal opinion, and Misaeng is not responsible for what is said in the conversation.",
+      "mentorRequired": "Please choose a mentor for your coffee chat.",
+      "mentorUnavailable": "You can't request a coffee chat with this mentor right now.",
+      "selfRequest": "You can't request a coffee chat with yourself.",
+      "mentorBusy": "This mentor has many requests waiting for an answer. Please try again later.",
+      "duplicateOpen": "You already have a request waiting for this mentor's answer.",
+      "timesRequired": "Please choose 1 to 3 preferred times.",
+      "timesInvalid": "Preferred times must be at least 12 hours from now and within 30 days.",
+      "scheduledAtInvalid": "Please pick one of the proposed times that hasn't passed yet.",
+      "zoomLinkInvalid": "Please enter a valid Zoom link (an https:// zoom.us address).",
+      "cancelTooLate": "A coffee chat can't be cancelled less than 6 hours before it starts.",
+      "invalidAction": "This request isn't supported.",
+      "reasonTooLong": "The reason can be up to {max} characters.",
+      "reportReasonRequired": "Please enter a reason for the report.",
+      "mentorNotEligible": "Only users with an approved offer (hired) review verification can become mentors.",
+      "mentorConsentRequired": "Please agree to the mentor notice.",
+      "mentorConsentOutdated": "The notice has changed. Please review the latest version and agree again.",
+      "mentorRoleRequired": "Please enter your role or title.",
+      "mentorRoleTooLong": "The role or title can be up to {max} characters.",
+      "mentorIntroTooLong": "The intro can be up to {max} characters.",
+      "mentorTopicsInvalid": "Add up to {max} topics, each up to {chars} characters.",
+      "nicknameRequired": "Please set a nickname before registering as a mentor."
     },
     "push": {
       "earned": {
@@ -410,5 +461,11 @@
     "deleted": "This account has been deleted. You can’t sign in with it again.",
     "deleteFailed": "We couldn’t delete your account. Please try again in a moment.",
     "deletedUser": "Deleted user"
+  },
+  "saves": {
+    "invalidTarget": "We couldn’t find the post to save.",
+    "loadFailed": "Couldn’t load your saved posts. Please try again shortly.",
+    "saveFailed": "Couldn’t save. Please try again shortly.",
+    "tooMany": "You can move up to {max} saves at once."
   }
 }

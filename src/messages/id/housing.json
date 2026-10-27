@@ -198,7 +198,17 @@
       "wall": "Pilihan dinding",
       "amenityFee": "Biaya fasilitas",
       "income": "Syarat penghasilan",
-      "subway": "Subway"
+      "subway": "Subway",
+      "unitWasherDryer": "Mesin cuci/pengering di unit",
+      "unitOutdoor": "Ruang luar pribadi",
+      "unitFlexWall": "Flex wall",
+      "yes": "Ada",
+      "no": "Tidak ada",
+      "outdoorBalcony": "Balkon",
+      "outdoorTerrace": "Teras",
+      "outdoorPatio": "Patio",
+      "flexWallAllowed": "Boleh",
+      "flexWallNotAllowed": "Tidak boleh"
     }
   },
   "listingKinds": {

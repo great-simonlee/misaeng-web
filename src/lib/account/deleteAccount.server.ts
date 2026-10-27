@@ -5,6 +5,7 @@ import { forgetReporterEmail } from '@lib/community/reports.server'
 import { deleteNotificationsForUser } from '@lib/push/inbox.server'
 import { deletePushDataForUser } from '@lib/push/store.server'
 import { isSupabaseStorageConfigured } from '@lib/supabase/avatar.server'
+import { deletePostSavesForUser } from '@lib/supabase/postSaves.server'
 import {
   deleteStoredCommunityPost,
   listAllStoredCommunityPostIds,
@@ -36,7 +37,7 @@ import { revokeAppleTokens, type AppleRevokeOutcome } from './appleRevoke.server
  *     is refused from now on even if a later step fails; a repeated call is a no-op re-run of the cleanup)
  *  2. nickname index, referral code index, avatar files
  *  3. verification documents (deleteAllVerificationFilesForUser), push devices / preferences / company follows,
- *     in-app notifications, open coffee chats (points tables only), reporter email on reports they made
+ *     in-app notifications, saved posts, open coffee chats + coffee chat mentor card (points tables only), reporter email on reports they made
  *  4. roommate/sublet posts (personal housing info) are deleted with their uploaded photos; other posts and every
  *     comment are kept for the threads but anonymized ("Deleted user", no photo/badges — render-time too)
  *  5. Sign in with Apple tokens revoked (when Apple keys are configured), Ellieo user/deletion + auth/logout
@@ -312,16 +313,13 @@ export async function deleteMisaengAccount(input: {
   })
   await step(report, 'push', () => deletePushDataForUser(uid))
   await step(report, 'notifications', () => deleteNotificationsForUser(uid))
+  await step(report, 'saves', () => deletePostSavesForUser(uid))
   await step(report, 'coffeeChats', async () => {
     const { getPointsEngineState } = await import('@lib/points/engine.server')
     if (!(await getPointsEngineState()).tablesReady) return 'skipped'
-    const { listMyCoffeeChats, transitionCoffeeChat } = await import('@lib/points/coffeeChat.server')
-    const open = (await listMyCoffeeChats(uid, 100)).filter((c) => c.status === 'requested' || c.status === 'scheduled')
-    for (const chat of open) {
-      // cancel releases the points hold
-      await transitionCoffeeChat({ id: chat.id, action: 'cancel', actor: uid, actorRole: 'user' })
-    }
-    return open.length ? `ok (${open.length} cancelled)` : 'skipped'
+    // open chats as requester or mentor are cancelled (holds released, the other side told); mentor card deleted
+    const { cleanupCoffeeChatsForDeletedUser } = await import('@lib/points/coffeeChatMentors.server')
+    return cleanupCoffeeChatsForDeletedUser(uid)
   })
   await step(report, 'reports', () => forgetReporterEmail(uid))
 

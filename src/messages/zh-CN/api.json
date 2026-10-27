@@ -301,6 +301,35 @@
         "title": "经验帖认证未通过",
         "body": "请在 我的 > 认证记录 中查看原因。材料将在 72 小时内永久删除。"
       }
+    },
+    "postRecommend": {
+      "title": "有人推荐了你的帖子",
+      "body": "{title}",
+      "bodyNoTitle": "点击查看你的帖子。"
+    },
+    "postSave": {
+      "title": "有人收藏了你的帖子",
+      "body": "{title}",
+      "bodyNoTitle": "点击查看你的帖子。"
+    },
+    "coffeeChat": {
+      "request": {
+        "title": "新的咖啡聊天申请",
+        "body": "{name} 申请了咖啡聊天：{topic}"
+      },
+      "accepted": {
+        "title": "咖啡聊天已确定",
+        "body": "{name} 接受了你的咖啡聊天。请在 App 中查看时间和 Zoom 链接。"
+      },
+      "declined": {
+        "title": "咖啡聊天申请未被接受",
+        "body": "{name} 这次无法接受你的咖啡聊天申请。"
+      },
+      "cancelled": {
+        "title": "咖啡聊天已取消",
+        "body": "{name} 取消了咖啡聊天。"
+      },
+      "refunded": "预留的 {amount} 积分已退还。"
     }
   },
   "reviewDocs": {
@@ -350,7 +379,29 @@
       "monthlyCap": "每月最多可申请 {max} 次 coffee chat。",
       "notFound": "找不到 coffee chat 申请。",
       "invalidTransition": "当前状态下无法更改。",
-      "cannotCancel": "已安排时间的 coffee chat 无法在此取消，请联系运营团队。"
+      "cannotCancel": "已安排时间的 coffee chat 无法在此取消，请联系运营团队。",
+      "mentorConsent": "导师须知与同意\n· 你在论坛发布的经验分享仍将保持匿名。但在咖啡聊天中，对方可能会看到你的面孔和姓名。\n· 担任导师没有任何报酬，包括积分。\n· Zoom 链接由导师自行创建并分享。Misaeng 仅提供匹配。\n· 职业建议仅代表个人观点，Misaeng 不对对话内容承担责任。",
+      "mentorRequired": "请选择要申请咖啡聊天的导师。",
+      "mentorUnavailable": "目前无法向这位导师申请咖啡聊天。",
+      "selfRequest": "不能向自己申请咖啡聊天。",
+      "mentorBusy": "这位导师目前有很多待回复的申请，请稍后再试。",
+      "duplicateOpen": "你已有一个等待这位导师回复的申请。",
+      "timesRequired": "请选择 1 到 3 个希望的时间。",
+      "timesInvalid": "希望的时间须在现在起 12 小时之后、30 天之内。",
+      "scheduledAtInvalid": "请从申请人提议的时间中选择一个尚未过去的时间。",
+      "zoomLinkInvalid": "请输入有效的 Zoom 链接（以 https:// 开头的 zoom.us 地址）。",
+      "cancelTooLate": "开始前 6 小时内无法取消。",
+      "invalidAction": "不支持此请求。",
+      "reasonTooLong": "原因最多可输入 {max} 个字符。",
+      "reportReasonRequired": "请输入举报原因。",
+      "mentorNotEligible": "只有录用（入职）经验分享认证已通过的用户才能注册为导师。",
+      "mentorConsentRequired": "请同意导师须知。",
+      "mentorConsentOutdated": "须知内容已更新，请查看最新内容后重新同意。",
+      "mentorRoleRequired": "请输入职位或职务。",
+      "mentorRoleTooLong": "职位或职务最多可输入 {max} 个字符。",
+      "mentorIntroTooLong": "简介最多可输入 {max} 个字符。",
+      "mentorTopicsInvalid": "主题最多 {max} 个，每个不超过 {chars} 个字符。",
+      "nicknameRequired": "注册为导师前，请先设置昵称。"
     },
     "push": {
       "earned": {
@@ -385,5 +436,11 @@
     "deleted": "该账号已注销，无法再次使用该账号登录。",
     "deleteFailed": "未能完成账号注销，请稍后再试。",
     "deletedUser": "已注销用户"
+  },
+  "saves": {
+    "invalidTarget": "找不到要收藏的帖子。",
+    "loadFailed": "无法加载收藏的帖子，请稍后再试。",
+    "saveFailed": "收藏失败，请稍后再试。",
+    "tooMany": "一次最多可转移 {max} 条收藏。"
   }
 }

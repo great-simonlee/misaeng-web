@@ -198,7 +198,17 @@
       "wall": "仕切り壁のオプション",
       "amenityFee": "アメニティフィー",
       "income": "収入条件",
-      "subway": "地下鉄"
+      "subway": "地下鉄",
+      "unitWasherDryer": "室内洗濯機・乾燥機",
+      "unitOutdoor": "専用屋外スペース",
+      "unitFlexWall": "仕切り壁",
+      "yes": "あり",
+      "no": "なし",
+      "outdoorBalcony": "バルコニー",
+      "outdoorTerrace": "テラス",
+      "outdoorPatio": "パティオ",
+      "flexWallAllowed": "可",
+      "flexWallNotAllowed": "不可"
     }
   },
   "listingKinds": {

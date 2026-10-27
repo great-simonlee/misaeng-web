@@ -23,7 +23,8 @@ export function pointsJson(body: unknown, status = 200, headers: Record<string, 
  */
 export function pointsErrorResponse(t: Translate, error: unknown, fallbackKey = 'points.requestFailed') {
   if (error instanceof PointsError) {
-    return pointsJson({ error: t(error.key, error.params), code: error.code }, error.status)
+    // params (e.g. required / available for INSUFFICIENT_POINTS) are also returned as fields for the app
+    return pointsJson({ ...(error.params ?? {}), error: t(error.key, error.params), code: error.code }, error.status)
   }
   if (error instanceof PointsStoreError && error.setupRequired) {
     return pointsJson({ error: t('points.notConfigured'), code: 'POINTS_NOT_CONFIGURED' }, 503)

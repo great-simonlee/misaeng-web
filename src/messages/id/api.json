@@ -301,6 +301,35 @@
         "title": "Ulasan belum dapat diverifikasi",
         "body": "Lihat alasannya di Akun > Riwayat Verifikasi. Dokumen akan dihapus permanen dalam 72 jam."
       }
+    },
+    "postRecommend": {
+      "title": "Seseorang merekomendasikan postingan Anda",
+      "body": "{title}",
+      "bodyNoTitle": "Ketuk untuk melihat postingan Anda."
+    },
+    "postSave": {
+      "title": "Seseorang menyimpan postingan Anda",
+      "body": "{title}",
+      "bodyNoTitle": "Ketuk untuk melihat postingan Anda."
+    },
+    "coffeeChat": {
+      "request": {
+        "title": "Permintaan coffee chat baru",
+        "body": "{name} mengajukan coffee chat: {topic}"
+      },
+      "accepted": {
+        "title": "Coffee chat dikonfirmasi",
+        "body": "{name} menerima coffee chat-mu. Cek waktu dan link Zoom di aplikasi."
+      },
+      "declined": {
+        "title": "Permintaan coffee chat tidak diterima",
+        "body": "{name} belum bisa menerima permintaan coffee chat-mu kali ini."
+      },
+      "cancelled": {
+        "title": "Coffee chat dibatalkan",
+        "body": "{name} membatalkan coffee chat."
+      },
+      "refunded": "{amount} poin yang ditahan sudah dikembalikan."
     }
   },
   "reviewDocs": {
@@ -350,7 +379,29 @@
       "monthlyCap": "Kamu bisa mengajukan maksimal {max} coffee chat per bulan.",
       "notFound": "Permintaan coffee chat tidak ditemukan.",
       "invalidTransition": "Tidak bisa diubah pada status saat ini.",
-      "cannotCancel": "Coffee chat yang sudah dijadwalkan tidak bisa dibatalkan di sini. Hubungi tim kami."
+      "cannotCancel": "Coffee chat yang sudah dijadwalkan tidak bisa dibatalkan di sini. Hubungi tim kami.",
+      "mentorConsent": "Pemberitahuan dan persetujuan mentor\n· Ulasanmu di forum tetap anonim. Namun dalam coffee chat, lawan bicaramu mungkin dapat melihat wajah dan namamu.\n· Menjadi mentor tidak mendapatkan imbalan apa pun, termasuk poin.\n· Mentor membuat dan membagikan link Zoom sendiri. Misaeng hanya membantu mempertemukan.\n· Saran karier adalah pendapat pribadi, dan Misaeng tidak bertanggung jawab atas isi percakapan.",
+      "mentorRequired": "Silakan pilih mentor untuk coffee chat.",
+      "mentorUnavailable": "Saat ini kamu tidak dapat mengajukan coffee chat dengan mentor ini.",
+      "selfRequest": "Kamu tidak dapat mengajukan coffee chat dengan dirimu sendiri.",
+      "mentorBusy": "Mentor ini sedang memiliki banyak permintaan yang menunggu jawaban. Silakan coba lagi nanti.",
+      "duplicateOpen": "Kamu sudah memiliki permintaan yang menunggu jawaban mentor ini.",
+      "timesRequired": "Silakan pilih 1 sampai 3 waktu yang diinginkan.",
+      "timesInvalid": "Waktu yang diinginkan harus minimal 12 jam dari sekarang dan dalam 30 hari.",
+      "scheduledAtInvalid": "Silakan pilih salah satu waktu yang diusulkan yang belum lewat.",
+      "zoomLinkInvalid": "Silakan masukkan link Zoom yang valid (alamat zoom.us yang diawali https://).",
+      "cancelTooLate": "Coffee chat tidak dapat dibatalkan kurang dari 6 jam sebelum dimulai.",
+      "invalidAction": "Permintaan ini tidak didukung.",
+      "reasonTooLong": "Alasan maksimal {max} karakter.",
+      "reportReasonRequired": "Silakan masukkan alasan laporan.",
+      "mentorNotEligible": "Hanya pengguna dengan verifikasi ulasan diterima kerja yang sudah disetujui yang dapat menjadi mentor.",
+      "mentorConsentRequired": "Silakan setujui pemberitahuan mentor.",
+      "mentorConsentOutdated": "Pemberitahuan telah berubah. Silakan baca versi terbaru dan setujui lagi.",
+      "mentorRoleRequired": "Silakan masukkan posisi atau jabatan.",
+      "mentorRoleTooLong": "Posisi atau jabatan maksimal {max} karakter.",
+      "mentorIntroTooLong": "Perkenalan maksimal {max} karakter.",
+      "mentorTopicsInvalid": "Maksimal {max} topik, masing-masing paling banyak {chars} karakter.",
+      "nicknameRequired": "Silakan atur nama panggilan sebelum mendaftar sebagai mentor."
     },
     "push": {
       "earned": {
@@ -385,5 +436,11 @@
     "deleted": "Akun ini telah dihapus. Kamu tidak dapat masuk lagi dengan akun ini.",
     "deleteFailed": "Akun tidak dapat dihapus. Silakan coba lagi nanti.",
     "deletedUser": "Pengguna yang dihapus"
+  },
+  "saves": {
+    "invalidTarget": "Postingan yang akan disimpan tidak ditemukan.",
+    "loadFailed": "Tidak dapat memuat postingan tersimpan. Coba lagi nanti.",
+    "saveFailed": "Tidak dapat menyimpan. Coba lagi nanti.",
+    "tooMany": "Anda dapat memindahkan maksimal {max} simpanan sekaligus."
   }
 }

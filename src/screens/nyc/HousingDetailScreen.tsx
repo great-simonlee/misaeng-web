@@ -710,7 +710,25 @@ function HousingPropertySection({
   const amenityFeeLabel = formatPropertyAmenityFee(property, t)
   const wallLabel = formatHousingPartWall(property.partWall, t)
   const incomeLabel = formatPropertyIncomeRequirements(property, t)
+  // ERP unit options (shown only when the unit has them)
+  const features = listing.unit.features ?? null
+  const outdoorKey = {
+    balcony: 'outdoorBalcony',
+    terrace: 'outdoorTerrace',
+    patio: 'outdoorPatio',
+  } as const
+  const outdoorLabel =
+    features && features.outdoor !== 'none'
+      ? t(`detail.property.${outdoorKey[features.outdoor]}`)
+      : ''
+  const flexWallLabel =
+    features?.flexWall === 'allowed'
+      ? t('detail.property.flexWallAllowed')
+      : features?.flexWall === 'not_allowed'
+        ? t('detail.property.flexWallNotAllowed')
+        : ''
   const hasContent =
+    Boolean(features) ||
     property.subway.length > 0 ||
     wallLabel ||
     amenityFeeLabel ||
@@ -733,7 +751,18 @@ function HousingPropertySection({
         {property.zipcode ? (
           <PropertyRow label={t('detail.property.zipcode')} value={property.zipcode} />
         ) : null}
-        {wallLabel ? (
+        {features ? (
+          <PropertyRow
+            label={t('detail.property.unitWasherDryer')}
+            value={t(features.washerDryer ? 'detail.property.yes' : 'detail.property.no')}
+          />
+        ) : null}
+        {outdoorLabel ? (
+          <PropertyRow label={t('detail.property.unitOutdoor')} value={outdoorLabel} />
+        ) : null}
+        {flexWallLabel ? (
+          <PropertyRow label={t('detail.property.unitFlexWall')} value={flexWallLabel} />
+        ) : wallLabel ? (
           <PropertyRow label={t('detail.property.wall')} value={wallLabel} />
         ) : null}
         <PropertyRow label={t('detail.property.amenityFee')} value={amenityFeeLabel} />

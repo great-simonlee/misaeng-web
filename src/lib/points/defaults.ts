@@ -63,7 +63,7 @@ export const POINT_RULE_DEFAULTS = {
   // 4.1 spending (active)
   'spend.review_unlock': { value: 10, enabled: true, public: true, description: 'Interview/job and visa reviews. Food is always free' },
   'quota.free_unlocks_lifetime': { value: 5, enabled: true, public: true, description: 'Lifetime free unlocks per account (Misaeng + Ellieo)' },
-  'spend.coffee_chat': { value: 120, enabled: true, public: true, description: 'Held on request, captured on completion / no-show' },
+  'spend.coffee_chat': { value: 120, enabled: true, public: true, description: 'Held on request, captured on completion / no-show, released on cancel / decline / expiry' },
   'cap.coffee_chat_monthly': { value: 1, enabled: true, public: true, description: 'Coffee chat requests per month (legacy limit)' },
   'spend.housing_post_boost': { value: 50, enabled: true, public: true, description: 'Roommate/sublet post pinned to the top for rule.housing_boost_days' },
   'rule.housing_boost_days': { value: 7, enabled: true, public: true, description: '' },
@@ -97,6 +97,8 @@ export type PointSettings = {
   'paywall.notice_days': number
   /** ISO timestamp. Before it (or when null) the legacy credit JSON stays in charge. */
   'points.cutover_at': string | null
+  /** Coffee chat v2 (peer mentors, app only). Off until the team turns it on. */
+  'coffee_chat.enabled': boolean
 }
 
 export type PointSettingKey = keyof PointSettings
@@ -106,6 +108,7 @@ export const POINT_SETTING_DEFAULTS: PointSettings = {
   'paywall.start_date': '2027-03-01',
   'paywall.notice_days': 21,
   'points.cutover_at': null,
+  'coffee_chat.enabled': false,
 }
 
 export const POINT_SETTING_KEYS = Object.keys(POINT_SETTING_DEFAULTS) as PointSettingKey[]
@@ -131,3 +134,10 @@ export function claimComponentRuleKey(board: ClaimBoard, component: ClaimCompone
 export const COFFEE_CHAT_DISCLAIMER_VERSION = '2026-10-26'
 export const COFFEE_CHAT_DISCLAIMER =
   "Coffee chats are voluntary conversations with mentors. Misaeng does not guarantee any referral, interview, or employment outcome. Any referral is made solely at the mentor's personal discretion and is subject to the policies of the mentor's employer. Misaeng does not receive any monetary benefit from coffee chats or referrals, and mentors are not compensated by Misaeng."
+
+/**
+ * Coffee chat v2: consent a peer mentor agrees to (required checkbox). The text itself is localized
+ * (api.points.coffeeChat.mentorConsent in src/messages/<locale>/api.json); bump the version whenever it changes.
+ */
+export const COFFEE_CHAT_MENTOR_CONSENT_VERSION = '2026-10-27'
+export const COFFEE_CHAT_MENTOR_CONSENT_KEY = 'points.coffeeChat.mentorConsent'

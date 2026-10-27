@@ -21,6 +21,7 @@ create table if not exists public.push_preferences (
   reply boolean not null default true,     -- a reply to my comment
   posting boolean not null default true,   -- a new posting from a company I follow
   credit boolean not null default true,    -- credits earned
+  -- post_recommend / post_save (someone recommended / saved my post) are added by post_saves.sql
   updated_at timestamptz not null default now()
 );
 

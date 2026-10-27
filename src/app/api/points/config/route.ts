@@ -2,7 +2,13 @@ import { NextResponse } from 'next/server'
 
 import { getRequestT } from '@lib/i18n/server'
 import { getPointsConfig } from '@lib/points/config.server'
-import { COFFEE_CHAT_DISCLAIMER, COFFEE_CHAT_DISCLAIMER_VERSION } from '@lib/points/defaults'
+import { coffeeChatCost } from '@lib/points/coffeeChatMentors.server'
+import {
+  COFFEE_CHAT_DISCLAIMER,
+  COFFEE_CHAT_DISCLAIMER_VERSION,
+  COFFEE_CHAT_MENTOR_CONSENT_KEY,
+  COFFEE_CHAT_MENTOR_CONSENT_VERSION,
+} from '@lib/points/defaults'
 import { getPointsEngineState } from '@lib/points/engine.server'
 import { POINTS_NAME_KEY } from '@lib/points/notify.server'
 
@@ -34,7 +40,15 @@ export async function GET(request: Request) {
         startDate: config.settings['paywall.start_date'],
         noticeDays: config.settings['paywall.notice_days'],
       },
-      coffeeChat: { disclaimer: COFFEE_CHAT_DISCLAIMER, disclaimerVersion: COFFEE_CHAT_DISCLAIMER_VERSION },
+      coffeeChat: {
+        disclaimer: COFFEE_CHAT_DISCLAIMER,
+        disclaimerVersion: COFFEE_CHAT_DISCLAIMER_VERSION,
+        // v2 peer mentors (app): off until point setting coffee_chat.enabled is turned on
+        enabled: config.settings['coffee_chat.enabled'] && config.tablesReady,
+        mentorConsent: { text: t(`api.${COFFEE_CHAT_MENTOR_CONSENT_KEY}`), version: COFFEE_CHAT_MENTOR_CONSENT_VERSION },
+        // requester cost in points (0 = free)
+        cost: coffeeChatCost(config),
+      },
       loadedAt: new Date(config.loadedAt).toISOString(),
     },
     { headers: { 'Cache-Control': 'private, max-age=30' } },

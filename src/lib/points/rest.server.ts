@@ -26,8 +26,8 @@ export class PointsStoreError extends Error {
   }
 }
 
-/** PostgREST / Postgres codes that mean "points.sql has not been run here". */
-const SETUP_CODES = new Set(['PGRST202', 'PGRST205', '42P01', '42883', '42501', '42704'])
+/** PostgREST / Postgres codes that mean "points.sql (or coffee_chat_mentors.sql: 42703 missing column) has not been run here". */
+const SETUP_CODES = new Set(['PGRST202', 'PGRST205', '42P01', '42883', '42501', '42704', '42703'])
 
 export async function pointsRest<T>(
   path: string,
@@ -103,4 +103,5 @@ export type PointsRpcResult = {
   already?: boolean
   free_remaining?: number
   boosted_until?: string
+  mentor_id?: string | null
 }

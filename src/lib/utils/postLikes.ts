@@ -1,4 +1,10 @@
-/** 개인 찜(좋아요) — 브라우저 localStorage */
+/**
+ * 개인 찜(좋아요) — 브라우저 localStorage
+ *
+ * Signed in: localStorage is a cache of the account's saves (/api/me/saves). On the first signed-in load of a uid the
+ * device's saves are merged into the account once, then the server list replaces the cache; each toggle is sent to
+ * the server too (reverted locally if the server refuses). Signed out: device only, as before.
+ */
 
 export type PostLikeKind = 'housing' | 'community'
 
@@ -12,6 +18,12 @@ export type PostLikeEntry = {
 const STORAGE_KEY = 'misaeng.nyc.postLikes.v1'
 const LEGACY_HOUSING_KEY = 'misaeng.nyc.housingLikes'
 const CHANGE_EVENT = 'misaeng:post-likes-changed'
+/** uids whose device saves were already merged into the account */
+const MERGED_KEY = 'misaeng.nyc.postLikes.mergedUids.v1'
+const SAVES_API = '/api/me/saves'
+
+/** Signed-in uid the cache belongs to (set by syncPostLikesWithAccount) */
+let accountUid: string | null = null
 
 function likeKey(entry: Pick<PostLikeEntry, 'kind' | 'id'>): string {
   return `${entry.kind}:${entry.id}`
@@ -101,8 +113,9 @@ export function togglePostLike(entry: PostLikeEntry): boolean {
   const key = likeKey(entry)
   const index = entries.findIndex((item) => likeKey(item) === key)
   if (index >= 0) {
-    entries.splice(index, 1)
+    const [removed] = entries.splice(index, 1)
     writeEntries(entries)
+    void pushToggle(removed ?? entry, false)
     return false
   }
   entries.unshift(
@@ -111,6 +124,7 @@ export function togglePostLike(entry: PostLikeEntry): boolean {
       : { kind: 'housing', id: entry.id },
   )
   writeEntries(entries)
+  void pushToggle(entry, true)
   return true
 }
 
@@ -122,5 +136,102 @@ export function subscribePostLikes(onChange: () => void): () => void {
   return () => {
     window.removeEventListener(CHANGE_EVENT, handler)
     window.removeEventListener('storage', handler)
+  }
+}
+
+// MARK: account sync
+
+type ServerSave = { kind: PostLikeKind; targetId: string; board: string | null }
+
+function readMergedUids(): string[] {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(MERGED_KEY) || '[]') as unknown
+    return Array.isArray(parsed) ? parsed.map(String) : []
+  } catch {
+    return []
+  }
+}
+
+function toServerItem(entry: PostLikeEntry) {
+  return { kind: entry.kind, targetId: entry.id, board: entry.kind === 'community' ? (entry.boardId ?? null) : null }
+}
+
+/** Sends one toggle to the account; puts the local state back if the server refuses it. */
+async function pushToggle(entry: PostLikeEntry, saved: boolean) {
+  const uid = accountUid
+  if (!uid) return
+  try {
+    const res = saved
+      ? await fetch(SAVES_API, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(toServerItem(entry)),
+        })
+      : await fetch(
+          `${SAVES_API}?kind=${encodeURIComponent(entry.kind)}&targetId=${encodeURIComponent(entry.id)}`,
+          { method: 'DELETE', credentials: 'include' },
+        )
+    if (res.ok || accountUid !== uid) return
+  } catch {
+    // Offline: keep the local change; the next sync replaces the cache with the server list.
+    return
+  }
+  // Refused (e.g. signed out meanwhile): undo the local toggle
+  const entries = readEntries()
+  const key = likeKey(entry)
+  const index = entries.findIndex((item) => likeKey(item) === key)
+  if (saved && index >= 0) entries.splice(index, 1)
+  else if (!saved && index < 0) entries.unshift(entry)
+  else return
+  writeEntries(entries)
+}
+
+/**
+ * Called by AuthProvider whenever the signed-in uid changes (null = signed out).
+ * Signing out clears the cache (the saves live on the account), so the next account doesn't inherit them.
+ */
+export async function syncPostLikesWithAccount(uid: string | null): Promise<void> {
+  if (typeof window === 'undefined') return
+  if (!uid) {
+    if (accountUid) {
+      accountUid = null
+      writeEntries([])
+    }
+    return
+  }
+  accountUid = uid
+  try {
+    const merged = readMergedUids()
+    if (!merged.includes(uid)) {
+      const local = readEntries().slice(0, 500)
+      let done = local.length === 0
+      if (!done) {
+        const res = await fetch(`${SAVES_API}/merge`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          // Newest first locally: give older entries older times so the server keeps the order
+          body: JSON.stringify({
+            items: local.map((entry, index) => ({ ...toServerItem(entry), savedAt: Date.now() - index * 1000 })),
+          }),
+        })
+        const data = (await res.json().catch(() => null)) as { stored?: boolean } | null
+        done = res.ok && data?.stored !== false
+      }
+      if (!done) return
+      window.localStorage.setItem(MERGED_KEY, JSON.stringify([...merged, uid].slice(-20)))
+    }
+
+    const res = await fetch(SAVES_API, { credentials: 'include', cache: 'no-store' })
+    if (!res.ok || accountUid !== uid) return
+    const data = (await res.json().catch(() => null)) as { items?: ServerSave[]; stored?: boolean } | null
+    if (!data || data.stored === false || !Array.isArray(data.items)) return
+    const entries = data.items
+      .map((item) => normalizeEntry({ kind: item.kind, id: item.targetId, boardId: item.board ?? undefined }))
+      .filter((item): item is PostLikeEntry => item != null)
+    writeEntries(entries)
+  } catch {
+    // Offline / server error: keep the cache as it is
   }
 }

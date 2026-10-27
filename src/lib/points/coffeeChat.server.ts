@@ -110,6 +110,12 @@ export async function transitionCoffeeChat(input: {
   scheduledAt?: string | null
   mentorNote?: string | null
   adminNote?: string | null
+  /** v2 (peer mentor) accept: the mentor's Zoom link */
+  zoomLink?: string | null
+  /** v2 decline (mentor cancels an unscheduled request) */
+  declineReason?: string | null
+  /** false = no v1 push (coffeeChatMentors.server.ts sends its own coffee_chat_* pushes) */
+  notify?: boolean
 }) {
   if (!/^[0-9a-f-]{36}$/i.test(input.id)) throw new PointsError('Not found', 'points.coffeeChat.notFound', 404)
   const result = await pointsRpc<PointsRpcResult>('transition_coffee_chat', {
@@ -121,17 +127,34 @@ export async function transitionCoffeeChat(input: {
     p_scheduled_at: input.scheduledAt ?? null,
     p_mentor_note: input.mentorNote ?? null,
     p_admin_note: input.adminNote ?? null,
+    // v2 params only when used, so ERP / v1 calls keep working before coffee_chat_mentors.sql has been run
+    ...(input.zoomLink ? { p_zoom_link: input.zoomLink } : {}),
+    ...(input.declineReason ? { p_decline_reason: input.declineReason } : {}),
   })
   if (!result?.ok) {
     if (result?.error === 'not_found') throw new PointsError('Not found', 'points.coffeeChat.notFound', 404)
     if (result?.error === 'invalid_transition') {
       throw new PointsError(`Cannot ${input.action} a ${result.status} request`, 'points.coffeeChat.invalidTransition', 409)
     }
+    if (result?.error === 'invalid_time') {
+      throw new PointsError('Pick one of the proposed times', 'points.coffeeChat.scheduledAtInvalid', 400, undefined, 'SCHEDULED_AT_INVALID')
+    }
+    if (result?.error === 'zoom_link_required') {
+      throw new PointsError('Zoom link required', 'points.coffeeChat.zoomLinkInvalid', 400, undefined, 'ZOOM_LINK_INVALID')
+    }
+    if (result?.error === 'too_late') {
+      throw new PointsError('Too late to cancel', 'points.coffeeChat.cancelTooLate', 409, undefined, 'CANCEL_TOO_LATE')
+    }
     throw new Error(`transition_coffee_chat failed: ${result?.error ?? 'unknown'}`)
   }
   // the requester gets a push unless they did it themselves
-  if (!result.duplicate && result.user_id && input.actorRole !== 'user') {
+  if (input.notify !== false && !result.duplicate && result.user_id && input.actorRole !== 'user') {
     notifyCoffeeChat(result.user_id, PUSH_FOR[input.action], input.id)
   }
-  return { request: await getCoffeeChat(input.id), duplicate: Boolean(result.duplicate) }
+  return {
+    request: await getCoffeeChat(input.id),
+    duplicate: Boolean(result.duplicate),
+    userId: result.user_id ?? null,
+    mentorId: result.mentor_id ?? null,
+  }
 }

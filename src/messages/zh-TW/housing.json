@@ -198,7 +198,17 @@
       "wall": "隔間選項",
       "amenityFee": "設施費",
       "income": "收入條件",
-      "subway": "地鐵"
+      "subway": "地鐵",
+      "unitWasherDryer": "室內洗衣機／烘衣機",
+      "unitOutdoor": "私人戶外空間",
+      "unitFlexWall": "隔間牆",
+      "yes": "有",
+      "no": "無",
+      "outdoorBalcony": "陽台",
+      "outdoorTerrace": "露台",
+      "outdoorPatio": "庭院",
+      "flexWallAllowed": "可以",
+      "flexWallNotAllowed": "不可以"
     }
   },
   "listingKinds": {

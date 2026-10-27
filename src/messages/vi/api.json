@@ -301,6 +301,35 @@
         "title": "Chưa thể xác minh bài review",
         "body": "Xem lý do tại Trang của tôi > Lịch sử xác minh. Giấy tờ sẽ bị xóa vĩnh viễn trong vòng 72 giờ."
       }
+    },
+    "postRecommend": {
+      "title": "Có người đã đề xuất bài viết của bạn",
+      "body": "{title}",
+      "bodyNoTitle": "Chạm để xem bài viết của bạn."
+    },
+    "postSave": {
+      "title": "Có người đã lưu bài viết của bạn",
+      "body": "{title}",
+      "bodyNoTitle": "Chạm để xem bài viết của bạn."
+    },
+    "coffeeChat": {
+      "request": {
+        "title": "Yêu cầu coffee chat mới",
+        "body": "{name} đã đăng ký coffee chat: {topic}"
+      },
+      "accepted": {
+        "title": "Coffee chat đã được xác nhận",
+        "body": "{name} đã chấp nhận coffee chat. Hãy xem thời gian và link Zoom trong ứng dụng."
+      },
+      "declined": {
+        "title": "Yêu cầu coffee chat không được chấp nhận",
+        "body": "{name} chưa thể chấp nhận yêu cầu coffee chat lần này."
+      },
+      "cancelled": {
+        "title": "Coffee chat đã bị hủy",
+        "body": "{name} đã hủy coffee chat."
+      },
+      "refunded": "{amount} điểm đã giữ chỗ đã được hoàn lại."
     }
   },
   "reviewDocs": {
@@ -350,7 +379,29 @@
       "monthlyCap": "Bạn có thể đăng ký tối đa {max} coffee chat mỗi tháng.",
       "notFound": "Không tìm thấy yêu cầu coffee chat.",
       "invalidTransition": "Không thể thay đổi ở trạng thái hiện tại.",
-      "cannotCancel": "Không thể tự hủy coffee chat đã có lịch. Vui lòng liên hệ đội ngũ vận hành."
+      "cannotCancel": "Không thể tự hủy coffee chat đã có lịch. Vui lòng liên hệ đội ngũ vận hành.",
+      "mentorConsent": "Thông báo và đồng ý dành cho mentor\n· Các bài review của bạn trên diễn đàn vẫn được giữ ẩn danh. Tuy nhiên, trong buổi coffee chat, người kia có thể thấy khuôn mặt và tên của bạn.\n· Làm mentor không có bất kỳ phần thưởng nào, kể cả điểm.\n· Mentor tự tạo và chia sẻ link Zoom của mình. Misaeng chỉ giúp kết nối.\n· Lời khuyên nghề nghiệp là ý kiến cá nhân, và Misaeng không chịu trách nhiệm về nội dung cuộc trò chuyện.",
+      "mentorRequired": "Vui lòng chọn mentor cho buổi coffee chat.",
+      "mentorUnavailable": "Hiện bạn không thể đăng ký coffee chat với mentor này.",
+      "selfRequest": "Bạn không thể đăng ký coffee chat với chính mình.",
+      "mentorBusy": "Mentor này đang có nhiều yêu cầu chờ trả lời. Vui lòng thử lại sau.",
+      "duplicateOpen": "Bạn đã có một yêu cầu đang chờ mentor này trả lời.",
+      "timesRequired": "Vui lòng chọn 1 đến 3 khung giờ mong muốn.",
+      "timesInvalid": "Khung giờ mong muốn phải cách hiện tại ít nhất 12 giờ và trong vòng 30 ngày.",
+      "scheduledAtInvalid": "Vui lòng chọn một trong các khung giờ được đề xuất chưa trôi qua.",
+      "zoomLinkInvalid": "Vui lòng nhập link Zoom hợp lệ (địa chỉ zoom.us bắt đầu bằng https://).",
+      "cancelTooLate": "Không thể hủy trong vòng 6 giờ trước khi bắt đầu.",
+      "invalidAction": "Yêu cầu này không được hỗ trợ.",
+      "reasonTooLong": "Lý do tối đa {max} ký tự.",
+      "reportReasonRequired": "Vui lòng nhập lý do báo cáo.",
+      "mentorNotEligible": "Chỉ người dùng đã được duyệt xác minh review trúng tuyển (đi làm) mới có thể đăng ký làm mentor.",
+      "mentorConsentRequired": "Vui lòng đồng ý với thông báo dành cho mentor.",
+      "mentorConsentOutdated": "Thông báo đã thay đổi. Vui lòng xem nội dung mới nhất và đồng ý lại.",
+      "mentorRoleRequired": "Vui lòng nhập vị trí hoặc chức danh.",
+      "mentorRoleTooLong": "Vị trí hoặc chức danh tối đa {max} ký tự.",
+      "mentorIntroTooLong": "Phần giới thiệu tối đa {max} ký tự.",
+      "mentorTopicsInvalid": "Tối đa {max} chủ đề, mỗi chủ đề không quá {chars} ký tự.",
+      "nicknameRequired": "Vui lòng đặt biệt danh trước khi đăng ký làm mentor."
     },
     "push": {
       "earned": {
@@ -385,5 +436,11 @@
     "deleted": "Tài khoản này đã bị xóa. Bạn không thể đăng nhập lại bằng tài khoản này.",
     "deleteFailed": "Không thể xóa tài khoản. Vui lòng thử lại sau.",
     "deletedUser": "Người dùng đã xóa tài khoản"
+  },
+  "saves": {
+    "invalidTarget": "Không tìm thấy bài viết để lưu.",
+    "loadFailed": "Không thể tải các bài viết đã lưu. Vui lòng thử lại sau.",
+    "saveFailed": "Không thể lưu. Vui lòng thử lại sau.",
+    "tooMany": "Bạn chỉ có thể chuyển tối đa {max} mục đã lưu cùng lúc."
   }
 }

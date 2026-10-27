@@ -172,6 +172,24 @@ export async function markNotificationsRead(uid: string, ids: string[] | 'all'):
   }
 }
 
+/**
+ * Whether the user already has an unread notification of `type` about `postId` newer than `withinMs`
+ * (collapses repeated recommend / save notifications). Errors and a missing table count as "no".
+ */
+export async function hasRecentUnreadForPost(uid: string, type: string, postId: string, withinMs: number): Promise<boolean> {
+  const since = new Date(Date.now() - withinMs).toISOString()
+  try {
+    const rows = await rest<{ id: string }[]>(
+      `${TABLE}?user_id=eq.${encodeURIComponent(uid)}&type=eq.${encodeURIComponent(type)}` +
+        `&data->>postId=eq.${encodeURIComponent(postId)}&read_at=is.null&created_at=gte.${encodeURIComponent(since)}` +
+        '&select=id&limit=1',
+    )
+    return Boolean(rows?.length)
+  } catch {
+    return false
+  }
+}
+
 /** Account deletion: removes every notification of the user. Missing table = nothing to delete. */
 export async function deleteNotificationsForUser(uid: string): Promise<void> {
   if (!uid) return

@@ -198,7 +198,17 @@
       "wall": "Lựa chọn vách ngăn",
       "amenityFee": "Phí tiện ích",
       "income": "Yêu cầu thu nhập",
-      "subway": "Tàu điện ngầm"
+      "subway": "Tàu điện ngầm",
+      "unitWasherDryer": "Máy giặt/máy sấy trong căn hộ",
+      "unitOutdoor": "Không gian ngoài trời riêng",
+      "unitFlexWall": "Vách ngăn",
+      "yes": "Có",
+      "no": "Không",
+      "outdoorBalcony": "Ban công",
+      "outdoorTerrace": "Sân hiên",
+      "outdoorPatio": "Patio",
+      "flexWallAllowed": "Được phép",
+      "flexWallNotAllowed": "Không được phép"
     }
   },
   "listingKinds": {

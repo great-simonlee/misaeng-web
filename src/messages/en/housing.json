@@ -201,7 +201,17 @@
       "wall": "Wall options",
       "amenityFee": "Amenity fee",
       "income": "Income requirements",
-      "subway": "Subway"
+      "subway": "Subway",
+      "unitWasherDryer": "In-unit washer/dryer",
+      "unitOutdoor": "Private outdoor space",
+      "unitFlexWall": "Flex wall",
+      "yes": "Yes",
+      "no": "No",
+      "outdoorBalcony": "Balcony",
+      "outdoorTerrace": "Terrace",
+      "outdoorPatio": "Patio",
+      "flexWallAllowed": "Allowed",
+      "flexWallNotAllowed": "Not allowed"
     }
   },
   "listingKinds": {

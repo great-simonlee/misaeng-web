@@ -198,7 +198,17 @@
       "wall": "隔墙选项",
       "amenityFee": "设施费",
       "income": "收入要求",
-      "subway": "地铁"
+      "subway": "地铁",
+      "unitWasherDryer": "室内洗衣机/烘干机",
+      "unitOutdoor": "私人户外空间",
+      "unitFlexWall": "隔墙",
+      "yes": "有",
+      "no": "无",
+      "outdoorBalcony": "阳台",
+      "outdoorTerrace": "露台",
+      "outdoorPatio": "庭院",
+      "flexWallAllowed": "可以",
+      "flexWallNotAllowed": "不可以"
     }
   },
   "listingKinds": {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { apiErrorMessage } from '@lib/i18n/apiError'
 import { getRequestT } from '@lib/i18n/server'
+import { notifyPostEngagement } from '@lib/push/postEngagementNotify.server'
 
 import { resolveAuthenticatedUser } from '../../../agent-auth/lib/authHelpers'
 import { accountSuspendedResponse } from '@lib/supabase/profile.server'
@@ -115,6 +116,8 @@ export async function POST(request: Request, context: RouteContext) {
 
   try {
     await saveStoredRecommends(postId, next)
+    // Author notification: first recommend by this user only (dedupe inside), never to yourself
+    if (recommend) notifyPostEngagement({ type: 'post_recommend', postId, actorUid: user.uid })
     return NextResponse.json({
       recommend,
       summary: buildSummary(next, user.uid),
