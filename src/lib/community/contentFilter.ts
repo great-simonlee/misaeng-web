@@ -4,10 +4,12 @@
  * only words that are almost never innocent, so ordinary posts are not rejected. Reports + auto-hide
  * (src/lib/community/reports.server.ts) catch the rest.
  *
- * Normalization: lower case, NFKC (full-width letters → ASCII), leetspeak for English (0→o, 1→i, 3→e, 4→a, 5→s,
- * 7→t, @→a, $→s) with symbols inside an English word dropped ("f*ck"), anything that is not Hangul separating Korean
- * words ("씨1발"), and runs of single-character pieces joined ("f u c k", "ㅅ ㅂ" are caught; "질병 신고" is not glued
- * into "병신"). No test runner in this repo: the cases were checked with a scratch `node` script.
+ * Normalization: lower case, NFKC (full-width letters → ASCII), link tokens skipped, leetspeak for English (0→o, 1→i,
+ * 3→e, 4→a, 5→s, 7→t, @→a, $→s, !→i) with symbols inside an English word dropped ("f*ck"), symbols/digits inside a
+ * Korean word dropped ("씨1발"), single letters / lone jamo joined across spaces ("f u c k", "ㅅ ㅂ") but Korean
+ * syllables never glued ("9시 발", "질병 신고"). "시발" / "병신" inside common compounds ("즉시발급", "질병신고") are
+ * skipped; "shit", "slut", "nigger", "chink", phrases are matched by word shape ("Yoshitaka", "snigger", "go diet" pass).
+ * No test runner in this repo: the cases were checked with a scratch `tsx` script.
  *
  * The route rejects with 400 `{ error: t('community.contentBlocked'), code: CONTENT_BLOCKED_CODE }`.
  */
@@ -32,13 +34,30 @@ const KO_TERMS = [
 ]
 
 /** Innocent Korean words that contain a blocked term ("시발점" = starting point). Removed before matching. */
-const KO_ALLOW = ['시발점', '시발역', '시발택시', '시발자동차']
+const KO_ALLOW = ['시발점', '시발역', '시발택시', '시발자동차', '윤간호', '언니엄마']
 
-/** English terms matched inside a word (fucking, motherfucker, bullshit). */
+/**
+ * Terms that are also the inside of ordinary compounds: an occurrence is skipped when the syllable before / after it is
+ * listed ("즉시발급", "동시발생", "출시발표", "질병신고", "투병신청"). A standalone "시발" / "병신" is still blocked.
+ */
+const KO_CONTEXT: Record<string, { before?: string; after?: string }> = {
+  시발: { before: '즉임동출공실수개검발착첫막시', after: '점생급송표령효견족전행매주' },
+  병신: { before: '질발투열전' },
+}
+
+/** English terms matched inside a word (fucking, motherfucker). */
 const EN_SUBSTRING = [
-  'fuck', 'fck', 'phuck', 'shit', 'bitch', 'cunt', 'nigger', 'nigga', 'faggot', 'motherf', 'asshole', 'dickhead',
+  'fuck', 'fck', 'phuck', 'bitch', 'cunt', 'faggot', 'motherf', 'asshole', 'dickhead',
   'whore', 'retarded', 'kike', 'wetback', 'chinaman', 'tranny', 'pussy', 'blowjob', 'handjob', 'cocksuck',
-  'jackass', 'dumbass', 'bastard', 'slut',
+  'jackass', 'dumbass', 'bastard',
+]
+
+/** English terms with a word shape (they appear inside innocent words: "Yoshitaka", "Slutsky", "snigger"). */
+const EN_PATTERNS: [string, RegExp][] = [
+  ['shit', /^shit|shit(s|ty|ting|ted|head|heads|hole|holes)?$/],
+  ['slut', /^slut(s|ty)?$/],
+  ['nigger', /^nigger(s|z)?$/],
+  ['nigga', /^nigga(s|z)?$/],
 ]
 
 /** English terms that must be a whole word (they appear inside innocent words: "Scunthorpe", "spice", "fagus"). */
@@ -47,11 +66,14 @@ const EN_WORDS = [
   'twat', 'wanker', 'kys', 'dyke', 'dykes', 'stfu', 'gtfo', 'milf',
 ]
 
-/** Phrases (after normalization, words joined with a single space). */
+/** Phrases, matched as whole words (after normalization, words joined with a single space). */
 const EN_PHRASES = ['kill yourself', 'kill urself', 'go die', 'send nudes', 'suck my', 'rape you', 'ill rape', 'i will rape']
 
 /** Innocent English words containing a substring term. Checked per word. */
 const EN_ALLOW = new Set(['shitake', 'shiitake', 'scunthorpe', 'pussycat', 'pussycats', 'pussywillow', 'shitzu', 'shihtzu'])
+
+/** Innocent English idioms containing a whole-word term, removed before matching. */
+const EN_ALLOW_PHRASES = /\bchinks? in (?:the|their|his|her|its|my|our|your) armou?r\b/g
 
 const LEET: Record<string, string> = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '@': 'a', '$': 's', '!': 'i' }
 
@@ -60,14 +82,24 @@ const KO_TERMS_N = KO_TERMS.map((term) => term.normalize('NFKC'))
 const KO_ALLOW_N = KO_ALLOW.map((term) => term.normalize('NFKC'))
 
 const HANGUL = /[ᄀ-ᇿ㄰-㆏가-힯]/
+const JAMO_ONLY = /^[ᄀ-ᇿ㄰-㆏]$/
 
-/** Splits into pieces, then joins runs of single-character pieces ("f u c k" → "fuck"). */
-function words(text: string, keep: RegExp): string[] {
-  const pieces = text.split(keep).filter(Boolean)
+/** "https://…", "www.…" and bare "domain.tld/path" tokens are links, not prose. */
+function isUrl(token: string): boolean {
+  return /^(?:[a-z][a-z0-9+.-]*:\/\/|www\.)/i.test(token) || /^[a-z0-9-]+(?:\.[a-z0-9-]+)+\/\S*$/i.test(token)
+}
+
+/** Whitespace-separated tokens without links. */
+function tokens(text: string): string[] {
+  return text.split(/\s+/).filter((token) => token && !isUrl(token))
+}
+
+/** Joins runs of pieces that pass `single` ("f u c k" → "fuck", "ㅅ ㅂ" → "ㅅㅂ"). */
+function joinSingles(pieces: string[], single: (piece: string) => boolean): string[] {
   const out: string[] = []
   let run = ''
   for (const piece of pieces) {
-    if ([...piece].length === 1) {
+    if (single(piece)) {
       run += piece
       continue
     }
@@ -81,17 +113,56 @@ function words(text: string, keep: RegExp): string[] {
   return out
 }
 
-function koreanWords(text: string): string[] {
-  // Hangul only: everything else (spaces, symbols, digits, Latin) separates
-  return words(text, /[^ᄀ-ᇿ㄰-㆏가-힯]+/)
+/**
+ * Korean words: inside a token, symbols / digits / Latin used as obfuscation are dropped ("씨1발", "씨.발" → "씨발"),
+ * but spaces separate words — single syllables are never glued together ("9시 발", "질병 신고"). Only lone jamo are
+ * joined across spaces ("ㅅ ㅂ"). A clock time ("9시발") is cut off first.
+ */
+function koreanWords(toks: string[]): string[] {
+  const pieces: string[] = []
+  for (const token of toks) {
+    for (const part of token.split(/\d+시/)) {
+      const hangul = part.replace(/[^ᄀ-ᇿ㄰-㆏가-힯]+/g, '')
+      if (hangul) pieces.push(hangul)
+    }
+  }
+  return joinSingles(pieces, (piece) => JAMO_ONLY.test(piece))
 }
 
-function englishWords(text: string): string[] {
-  const leet = [...text].map((ch) => LEET[ch] ?? ch).join('')
+function koreanHit(word: string): string | null {
+  let w = word
+  for (const allowed of KO_ALLOW_N) w = w.split(allowed).join(' ')
+  for (const term of KO_TERMS_N) {
+    const context = KO_CONTEXT[term]
+    let at = w.indexOf(term)
+    while (at !== -1) {
+      if (!context) return term
+      const before = w[at - 1] ?? ''
+      const after = w[at + term.length] ?? ''
+      const compound =
+        (before && context.before?.includes(before)) || (after && context.after?.includes(after))
+      if (!compound) return term
+      at = w.indexOf(term, at + 1)
+    }
+  }
+  return null
+}
+
+function englishWords(toks: string[]): string[] {
   // symbols inside a word are dropped ("f*ck", "fu.ck" → "fck", "fuck"); spaces separate words
-  return words(leet, /\s+/)
-    .map((word) => word.replace(/[^a-z]+/g, ''))
+  const pieces = toks
+    .map((token) => [...token].map((ch) => LEET[ch] ?? ch).join('').replace(/[^a-z]+/g, ''))
     .filter(Boolean)
+  return joinSingles(pieces, (piece) => piece.length === 1)
+}
+
+function englishHit(word: string): string | null {
+  if (EN_ALLOW.has(word)) return null
+  const sub = EN_SUBSTRING.find((term) => word.includes(term))
+  if (sub) return sub
+  const shaped = EN_PATTERNS.find(([, pattern]) => pattern.test(word))
+  if (shaped) return shaped[0]
+  return EN_WORDS.includes(word) ? word : null
 }
 
 function normalize(text: string): string {
@@ -119,25 +190,22 @@ function collectStrings(value: unknown, out: string[], depth = 0) {
 export function findBlockedTerm(text: string): string | null {
   const value = normalize(String(text || ''))
   if (!value.trim()) return null
+  const toks = tokens(value)
 
   if (HANGUL.test(value)) {
-    for (const word of koreanWords(value)) {
-      let w = word
-      for (const allowed of KO_ALLOW_N) w = w.split(allowed).join(' ')
-      const hit = KO_TERMS_N.find((term) => w.includes(term))
+    for (const word of koreanWords(toks)) {
+      const hit = koreanHit(word)
       if (hit) return hit
     }
   }
 
-  const en = englishWords(value)
+  const en = englishWords(tokens(value.replace(EN_ALLOW_PHRASES, ' ')))
   for (const word of en) {
-    if (EN_ALLOW.has(word)) continue
-    const hit = EN_SUBSTRING.find((term) => word.includes(term)) ?? (EN_WORDS.includes(word) ? word : undefined)
+    const hit = englishHit(word)
     if (hit) return hit
   }
   const joined = ` ${en.join(' ')} `
-  const phrase = EN_PHRASES.find((p) => joined.includes(` ${p} `) || joined.includes(` ${p}`))
-  return phrase ?? null
+  return EN_PHRASES.find((p) => joined.includes(` ${p} `)) ?? null
 }
 
 /** Checks every string in the given values. Returns the first blocked term, or null when the content is fine. */

@@ -207,22 +207,34 @@ export async function createCommunityReport(input: CreateReportInput): Promise<C
   return { ok: true, report, storage: 'json' }
 }
 
-/** Distinct reporters of one post/comment (dismissed reports do not count). Table + old JSON. */
+/**
+ * Distinct reporters of one post/comment (dismissed reports do not count). Table + old JSON.
+ * `since` (ms, the target's moderation.restoredAt): only reports made after the team restored it count, so a restore
+ * is not undone by the next single report.
+ */
 export async function countDistinctReporters(
   targetType: CommunityEngagementTargetType,
   targetId: string,
+  since?: number | null,
 ): Promise<number> {
+  const cutoff = typeof since === 'number' && since > 0 ? since : 0
   const reporters = new Set<string>()
   try {
+    const sinceFilter = cutoff ? `&created_at=gt.${enc(new Date(cutoff).toISOString())}` : ''
     const rows = await rest<{ reporter_uid: string }[]>(
-      `${TABLE}?target_type=eq.${enc(targetType)}&target_id=eq.${enc(targetId)}&status=neq.dismissed&select=reporter_uid&limit=1000`,
+      `${TABLE}?target_type=eq.${enc(targetType)}&target_id=eq.${enc(targetId)}&status=neq.dismissed${sinceFilter}&select=reporter_uid&limit=1000`,
     )
     for (const row of rows ?? []) reporters.add(row.reporter_uid)
   } catch (error) {
     if (!(error instanceof ReportsTableMissing)) console.error('Report count error:', error)
   }
   for (const item of await listJsonReports()) {
-    if (item.targetType === targetType && item.targetId === targetId && item.status !== 'dismissed') {
+    if (
+      item.targetType === targetType &&
+      item.targetId === targetId &&
+      item.status !== 'dismissed' &&
+      item.createdAt > cutoff
+    ) {
       reporters.add(item.reporterUid)
     }
   }

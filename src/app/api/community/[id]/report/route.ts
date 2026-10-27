@@ -138,8 +138,9 @@ export async function POST(request: Request, context: RouteContext) {
     let reportCount = 1
     let autoHidden = false
     try {
-      reportCount = await countDistinctReporters(targetType, targetId)
       const target = targetType === 'comment' ? comment : post
+      // after an ERP restore only newer reports count (the restore also dismissed the open ones)
+      reportCount = await countDistinctReporters(targetType, targetId, target?.moderation?.restoredAt ?? null)
       if (reportCount >= AUTO_HIDE_REPORTERS && target && !isModerationHidden(target)) {
         const moderation: ContentModeration = {
           hidden: true,
@@ -170,6 +171,7 @@ export async function POST(request: Request, context: RouteContext) {
     after(() =>
       notifyTeamOfCommunityReport({
         targetType,
+        targetId,
         postId,
         postTitle: post?.title ?? null,
         commentPreview: comment?.body ?? null,
@@ -178,7 +180,6 @@ export async function POST(request: Request, context: RouteContext) {
         detail: detail || null,
         reportCount,
         autoHidden,
-        reporterEmail: user.email,
       }),
     )
 

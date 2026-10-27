@@ -502,7 +502,7 @@
   },
   "deleteAccount": {
     "title": "Delete account",
-    "confirm": "Delete your account?\n\n• Your profile, verifications and notifications are deleted right away\n• Roommate/sublet posts are deleted; other posts and comments stay as \"Deleted user\"\n• You can’t sign in with this account again",
+    "confirm": "Delete your account?\n\n• Your profile, verifications and notifications are deleted right away\n• Roommate/sublet posts are deleted; other posts and comments stay as \"Deleted user\"\n• You can’t sign in with this account again\n• Your Ellieo account (same login as Misaeng) is deleted too",
     "done": "Your account has been deleted",
     "failed": "We couldn’t delete your account. Please try again in a moment."
   }

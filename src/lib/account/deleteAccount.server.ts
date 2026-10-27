@@ -62,6 +62,72 @@ const KEEP_PROFILE_KEYS = new Set([
   'updatedAt',
 ])
 
+type KeptProfileKey =
+  | 'uid'
+  | 'status'
+  | 'deletedAt'
+  | 'deletionReason'
+  | 'termsVersion'
+  | 'privacyVersion'
+  | 'consentedAt'
+  | 'consentUiLanguage'
+  | 'updatedAt'
+
+/**
+ * Every personal profile field, cleared on the tombstone even when the profile read failed (upsert merges onto what is
+ * stored, so clearing only the keys we managed to read could leave personal data behind). Typed as a full record so a
+ * new SupabaseProfileRecord field fails type-checking until it is listed here.
+ */
+const PERSONAL_PROFILE_FIELDS: Record<Exclude<keyof SupabaseProfileRecord, KeptProfileKey>, true> = {
+  email: true,
+  nickname: true,
+  firstName: true,
+  lastName: true,
+  mbti: true,
+  photoURL: true,
+  gender: true,
+  occupationType: true,
+  schoolEmail: true,
+  schoolEmailVerified: true,
+  verifiedSchoolId: true,
+  verifiedSchoolName: true,
+  verifiedSchools: true,
+  workEmail: true,
+  workEmailVerified: true,
+  workplaceCompanyName: true,
+  workplaceStatus: true,
+  workplaceRequestId: true,
+  workplaceRejectReason: true,
+  workplaceReviewedAt: true,
+  workplaceReviewedByEmail: true,
+  phone: true,
+  phoneVerified: true,
+  instagramHandle: true,
+  instagramVerified: true,
+  instagramStatus: true,
+  instagramRequestId: true,
+  instagramRejectReasonCode: true,
+  instagramRejectReason: true,
+  instagramReviewedAt: true,
+  instagramReviewedByEmail: true,
+  instagramPendingHandle: true,
+  instagramPendingCode: true,
+  instagramPendingExpiresAt: true,
+  instagramPendingSentAt: true,
+  writeGuidelinesVersion: true,
+  writeGuidelinesConsentedAt: true,
+  writeGuidelinesSource: true,
+  preferredLocale: true,
+  referralCode: true,
+  referredByUid: true,
+  referredByCode: true,
+  referredAt: true,
+  blockedUsers: true,
+}
+
+/** Older / untyped keys that may still be in stored profile.json files. */
+const LEGACY_PERSONAL_KEYS = ['bio', 'avatarUrl', 'avatarURL', 'photoUrl', 'displayName', 'schoolId', 'schoolName']
+
 export type StepOutcome = 'ok' | 'skipped' | 'failed'
 
 export type DeleteAccountReport = {
@@ -122,10 +188,10 @@ async function step(report: DeleteAccountReport, name: string, run: () => Promis
   }
 }
 
-/** Tombstone: keeps consent + state, sets every other existing field to null. */
+/** Tombstone: keeps consent + state, sets every personal field (fixed list + whatever was read) to null. */
 async function writeTombstone(uid: string, existing: SupabaseProfileRecord | null, reason: string | null) {
   const cleared: Record<string, null> = {}
-  for (const key of Object.keys(existing ?? {})) {
+  for (const key of [...Object.keys(PERSONAL_PROFILE_FIELDS), ...LEGACY_PERSONAL_KEYS, ...Object.keys(existing ?? {})]) {
     if (!KEEP_PROFILE_KEYS.has(key)) cleared[key] = null
   }
   await upsertSupabaseProfile(uid, {
