@@ -1,0 +1,151 @@
+name: Server Env (misaeng.com)
+
+# misaeng.com runs on the AWS app server (behind the bastion), not on Vercel.
+# This workflow manages that server's env file from GitHub Secrets.
+#   mode=inspect : read-only. Shows the app process, its folder and which env keys exist (names only, never values).
+#   mode=apply   : writes INTERNAL_POINTS_SECRET / INTERNAL_VERIFICATION_SECRET / INTERNAL_PUSH_SECRET into the env file
+#                  (replacing old lines, backup kept as <file>.bak-<time>) and restarts the app.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: inspect (read-only) or apply
+        type: choice
+        options: [inspect, apply]
+        default: inspect
+      app_dir:
+        description: App folder on the server (from an inspect run), e.g. /home/ubuntu/misaeng-web
+        required: false
+        default: ''
+      env_file:
+        description: Env file name inside app_dir
+        required: false
+        default: .env.production
+      restart_cmd:
+        description: Command that restarts the app (from an inspect run), e.g. pm2 restart misaeng-web --update-env
+        required: false
+        default: ''
+
+concurrency:
+  group: server-env
+  cancel-in-progress: false
+
+jobs:
+  server-env:
+    name: ${{ inputs.mode }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASTION_HOST: ${{ secrets.BASTION_HOST }}
+      APP_HOST: ${{ secrets.APP_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+
+    steps:
+      - name: Setup SSH config
+        env:
+          BASTION_SSH_KEY: ${{ secrets.BASTION_SSH_KEY }}
+        run: |
+          if [ -z "$BASTION_SSH_KEY" ] || [ -z "$BASTION_HOST" ] || [ -z "$APP_HOST" ] || [ -z "$SSH_USER" ]; then
+            echo "Missing BASTION_SSH_KEY / BASTION_HOST / APP_HOST / SSH_USER secrets."
+            exit 1
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "$BASTION_SSH_KEY" | sed 's/\r$//' > ~/.ssh/bastion.pem
+          chmod 600 ~/.ssh/bastion.pem
+          cat > ~/.ssh/config <<EOF
+          Host bastion
+            HostName ${BASTION_HOST}
+            User ${SSH_USER}
+            IdentityFile ~/.ssh/bastion.pem
+            IdentitiesOnly yes
+            StrictHostKeyChecking accept-new
+
+          Host app
+            HostName ${APP_HOST}
+            User ${SSH_USER}
+            ProxyJump bastion
+            IdentityFile ~/.ssh/bastion.pem
+            IdentitiesOnly yes
+            StrictHostKeyChecking accept-new
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Inspect (read-only)
+        if: inputs.mode == 'inspect'
+        run: |
+          ssh -o ConnectTimeout=20 app 'bash -s' <<'REMOTE'
+          echo "== user / host"; whoami; hostname
+          echo "== pm2"; (command -v pm2 >/dev/null && pm2 jlist 2>/dev/null | node -e 'let r="";process.stdin.on("data",c=>r+=c).on("end",()=>{try{for(const p of JSON.parse(r))console.log(p.name,"|",p.pm2_env.status,"|",p.pm2_env.pm_cwd)}catch{console.log("(pm2 jlist not readable)")}})') || echo "(no pm2)"
+          echo "== systemd units"; systemctl list-units --type=service --no-pager 2>/dev/null | grep -iE "next|node|misaeng" || echo "(none matched)"
+          echo "== docker"; (command -v docker >/dev/null && docker ps --format '{{.Names}} {{.Image}}' 2>/dev/null) || echo "(no docker)"
+          echo "== candidate app folders (package.json name)"
+          for f in $(find / -maxdepth 4 -name package.json -path '*misaeng*' -not -path '*/node_modules/*' 2>/dev/null | head -10); do
+            echo "$(dirname "$f") -> $(grep -m1 '"name"' "$f")"
+          done
+          echo "== env files and key NAMES (no values)"
+          for d in $(find / -maxdepth 4 -name package.json -path '*misaeng*' -not -path '*/node_modules/*' 2>/dev/null | head -5 | xargs -n1 dirname); do
+            for e in "$d"/.env*; do
+              [ -f "$e" ] || continue
+              echo "-- $e"
+              grep -oE '^[A-Z_][A-Z0-9_]*' "$e" | grep -E 'INTERNAL|SUPABASE|APP_CONNECT|MISAENG' | sort | uniq
+            done
+          done
+          REMOTE
+
+      - name: Apply env and restart
+        if: inputs.mode == 'apply'
+        env:
+          APP_DIR: ${{ inputs.app_dir }}
+          ENV_FILE: ${{ inputs.env_file }}
+          RESTART_CMD: ${{ inputs.restart_cmd }}
+          INTERNAL_POINTS_SECRET: ${{ secrets.INTERNAL_POINTS_SECRET }}
+          INTERNAL_VERIFICATION_SECRET: ${{ secrets.INTERNAL_VERIFICATION_SECRET }}
+          INTERNAL_PUSH_SECRET: ${{ secrets.INTERNAL_PUSH_SECRET }}
+        run: |
+          if [ -z "$APP_DIR" ] || [ -z "$RESTART_CMD" ]; then
+            echo "app_dir and restart_cmd are required for apply (run inspect first)."
+            exit 1
+          fi
+          for k in INTERNAL_POINTS_SECRET INTERNAL_VERIFICATION_SECRET INTERNAL_PUSH_SECRET; do
+            if [ -z "${!k}" ]; then echo "GitHub Secret $k is missing."; exit 1; fi
+          done
+          # 1) put a small script on the server
+          ssh -o ConnectTimeout=20 app 'cat > /tmp/misaeng-apply-env.sh' <<'SCRIPT'
+          #!/bin/bash
+          # usage: misaeng-apply-env.sh <env file path>   (new KEY=value lines on stdin)
+          set -euo pipefail
+          file="$1"
+          touch "$file"
+          cp "$file" "$file.bak-$(date +%Y%m%d%H%M%S)"
+          new="$(cat)"
+          tmp="$(mktemp)"
+          cp "$file" "$tmp"
+          while IFS= read -r line; do
+            key="${line%%=*}"
+            [ -n "$key" ] || continue
+            grep -v "^${key}=" "$tmp" > "$tmp.next" || true
+            mv "$tmp.next" "$tmp"
+            printf '%s\n' "$line" >> "$tmp"
+            echo "updated: $key"
+          done <<< "$new"
+          cat "$tmp" > "$file"
+          rm -f "$tmp" /tmp/misaeng-apply-env.sh
+          SCRIPT
+          # 2) send the values over stdin (never on a command line or in the log)
+          printf 'INTERNAL_POINTS_SECRET=%s\nINTERNAL_VERIFICATION_SECRET=%s\nINTERNAL_PUSH_SECRET=%s\n' \
+            "$INTERNAL_POINTS_SECRET" "$INTERNAL_VERIFICATION_SECRET" "$INTERNAL_PUSH_SECRET" |
+            ssh -o ConnectTimeout=20 app "bash /tmp/misaeng-apply-env.sh '$APP_DIR/$ENV_FILE'"
+          # 3) restart the app so the server picks up the new values
+          ssh -o ConnectTimeout=20 app "cd '$APP_DIR' && $RESTART_CMD"
+
+      - name: Check misaeng.com
+        if: inputs.mode == 'apply'
+        run: |
+          sleep 10
+          for p in / /api/points/config; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "https://misaeng.com$p")
+            echo "$p -> $code"
+          done
+          # 401 = the server now has a secret and refuses calls without it
+          code=$(curl -s -o /dev/null -w '%{http_code}' https://misaeng.com/api/internal/points/rules)
+          echo "/api/internal/points/rules (no secret) -> $code"
