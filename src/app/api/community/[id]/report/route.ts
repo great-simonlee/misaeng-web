@@ -73,7 +73,10 @@ export async function POST(request: Request, context: RouteContext) {
 
   const targetType: CommunityEngagementTargetType =
     payload?.targetType === 'comment' ? 'comment' : 'post'
-  const targetId = String(payload?.targetId || '').trim() || postId
+  // A post report always targets the post in the URL (never a body-supplied id: that let one person push another
+  // post over the auto-hide threshold). A comment must belong to this post (checked below).
+  const targetId = targetType === 'post' ? postId : String(payload?.targetId || '').trim()
+  if (!targetId) return NextResponse.json({ error: t('common.badRequest') }, { status: 400 })
   const reason = payload?.reason
   const detail =
     typeof payload?.detail === 'string' ? payload.detail.trim() : ''
@@ -104,6 +107,12 @@ export async function POST(request: Request, context: RouteContext) {
     const comments: CommunityComment[] =
       targetType === 'comment' && post ? await listStoredCommunityComments(postId).catch(() => []) : []
     const comment = targetType === 'comment' ? comments.find((item) => item.id === targetId) ?? null : null
+    if (targetType === 'comment' && !comment) {
+      return NextResponse.json({ error: t('common.postNotFound') }, { status: 404 })
+    }
+    if (targetType === 'post' && !post && !postId.startsWith('mock-')) {
+      return NextResponse.json({ error: t('common.postNotFound') }, { status: 404 })
+    }
     const boardId = String(payload?.boardId || '').trim() || post?.categoryId || ''
     const authorUid = (targetType === 'comment' ? comment?.authorUid : post?.authorUid) || null
 
