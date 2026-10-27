@@ -13,7 +13,7 @@
     "me": "마이페이지",
     "myPosts": "내가 올린 글",
     "myLikes": "내가 좋아요 누른 글",
-    "creditReviews": "크레딧 리뷰"
+    "creditReviews": "미생 포인트 리뷰"
   },
   "accountMenu": "계정 메뉴",
   "openAccountMenu": "계정 메뉴 열기",
@@ -38,7 +38,7 @@
     },
     "links": {
       "housing": "하우징",
-      "credit": "크레딧",
+      "credit": "미생 포인트",
       "partners": "파트너",
       "companySite": "회사 사이트",
       "about": "회사 소개",

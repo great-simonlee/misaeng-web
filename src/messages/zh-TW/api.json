@@ -28,7 +28,7 @@
     "identityVerificationRequired": "要發文或留言，請先完成學校或公司認證。"
   },
   "auth": {
-    "ellieoUnavailable": "目前無法連線到 Ellieo 伺服器，請稍後再試。",
+    "ellieoUnavailable": "目前無法連線到登入伺服器，請稍後再試。",
     "noAccessToken": "未收到存取權杖（access token）。",
     "loginFailed": "登入失敗。",
     "signupFailed": "註冊失敗。",
@@ -45,7 +45,14 @@
     "passwordResetFailed": "無法送出密碼重設請求。",
     "emailAuthError": "Email 登入時發生錯誤。",
     "sessionExpired": "登入狀態已過期，請重新登入。",
-    "userInfoUnavailable": "你已登入，但無法載入帳號資訊。"
+    "userInfoUnavailable": "你已登入，但無法載入帳號資訊。",
+    "invalidCredentials": "電子郵件或密碼不正確。",
+    "accountNotFound": "此電子郵件沒有註冊帳號。請檢查電子郵件或註冊。",
+    "emailInUse": "此電子郵件已註冊。請登入或重設密碼。",
+    "tooManyAttempts": "嘗試次數過多，請稍後再試。",
+    "weakPassword": "密碼至少需要6個字元。",
+    "invalidEmail": "請輸入有效的電子郵件地址。",
+    "accountDisabled": "此帳號已被限制使用，請聯絡 Misaeng 團隊。"
   },
   "profile": {
     "nickname": {
@@ -95,7 +102,19 @@
     "workplacePending": "Misaeng 團隊正在審核你的公司認證。",
     "workplaceStorageMissing": "尚未設定公司認證的儲存空間。",
     "workplaceSaveFailed": "無法儲存公司認證申請（HTTP {status}）",
-    "workEmailError": "認證公司信箱時發生錯誤。"
+    "workEmailError": "認證公司信箱時發生錯誤。",
+    "schoolAlreadyVerified": "你已經驗證過這個學校信箱。",
+    "schoolLimitReached": "最多可以驗證 {max} 所學校。",
+    "schoolNotVerified": "這不是你已驗證的學校。",
+    "instagram": {
+      "noRequest": "你沒有進行中的 Instagram 驗證申請。",
+      "invalidHandle": "請確認 Instagram 使用者名稱，只能使用英文字母、數字、句點和底線。",
+      "alreadyVerified": "這個 Instagram 帳號已經驗證。",
+      "handleTaken": "這個 Instagram 帳號已由其他 Misaeng 帳號驗證或正在驗證中。",
+      "tooManyRequests": "今天無法再取得驗證碼，請明天再試。",
+      "requestFailed": "無法申請 Instagram 驗證。",
+      "saveFailed": "無法儲存 Instagram 驗證申請。"
+    }
   },
   "consent": {
     "termsRequired": "請同意條款後再繼續。",
@@ -117,22 +136,23 @@
     "maxUsesReached": "這個推薦碼最多只能讓 {max} 人使用。"
   },
   "credit": {
-    "loadFailed": "無法載入你的積分資訊。",
+    "loadFailed": "無法載入你的點數資訊。",
     "invalidUser": "使用者無效。",
-    "saveFailed": "積分儲存失敗（HTTP {status}）",
+    "saveFailed": "點數儲存失敗（HTTP {status}）",
     "reviewListLoadFailed": "無法載入審核列表。",
     "reviewRequestNotFound": "找不到這筆申請。",
     "reviewAlreadyProcessed": "這筆申請已經處理過了。",
     "reviewPostMissing": "貼文不存在或已被刪除。",
-    "awardFailed": "無法發放積分，請檢查儲存空間設定。",
+    "awardFailed": "無法發放點數，請檢查儲存空間設定。",
     "processFailed": "無法完成此操作。",
     "reviewSaveFailed": "無法儲存審核申請（HTTP {status}）",
     "reviewStatusLoadFailed": "無法載入審核申請狀態。",
-    "reviewBoardIneligible": "這個看板的貼文無法申請額外積分。",
+    "reviewBoardIneligible": "這個看板的貼文無法申請額外點數。",
     "reviewFinalResultRequired": "請先在時間軸加上最終結果（核准、收到卡片、offer、未錄取等）。",
     "reviewAlreadyAwarded": "這篇貼文已經獲得審核獎勵。",
     "reviewAlreadyPending": "已在等待審核中。",
-    "reviewRequestFailed": "無法申請額外積分。"
+    "reviewRequestFailed": "無法申請額外點數。",
+    "reviewBonusReplaced": "積分規則更新後，此獎勵改為由營運團隊審核每篇評價後發放積分。請使用 ERP 中的積分審核佇列。"
   },
   "postings": {
     "loadFailed": "無法載入職缺。"
@@ -223,12 +243,22 @@
           "moveInEnd": "請選擇轉租結束日期。"
         }
       }
+    },
+    "blocks": {
+      "loadFailed": "無法載入封鎖清單。",
+      "failed": "無法封鎖這位使用者，請稍後再試。",
+      "unblockFailed": "無法解除封鎖，請稍後再試。",
+      "targetNotFound": "找不到要封鎖的貼文或留言。",
+      "self": "無法封鎖自己的貼文或留言。",
+      "limit": "最多可以封鎖 {max} 位使用者。",
+      "notFound": "這位使用者不在你的封鎖清單中。",
+      "blockedPost": "這是你已封鎖使用者的貼文。"
     }
   },
   "guest": {
     "invalidRequest": "請確認你的請求內容。",
     "nicknameInvalid": "請輸入 {min}–{max} 個字元的顯示暱稱（不可為 Email 地址）。",
-    "emailInvalid": "請輸入有效的 Email，以便我們寄送禮物卡和積分相關通知。",
+    "emailInvalid": "請輸入有效的 Email，以便我們寄送禮物卡和點數相關通知。",
     "linkedinRequired": "請輸入你的 LinkedIn 個人檔案網址。範例：linkedin.com/in/your-name",
     "guidelinesRequired": "請同意社群發文規範。",
     "titleRequired": "請輸入標題。",
@@ -236,5 +266,115 @@
     "bodyTooLong": "「注意事項」最多 {max} 個字元。",
     "jobReviewTypeRequired": "請選擇類型：實習、新鮮人、有經驗、轉職或約聘。",
     "rateLimited": "請稍後再試。（短時間內請求次數過多）"
+  },
+  "push": {
+    "verification": {
+      "instagram": {
+        "approved": {
+          "title": "Instagram 驗證完成",
+          "body": "你的貼文現在會顯示 Instagram 驗證徽章。"
+        },
+        "rejected": {
+          "title": "Instagram 驗證未通過",
+          "body": "請到我的頁面查看原因並重新申請。"
+        }
+      }
+    },
+    "reviewDocs": {
+      "deleted": {
+        "title": "認證文件已刪除",
+        "body": "你提交的認證文件已於 {date} 永久刪除，僅保留認證結果。"
+      },
+      "expired": {
+        "title": "請重新提交認證文件",
+        "body": "由於未能在 7 天內完成審核，你提交的文件已於 {date} 永久刪除。你可以在貼文中重新認證。"
+      },
+      "approved": {
+        "title": "心得已認證",
+        "body": "你的心得已通過認證。文件將在 72 小時內永久刪除。"
+      },
+      "rejected": {
+        "title": "心得認證未通過",
+        "body": "請到 我的 > 認證紀錄 查看原因。文件將在 72 小時內永久刪除。"
+      }
+    }
+  },
+  "reviewDocs": {
+    "notReady": "認證文件功能尚未開放，請稍後再試。",
+    "failed": "無法處理你的文件，請稍後再試。",
+    "invalidRequest": "請確認請求內容後再試一次。",
+    "consentRequired": "上傳前請先同意認證文件的處理說明。",
+    "fileRequired": "請選擇要上傳的圖片。",
+    "tooManyFiles": "一次最多可上傳 {max} 個檔案。",
+    "fileTooLarge": "每個檔案不得超過 10MB。",
+    "heicNotSupported": "請先將 HEIC 檔案轉成 JPG 再上傳。",
+    "invalidImage": "無法讀取這張圖片，請換一個檔案再試。",
+    "unsupportedType": "只能上傳 JPG、PNG 和 PDF 檔案。",
+    "boardNotEligible": "只有面試・求職心得和 OPT・簽證・綠卡貼文可以認證。",
+    "alreadyVerified": "這篇貼文已經認證。",
+    "alreadyPending": "這篇貼文的認證文件正在審核中。",
+    "dailyLimit": "今天無法再上傳認證文件，請明天再試。",
+    "notFound": "找不到這筆認證紀錄。",
+    "deleteFailed": "暫時無法立即刪除檔案，系統會自動重試。"
+  },
+  "points": {
+    "notConfigured": "積分功能暫時無法使用，請稍後再試。",
+    "notActive": "新的積分功能尚未開始。",
+    "loadFailed": "無法載入積分資訊。",
+    "requestFailed": "無法處理積分請求，請稍後再試。",
+    "invalidCursor": "請求無效，請從頭重新載入紀錄。",
+    "insufficient": "積分不足。（需要 {required}，可用 {available}）",
+    "monthlyCap": "已達本月使用上限。",
+    "featureDisabled": "此功能目前無法使用。",
+    "identityRequired": "完成學校或工作信箱認證後即可使用。",
+    "verificationRequired": "完成帳號認證（學校或工作信箱，或 Instagram）後即可累積積分。",
+    "claimNotFound": "找不到審核申請。",
+    "claimNotPending": "此審核申請已處理。",
+    "boost": {
+      "notAllowed": "只有室友·轉租貼文可以置頂。",
+      "notAuthor": "只能置頂自己發表的貼文。",
+      "active": "這篇貼文已在置頂中（至{date}）。",
+      "cooldown": "這篇貼文可在{date}起再次置頂。",
+      "monthlyCap": "每月最多可置頂{max}次。",
+      "slotsFull": "目前置頂位置已滿，{date}會空出位置。"
+    },
+    "coffeeChat": {
+      "agreeRequired": "請同意 coffee chat 注意事項。",
+      "topicRequired": "請輸入 coffee chat 主題。",
+      "topicTooLong": "主題最多 {max} 個字。",
+      "messageTooLong": "訊息最多 {max} 個字。",
+      "monthlyCap": "每月最多可申請 {max} 次 coffee chat。",
+      "notFound": "找不到 coffee chat 申請。",
+      "invalidTransition": "目前的狀態無法變更。",
+      "cannotCancel": "已排定時間的 coffee chat 無法在此取消，請聯絡營運團隊。"
+    },
+    "push": {
+      "earned": {
+        "title": "{name} +{amount}",
+        "body": "{reason} · 餘額 {balance}"
+      },
+      "clawback": {
+        "title": "{name} -{amount} 已收回",
+        "body": "依營運規則，積分已被收回 · 餘額 {balance}"
+      },
+      "coffeeChat": {
+        "scheduled": {
+          "title": "coffee chat 已排定",
+          "body": "請到我的頁面查看時間。"
+        },
+        "completed": {
+          "title": "coffee chat 已完成",
+          "body": "預留的{name}已被使用。"
+        },
+        "cancelled": {
+          "title": "coffee chat 已取消",
+          "body": "預留的{name}未被扣除。"
+        },
+        "no_show": {
+          "title": "coffee chat 缺席",
+          "body": "已依缺席處理，預留的{name}已被使用。"
+        }
+      }
+    }
   }
 }

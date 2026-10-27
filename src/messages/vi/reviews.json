@@ -615,7 +615,7 @@
     "nicknamePlaceholder": "VD: NYCWorker",
     "emailLabel": "Email",
     "emailHintMember": "Email tài khoản · Riêng tư",
-    "emailHintGuest": "Để nhận thông tin thẻ quà tặng và credit · Riêng tư",
+    "emailHintGuest": "Để nhận thông tin thẻ quà tặng và điểm · Riêng tư",
     "linkedinLabel": "URL hồ sơ LinkedIn",
     "linkedinHint": "Để xác nhận nơi bạn làm việc · Riêng tư",
     "coffeeChatLabel": "Mình sẵn sàng nhận lời mời coffee chat từ người mới bắt đầu",
@@ -625,7 +625,7 @@
     "submitGuest": "Đăng review không cần đăng ký",
     "footnoteBefore": "Không cần đăng ký.",
     "footnoteLink": "Đăng ký bằng Google và đăng bài",
-    "footnoteAfter": " để nhận credit vào tài khoản ngay.",
+    "footnoteAfter": " để nhận điểm vào tài khoản ngay.",
     "footnoteMember": "Sau khi đăng, bạn có thể tiếp tục thêm và sửa tiến trình trong Bài viết của tôi.",
     "choose": {
       "eyebrow": "Chia sẻ trải nghiệm",
@@ -633,54 +633,58 @@
       "intro": "Kể lại từng bước, từ ứng tuyển, phỏng vấn đến kết quả. Điều này giúp ích rất nhiều cho những người đang chuẩn bị đi cùng con đường. Chỉ mất 5 phút.",
       "recommended": "Khuyên dùng",
       "googleTitle": "Đăng ký bằng Google và đăng bài",
-      "googlePitch1": "Credit được cộng thẳng vào tài khoản",
+      "googlePitch1": "Điểm được cộng thẳng vào tài khoản",
       "googlePitch2": "Bạn có thể tiếp tục thêm tiến trình sau khi đăng",
       "guestTitle": "Đăng bài không cần đăng ký",
       "guestPitch1": "Chỉ cần biệt danh, email và URL LinkedIn",
-      "guestPitch2": "Chúng tôi sẽ giữ credit cho bạn và tự động cộng khi bạn đăng ký sau bằng cùng email",
+      "guestPitch2": "Chúng tôi sẽ giữ điểm cho bạn và tự động cộng khi bạn đăng ký sau bằng cùng email",
       "guestCta": "Đăng review không cần đăng ký"
     },
     "creditPitch": {
-      "title": "Nhận credit cho review của bạn",
-      "perStep": "{perStep} credit cho mỗi giai đoạn tuyển dụng (tối đa {max} mỗi bài viết)",
-      "perStepWithBonus": "{perStep} credit cho mỗi giai đoạn tuyển dụng (tối đa {max} mỗi bài viết) · Bài viết đầu tiên +{bonus}",
-      "review": "Review chi tiết sẽ nhận thêm credit sau khi đội ngũ Misaeng xét duyệt",
-      "coffeeChat": "Dùng credit ({cost}) cho buổi coffee chat 1:1 với người trong ngành hoặc công ty của bạn, hay cả ngành khác",
-      "optionalSignup": "Đăng ký là không bắt buộc. Sau khi đăng ký, bạn có thể dùng credit và nhận lời mời coffee chat"
+      "title": "Nhận điểm Misaeng cho review của bạn",
+      "perStep": "{perStep} điểm cho mỗi giai đoạn tuyển dụng (tối đa {max} mỗi bài viết)",
+      "perStepWithBonus": "{perStep} điểm cho mỗi giai đoạn tuyển dụng (tối đa {max} mỗi bài viết) · Bài viết đầu tiên +{bonus}",
+      "review": "Review chi tiết sẽ nhận thêm điểm sau khi đội ngũ Misaeng xét duyệt",
+      "coffeeChat": "Dùng điểm ({cost}) cho buổi coffee chat 1:1 với người trong ngành hoặc công ty của bạn, hay cả ngành khác",
+      "optionalSignup": "Đăng ký là không bắt buộc. Sau khi đăng ký, bạn có thể dùng điểm và nhận lời mời coffee chat"
     },
     "hero": {
       "memberEyebrow": "Đăng bằng tài khoản của tôi",
-      "memberIntro": "Credit được cộng vào tài khoản này ngay khi bạn đăng bài. Bạn cũng có thể nhận lời mời coffee chat.",
-      "guestIntro": "Không cần đăng ký. Chúng tôi sẽ giữ credit cho bạn và tự động cộng khi bạn đăng ký sau bằng cùng email."
+      "memberIntro": "Điểm được cộng vào tài khoản này ngay khi bạn đăng bài. Bạn cũng có thể nhận lời mời coffee chat.",
+      "guestIntro": "Không cần đăng ký. Chúng tôi sẽ giữ điểm cho bạn và tự động cộng khi bạn đăng ký sau bằng cùng email."
     },
     "preview": {
       "count_other": "Đã thêm {count} giai đoạn tuyển dụng",
-      "member": "Bạn sẽ nhận {credit} credit",
-      "memberWithBonus": "Bạn sẽ nhận {credit} credit (+{bonus} bài viết đầu tiên)",
-      "guest": "{credit} credit khi bạn đăng ký",
-      "guestWithBonus": "{credit} credit khi bạn đăng ký (+{bonus} bài viết đầu tiên)"
+      "member": "Bạn sẽ nhận {credit} điểm",
+      "memberWithBonus": "Bạn sẽ nhận {credit} điểm (+{bonus} bài viết đầu tiên)",
+      "guest": "{credit} điểm khi bạn đăng ký",
+      "guestWithBonus": "{credit} điểm khi bạn đăng ký (+{bonus} bài viết đầu tiên)"
     },
     "done": {
       "eyebrow": "Đã đăng",
       "title": "Cảm ơn bạn đã chia sẻ review",
       "body_other": "\"{title}\" đã có mặt trên bảng tin Review phỏng vấn & việc làm. {count} giai đoạn tuyển dụng của bạn sẽ giúp ích cho những người đi sau.",
-      "awarded": "Đã cộng {credit} credit vào tài khoản của bạn",
+      "awarded": "Đã cộng {credit} điểm vào tài khoản của bạn",
       "linked": "Review của bạn đã được liên kết với tài khoản",
-      "coffeeChat": "Dùng credit cho coffee chat ({cost} credit) với người trong ngành hoặc công ty của bạn, hay cả ngành khác.",
-      "pending": "Đăng ký để nhận ngay {credit} credit",
-      "breakdown_other": "{count} giai đoạn tuyển dụng = {credit} credit. Đăng ký bằng tài khoản Google trùng với email trong review, hệ thống sẽ tự động liên kết.",
-      "breakdownWithBonus_other": "{count} giai đoạn tuyển dụng = {credit} credit + {bonus} thưởng bài viết đầu tiên. Đăng ký bằng tài khoản Google trùng với email trong review, hệ thống sẽ tự động liên kết.",
+      "coffeeChat": "Dùng điểm cho coffee chat ({cost} điểm) với người trong ngành hoặc công ty của bạn, hay cả ngành khác.",
+      "pending": "Đăng ký để nhận ngay {credit} điểm",
+      "breakdown_other": "{count} giai đoạn tuyển dụng = {credit} điểm. Đăng ký bằng tài khoản Google trùng với email trong review, hệ thống sẽ tự động liên kết.",
+      "breakdownWithBonus_other": "{count} giai đoạn tuyển dụng = {credit} điểm + {bonus} thưởng bài viết đầu tiên. Đăng ký bằng tài khoản Google trùng với email trong review, hệ thống sẽ tự động liên kết.",
       "viewPost": "Xem review của tôi",
-      "viewCredit": "Xem credit của tôi",
+      "viewCredit": "Xem điểm Misaeng của tôi",
       "toList": "Quay lại danh sách",
       "optional": "Không bắt buộc",
       "signupTitle": "Đăng ký {brand} để nhận lời mời coffee chat từ người mới bắt đầu",
-      "signupPitch1": "Review bạn vừa viết và {credit} credit sẽ được liên kết với tài khoản ngay",
-      "signupPitch2": "Dùng credit cho coffee chat 1:1 với người trong ngành hoặc công ty của bạn, hay ngành khác",
+      "signupPitch1": "Review bạn vừa viết và {credit} điểm sẽ được liên kết với tài khoản ngay",
+      "signupPitch2": "Dùng điểm cho coffee chat 1:1 với người trong ngành hoặc công ty của bạn, hay ngành khác",
       "signupPitch3": "Bạn có thể tiếp tục thêm và sửa tiến trình",
       "emailMismatch": "Email tài khoản của bạn khác với email trong review nên chúng tôi không thể tự động liên kết. Đội ngũ của chúng tôi sẽ kiểm tra LinkedIn và email của bạn, rồi liên kết với tài khoản.",
       "skipNote": "Review của bạn vẫn được đăng kể cả khi bạn chưa đăng ký bây giờ.",
-      "skip": "Để sau"
+      "skip": "Để sau",
+      "linkedReviewPending": "Review của bạn đã được liên kết với tài khoản. Điểm sẽ được cộng sau khi đội ngũ xét duyệt",
+      "pendingReview": "Đăng ký để nhận điểm cho review này",
+      "pendingReviewNote": "Điểm cho review được cộng sau khi đội ngũ xét duyệt bài viết. Đăng ký bằng tài khoản Google trùng với email trong review để tự động liên kết.",
+      "signupPitch1Review": "Review bạn vừa viết sẽ được liên kết với tài khoản ngay, và điểm được cộng sau khi xét duyệt"
     }
   }
 }

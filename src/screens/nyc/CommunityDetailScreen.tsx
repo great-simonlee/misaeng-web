@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
-import { LoadingState, PullToRefresh, SchoolBadge } from '@components'
+import { LoadingState, PullToRefresh, AuthorBadges } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
@@ -13,6 +13,7 @@ import {
   isSharedCommunityBoard,
 } from '@lib/constants/cities'
 import {
+  CommunityBlockedPostError,
   deleteCommunityPostRequest,
   fetchCommunityPost,
   localizeCommunityError,
@@ -28,11 +29,6 @@ import {
 import { useT } from '@lib/i18n/client'
 import type { CommunityPost } from '@/types/nyc'
 import {
-  formatRoommateBudget,
-  formatRoommateMoveInRange,
-  getRoommateLookingForLabel,
-} from '@lib/community/roommate'
-import {
   BoardBackLink,
   BoardMetaChip,
   BoardPageShell,
@@ -47,7 +43,9 @@ import { TranslationNotice, useTranslatedContent } from '@widgets/TranslationNot
 import { FoodDetailContent } from '@widgets/nyc/FoodDetailContent'
 import { CptOptDetailContent } from '@widgets/nyc/CptOptDetailContent'
 import { JobReviewDetailContent } from '@widgets/nyc/JobReviewDetailContent'
+import { RoommateDetailContent } from '@widgets/nyc/RoommateDetailContent'
 import { EmptyState } from '@widgets/nyc/EmptyState'
+import { ReviewVerificationEntry } from '@widgets/nyc/reviewDocs/ReviewVerificationEntry'
 
 interface CommunityDetailScreenProps {
   boardId: NycCommunityBoardId
@@ -61,7 +59,6 @@ export function CommunityDetailScreen({
   postId,
 }: CommunityDetailScreenProps) {
   const t = useT('community')
-  const tHousing = useT('housing')
   const format = useCommunityFormat()
   const city = useCity()
   const href = useCityPath()
@@ -82,6 +79,8 @@ export function CommunityDetailScreen({
   const post = translated.item
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  // 내가 차단한 사용자의 글
+  const [blocked, setBlocked] = useState(false)
 
   const loadPost = useCallback(
     async (opts?: { silent?: boolean }) => {
@@ -93,7 +92,14 @@ export function CommunityDetailScreen({
         const data = await fetchCommunityPost(postId)
         setPost(data)
         setError(null)
+        setBlocked(false)
       } catch (err) {
+        if (err instanceof CommunityBlockedPostError) {
+          setPost(null)
+          setError(null)
+          setBlocked(true)
+          return
+        }
         const msg = getErrorMessage(
           localizeCommunityError(err, t),
           t('detail.loadFailed'),
@@ -169,6 +175,21 @@ export function CommunityDetailScreen({
     )
   }
 
+  if (blocked) {
+    return (
+      <PullToRefresh onRefresh={refreshPost}>
+        <BoardPageShell width={shellWidth} className='py-12'>
+          <EmptyState
+            title={t('blocks.blockedPostTitle')}
+            description={t('blocks.blockedPostDescription')}
+            actionHref={href(`/${boardId}`)}
+            actionLabel={t('detail.backToListAction', { board: title })}
+          />
+        </BoardPageShell>
+      </PullToRefresh>
+    )
+  }
+
   const boardMatch = isStatusCommunityBoard(boardId)
     ? isStatusCommunityBoard(post?.categoryId ?? '')
     : post?.categoryId === boardId
@@ -213,34 +234,17 @@ export function CommunityDetailScreen({
     />
   )
   const tone = boardToneForId(boardId)
-  const roommateBudget = formatRoommateBudget(post.roommateBudgetMax)
-  const roommateMoveIn = formatRoommateMoveInRange(
-    post.roommateMoveInDate,
-    post.roommateMoveOutDate,
-  )
-  const roommateType = getRoommateLookingForLabel(post.roommateLookingFor, tHousing)
   const metaBits = [
     post.location && {
       label: t(communityBoardKey(boardId, 'locationLabel')),
       value: post.location,
     },
-    isRoommate && roommateType
-      ? { label: t('detail.roommateType'), value: roommateType }
-      : post.detail &&
-          meta.hasDetail && {
-            label: t(communityBoardKey(boardId, 'detailLabel')),
-            value:
-              boardId === 'marketplace' ? `$${post.detail}` : post.detail,
-          },
-    isRoommate && roommateBudget
-      ? {
-          label: t('detail.roommateBudget'),
-          value: t('detail.perMonthValue', { value: roommateBudget }),
-        }
-      : null,
-    isRoommate && roommateMoveIn
-      ? { label: t('detail.roommateMoveIn'), value: roommateMoveIn }
-      : null,
+    post.detail &&
+      meta.hasDetail && {
+        label: t(communityBoardKey(boardId, 'detailLabel')),
+        value:
+          boardId === 'marketplace' ? `$${post.detail}` : post.detail,
+      },
   ].filter(Boolean) as { label: string; value: string }[]
 
   return (
@@ -302,6 +306,17 @@ export function CommunityDetailScreen({
               isAuthor={isAuthor}
               onDelete={() => void handleDelete()}
             />
+          ) : isRoommate ? (
+            <RoommateDetailContent
+              post={post}
+              translationNotice={
+                post.i18n && post.i18n.state !== 'original' ? translationNotice : null
+              }
+              contentLang={translated.lang}
+              boardTitle={title}
+              isAuthor={isAuthor}
+              onDelete={() => void handleDelete()}
+            />
           ) : (
             <>
               <BoardSurface as='article' className='overflow-hidden'>
@@ -311,7 +326,7 @@ export function CommunityDetailScreen({
                     {anonymous ? (
                       <BoardMetaChip>{t('author.anonymous')}</BoardMetaChip>
                     ) : (
-                      <SchoolBadge schoolId={post.authorSchoolId} />
+                      <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} />
                     )}
                     <span className='text-[12px] text-[var(--muted)]'>
                       {format.relativeTime(post.createdAt)}
@@ -365,6 +380,10 @@ export function CommunityDetailScreen({
               </BoardSurface>
             </>
           )}
+
+          {isAuthor && (isCptOpt || isJobReview) ? (
+            <ReviewVerificationEntry postId={post.id} className='mt-4' />
+          ) : null}
 
           <CommunityCommentsSection
             postId={post.id}

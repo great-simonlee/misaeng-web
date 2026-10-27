@@ -28,7 +28,7 @@
     "identityVerificationRequired": "发帖和评论前，请先完成学校或公司验证。"
   },
   "auth": {
-    "ellieoUnavailable": "无法连接 Ellieo 服务器，请稍后再试。",
+    "ellieoUnavailable": "暂时无法连接登录服务器，请稍后再试。",
     "noAccessToken": "未收到 access token。",
     "loginFailed": "登录失败。",
     "signupFailed": "注册失败。",
@@ -45,7 +45,14 @@
     "passwordResetFailed": "密码重置请求发送失败。",
     "emailAuthError": "邮箱登录时出错了。",
     "sessionExpired": "登录已过期，请重新登录。",
-    "userInfoUnavailable": "已登录，但无法加载账号信息。"
+    "userInfoUnavailable": "已登录，但无法加载账号信息。",
+    "invalidCredentials": "邮箱或密码不正确。",
+    "accountNotFound": "该邮箱没有注册账号。请检查邮箱或注册。",
+    "emailInUse": "该邮箱已注册。请登录或重置密码。",
+    "tooManyAttempts": "尝试次数过多，请稍后再试。",
+    "weakPassword": "密码至少需要6个字符。",
+    "invalidEmail": "请输入有效的邮箱地址。",
+    "accountDisabled": "该账号已被限制使用，请联系 Misaeng 团队。"
   },
   "profile": {
     "nickname": {
@@ -95,7 +102,19 @@
     "workplacePending": "Misaeng 团队正在审核你的公司验证。",
     "workplaceStorageMissing": "公司验证存储尚未配置。",
     "workplaceSaveFailed": "公司验证申请保存失败（HTTP {status}）",
-    "workEmailError": "工作邮箱验证时出错了。"
+    "workEmailError": "工作邮箱验证时出错了。",
+    "schoolAlreadyVerified": "你已经验证过这个学校邮箱。",
+    "schoolLimitReached": "最多可以验证 {max} 所学校。",
+    "schoolNotVerified": "这不是你已验证的学校。",
+    "instagram": {
+      "noRequest": "你没有进行中的 Instagram 验证请求。",
+      "invalidHandle": "请检查 Instagram 用户名，只能使用字母、数字、句点和下划线。",
+      "alreadyVerified": "该 Instagram 账号已验证。",
+      "handleTaken": "该 Instagram 账号已被其他 Misaeng 账号验证或正在验证中。",
+      "tooManyRequests": "今天无法再获取验证码，请明天再试。",
+      "requestFailed": "无法申请 Instagram 验证。",
+      "saveFailed": "无法保存 Instagram 验证请求。"
+    }
   },
   "consent": {
     "termsRequired": "请同意条款后继续。",
@@ -132,7 +151,8 @@
     "reviewFinalResultRequired": "请先在时间线中添加最终结果（获批、收到卡、拿到 offer、被拒等）。",
     "reviewAlreadyAwarded": "该帖子已获得审核奖励。",
     "reviewAlreadyPending": "已在等待审核中。",
-    "reviewRequestFailed": "额外积分申请失败。"
+    "reviewRequestFailed": "额外积分申请失败。",
+    "reviewBonusReplaced": "积分规则更新后，此奖励改为由运营团队审核每篇经验分享后发放积分。请使用 ERP 中的积分审核队列。"
   },
   "postings": {
     "loadFailed": "无法加载招聘信息。"
@@ -223,6 +243,16 @@
           "moveInEnd": "请选择转租结束日期。"
         }
       }
+    },
+    "blocks": {
+      "loadFailed": "无法加载屏蔽列表。",
+      "failed": "无法屏蔽此用户，请稍后再试。",
+      "unblockFailed": "无法解除屏蔽，请稍后再试。",
+      "targetNotFound": "找不到要屏蔽的帖子或评论。",
+      "self": "不能屏蔽自己的帖子或评论。",
+      "limit": "最多可以屏蔽 {max} 位用户。",
+      "notFound": "此用户不在你的屏蔽列表中。",
+      "blockedPost": "这是你已屏蔽用户的帖子。"
     }
   },
   "guest": {
@@ -236,5 +266,115 @@
     "bodyTooLong": "“注意事项”最多 {max} 个字符。",
     "jobReviewTypeRequired": "请选择类型：实习、应届、社招、跳槽或合同工。",
     "rateLimited": "请稍后再试。（短时间内请求过多）"
+  },
+  "push": {
+    "verification": {
+      "instagram": {
+        "approved": {
+          "title": "Instagram 验证完成",
+          "body": "你的帖子现在会显示 Instagram 验证徽章。"
+        },
+        "rejected": {
+          "title": "Instagram 验证未通过",
+          "body": "请在我的页面查看原因并重新申请。"
+        }
+      }
+    },
+    "reviewDocs": {
+      "deleted": {
+        "title": "认证材料已删除",
+        "body": "你提交的认证材料已于 {date} 永久删除，仅保留认证结果。"
+      },
+      "expired": {
+        "title": "请重新提交认证材料",
+        "body": "由于未能在 7 天内完成审核，你提交的材料已于 {date} 永久删除。你可以在帖子中重新认证。"
+      },
+      "approved": {
+        "title": "经验帖已认证",
+        "body": "你的经验帖已通过认证。材料将在 72 小时内永久删除。"
+      },
+      "rejected": {
+        "title": "经验帖认证未通过",
+        "body": "请在 我的 > 认证记录 中查看原因。材料将在 72 小时内永久删除。"
+      }
+    }
+  },
+  "reviewDocs": {
+    "notReady": "认证材料功能尚未开放，请稍后再试。",
+    "failed": "无法处理你的材料，请稍后再试。",
+    "invalidRequest": "请检查请求内容后重试。",
+    "consentRequired": "上传前请先同意认证材料的处理说明。",
+    "fileRequired": "请选择要上传的图片。",
+    "tooManyFiles": "一次最多可上传 {max} 个文件。",
+    "fileTooLarge": "每个文件不能超过 10MB。",
+    "heicNotSupported": "请先将 HEIC 文件转换为 JPG 再上传。",
+    "invalidImage": "无法读取该图片，请换一个文件再试。",
+    "unsupportedType": "仅支持上传 JPG、PNG 和 PDF 文件。",
+    "boardNotEligible": "仅面试·求职经验和 OPT·签证·绿卡帖子可以认证。",
+    "alreadyVerified": "该帖子已认证。",
+    "alreadyPending": "该帖子的认证材料正在审核中。",
+    "dailyLimit": "今天不能再上传认证材料了，请明天再试。",
+    "notFound": "找不到该认证记录。",
+    "deleteFailed": "暂时无法立即删除文件，系统会自动重试。"
+  },
+  "points": {
+    "notConfigured": "积分功能暂不可用，请稍后再试。",
+    "notActive": "新的积分功能尚未开始。",
+    "loadFailed": "无法加载积分信息。",
+    "requestFailed": "无法处理积分请求，请稍后再试。",
+    "invalidCursor": "请求无效，请从头重新加载记录。",
+    "insufficient": "积分不足。（需要 {required}，可用 {available}）",
+    "monthlyCap": "已达到本月使用上限。",
+    "featureDisabled": "该功能目前不可用。",
+    "identityRequired": "完成学校或工作邮箱认证后即可使用。",
+    "verificationRequired": "完成账号认证（学校或工作邮箱，或 Instagram）后即可累积积分。",
+    "claimNotFound": "找不到审核申请。",
+    "claimNotPending": "该审核申请已处理。",
+    "boost": {
+      "notAllowed": "只有室友·转租帖子可以置顶。",
+      "notAuthor": "只能置顶自己发布的帖子。",
+      "active": "该帖子已在置顶中（至{date}）。",
+      "cooldown": "该帖子可在{date}起再次置顶。",
+      "monthlyCap": "每月最多可置顶{max}次。",
+      "slotsFull": "目前置顶位置已满，{date}会空出位置。"
+    },
+    "coffeeChat": {
+      "agreeRequired": "请同意 coffee chat 注意事项。",
+      "topicRequired": "请输入 coffee chat 主题。",
+      "topicTooLong": "主题最多 {max} 个字。",
+      "messageTooLong": "留言最多 {max} 个字。",
+      "monthlyCap": "每月最多可申请 {max} 次 coffee chat。",
+      "notFound": "找不到 coffee chat 申请。",
+      "invalidTransition": "当前状态下无法更改。",
+      "cannotCancel": "已安排时间的 coffee chat 无法在此取消，请联系运营团队。"
+    },
+    "push": {
+      "earned": {
+        "title": "{name} +{amount}",
+        "body": "{reason} · 余额 {balance}"
+      },
+      "clawback": {
+        "title": "{name} -{amount} 已收回",
+        "body": "根据运营规则，积分已被收回 · 余额 {balance}"
+      },
+      "coffeeChat": {
+        "scheduled": {
+          "title": "coffee chat 已安排",
+          "body": "请在我的页面查看时间。"
+        },
+        "completed": {
+          "title": "coffee chat 已完成",
+          "body": "预留的{name}已被使用。"
+        },
+        "cancelled": {
+          "title": "coffee chat 已取消",
+          "body": "预留的{name}未被扣除。"
+        },
+        "no_show": {
+          "title": "coffee chat 缺席",
+          "body": "已按缺席处理，预留的{name}已被使用。"
+        }
+      }
+    }
   }
 }

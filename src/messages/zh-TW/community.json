@@ -326,7 +326,7 @@
     "reply": "回覆"
   },
   "share": {
-    "metaDescription": "不需註冊。一步步分享你的申請、面試與結果。每篇評價都能賺積分，可用來和業界人士 coffee chat。"
+    "metaDescription": "不需註冊。一步步分享你的申請、面試與結果。每篇評價都能賺點數，可用來和業界人士 coffee chat。"
   },
   "wip": {
     "title": "即將推出",
@@ -481,5 +481,30 @@
     "createTitle": "在匿名看板發文",
     "createDescription": "你的名字、學校和照片都會隱藏，放心分享吧。",
     "editTitle": "編輯匿名貼文"
+  },
+  "badges": {
+    "workplace": "職場已驗證",
+    "instagram": "Instagram 已驗證"
+  },
+  "blocks": {
+    "action": "封鎖",
+    "confirmTitle": "要封鎖這位使用者嗎？",
+    "confirmMessage": "封鎖後，你將不會再看到這位使用者的貼文和留言",
+    "confirm": "要封鎖這位使用者嗎？\n封鎖後，你將不會再看到這位使用者的貼文和留言。",
+    "confirmAction": "封鎖",
+    "blocked": "已封鎖。你將不會再看到這位使用者的貼文和留言。",
+    "failed": "無法封鎖這位使用者，請稍後再試。",
+    "blockedPostTitle": "這是你已封鎖使用者的貼文",
+    "blockedPostDescription": "在「我的」頁面的「已封鎖的使用者」中解除封鎖後即可再次查看。",
+    "listTitle": "已封鎖的使用者",
+    "listHint": "你不會看到已封鎖使用者的貼文和留言。",
+    "empty": "你還沒有封鎖任何人",
+    "loading": "正在載入封鎖清單…",
+    "loadFailed": "無法載入封鎖清單",
+    "unblock": "解除封鎖",
+    "unblocked": "已解除封鎖",
+    "unblockFailed": "無法解除封鎖，請稍後再試。",
+    "anonymousUser": "匿名使用者",
+    "blockedAt": "{date} 封鎖"
   }
 }

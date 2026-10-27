@@ -1,4 +1,6 @@
 import type { ConsentUiLanguage } from '@lib/consent/types'
+import type { InstagramVerificationStatus } from '@lib/verification/instagram'
+import type { VerifiedSchoolEntry } from '@lib/verification/verifiedSchools'
 import {
   assertSupabaseReachable,
   isSupabaseStorageConfigured,
@@ -27,8 +29,11 @@ export type SupabaseProfileRecord = {
   occupationType?: string | null
   schoolEmail?: string | null
   schoolEmailVerified?: boolean
+  /** 대표 학교 (글 배지·학교 게시판에 쓰는 학교). verifiedSchools 중 하나 */
   verifiedSchoolId?: string | null
   verifiedSchoolName?: string | null
+  /** 인증한 학교 전부 (최대 MAX_VERIFIED_SCHOOLS). 없으면 위 대표 학교 하나로 본다 (src/lib/verification/verifiedSchools.ts) */
+  verifiedSchools?: VerifiedSchoolEntry[] | null
   workEmail?: string | null
   workEmailVerified?: boolean
   workplaceCompanyName?: string | null
@@ -39,6 +44,20 @@ export type SupabaseProfileRecord = {
   workplaceReviewedByEmail?: string | null
   phone?: string | null
   phoneVerified?: boolean
+  /** 인스타그램 DM 인증 (@misaeng.ny로 코드 DM → ERP 승인). 아이디는 본인·운영자만 본다 */
+  instagramHandle?: string | null
+  instagramVerified?: boolean
+  instagramStatus?: InstagramVerificationStatus | null
+  instagramRequestId?: string | null
+  instagramRejectReasonCode?: string | null
+  instagramRejectReason?: string | null
+  instagramReviewedAt?: number | null
+  instagramReviewedByEmail?: string | null
+  /** 진행 중인 요청 (status pending일 때만 의미 있음). 목록 전체를 읽지 않고 내 상태를 보여 주려고 프로필에 둔다 */
+  instagramPendingHandle?: string | null
+  instagramPendingCode?: string | null
+  instagramPendingExpiresAt?: number | null
+  instagramPendingSentAt?: number | null
   termsVersion?: string | null
   privacyVersion?: string | null
   consentedAt?: string | null
@@ -60,7 +79,18 @@ export type SupabaseProfileRecord = {
   referredByUid?: string | null
   referredByCode?: string | null
   referredAt?: number | null
+  /** 내가 차단한 사용자 (src/lib/community/blocks.server.ts). uid는 서버에서만 쓰고 응답에는 내보내지 않는다 */
+  blockedUsers?: BlockedUserEntry[] | null
   updatedAt?: number
+}
+
+export type BlockedUserEntry = {
+  id: string
+  uid: string
+  /** 차단할 때의 닉네임. 익명 글·댓글에서 차단했으면 null */
+  label: string | null
+  anonymous: boolean
+  createdAt: number
 }
 
 function getSupabaseUrl() {

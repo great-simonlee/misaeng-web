@@ -641,7 +641,7 @@
       "guestCta": "免注册发布经验分享"
     },
     "creditPitch": {
-      "title": "发布经验分享，赚取积分",
+      "title": "发布经验分享，赚取 Misaeng 积分",
       "perStep": "每个招聘环节 {perStep} 积分（每篇最多 {max}）",
       "perStepWithBonus": "每个招聘环节 {perStep} 积分（每篇最多 {max}）· 首次发帖 +{bonus}",
       "review": "详细的经验分享经 Misaeng 团队审核后可获得额外积分",
@@ -671,7 +671,7 @@
       "breakdown_other": "{count} 个招聘环节 = {credit} 积分。使用与经验分享中邮箱一致的 Google 账号注册，即可自动关联。",
       "breakdownWithBonus_other": "{count} 个招聘环节 = {credit} 积分 + {bonus} 首次发帖奖励。使用与经验分享中邮箱一致的 Google 账号注册，即可自动关联。",
       "viewPost": "查看我的经验分享",
-      "viewCredit": "查看我的积分",
+      "viewCredit": "查看我的 Misaeng 积分",
       "toList": "返回列表",
       "optional": "可选",
       "signupTitle": "注册 {brand}，接收职场新人的 coffee chat 邀请",
@@ -680,7 +680,11 @@
       "signupPitch3": "可以继续添加和编辑你的进度",
       "emailMismatch": "你的账号邮箱与经验分享中的邮箱不同，无法自动关联。我们团队会核实你的 LinkedIn 和邮箱后，再关联到你的账号。",
       "skipNote": "即使现在不注册，你的经验分享也会保留。",
-      "skip": "以后再说"
+      "skip": "以后再说",
+      "linkedReviewPending": "经验分享已关联到你的账号。运营团队审核后会发放积分",
+      "pendingReview": "注册后即可凭这篇经验分享获得积分",
+      "pendingReviewNote": "经验分享的积分会在运营团队审核后发放。使用与经验分享中填写的邮箱相同的 Google 账号注册，即可自动关联。",
+      "signupPitch1Review": "你刚写的经验分享会立即关联到你的账号，审核后发放积分"
     }
   }
 }

@@ -3,11 +3,11 @@
     "checkFailed": "Couldn't check that nickname.",
     "available": "This nickname is available",
     "taken": "That nickname is already taken.",
-    "ruleHint": "Use only English letters and \".\"",
+    "ruleHint": "Use only English letters, Korean (Hangul) and \".\"",
     "errors": {
       "tooShort": "Your nickname needs at least {min} characters",
       "tooLong": "Your nickname can be up to {max} characters",
-      "invalidChars": "Use only English letters and \".\""
+      "invalidChars": "Use only English letters, Korean (Hangul) and \".\""
     }
   },
   "profile": {
@@ -133,11 +133,54 @@
       "backToVerify": "Back to school email verification",
       "verifyTitle": "School email verification",
       "formDescription": "Your school email will be linked to the account you're signed in with, even if it's different from your sign-up email. We'll send a 6-digit code to your school email.",
-      "notFoundRequest": "Can't find your school? Request it"
+      "notFoundRequest": "Can't find your school? Request it",
+      "manageTitle": "Your schools",
+      "manageDescription": "Your posts show one main school. You can verify up to {max} schools.",
+      "primary": "Main",
+      "addAnother": "Verify another school",
+      "limitReached": "You can verify up to {max} schools.",
+      "primaryChangedToast": "{school} is now your main school",
+      "moreSchools": "{school} +{count}"
     },
     "instagram": {
       "rowLabel": "Instagram",
-      "rowHint": "Connect your account"
+      "rowHint": "Verify your account by DM",
+      "title": "Instagram verification",
+      "intro": "Send a code by DM from your Instagram account to Misaeng's official account @{account}, and our team will verify you.",
+      "privacy": "Others only see an 'Instagram verified' badge, never your username.",
+      "handleLabel": "Your Instagram username",
+      "handlePlaceholder": "@username",
+      "getCode": "Get a code",
+      "step1": "In Instagram, signed in as @{handle}, send the message below to @{account}.",
+      "previewLabel": "Preview",
+      "previewHint": "Message to send",
+      "copyAndOpen": "Copy message and open DM",
+      "copyOnly": "Copy message only",
+      "copiedToast": "Message copied. Just paste it in Instagram.",
+      "step2": "In the chat, press and hold the message box, tap 'Paste', then send",
+      "step3": "Once you've sent it, tap the button below.",
+      "sent": "I sent it",
+      "sentToast": "Got it. We usually check within 3 business days.",
+      "inReview": "In review · usually within 3 business days",
+      "inReviewDescription": "Our team is checking the DMs to @{account}. We'll notify you of the result.",
+      "noteOtherAccount": "Messages from a different account won't be verified",
+      "notePrivate": "Private accounts are fine",
+      "noteExpiry": "The code is valid until {date}",
+      "expired": "This code has expired. Please get a new one.",
+      "cancel": "Cancel request",
+      "cancelledToast": "Verification request cancelled",
+      "verifiedDescription": "@{handle} is verified. Your posts show an Instagram verified badge without your username.",
+      "changeAccount": "Verify a different account",
+      "rejectedTitle": "Verification wasn't approved",
+      "rejectReasons": {
+        "noMessage": "We didn't receive a message at @misaeng.ny.",
+        "wrongAccount": "The message came from a different account than the one you entered.",
+        "codeMismatch": "The code you sent doesn't match.",
+        "other": "It wasn't approved for another reason."
+      },
+      "dmMessage": "Hi Misaeng! This is my Instagram verification request.\nCode: {code}",
+      "pendingDetail": "In review · @{handle}",
+      "codeIssuedDetail": "Code issued · send the DM"
     },
     "title": "Verification",
     "description": "Your school or work email links to this account, even if it's different from the email you signed up with.",
@@ -180,7 +223,7 @@
     "profileFailed": "Couldn't save your profile"
   },
   "title": "My Page",
-  "suspendedNotice": "This account is suspended. You can still browse, but posting, comments, and credit requests are blocked.",
+  "suspendedNotice": "This account is suspended. You can still browse, but posting, comments, and points requests are blocked.",
   "nicknameSheet": {
     "title": "Set nickname",
     "minLength": "Min {min} characters"
@@ -240,25 +283,25 @@
     }
   },
   "credit": {
-    "loadFailed": "Couldn't load your credits",
-    "ledgerLoadFailed": "Couldn't load your credit history",
-    "redeemComingSoon": "Reward requests are opening in stages. Check the credit guide for details.",
-    "loadFailedRetry": "Couldn't load credits · Retry",
-    "pillAria_other": "{count} community credits, view history",
-    "unit": "credits",
+    "loadFailed": "Couldn't load your points",
+    "ledgerLoadFailed": "Couldn't load your points history",
+    "redeemComingSoon": "Reward requests are opening in stages. Check the Misaeng Points guide for details.",
+    "loadFailedRetry": "Couldn't load points · Retry",
+    "pillAria_other": "{count} Misaeng Points, view history",
+    "unit": "points",
     "history": "History",
-    "requestTitle": "Use credits",
-    "balanceLabel": "Your credits",
+    "requestTitle": "Use Misaeng Points",
+    "balanceLabel": "Your Misaeng Points",
     "requestDescription": "Pick a reward to use. After you request it, Misaeng will review and match you.",
     "optionMeta_other": "{duration} · {count} times a month",
-    "needMore_other": "You need {count} more credits",
+    "needMore_other": "You need {count} more points",
     "redeemGuideLink": "Learn more about rewards",
     "submit": "Request",
-    "historyTitle": "Credit history",
+    "historyTitle": "Misaeng Points history",
     "guideLink": "View guide",
     "retry": "Try again",
     "emptyTitle": "No history yet",
-    "emptyDescription": "Earn credits with food spots, reviews, and comments.",
+    "emptyDescription": "Earn points with food spots, reviews, and comments.",
     "writeFoodReview": "Write a food review",
     "kinds": {
       "earn": "Earned",
@@ -267,9 +310,9 @@
       "restore": "Restored",
       "other": "Other"
     },
-    "pillAria_one": "{count} community credit, view history",
+    "pillAria_one": "{count} Misaeng Point, view history",
     "optionMeta_one": "{duration} · {count} time a month",
-    "needMore_one": "You need {count} more credit"
+    "needMore_one": "You need {count} more point"
   },
   "referral": {
     "linkCopied": "Referral link copied",
@@ -281,7 +324,7 @@
     "bound": "Referrer linked",
     "title": "Referrals",
     "description": "Each time someone uses your referral code, you get {credits}. Up to {max} people, and you can't refer yourself.",
-    "creditsAmount_other": "{count} credits",
+    "creditsAmount_other": "{count} points",
     "copying": "Copying…",
     "shareButton": "Invite your friends",
     "myCode": "My referral code",
@@ -292,7 +335,7 @@
     "codePlaceholder": "8-character referral code",
     "binding": "Linking…",
     "bind": "Link",
-    "creditsAmount_one": "{count} credit"
+    "creditsAmount_one": "{count} point"
   },
   "posts": {
     "loadFailed": "Couldn't load your posts",
@@ -334,5 +377,127 @@
     "browseHousing": "Browse housing",
     "rent": "{amount}/mo",
     "rentWithNet": "{gross} / {net}/mo"
+  },
+  "reviewDocs": {
+    "entry": {
+      "title": "Verify this review",
+      "description": "Verify your review with a screenshot of your offer or approval email to earn bonus points. Files are deleted soon after review.",
+      "start": "Verify",
+      "pending": "We're reviewing your documents. We'll let you know when it's done.",
+      "approved": "This review is verified.",
+      "rejected": "Your last verification wasn't approved. You can submit again.",
+      "dailyLimit": "You can't upload more today. Please try again tomorrow.",
+      "history": "Verification history"
+    },
+    "notice": {
+      "title": "Please read before uploading",
+      "body": "Verification documents are used only to confirm your review and award bonus points. Please mask sensitive information such as salary, A-number, SEVIS ID, receipt numbers, date of birth, and address before uploading. Files are permanently deleted within 72 hours after review, and no later than 7 days after upload. Only the verification result (verified status and company or visa type) is kept. Please do not send documents by email or message.",
+      "agree": "I have read the above and agree to how my verification documents are handled. (Required)",
+      "screenshotTip": "We recommend an email screenshot. It has far less to mask than a photo of a card or paper document.",
+      "maskTip": "You'll mask every image yourself in the next step, and only the masked version is sent. Photo data such as location is also removed on our server.",
+      "continue": "Agree and continue"
+    },
+    "kindTitle": "What will you verify with?",
+    "kinds": {
+      "interview": {
+        "label": "Interview",
+        "example": "Screenshot of an interview invitation email",
+        "mask": "Other people's names and contact details"
+      },
+      "offer": {
+        "label": "Offer or hire",
+        "example": "Screenshot of an offer or acceptance email",
+        "mask": "Salary (optional), address, signature"
+      },
+      "opt": {
+        "label": "OPT / STEM OPT",
+        "example": "Screenshot of an OPT approval email (or a photo of the EAD card)",
+        "mask": "A-number, card number, date of birth, photo"
+      },
+      "visa_approval": {
+        "label": "Visa or petition approval",
+        "example": "Screenshot of an approval email or the I-797 approval notice",
+        "mask": "Receipt number, A-number, address"
+      },
+      "cpt": {
+        "label": "CPT",
+        "example": "The CPT authorization page of your I-20",
+        "mask": "SEVIS ID, date of birth, address"
+      }
+    },
+    "maskLabel": "Be sure to mask: {items}",
+    "pick": {
+      "title": "Choose images",
+      "hint": "Up to {max} files · 10 MB each · JPG, PNG, HEIC, PDF",
+      "add": "Add image",
+      "remove": "Remove",
+      "edit": "Mask again",
+      "masked": "{count} masked",
+      "notMasked": "Not masked yet",
+      "pdfTitle": "PDFs can't be masked here",
+      "pdfBody": "If you can, upload a screenshot of the email instead. If you upload a PDF, sensitive information must already be masked in the file.",
+      "pdfConfirm": "I have masked all sensitive information in this PDF.",
+      "unsupported": "Only JPG, PNG, HEIC and PDF files can be uploaded.",
+      "tooLarge": "Files must be 10 MB or smaller.",
+      "tooMany": "You can upload up to {max} files.",
+      "readFailed": "We couldn't open this image. Please choose another file."
+    },
+    "mask": {
+      "title": "Mask sensitive information",
+      "hint": "Drag over anything you want to hide to draw a black box. Only the masked image is sent.",
+      "undo": "Undo",
+      "clear": "Clear all",
+      "done": "Done masking",
+      "noBoxes": "You haven't masked anything yet. Is there really nothing to hide?",
+      "noBoxesConfirm": "Nothing to mask"
+    },
+    "submit": "Submit documents",
+    "uploading": "Uploading securely…",
+    "uploadFailed": "We couldn't upload your documents. Please try again.",
+    "back": "Back",
+    "next": "Next",
+    "cancel": "Cancel",
+    "done": {
+      "title": "Your documents were received securely",
+      "body": "They will be permanently deleted within 72 hours after review, and no later than 7 days after upload.",
+      "detail": "We'll notify you when they are deleted. You can delete them right away at any time from Account > Verification History.",
+      "close": "OK"
+    },
+    "status": {
+      "pending": "In review",
+      "approved": "Verified",
+      "rejected": "Not approved",
+      "expired": "Expired",
+      "withdrawn": "Withdrawn"
+    },
+    "rejectReasons": {
+      "unreadable": "The document couldn't be read",
+      "mismatch": "The document doesn't match the review",
+      "not_masked": "Sensitive information wasn't masked",
+      "wrong_document": "This document can't be used for verification",
+      "other": "Other reason"
+    },
+    "history": {
+      "title": "Review verification history",
+      "empty": "You haven't submitted any verification documents. You can verify from your own interview, job or visa post.",
+      "note": "Files are permanently deleted within 72 hours after review, and no later than 7 days after upload. Only the result is kept.",
+      "uploaded": "Submitted",
+      "decided": "Decided",
+      "deleteDue": "Deletion due",
+      "deleted": "Deleted",
+      "deleting": "Deleting",
+      "files": "{count} file(s)",
+      "result": "Result: {label}",
+      "reason": "Reason: {reason}",
+      "deleteNow": "Delete now",
+      "deleteConfirmTitle": "Delete the files now?",
+      "deleteConfirmBody": "Your files will be permanently deleted right away. If they are still in review, the verification is cancelled. A result that was already given is kept.",
+      "deleteConfirm": "Delete now",
+      "deletedToast": "Your files were permanently deleted.",
+      "deleteFailed": "We couldn't delete them right away. We'll keep retrying automatically.",
+      "viewPost": "View post",
+      "loadFailed": "We couldn't load your verification history.",
+      "retry": "Try again"
+    }
   }
 }

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { SchoolBadge, UserAvatar } from '@components'
+import { AuthorBadges, UserAvatar } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
@@ -34,6 +34,7 @@ import type { CommunityComment, CommunityReportReason } from '@/types/nyc'
 import { TranslationNotice, useTranslatedContent } from '@widgets/TranslationNotice'
 import { useCommunityFormat } from '@widgets/nyc/CommunityPostCard'
 import { CommunityReportSheet } from '@widgets/nyc/CommunityReportSheet'
+import { CommunityBlockAction } from '@widgets/nyc/CommunityBlockAction'
 
 type CommunityCommentsSectionProps = {
   postId: string
@@ -435,6 +436,8 @@ export function CommunityCommentsSection({
                     ? () => setReportTargetId(thread.id)
                     : undefined
                 }
+                blockPostId={postId}
+                onBlocked={() => void loadComments()}
                 onStartEdit={
                   user?.uid && user.uid === thread.authorUid
                     ? () => startEdit(thread)
@@ -477,6 +480,8 @@ export function CommunityCommentsSection({
                           ? () => setReportTargetId(reply.id)
                           : undefined
                       }
+                      blockPostId={postId}
+                      onBlocked={() => void loadComments()}
                       onStartEdit={
                         user?.uid && user.uid === reply.authorUid
                           ? () => startEdit(reply)
@@ -566,6 +571,8 @@ function CommentItem({
   onEditDraftChange,
   onReply,
   onReport,
+  blockPostId,
+  onBlocked,
   onStartEdit,
   onCancelEdit,
   onSaveEdit,
@@ -585,6 +592,9 @@ function CommentItem({
   onEditDraftChange?: (value: string) => void
   onReply?: () => void
   onReport?: () => void
+  /** 있으면 "차단하기"를 함께 보여 준다 (남의 댓글) */
+  blockPostId?: string
+  onBlocked?: () => void
   onStartEdit?: () => void
   onCancelEdit?: () => void
   onSaveEdit?: () => void
@@ -628,7 +638,7 @@ function CommentItem({
               {displayName}
             </span>
             {!anonymousBoard && (
-              <SchoolBadge schoolId={comment.authorSchoolId} />
+              <AuthorBadges schoolId={comment.authorSchoolId} workplaceVerified={comment.authorWorkplaceVerified} instagramVerified={comment.authorInstagramVerified} />
             )}
             <time className='text-[11px] text-[var(--muted)]'>
               {format.relativeTime(comment.createdAt)}
@@ -666,13 +676,23 @@ function CommentItem({
                   ) : null}
                 </>
               ) : canReport && onReport ? (
-                <button
-                  type='button'
-                  onClick={onReport}
-                  className='text-[var(--muted)] touch-manipulation hover:text-red-600'
-                >
-                  {t('report.action')}
-                </button>
+                <>
+                  <button
+                    type='button'
+                    onClick={onReport}
+                    className='text-[var(--muted)] touch-manipulation hover:text-red-600'
+                  >
+                    {t('report.action')}
+                  </button>
+                  {blockPostId ? (
+                    <CommunityBlockAction
+                      postId={blockPostId}
+                      commentId={comment.id}
+                      onBlocked={onBlocked}
+                      className='text-[12px]'
+                    />
+                  ) : null}
+                </>
               ) : loginHref ? (
                 <Link
                   href={loginHref}

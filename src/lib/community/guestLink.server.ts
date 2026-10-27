@@ -1,4 +1,3 @@
-import { awardPostCredit } from '@lib/community/creditLedger'
 import { isUnlinkedGuestCommunityPost } from '@lib/community/guest'
 import {
   COMMUNITY_CREDIT_BONUS_RULES,
@@ -15,6 +14,7 @@ import {
   isCommunityCreditStorageConfigured,
 } from '@lib/supabase/communityCredit.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
+import { onGuestPostLinked } from '@lib/points/facade.server'
 import type { CommunityPost } from '@/types/nyc'
 
 /** 게스트 글 ↔ 계정 연결 (서버 전용) */
@@ -108,12 +108,9 @@ export async function linkGuestPostToAccount(
   let creditAwarded = 0
   try {
     const before = await readBalance(actor.uid)
-    const account = await awardPostCredit({
-      uid: actor.uid,
-      postId: saved.id,
-      boardId: saved.categoryId,
-      timelineCount: saved.jobReviewTimeline.length,
-    })
+    // 전환 전 = 기존 크레딧 즉시 적립, 후 = 검수 대기 claim (즉시 지급 없음 → creditAwarded 0)
+    const result = await onGuestPostLinked({ uid: actor.uid, post: saved, linkedAt: Date.now() })
+    const account = result.ok && result.engine === 'legacy' ? result.result : null
     if (account && before != null) {
       creditAwarded = Math.max(0, account.balance - before)
     }

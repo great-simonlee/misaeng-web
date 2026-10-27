@@ -1029,7 +1029,9 @@ function DonePhase({
               <p className='text-[13px] font-semibold text-[var(--brand)]'>
                 {awarded > 0
                   ? t('guest.done.awarded', { credit: awarded })
-                  : t('guest.done.linked')}
+                  : credit.pendingReview
+                    ? t('guest.done.linkedReviewPending')
+                    : t('guest.done.linked')}
               </p>
               <p className='mt-1 text-[12px] leading-relaxed text-[var(--muted-foreground)]'>
                 {t('guest.done.coffeeChat', { cost: COFFEE_CHAT_COST })}
@@ -1038,19 +1040,23 @@ function DonePhase({
           ) : (
             <>
               <p className='text-[13px] font-semibold text-[var(--brand)]'>
-                {t('guest.done.pending', { credit: pending })}
+                {credit.pendingReview
+                  ? t('guest.done.pendingReview')
+                  : t('guest.done.pending', { credit: pending })}
               </p>
               <p className='mt-1 text-[12px] leading-relaxed text-[var(--muted-foreground)]'>
-                {t(
-                  credit.firstPostBonus > 0
-                    ? 'guest.done.breakdownWithBonus'
-                    : 'guest.done.breakdown',
-                  {
-                    count: post.jobReviewTimeline.length,
-                    credit: credit.estimated,
-                    bonus: credit.firstPostBonus,
-                  },
-                )}
+                {credit.pendingReview
+                  ? t('guest.done.pendingReviewNote')
+                  : t(
+                      credit.firstPostBonus > 0
+                        ? 'guest.done.breakdownWithBonus'
+                        : 'guest.done.breakdown',
+                      {
+                        count: post.jobReviewTimeline.length,
+                        credit: credit.estimated,
+                        bonus: credit.firstPostBonus,
+                      },
+                    )}
               </p>
             </>
           )}
@@ -1081,7 +1087,11 @@ function DonePhase({
             {t('guest.done.signupTitle', { brand: BRAND_CONFIG.name })}
           </h2>
           <ul className='mt-2.5 space-y-1.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-            <PitchItem>{t('guest.done.signupPitch1', { credit: pending })}</PitchItem>
+            <PitchItem>
+              {credit.pendingReview
+                ? t('guest.done.signupPitch1Review')
+                : t('guest.done.signupPitch1', { credit: pending })}
+            </PitchItem>
             <PitchItem>{t('guest.done.signupPitch2')}</PitchItem>
             <PitchItem>{t('guest.done.signupPitch3')}</PitchItem>
           </ul>

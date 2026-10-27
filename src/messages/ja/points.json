@@ -1,0 +1,42 @@
+{
+  "name": "ミセンポイント",
+  "nameEllieo": "Ellieoポイント",
+  "sharedNotice": "ポイントはMisaengとEllieoで共有されます。",
+  "reasons": {
+    "welcome": "ウェルカムポイント（初回の学校・職場認証）",
+    "verify_instagram": "Instagram認証",
+    "profile_complete": "プロフィール完成",
+    "checkin": "出席",
+    "checkin_streak7": "7日連続出席",
+    "referral": "友だち紹介",
+    "comment": "コメント",
+    "review": {
+      "base": "レビュー投稿",
+      "detail": "ステップ別の詳しいレビュー",
+      "verified": "書類による認証",
+      "pick": "ミセンPickに選定",
+      "first_company": "企業の初レビュー",
+      "total": "レビューポイント"
+    },
+    "review_unlock": "レビュー閲覧",
+    "coffee_chat": "1:1コーヒーチャット",
+    "coffee_chat_no_show": "コーヒーチャット不参加",
+    "housing_post_boost": "ルームメイト・サブレット投稿の上位表示",
+    "clawback": {
+      "post": "レビューポイントの回収",
+      "comment": "コメントポイントの回収",
+      "admin": "ポイントの回収"
+    },
+    "legacy_opening": "以前のポイントの繰越",
+    "adjust": "ポイント調整"
+  },
+  "entryTypes": {
+    "earn": "獲得",
+    "spend": "使用",
+    "hold": "予約",
+    "release": "予約解除",
+    "clawback": "回収",
+    "adjust": "調整"
+  },
+  "legacyBadge": "以前の履歴"
+}

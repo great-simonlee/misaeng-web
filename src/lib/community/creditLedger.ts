@@ -19,7 +19,8 @@ import {
   isCommunityCreditStorageConfigured,
   saveStoredCommunityCreditAccount,
 } from '@lib/supabase/communityCredit.server'
-import { getSupabaseProfile } from '@lib/supabase/profile.server'
+import { getSupabaseProfile, type SupabaseProfileRecord } from '@lib/supabase/profile.server'
+import type { CommunityPost } from '@/types/nyc'
 import { createTranslator, type Translate } from '@lib/i18n/translate'
 import koCreditMessages from '@/messages/ko/credit.json'
 
@@ -447,6 +448,87 @@ export async function revokeSourceCredit(args: {
   })
 }
 
+/**
+ * 기존 글·학교 인증 기준으로 소급 적립할 항목을 계산한다 (저장하지 않음).
+ * ensureCreditBackfill과 포인트 전환 전 일괄 소급(src/lib/points/legacyBackfill.server.ts)이 같이 쓴다.
+ */
+export function planCreditBackfill(
+  current: CommunityCreditAccount,
+  posts: CommunityPost[],
+  profile: SupabaseProfileRecord | null,
+): { next: CommunityCreditAccount; changed: boolean } {
+  let next = current
+  let changed = false
+
+  if (profile?.schoolEmailVerified && !next.bonusesClaimed.includes('school-verify')) {
+    next = claimBonus(next, 'school-verify', 'school-verify')
+    changed = true
+  }
+
+  const eligible = posts
+    .filter((post) => post.status === 'open')
+    .map((post) => ({
+      post,
+      reason: creditReasonForBoard(post.categoryId),
+    }))
+    .filter(
+      (
+        item,
+      ): item is {
+        post: (typeof posts)[number]
+        reason: NonNullable<ReturnType<typeof creditReasonForBoard>>
+      } => Boolean(item.reason),
+    )
+    .sort((a, b) => a.post.createdAt - b.post.createdAt)
+
+  for (const { post, reason } of eligible) {
+    if (isTimelineBoardReason(reason)) {
+      const steps =
+        reason === 'status'
+          ? (post.cptOptTimeline?.length ?? 0)
+          : (post.jobReviewTimeline?.length ?? 0)
+      const target = Math.min(
+        steps * COMMUNITY_CREDIT_TIMELINE_ENTRY,
+        COMMUNITY_CREDIT_TIMELINE_POST_MAX,
+      )
+      const already = netEarnedForSource(next, reason, post.id)
+      const delta = target - already
+      if (delta <= 0) continue
+
+      next = appendEntry(next, {
+        id: newEntryId('earn'),
+        kind: 'earn',
+        reason,
+        amount: delta,
+        label: storedEntryLabel('earn', reason),
+        sourceId: post.id,
+        createdAt: post.createdAt,
+      })
+      next = claimBonus(next, 'first-post', post.id)
+      changed = true
+      continue
+    }
+
+    if (hasEarnForSource(next, reason, post.id)) continue
+    const amount = earnAmountForReason(reason)
+    if (amount <= 0) continue
+
+    next = appendEntry(next, {
+      id: newEntryId('earn'),
+      kind: 'earn',
+      reason,
+      amount,
+      label: storedEntryLabel('earn', reason),
+      sourceId: post.id,
+      createdAt: post.createdAt,
+    })
+    next = claimBonus(next, 'first-post', post.id)
+    changed = true
+  }
+
+  return { next, changed }
+}
+
 /** 기존 글 기준 소급 + 타임라인 상한까지 추가 적립 동기화 */
 export async function ensureCreditBackfill(
   uid: string,
@@ -464,74 +546,9 @@ export async function ensureCreditBackfill(
       getSupabaseProfile(userId),
     ])
 
-    let next = current
-    let changed = false
-
-    if (profile?.schoolEmailVerified && !next.bonusesClaimed.includes('school-verify')) {
-      next = claimBonus(next, 'school-verify', 'school-verify')
-      changed = true
-    }
-
-    const eligible = posts
-      .filter((post) => post.status === 'open')
-      .map((post) => ({
-        post,
-        reason: creditReasonForBoard(post.categoryId),
-      }))
-      .filter(
-        (
-          item,
-        ): item is {
-          post: (typeof posts)[number]
-          reason: NonNullable<ReturnType<typeof creditReasonForBoard>>
-        } => Boolean(item.reason),
-      )
-      .sort((a, b) => a.post.createdAt - b.post.createdAt)
-
-    for (const { post, reason } of eligible) {
-      if (isTimelineBoardReason(reason)) {
-        const steps =
-          reason === 'status'
-            ? (post.cptOptTimeline?.length ?? 0)
-            : (post.jobReviewTimeline?.length ?? 0)
-        const target = Math.min(
-          steps * COMMUNITY_CREDIT_TIMELINE_ENTRY,
-          COMMUNITY_CREDIT_TIMELINE_POST_MAX,
-        )
-        const already = netEarnedForSource(next, reason, post.id)
-        const delta = target - already
-        if (delta <= 0) continue
-
-        next = appendEntry(next, {
-          id: newEntryId('earn'),
-          kind: 'earn',
-          reason,
-          amount: delta,
-          label: storedEntryLabel('earn', reason),
-          sourceId: post.id,
-          createdAt: post.createdAt,
-        })
-        next = claimBonus(next, 'first-post', post.id)
-        changed = true
-        continue
-      }
-
-      if (hasEarnForSource(next, reason, post.id)) continue
-      const amount = earnAmountForReason(reason)
-      if (amount <= 0) continue
-
-      next = appendEntry(next, {
-        id: newEntryId('earn'),
-        kind: 'earn',
-        reason,
-        amount,
-        label: storedEntryLabel('earn', reason),
-        sourceId: post.id,
-        createdAt: post.createdAt,
-      })
-      next = claimBonus(next, 'first-post', post.id)
-      changed = true
-    }
+    const planned = planCreditBackfill(current, posts, profile)
+    let next = planned.next
+    const changed = planned.changed
 
     if (!changed && current.backfilledAt) return current
 

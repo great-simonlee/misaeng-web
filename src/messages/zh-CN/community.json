@@ -481,5 +481,30 @@
     "createTitle": "在匿名版块发帖",
     "createDescription": "你的名字、学校和照片都会隐藏，放心分享。",
     "editTitle": "编辑匿名帖子"
+  },
+  "badges": {
+    "workplace": "职场已验证",
+    "instagram": "Instagram 已验证"
+  },
+  "blocks": {
+    "action": "屏蔽",
+    "confirmTitle": "要屏蔽此用户吗？",
+    "confirmMessage": "屏蔽后，你将不会再看到此用户的帖子和评论",
+    "confirm": "要屏蔽此用户吗？\n屏蔽后，你将不会再看到此用户的帖子和评论。",
+    "confirmAction": "屏蔽",
+    "blocked": "已屏蔽。你将不会再看到此用户的帖子和评论。",
+    "failed": "无法屏蔽此用户，请稍后再试。",
+    "blockedPostTitle": "这是你已屏蔽用户的帖子",
+    "blockedPostDescription": "在“我的”页面的“已屏蔽的用户”中解除屏蔽后即可再次查看。",
+    "listTitle": "已屏蔽的用户",
+    "listHint": "你不会看到已屏蔽用户的帖子和评论。",
+    "empty": "你还没有屏蔽任何人",
+    "loading": "正在加载屏蔽列表…",
+    "loadFailed": "无法加载屏蔽列表",
+    "unblock": "解除屏蔽",
+    "unblocked": "已解除屏蔽",
+    "unblockFailed": "无法解除屏蔽，请稍后再试。",
+    "anonymousUser": "匿名用户",
+    "blockedAt": "{date} 屏蔽"
   }
 }

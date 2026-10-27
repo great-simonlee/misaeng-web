@@ -331,7 +331,7 @@
     "reply": "Reply"
   },
   "share": {
-    "metaDescription": "No sign-up needed. Share your applications, interviews, and results step by step. Each review earns you credits you can use for coffee chats with people in the industry."
+    "metaDescription": "No sign-up needed. Share your applications, interviews, and results step by step. Each review earns you points you can use for coffee chats with people in the industry."
   },
   "wip": {
     "title": "Coming soon",
@@ -491,5 +491,30 @@
     "createTitle": "Post on the anonymous board",
     "createDescription": "Your name, school, and photo stay hidden. Share freely.",
     "editTitle": "Edit anonymous post"
+  },
+  "badges": {
+    "workplace": "Workplace verified",
+    "instagram": "Instagram verified"
+  },
+  "blocks": {
+    "action": "Block",
+    "confirmTitle": "Block this user?",
+    "confirmMessage": "You won't see this user's posts and comments anymore",
+    "confirm": "Block this user?\nYou won't see this user's posts and comments anymore.",
+    "confirmAction": "Block",
+    "blocked": "User blocked. You won't see their posts and comments anymore.",
+    "failed": "Couldn't block this user. Please try again in a moment.",
+    "blockedPostTitle": "This post is from a user you blocked",
+    "blockedPostDescription": "Unblock them under Blocked users on My Page to see it again.",
+    "listTitle": "Blocked users",
+    "listHint": "You don't see posts and comments from users you blocked.",
+    "empty": "You haven't blocked anyone",
+    "loading": "Loading blocked users…",
+    "loadFailed": "Couldn't load blocked users",
+    "unblock": "Unblock",
+    "unblocked": "User unblocked",
+    "unblockFailed": "Couldn't unblock this user. Please try again in a moment.",
+    "anonymousUser": "Anonymous user",
+    "blockedAt": "Blocked {date}"
   }
 }

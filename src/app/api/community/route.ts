@@ -45,6 +45,7 @@ import {
   isStatusCommunityBoard,
 } from '@lib/constants/nyc'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
+import { getViewerBlockedUids, withoutBlockedAuthors } from '@lib/community/blocks.server'
 import {
   isIdentityVerified,
   SCHOOL_VERIFY_REQUIRED_CODE,
@@ -81,6 +82,19 @@ import type {
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+
+/** postId → boostedUntil (ISO) of running roommate boosts. Before cutover there are none: no query at all. */
+async function loadRoommateBoosts(): Promise<Map<string, string> | null> {
+  try {
+    const { isPointsLedgerActive } = await import('@lib/points/facade.server')
+    if (!(await isPointsLedgerActive())) return null
+    const { getActiveBoosts } = await import('@lib/points/boost.server')
+    return await getActiveBoosts()
+  } catch (error) {
+    console.error('Roommate boost load error:', error)
+    return null
+  }
+}
 
 export async function GET(request: Request) {
   const t = await getRequestT(request, 'api')
@@ -130,13 +144,32 @@ export async function GET(request: Request) {
     const user = await resolveAuthenticatedUser()
     const city = resolveCityId(searchParams.get('city'))
     const locale = await getRequestLocale(request)
-    const posts = localizePosts(await listStoredCommunityPosts(board, city), locale)
+    // 차단한 작성자는 캐시된 목록을 꺼낸 뒤 보는 사람마다 거른다 (익명 정리 전에)
+    const [stored, blocked] = await Promise.all([
+      listStoredCommunityPosts(board, city),
+      getViewerBlockedUids(user?.uid),
+    ])
+    const visible = withoutBlockedAuthors(stored, blocked)
+    // 룸메이트 게시판: 포인트로 부스트한 글을 위로 (부스트는 전환 후에만 생긴다, WIRING.md 5)
+    const boosts = board === 'roommate' ? await loadRoommateBoosts() : null
+    const ordered =
+      boosts && boosts.size > 0
+        ? [...visible].sort((a, b) => {
+            const ua = boosts.get(a.id) ?? ''
+            const ub = boosts.get(b.id) ?? ''
+            if (ua === ub) return 0
+            return ua < ub ? 1 : -1
+          })
+        : visible
+    const posts = localizePosts(ordered, locale)
     return NextResponse.json({
-      posts: posts.map((item) =>
-        finalizePost(
+      posts: posts.map((item) => {
+        const finalized = finalizePost(
           applyReviewBodyAccess(sanitizeAnonymousCommunityPost(item, user?.uid), user),
-        ),
-      ),
+        )
+        const boostedUntil = boosts?.get(item.id)
+        return boostedUntil ? { ...finalized, boostedUntil } : finalized
+      }),
     })
   } catch (error) {
     console.error('Community list error:', error)
@@ -598,17 +631,9 @@ export async function POST(request: Request) {
         : undefined,
     )
     try {
-      const { awardPostCredit } = await import('@lib/community/creditLedger')
-      await awardPostCredit({
-        uid: user.uid,
-        postId: saved.id,
-        boardId: saved.categoryId,
-        timelineCount: isCptOpt
-          ? cptOptTimeline.length
-          : isJobReview
-            ? jobReviewTimeline.length
-            : undefined,
-      })
+      // 포인트: 전환(cutover) 전에는 기존 크레딧 적립, 후에는 검수 대기 claim (src/lib/points/WIRING.md)
+      const { onPostCreated } = await import('@lib/points/facade.server')
+      await onPostCreated({ uid: user.uid, post: saved })
     } catch (creditError) {
       console.error('Community credit award (post) error:', creditError)
     }

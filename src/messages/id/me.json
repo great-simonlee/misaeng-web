@@ -3,11 +3,11 @@
     "checkFailed": "Gagal mengecek nama panggilan itu.",
     "available": "Nama panggilan ini tersedia",
     "taken": "Nama panggilan itu sudah dipakai.",
-    "ruleHint": "Gunakan hanya huruf Latin dan \".\"",
+    "ruleHint": "Gunakan hanya huruf Latin, Hangul (Korea) dan \".\"",
     "errors": {
       "tooShort": "Nama panggilan minimal {min} karakter",
       "tooLong": "Nama panggilan maksimal {max} karakter",
-      "invalidChars": "Gunakan hanya huruf Latin dan \".\""
+      "invalidChars": "Gunakan hanya huruf Latin, Hangul (Korea) dan \".\""
     }
   },
   "profile": {
@@ -133,11 +133,54 @@
       "backToVerify": "Kembali ke verifikasi email kampus",
       "verifyTitle": "Verifikasi email kampus",
       "formDescription": "Email kampus kamu akan ditautkan ke akun yang sedang kamu pakai, meskipun berbeda dari email pendaftaran. Kami akan mengirim kode 6 digit ke email kampus kamu.",
-      "notFoundRequest": "Kampus kamu tidak ada? Ajukan di sini"
+      "notFoundRequest": "Kampus kamu tidak ada? Ajukan di sini",
+      "manageTitle": "Sekolah terverifikasi",
+      "manageDescription": "Postinganmu hanya menampilkan satu sekolah utama. Kamu bisa memverifikasi hingga {max} sekolah.",
+      "primary": "Utama",
+      "addAnother": "Verifikasi sekolah lain",
+      "limitReached": "Kamu bisa memverifikasi hingga {max} sekolah.",
+      "primaryChangedToast": "{school} kini jadi sekolah utamamu",
+      "moreSchools": "{school} +{count}"
     },
     "instagram": {
       "rowLabel": "Instagram",
-      "rowHint": "Hubungkan akun kamu"
+      "rowHint": "Verifikasi akun lewat DM",
+      "title": "Verifikasi Instagram",
+      "intro": "Kirim kode lewat DM dari akun Instagram-mu ke akun resmi Misaeng @{account}, lalu tim kami akan memverifikasimu.",
+      "privacy": "Orang lain hanya melihat lencana 'Instagram terverifikasi', bukan username-mu.",
+      "handleLabel": "Username Instagram-mu",
+      "handlePlaceholder": "@username",
+      "getCode": "Dapatkan kode",
+      "step1": "Di Instagram yang masuk sebagai @{handle}, kirim pesan di bawah ke @{account}.",
+      "previewLabel": "Pratinjau",
+      "previewHint": "Pesan yang dikirim",
+      "copyAndOpen": "Salin pesan dan buka DM",
+      "copyOnly": "Salin pesan saja",
+      "copiedToast": "Pesan disalin. Tinggal tempel di Instagram.",
+      "step2": "Di obrolan, tekan lama kolom pesan, pilih 'Tempel', lalu kirim",
+      "step3": "Setelah terkirim, ketuk tombol di bawah.",
+      "sent": "Sudah saya kirim",
+      "sentToast": "Diterima. Biasanya kami cek dalam 3 hari kerja.",
+      "inReview": "Sedang ditinjau · biasanya dalam 3 hari kerja",
+      "inReviewDescription": "Tim kami sedang memeriksa DM ke @{account}. Hasilnya akan kami beri tahu lewat notifikasi.",
+      "noteOtherAccount": "Pesan dari akun lain tidak akan diverifikasi",
+      "notePrivate": "Akun privat tidak masalah",
+      "noteExpiry": "Kode berlaku sampai {date}",
+      "expired": "Kode sudah kedaluwarsa. Silakan minta kode baru.",
+      "cancel": "Batalkan permintaan",
+      "cancelledToast": "Permintaan verifikasi dibatalkan",
+      "verifiedDescription": "@{handle} sudah terverifikasi. Postinganmu menampilkan lencana Instagram terverifikasi tanpa username.",
+      "changeAccount": "Verifikasi akun lain",
+      "rejectedTitle": "Verifikasi belum disetujui",
+      "rejectReasons": {
+        "noMessage": "Kami tidak menerima pesan di @misaeng.ny.",
+        "wrongAccount": "Pesan dikirim dari akun yang berbeda dengan yang kamu masukkan.",
+        "codeMismatch": "Kode yang dikirim tidak cocok.",
+        "other": "Tidak disetujui karena alasan lain."
+      },
+      "dmMessage": "Halo Misaeng! Ini permintaan verifikasi Instagram saya.\nKode: {code}",
+      "pendingDetail": "Sedang ditinjau · @{handle}",
+      "codeIssuedDetail": "Kode diterbitkan · kirim DM"
     },
     "title": "Verifikasi",
     "description": "Email kampus atau kantor kamu akan ditautkan ke akun ini, meskipun berbeda dari email yang kamu pakai untuk mendaftar.",
@@ -180,7 +223,7 @@
     "profileFailed": "Gagal menyimpan profil"
   },
   "title": "Halaman Saya",
-  "suspendedNotice": "Akun ini sedang ditangguhkan. Kamu masih bisa melihat-lihat, tapi membuat postingan, komentar, dan permintaan kredit diblokir.",
+  "suspendedNotice": "Akun ini sedang ditangguhkan. Kamu masih bisa melihat-lihat, tapi membuat postingan, komentar, dan permintaan poin diblokir.",
   "nicknameSheet": {
     "title": "Atur nama panggilan",
     "minLength": "Min. {min} karakter"
@@ -240,25 +283,25 @@
     }
   },
   "credit": {
-    "loadFailed": "Gagal memuat kredit kamu",
-    "ledgerLoadFailed": "Gagal memuat riwayat kredit",
-    "redeemComingSoon": "Penukaran hadiah dibuka secara bertahap. Cek panduan kredit untuk detailnya.",
-    "loadFailedRetry": "Gagal memuat kredit · Coba lagi",
-    "pillAria_other": "{count} kredit komunitas, lihat riwayat",
-    "unit": "kredit",
+    "loadFailed": "Gagal memuat poin kamu",
+    "ledgerLoadFailed": "Gagal memuat riwayat poin",
+    "redeemComingSoon": "Penukaran hadiah dibuka secara bertahap. Cek panduan poin Misaeng untuk detailnya.",
+    "loadFailedRetry": "Gagal memuat poin · Coba lagi",
+    "pillAria_other": "{count} poin Misaeng, lihat riwayat",
+    "unit": "poin",
     "history": "Riwayat",
-    "requestTitle": "Pakai kredit",
-    "balanceLabel": "Kredit kamu",
+    "requestTitle": "Pakai poin Misaeng",
+    "balanceLabel": "Poin kamu",
     "requestDescription": "Pilih hadiah yang ingin dipakai. Setelah kamu mengajukan, Misaeng akan meninjau dan mencarikan pasangan yang cocok.",
     "optionMeta_other": "{duration} · {count} kali sebulan",
-    "needMore_other": "Kamu butuh {count} kredit lagi",
+    "needMore_other": "Kamu butuh {count} poin lagi",
     "redeemGuideLink": "Pelajari lebih lanjut tentang hadiah",
     "submit": "Ajukan",
-    "historyTitle": "Riwayat kredit",
+    "historyTitle": "Riwayat poin Misaeng",
     "guideLink": "Lihat panduan",
     "retry": "Coba lagi",
     "emptyTitle": "Belum ada riwayat",
-    "emptyDescription": "Dapatkan kredit dari tempat makan, ulasan, dan komentar.",
+    "emptyDescription": "Dapatkan poin dari tempat makan, ulasan, dan komentar.",
     "writeFoodReview": "Tulis ulasan kuliner",
     "kinds": {
       "earn": "Didapat",
@@ -278,7 +321,7 @@
     "bound": "Referrer terhubung",
     "title": "Referral",
     "description": "Setiap kali ada yang memakai kode referral kamu, kamu dapat {credits}. Maksimal {max} orang, dan kamu tidak bisa mereferensikan diri sendiri.",
-    "creditsAmount_other": "{count} kredit",
+    "creditsAmount_other": "{count} poin",
     "copying": "Menyalin…",
     "shareButton": "Undang teman kamu",
     "myCode": "Kode referral saya",
@@ -329,5 +372,127 @@
     "browseHousing": "Jelajahi hunian",
     "rent": "{amount}/bln",
     "rentWithNet": "{gross} / {net}/bln"
+  },
+  "reviewDocs": {
+    "entry": {
+      "title": "Verifikasi ulasan ini",
+      "description": "Verifikasi ulasan kamu dengan tangkapan layar email offer atau persetujuan untuk mendapat poin bonus. File segera dihapus setelah ditinjau.",
+      "start": "Verifikasi",
+      "pending": "Dokumen kamu sedang kami tinjau. Kami akan memberi tahu saat selesai.",
+      "approved": "Ulasan ini sudah terverifikasi.",
+      "rejected": "Verifikasi sebelumnya tidak disetujui. Kamu bisa mengirim ulang.",
+      "dailyLimit": "Kamu tidak dapat mengunggah lagi hari ini. Coba lagi besok.",
+      "history": "Riwayat verifikasi"
+    },
+    "notice": {
+      "title": "Baca sebelum mengunggah",
+      "body": "Dokumen verifikasi hanya digunakan untuk mengonfirmasi ulasan kamu dan memberikan poin bonus. Tutupi informasi sensitif seperti gaji, A-number, SEVIS ID, nomor tanda terima, tanggal lahir, dan alamat sebelum mengunggah. File dihapus permanen dalam 72 jam setelah ditinjau, dan paling lambat 7 hari setelah diunggah. Hanya hasil verifikasi (status verifikasi dan nama perusahaan atau jenis visa) yang disimpan. Jangan kirim dokumen lewat email atau pesan.",
+      "agree": "Saya telah membaca informasi di atas dan menyetujui cara penanganan dokumen verifikasi saya. (Wajib)",
+      "screenshotTip": "Kami menyarankan tangkapan layar email. Informasi yang perlu ditutupi jauh lebih sedikit dibanding foto kartu atau dokumen kertas.",
+      "maskTip": "Kamu akan menutupi setiap gambar sendiri di langkah berikutnya, dan hanya versi yang sudah ditutupi yang dikirim. Data foto seperti lokasi juga dihapus di server kami.",
+      "continue": "Setuju dan lanjut"
+    },
+    "kindTitle": "Verifikasi dengan dokumen apa?",
+    "kinds": {
+      "interview": {
+        "label": "Wawancara",
+        "example": "Tangkapan layar email undangan wawancara",
+        "mask": "Nama dan kontak orang lain"
+      },
+      "offer": {
+        "label": "Offer / diterima kerja",
+        "example": "Tangkapan layar email offer atau penerimaan",
+        "mask": "Gaji (opsional), alamat, tanda tangan"
+      },
+      "opt": {
+        "label": "OPT / STEM OPT",
+        "example": "Tangkapan layar email persetujuan OPT (atau foto kartu EAD)",
+        "mask": "A-number, nomor kartu, tanggal lahir, foto"
+      },
+      "visa_approval": {
+        "label": "Persetujuan visa / petisi",
+        "example": "Tangkapan layar email persetujuan atau pemberitahuan persetujuan I-797",
+        "mask": "Nomor tanda terima, A-number, alamat"
+      },
+      "cpt": {
+        "label": "CPT",
+        "example": "Halaman persetujuan CPT di I-20",
+        "mask": "SEVIS ID, tanggal lahir, alamat"
+      }
+    },
+    "maskLabel": "Pastikan ditutupi: {items}",
+    "pick": {
+      "title": "Pilih gambar",
+      "hint": "Maksimal {max} file · 10 MB per file · JPG, PNG, HEIC, PDF",
+      "add": "Tambah gambar",
+      "remove": "Hapus",
+      "edit": "Tutupi lagi",
+      "masked": "{count} bagian ditutupi",
+      "notMasked": "Belum ditutupi",
+      "pdfTitle": "PDF tidak dapat ditutupi di sini",
+      "pdfBody": "Jika bisa, unggah tangkapan layar email saja. Jika mengunggah PDF, informasi sensitif harus sudah ditutupi di dalam file.",
+      "pdfConfirm": "Saya sudah menutupi semua informasi sensitif di PDF ini.",
+      "unsupported": "Hanya file JPG, PNG, HEIC, dan PDF yang dapat diunggah.",
+      "tooLarge": "File maksimal 10 MB.",
+      "tooMany": "Kamu dapat mengunggah hingga {max} file.",
+      "readFailed": "Gambar ini tidak dapat dibuka. Pilih file lain."
+    },
+    "mask": {
+      "title": "Tutupi informasi sensitif",
+      "hint": "Seret di atas bagian yang ingin disembunyikan untuk menggambar kotak hitam. Hanya gambar yang sudah ditutupi yang dikirim.",
+      "undo": "Urungkan",
+      "clear": "Hapus semua",
+      "done": "Selesai",
+      "noBoxes": "Kamu belum menutupi apa pun. Benar tidak ada yang perlu disembunyikan?",
+      "noBoxesConfirm": "Tidak ada yang perlu ditutupi"
+    },
+    "submit": "Kirim dokumen",
+    "uploading": "Mengunggah dengan aman…",
+    "uploadFailed": "Gagal mengunggah. Silakan coba lagi.",
+    "back": "Kembali",
+    "next": "Lanjut",
+    "cancel": "Batal",
+    "done": {
+      "title": "Dokumen kamu sudah diterima dengan aman",
+      "body": "Dokumen akan dihapus permanen dalam 72 jam setelah ditinjau, dan paling lambat 7 hari setelah diunggah.",
+      "detail": "Kami akan memberi tahu saat dokumen dihapus. Kamu bisa langsung menghapusnya kapan saja di Akun > Riwayat Verifikasi.",
+      "close": "OK"
+    },
+    "status": {
+      "pending": "Sedang ditinjau",
+      "approved": "Terverifikasi",
+      "rejected": "Tidak disetujui",
+      "expired": "Kedaluwarsa",
+      "withdrawn": "Dibatalkan"
+    },
+    "rejectReasons": {
+      "unreadable": "Dokumen tidak dapat dibaca",
+      "mismatch": "Dokumen tidak sesuai dengan ulasan",
+      "not_masked": "Informasi sensitif belum ditutupi",
+      "wrong_document": "Dokumen ini tidak dapat digunakan untuk verifikasi",
+      "other": "Alasan lain"
+    },
+    "history": {
+      "title": "Riwayat verifikasi ulasan",
+      "empty": "Kamu belum mengirim dokumen verifikasi. Kamu bisa memverifikasi dari postingan wawancara, kerja, atau visa milikmu.",
+      "note": "File dihapus permanen dalam 72 jam setelah ditinjau, dan paling lambat 7 hari setelah diunggah. Hanya hasilnya yang disimpan.",
+      "uploaded": "Dikirim",
+      "decided": "Diputuskan",
+      "deleteDue": "Jadwal hapus",
+      "deleted": "Dihapus",
+      "deleting": "Sedang dihapus",
+      "files": "{count} file",
+      "result": "Hasil: {label}",
+      "reason": "Alasan: {reason}",
+      "deleteNow": "Hapus sekarang",
+      "deleteConfirmTitle": "Hapus file sekarang?",
+      "deleteConfirmBody": "File kamu akan langsung dihapus permanen. Jika masih ditinjau, verifikasi dibatalkan. Hasil yang sudah ada tetap disimpan.",
+      "deleteConfirm": "Hapus sekarang",
+      "deletedToast": "File kamu sudah dihapus permanen.",
+      "deleteFailed": "File tidak dapat langsung dihapus. Kami akan mencoba lagi secara otomatis.",
+      "viewPost": "Lihat postingan",
+      "loadFailed": "Riwayat verifikasi tidak dapat dimuat.",
+      "retry": "Coba lagi"
+    }
   }
 }

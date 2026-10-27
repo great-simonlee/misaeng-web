@@ -13,7 +13,7 @@
     "me": "Halaman saya",
     "myPosts": "Postingan saya",
     "myLikes": "Postingan yang saya suka",
-    "creditReviews": "Peninjauan kredit"
+    "creditReviews": "Peninjauan poin"
   },
   "accountMenu": "Menu akun",
   "openAccountMenu": "Buka menu akun",
@@ -38,7 +38,7 @@
     },
     "links": {
       "housing": "Hunian",
-      "credit": "Kredit",
+      "credit": "Poin Misaeng",
       "partners": "Partner",
       "companySite": "Situs perusahaan",
       "about": "Tentang kami",

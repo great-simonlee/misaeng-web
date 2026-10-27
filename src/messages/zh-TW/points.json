@@ -1,0 +1,42 @@
+{
+  "name": "Misaeng 積分",
+  "nameEllieo": "Ellieo 積分",
+  "sharedNotice": "你的積分在 Misaeng 與 Ellieo 之間共用。",
+  "reasons": {
+    "welcome": "歡迎積分（首次學校或工作認證）",
+    "verify_instagram": "Instagram 認證",
+    "profile_complete": "完成個人檔案",
+    "checkin": "每日簽到",
+    "checkin_streak7": "連續簽到 7 天",
+    "referral": "推薦好友",
+    "comment": "留言",
+    "review": {
+      "base": "發表心得",
+      "detail": "分階段詳細心得",
+      "verified": "文件認證",
+      "pick": "入選 Misaeng Pick",
+      "first_company": "公司的第一篇心得",
+      "total": "心得積分"
+    },
+    "review_unlock": "查看心得",
+    "coffee_chat": "1:1 coffee chat",
+    "coffee_chat_no_show": "coffee chat 缺席",
+    "housing_post_boost": "室友·轉租貼文置頂",
+    "clawback": {
+      "post": "收回心得積分",
+      "comment": "收回留言積分",
+      "admin": "收回積分"
+    },
+    "legacy_opening": "原有積分結轉",
+    "adjust": "積分調整"
+  },
+  "entryTypes": {
+    "earn": "獲得",
+    "spend": "使用",
+    "hold": "預留",
+    "release": "取消預留",
+    "clawback": "收回",
+    "adjust": "調整"
+  },
+  "legacyBadge": "先前紀錄"
+}

@@ -48,6 +48,7 @@ import {
 import { parseCityId } from '@lib/constants/cities'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
+import { BLOCKED_USER_CODE, getViewerBlockedUids } from '@lib/community/blocks.server'
 import {
   deleteStoredCommunityPost,
   getStoredCommunityPost,
@@ -128,6 +129,17 @@ export async function GET(request: Request, context: RouteContext) {
     }
     const user = await resolveAuthenticatedUser()
     const locale = await getRequestLocale(request)
+    // 차단한 사용자의 글: 내용 대신 "차단한 사용자의 글이에요"를 보여 주도록 코드만 내려준다
+    if (user?.uid && post.authorUid && post.authorUid !== user.uid) {
+      const blocked = await getViewerBlockedUids(user.uid)
+      if (blocked.has(post.authorUid)) {
+        const t = await getT(locale, 'api')
+        return NextResponse.json(
+          { error: t('community.blocks.blockedPost'), code: BLOCKED_USER_CODE, blocked: true },
+          { status: 403 },
+        )
+      }
+    }
     const visible = finalizePost(
       applyReviewBodyAccess(
         sanitizeAnonymousCommunityPost(localizePost(post, locale, { viewerUid: user?.uid }), user?.uid),
@@ -542,17 +554,9 @@ export async function PATCH(request: Request, context: RouteContext) {
         : undefined,
     )
     try {
-      const { awardPostCredit } = await import('@lib/community/creditLedger')
-      await awardPostCredit({
-        uid: user.uid,
-        postId: saved.id,
-        boardId: saved.categoryId,
-        timelineCount: isCptOpt
-          ? cptOptTimeline.length
-          : isJobReview
-            ? jobReviewTimeline.length
-            : undefined,
-      })
+      // 포인트: 전환 전 = 기존 크레딧 타임라인 추가 적립, 후 = 대기 중인 claim 갱신 (src/lib/points/WIRING.md)
+      const { onPostUpdated } = await import('@lib/points/facade.server')
+      await onPostUpdated({ uid: user.uid, post: saved })
     } catch (creditError) {
       console.error('Community credit award (post update) error:', creditError)
     }
@@ -601,12 +605,8 @@ export async function DELETE(request: Request, context: RouteContext) {
       return NextResponse.json({ error: t('community.deleteFailed') }, { status: 500 })
     }
     try {
-      const { revokeSourceCredit } = await import('@lib/community/creditLedger')
-      await revokeSourceCredit({
-        uid: user.uid,
-        sourceId: id,
-        reasons: ['food', 'status', 'job-review', 'review-bonus'],
-      })
+      const { onPostDeleted } = await import('@lib/points/facade.server')
+      await onPostDeleted({ uid: user.uid, postId: id })
     } catch (creditError) {
       console.error('Community credit revoke (post) error:', creditError)
     }

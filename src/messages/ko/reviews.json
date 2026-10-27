@@ -615,7 +615,7 @@
     "nicknamePlaceholder": "예: 뉴욕직장인",
     "emailLabel": "이메일",
     "emailHintMember": "계정 이메일 · 비공개",
-    "emailHintGuest": "기프트카드·크레딧 안내 발송용 · 비공개",
+    "emailHintGuest": "기프트카드·포인트 안내 발송용 · 비공개",
     "linkedinLabel": "LinkedIn 프로필 주소",
     "linkedinHint": "실제 재직 확인용 · 비공개",
     "coffeeChatLabel": "후배들의 커피챗 요청을 받아도 괜찮아요",
@@ -625,7 +625,7 @@
     "submitGuest": "가입 없이 후기 등록하기",
     "footnoteBefore": "가입은 필요 없어요.",
     "footnoteLink": "Google로 가입하고 남기기",
-    "footnoteAfter": "를 고르면 크레딧이 계정에 바로 적립돼요.",
+    "footnoteAfter": "를 고르면 미생 포인트가 계정에 바로 적립돼요.",
     "footnoteMember": "등록 후에는 내 글에서 진행 기록을 이어서 추가·수정할 수 있어요.",
     "choose": {
       "eyebrow": "현직자 후기 남기기",
@@ -633,54 +633,58 @@
       "intro": "서류부터 인터뷰, 결과까지 단계별로 남겨 주시면 같은 길을 준비하는 후배들에게 큰 도움이 돼요. 5분이면 충분해요.",
       "recommended": "추천",
       "googleTitle": "Google로 가입하고 남기기",
-      "googlePitch1": "크레딧이 내 계정에 바로 적립돼요",
+      "googlePitch1": "미생 포인트가 내 계정에 바로 적립돼요",
       "googlePitch2": "등록 후에도 진행 기록을 이어서 추가할 수 있어요",
       "guestTitle": "가입 없이 남기기",
       "guestPitch1": "닉네임·이메일·LinkedIn 주소만 적으면 돼요",
-      "guestPitch2": "크레딧은 보관해 두었다가, 나중에 같은 이메일로 가입하면 자동으로 적립돼요",
+      "guestPitch2": "미생 포인트는 보관해 두었다가, 나중에 같은 이메일로 가입하면 자동으로 적립돼요",
       "guestCta": "가입 없이 후기 남기기"
     },
     "creditPitch": {
-      "title": "후기를 남기면 크레딧이 쌓여요",
-      "perStep": "채용 단계 1개당 {perStep} 크레딧 (글당 최대 {max})",
-      "perStepWithBonus": "채용 단계 1개당 {perStep} 크레딧 (글당 최대 {max}) · 첫 글 +{bonus}",
-      "review": "자세히 남겨 주신 후기는 미생팀 리뷰 후 추가 크레딧을 드려요",
-      "coffeeChat": "모은 크레딧({cost})으로 같은 업계·회사는 물론 다른 업계 현직자와의 1:1 커피챗에 쓸 수 있어요",
-      "optionalSignup": "가입은 선택이에요. 가입하면 크레딧 사용과 후배들의 커피챗 요청 수신이 가능해져요"
+      "title": "후기를 남기면 미생 포인트가 쌓여요",
+      "perStep": "채용 단계 1개당 {perStep} 포인트 (글당 최대 {max})",
+      "perStepWithBonus": "채용 단계 1개당 {perStep} 포인트 (글당 최대 {max}) · 첫 글 +{bonus}",
+      "review": "자세히 남겨 주신 후기는 미생팀 리뷰 후 추가 포인트를 드려요",
+      "coffeeChat": "모은 미생 포인트({cost})로 같은 업계·회사는 물론 다른 업계 현직자와의 1:1 커피챗에 쓸 수 있어요",
+      "optionalSignup": "가입은 선택이에요. 가입하면 미생 포인트 사용과 후배들의 커피챗 요청 수신이 가능해져요"
     },
     "hero": {
       "memberEyebrow": "내 계정으로 남기기",
-      "memberIntro": "크레딧은 등록 즉시 이 계정에 적립돼요. 후배들의 커피챗 요청도 받아볼 수 있어요.",
-      "guestIntro": "가입은 필요 없어요. 크레딧은 보관해 두었다가 나중에 같은 이메일로 가입하면 자동으로 적립돼요."
+      "memberIntro": "미생 포인트는 등록 즉시 이 계정에 적립돼요. 후배들의 커피챗 요청도 받아볼 수 있어요.",
+      "guestIntro": "가입은 필요 없어요. 미생 포인트는 보관해 두었다가 나중에 같은 이메일로 가입하면 자동으로 적립돼요."
     },
     "preview": {
       "count_other": "지금까지 추가한 채용 단계 {count}건",
-      "member": "적립 예정 {credit} 크레딧",
-      "memberWithBonus": "적립 예정 {credit} 크레딧 (+첫 글 {bonus})",
-      "guest": "가입 시 적립 {credit} 크레딧",
-      "guestWithBonus": "가입 시 적립 {credit} 크레딧 (+첫 글 {bonus})"
+      "member": "적립 예정 {credit} 포인트",
+      "memberWithBonus": "적립 예정 {credit} 포인트 (+첫 글 {bonus})",
+      "guest": "가입 시 적립 {credit} 포인트",
+      "guestWithBonus": "가입 시 적립 {credit} 포인트 (+첫 글 {bonus})"
     },
     "done": {
       "eyebrow": "등록 완료",
       "title": "후기를 남겨 주셔서 감사해요",
       "body_other": "「{title}」이(가) 면접·취업 게시판에 올라갔어요. 채용 단계 {count}건이 후배들에게 공유돼요.",
-      "awarded": "{credit} 크레딧이 계정에 적립됐어요",
+      "awarded": "{credit} 포인트가 계정에 적립됐어요",
       "linked": "후기가 계정에 연결됐어요",
-      "coffeeChat": "크레딧은 같은 업계·회사는 물론 다른 업계 현직자와의 커피챗 ({cost} 크레딧)에 쓸 수 있어요.",
-      "pending": "가입하시면 {credit} 크레딧이 바로 적립돼요",
-      "breakdown_other": "채용 단계 {count}건 = {credit} 크레딧. 후기에 적은 이메일과 같은 Google 계정으로 가입하면 자동으로 연결돼요.",
-      "breakdownWithBonus_other": "채용 단계 {count}건 = {credit} 크레딧 + 첫 글 보너스 {bonus}. 후기에 적은 이메일과 같은 Google 계정으로 가입하면 자동으로 연결돼요.",
+      "coffeeChat": "미생 포인트는 같은 업계·회사는 물론 다른 업계 현직자와의 커피챗 ({cost} 포인트)에 쓸 수 있어요.",
+      "pending": "가입하시면 {credit} 포인트가 바로 적립돼요",
+      "breakdown_other": "채용 단계 {count}건 = {credit} 포인트. 후기에 적은 이메일과 같은 Google 계정으로 가입하면 자동으로 연결돼요.",
+      "breakdownWithBonus_other": "채용 단계 {count}건 = {credit} 포인트 + 첫 글 보너스 {bonus}. 후기에 적은 이메일과 같은 Google 계정으로 가입하면 자동으로 연결돼요.",
       "viewPost": "내 후기 보기",
-      "viewCredit": "내 크레딧 보기",
+      "viewCredit": "내 미생 포인트 보기",
       "toList": "목록으로",
       "optional": "선택 사항",
       "signupTitle": "{brand}에 가입하시면 후배들의 커피챗 요청을 받아보실 수 있어요",
-      "signupPitch1": "방금 남긴 후기와 {credit} 크레딧이 계정에 바로 연결돼요",
-      "signupPitch2": "크레딧으로 같은 업계·회사, 혹은 다른 업계 현직자와 1:1 커피챗을 할 수 있어요",
+      "signupPitch1": "방금 남긴 후기와 {credit} 포인트가 계정에 바로 연결돼요",
+      "signupPitch2": "미생 포인트로 같은 업계·회사, 혹은 다른 업계 현직자와 1:1 커피챗을 할 수 있어요",
       "signupPitch3": "진행 기록을 이어서 추가·수정할 수 있어요",
       "emailMismatch": "가입한 계정 이메일이 후기에 적은 이메일과 달라 자동으로 연결되지 않았어요. 운영팀이 LinkedIn·이메일을 확인한 뒤 계정에 연결해 드릴게요.",
       "skipNote": "지금 가입하지 않아도 후기는 그대로 게시돼요.",
-      "skip": "나중에 할게요"
+      "skip": "나중에 할게요",
+      "linkedReviewPending": "후기가 계정에 연결됐어요. 운영팀 검수 후 포인트가 지급돼요",
+      "pendingReview": "가입하면 이 후기로 포인트를 받을 수 있어요",
+      "pendingReviewNote": "후기 포인트는 운영팀 검수 후 지급돼요. 후기에 적은 이메일과 같은 Google 계정으로 가입하면 자동으로 연결돼요.",
+      "signupPitch1Review": "방금 남긴 후기가 계정에 바로 연결되고, 검수 후 포인트가 지급돼요"
     }
   }
 }

@@ -13,7 +13,7 @@
     "me": "My page",
     "myPosts": "My posts",
     "myLikes": "Posts I liked",
-    "creditReviews": "Credit reviews"
+    "creditReviews": "Misaeng Points reviews"
   },
   "accountMenu": "Account menu",
   "openAccountMenu": "Open account menu",
@@ -38,7 +38,7 @@
     },
     "links": {
       "housing": "Housing",
-      "credit": "Credits",
+      "credit": "Misaeng Points",
       "partners": "Partners",
       "companySite": "Company site",
       "about": "About us",

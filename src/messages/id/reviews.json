@@ -615,7 +615,7 @@
     "nicknamePlaceholder": "mis. NYCWorker",
     "emailLabel": "Email",
     "emailHintMember": "Email akun · Privat",
-    "emailHintGuest": "Untuk info gift card dan kredit · Privat",
+    "emailHintGuest": "Untuk info gift card dan poin · Privat",
     "linkedinLabel": "URL profil LinkedIn",
     "linkedinHint": "Untuk memastikan tempat kerjamu · Privat",
     "coffeeChatLabel": "Aku terbuka untuk permintaan coffee chat dari orang yang baru mulai",
@@ -625,7 +625,7 @@
     "submitGuest": "Posting ulasan tanpa daftar",
     "footnoteBefore": "Tanpa perlu daftar.",
     "footnoteLink": "Daftar dengan Google dan posting",
-    "footnoteAfter": " untuk langsung dapat kredit di akunmu.",
+    "footnoteAfter": " untuk langsung dapat poin di akunmu.",
     "footnoteMember": "Setelah memposting, kamu bisa terus menambah dan mengedit progres dari Postingan saya.",
     "choose": {
       "eyebrow": "Bagikan pengalamanmu",
@@ -633,54 +633,58 @@
       "intro": "Ceritakan tiap tahap, dari lamaran, interview, sampai hasilnya. Ini sangat membantu orang yang sedang menyiapkan jalur yang sama. Cuma butuh 5 menit.",
       "recommended": "Direkomendasikan",
       "googleTitle": "Daftar dengan Google dan posting",
-      "googlePitch1": "Kredit langsung masuk ke akunmu",
+      "googlePitch1": "Poin langsung masuk ke akunmu",
       "googlePitch2": "Kamu bisa terus menambah progres setelah memposting",
       "guestTitle": "Posting tanpa daftar",
       "guestPitch1": "Cukup nama panggilan, email, dan URL LinkedIn",
-      "guestPitch2": "Kredit kamu kami simpan dan otomatis ditambahkan saat kamu mendaftar nanti dengan email yang sama",
+      "guestPitch2": "Poin kamu kami simpan dan otomatis ditambahkan saat kamu mendaftar nanti dengan email yang sama",
       "guestCta": "Posting ulasan tanpa daftar"
     },
     "creditPitch": {
-      "title": "Dapatkan kredit untuk ulasanmu",
-      "perStep": "{perStep} kredit per tahap rekrutmen (maksimal {max} per postingan)",
-      "perStepWithBonus": "{perStep} kredit per tahap rekrutmen (maksimal {max} per postingan) · Postingan pertama +{bonus}",
-      "review": "Ulasan yang detail mendapat kredit tambahan setelah ditinjau tim Misaeng",
-      "coffeeChat": "Pakai kreditmu ({cost}) untuk coffee chat 1:1 dengan orang di industri atau perusahaanmu, atau di industri lain juga",
-      "optionalSignup": "Pendaftaran opsional. Setelah mendaftar, kamu bisa memakai kredit dan menerima permintaan coffee chat"
+      "title": "Dapatkan poin Misaeng untuk ulasanmu",
+      "perStep": "{perStep} poin per tahap rekrutmen (maksimal {max} per postingan)",
+      "perStepWithBonus": "{perStep} poin per tahap rekrutmen (maksimal {max} per postingan) · Postingan pertama +{bonus}",
+      "review": "Ulasan yang detail mendapat poin tambahan setelah ditinjau tim Misaeng",
+      "coffeeChat": "Pakai poinmu ({cost}) untuk coffee chat 1:1 dengan orang di industri atau perusahaanmu, atau di industri lain juga",
+      "optionalSignup": "Pendaftaran opsional. Setelah mendaftar, kamu bisa memakai poin dan menerima permintaan coffee chat"
     },
     "hero": {
       "memberEyebrow": "Posting dengan akunku",
-      "memberIntro": "Kredit masuk ke akun ini begitu kamu memposting. Kamu juga bisa menerima permintaan coffee chat.",
-      "guestIntro": "Tanpa perlu daftar. Kredit kamu kami simpan dan otomatis ditambahkan saat kamu mendaftar nanti dengan email yang sama."
+      "memberIntro": "Poin masuk ke akun ini begitu kamu memposting. Kamu juga bisa menerima permintaan coffee chat.",
+      "guestIntro": "Tanpa perlu daftar. Poin kamu kami simpan dan otomatis ditambahkan saat kamu mendaftar nanti dengan email yang sama."
     },
     "preview": {
       "count_other": "{count} tahap rekrutmen sudah ditambahkan",
-      "member": "Kamu akan mendapat {credit} kredit",
-      "memberWithBonus": "Kamu akan mendapat {credit} kredit (+{bonus} postingan pertama)",
-      "guest": "{credit} kredit saat kamu mendaftar",
-      "guestWithBonus": "{credit} kredit saat kamu mendaftar (+{bonus} postingan pertama)"
+      "member": "Kamu akan mendapat {credit} poin",
+      "memberWithBonus": "Kamu akan mendapat {credit} poin (+{bonus} postingan pertama)",
+      "guest": "{credit} poin saat kamu mendaftar",
+      "guestWithBonus": "{credit} poin saat kamu mendaftar (+{bonus} postingan pertama)"
     },
     "done": {
       "eyebrow": "Terposting",
       "title": "Terima kasih sudah berbagi ulasan",
       "body_other": "\"{title}\" sekarang ada di forum Ulasan interview & kerja. {count} tahap rekrutmennya akan membantu orang-orang setelahmu.",
-      "awarded": "{credit} kredit sudah ditambahkan ke akunmu",
+      "awarded": "{credit} poin sudah ditambahkan ke akunmu",
       "linked": "Ulasan kamu sudah tertaut ke akunmu",
-      "coffeeChat": "Pakai kredit untuk coffee chat ({cost} kredit) dengan orang di industri atau perusahaanmu, atau di industri lain juga.",
-      "pending": "Daftar dan langsung dapat {credit} kredit",
-      "breakdown_other": "{count} tahap rekrutmen = {credit} kredit. Daftar dengan akun Google yang sama dengan email di ulasanmu, dan semuanya otomatis tertaut.",
-      "breakdownWithBonus_other": "{count} tahap rekrutmen = {credit} kredit + {bonus} bonus postingan pertama. Daftar dengan akun Google yang sama dengan email di ulasanmu, dan semuanya otomatis tertaut.",
+      "coffeeChat": "Pakai poin untuk coffee chat ({cost} poin) dengan orang di industri atau perusahaanmu, atau di industri lain juga.",
+      "pending": "Daftar dan langsung dapat {credit} poin",
+      "breakdown_other": "{count} tahap rekrutmen = {credit} poin. Daftar dengan akun Google yang sama dengan email di ulasanmu, dan semuanya otomatis tertaut.",
+      "breakdownWithBonus_other": "{count} tahap rekrutmen = {credit} poin + {bonus} bonus postingan pertama. Daftar dengan akun Google yang sama dengan email di ulasanmu, dan semuanya otomatis tertaut.",
       "viewPost": "Lihat ulasanku",
-      "viewCredit": "Lihat kreditku",
+      "viewCredit": "Lihat poin Misaeng-ku",
       "toList": "Kembali ke daftar",
       "optional": "Opsional",
       "signupTitle": "Daftar ke {brand} untuk menerima permintaan coffee chat dari orang yang baru mulai",
-      "signupPitch1": "Ulasan yang baru kamu tulis dan {credit} kredit langsung tertaut ke akunmu",
-      "signupPitch2": "Pakai kredit untuk coffee chat 1:1 dengan orang di industri atau perusahaanmu, atau di industri lain",
+      "signupPitch1": "Ulasan yang baru kamu tulis dan {credit} poin langsung tertaut ke akunmu",
+      "signupPitch2": "Pakai poin untuk coffee chat 1:1 dengan orang di industri atau perusahaanmu, atau di industri lain",
       "signupPitch3": "Kamu bisa terus menambah dan mengedit progres",
       "emailMismatch": "Email akunmu berbeda dengan email di ulasan, jadi tidak bisa ditautkan otomatis. Tim kami akan mengecek LinkedIn dan email kamu, lalu menautkannya ke akunmu.",
       "skipNote": "Ulasan kamu tetap terposting meskipun kamu tidak mendaftar sekarang.",
-      "skip": "Nanti saja"
+      "skip": "Nanti saja",
+      "linkedReviewPending": "Ulasan kamu sudah tertaut ke akunmu. Poin ditambahkan setelah tim kami meninjaunya",
+      "pendingReview": "Daftar untuk mendapatkan poin dari ulasan ini",
+      "pendingReviewNote": "Poin ulasan ditambahkan setelah tim kami meninjau postingannya. Daftar dengan akun Google yang sama dengan email di ulasanmu, dan ulasan akan tertaut otomatis.",
+      "signupPitch1Review": "Ulasan yang baru kamu tulis langsung tertaut ke akunmu, dan poin ditambahkan setelah ditinjau"
     }
   }
 }

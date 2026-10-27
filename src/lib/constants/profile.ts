@@ -1,9 +1,10 @@
 export const MIN_NICKNAME_LEN = 2
 export const MAX_NICKNAME_LEN = 20
 
-/** 영문 알파벳, 점(.)만 허용 */
-export const NICKNAME_ALLOWED_PATTERN = /^[A-Za-z.]+$/
-export const NICKNAME_CHAR_FILTER = /[^A-Za-z.]/g
+/** 영문 알파벳, 완성된 한글, 점(.)만 허용 */
+export const NICKNAME_ALLOWED_PATTERN = /^[A-Za-z가-힣.]+$/
+/** 입력 중에는 자모(ㄱ, ㅏ)도 남긴다. 지우면 한글 조합이 깨진다. 저장 전 검사는 위 패턴으로 한다 */
+export const NICKNAME_CHAR_FILTER = /[^A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ.]/g
 
 export function sanitizeNicknameInput(value: string): string {
   return value.replace(NICKNAME_CHAR_FILTER, '').slice(0, MAX_NICKNAME_LEN)

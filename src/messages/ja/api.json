@@ -28,7 +28,7 @@
     "identityVerificationRequired": "投稿やコメントを書くには、先に学校または勤務先の認証をしてください。"
   },
   "auth": {
-    "ellieoUnavailable": "Ellieoのサーバーに接続できません。しばらくしてからもう一度お試しください。",
+    "ellieoUnavailable": "現在ログインサーバーに接続できません。しばらくしてからもう一度お試しください。",
     "noAccessToken": "アクセストークンを受け取れませんでした。",
     "loginFailed": "ログインに失敗しました。",
     "signupFailed": "登録に失敗しました。",
@@ -45,7 +45,14 @@
     "passwordResetFailed": "パスワード再設定のリクエストを送信できませんでした。",
     "emailAuthError": "メールでのログイン中に問題が発生しました。",
     "sessionExpired": "セッションの有効期限が切れました。もう一度ログインしてください。",
-    "userInfoUnavailable": "ログインはできましたが、アカウント情報を読み込めませんでした。"
+    "userInfoUnavailable": "ログインはできましたが、アカウント情報を読み込めませんでした。",
+    "invalidCredentials": "メールアドレスまたはパスワードが正しくありません。",
+    "accountNotFound": "このメールアドレスのアカウントはありません。メールアドレスを確認するか、新規登録してください。",
+    "emailInUse": "このメールアドレスはすでに登録されています。ログインするか、パスワードを再設定してください。",
+    "tooManyAttempts": "試行回数が多すぎます。しばらくしてからもう一度お試しください。",
+    "weakPassword": "パスワードは6文字以上にしてください。",
+    "invalidEmail": "正しいメールアドレスを入力してください。",
+    "accountDisabled": "このアカウントは利用が制限されています。Misaengチームにお問い合わせください。"
   },
   "profile": {
     "nickname": {
@@ -95,7 +102,19 @@
     "workplacePending": "Misaengチームが勤務先認証を確認しています。",
     "workplaceStorageMissing": "勤務先認証のストレージが設定されていません。",
     "workplaceSaveFailed": "勤務先認証のリクエストを保存できませんでした（HTTP {status}）",
-    "workEmailError": "勤務先メールの認証中に問題が発生しました。"
+    "workEmailError": "勤務先メールの認証中に問題が発生しました。",
+    "schoolAlreadyVerified": "すでに認証した学校メールです。",
+    "schoolLimitReached": "学校は最大{max}校まで認証できます。",
+    "schoolNotVerified": "認証済みの学校ではありません。",
+    "instagram": {
+      "noRequest": "進行中のInstagram認証リクエストがありません。",
+      "invalidHandle": "Instagramのユーザーネームを確認してください。英数字・ピリオド・アンダースコアのみ使えます。",
+      "alreadyVerified": "すでに認証済みのInstagramアカウントです。",
+      "handleTaken": "このInstagramアカウントは別のMisaengアカウントで認証済み、または認証中です。",
+      "tooManyRequests": "本日はこれ以上コードを受け取れません。明日もう一度お試しください。",
+      "requestFailed": "Instagram認証をリクエストできませんでした。",
+      "saveFailed": "Instagram認証リクエストを保存できませんでした。"
+    }
   },
   "consent": {
     "termsRequired": "続行するには利用規約に同意してください。",
@@ -117,22 +136,23 @@
     "maxUsesReached": "この紹介コードは最大{max}人まで使用できます。"
   },
   "credit": {
-    "loadFailed": "クレジット情報を読み込めませんでした。",
+    "loadFailed": "ポイント情報を読み込めませんでした。",
     "invalidUser": "ユーザーが正しくありません。",
-    "saveFailed": "クレジットを保存できませんでした（HTTP {status}）",
+    "saveFailed": "ポイントを保存できませんでした（HTTP {status}）",
     "reviewListLoadFailed": "審査リストを読み込めませんでした。",
     "reviewRequestNotFound": "そのリクエストが見つかりませんでした。",
     "reviewAlreadyProcessed": "このリクエストはすでに処理されています。",
     "reviewPostMissing": "投稿が存在しないか、削除されています。",
-    "awardFailed": "クレジットを付与できませんでした。ストレージの設定を確認してください。",
+    "awardFailed": "ポイントを付与できませんでした。ストレージの設定を確認してください。",
     "processFailed": "処理を完了できませんでした。",
     "reviewSaveFailed": "審査リクエストを保存できませんでした（HTTP {status}）",
     "reviewStatusLoadFailed": "審査リクエストの状況を読み込めませんでした。",
-    "reviewBoardIneligible": "この掲示板の投稿は追加クレジットを申請できません。",
+    "reviewBoardIneligible": "この掲示板の投稿は追加ポイントを申請できません。",
     "reviewFinalResultRequired": "先にタイムラインに最終結果（承認、カード受領、オファー、不合格など）を追加してください。",
     "reviewAlreadyAwarded": "この投稿はすでにレビューボーナスを受け取っています。",
     "reviewAlreadyPending": "すでに審査待ちです。",
-    "reviewRequestFailed": "追加クレジットを申請できませんでした。"
+    "reviewRequestFailed": "追加ポイントを申請できませんでした。",
+    "reviewBonusReplaced": "ポイント改定後は、このボーナスの代わりに運営チームがレビューを確認してポイントを付与します。ERPのポイント審査画面をご利用ください。"
   },
   "postings": {
     "loadFailed": "求人を読み込めませんでした。"
@@ -223,12 +243,22 @@
           "moveInEnd": "サブレットの終了日を選択してください。"
         }
       }
+    },
+    "blocks": {
+      "loadFailed": "ブロックリストを読み込めませんでした。",
+      "failed": "ブロックできませんでした。しばらくしてからもう一度お試しください。",
+      "unblockFailed": "ブロックを解除できませんでした。しばらくしてからもう一度お試しください。",
+      "targetNotFound": "ブロックする投稿またはコメントが見つかりませんでした。",
+      "self": "自分の投稿やコメントはブロックできません。",
+      "limit": "ブロックできるのは最大{max}人までです。",
+      "notFound": "ブロックリストにないユーザーです。",
+      "blockedPost": "ブロックしたユーザーの投稿です。"
     }
   },
   "guest": {
     "invalidRequest": "リクエスト内容を確認してください。",
     "nicknameInvalid": "表示用のニックネームを{min}〜{max}文字で入力してください（メールアドレスは不可）。",
-    "emailInvalid": "ギフトカードやクレジットのお知らせをお送りするため、有効なメールアドレスを入力してください。",
+    "emailInvalid": "ギフトカードやポイントのお知らせをお送りするため、有効なメールアドレスを入力してください。",
     "linkedinRequired": "LinkedInのプロフィールURLを入力してください。例：linkedin.com/in/your-name",
     "guidelinesRequired": "コミュニティの投稿ガイドラインに同意してください。",
     "titleRequired": "タイトルを入力してください。",
@@ -236,5 +266,115 @@
     "bodyTooLong": "「注意点」は{max}文字以内にしてください。",
     "jobReviewTypeRequired": "種類を選択してください：インターン、新卒、経験者、転職、契約。",
     "rateLimited": "しばらくしてからもう一度お試しください。（短時間にリクエストが多すぎます）"
+  },
+  "push": {
+    "verification": {
+      "instagram": {
+        "approved": {
+          "title": "Instagram認証が完了しました",
+          "body": "あなたの投稿にInstagram認証バッジが表示されます。"
+        },
+        "rejected": {
+          "title": "Instagram認証が承認されませんでした",
+          "body": "マイページで理由を確認し、もう一度リクエストしてください。"
+        }
+      }
+    },
+    "reviewDocs": {
+      "deleted": {
+        "title": "認証書類を削除しました",
+        "body": "提出された認証書類は{date}に完全に削除されました。認証結果のみ保管されます。"
+      },
+      "expired": {
+        "title": "認証書類を再提出してください",
+        "body": "7日以内に審査できなかったため、提出された書類を{date}に完全に削除しました。レビューから再度認証できます。"
+      },
+      "approved": {
+        "title": "レビューが認証されました",
+        "body": "レビューが認証されました。書類は72時間以内に完全に削除されます。"
+      },
+      "rejected": {
+        "title": "レビューの認証が却下されました",
+        "body": "マイページ > 認証履歴で理由をご確認ください。書類は72時間以内に完全に削除されます。"
+      }
+    }
+  },
+  "reviewDocs": {
+    "notReady": "認証書類の機能は準備中です。しばらくしてからもう一度お試しください。",
+    "failed": "認証書類を処理できませんでした。しばらくしてからもう一度お試しください。",
+    "invalidRequest": "リクエスト内容を確認してください。",
+    "consentRequired": "アップロードするには、認証書類の取り扱いに同意してください。",
+    "fileRequired": "アップロードする画像を選んでください。",
+    "tooManyFiles": "一度にアップロードできるのは最大{max}枚です。",
+    "fileTooLarge": "ファイルは1つあたり10MB以下にしてください。",
+    "heicNotSupported": "HEICファイルはJPGに変換してからアップロードしてください。",
+    "invalidImage": "画像を読み込めませんでした。別のファイルでお試しください。",
+    "unsupportedType": "アップロードできるのはJPG、PNG、PDFファイルのみです。",
+    "boardNotEligible": "認証できるのは面接・就職レビューとOPT・ビザ・グリーンカードの投稿のみです。",
+    "alreadyVerified": "この投稿はすでに認証済みです。",
+    "alreadyPending": "この投稿の認証書類はすでに審査中です。",
+    "dailyLimit": "本日はこれ以上認証書類をアップロードできません。明日もう一度お試しください。",
+    "notFound": "認証履歴が見つかりません。",
+    "deleteFailed": "ファイルをすぐに削除できませんでした。自動的に再試行します。"
+  },
+  "points": {
+    "notConfigured": "ポイント機能はまだご利用いただけません。しばらくしてからもう一度お試しください。",
+    "notActive": "新しいポイント機能はまだ始まっていません。",
+    "loadFailed": "ポイント情報を読み込めませんでした。",
+    "requestFailed": "ポイントのリクエストを処理できませんでした。しばらくしてからもう一度お試しください。",
+    "invalidCursor": "無効なリクエストです。履歴を最初から読み込み直してください。",
+    "insufficient": "ポイントが足りません。（必要 {required}、利用可能 {available}）",
+    "monthlyCap": "今月の利用上限に達しました。",
+    "featureDisabled": "現在この機能はご利用いただけません。",
+    "identityRequired": "学校または職場のメール認証後にご利用いただけます。",
+    "verificationRequired": "アカウント認証（学校・職場のメールまたはInstagram）後にポイントを貯められます。",
+    "claimNotFound": "審査リクエストが見つかりません。",
+    "claimNotPending": "この審査リクエストはすでに処理されています。",
+    "boost": {
+      "notAllowed": "上位表示できるのはルームメイト・サブレットの投稿だけです。",
+      "notAuthor": "上位表示できるのは自分の投稿だけです。",
+      "active": "すでに上部に表示中です（{date}まで）。",
+      "cooldown": "この投稿は{date}から再び上部に表示できます。",
+      "monthlyCap": "上部表示は月{max}回までです。",
+      "slotsFull": "現在、上部の枠がすべて埋まっています。{date}に空きが出ます。"
+    },
+    "coffeeChat": {
+      "agreeRequired": "コーヒーチャットの注意事項に同意してください。",
+      "topicRequired": "コーヒーチャットのテーマを入力してください。",
+      "topicTooLong": "テーマは{max}文字まで入力できます。",
+      "messageTooLong": "メッセージは{max}文字まで入力できます。",
+      "monthlyCap": "コーヒーチャットは月{max}回まで申し込めます。",
+      "notFound": "コーヒーチャットの申し込みが見つかりません。",
+      "invalidTransition": "現在の状態では変更できません。",
+      "cannotCancel": "日程が決まったコーヒーチャットはここではキャンセルできません。運営チームにお問い合わせください。"
+    },
+    "push": {
+      "earned": {
+        "title": "{name} +{amount}",
+        "body": "{reason} · 残高 {balance}"
+      },
+      "clawback": {
+        "title": "{name} -{amount} 回収",
+        "body": "運営基準によりポイントが回収されました · 残高 {balance}"
+      },
+      "coffeeChat": {
+        "scheduled": {
+          "title": "コーヒーチャットの日程が決まりました",
+          "body": "マイページで日程をご確認ください。"
+        },
+        "completed": {
+          "title": "コーヒーチャットが完了しました",
+          "body": "予約していた{name}が使用されました。"
+        },
+        "cancelled": {
+          "title": "コーヒーチャットがキャンセルされました",
+          "body": "予約していた{name}は差し引かれていません。"
+        },
+        "no_show": {
+          "title": "コーヒーチャット不参加",
+          "body": "不参加として処理されたため、予約していた{name}が使用されました。"
+        }
+      }
+    }
   }
 }

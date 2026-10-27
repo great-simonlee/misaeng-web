@@ -1,0 +1,42 @@
+{
+  "name": "điểm Misaeng",
+  "nameEllieo": "điểm Ellieo",
+  "sharedNotice": "Điểm của bạn được dùng chung giữa Misaeng và Ellieo.",
+  "reasons": {
+    "welcome": "Điểm chào mừng (xác minh trường hoặc nơi làm việc lần đầu)",
+    "verify_instagram": "Xác minh Instagram",
+    "profile_complete": "Hoàn thiện hồ sơ",
+    "checkin": "Điểm danh hằng ngày",
+    "checkin_streak7": "Điểm danh 7 ngày liên tiếp",
+    "referral": "Giới thiệu bạn bè",
+    "comment": "Bình luận",
+    "review": {
+      "base": "Viết review",
+      "detail": "Review chi tiết từng bước",
+      "verified": "Xác minh bằng giấy tờ",
+      "pick": "Được chọn là Misaeng Pick",
+      "first_company": "Review đầu tiên của công ty",
+      "total": "Điểm review"
+    },
+    "review_unlock": "Mở xem review",
+    "coffee_chat": "Coffee chat 1:1",
+    "coffee_chat_no_show": "Vắng mặt coffee chat",
+    "housing_post_boost": "Ghim bài ở ghép/sublet lên đầu",
+    "clawback": {
+      "post": "Thu hồi điểm review",
+      "comment": "Thu hồi điểm bình luận",
+      "admin": "Thu hồi điểm"
+    },
+    "legacy_opening": "Chuyển điểm trước đây",
+    "adjust": "Điều chỉnh điểm"
+  },
+  "entryTypes": {
+    "earn": "Nhận",
+    "spend": "Sử dụng",
+    "hold": "Tạm giữ",
+    "release": "Hủy tạm giữ",
+    "clawback": "Thu hồi",
+    "adjust": "Điều chỉnh"
+  },
+  "legacyBadge": "Lịch sử trước đây"
+}

@@ -12,7 +12,8 @@ import { deletePushDevices, listPushDevices, usersWithTypeOff, type PushType } f
  * `build` gets the translator for the device language (all namespaces; push texts are `api.push.*`).
  */
 export function notifyUsers(input: {
-  type: PushType
+  /** 'account' = notices about the user's own account (verification results): sent regardless of the type switches */
+  type: PushType | 'account'
   userIds: string[]
   build: (t: Translate, locale: Locale) => ApnsMessage
 }) {
@@ -22,7 +23,10 @@ export function notifyUsers(input: {
 
   const run = async () => {
     try {
-      const [devices, off] = await Promise.all([listPushDevices(userIds), usersWithTypeOff(userIds, input.type)])
+      const [devices, off] = await Promise.all([
+        listPushDevices(userIds),
+        input.type === 'account' ? Promise.resolve(new Set<string>()) : usersWithTypeOff(userIds, input.type),
+      ])
       const targets = devices.filter((d) => !off.has(d.user_id) && d.platform === 'ios')
       if (targets.length === 0) return
 

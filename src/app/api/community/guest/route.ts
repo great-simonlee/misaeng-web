@@ -286,23 +286,21 @@ export async function POST(request: Request) {
       jobReviewSourceOrgId: jobReviewSource.orgId,
     })
 
-    const estimated = estimateTimelinePostCredit(jobReviewTimeline.length)
+    // 포인트 전환(cutover) 후에는 즉시 적립이 없고 운영팀 검수 뒤 지급된다 (src/lib/points/WIRING.md)
+    const { isPointsLedgerActive, onPostCreated } = await import('@lib/points/facade.server')
+    const pendingReview = await isPointsLedgerActive().catch(() => false)
+    const estimated = pendingReview ? 0 : estimateTimelinePostCredit(jobReviewTimeline.length)
     let awarded = 0
     if (isMember) {
       try {
-        const { awardPostCredit } = await import('@lib/community/creditLedger')
         const { getStoredCommunityCreditAccount } = await import(
           '@lib/supabase/communityCredit.server'
         )
-        const before = await getStoredCommunityCreditAccount(user!.uid).catch(
-          () => null,
-        )
-        const after = await awardPostCredit({
-          uid: user!.uid,
-          postId: saved.id,
-          boardId: saved.categoryId,
-          timelineCount: jobReviewTimeline.length,
-        })
+        const before = pendingReview
+          ? null
+          : await getStoredCommunityCreditAccount(user!.uid).catch(() => null)
+        const result = await onPostCreated({ uid: user!.uid, post: saved })
+        const after = result.ok && result.engine === 'legacy' ? result.result : null
         if (after && before) awarded = Math.max(0, after.balance - before.balance)
       } catch (creditError) {
         console.error('Guest job-review credit award error:', creditError)
@@ -315,10 +313,12 @@ export async function POST(request: Request) {
         /** 타임라인 단계 기준 자동 적립액 */
         estimated,
         /** 첫 글 보너스 (가입 후 첫 글이면 추가) */
-        firstPostBonus: firstPostBonusAmount(),
+        firstPostBonus: pendingReview ? 0 : firstPostBonusAmount(),
         /** 이번 요청에서 실제로 적립된 금액 (회원만) */
         awarded,
         linked: isMember,
+        /** 포인트 전환 후: 검수 뒤 지급 (전환 전 응답에는 이 필드가 없다) */
+        ...(pendingReview ? { pendingReview: true } : {}),
       },
     })
   } catch (error) {

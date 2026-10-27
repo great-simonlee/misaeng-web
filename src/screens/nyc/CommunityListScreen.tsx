@@ -26,7 +26,7 @@ import {
   resolvePostCity,
   type CityId,
 } from '@lib/constants/cities'
-import { VERIFIED_SCHOOLS } from '@lib/constants/schools'
+import { useEnabledSchools } from '@hooks/useVerifiedSchools'
 import {
   getIdentityVerifyHref,
   isAccountSuspended,
@@ -277,6 +277,7 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
   const [draftCptOptType, setDraftCptOptType] = useState<CptOptTypeId | 'all'>('all')
   const [draftStatusCity, setDraftStatusCity] = useState<CityId | 'all'>('all')
   const [draftStatusSchool, setDraftStatusSchool] = useState<string | 'all'>('all')
+  const enabledSchools = useEnabledSchools()
   const [jobReviewType, setJobReviewType] = useState<JobReviewTypeId | 'all'>('all')
   const [draftJobReviewType, setDraftJobReviewType] = useState<JobReviewTypeId | 'all'>('all')
   const [jobReviewEmployer, setJobReviewEmployer] = useState<EmployerFilter>(EMPTY_EMPLOYER_FILTER)
@@ -719,7 +720,7 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
                   ariaLabel={t('list.filterSchool')}
                   options={[
                     { id: 'all', label: t('list.all') },
-                    ...VERIFIED_SCHOOLS.map((school) => ({
+                    ...enabledSchools.map((school) => ({
                       id: school.id,
                       label: school.shortName,
                     })),

@@ -3,11 +3,11 @@
     "checkFailed": "ニックネームを確認できませんでした。",
     "available": "このニックネームは使用できます",
     "taken": "このニックネームはすでに使われています。",
-    "ruleHint": "英字と「.」のみ使用できます",
+    "ruleHint": "英字・ハングルと「.」のみ使用できます",
     "errors": {
       "tooShort": "ニックネームは{min}文字以上にしてください",
       "tooLong": "ニックネームは{max}文字以内にしてください",
-      "invalidChars": "英字と「.」のみ使用できます"
+      "invalidChars": "英字・ハングルと「.」のみ使用できます"
     }
   },
   "profile": {
@@ -133,11 +133,54 @@
       "backToVerify": "学校メール認証に戻る",
       "verifyTitle": "学校メール認証",
       "formDescription": "学校のメールアドレスは、登録時のメールアドレスと異なっていても、現在ログイン中のアカウントに紐づけられます。学校のメールアドレスに6桁のコードをお送りします。",
-      "notFoundRequest": "学校が見つかりませんか？追加をリクエスト"
+      "notFoundRequest": "学校が見つかりませんか？追加をリクエスト",
+      "manageTitle": "学校認証の管理",
+      "manageDescription": "投稿にはメインの学校が1つだけ表示されます。学校は最大{max}校まで認証できます。",
+      "primary": "メイン",
+      "addAnother": "別の学校を認証",
+      "limitReached": "学校は最大{max}校まで認証できます。",
+      "primaryChangedToast": "メインの学校を{school}に変更しました",
+      "moreSchools": "{school} ほか{count}校"
     },
     "instagram": {
       "rowLabel": "Instagram",
-      "rowHint": "アカウントを連携"
+      "rowHint": "DMでアカウント認証",
+      "title": "Instagram認証",
+      "intro": "自分のInstagramアカウントからMisaeng公式アカウント @{account} に認証コードをDMで送ると、運営チームが確認して認証します。",
+      "privacy": "他の人にはユーザーネームなしで「Instagram認証」バッジだけが表示されます。",
+      "handleLabel": "自分のInstagramユーザーネーム",
+      "handlePlaceholder": "@username",
+      "getCode": "認証コードを受け取る",
+      "step1": "@{handle} でログインしたInstagramから、下のメッセージを @{account} に送ってください。",
+      "previewLabel": "プレビュー",
+      "previewHint": "送るメッセージ",
+      "copyAndOpen": "メッセージをコピーしてDMを開く",
+      "copyOnly": "メッセージだけコピー",
+      "copiedToast": "メッセージをコピーしました。Instagramで貼り付けるだけです。",
+      "step2": "チャットで入力欄を長押しして「ペースト」→ 送信",
+      "step3": "送信したら下のボタンを押してください。",
+      "sent": "送りました",
+      "sentToast": "確認リクエストを受け付けました。通常3営業日以内に確認します。",
+      "inReview": "確認中 · 通常3営業日以内",
+      "inReviewDescription": "@{account} に届いたDMを運営チームが確認しています。結果は通知でお知らせします。",
+      "noteOtherAccount": "別のアカウントから送ると認証されません",
+      "notePrivate": "非公開アカウントでも大丈夫です",
+      "noteExpiry": "コードは{date}まで有効です",
+      "expired": "コードの有効期限が切れました。新しいコードを受け取ってください。",
+      "cancel": "リクエストを取り消す",
+      "cancelledToast": "認証リクエストを取り消しました",
+      "verifiedDescription": "@{handle} が認証されました。投稿にはユーザーネームなしでInstagram認証バッジが表示されます。",
+      "changeAccount": "別のアカウントで認証し直す",
+      "rejectedTitle": "認証が承認されませんでした",
+      "rejectReasons": {
+        "noMessage": "@misaeng.ny にメッセージが届いていません。",
+        "wrongAccount": "入力したユーザーネームとは別のアカウントから送られました。",
+        "codeMismatch": "送られたコードが一致しません。",
+        "other": "その他の理由で承認されませんでした。"
+      },
+      "dmMessage": "こんにちは、MisaengのInstagram認証リクエストです。\n認証コード: {code}",
+      "pendingDetail": "確認中 · @{handle}",
+      "codeIssuedDetail": "コード発行済み · DMを送ってください"
     },
     "title": "認証",
     "description": "学校または勤務先のメールアドレスは、登録時のメールアドレスと異なっていてもこのアカウントに紐づけられます。",
@@ -180,7 +223,7 @@
     "profileFailed": "プロフィールを保存できませんでした"
   },
   "title": "マイページ",
-  "suspendedNotice": "このアカウントは利用停止中です。閲覧はできますが、投稿、コメント、クレジットの申請はできません。",
+  "suspendedNotice": "このアカウントは利用停止中です。閲覧はできますが、投稿、コメント、ポイントの申請はできません。",
   "nicknameSheet": {
     "title": "ニックネームを設定",
     "minLength": "{min}文字以上"
@@ -240,25 +283,25 @@
     }
   },
   "credit": {
-    "loadFailed": "クレジットを読み込めませんでした",
-    "ledgerLoadFailed": "クレジット履歴を読み込めませんでした",
-    "redeemComingSoon": "特典の申請は段階的に開始しています。詳しくはクレジットガイドをご覧ください。",
-    "loadFailedRetry": "クレジットを読み込めませんでした · 再試行",
-    "pillAria_other": "コミュニティクレジット{count}、履歴を見る",
-    "unit": "クレジット",
+    "loadFailed": "ポイントを読み込めませんでした",
+    "ledgerLoadFailed": "ポイント履歴を読み込めませんでした",
+    "redeemComingSoon": "特典の申請は段階的に開始しています。詳しくはミセンポイントガイドをご覧ください。",
+    "loadFailedRetry": "ポイントを読み込めませんでした · 再試行",
+    "pillAria_other": "ミセンポイント{count}、履歴を見る",
+    "unit": "ポイント",
     "history": "履歴",
-    "requestTitle": "クレジットを使う",
-    "balanceLabel": "保有クレジット",
+    "requestTitle": "ミセンポイントを使う",
+    "balanceLabel": "保有ポイント",
     "requestDescription": "使いたい特典を選んでください。申請後、Misaengが確認してマッチングします。",
     "optionMeta_other": "{duration} · 月{count}回",
-    "needMore_other": "あと{count}クレジット必要です",
+    "needMore_other": "あと{count}ポイント必要です",
     "redeemGuideLink": "特典について詳しく見る",
     "submit": "申請する",
-    "historyTitle": "クレジット履歴",
+    "historyTitle": "ミセンポイント履歴",
     "guideLink": "ガイドを見る",
     "retry": "再試行",
     "emptyTitle": "まだ履歴がありません",
-    "emptyDescription": "グルメ情報、レビュー、コメントでクレジットを獲得しましょう。",
+    "emptyDescription": "グルメ情報、レビュー、コメントでポイントを獲得しましょう。",
     "writeFoodReview": "グルメレビューを書く",
     "kinds": {
       "earn": "獲得",
@@ -278,7 +321,7 @@
     "bound": "紹介者を登録しました",
     "title": "友だち紹介",
     "description": "あなたの紹介コードが使われるたびに{credits}がもらえます。最大{max}人まで、自分自身を紹介することはできません。",
-    "creditsAmount_other": "{count}クレジット",
+    "creditsAmount_other": "{count}ポイント",
     "copying": "コピーしています…",
     "shareButton": "友だちを招待する",
     "myCode": "自分の紹介コード",
@@ -329,5 +372,127 @@
     "browseHousing": "住まいを見る",
     "rent": "{amount}/月",
     "rentWithNet": "{gross} / {net}/月"
+  },
+  "reviewDocs": {
+    "entry": {
+      "title": "レビューを認証する",
+      "description": "内定・承認メールのスクリーンショットでレビューを認証すると、追加ポイントがもらえます。ファイルは確認後すぐに削除されます。",
+      "start": "認証する",
+      "pending": "認証書類を審査中です。結果が出たらお知らせします。",
+      "approved": "認証済みのレビューです。",
+      "rejected": "前回の認証は却下されました。再提出できます。",
+      "dailyLimit": "本日はこれ以上アップロードできません。明日もう一度お試しください。",
+      "history": "認証履歴を見る"
+    },
+    "notice": {
+      "title": "アップロード前に必ずお読みください",
+      "body": "認証書類は、レビュー内容の確認と追加ポイントの付与にのみ使用されます。年収、A-number、SEVIS ID、受付番号、生年月日、住所などの機密情報は隠してからアップロードしてください。提出されたファイルは審査後72時間以内、遅くともアップロードから7日以内に完全に削除され、認証結果（認証の有無と会社名またはビザの種類）のみ保管されます。書類をメールやメッセージで送らないでください。",
+      "agree": "上記の内容を確認し、認証書類の取り扱いに同意します。（必須）",
+      "screenshotTip": "メールのスクリーンショットがおすすめです。カードや書類の写真より隠す情報がずっと少なくなります。",
+      "maskTip": "アップロードするすべての画像は次のステップでご自身で隠し、隠した結果だけが送信されます。位置情報などの写真データもサーバーで削除します。",
+      "continue": "同意して続ける"
+    },
+    "kindTitle": "どの書類で認証しますか？",
+    "kinds": {
+      "interview": {
+        "label": "面接",
+        "example": "面接案内メールのスクリーンショット",
+        "mask": "ご本人以外の名前、連絡先"
+      },
+      "offer": {
+        "label": "内定・就職",
+        "example": "オファーまたは内定メールのスクリーンショット",
+        "mask": "年収（任意）、住所、署名"
+      },
+      "opt": {
+        "label": "OPT・STEM OPT",
+        "example": "OPT承認メールのスクリーンショット（EADカードの写真も可）",
+        "mask": "A-number、カード番号、生年月日、顔写真"
+      },
+      "visa_approval": {
+        "label": "ビザ・請願の承認",
+        "example": "承認メールのスクリーンショットまたはI-797承認通知",
+        "mask": "受付番号、A-number、住所"
+      },
+      "cpt": {
+        "label": "CPT",
+        "example": "I-20のCPT承認ページ",
+        "mask": "SEVIS ID、生年月日、住所"
+      }
+    },
+    "maskLabel": "必ず隠してください: {items}",
+    "pick": {
+      "title": "画像を選ぶ",
+      "hint": "最大{max}枚・1枚10MBまで・JPG、PNG、HEIC、PDF",
+      "add": "画像を追加",
+      "remove": "削除",
+      "edit": "もう一度隠す",
+      "masked": "{count}か所を隠しました",
+      "notMasked": "未処理",
+      "pdfTitle": "PDFはこの画面で隠せません",
+      "pdfBody": "できればメール画面のスクリーンショットをアップロードしてください。PDFをアップロードする場合は、機密情報を事前に隠したファイルにしてください。",
+      "pdfConfirm": "このPDFの機密情報はすべて隠しました。",
+      "unsupported": "アップロードできるのはJPG、PNG、HEIC、PDFファイルのみです。",
+      "tooLarge": "10MB以下のファイルのみアップロードできます。",
+      "tooMany": "最大{max}枚までアップロードできます。",
+      "readFailed": "この画像を開けません。別のファイルを選んでください。"
+    },
+    "mask": {
+      "title": "機密情報を隠す",
+      "hint": "隠したい部分をドラッグして黒いボックスを描いてください。隠した結果だけが送信されます。",
+      "undo": "元に戻す",
+      "clear": "すべて消す",
+      "done": "隠し終わった",
+      "noBoxes": "まだ何も隠していません。本当に隠す情報はありませんか？",
+      "noBoxesConfirm": "隠す情報はありません"
+    },
+    "submit": "認証書類を提出",
+    "uploading": "安全にアップロード中…",
+    "uploadFailed": "アップロードできませんでした。もう一度お試しください。",
+    "back": "戻る",
+    "next": "次へ",
+    "cancel": "キャンセル",
+    "done": {
+      "title": "書類を安全に受け付けました",
+      "body": "審査後72時間以内、遅くともアップロードから7日以内に完全に削除されます。",
+      "detail": "削除されたらお知らせします。マイページ > 認証履歴からいつでもすぐに削除できます。",
+      "close": "OK"
+    },
+    "status": {
+      "pending": "審査中",
+      "approved": "認証済み",
+      "rejected": "却下",
+      "expired": "期限切れ",
+      "withdrawn": "提出取り消し"
+    },
+    "rejectReasons": {
+      "unreadable": "書類を読み取れません",
+      "mismatch": "レビュー内容と書類が一致しません",
+      "not_masked": "機密情報が隠されていません",
+      "wrong_document": "認証に使えない書類です",
+      "other": "その他の理由"
+    },
+    "history": {
+      "title": "レビュー認証履歴",
+      "empty": "まだ認証書類を提出していません。ご自身の面接・就職レビューやビザの投稿から認証できます。",
+      "note": "提出したファイルは審査後72時間以内、遅くともアップロードから7日以内に完全に削除されます。認証結果のみ保管されます。",
+      "uploaded": "提出",
+      "decided": "決定",
+      "deleteDue": "削除予定",
+      "deleted": "削除完了",
+      "deleting": "削除処理中",
+      "files": "ファイル{count}件",
+      "result": "認証結果: {label}",
+      "reason": "却下理由: {reason}",
+      "deleteNow": "今すぐ削除",
+      "deleteConfirmTitle": "ファイルを今すぐ削除しますか？",
+      "deleteConfirmBody": "提出したファイルはすぐに完全に削除されます。審査中の場合は認証が取り消されます。すでに出た認証結果はそのまま残ります。",
+      "deleteConfirm": "今すぐ削除",
+      "deletedToast": "ファイルを完全に削除しました。",
+      "deleteFailed": "すぐに削除できませんでした。自動的に再試行します。",
+      "viewPost": "投稿を見る",
+      "loadFailed": "認証履歴を読み込めませんでした。",
+      "retry": "再試行"
+    }
   }
 }

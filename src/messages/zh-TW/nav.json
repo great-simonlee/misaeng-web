@@ -13,7 +13,7 @@
     "me": "我的頁面",
     "myPosts": "我的貼文",
     "myLikes": "我按讚的貼文",
-    "creditReviews": "積分審核"
+    "creditReviews": "點數審核"
   },
   "accountMenu": "帳號選單",
   "openAccountMenu": "開啟帳號選單",
@@ -38,7 +38,7 @@
     },
     "links": {
       "housing": "租屋",
-      "credit": "積分",
+      "credit": "Misaeng 點數",
       "partners": "合作夥伴",
       "companySite": "公司網站",
       "about": "關於我們",

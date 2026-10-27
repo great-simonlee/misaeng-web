@@ -150,7 +150,17 @@ export async function PATCH(request: Request) {
   }
 
   try {
+    // 포인트: 필수 항목이 처음 다 채워지면 프로필 보너스 (전환 후에만 의미가 있어 그 전에는 읽지도 않는다)
+    const points = await import('@lib/points/facade.server')
+    const pointsActive = await points.isPointsLedgerActive().catch(() => false)
+    const before = pointsActive ? await getSupabaseProfile(user.uid).catch(() => null) : null
     const profile = await upsertSupabaseProfile(user.uid, patch)
+    if (pointsActive) {
+      const { isProfileCompleteForPoints } = await import('@lib/points/account.server')
+      if (!isProfileCompleteForPoints(before) && isProfileCompleteForPoints(profile)) {
+        await points.onProfileCompleted(user.uid)
+      }
+    }
     if (nicknameChanged && previousNickname) {
       await releaseNickname(user.uid, previousNickname).catch((error) => {
         console.error('Nickname release error:', error)

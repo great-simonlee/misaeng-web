@@ -107,8 +107,9 @@ export async function bindUserReferrer(args: {
     referredAt: Date.now(),
   })
 
-  const { awardReferralBindCredit } = await import('@lib/community/creditLedger')
-  await awardReferralBindCredit({
+  // 포인트: 전환 전 = 연결 시 추천인 적립(기존 크레딧), 후 = 추천받은 사람이 인증하면 지급 (src/lib/points/WIRING.md)
+  const { onReferralBound } = await import('@lib/points/facade.server')
+  await onReferralBound({
     referrerUid: indexed.uid,
     referredUid: userId,
   })

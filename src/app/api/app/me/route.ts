@@ -2,11 +2,14 @@ import { NextResponse } from 'next/server'
 
 import { isMisaengEmail } from '@lib/constants/nyc'
 import { getVerifiedSchool, resolveSchoolFromEmail } from '@lib/constants/schools'
+import { getSchoolRegistry } from '@lib/supabase/schoolRegistry.server'
 import { isPhoneSmsEnabled } from '@lib/constants/verificationSafety'
 import { getRequestT } from '@lib/i18n/server'
 import { getLatestSupabaseAvatarUrl, isSupabaseStorageConfigured } from '@lib/supabase/avatar.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import { getSupabaseAvatarBucket } from '@lib/supabase/server'
+import { instagramStateFromProfile } from '@lib/verification/instagram'
+import { listVerifiedSchools, MAX_VERIFIED_SCHOOLS } from '@lib/verification/verifiedSchools'
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 
 export const runtime = 'nodejs'
@@ -21,7 +24,8 @@ export async function GET(request: Request) {
   const user = await resolveAuthenticatedUser()
   if (!user?.uid) return NextResponse.json({ error: t('common.loginRequired') }, { status: 401 })
 
-  const profile = await getSupabaseProfile(user.uid).catch(() => null)
+  // ERP 학교 목록을 불러 둔다 (아래 getVerifiedSchool·resolveSchoolFromEmail이 ERP에서 더한 학교도 찾게)
+  const [profile] = await Promise.all([getSupabaseProfile(user.uid).catch(() => null), getSchoolRegistry()])
   let photoURL = profile?.photoURL ?? user.photoURL ?? null
   if (isSupabaseStorageConfigured()) {
     const latest = await getLatestSupabaseAvatarUrl({ uid: user.uid, bucket: getSupabaseAvatarBucket() }).catch(
@@ -79,6 +83,19 @@ export async function GET(request: Request) {
         companyName: company,
         rejectReason: profile?.workplaceRejectReason ?? null,
       },
+      // All verified schools (max 3), the main one (used for badges) first.
+      schools: listVerifiedSchools(profile).map((entry, index) => ({
+        email: entry.email,
+        id: entry.id,
+        shortName: getVerifiedSchool(entry.id)?.shortName ?? null,
+        name: entry.name,
+        primary: index === 0,
+      })),
+      maxSchools: MAX_VERIFIED_SCHOOLS,
+      instagram: instagramStateFromProfile(profile),
+      // Stays true while a request for another account is in review (the earlier approval still counts).
+      instagramVerified: Boolean(profile?.instagramVerified),
+      // Phone verification is hidden until it's built (Twilio); older app builds still read this.
       phone: {
         verified: Boolean(profile?.phoneVerified),
         number: profile?.phone ?? user.phoneNumber ?? null,

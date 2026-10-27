@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 
       if (!res.ok) {
         return NextResponse.json(
-          { error: getAuthErrorMessage(t, data, t('auth.passwordResetFailed')) },
+          { error: getAuthErrorMessage(t, data, t('auth.passwordResetFailed'), res.status) },
           { status: res.status || 400 },
         )
       }
@@ -94,7 +94,10 @@ export async function POST(request: Request) {
 
     const result = await registerWithEmail(t, email, password, body.name)
     if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: 401 })
+      return NextResponse.json(
+        { error: result.error },
+        { status: 'emailInUse' in result && result.emailInUse ? 409 : 400 },
+      )
     }
 
     if (result.user?.uid) {

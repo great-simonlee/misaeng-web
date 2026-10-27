@@ -7,10 +7,11 @@ import { hrefForCommunityPost } from '@lib/constants/cities'
 import { getCommunityAuthorDisplayName } from '@lib/community/author'
 import { maskAnonymousDisplayName } from '@lib/community/anonymous'
 import { useT } from '@lib/i18n/client'
-import { UserAvatar, SchoolBadge } from '@components'
+import { UserAvatar, AuthorBadges } from '@components'
 import type { CommunityPost } from '@/types/nyc'
 import { CommunityEngagementBar } from '@widgets/nyc/CommunityEngagementBar'
 import { CommunityPostReportAction } from '@widgets/nyc/CommunityPostReportAction'
+import { CommunityBlockAction } from '@widgets/nyc/CommunityBlockAction'
 import { CopyLinkButton } from '@widgets/nyc/CopyLinkButton'
 import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
 
@@ -58,7 +59,7 @@ export function CommunityPostFooter({
               {authorName}
             </p>
             {!anonymous ? (
-              <SchoolBadge schoolId={post.authorSchoolId} size='author' />
+              <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} size='author' />
             ) : null}
           </div>
         </div>
@@ -80,11 +81,17 @@ export function CommunityPostFooter({
             </button>
           </div>
         ) : (
-          <CommunityPostReportAction
-            postId={post.id}
-            boardId={boardId}
-            loginNext={loginNext}
-          />
+          <div className='flex shrink-0 items-center gap-3'>
+            <CommunityPostReportAction
+              postId={post.id}
+              boardId={boardId}
+              loginNext={loginNext}
+            />
+            <CommunityBlockAction
+              postId={post.id}
+              onBlocked={() => window.location.reload()}
+            />
+          </div>
         )}
       </div>
 

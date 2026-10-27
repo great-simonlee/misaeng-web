@@ -3,11 +3,11 @@
     "checkFailed": "无法检查该昵称。",
     "available": "该昵称可以使用",
     "taken": "该昵称已被使用。",
-    "ruleHint": "只能使用英文字母和“.”",
+    "ruleHint": "只能使用英文字母、韩文和“.”",
     "errors": {
       "tooShort": "昵称至少需要 {min} 个字符",
       "tooLong": "昵称最多 {max} 个字符",
-      "invalidChars": "只能使用英文字母和“.”"
+      "invalidChars": "只能使用英文字母、韩文和“.”"
     }
   },
   "profile": {
@@ -133,11 +133,54 @@
       "backToVerify": "返回学校邮箱验证",
       "verifyTitle": "学校邮箱验证",
       "formDescription": "即使与注册邮箱不同，学校邮箱也会关联到当前登录的账号。我们会向你的学校邮箱发送 6 位验证码。",
-      "notFoundRequest": "找不到你的学校？申请添加"
+      "notFoundRequest": "找不到你的学校？申请添加",
+      "manageTitle": "已验证的学校",
+      "manageDescription": "帖子只显示一所主学校。最多可以验证 {max} 所学校。",
+      "primary": "主学校",
+      "addAnother": "验证其他学校",
+      "limitReached": "最多可以验证 {max} 所学校。",
+      "primaryChangedToast": "已将主学校改为 {school}",
+      "moreSchools": "{school} 等 {count} 所"
     },
     "instagram": {
       "rowLabel": "Instagram",
-      "rowHint": "关联你的账号"
+      "rowHint": "通过私信验证账号",
+      "title": "Instagram 验证",
+      "intro": "用你的 Instagram 账号把验证码私信给 Misaeng 官方账号 @{account}，运营团队确认后会为你完成验证。",
+      "privacy": "其他人只会看到“Instagram 已验证”徽章，不会看到你的用户名。",
+      "handleLabel": "我的 Instagram 用户名",
+      "handlePlaceholder": "@username",
+      "getCode": "获取验证码",
+      "step1": "在登录 @{handle} 的 Instagram 中，把下面的消息发送给 @{account}。",
+      "previewLabel": "预览",
+      "previewHint": "要发送的消息",
+      "copyAndOpen": "复制消息并打开私信",
+      "copyOnly": "仅复制消息",
+      "copiedToast": "消息已复制，在 Instagram 中粘贴即可。",
+      "step2": "在对话中长按输入框，点“粘贴”后发送",
+      "step3": "发送后请点击下方按钮。",
+      "sent": "我已发送",
+      "sentToast": "已收到，通常会在 3 个工作日内确认。",
+      "inReview": "审核中 · 通常 3 个工作日内",
+      "inReviewDescription": "运营团队正在确认发给 @{account} 的私信，结果会通过通知告诉你。",
+      "noteOtherAccount": "用其他账号发送将无法验证",
+      "notePrivate": "私密账号也可以",
+      "noteExpiry": "验证码有效期至 {date}",
+      "expired": "验证码已过期，请重新获取。",
+      "cancel": "取消申请",
+      "cancelledToast": "已取消验证申请",
+      "verifiedDescription": "@{handle} 已验证。你的帖子会显示 Instagram 验证徽章，但不会显示用户名。",
+      "changeAccount": "验证其他账号",
+      "rejectedTitle": "验证未通过",
+      "rejectReasons": {
+        "noMessage": "@misaeng.ny 没有收到消息。",
+        "wrongAccount": "消息来自与你填写的用户名不同的账号。",
+        "codeMismatch": "发送的验证码不正确。",
+        "other": "因其他原因未通过。"
+      },
+      "dmMessage": "你好 Misaeng！这是我的 Instagram 验证申请。\n验证码：{code}",
+      "pendingDetail": "审核中 · @{handle}",
+      "codeIssuedDetail": "已发放验证码 · 请发送私信"
     },
     "title": "验证",
     "description": "即使与注册邮箱不同，学校或工作邮箱也会关联到这个账号。",
@@ -242,19 +285,19 @@
   "credit": {
     "loadFailed": "无法加载积分",
     "ledgerLoadFailed": "无法加载积分明细",
-    "redeemComingSoon": "奖励申请将分阶段开放，详情请查看积分指南。",
+    "redeemComingSoon": "奖励申请将分阶段开放，详情请查看 Misaeng 积分指南。",
     "loadFailedRetry": "积分加载失败 · 重试",
-    "pillAria_other": "社区积分 {count}，查看明细",
+    "pillAria_other": "Misaeng 积分 {count}，查看明细",
     "unit": "积分",
     "history": "明细",
-    "requestTitle": "使用积分",
+    "requestTitle": "使用 Misaeng 积分",
     "balanceLabel": "我的积分",
     "requestDescription": "选择要兑换的奖励。申请后，Misaeng 会进行审核并为你匹配。",
     "optionMeta_other": "{duration} · 每月 {count} 次",
     "needMore_other": "还需要 {count} 积分",
     "redeemGuideLink": "了解更多奖励",
     "submit": "申请",
-    "historyTitle": "积分明细",
+    "historyTitle": "Misaeng 积分明细",
     "guideLink": "查看指南",
     "retry": "重试",
     "emptyTitle": "暂无明细",
@@ -329,5 +372,127 @@
     "browseHousing": "浏览房源",
     "rent": "{amount}/月",
     "rentWithNet": "{gross} / {net}/月"
+  },
+  "reviewDocs": {
+    "entry": {
+      "title": "认证这篇经验帖",
+      "description": "用录用或批准邮件的截图认证经验帖，可获得额外积分。文件审核后会尽快删除。",
+      "start": "去认证",
+      "pending": "你的认证材料正在审核中，有结果后会通知你。",
+      "approved": "这篇经验帖已认证。",
+      "rejected": "上次认证未通过，你可以重新提交。",
+      "dailyLimit": "今天不能再上传了，请明天再试。",
+      "history": "查看认证记录"
+    },
+    "notice": {
+      "title": "上传前请务必阅读",
+      "body": "认证材料仅用于核实你的经验帖内容和发放额外积分。请在上传前遮盖薪资、A-number、SEVIS ID、受理号、出生日期、住址等敏感信息。提交的文件会在审核后 72 小时内、最迟在上传后 7 天内永久删除，仅保留认证结果（是否认证以及公司名称或签证类型）。请不要通过邮件或消息发送材料。",
+      "agree": "我已阅读以上内容，并同意认证材料的处理方式。（必选）",
+      "screenshotTip": "推荐使用邮件截图，需要遮盖的信息比卡片或纸质文件的照片少得多。",
+      "maskTip": "你上传的每张图片都会在下一步由你亲自遮盖，只发送遮盖后的结果。位置等照片信息也会在服务器上删除。",
+      "continue": "同意并继续"
+    },
+    "kindTitle": "用哪种材料认证？",
+    "kinds": {
+      "interview": {
+        "label": "面试",
+        "example": "面试邀请邮件截图",
+        "mask": "本人以外的姓名、联系方式"
+      },
+      "offer": {
+        "label": "录用·入职",
+        "example": "Offer 或录用邮件截图",
+        "mask": "薪资（可选）、住址、签名"
+      },
+      "opt": {
+        "label": "OPT·STEM OPT",
+        "example": "OPT 批准邮件截图（也可以是 EAD 卡照片）",
+        "mask": "A-number、卡号、出生日期、照片"
+      },
+      "visa_approval": {
+        "label": "签证·申请批准",
+        "example": "批准邮件截图或 I-797 批准通知",
+        "mask": "受理号、A-number、住址"
+      },
+      "cpt": {
+        "label": "CPT",
+        "example": "I-20 中的 CPT 批准页",
+        "mask": "SEVIS ID、出生日期、住址"
+      }
+    },
+    "maskLabel": "请务必遮盖：{items}",
+    "pick": {
+      "title": "选择图片",
+      "hint": "最多 {max} 个 · 每个 10MB · JPG、PNG、HEIC、PDF",
+      "add": "添加图片",
+      "remove": "删除",
+      "edit": "重新遮盖",
+      "masked": "已遮盖 {count} 处",
+      "notMasked": "尚未遮盖",
+      "pdfTitle": "PDF 无法在此遮盖",
+      "pdfBody": "如果可以，请上传邮件截图。如果上传 PDF，文件中的敏感信息必须事先遮盖好。",
+      "pdfConfirm": "我已遮盖此 PDF 中的所有敏感信息。",
+      "unsupported": "仅支持上传 JPG、PNG、HEIC 和 PDF 文件。",
+      "tooLarge": "仅可上传 10MB 以下的文件。",
+      "tooMany": "最多可上传 {max} 个文件。",
+      "readFailed": "无法打开这张图片，请选择其他文件。"
+    },
+    "mask": {
+      "title": "遮盖敏感信息",
+      "hint": "在需要隐藏的地方拖动即可画出黑色方框。只会发送遮盖后的图片。",
+      "undo": "撤销",
+      "clear": "全部清除",
+      "done": "遮盖完成",
+      "noBoxes": "你还没有遮盖任何地方。确定没有需要隐藏的信息吗？",
+      "noBoxesConfirm": "没有需要遮盖的信息"
+    },
+    "submit": "提交认证材料",
+    "uploading": "正在安全上传…",
+    "uploadFailed": "上传失败，请重试。",
+    "back": "上一步",
+    "next": "下一步",
+    "cancel": "取消",
+    "done": {
+      "title": "材料已安全提交",
+      "body": "材料会在审核后 72 小时内、最迟在上传后 7 天内永久删除。",
+      "detail": "删除后会通知你。你也可以随时在 我的 > 认证记录 中立即删除。",
+      "close": "确定"
+    },
+    "status": {
+      "pending": "审核中",
+      "approved": "已认证",
+      "rejected": "未通过",
+      "expired": "已过期",
+      "withdrawn": "已撤回"
+    },
+    "rejectReasons": {
+      "unreadable": "无法识别材料内容",
+      "mismatch": "材料与经验帖内容不符",
+      "not_masked": "敏感信息未遮盖",
+      "wrong_document": "该材料不能用于认证",
+      "other": "其他原因"
+    },
+    "history": {
+      "title": "经验帖认证记录",
+      "empty": "你还没有提交过认证材料。可以在自己的面试·求职或签证帖子中进行认证。",
+      "note": "提交的文件会在审核后 72 小时内、最迟在上传后 7 天内永久删除，仅保留认证结果。",
+      "uploaded": "提交",
+      "decided": "审核",
+      "deleteDue": "预计删除",
+      "deleted": "已删除",
+      "deleting": "删除中",
+      "files": "{count} 个文件",
+      "result": "认证结果：{label}",
+      "reason": "未通过原因：{reason}",
+      "deleteNow": "立即删除",
+      "deleteConfirmTitle": "现在删除文件吗？",
+      "deleteConfirmBody": "你提交的文件将立即被永久删除。如果仍在审核中，认证会被取消。已有的认证结果会保留。",
+      "deleteConfirm": "立即删除",
+      "deletedToast": "文件已永久删除。",
+      "deleteFailed": "暂时无法立即删除，系统会自动重试。",
+      "viewPost": "查看帖子",
+      "loadFailed": "无法加载认证记录。",
+      "retry": "重试"
+    }
   }
 }

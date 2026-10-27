@@ -28,7 +28,7 @@
     "identityVerificationRequired": "Để viết bài và bình luận, vui lòng xác minh trường học hoặc nơi làm việc trước."
   },
   "auth": {
-    "ellieoUnavailable": "Không kết nối được máy chủ Ellieo. Vui lòng thử lại sau giây lát.",
+    "ellieoUnavailable": "Hiện không thể kết nối với máy chủ đăng nhập. Vui lòng thử lại sau ít phút.",
     "noAccessToken": "Không nhận được access token.",
     "loginFailed": "Đăng nhập thất bại.",
     "signupFailed": "Đăng ký thất bại.",
@@ -45,7 +45,14 @@
     "passwordResetFailed": "Không thể gửi yêu cầu đặt lại mật khẩu.",
     "emailAuthError": "Đã xảy ra lỗi khi đăng nhập bằng email.",
     "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
-    "userInfoUnavailable": "Bạn đã đăng nhập nhưng chúng tôi không thể tải thông tin tài khoản."
+    "userInfoUnavailable": "Bạn đã đăng nhập nhưng chúng tôi không thể tải thông tin tài khoản.",
+    "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+    "accountNotFound": "Không có tài khoản nào với email này. Hãy kiểm tra lại email hoặc đăng ký.",
+    "emailInUse": "Email này đã được đăng ký. Hãy đăng nhập hoặc đặt lại mật khẩu.",
+    "tooManyAttempts": "Bạn đã thử quá nhiều lần. Vui lòng thử lại sau ít phút.",
+    "weakPassword": "Mật khẩu phải có ít nhất 6 ký tự.",
+    "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ.",
+    "accountDisabled": "Tài khoản này đã bị hạn chế. Vui lòng liên hệ đội ngũ Misaeng."
   },
   "profile": {
     "nickname": {
@@ -95,7 +102,19 @@
     "workplacePending": "Đội ngũ Misaeng đang xem xét yêu cầu xác minh nơi làm việc của bạn.",
     "workplaceStorageMissing": "Bộ lưu trữ xác minh nơi làm việc chưa được cấu hình.",
     "workplaceSaveFailed": "Không thể lưu yêu cầu xác minh nơi làm việc (HTTP {status})",
-    "workEmailError": "Đã xảy ra lỗi khi xác minh email công việc."
+    "workEmailError": "Đã xảy ra lỗi khi xác minh email công việc.",
+    "schoolAlreadyVerified": "Bạn đã xác minh email trường này rồi.",
+    "schoolLimitReached": "Bạn có thể xác minh tối đa {max} trường.",
+    "schoolNotVerified": "Đây không phải trường bạn đã xác minh.",
+    "instagram": {
+      "noRequest": "Bạn không có yêu cầu xác minh Instagram nào đang chờ.",
+      "invalidHandle": "Hãy kiểm tra tên người dùng Instagram. Chỉ dùng chữ, số, dấu chấm và dấu gạch dưới.",
+      "alreadyVerified": "Tài khoản Instagram này đã được xác minh.",
+      "handleTaken": "Tài khoản Instagram này đã được xác minh hoặc đang được xác minh bởi một tài khoản Misaeng khác.",
+      "tooManyRequests": "Hôm nay bạn không thể nhận thêm mã. Vui lòng thử lại vào ngày mai.",
+      "requestFailed": "Không thể gửi yêu cầu xác minh Instagram.",
+      "saveFailed": "Không thể lưu yêu cầu xác minh Instagram."
+    }
   },
   "consent": {
     "termsRequired": "Vui lòng đồng ý với Điều khoản để tiếp tục.",
@@ -117,22 +136,23 @@
     "maxUsesReached": "Mã giới thiệu này chỉ dùng được tối đa cho {max} người."
   },
   "credit": {
-    "loadFailed": "Không thể tải thông tin credit.",
+    "loadFailed": "Không thể tải thông tin điểm.",
     "invalidUser": "Người dùng không hợp lệ.",
-    "saveFailed": "Không thể lưu credit (HTTP {status})",
+    "saveFailed": "Không thể lưu điểm (HTTP {status})",
     "reviewListLoadFailed": "Không thể tải danh sách yêu cầu xét duyệt.",
     "reviewRequestNotFound": "Không tìm thấy yêu cầu này.",
     "reviewAlreadyProcessed": "Yêu cầu này đã được xử lý.",
     "reviewPostMissing": "Bài viết không tồn tại hoặc đã bị xóa.",
-    "awardFailed": "Không thể cộng credit. Vui lòng kiểm tra cài đặt bộ lưu trữ.",
+    "awardFailed": "Không thể cộng điểm. Vui lòng kiểm tra cài đặt bộ lưu trữ.",
     "processFailed": "Không thể hoàn tất thao tác.",
     "reviewSaveFailed": "Không thể lưu yêu cầu xét duyệt (HTTP {status})",
     "reviewStatusLoadFailed": "Không thể tải trạng thái yêu cầu xét duyệt.",
-    "reviewBoardIneligible": "Bài viết ở bảng tin này không thể yêu cầu thêm credit.",
+    "reviewBoardIneligible": "Bài viết ở bảng tin này không thể yêu cầu thêm điểm.",
     "reviewFinalResultRequired": "Hãy thêm kết quả cuối cùng vào timeline trước (được duyệt, đã nhận thẻ, nhận offer, bị từ chối, v.v.).",
     "reviewAlreadyAwarded": "Bài viết này đã nhận thưởng xét duyệt.",
     "reviewAlreadyPending": "Yêu cầu này đang chờ xét duyệt.",
-    "reviewRequestFailed": "Không thể yêu cầu thêm credit."
+    "reviewRequestFailed": "Không thể yêu cầu thêm điểm.",
+    "reviewBonusReplaced": "Sau khi cập nhật hệ thống điểm, điểm cho review được cộng sau khi đội ngũ xét duyệt từng bài thay cho khoản thưởng này. Vui lòng dùng hàng chờ xét duyệt điểm trong ERP."
   },
   "postings": {
     "loadFailed": "Không thể tải tin tuyển dụng."
@@ -223,12 +243,22 @@
           "moveInEnd": "Vui lòng chọn ngày kết thúc sublet."
         }
       }
+    },
+    "blocks": {
+      "loadFailed": "Không thể tải danh sách chặn.",
+      "failed": "Không thể chặn người dùng này. Vui lòng thử lại sau.",
+      "unblockFailed": "Không thể bỏ chặn. Vui lòng thử lại sau.",
+      "targetNotFound": "Không tìm thấy bài viết hoặc bình luận để chặn.",
+      "self": "Bạn không thể chặn bài viết hoặc bình luận của chính mình.",
+      "limit": "Bạn có thể chặn tối đa {max} người dùng.",
+      "notFound": "Người dùng này không có trong danh sách chặn.",
+      "blockedPost": "Đây là bài viết của người dùng bạn đã chặn."
     }
   },
   "guest": {
     "invalidRequest": "Vui lòng kiểm tra lại yêu cầu.",
     "nicknameInvalid": "Vui lòng nhập biệt danh hiển thị từ {min}–{max} ký tự (không phải địa chỉ email).",
-    "emailInvalid": "Vui lòng nhập email hợp lệ để chúng tôi gửi thông tin về thẻ quà tặng và credit.",
+    "emailInvalid": "Vui lòng nhập email hợp lệ để chúng tôi gửi thông tin về thẻ quà tặng và điểm.",
     "linkedinRequired": "Vui lòng nhập URL hồ sơ LinkedIn. Ví dụ: linkedin.com/in/your-name",
     "guidelinesRequired": "Vui lòng đồng ý với nguyên tắc đăng bài của cộng đồng.",
     "titleRequired": "Vui lòng nhập tiêu đề.",
@@ -236,5 +266,115 @@
     "bodyTooLong": "Phần \"Cần lưu ý\" tối đa {max} ký tự.",
     "jobReviewTypeRequired": "Vui lòng chọn loại: thực tập, mới đi làm, có kinh nghiệm, chuyển việc hoặc hợp đồng.",
     "rateLimited": "Vui lòng thử lại sau giây lát. (Quá nhiều yêu cầu trong thời gian ngắn)"
+  },
+  "push": {
+    "verification": {
+      "instagram": {
+        "approved": {
+          "title": "Đã xác minh Instagram",
+          "body": "Bài viết của bạn giờ có huy hiệu xác minh Instagram."
+        },
+        "rejected": {
+          "title": "Xác minh Instagram chưa được duyệt",
+          "body": "Xem lý do trong Trang của tôi và gửi lại yêu cầu."
+        }
+      }
+    },
+    "reviewDocs": {
+      "deleted": {
+        "title": "Đã xóa giấy tờ xác minh",
+        "body": "Giấy tờ xác minh bạn gửi đã bị xóa vĩnh viễn vào {date}. Chỉ kết quả xác minh được lưu lại."
+      },
+      "expired": {
+        "title": "Vui lòng gửi lại giấy tờ",
+        "body": "Chúng tôi chưa thể xét duyệt trong 7 ngày nên giấy tờ của bạn đã bị xóa vĩnh viễn vào {date}. Bạn có thể xác minh lại từ bài review."
+      },
+      "approved": {
+        "title": "Đã xác minh bài review",
+        "body": "Bài review của bạn đã được xác minh. Giấy tờ sẽ bị xóa vĩnh viễn trong vòng 72 giờ."
+      },
+      "rejected": {
+        "title": "Chưa thể xác minh bài review",
+        "body": "Xem lý do tại Trang của tôi > Lịch sử xác minh. Giấy tờ sẽ bị xóa vĩnh viễn trong vòng 72 giờ."
+      }
+    }
+  },
+  "reviewDocs": {
+    "notReady": "Tính năng tải giấy tờ xác minh chưa sẵn sàng. Vui lòng thử lại sau.",
+    "failed": "Không thể xử lý giấy tờ của bạn. Vui lòng thử lại sau.",
+    "invalidRequest": "Vui lòng kiểm tra lại yêu cầu.",
+    "consentRequired": "Vui lòng đồng ý với cách xử lý giấy tờ xác minh trước khi tải lên.",
+    "fileRequired": "Vui lòng chọn ảnh để tải lên.",
+    "tooManyFiles": "Bạn có thể tải lên tối đa {max} tệp mỗi lần.",
+    "fileTooLarge": "Mỗi tệp phải nhỏ hơn hoặc bằng 10 MB.",
+    "heicNotSupported": "Vui lòng chuyển tệp HEIC sang JPG trước khi tải lên.",
+    "invalidImage": "Không đọc được ảnh này. Vui lòng thử tệp khác.",
+    "unsupportedType": "Chỉ có thể tải lên tệp JPG, PNG và PDF.",
+    "boardNotEligible": "Chỉ có thể xác minh bài review phỏng vấn, việc làm và bài OPT, visa, thẻ xanh.",
+    "alreadyVerified": "Bài viết này đã được xác minh.",
+    "alreadyPending": "Chúng tôi đang xét duyệt giấy tờ của bài viết này.",
+    "dailyLimit": "Hôm nay bạn không thể tải thêm giấy tờ xác minh. Vui lòng thử lại vào ngày mai.",
+    "notFound": "Không tìm thấy lịch sử xác minh.",
+    "deleteFailed": "Không thể xóa tệp ngay. Hệ thống sẽ tự động thử lại."
+  },
+  "points": {
+    "notConfigured": "Tính năng điểm chưa sẵn sàng. Vui lòng thử lại sau.",
+    "notActive": "Các tính năng điểm mới chưa bắt đầu.",
+    "loadFailed": "Không thể tải thông tin điểm.",
+    "requestFailed": "Không thể xử lý yêu cầu về điểm. Vui lòng thử lại sau.",
+    "invalidCursor": "Yêu cầu không hợp lệ. Vui lòng tải lại lịch sử từ đầu.",
+    "insufficient": "Không đủ điểm. (Cần {required}, có thể dùng {available})",
+    "monthlyCap": "Bạn đã đạt giới hạn của tháng này.",
+    "featureDisabled": "Tính năng này hiện không khả dụng.",
+    "identityRequired": "Hãy xác minh email trường hoặc email công ty để sử dụng.",
+    "verificationRequired": "Hãy xác minh tài khoản (email trường, email công ty hoặc Instagram) để tích điểm.",
+    "claimNotFound": "Không tìm thấy yêu cầu xét duyệt.",
+    "claimNotPending": "Yêu cầu xét duyệt này đã được xử lý.",
+    "boost": {
+      "notAllowed": "Chỉ có thể ghim bài ở ghép và sublet.",
+      "notAuthor": "Bạn chỉ có thể ghim bài của chính mình.",
+      "active": "Bài này đang được ghim lên đầu (đến {date}).",
+      "cooldown": "Bạn có thể ghim lại bài này từ {date}.",
+      "monthlyCap": "Bạn có thể ghim bài tối đa {max} lần mỗi tháng.",
+      "slotsFull": "Hiện các vị trí trên đầu đã đầy. Sẽ có chỗ trống vào {date}."
+    },
+    "coffeeChat": {
+      "agreeRequired": "Vui lòng đồng ý với thông báo về coffee chat.",
+      "topicRequired": "Vui lòng nhập chủ đề coffee chat.",
+      "topicTooLong": "Chủ đề tối đa {max} ký tự.",
+      "messageTooLong": "Tin nhắn tối đa {max} ký tự.",
+      "monthlyCap": "Bạn có thể đăng ký tối đa {max} coffee chat mỗi tháng.",
+      "notFound": "Không tìm thấy yêu cầu coffee chat.",
+      "invalidTransition": "Không thể thay đổi ở trạng thái hiện tại.",
+      "cannotCancel": "Không thể tự hủy coffee chat đã có lịch. Vui lòng liên hệ đội ngũ vận hành."
+    },
+    "push": {
+      "earned": {
+        "title": "+{amount} {name}",
+        "body": "{reason} · Số dư {balance}"
+      },
+      "clawback": {
+        "title": "Thu hồi -{amount} {name}",
+        "body": "Điểm đã bị thu hồi theo quy định vận hành · Số dư {balance}"
+      },
+      "coffeeChat": {
+        "scheduled": {
+          "title": "Coffee chat đã có lịch",
+          "body": "Hãy xem lịch trong trang tài khoản."
+        },
+        "completed": {
+          "title": "Coffee chat đã hoàn tất",
+          "body": "Số {name} đã tạm giữ đã được sử dụng."
+        },
+        "cancelled": {
+          "title": "Coffee chat đã bị hủy",
+          "body": "Số {name} đã tạm giữ không bị trừ."
+        },
+        "no_show": {
+          "title": "Vắng mặt coffee chat",
+          "body": "Bạn được ghi nhận vắng mặt nên số {name} đã tạm giữ đã được sử dụng."
+        }
+      }
+    }
   }
 }

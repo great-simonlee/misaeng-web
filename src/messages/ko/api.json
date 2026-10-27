@@ -29,7 +29,7 @@
     "requestFailed": "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
   },
   "auth": {
-    "ellieoUnavailable": "Ellieo 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.",
+    "ellieoUnavailable": "지금 로그인 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.",
     "noAccessToken": "액세스 토큰을 받지 못했어요.",
     "loginFailed": "로그인에 실패했어요.",
     "signupFailed": "회원가입에 실패했어요.",
@@ -51,7 +51,14 @@
     "appleLoginFailed": "Apple로 로그인하지 못했어요. 다시 시도해 주세요.",
     "appleSignupFailed": "Apple로 가입하지 못했어요. 다시 시도해 주세요.",
     "consentRequired": "가입하려면 이용약관과 개인정보 처리방침에 동의해 주세요.",
-    "refreshTokenRequired": "갱신 토큰이 없어요."
+    "refreshTokenRequired": "갱신 토큰이 없어요.",
+    "invalidCredentials": "이메일 또는 비밀번호가 맞지 않아요.",
+    "accountNotFound": "가입된 계정이 없어요. 이메일을 확인하거나 회원가입해 주세요.",
+    "emailInUse": "이미 가입된 이메일이에요. 로그인하거나 비밀번호 찾기를 이용해 주세요.",
+    "tooManyAttempts": "시도 횟수가 너무 많아요. 잠시 후 다시 시도해 주세요.",
+    "weakPassword": "비밀번호는 6자 이상이어야 해요.",
+    "invalidEmail": "올바른 이메일 주소를 입력해 주세요.",
+    "accountDisabled": "이용이 제한된 계정이에요. 미생팀에 문의해 주세요."
   },
   "profile": {
     "nickname": {
@@ -101,7 +108,19 @@
     "workplacePending": "미생 팀에서 직장인 인증을 확인하고 있어요.",
     "workplaceStorageMissing": "직장인 인증 저장소가 설정되지 않았어요.",
     "workplaceSaveFailed": "직장인 인증 요청 저장 실패 (HTTP {status})",
-    "workEmailError": "직장 이메일 인증 중 오류가 발생했어요."
+    "workEmailError": "직장 이메일 인증 중 오류가 발생했어요.",
+    "schoolAlreadyVerified": "이미 인증한 학교 메일이에요.",
+    "schoolLimitReached": "학교는 최대 {max}개까지 인증할 수 있어요.",
+    "schoolNotVerified": "인증한 학교가 아니에요.",
+    "instagram": {
+      "noRequest": "진행 중인 인스타그램 인증 요청이 없어요.",
+      "invalidHandle": "인스타그램 아이디를 확인해 주세요. 영문·숫자·마침표·밑줄만 쓸 수 있어요.",
+      "alreadyVerified": "이미 인증된 인스타그램 계정이에요.",
+      "handleTaken": "다른 미생 계정에서 이미 인증했거나 인증 중인 인스타그램 계정이에요.",
+      "tooManyRequests": "오늘은 인증 코드를 더 받을 수 없어요. 내일 다시 시도해 주세요.",
+      "requestFailed": "인스타그램 인증 요청에 실패했어요.",
+      "saveFailed": "인스타그램 인증 요청을 저장하지 못했어요."
+    }
   },
   "consent": {
     "termsRequired": "약관에 동의해 주세요.",
@@ -123,22 +142,23 @@
     "maxUsesReached": "이 추천 코드는 최대 {max}명까지 사용할 수 있어요."
   },
   "credit": {
-    "loadFailed": "크레딧 정보를 불러오지 못했어요.",
+    "loadFailed": "미생 포인트 정보를 불러오지 못했어요.",
     "invalidUser": "잘못된 사용자예요.",
-    "saveFailed": "크레딧 저장 실패 (HTTP {status})",
+    "saveFailed": "미생 포인트 저장 실패 (HTTP {status})",
     "reviewListLoadFailed": "리뷰 목록을 불러오지 못했어요.",
     "reviewRequestNotFound": "요청을 찾을 수 없어요.",
     "reviewAlreadyProcessed": "이미 처리된 요청이에요.",
     "reviewPostMissing": "대상 글이 없거나 삭제되었어요.",
-    "awardFailed": "크레딧 지급에 실패했어요. 저장소 설정을 확인해 주세요.",
+    "awardFailed": "미생 포인트 지급에 실패했어요. 저장소 설정을 확인해 주세요.",
     "processFailed": "처리에 실패했어요.",
     "reviewSaveFailed": "리뷰 요청 저장 실패 (HTTP {status})",
     "reviewStatusLoadFailed": "리뷰 요청 상태를 불러오지 못했어요.",
-    "reviewBoardIneligible": "이 게시판은 추가 크레딧 요청 대상이 아니에요.",
+    "reviewBoardIneligible": "이 게시판은 추가 포인트 요청 대상이 아니에요.",
     "reviewFinalResultRequired": "타임라인에 최종 결과(승인·카드 수령·Offer·거절 등)를 먼저 기록해 주세요.",
     "reviewAlreadyAwarded": "이미 리뷰 보너스가 지급된 글이에요.",
     "reviewAlreadyPending": "이미 검토 대기 중이에요.",
-    "reviewRequestFailed": "추가 크레딧 요청에 실패했어요."
+    "reviewRequestFailed": "추가 포인트 요청에 실패했어요.",
+    "reviewBonusReplaced": "포인트 개편 후에는 이 보너스 대신 운영팀이 후기 포인트를 검수해서 지급해요. ERP의 포인트 검수 화면을 이용해 주세요."
   },
   "postings": {
     "loadFailed": "공고를 불러오지 못했어요."
@@ -229,12 +249,22 @@
           "moveInEnd": "서블렛 종료일을(를) 선택해 주세요."
         }
       }
+    },
+    "blocks": {
+      "loadFailed": "차단 목록을 불러오지 못했어요.",
+      "failed": "차단하지 못했어요. 잠시 후 다시 시도해 주세요.",
+      "unblockFailed": "차단을 해제하지 못했어요. 잠시 후 다시 시도해 주세요.",
+      "targetNotFound": "차단할 글이나 댓글을 찾지 못했어요.",
+      "self": "내 글이나 댓글은 차단할 수 없어요.",
+      "limit": "차단은 최대 {max}명까지 할 수 있어요.",
+      "notFound": "차단 목록에 없는 사용자예요.",
+      "blockedPost": "차단한 사용자의 글이에요."
     }
   },
   "guest": {
     "invalidRequest": "요청 내용을 확인해 주세요.",
     "nicknameInvalid": "게시용 닉네임을 {min}~{max}자로 입력해 주세요. (이메일 형식 제외)",
-    "emailInvalid": "기프트카드·크레딧 안내를 받을 이메일을 정확히 입력해 주세요.",
+    "emailInvalid": "기프트카드·포인트 안내를 받을 이메일을 정확히 입력해 주세요.",
     "linkedinRequired": "LinkedIn 프로필 주소를 입력해 주세요. 예: linkedin.com/in/your-name",
     "guidelinesRequired": "커뮤니티 작성 안내에 동의해 주세요.",
     "titleRequired": "제목을 입력해 주세요.",
@@ -258,10 +288,118 @@
       "body": "{title}"
     },
     "credit": {
-      "title": "크레딧 +{amount}",
+      "title": "미생 포인트 +{amount}",
       "body": "{label} · 잔액 {balance}"
     },
     "anonymous": "익명",
-    "someone": "누군가"
+    "someone": "누군가",
+    "verification": {
+      "instagram": {
+        "approved": {
+          "title": "인스타그램 인증 완료",
+          "body": "이제 내 글에 인스타 인증 배지가 표시돼요."
+        },
+        "rejected": {
+          "title": "인스타그램 인증이 반려됐어요",
+          "body": "마이페이지에서 사유를 확인하고 다시 요청해 주세요."
+        }
+      }
+    },
+    "reviewDocs": {
+      "deleted": {
+        "title": "인증 서류 삭제 완료",
+        "body": "제출하신 인증 서류가 {date}에 영구 삭제되었습니다. 인증 결과만 보관됩니다."
+      },
+      "expired": {
+        "title": "인증 서류를 다시 제출해 주세요",
+        "body": "7일 안에 심사하지 못해 제출하신 서류를 {date}에 영구 삭제했어요. 후기에서 다시 인증할 수 있어요."
+      },
+      "approved": {
+        "title": "후기 인증 완료",
+        "body": "후기가 인증되었어요. 서류는 72시간 이내에 영구 삭제됩니다."
+      },
+      "rejected": {
+        "title": "후기 인증이 반려됐어요",
+        "body": "마이페이지 > 인증 내역에서 사유를 확인해 주세요. 서류는 72시간 이내에 영구 삭제됩니다."
+      }
+    }
+  },
+  "reviewDocs": {
+    "notReady": "인증 서류 기능을 준비 중이에요. 잠시 후 다시 시도해 주세요.",
+    "failed": "인증 서류를 처리하지 못했어요. 잠시 후 다시 시도해 주세요.",
+    "invalidRequest": "요청 내용을 확인해 주세요.",
+    "consentRequired": "인증 서류 처리 안내에 동의해야 올릴 수 있어요.",
+    "fileRequired": "올릴 이미지를 선택해 주세요.",
+    "tooManyFiles": "한 번에 최대 {max}장까지 올릴 수 있어요.",
+    "fileTooLarge": "파일 하나는 10MB 이하여야 해요.",
+    "heicNotSupported": "HEIC 파일은 JPG로 바꿔서 올려 주세요.",
+    "invalidImage": "이미지를 읽을 수 없어요. 다른 파일로 다시 시도해 주세요.",
+    "unsupportedType": "JPG, PNG, PDF 파일만 올릴 수 있어요.",
+    "boardNotEligible": "면접·취업 후기와 OPT·비자·영주권 글만 인증할 수 있어요.",
+    "alreadyVerified": "이미 인증된 글이에요.",
+    "alreadyPending": "이 글의 인증 서류를 이미 심사하고 있어요.",
+    "dailyLimit": "오늘은 더 이상 인증 서류를 올릴 수 없어요. 내일 다시 시도해 주세요.",
+    "notFound": "인증 내역을 찾을 수 없어요.",
+    "deleteFailed": "파일을 바로 삭제하지 못했어요. 자동으로 다시 삭제를 시도할게요."
+  },
+  "points": {
+    "notConfigured": "포인트 기능을 아직 사용할 수 없어요. 잠시 후 다시 시도해 주세요.",
+    "notActive": "새 포인트 기능은 아직 시작 전이에요.",
+    "loadFailed": "포인트 정보를 불러오지 못했어요.",
+    "requestFailed": "포인트 요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.",
+    "invalidCursor": "잘못된 요청이에요. 내역을 처음부터 다시 불러와 주세요.",
+    "insufficient": "포인트가 부족해요. (필요 {required}, 사용 가능 {available})",
+    "monthlyCap": "이번 달 사용 한도에 도달했어요.",
+    "featureDisabled": "지금은 이용할 수 없는 기능이에요.",
+    "identityRequired": "학교 또는 직장 이메일 인증 후 이용할 수 있어요.",
+    "verificationRequired": "계정 인증(학교·직장 이메일 또는 인스타그램) 후 포인트를 모을 수 있어요.",
+    "claimNotFound": "심사 요청을 찾을 수 없어요.",
+    "claimNotPending": "이미 처리된 심사 요청이에요.",
+    "boost": {
+      "notAllowed": "룸메이트·서블렛 글만 상단 노출할 수 있어요.",
+      "notAuthor": "내가 쓴 글만 상단 노출할 수 있어요.",
+      "active": "이미 상단에 노출 중이에요. ({date}까지)",
+      "cooldown": "같은 글은 {date}부터 다시 상단에 올릴 수 있어요.",
+      "monthlyCap": "상단 노출은 한 달에 {max}번까지 할 수 있어요.",
+      "slotsFull": "지금은 상단 자리가 모두 찼어요. {date}에 자리가 나요."
+    },
+    "coffeeChat": {
+      "agreeRequired": "커피챗 안내 사항에 동의해 주세요.",
+      "topicRequired": "커피챗 주제를 입력해 주세요.",
+      "topicTooLong": "주제는 {max}자까지 입력할 수 있어요.",
+      "messageTooLong": "메시지는 {max}자까지 입력할 수 있어요.",
+      "monthlyCap": "커피챗은 한 달에 {max}번까지 신청할 수 있어요.",
+      "notFound": "커피챗 신청을 찾을 수 없어요.",
+      "invalidTransition": "지금 상태에서는 변경할 수 없어요.",
+      "cannotCancel": "일정이 잡힌 커피챗은 직접 취소할 수 없어요. 운영진에게 문의해 주세요."
+    },
+    "push": {
+      "earned": {
+        "title": "{name} +{amount}",
+        "body": "{reason} · 잔액 {balance}"
+      },
+      "clawback": {
+        "title": "{name} -{amount} 회수",
+        "body": "운영 기준에 따라 포인트가 회수됐어요 · 잔액 {balance}"
+      },
+      "coffeeChat": {
+        "scheduled": {
+          "title": "커피챗 일정이 잡혔어요",
+          "body": "마이페이지에서 일정을 확인해 주세요."
+        },
+        "completed": {
+          "title": "커피챗이 완료됐어요",
+          "body": "예약해 둔 {name}가 사용됐어요."
+        },
+        "cancelled": {
+          "title": "커피챗이 취소됐어요",
+          "body": "예약해 둔 {name}는 차감되지 않았어요."
+        },
+        "no_show": {
+          "title": "커피챗 불참 처리",
+          "body": "불참으로 처리되어 예약해 둔 {name}가 사용됐어요."
+        }
+      }
+    }
   }
 }

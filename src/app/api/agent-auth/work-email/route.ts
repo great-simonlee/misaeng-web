@@ -60,7 +60,7 @@ async function sendViaEllieo(t: Translate, email: string) {
 
   return {
     ok: false as const,
-    error: getAuthErrorMessage(t, data, t('verification.codeSendFailed')),
+    error: getAuthErrorMessage(t, data, t('verification.codeSendFailed'), res.status),
   }
 }
 
@@ -80,7 +80,7 @@ async function confirmViaEllieo(t: Translate, email: string, code: string) {
       },
     )
     if (res.ok) return { ok: true as const }
-    lastError = getAuthErrorMessage(t, data, lastError)
+    lastError = getAuthErrorMessage(t, data, lastError, res.status)
   }
 
   return { ok: false as const, error: lastError }

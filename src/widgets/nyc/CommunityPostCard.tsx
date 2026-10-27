@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-import { SchoolBadge } from '@components'
+import { AuthorBadges } from '@components'
 import { useCity } from '@hooks/useCity'
 import {
   getCity,
@@ -277,7 +277,7 @@ function CptOptListingCard({
                 {getCity(postCity).shortLabel}
               </span>
             ) : null}
-            <SchoolBadge schoolId={post.authorSchoolId} size='md' />
+            <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} size='md' />
             {contextTag ? (
               <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#eef4ff] px-2.5 py-1 text-[11px] font-semibold text-[#3b5bdb] ring-1 ring-[#3b5bdb]/15'>
                 {contextTag}
@@ -359,7 +359,7 @@ function JobReviewListingCard({
         <div className='flex items-start justify-between gap-3'>
           <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
             <JobReviewTypeBadge type={post.jobReviewType} />
-            <SchoolBadge schoolId={post.authorSchoolId} size='md' />
+            <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} size='md' />
             {contextTag ? (
               <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#eef4ff] px-2.5 py-1 text-[11px] font-semibold text-[#3b5bdb] ring-1 ring-[#3b5bdb]/15'>
                 {contextTag}
@@ -480,7 +480,7 @@ function TextListingCard({
                 {t('author.anonymous')}
               </span>
             ) : (
-              <SchoolBadge schoolId={post.authorSchoolId} />
+              <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} />
             )}
             {roommateLabel ? (
               <span

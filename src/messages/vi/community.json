@@ -326,7 +326,7 @@
     "reply": "Trả lời"
   },
   "share": {
-    "metaDescription": "Không cần đăng ký. Chia sẻ từng bước quá trình ứng tuyển, phỏng vấn và kết quả. Mỗi review giúp bạn nhận credit để dùng cho các buổi coffee chat với người trong ngành."
+    "metaDescription": "Không cần đăng ký. Chia sẻ từng bước quá trình ứng tuyển, phỏng vấn và kết quả. Mỗi review giúp bạn nhận điểm để dùng cho các buổi coffee chat với người trong ngành."
   },
   "wip": {
     "title": "Sắp ra mắt",
@@ -481,5 +481,30 @@
     "createTitle": "Đăng bài trên bảng tin ẩn danh",
     "createDescription": "Tên, trường và ảnh của bạn sẽ được ẩn. Cứ thoải mái chia sẻ.",
     "editTitle": "Sửa bài viết ẩn danh"
+  },
+  "badges": {
+    "workplace": "Đã xác minh nơi làm việc",
+    "instagram": "Đã xác minh Instagram"
+  },
+  "blocks": {
+    "action": "Chặn",
+    "confirmTitle": "Chặn người dùng này?",
+    "confirmMessage": "Sau khi chặn, bạn sẽ không thấy bài viết và bình luận của người này nữa",
+    "confirm": "Chặn người dùng này?\nSau khi chặn, bạn sẽ không thấy bài viết và bình luận của người này nữa.",
+    "confirmAction": "Chặn",
+    "blocked": "Đã chặn. Bạn sẽ không thấy bài viết và bình luận của người này nữa.",
+    "failed": "Không thể chặn người dùng này. Vui lòng thử lại sau.",
+    "blockedPostTitle": "Đây là bài viết của người dùng bạn đã chặn",
+    "blockedPostDescription": "Bỏ chặn trong mục Người dùng đã chặn ở Trang của tôi để xem lại.",
+    "listTitle": "Người dùng đã chặn",
+    "listHint": "Bạn không thấy bài viết và bình luận của người dùng đã chặn.",
+    "empty": "Bạn chưa chặn ai",
+    "loading": "Đang tải danh sách chặn…",
+    "loadFailed": "Không thể tải danh sách chặn",
+    "unblock": "Bỏ chặn",
+    "unblocked": "Đã bỏ chặn",
+    "unblockFailed": "Không thể bỏ chặn. Vui lòng thử lại sau.",
+    "anonymousUser": "Người dùng ẩn danh",
+    "blockedAt": "Đã chặn {date}"
   }
 }

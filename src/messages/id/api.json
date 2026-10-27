@@ -28,7 +28,7 @@
     "identityVerificationRequired": "Untuk menulis postingan dan komentar, verifikasi kampus atau tempat kerja kamu dulu."
   },
   "auth": {
-    "ellieoUnavailable": "Tidak bisa terhubung ke server Ellieo. Coba lagi sebentar lagi.",
+    "ellieoUnavailable": "Saat ini tidak dapat terhubung ke server login. Silakan coba lagi sebentar lagi.",
     "noAccessToken": "Kami tidak menerima access token.",
     "loginFailed": "Gagal masuk.",
     "signupFailed": "Gagal mendaftar.",
@@ -45,7 +45,14 @@
     "passwordResetFailed": "Gagal mengirim permintaan reset kata sandi.",
     "emailAuthError": "Terjadi kesalahan saat masuk dengan email.",
     "sessionExpired": "Sesi kamu sudah berakhir. Silakan masuk lagi.",
-    "userInfoUnavailable": "Kamu sudah masuk, tapi detail akun kamu gagal dimuat."
+    "userInfoUnavailable": "Kamu sudah masuk, tapi detail akun kamu gagal dimuat.",
+    "invalidCredentials": "Email atau kata sandi salah.",
+    "accountNotFound": "Tidak ada akun dengan email ini. Periksa email Anda atau daftar.",
+    "emailInUse": "Email ini sudah terdaftar. Silakan masuk atau atur ulang kata sandi.",
+    "tooManyAttempts": "Terlalu banyak percobaan. Silakan coba lagi sebentar lagi.",
+    "weakPassword": "Kata sandi minimal 6 karakter.",
+    "invalidEmail": "Masukkan alamat email yang valid.",
+    "accountDisabled": "Akun ini dibatasi. Silakan hubungi tim Misaeng."
   },
   "profile": {
     "nickname": {
@@ -95,7 +102,19 @@
     "workplacePending": "Tim Misaeng sedang meninjau verifikasi tempat kerja kamu.",
     "workplaceStorageMissing": "Penyimpanan verifikasi tempat kerja belum dikonfigurasi.",
     "workplaceSaveFailed": "Gagal menyimpan permintaan verifikasi tempat kerja (HTTP {status})",
-    "workEmailError": "Terjadi kesalahan saat memverifikasi email kantor kamu."
+    "workEmailError": "Terjadi kesalahan saat memverifikasi email kantor kamu.",
+    "schoolAlreadyVerified": "Email sekolah ini sudah kamu verifikasi.",
+    "schoolLimitReached": "Kamu bisa memverifikasi hingga {max} sekolah.",
+    "schoolNotVerified": "Sekolah ini belum kamu verifikasi.",
+    "instagram": {
+      "noRequest": "Tidak ada verifikasi Instagram yang sedang berjalan.",
+      "invalidHandle": "Periksa username Instagram. Hanya huruf, angka, titik, dan garis bawah yang diizinkan.",
+      "alreadyVerified": "Akun Instagram ini sudah terverifikasi.",
+      "handleTaken": "Akun Instagram ini sudah atau sedang diverifikasi oleh akun Misaeng lain.",
+      "tooManyRequests": "Kamu tidak bisa meminta kode lagi hari ini. Coba lagi besok.",
+      "requestFailed": "Gagal meminta verifikasi Instagram.",
+      "saveFailed": "Gagal menyimpan permintaan verifikasi Instagram."
+    }
   },
   "consent": {
     "termsRequired": "Setujui Ketentuan untuk melanjutkan.",
@@ -117,22 +136,23 @@
     "maxUsesReached": "Kode referral ini hanya bisa dipakai maksimal {max} orang."
   },
   "credit": {
-    "loadFailed": "Gagal memuat info kredit kamu.",
+    "loadFailed": "Gagal memuat info poin kamu.",
     "invalidUser": "Pengguna tersebut tidak valid.",
-    "saveFailed": "Gagal menyimpan kredit (HTTP {status})",
+    "saveFailed": "Gagal menyimpan poin (HTTP {status})",
     "reviewListLoadFailed": "Gagal memuat daftar peninjauan.",
     "reviewRequestNotFound": "Permintaan itu tidak ditemukan.",
     "reviewAlreadyProcessed": "Permintaan ini sudah diproses.",
     "reviewPostMissing": "Postingan tidak ada atau sudah dihapus.",
-    "awardFailed": "Gagal memberikan kredit. Periksa pengaturan penyimpanan.",
+    "awardFailed": "Gagal memberikan poin. Periksa pengaturan penyimpanan.",
     "processFailed": "Gagal menyelesaikan tindakan itu.",
     "reviewSaveFailed": "Gagal menyimpan permintaan peninjauan (HTTP {status})",
     "reviewStatusLoadFailed": "Gagal memuat status permintaan peninjauan.",
-    "reviewBoardIneligible": "Postingan di forum ini tidak bisa mengajukan kredit tambahan.",
+    "reviewBoardIneligible": "Postingan di forum ini tidak bisa mengajukan poin tambahan.",
     "reviewFinalResultRequired": "Tambahkan hasil akhir ke timeline kamu dulu (disetujui, kartu diterima, offer, ditolak, dll.).",
     "reviewAlreadyAwarded": "Postingan ini sudah menerima bonus ulasan.",
     "reviewAlreadyPending": "Ini sudah menunggu peninjauan.",
-    "reviewRequestFailed": "Gagal mengajukan kredit tambahan."
+    "reviewRequestFailed": "Gagal mengajukan poin tambahan.",
+    "reviewBonusReplaced": "Sejak pembaruan poin, poin ulasan diberikan setelah tim meninjau setiap postingan, menggantikan bonus ini. Gunakan antrean tinjauan poin di ERP."
   },
   "postings": {
     "loadFailed": "Gagal memuat lowongan kerja."
@@ -223,12 +243,22 @@
           "moveInEnd": "Pilih tanggal selesai sublet."
         }
       }
+    },
+    "blocks": {
+      "loadFailed": "Tidak dapat memuat daftar blokir.",
+      "failed": "Tidak dapat memblokir pengguna ini. Coba lagi sebentar lagi.",
+      "unblockFailed": "Tidak dapat membuka blokir. Coba lagi sebentar lagi.",
+      "targetNotFound": "Postingan atau komentar yang akan diblokir tidak ditemukan.",
+      "self": "Kamu tidak dapat memblokir postingan atau komentarmu sendiri.",
+      "limit": "Kamu dapat memblokir hingga {max} pengguna.",
+      "notFound": "Pengguna ini tidak ada di daftar blokirmu.",
+      "blockedPost": "Ini postingan dari pengguna yang kamu blokir."
     }
   },
   "guest": {
     "invalidRequest": "Periksa permintaan kamu.",
     "nicknameInvalid": "Masukkan nama panggilan tampilan {min}–{max} karakter (bukan alamat email).",
-    "emailInvalid": "Masukkan email yang valid agar kami bisa mengirim info gift card dan kredit.",
+    "emailInvalid": "Masukkan email yang valid agar kami bisa mengirim info gift card dan poin.",
     "linkedinRequired": "Masukkan URL profil LinkedIn kamu. Contoh: linkedin.com/in/your-name",
     "guidelinesRequired": "Setujui pedoman posting komunitas.",
     "titleRequired": "Masukkan judul.",
@@ -236,5 +266,115 @@
     "bodyTooLong": "\"Hal yang perlu diwaspadai\" maksimal {max} karakter.",
     "jobReviewTypeRequired": "Pilih jenisnya: magang, entry-level, berpengalaman, pindah kerja, atau kontrak.",
     "rateLimited": "Coba lagi sebentar lagi. (Terlalu banyak permintaan dalam waktu singkat)"
+  },
+  "push": {
+    "verification": {
+      "instagram": {
+        "approved": {
+          "title": "Instagram terverifikasi",
+          "body": "Postinganmu kini menampilkan lencana verifikasi Instagram."
+        },
+        "rejected": {
+          "title": "Verifikasi Instagram belum disetujui",
+          "body": "Lihat alasannya di Halaman Saya lalu ajukan lagi."
+        }
+      }
+    },
+    "reviewDocs": {
+      "deleted": {
+        "title": "Dokumen verifikasi dihapus",
+        "body": "Dokumen verifikasi kamu telah dihapus permanen pada {date}. Hanya hasil verifikasi yang disimpan."
+      },
+      "expired": {
+        "title": "Kirim ulang dokumen kamu",
+        "body": "Kami tidak dapat meninjau dokumen kamu dalam 7 hari, jadi dokumen dihapus permanen pada {date}. Kamu bisa memverifikasi lagi dari ulasan kamu."
+      },
+      "approved": {
+        "title": "Ulasan terverifikasi",
+        "body": "Ulasan kamu sudah terverifikasi. Dokumen akan dihapus permanen dalam 72 jam."
+      },
+      "rejected": {
+        "title": "Ulasan belum dapat diverifikasi",
+        "body": "Lihat alasannya di Akun > Riwayat Verifikasi. Dokumen akan dihapus permanen dalam 72 jam."
+      }
+    }
+  },
+  "reviewDocs": {
+    "notReady": "Fitur unggah dokumen verifikasi belum tersedia. Silakan coba lagi nanti.",
+    "failed": "Dokumen kamu tidak dapat diproses. Silakan coba lagi nanti.",
+    "invalidRequest": "Periksa kembali permintaan kamu.",
+    "consentRequired": "Setujui cara penanganan dokumen verifikasi sebelum mengunggah.",
+    "fileRequired": "Pilih gambar yang ingin diunggah.",
+    "tooManyFiles": "Kamu dapat mengunggah hingga {max} file sekaligus.",
+    "fileTooLarge": "Setiap file maksimal 10 MB.",
+    "heicNotSupported": "Ubah file HEIC ke JPG sebelum mengunggah.",
+    "invalidImage": "Gambar ini tidak dapat dibaca. Coba file lain.",
+    "unsupportedType": "Hanya file JPG, PNG, dan PDF yang dapat diunggah.",
+    "boardNotEligible": "Hanya ulasan wawancara dan kerja serta postingan OPT, visa, dan green card yang dapat diverifikasi.",
+    "alreadyVerified": "Postingan ini sudah terverifikasi.",
+    "alreadyPending": "Dokumen untuk postingan ini sedang kami tinjau.",
+    "dailyLimit": "Kamu tidak dapat mengunggah dokumen verifikasi lagi hari ini. Coba lagi besok.",
+    "notFound": "Riwayat verifikasi tidak ditemukan.",
+    "deleteFailed": "File tidak dapat langsung dihapus. Kami akan mencoba lagi secara otomatis."
+  },
+  "points": {
+    "notConfigured": "Fitur poin belum tersedia. Silakan coba lagi nanti.",
+    "notActive": "Fitur poin baru belum dimulai.",
+    "loadFailed": "Gagal memuat info poin.",
+    "requestFailed": "Permintaan poin tidak dapat diproses. Silakan coba lagi nanti.",
+    "invalidCursor": "Permintaan tidak valid. Muat ulang riwayat dari awal.",
+    "insufficient": "Poin tidak cukup. (Dibutuhkan {required}, tersedia {available})",
+    "monthlyCap": "Kamu sudah mencapai batas bulan ini.",
+    "featureDisabled": "Fitur ini sedang tidak tersedia.",
+    "identityRequired": "Verifikasi email sekolah atau kantor untuk memakai fitur ini.",
+    "verificationRequired": "Verifikasi akun (email sekolah, email kantor, atau Instagram) untuk mengumpulkan poin.",
+    "claimNotFound": "Permintaan peninjauan tidak ditemukan.",
+    "claimNotPending": "Permintaan peninjauan ini sudah diproses.",
+    "boost": {
+      "notAllowed": "Hanya postingan roommate dan sublet yang bisa disematkan.",
+      "notAuthor": "Kamu hanya bisa menyematkan postingan milikmu sendiri.",
+      "active": "Postingan ini sedang disematkan di atas (sampai {date}).",
+      "cooldown": "Kamu bisa menyematkan postingan ini lagi mulai {date}.",
+      "monthlyCap": "Kamu bisa menyematkan postingan maksimal {max} kali sebulan.",
+      "slotsFull": "Semua tempat teratas sedang penuh. Tempat kosong tersedia pada {date}."
+    },
+    "coffeeChat": {
+      "agreeRequired": "Setujui pemberitahuan coffee chat terlebih dahulu.",
+      "topicRequired": "Masukkan topik coffee chat.",
+      "topicTooLong": "Topik maksimal {max} karakter.",
+      "messageTooLong": "Pesan maksimal {max} karakter.",
+      "monthlyCap": "Kamu bisa mengajukan maksimal {max} coffee chat per bulan.",
+      "notFound": "Permintaan coffee chat tidak ditemukan.",
+      "invalidTransition": "Tidak bisa diubah pada status saat ini.",
+      "cannotCancel": "Coffee chat yang sudah dijadwalkan tidak bisa dibatalkan di sini. Hubungi tim kami."
+    },
+    "push": {
+      "earned": {
+        "title": "+{amount} {name}",
+        "body": "{reason} · Saldo {balance}"
+      },
+      "clawback": {
+        "title": "-{amount} {name} ditarik",
+        "body": "Poin ditarik sesuai aturan layanan · Saldo {balance}"
+      },
+      "coffeeChat": {
+        "scheduled": {
+          "title": "Coffee chat sudah dijadwalkan",
+          "body": "Cek jadwalnya di halaman akun."
+        },
+        "completed": {
+          "title": "Coffee chat selesai",
+          "body": "{name} yang ditahan sudah dipakai."
+        },
+        "cancelled": {
+          "title": "Coffee chat dibatalkan",
+          "body": "{name} yang ditahan tidak dipotong."
+        },
+        "no_show": {
+          "title": "Tidak hadir coffee chat",
+          "body": "Kamu dicatat tidak hadir, jadi {name} yang ditahan sudah dipakai."
+        }
+      }
+    }
   }
 }

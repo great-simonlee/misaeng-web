@@ -29,10 +29,13 @@ export function sanitizeAnonymousCommunityPost(
   post: CommunityPost,
   viewerUid?: string | null,
 ): CommunityPost {
-  const base = sanitizeGuestAuthorForViewer(post, viewerUid)
+  const isAuthor = isViewerAuthor(post.authorUid, viewerUid)
+  // 작성자 이메일은 어느 게시판이든 본인에게만 (공개 목록·상세에 남의 이메일을 내보내지 않는다)
+  const base = {
+    ...sanitizeGuestAuthorForViewer(post, viewerUid),
+    authorEmail: isAuthor ? post.authorEmail : '',
+  }
   if (!isAnonymousBoard(base.categoryId)) return base
-
-  const isAuthor = isViewerAuthor(base.authorUid, viewerUid)
 
   return {
     ...base,
@@ -60,4 +63,12 @@ export function sanitizeAnonymousCommunityComment(
     authorEmail: isAuthor ? comment.authorEmail : '',
     authorUid: isAuthor ? comment.authorUid : '',
   }
+}
+
+/** 일반 게시판 댓글 — 작성자 이메일은 본인에게만 */
+export function hideCommentAuthorEmail(
+  comment: CommunityComment,
+  viewerUid?: string | null,
+): CommunityComment {
+  return isViewerAuthor(comment.authorUid, viewerUid) ? comment : { ...comment, authorEmail: '' }
 }

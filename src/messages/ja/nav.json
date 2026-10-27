@@ -13,7 +13,7 @@
     "me": "マイページ",
     "myPosts": "自分の投稿",
     "myLikes": "いいねした投稿",
-    "creditReviews": "クレジット審査"
+    "creditReviews": "ポイント審査"
   },
   "accountMenu": "アカウントメニュー",
   "openAccountMenu": "アカウントメニューを開く",
@@ -38,7 +38,7 @@
     },
     "links": {
       "housing": "住まい",
-      "credit": "クレジット",
+      "credit": "ミセンポイント",
       "partners": "パートナー",
       "companySite": "企業サイト",
       "about": "会社概要",

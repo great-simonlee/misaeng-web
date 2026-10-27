@@ -17,6 +17,7 @@ export const NAMESPACES = [
   'reviews',
   'companies',
   'credit',
+  'points',
   'partners',
   'legal',
   'consent',

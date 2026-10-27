@@ -88,7 +88,7 @@ export async function POST(request: Request) {
     if (!tokens?.accessToken) {
       const status = isUpstreamUnavailable(register.res.status) ? 503 : 401
       return NextResponse.json(
-        { error: getAuthErrorMessage(t, register.data, t('auth.appleSignupFailed')) },
+        { error: getAuthErrorMessage(t, register.data, t('auth.appleSignupFailed'), register.res.status) },
         { status },
       )
     }

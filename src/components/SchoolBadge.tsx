@@ -1,6 +1,6 @@
 'use client'
 
-import { getVerifiedSchool } from '@lib/constants/schools'
+import { useVerifiedSchool } from '@hooks/useVerifiedSchools'
 import { cn } from '@lib'
 import { useT } from '@lib/i18n/client'
 
@@ -21,7 +21,7 @@ export function SchoolBadge({
   className,
 }: SchoolBadgeProps) {
   const t = useT('common')
-  const school = getVerifiedSchool(schoolId)
+  const school = useVerifiedSchool(schoolId)
   if (!school) return null
 
   const label = variant === 'full' ? school.fullName : school.shortName

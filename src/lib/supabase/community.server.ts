@@ -39,7 +39,7 @@ import {
   type CityId,
 } from '@lib/constants/cities'
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
-import { getSupabaseProfile } from '@lib/supabase/profile.server'
+import { getSupabaseProfile, type SupabaseProfileRecord } from '@lib/supabase/profile.server'
 import type { CommunityPost, JobReviewSourceId } from '@/types/nyc'
 import { listStoredCommunityComments } from '@lib/supabase/communityComments.server'
 import { listStoredRecommends } from '@lib/supabase/communityEngagement.server'
@@ -461,6 +461,9 @@ export async function listStoredCommunityPostsByAuthor(
   return posts.filter((post) => post.authorUid === uid)
 }
 
+/** 후기 게시판은 "어느 학교에서의 경험인가"가 내용이라 글쓴 시점의 학교를 그대로 보여 준다 */
+const SNAPSHOT_SCHOOL_BOARDS = new Set(['status', 'cpt-opt', 'visa', 'green-card', 'job-review'])
+
 async function enrichCommunityPostAuthor(
   post: CommunityPost,
   options?: { persist?: boolean; cachedProfile?: boolean },
@@ -489,25 +492,46 @@ async function enrichCommunityPostAuthor(
   const authorPhotoURL = profilePhoto || safeStoredPhoto
 
   if (
-    authorNickname === storedNickname &&
-    authorPhotoURL === storedPhoto
+    options?.persist !== false &&
+    (authorNickname !== storedNickname || authorPhotoURL !== storedPhoto)
   ) {
-    return post
-  }
-
-  const enriched: CommunityPost = {
-    ...post,
-    authorNickname,
-    authorPhotoURL,
-  }
-  if (options?.persist !== false) {
     try {
-      await saveStoredCommunityPost(enriched)
+      await saveStoredCommunityPost({ ...post, authorNickname, authorPhotoURL })
     } catch {
       // 표시만 보강
     }
   }
-  return enriched
+
+  return {
+    ...post,
+    authorNickname,
+    authorPhotoURL,
+    ...authorBadgeFields(post, profile),
+  }
+}
+
+/**
+ * 작성자 인증 배지 (응답에만 붙이고 저장하지 않는다) — 인증되는 즉시 예전 글에도 보이게 프로필에서 읽는다.
+ * 학교는 대표 학교, 후기 게시판만 글쓴 시점의 학교. 인스타그램은 아이디 없이 인증 여부만.
+ */
+export function authorBadgeFields(
+  post: Pick<CommunityPost, 'categoryId' | 'authorSchoolId' | 'authorSchoolName'>,
+  profile: SupabaseProfileRecord | null,
+) {
+  const liveSchool =
+    profile?.schoolEmailVerified && profile.verifiedSchoolName?.trim()
+      ? { id: profile.verifiedSchoolId?.trim() || null, name: profile.verifiedSchoolName.trim() }
+      : null
+  const school =
+    SNAPSHOT_SCHOOL_BOARDS.has(post.categoryId) || !liveSchool
+      ? { id: post.authorSchoolId, name: post.authorSchoolName }
+      : liveSchool
+  return {
+    authorSchoolId: school.id,
+    authorSchoolName: school.name,
+    authorWorkplaceVerified: profile?.workplaceStatus === 'approved',
+    authorInstagramVerified: Boolean(profile?.instagramVerified),
+  }
 }
 
 export async function getStoredCommunityPost(

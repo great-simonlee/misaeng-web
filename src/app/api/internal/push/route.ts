@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic'
  * Pushes triggered by ellieo-erp (server to server). Header `x-internal-secret: $INTERNAL_PUSH_SECRET`.
  * { type: 'posting', postingId }                         — a posting was approved → followers of its company
  * { type: 'credit', uid, amount, balance, reason?, label? } — credits awarded by an admin
+ * { type: 'verification', uid, kind: 'instagram', result: 'approved' | 'rejected' } — a verification was reviewed
  */
 function authorized(request: Request) {
   const secret = process.env.INTERNAL_PUSH_SECRET?.trim()
@@ -60,6 +61,26 @@ export async function POST(request: Request) {
           threadId: 'credit',
         }
       },
+    })
+    return NextResponse.json({ sent: true })
+  }
+
+  if (body.type === 'verification') {
+    const uid = String(body.uid || '').trim()
+    const kind = String(body.kind || '').trim()
+    const result = body.result === 'approved' ? 'approved' : body.result === 'rejected' ? 'rejected' : null
+    if (!uid || kind !== 'instagram' || !result) {
+      return NextResponse.json({ error: 'uid, kind and result are required.' }, { status: 400 })
+    }
+    notifyUsers({
+      type: 'account',
+      userIds: [uid],
+      build: (t) => ({
+        title: t(`api.push.verification.${kind}.${result}.title`),
+        body: t(`api.push.verification.${kind}.${result}.body`),
+        data: { type: 'verification', kind },
+        threadId: 'verification',
+      }),
     })
     return NextResponse.json({ sent: true })
   }

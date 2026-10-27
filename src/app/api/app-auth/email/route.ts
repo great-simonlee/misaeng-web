@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       })
       if (!res.ok) {
         return NextResponse.json(
-          { error: getAuthErrorMessage(t, data, t('auth.passwordResetFailed')) },
+          { error: getAuthErrorMessage(t, data, t('auth.passwordResetFailed'), res.status) },
           { status: res.status || 400 },
         )
       }
@@ -60,7 +60,10 @@ export async function POST(request: Request) {
 
     if (mode === 'login') {
       const login = await loginWithEmail(t, email, password, { deviceId: APP_DEVICE_ID })
-      if (!login.ok) return NextResponse.json({ error: login.error }, { status: 401 })
+      if (!login.ok) {
+        // code: 'auth.invalidCredentials' | 'auth.accountNotFound' | … — the app shows "sign up" / "forgot password" from it
+        return NextResponse.json({ error: login.error, code: login.errorKey }, { status: 401 })
+      }
       return appSessionResponse({ ...login, registered: false })
     }
 
@@ -69,7 +72,13 @@ export async function POST(request: Request) {
     const result = await registerWithEmail(t, email, password, body.name ?? undefined, {
       deviceId: APP_DEVICE_ID,
     })
-    if (!result.ok) return NextResponse.json({ error: result.error }, { status: 401 })
+    if (!result.ok) {
+      const emailInUse = 'emailInUse' in result && result.emailInUse
+      return NextResponse.json(
+        { error: result.error, code: emailInUse ? 'auth.emailInUse' : null },
+        { status: emailInUse ? 409 : 400 },
+      )
+    }
 
     if (result.user?.uid) {
       const consent = await persistConsentRecord({

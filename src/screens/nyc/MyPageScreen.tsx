@@ -31,6 +31,8 @@ import { MyPageSkeleton } from '@widgets/nyc/MyPageSkeleton'
 import { ProfileCardAction } from '@widgets/nyc/ProfileCardAction'
 import { MyPageCreditSection } from '@widgets/nyc/MyPageCreditSection'
 import { MyPageReferralSection } from '@widgets/nyc/MyPageReferralSection'
+import { MyPageReviewVerifications } from '@widgets/nyc/reviewDocs/MyPageReviewVerifications'
+import { MyPageBlockedUsersSection } from '@widgets/nyc/MyPageBlockedUsersSection'
 
 import type { NycUserProfile } from '@/types/nyc'
 
@@ -672,6 +674,8 @@ export function MyPageScreen() {
 
             <MyPageReferralSection />
 
+            <MyPageBlockedUsersSection />
+
             <ProfileVerificationSection
               profile={profile}
               openSchoolVerify={schoolVerifyOpen}
@@ -681,6 +685,8 @@ export function MyPageScreen() {
               openIdentityVerify={identityVerifyOpen}
               onIdentityVerifyOpenChange={setIdentityVerifyOpen}
             />
+
+            <MyPageReviewVerifications />
           </div>
 
           <LogoutSection

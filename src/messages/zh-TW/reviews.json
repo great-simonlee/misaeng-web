@@ -615,7 +615,7 @@
     "nicknamePlaceholder": "例：NYCWorker",
     "emailLabel": "Email",
     "emailHintMember": "帳號 Email · 不公開",
-    "emailHintGuest": "用於禮物卡與積分通知 · 不公開",
+    "emailHintGuest": "用於禮物卡與點數通知 · 不公開",
     "linkedinLabel": "LinkedIn 個人檔案網址",
     "linkedinHint": "用於確認工作單位 · 不公開",
     "coffeeChatLabel": "我願意接受新手的 coffee chat 邀請",
@@ -625,7 +625,7 @@
     "submitGuest": "免註冊發布評價",
     "footnoteBefore": "不需註冊。",
     "footnoteLink": "用 Google 註冊並發布",
-    "footnoteAfter": "，積分會立即存入你的帳號。",
+    "footnoteAfter": "，點數會立即存入你的帳號。",
     "footnoteMember": "發布後，可在我的貼文中繼續新增和編輯進度。",
     "choose": {
       "eyebrow": "分享你的經驗",
@@ -633,54 +633,58 @@
       "intro": "一步步分享從申請、面試到結果的過程，對準備走同一條路的人幫助超大。只要 5 分鐘。",
       "recommended": "推薦",
       "googleTitle": "用 Google 註冊並發布",
-      "googlePitch1": "積分直接存入你的帳號",
+      "googlePitch1": "點數直接存入你的帳號",
       "googlePitch2": "發布後可以繼續新增進度",
       "guestTitle": "免註冊發布",
       "guestPitch1": "只需要暱稱、Email 和 LinkedIn 網址",
-      "guestPitch2": "我們會先幫你保留積分，之後用同一個 Email 註冊時自動存入",
+      "guestPitch2": "我們會先幫你保留點數，之後用同一個 Email 註冊時自動存入",
       "guestCta": "免註冊發布評價"
     },
     "creditPitch": {
-      "title": "寫評價賺積分",
-      "perStep": "每個招募階段 {perStep} 點積分（每篇最多 {max}）",
-      "perStepWithBonus": "每個招募階段 {perStep} 點積分（每篇最多 {max}）· 第一篇貼文 +{bonus}",
-      "review": "詳細的評價經 Misaeng 團隊審核後可獲得額外積分",
-      "coffeeChat": "用積分（{cost}）和你所在產業或公司的人一對一 coffee chat，其他產業也可以",
-      "optionalSignup": "註冊是選擇性的。註冊後即可使用積分並接收 coffee chat 邀請"
+      "title": "寫評價賺 Misaeng 點數",
+      "perStep": "每個招募階段 {perStep} 點（每篇最多 {max}）",
+      "perStepWithBonus": "每個招募階段 {perStep} 點（每篇最多 {max}）· 第一篇貼文 +{bonus}",
+      "review": "詳細的評價經 Misaeng 團隊審核後可獲得額外點數",
+      "coffeeChat": "用點數（{cost}）和你所在產業或公司的人一對一 coffee chat，其他產業也可以",
+      "optionalSignup": "註冊是選擇性的。註冊後即可使用點數並接收 coffee chat 邀請"
     },
     "hero": {
       "memberEyebrow": "用我的帳號發布",
-      "memberIntro": "發布後積分會立即存入這個帳號，也能接收 coffee chat 邀請。",
-      "guestIntro": "不需註冊。我們會先幫你保留積分，之後用同一個 Email 註冊時自動存入。"
+      "memberIntro": "發布後點數會立即存入這個帳號，也能接收 coffee chat 邀請。",
+      "guestIntro": "不需註冊。我們會先幫你保留點數，之後用同一個 Email 註冊時自動存入。"
     },
     "preview": {
       "count_other": "目前已新增 {count} 個招募階段",
-      "member": "你將獲得 {credit} 點積分",
-      "memberWithBonus": "你將獲得 {credit} 點積分（第一篇貼文 +{bonus}）",
-      "guest": "註冊後可獲得 {credit} 點積分",
-      "guestWithBonus": "註冊後可獲得 {credit} 點積分（第一篇貼文 +{bonus}）"
+      "member": "你將獲得 {credit} 點",
+      "memberWithBonus": "你將獲得 {credit} 點（第一篇貼文 +{bonus}）",
+      "guest": "註冊後可獲得 {credit} 點",
+      "guestWithBonus": "註冊後可獲得 {credit} 點（第一篇貼文 +{bonus}）"
     },
     "done": {
       "eyebrow": "已發布",
       "title": "謝謝你分享評價",
       "body_other": "「{title}」已發布在面試與求職評價看板。其中 {count} 個招募階段會幫助後面的人。",
-      "awarded": "已有 {credit} 點積分存入你的帳號",
+      "awarded": "已有 {credit} 點存入你的帳號",
       "linked": "你的評價已連結到你的帳號",
-      "coffeeChat": "用積分（{cost} 點）和你所在產業或公司的人 coffee chat，其他產業也可以。",
-      "pending": "註冊即可立即獲得 {credit} 點積分",
-      "breakdown_other": "{count} 個招募階段 = {credit} 點積分。用與評價中 Email 相同的 Google 帳號註冊，就會自動連結。",
-      "breakdownWithBonus_other": "{count} 個招募階段 = {credit} 點積分 + 第一篇貼文獎勵 {bonus}。用與評價中 Email 相同的 Google 帳號註冊，就會自動連結。",
+      "coffeeChat": "用點數（{cost} 點）和你所在產業或公司的人 coffee chat，其他產業也可以。",
+      "pending": "註冊即可立即獲得 {credit} 點",
+      "breakdown_other": "{count} 個招募階段 = {credit} 點。用與評價中 Email 相同的 Google 帳號註冊，就會自動連結。",
+      "breakdownWithBonus_other": "{count} 個招募階段 = {credit} 點 + 第一篇貼文獎勵 {bonus}。用與評價中 Email 相同的 Google 帳號註冊，就會自動連結。",
       "viewPost": "查看我的評價",
-      "viewCredit": "查看我的積分",
+      "viewCredit": "查看我的 Misaeng 點數",
       "toList": "返回列表",
       "optional": "選擇性",
       "signupTitle": "註冊 {brand}，接收新手的 coffee chat 邀請",
-      "signupPitch1": "你剛寫的評價和 {credit} 點積分會立即連結到你的帳號",
-      "signupPitch2": "用積分和你所在產業或公司的人一對一 coffee chat，其他產業也可以",
+      "signupPitch1": "你剛寫的評價和 {credit} 點會立即連結到你的帳號",
+      "signupPitch2": "用點數和你所在產業或公司的人一對一 coffee chat，其他產業也可以",
       "signupPitch3": "可以繼續新增和編輯你的進度",
       "emailMismatch": "你的帳號 Email 與評價中的 Email 不同，因此無法自動連結。我們團隊會確認你的 LinkedIn 和 Email 後，再連結到你的帳號。",
       "skipNote": "即使現在不註冊，你的評價也會保留。",
-      "skip": "稍後再說"
+      "skip": "稍後再說",
+      "linkedReviewPending": "你的評價已連結到你的帳號。營運團隊審核後會發放積分",
+      "pendingReview": "註冊後即可憑這篇評價獲得積分",
+      "pendingReviewNote": "評價的積分會在營運團隊審核後發放。使用與評價中填寫的電子郵件相同的 Google 帳號註冊，即可自動連結。",
+      "signupPitch1Review": "你剛寫的評價會立即連結到你的帳號，審核後發放積分"
     }
   }
 }

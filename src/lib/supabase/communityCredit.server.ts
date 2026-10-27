@@ -105,7 +105,7 @@ function normalizeAccount(
         kind,
         reason: reasonRaw as CommunityCreditAccount['entries'][number]['reason'],
         amount: Math.trunc(amount),
-        label: String(e.label || '').trim() || '크레딧',
+        label: String(e.label || '').trim() || '미생 포인트',
         sourceId:
           typeof e.sourceId === 'string' && e.sourceId.trim()
             ? e.sourceId.trim()
@@ -161,6 +161,42 @@ export async function getStoredCommunityCreditAccount(
 
   const data = await res.json().catch(() => null)
   return normalizeAccount(userId, data)
+}
+
+/**
+ * Strict read for bulk jobs (points legacy backfill): null when the user has no credit JSON yet,
+ * throws on any other failure. The regular reader returns an empty account on failure, which a bulk
+ * read-modify-write must never mistake for "no entries" (it would overwrite real history).
+ */
+export async function getStoredCommunityCreditAccountStrict(
+  uid: string,
+): Promise<CommunityCreditAccount | null> {
+  const userId = String(uid || '').trim()
+  if (!userId || !isCommunityCreditStorageConfigured()) return null
+
+  const bucket = await resolveBucket()
+  const res = await storageFetch(
+    `/storage/v1/object/${bucket}/${objectPath(userId)}`,
+    {
+      method: 'GET',
+      headers: storageHeaders(),
+    },
+  )
+  if (!res) throw new Error('Credit storage unreachable')
+  if (res.ok) {
+    const text = await res.text()
+    let data: unknown
+    try {
+      data = JSON.parse(text)
+    } catch {
+      throw new Error('Credit JSON is not valid JSON')
+    }
+    return normalizeAccount(userId, data)
+  }
+  await res.arrayBuffer().catch(() => undefined)
+  // Storage answers a missing object with 404, or 400 + {"statusCode":"404"} on older versions
+  if (res.status === 404 || res.status === 400) return null
+  throw new Error(`Credit read failed (HTTP ${res.status})`)
 }
 
 export async function saveStoredCommunityCreditAccount(

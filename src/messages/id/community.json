@@ -326,7 +326,7 @@
     "reply": "Balas"
   },
   "share": {
-    "metaDescription": "Tanpa perlu daftar. Bagikan lamaran, interview, dan hasilnya tahap demi tahap. Setiap ulasan memberimu kredit yang bisa dipakai untuk coffee chat dengan orang-orang di industri."
+    "metaDescription": "Tanpa perlu daftar. Bagikan lamaran, interview, dan hasilnya tahap demi tahap. Setiap ulasan memberimu poin yang bisa dipakai untuk coffee chat dengan orang-orang di industri."
   },
   "wip": {
     "title": "Segera hadir",
@@ -481,5 +481,30 @@
     "createTitle": "Posting di forum anonim",
     "createDescription": "Nama, kampus, dan foto kamu tetap tersembunyi. Bebas berbagi.",
     "editTitle": "Edit postingan anonim"
+  },
+  "badges": {
+    "workplace": "Kantor terverifikasi",
+    "instagram": "Instagram terverifikasi"
+  },
+  "blocks": {
+    "action": "Blokir",
+    "confirmTitle": "Blokir pengguna ini?",
+    "confirmMessage": "Setelah diblokir, kamu tidak akan melihat postingan dan komentar pengguna ini lagi",
+    "confirm": "Blokir pengguna ini?\nSetelah diblokir, kamu tidak akan melihat postingan dan komentar pengguna ini lagi.",
+    "confirmAction": "Blokir",
+    "blocked": "Pengguna diblokir. Kamu tidak akan melihat postingan dan komentarnya lagi.",
+    "failed": "Tidak dapat memblokir pengguna ini. Coba lagi sebentar lagi.",
+    "blockedPostTitle": "Ini postingan dari pengguna yang kamu blokir",
+    "blockedPostDescription": "Buka blokir di Pengguna yang diblokir pada Halaman Saya untuk melihatnya lagi.",
+    "listTitle": "Pengguna yang diblokir",
+    "listHint": "Kamu tidak melihat postingan dan komentar dari pengguna yang kamu blokir.",
+    "empty": "Kamu belum memblokir siapa pun",
+    "loading": "Memuat daftar blokir…",
+    "loadFailed": "Tidak dapat memuat daftar blokir",
+    "unblock": "Buka blokir",
+    "unblocked": "Blokir dibuka",
+    "unblockFailed": "Tidak dapat membuka blokir. Coba lagi sebentar lagi.",
+    "anonymousUser": "Pengguna anonim",
+    "blockedAt": "Diblokir {date}"
   }
 }

@@ -1,0 +1,42 @@
+{
+  "name": "미생 포인트",
+  "nameEllieo": "Ellieo Points",
+  "sharedNotice": "미생 포인트는 Ellieo와 공유됩니다.",
+  "reasons": {
+    "welcome": "웰컴 포인트 (첫 학교·직장 인증)",
+    "verify_instagram": "인스타그램 인증",
+    "profile_complete": "프로필 완성",
+    "checkin": "출석",
+    "checkin_streak7": "7일 연속 출석",
+    "referral": "친구 추천",
+    "comment": "댓글",
+    "review": {
+      "base": "후기 작성",
+      "detail": "단계별 상세 작성",
+      "verified": "서류 인증",
+      "pick": "미생 Pick 선정",
+      "first_company": "회사 첫 후기",
+      "total": "후기 포인트"
+    },
+    "review_unlock": "후기 열람",
+    "coffee_chat": "1:1 커피챗",
+    "coffee_chat_no_show": "커피챗 불참",
+    "housing_post_boost": "룸메이트·서블렛 글 상단 노출",
+    "clawback": {
+      "post": "후기 포인트 회수",
+      "comment": "댓글 포인트 회수",
+      "admin": "포인트 회수"
+    },
+    "legacy_opening": "이전 포인트 이월",
+    "adjust": "포인트 조정"
+  },
+  "entryTypes": {
+    "earn": "적립",
+    "spend": "사용",
+    "hold": "예약",
+    "release": "예약 해제",
+    "clawback": "회수",
+    "adjust": "조정"
+  },
+  "legacyBadge": "이전 내역"
+}

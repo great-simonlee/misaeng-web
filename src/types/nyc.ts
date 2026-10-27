@@ -1,6 +1,8 @@
 import type { Locale } from '@lib/i18n/locales'
 import type { ContentI18n, TranslationFields } from '@lib/translations/content'
 import type { CityId } from '@lib/constants/cities'
+import type { InstagramVerificationState } from '@lib/verification/instagram'
+import type { VerifiedSchoolEntry } from '@lib/verification/verifiedSchools'
 
 export type PostStatus = 'open' | 'closed'
 
@@ -286,6 +288,10 @@ export interface CommunityPost extends TranslationFields {
   authorPhotoURL: string | null
   authorSchoolId: string | null
   authorSchoolName: string | null
+  /** 작성자 직장인 인증 (응답에만 있음 — 프로필에서 바로 읽어 붙임) */
+  authorWorkplaceVerified?: boolean
+  /** 작성자 인스타그램 인증 (응답에만 있음, 아이디는 내보내지 않음) */
+  authorInstagramVerified?: boolean
   createdAt: number
   updatedAt: number
   status: PostStatus
@@ -354,6 +360,8 @@ export interface CommunityPost extends TranslationFields {
   roommateMoveInDate: string | null
   /** 룸메이트/서블렛: 입주·서블렛 종료일 (YYYY-MM-DD) */
   roommateMoveOutDate: string | null
+  /** 룸메이트/서블렛: 포인트로 상단 노출 중이면 끝나는 시각 (ISO, 목록 응답에만 있음) */
+  boostedUntil?: string | null
   /**
    * 비회원(게스트) 작성 정보. 가입 없이 남긴 취업 후기에만 존재.
    * email·linkedinUrl은 비공개 — 공개 API 응답에서는 빈 문자열로 내려간다.
@@ -480,6 +488,11 @@ export interface CommunityComment extends TranslationFields {
   authorNickname: string | null
   authorPhotoURL: string | null
   authorSchoolId: string | null
+  /** 작성자 인증 배지 (응답에만 있음) */
+  authorWorkplaceVerified?: boolean
+  authorInstagramVerified?: boolean
+  /** 보는 사람이 쓴 댓글인지 (GET 응답에만 있음) */
+  isMine?: boolean
   createdAt: number
   updatedAt: number
   status: CommunityCommentStatus
@@ -633,9 +646,12 @@ export interface NycUserProfile {
   /** 휴대폰 인증 */
   phone: string | null
   phoneVerified: boolean
-  /** 인스타그램 인증 (예정) */
+  /** 인증한 학교 전부 (최대 3개, 대표 학교가 맨 앞) */
+  verifiedSchools: VerifiedSchoolEntry[]
+  /** 인스타그램 DM 인증 — 아이디는 본인만 본다 */
   instagramHandle: string | null
   instagramVerified: boolean
+  instagram: InstagramVerificationState
   /** 선호 언어 (가입·마이페이지·언어 메뉴에서 고름). misaeng·ellieo가 같이 쓴다 */
   preferredLocale: Locale | null
   /** ERP 관리 상태 */

@@ -3,11 +3,11 @@
     "checkFailed": "Không thể kiểm tra biệt danh này.",
     "available": "Bạn có thể dùng biệt danh này",
     "taken": "Biệt danh này đã có người dùng.",
-    "ruleHint": "Chỉ dùng chữ cái tiếng Anh và dấu \".\"",
+    "ruleHint": "Chỉ dùng chữ cái tiếng Anh, tiếng Hàn và dấu \".\"",
     "errors": {
       "tooShort": "Biệt danh cần có ít nhất {min} ký tự",
       "tooLong": "Biệt danh tối đa {max} ký tự",
-      "invalidChars": "Chỉ dùng chữ cái tiếng Anh và dấu \".\""
+      "invalidChars": "Chỉ dùng chữ cái tiếng Anh, tiếng Hàn và dấu \".\""
     }
   },
   "profile": {
@@ -133,11 +133,54 @@
       "backToVerify": "Quay lại xác minh email trường",
       "verifyTitle": "Xác minh email trường",
       "formDescription": "Email trường sẽ được liên kết với tài khoản bạn đang đăng nhập, kể cả khi khác với email đăng ký. Chúng tôi sẽ gửi mã 6 chữ số tới email trường của bạn.",
-      "notFoundRequest": "Không tìm thấy trường của bạn? Gửi yêu cầu"
+      "notFoundRequest": "Không tìm thấy trường của bạn? Gửi yêu cầu",
+      "manageTitle": "Trường đã xác minh",
+      "manageDescription": "Bài viết chỉ hiển thị một trường chính. Bạn có thể xác minh tối đa {max} trường.",
+      "primary": "Chính",
+      "addAnother": "Xác minh trường khác",
+      "limitReached": "Bạn có thể xác minh tối đa {max} trường.",
+      "primaryChangedToast": "{school} giờ là trường chính của bạn",
+      "moreSchools": "{school} +{count}"
     },
     "instagram": {
       "rowLabel": "Instagram",
-      "rowHint": "Kết nối tài khoản"
+      "rowHint": "Xác minh tài khoản qua DM",
+      "title": "Xác minh Instagram",
+      "intro": "Gửi mã qua DM từ tài khoản Instagram của bạn tới tài khoản chính thức của Misaeng @{account}, đội ngũ của chúng tôi sẽ xác minh cho bạn.",
+      "privacy": "Người khác chỉ thấy huy hiệu 'Đã xác minh Instagram', không thấy tên người dùng của bạn.",
+      "handleLabel": "Tên người dùng Instagram của bạn",
+      "handlePlaceholder": "@username",
+      "getCode": "Nhận mã",
+      "step1": "Trong Instagram, đăng nhập bằng @{handle}, gửi tin nhắn bên dưới tới @{account}.",
+      "previewLabel": "Xem trước",
+      "previewHint": "Tin nhắn sẽ gửi",
+      "copyAndOpen": "Sao chép tin nhắn và mở DM",
+      "copyOnly": "Chỉ sao chép tin nhắn",
+      "copiedToast": "Đã sao chép tin nhắn. Chỉ cần dán vào Instagram.",
+      "step2": "Trong cuộc trò chuyện, nhấn giữ ô nhập, chọn 'Dán' rồi gửi",
+      "step3": "Khi đã gửi, hãy nhấn nút bên dưới.",
+      "sent": "Tôi đã gửi",
+      "sentToast": "Đã nhận. Chúng tôi thường kiểm tra trong vòng 3 ngày làm việc.",
+      "inReview": "Đang xem xét · thường trong 3 ngày làm việc",
+      "inReviewDescription": "Đội ngũ đang kiểm tra DM gửi tới @{account}. Chúng tôi sẽ thông báo kết quả cho bạn.",
+      "noteOtherAccount": "Tin nhắn từ tài khoản khác sẽ không được xác minh",
+      "notePrivate": "Tài khoản riêng tư vẫn được",
+      "noteExpiry": "Mã có hiệu lực đến {date}",
+      "expired": "Mã đã hết hạn. Vui lòng nhận mã mới.",
+      "cancel": "Hủy yêu cầu",
+      "cancelledToast": "Đã hủy yêu cầu xác minh",
+      "verifiedDescription": "@{handle} đã được xác minh. Bài viết của bạn hiển thị huy hiệu xác minh Instagram mà không có tên người dùng.",
+      "changeAccount": "Xác minh tài khoản khác",
+      "rejectedTitle": "Xác minh chưa được duyệt",
+      "rejectReasons": {
+        "noMessage": "Chúng tôi không nhận được tin nhắn nào tại @misaeng.ny.",
+        "wrongAccount": "Tin nhắn được gửi từ tài khoản khác với tài khoản bạn đã nhập.",
+        "codeMismatch": "Mã bạn gửi không khớp.",
+        "other": "Yêu cầu không được duyệt vì lý do khác."
+      },
+      "dmMessage": "Xin chào Misaeng! Đây là yêu cầu xác minh Instagram của tôi.\nMã: {code}",
+      "pendingDetail": "Đang xem xét · @{handle}",
+      "codeIssuedDetail": "Đã cấp mã · hãy gửi DM"
     },
     "title": "Xác minh",
     "description": "Email trường hoặc email công việc sẽ được liên kết với tài khoản này, kể cả khi khác với email bạn dùng để đăng ký.",
@@ -180,7 +223,7 @@
     "profileFailed": "Không thể lưu hồ sơ"
   },
   "title": "Trang của tôi",
-  "suspendedNotice": "Tài khoản này đang bị tạm khóa. Bạn vẫn có thể xem, nhưng không thể đăng bài, bình luận hay yêu cầu credit.",
+  "suspendedNotice": "Tài khoản này đang bị tạm khóa. Bạn vẫn có thể xem, nhưng không thể đăng bài, bình luận hay yêu cầu điểm.",
   "nicknameSheet": {
     "title": "Đặt biệt danh",
     "minLength": "Tối thiểu {min} ký tự"
@@ -240,25 +283,25 @@
     }
   },
   "credit": {
-    "loadFailed": "Không thể tải credit",
-    "ledgerLoadFailed": "Không thể tải lịch sử credit",
-    "redeemComingSoon": "Tính năng đổi thưởng đang được mở dần. Xem hướng dẫn credit để biết chi tiết.",
-    "loadFailedRetry": "Không thể tải credit · Thử lại",
-    "pillAria_other": "{count} credit cộng đồng, xem lịch sử",
-    "unit": "credit",
+    "loadFailed": "Không thể tải điểm",
+    "ledgerLoadFailed": "Không thể tải lịch sử điểm",
+    "redeemComingSoon": "Tính năng đổi thưởng đang được mở dần. Xem hướng dẫn điểm Misaeng để biết chi tiết.",
+    "loadFailedRetry": "Không thể tải điểm · Thử lại",
+    "pillAria_other": "{count} điểm Misaeng, xem lịch sử",
+    "unit": "điểm",
     "history": "Lịch sử",
-    "requestTitle": "Dùng credit",
-    "balanceLabel": "Credit của bạn",
+    "requestTitle": "Dùng điểm Misaeng",
+    "balanceLabel": "Điểm của bạn",
     "requestDescription": "Chọn phần thưởng bạn muốn dùng. Sau khi bạn gửi yêu cầu, Misaeng sẽ xem xét và kết nối cho bạn.",
     "optionMeta_other": "{duration} · {count} lần mỗi tháng",
-    "needMore_other": "Bạn cần thêm {count} credit",
+    "needMore_other": "Bạn cần thêm {count} điểm",
     "redeemGuideLink": "Tìm hiểu thêm về phần thưởng",
     "submit": "Gửi yêu cầu",
-    "historyTitle": "Lịch sử credit",
+    "historyTitle": "Lịch sử điểm Misaeng",
     "guideLink": "Xem hướng dẫn",
     "retry": "Thử lại",
     "emptyTitle": "Chưa có lịch sử",
-    "emptyDescription": "Kiếm credit bằng cách chia sẻ quán ăn, viết review và bình luận.",
+    "emptyDescription": "Kiếm điểm bằng cách chia sẻ quán ăn, viết review và bình luận.",
     "writeFoodReview": "Viết review ăn uống",
     "kinds": {
       "earn": "Nhận được",
@@ -278,7 +321,7 @@
     "bound": "Đã liên kết người giới thiệu",
     "title": "Giới thiệu bạn bè",
     "description": "Mỗi khi có người dùng mã giới thiệu của bạn, bạn nhận được {credits}. Tối đa {max} người và bạn không thể tự giới thiệu chính mình.",
-    "creditsAmount_other": "{count} credit",
+    "creditsAmount_other": "{count} điểm",
     "copying": "Đang sao chép…",
     "shareButton": "Mời bạn bè",
     "myCode": "Mã giới thiệu của tôi",
@@ -329,5 +372,127 @@
     "browseHousing": "Xem nhà ở",
     "rent": "{amount}/tháng",
     "rentWithNet": "{gross} / {net}/tháng"
+  },
+  "reviewDocs": {
+    "entry": {
+      "title": "Xác minh bài review",
+      "description": "Xác minh bài review bằng ảnh chụp màn hình email trúng tuyển hoặc phê duyệt để nhận thêm điểm. Tệp sẽ bị xóa ngay sau khi xét duyệt.",
+      "start": "Xác minh",
+      "pending": "Chúng tôi đang xét duyệt giấy tờ của bạn. Chúng tôi sẽ báo khi có kết quả.",
+      "approved": "Bài review này đã được xác minh.",
+      "rejected": "Lần xác minh trước chưa được duyệt. Bạn có thể gửi lại.",
+      "dailyLimit": "Hôm nay bạn không thể tải thêm. Vui lòng thử lại vào ngày mai.",
+      "history": "Lịch sử xác minh"
+    },
+    "notice": {
+      "title": "Vui lòng đọc trước khi tải lên",
+      "body": "Giấy tờ xác minh chỉ được dùng để xác nhận bài review của bạn và cộng điểm thưởng. Vui lòng che các thông tin nhạy cảm như mức lương, A-number, SEVIS ID, số biên nhận, ngày sinh và địa chỉ trước khi tải lên. Tệp sẽ bị xóa vĩnh viễn trong vòng 72 giờ sau khi xét duyệt và chậm nhất 7 ngày sau khi tải lên. Chỉ kết quả xác minh (trạng thái xác minh và tên công ty hoặc loại visa) được lưu lại. Vui lòng không gửi giấy tờ qua email hoặc tin nhắn.",
+      "agree": "Tôi đã đọc nội dung trên và đồng ý với cách xử lý giấy tờ xác minh. (Bắt buộc)",
+      "screenshotTip": "Chúng tôi khuyên dùng ảnh chụp màn hình email. Cần che ít thông tin hơn nhiều so với ảnh thẻ hoặc giấy tờ.",
+      "maskTip": "Bạn sẽ tự che từng ảnh ở bước tiếp theo và chỉ bản đã che được gửi đi. Dữ liệu ảnh như vị trí cũng được xóa trên máy chủ.",
+      "continue": "Đồng ý và tiếp tục"
+    },
+    "kindTitle": "Bạn xác minh bằng giấy tờ nào?",
+    "kinds": {
+      "interview": {
+        "label": "Phỏng vấn",
+        "example": "Ảnh chụp màn hình email mời phỏng vấn",
+        "mask": "Tên và thông tin liên lạc của người khác"
+      },
+      "offer": {
+        "label": "Trúng tuyển / có việc",
+        "example": "Ảnh chụp màn hình email offer hoặc trúng tuyển",
+        "mask": "Mức lương (tùy chọn), địa chỉ, chữ ký"
+      },
+      "opt": {
+        "label": "OPT / STEM OPT",
+        "example": "Ảnh chụp màn hình email phê duyệt OPT (hoặc ảnh thẻ EAD)",
+        "mask": "A-number, số thẻ, ngày sinh, ảnh chân dung"
+      },
+      "visa_approval": {
+        "label": "Phê duyệt visa / đơn bảo lãnh",
+        "example": "Ảnh chụp email phê duyệt hoặc thông báo phê duyệt I-797",
+        "mask": "Số biên nhận, A-number, địa chỉ"
+      },
+      "cpt": {
+        "label": "CPT",
+        "example": "Trang phê duyệt CPT trong I-20",
+        "mask": "SEVIS ID, ngày sinh, địa chỉ"
+      }
+    },
+    "maskLabel": "Nhớ che: {items}",
+    "pick": {
+      "title": "Chọn ảnh",
+      "hint": "Tối đa {max} tệp · mỗi tệp 10 MB · JPG, PNG, HEIC, PDF",
+      "add": "Thêm ảnh",
+      "remove": "Xóa",
+      "edit": "Che lại",
+      "masked": "Đã che {count} chỗ",
+      "notMasked": "Chưa che",
+      "pdfTitle": "Không thể che PDF tại đây",
+      "pdfBody": "Nếu được, hãy tải lên ảnh chụp màn hình email. Nếu tải PDF, thông tin nhạy cảm phải được che sẵn trong tệp.",
+      "pdfConfirm": "Tôi đã che toàn bộ thông tin nhạy cảm trong PDF này.",
+      "unsupported": "Chỉ có thể tải lên tệp JPG, PNG, HEIC và PDF.",
+      "tooLarge": "Chỉ có thể tải lên tệp tối đa 10 MB.",
+      "tooMany": "Bạn có thể tải lên tối đa {max} tệp.",
+      "readFailed": "Không mở được ảnh này. Vui lòng chọn tệp khác."
+    },
+    "mask": {
+      "title": "Che thông tin nhạy cảm",
+      "hint": "Kéo qua phần muốn ẩn để vẽ ô đen. Chỉ ảnh đã che được gửi đi.",
+      "undo": "Hoàn tác",
+      "clear": "Xóa hết",
+      "done": "Che xong",
+      "noBoxes": "Bạn chưa che gì cả. Thật sự không có thông tin cần ẩn?",
+      "noBoxesConfirm": "Không có gì cần che"
+    },
+    "submit": "Gửi giấy tờ",
+    "uploading": "Đang tải lên an toàn…",
+    "uploadFailed": "Không thể tải lên. Vui lòng thử lại.",
+    "back": "Quay lại",
+    "next": "Tiếp",
+    "cancel": "Hủy",
+    "done": {
+      "title": "Đã nhận giấy tờ an toàn",
+      "body": "Giấy tờ sẽ bị xóa vĩnh viễn trong vòng 72 giờ sau khi xét duyệt và chậm nhất 7 ngày sau khi tải lên.",
+      "detail": "Chúng tôi sẽ báo khi giấy tờ bị xóa. Bạn có thể xóa ngay bất cứ lúc nào tại Trang của tôi > Lịch sử xác minh.",
+      "close": "OK"
+    },
+    "status": {
+      "pending": "Đang xét duyệt",
+      "approved": "Đã xác minh",
+      "rejected": "Không được duyệt",
+      "expired": "Hết hạn",
+      "withdrawn": "Đã hủy"
+    },
+    "rejectReasons": {
+      "unreadable": "Không đọc được giấy tờ",
+      "mismatch": "Giấy tờ không khớp với bài review",
+      "not_masked": "Thông tin nhạy cảm chưa được che",
+      "wrong_document": "Giấy tờ này không dùng để xác minh được",
+      "other": "Lý do khác"
+    },
+    "history": {
+      "title": "Lịch sử xác minh bài review",
+      "empty": "Bạn chưa gửi giấy tờ xác minh nào. Bạn có thể xác minh từ bài review phỏng vấn, việc làm hoặc visa của mình.",
+      "note": "Tệp sẽ bị xóa vĩnh viễn trong vòng 72 giờ sau khi xét duyệt và chậm nhất 7 ngày sau khi tải lên. Chỉ kết quả được lưu lại.",
+      "uploaded": "Đã gửi",
+      "decided": "Đã quyết định",
+      "deleteDue": "Dự kiến xóa",
+      "deleted": "Đã xóa",
+      "deleting": "Đang xóa",
+      "files": "{count} tệp",
+      "result": "Kết quả: {label}",
+      "reason": "Lý do: {reason}",
+      "deleteNow": "Xóa ngay",
+      "deleteConfirmTitle": "Xóa tệp ngay bây giờ?",
+      "deleteConfirmBody": "Tệp của bạn sẽ bị xóa vĩnh viễn ngay. Nếu đang xét duyệt, yêu cầu xác minh sẽ bị hủy. Kết quả đã có vẫn được giữ.",
+      "deleteConfirm": "Xóa ngay",
+      "deletedToast": "Đã xóa vĩnh viễn tệp của bạn.",
+      "deleteFailed": "Không thể xóa ngay. Hệ thống sẽ tự động thử lại.",
+      "viewPost": "Xem bài viết",
+      "loadFailed": "Không tải được lịch sử xác minh.",
+      "retry": "Thử lại"
+    }
   }
 }

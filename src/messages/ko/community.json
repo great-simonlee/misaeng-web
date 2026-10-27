@@ -326,7 +326,7 @@
     "reply": "답글 달기"
   },
   "share": {
-    "metaDescription": "가입 없이도 서류·인터뷰·결과를 단계별로 남길 수 있어요. 후기를 남기면 크레딧이 쌓이고, 현직자 커피챗에 사용할 수 있습니다."
+    "metaDescription": "가입 없이도 서류·인터뷰·결과를 단계별로 남길 수 있어요. 후기를 남기면 미생 포인트가 쌓이고, 현직자 커피챗에 사용할 수 있습니다."
   },
   "wip": {
     "title": "준비 중이에요",
@@ -481,5 +481,30 @@
     "createTitle": "익명게시판 글 올리기",
     "createDescription": "이름·학교·사진은 보이지 않아요. 부담 없이 남겨 주세요.",
     "editTitle": "익명 글 수정하기"
+  },
+  "badges": {
+    "workplace": "직장 인증",
+    "instagram": "인스타 인증"
+  },
+  "blocks": {
+    "action": "차단하기",
+    "confirmTitle": "이 사용자를 차단할까요?",
+    "confirmMessage": "차단하면 이 사용자의 글과 댓글이 보이지 않아요",
+    "confirm": "이 사용자를 차단할까요?\n차단하면 이 사용자의 글과 댓글이 보이지 않아요.",
+    "confirmAction": "차단",
+    "blocked": "차단했어요. 이 사용자의 글과 댓글이 더 이상 보이지 않아요.",
+    "failed": "차단하지 못했어요. 잠시 후 다시 시도해 주세요.",
+    "blockedPostTitle": "차단한 사용자의 글이에요",
+    "blockedPostDescription": "마이페이지의 차단한 사용자에서 차단을 해제하면 다시 볼 수 있어요.",
+    "listTitle": "차단한 사용자",
+    "listHint": "차단한 사용자의 글과 댓글은 보이지 않아요.",
+    "empty": "차단한 사용자가 없어요",
+    "loading": "차단 목록을 불러오는 중이에요…",
+    "loadFailed": "차단 목록을 불러오지 못했어요",
+    "unblock": "차단 해제",
+    "unblocked": "차단을 해제했어요",
+    "unblockFailed": "차단을 해제하지 못했어요. 잠시 후 다시 시도해 주세요.",
+    "anonymousUser": "익명 사용자",
+    "blockedAt": "{date} 차단"
   }
 }

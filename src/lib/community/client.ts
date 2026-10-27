@@ -141,9 +141,18 @@ export async function fetchCommunityPosts(
     .map((post) => sanitizeAnonymousCommunityPost(post))
 }
 
+/** 보는 사람이 차단한 작성자의 글 (GET /api/community/{id} → 403 BLOCKED_USER) */
+export class CommunityBlockedPostError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'CommunityBlockedPostError'
+  }
+}
+
 export async function fetchCommunityPost(
   id: string,
 ): Promise<CommunityPost | null> {
+  let blockedMessage: string | null = null
   try {
     const res = await fetch(`/api/community/${encodeURIComponent(id)}`, {
       cache: 'no-store',
@@ -151,10 +160,16 @@ export async function fetchCommunityPost(
     if (res.ok) {
       const data = (await res.json()) as { post?: CommunityPost }
       if (data.post) return withLocalCounts(data.post)
+    } else if (res.status === 403) {
+      const data = (await res.json().catch(() => null)) as
+        | { code?: string; error?: string }
+        | null
+      if (data?.code === 'BLOCKED_USER') blockedMessage = data.error || 'blocked'
     }
   } catch {
     // 목 데이터로 폴백
   }
+  if (blockedMessage) throw new CommunityBlockedPostError(blockedMessage)
   const mock = getMockCommunityPost(id)
   return mock
     ? sanitizeAnonymousCommunityPost(withLocalCounts(mock))
@@ -218,6 +233,8 @@ export type GuestJobReviewCreditInfo = {
   firstPostBonus: number
   awarded: number
   linked: boolean
+  /** Points ledger active: nothing is paid right away, points come after the team reviews the post */
+  pendingReview?: boolean
 }
 
 /** 가입 없이(또는 인증 없이) 남기는 면접·취업 후기 */

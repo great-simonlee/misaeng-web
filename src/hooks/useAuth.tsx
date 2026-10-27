@@ -10,6 +10,11 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import {
+  instagramStateFromProfile,
+  type InstagramVerificationState,
+} from '@lib/verification/instagram'
+import { listVerifiedSchools, type VerifiedSchoolEntry } from '@lib/verification/verifiedSchools'
 
 import { BRAND_CONFIG } from '@lib/brand'
 import { isMisaengEmail } from '@lib/constants/nyc'
@@ -154,8 +159,19 @@ function mapProfile(uid: string, email: string, raw: Record<string, unknown> | n
         : null,
     phone: typeof raw?.phone === 'string' ? raw.phone : null,
     phoneVerified: Boolean(raw?.phoneVerified),
-    instagramHandle: null,
-    instagramVerified: false,
+    // 서버 프로필(verifiedSchools 원본) → 계산, 부분 patch면 이전 목록 유지, 예전 프로필은 대표 학교 하나
+    verifiedSchools: Array.isArray(raw?.verifiedSchools)
+      ? listVerifiedSchools(raw as Parameters<typeof listVerifiedSchools>[0])
+      : Array.isArray(raw?.verifiedSchoolsList)
+        ? (raw.verifiedSchoolsList as VerifiedSchoolEntry[])
+        : listVerifiedSchools(raw as Parameters<typeof listVerifiedSchools>[0]),
+    instagramHandle: typeof raw?.instagramHandle === 'string' ? raw.instagramHandle : null,
+    instagramVerified: Boolean(raw?.instagramVerified),
+    // 서버 프로필이면 원본 필드에서, mergeStoredProfile의 이전 값이면 계산된 상태를 그대로
+    instagram:
+      raw && 'instagramStatus' in raw
+        ? instagramStateFromProfile(raw as Parameters<typeof instagramStateFromProfile>[0])
+        : ((raw?.instagram as InstagramVerificationState | undefined) ?? instagramStateFromProfile(null)),
     status: raw?.status === 'suspended' ? 'suspended' : 'active',
     otpQuota: null,
     createdAt: now,
@@ -259,6 +275,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 workplaceReviewedByEmail: prev.workplaceReviewedByEmail,
                 phone: prev.phone,
                 phoneVerified: prev.phoneVerified,
+                verifiedSchoolsList: prev.verifiedSchools,
+                instagramHandle: prev.instagramHandle,
+                instagramVerified: prev.instagramVerified,
+                instagram: prev.instagram,
                 status: prev.status,
               }
             : {}),

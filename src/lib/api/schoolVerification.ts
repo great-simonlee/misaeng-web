@@ -47,6 +47,7 @@ export async function confirmSchoolEmailVerification(
     | {
         error?: string
         schoolName?: string
+        isPrimary?: boolean
         profile?: Record<string, unknown>
       }
     | null
@@ -57,6 +58,25 @@ export async function confirmSchoolEmailVerification(
 
   return {
     schoolName: data?.schoolName ?? null,
+    /** 처음 인증한 학교면 true (대표 학교가 됨). 두 번째부터는 false */
+    isPrimary: data?.isPrimary ?? true,
     profile: data?.profile ?? null,
   }
+}
+
+/** 인증한 학교 중 하나를 대표 학교로 (글 배지·학교 게시판에 쓰는 학교) */
+export async function setPrimarySchool(email: string, t: Translate) {
+  const response = await fetch('/api/agent-auth/school-email', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'primary', email }),
+  })
+  const data = (await response.json().catch(() => null)) as
+    | { error?: string; profile?: Record<string, unknown> }
+    | null
+  if (!response.ok) {
+    throw new Error(data?.error || t('me.verification.errors.confirmFailed'))
+  }
+  return data?.profile ?? null
 }

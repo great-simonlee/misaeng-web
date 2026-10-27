@@ -1,0 +1,42 @@
+{
+  "name": "Misaeng Points",
+  "nameEllieo": "Ellieo Points",
+  "sharedNotice": "Your points are shared between Misaeng and Ellieo.",
+  "reasons": {
+    "welcome": "Welcome bonus (first school or work verification)",
+    "verify_instagram": "Instagram verification",
+    "profile_complete": "Profile completed",
+    "checkin": "Daily check-in",
+    "checkin_streak7": "7-day check-in streak",
+    "referral": "Friend referral",
+    "comment": "Comment",
+    "review": {
+      "base": "Review",
+      "detail": "Detailed step-by-step review",
+      "verified": "Verified with a document",
+      "pick": "Selected as a Misaeng Pick",
+      "first_company": "First review for a company",
+      "total": "Review points"
+    },
+    "review_unlock": "Review unlocked",
+    "coffee_chat": "1:1 coffee chat",
+    "coffee_chat_no_show": "Coffee chat no-show",
+    "housing_post_boost": "Roommate/sublet post pinned to the top",
+    "clawback": {
+      "post": "Review points reversed",
+      "comment": "Comment points reversed",
+      "admin": "Points reversed"
+    },
+    "legacy_opening": "Points carried over",
+    "adjust": "Points adjustment"
+  },
+  "entryTypes": {
+    "earn": "Earned",
+    "spend": "Used",
+    "hold": "Reserved",
+    "release": "Reservation released",
+    "clawback": "Reversed",
+    "adjust": "Adjusted"
+  },
+  "legacyBadge": "Earlier history"
+}

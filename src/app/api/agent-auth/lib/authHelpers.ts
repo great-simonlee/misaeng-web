@@ -14,17 +14,9 @@ import {
   refreshEllieoAccessToken,
   setEllieoSession,
 } from './ellieoServer'
+import { getAuthErrorMessage, upstreamErrorKey } from './upstreamError'
 
-/** 업스트림 응답의 오류 문구. t는 `getRequestT(request, 'api')` */
-export function getAuthErrorMessage(t: Translate, data: unknown, fallback: string) {
-  if (!data || typeof data !== 'object') return fallback
-  if ('message' in data && typeof data.message === 'string') return data.message
-  if ('error' in data && typeof data.error === 'string') return data.error
-  if ('raw' in data && typeof data.raw === 'string' && data.raw.includes('502')) {
-    return t('auth.ellieoUnavailable')
-  }
-  return fallback
-}
+export { getAuthErrorMessage }
 
 function isUpstreamUnavailable(status: number) {
   return status === 502 || status === 503 || status === 504
@@ -219,6 +211,8 @@ export async function loginWithEmail(
   ]
 
   let lastError = t('auth.loginFailed')
+  // `api` 번역 키 (예: 'auth.invalidCredentials'). 앱이 다음 안내(가입하기, 비밀번호 찾기)를 고르는 데 쓴다
+  let errorKey: string | null = null
   for (const body of candidates) {
     const { res, data } = await ellieoUpstreamFetch('auth/login', {
       method: 'POST',
@@ -227,7 +221,8 @@ export async function loginWithEmail(
     })
 
     if (!res.ok) {
-      lastError = getAuthErrorMessage(t, data, lastError)
+      lastError = getAuthErrorMessage(t, data, lastError, res.status)
+      errorKey = upstreamErrorKey(data, res.status)
       continue
     }
 
@@ -236,7 +231,7 @@ export async function loginWithEmail(
     lastError = session.error
   }
 
-  return { ok: false as const, error: lastError }
+  return { ok: false as const, error: lastError, errorKey }
 }
 
 export async function registerWithEmail(
@@ -253,6 +248,7 @@ export async function registerWithEmail(
     : ['auth/register', 'auth/register/agent']
 
   let signupError = t('auth.signupFailed')
+  let emailInUse = false
   for (const path of registerPaths) {
     const { res, data } = await ellieoUpstreamFetch(path, {
       method: 'POST',
@@ -271,13 +267,19 @@ export async function registerWithEmail(
       break
     }
 
-    signupError = getAuthErrorMessage(t, data, signupError)
+    // 첫 경로의 구체적인 오류(이미 가입된 이메일 등)를 두 번째 경로의 일반 오류로 덮지 않는다
+    if (signupError === t('auth.signupFailed')) {
+      signupError = getAuthErrorMessage(t, data, signupError, res.status)
+      emailInUse = signupError === t('auth.emailInUse')
+    }
   }
 
+  // 같은 비밀번호로 이미 가입한 사람은 그대로 로그인시킨다
   const login = await loginWithEmail(t, email, password, options)
   if (login.ok) return login
 
-  return { ok: false as const, error: login.error || signupError }
+  // 가입을 하려던 것이니 로그인 오류(비밀번호 틀림)보다 가입 오류가 맞는 안내다
+  return { ok: false as const, error: signupError, emailInUse }
 }
 
 function buildGoogleBodies(
@@ -316,7 +318,7 @@ export async function loginWithGoogle(
 
     if (!res.ok) {
       lastStatus = res.status
-      lastError = getAuthErrorMessage(t, data, lastError)
+      lastError = getAuthErrorMessage(t, data, lastError, res.status)
       if (isUpstreamUnavailable(res.status)) {
         return { ok: false as const, error: lastError, status: lastStatus }
       }
@@ -359,7 +361,7 @@ export async function registerWithGoogle(
 
     if (!res.ok) {
       lastStatus = res.status
-      lastError = getAuthErrorMessage(t, data, lastError)
+      lastError = getAuthErrorMessage(t, data, lastError, res.status)
       if (isUpstreamUnavailable(res.status)) {
         return { ok: false as const, error: lastError, status: lastStatus }
       }

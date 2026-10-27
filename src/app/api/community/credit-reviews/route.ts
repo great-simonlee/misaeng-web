@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
-import { awardReviewBonusCredit } from '@lib/community/creditLedger'
+import { awardForReviewBonus } from '@lib/points/facade.server'
 import { isMisaengEmail } from '@lib/constants/nyc'
 import { COMMUNITY_CREDIT_REVIEW_BONUS } from '@lib/constants/communityCredit'
 import {
@@ -115,10 +115,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, request: saved })
     }
 
-    const credited = await awardReviewBonusCredit({
+    // 포인트 전환 후에는 ERP 검수 claim이 이 보너스를 대신한다 (src/lib/points/WIRING.md)
+    const bonus = await awardForReviewBonus({
       uid: existing.authorUid,
       postId: existing.postId,
     })
+    if (bonus.ok && bonus.engine === 'ledger') {
+      return NextResponse.json(
+        { error: t('credit.reviewBonusReplaced'), code: 'POINTS_CLAIMS_ACTIVE' },
+        { status: 409 },
+      )
+    }
+    const credited = bonus.ok && bonus.engine === 'legacy' ? bonus.result : null
     if (!credited) {
       return NextResponse.json(
         { error: t('credit.awardFailed') },

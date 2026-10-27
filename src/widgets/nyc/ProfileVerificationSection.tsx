@@ -6,18 +6,19 @@ import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { BottomSheet, SchoolBadge } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
-import {
-  PHONE_OTP_COOLDOWN_MS,
-  PHONE_OTP_DAILY_MAX,
-  REQUIRE_SCHOOL_BEFORE_PHONE,
-  SCHOOL_OTP_COOLDOWN_MS,
-  isPhoneSmsEnabled,
-  isPhoneTestOnly,
-} from '@lib/constants/verificationSafety'
+import { SCHOOL_OTP_COOLDOWN_MS } from '@lib/constants/verificationSafety'
 import {
   confirmSchoolEmailVerification,
   sendSchoolEmailVerification,
+  setPrimarySchool,
 } from '@lib/api/schoolVerification'
+import { postInstagramVerification } from '@lib/api/instagramVerification'
+import {
+  MISAENG_INSTAGRAM_DM_URL,
+  MISAENG_INSTAGRAM_HANDLE,
+  type InstagramVerificationState,
+} from '@lib/verification/instagram'
+import { MAX_VERIFIED_SCHOOLS, type VerifiedSchoolEntry } from '@lib/verification/verifiedSchools'
 import {
   confirmWorkplaceEmailVerification,
   sendWorkplaceEmailVerification,
@@ -25,21 +26,18 @@ import {
 import { WORKPLACE_COMPANY_MAX } from '@lib/constants/workplace'
 import { sendSchoolRegistrationRequest } from '@lib/api/schoolRegistrationRequest'
 import { resolveSchoolFromEmail } from '@lib/constants/schools'
+import { useVerifiedSchools } from '@hooks/useVerifiedSchools'
 import {
   isValidSchoolDomain,
   normalizeSchoolDomain,
 } from '@lib/utils/schoolDomain'
-import {
-  formatPhoneDisplay,
-  isSchoolEmail,
-  isValidEmailFormat,
-} from '@lib/utils/verification'
+import { isSchoolEmail, isValidEmailFormat } from '@lib/utils/verification'
 import { getWorkplaceEmailErrorCode } from '@lib/utils/workplaceEmail'
 import { BRAND_CONFIG } from '@lib/brand'
-import { useT } from '@lib/i18n/client'
+import { useFormat, useT } from '@lib/i18n/client'
 import type { NycUserProfile } from '@/types/nyc'
 
-type VerifyKind = 'school' | 'workplace' | 'phone' | 'chooser' | null
+type VerifyKind = 'school' | 'schools' | 'workplace' | 'instagram' | 'chooser' | null
 
 /** `{name}` 자리에 요소를 끼운다 (언어마다 어순이 달라서 문장을 쪼개지 않는다) */
 function renderWithSlots(template: string, slots: Record<string, ReactNode>) {
@@ -101,13 +99,9 @@ export function ProfileVerificationSection({
     ],
   )
 
-  const smsEnabled = isPhoneSmsEnabled()
-  const schoolOk = Boolean(profile?.schoolEmailVerified)
-  const phoneBlockedReason = !smsEnabled
-    ? t('verification.phone.smsDisabledShort')
-    : REQUIRE_SCHOOL_BEFORE_PHONE && !schoolOk
-      ? t('verification.phone.afterSchool')
-      : null
+  const schools = profile?.verifiedSchools ?? []
+  const instagram = profile?.instagram
+  const instagramPending = instagram?.status === 'pending' && !instagram.expired
 
   const workplaceStatus = profile?.workplaceStatus ?? 'none'
   const workplaceApproved = workplaceStatus === 'approved'
@@ -131,7 +125,12 @@ export function ProfileVerificationSection({
       verified: Boolean(profile?.schoolEmailVerified),
       schoolId: profile?.verifiedSchoolId ?? null,
       detail: profile?.schoolEmailVerified
-        ? profile.schoolEmail || t('verification.verifiedShort')
+        ? schools.length > 1
+          ? t('verification.school.moreSchools', {
+              school: schools[0]?.name ?? '',
+              count: schools.length - 1,
+            })
+          : profile.schoolEmail || t('verification.verifiedShort')
         : t('verification.school.rowHint'),
       pending: false,
     },
@@ -143,26 +142,22 @@ export function ProfileVerificationSection({
       detail: workplaceDetail,
       pending: workplacePending,
     },
-    {
-      id: 'phone' as const,
-      label: t('verification.phone.rowLabel'),
-      verified: Boolean(profile?.phoneVerified),
-      schoolId: null as string | null,
-      detail: profile?.phoneVerified
-        ? formatPhoneDisplay(profile.phone ?? '')
-        : phoneBlockedReason
-          ? phoneBlockedReason
-          : t('verification.phone.rowHint'),
-    },
+    // 휴대폰 인증은 실제로 개발할 때까지 숨긴다 (Twilio 예정)
     {
       id: 'instagram' as const,
       label: t('verification.instagram.rowLabel'),
-      verified: Boolean(profile?.instagramVerified),
+      verified: Boolean(profile?.instagramVerified) && !instagramPending,
       schoolId: null as string | null,
-      detail: profile?.instagramVerified
-        ? `@${profile.instagramHandle ?? ''}`
-        : t('verification.instagram.rowHint'),
-      soon: true,
+      detail: instagramPending
+        ? instagram?.sentAt
+          ? t('verification.instagram.pendingDetail', { handle: instagram.handle ?? '' })
+          : t('verification.instagram.codeIssuedDetail')
+        : profile?.instagramVerified
+          ? `@${profile.instagramHandle ?? ''}`
+          : instagram?.status === 'rejected'
+            ? t('verification.instagram.rejectedTitle')
+            : t('verification.instagram.rowHint'),
+      pending: instagramPending && Boolean(instagram?.sentAt),
     },
   ]
 
@@ -177,44 +172,31 @@ export function ProfileVerificationSection({
       <ul className='overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>
         {items.map((item, index) => {
           const isLast = index === items.length - 1
-          const soon = 'soon' in item && item.soon
-          const phoneBlocked = item.id === 'phone' && phoneBlockedReason
-          const pending = 'pending' in item && item.pending
-          const canVerify =
-            !soon &&
-            !item.verified &&
-            !pending &&
-            !phoneBlocked &&
-            (item.id === 'school' ||
-              item.id === 'workplace' ||
-              item.id === 'phone')
-          const canOpen = canVerify || (item.id === 'workplace' && pending)
+          const pending = item.pending
+          const canVerify = !item.verified && !pending
+          // 학교는 인증 뒤에도 열어서 대표 학교를 고르거나 더 인증한다. 인스타그램은 진행 상태·재인증을 본다
+          const canOpen =
+            canVerify || pending || item.id === 'school' || item.id === 'instagram'
 
           const row = (
             <div className='flex items-center gap-3.5 px-5 py-4'>
-              <VerificationItemIcon
-                kind={item.id}
-                verified={item.verified}
-                muted={Boolean(soon || phoneBlocked)}
-              />
+              <VerificationItemIcon kind={item.id} verified={item.verified} />
               <div className='min-w-0 flex-1'>
                 <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
                   <p className='text-[15px] font-medium tracking-tight text-[var(--foreground)]'>
                     {item.label}
                   </p>
-                  {item.id === 'school' && item.verified && (
-                    <SchoolBadge schoolId={item.schoolId} />
-                  )}
+                  {item.id === 'school' &&
+                    item.verified &&
+                    schools.map((school) => (
+                      <SchoolBadge key={school.email} schoolId={school.id} />
+                    ))}
                 </div>
                 <p className='mt-0.5 truncate text-[12px] text-[var(--muted)]'>
                   {item.detail}
                 </p>
               </div>
-              {soon ? (
-                <span className='shrink-0 text-[12px] text-[var(--muted)]'>
-                  {t('verification.status.soon')}
-                </span>
-              ) : item.verified ? (
+              {item.verified ? (
                 <span className='shrink-0 text-[12px] font-medium text-emerald-600'>
                   {t('verification.status.verified')}
                 </span>
@@ -222,18 +204,12 @@ export function ProfileVerificationSection({
                 <span className='shrink-0 text-[12px] font-medium text-amber-700'>
                   {t('verification.status.inReview')}
                 </span>
-              ) : phoneBlocked ? (
-                <span className='shrink-0 text-[12px] text-[var(--muted)]'>
-                  {phoneBlockedReason}
-                </span>
               ) : (
                 <span className='shrink-0 text-[12px] font-medium text-[var(--brand)]'>
                   {t('verification.status.verify')}
                 </span>
               )}
-              {(canOpen || soon || phoneBlocked) && !item.verified && (
-                <ChevronRight muted={!canVerify} />
-              )}
+              {canOpen && <ChevronRight />}
             </div>
           )
 
@@ -245,7 +221,9 @@ export function ProfileVerificationSection({
               {canOpen ? (
                 <button
                   type='button'
-                  onClick={() => setActive(item.id)}
+                  onClick={() =>
+                    setActive(item.id === 'school' && item.verified ? 'schools' : item.id)
+                  }
                   className='w-full text-left touch-manipulation transition active:bg-[#f8f9fb]'
                 >
                   {row}
@@ -257,11 +235,6 @@ export function ProfileVerificationSection({
           )
         })}
       </ul>
-      {!smsEnabled && (
-        <p className='mt-2.5 px-0.5 text-[11px] leading-relaxed text-[var(--muted)]'>
-          {t('verification.phone.smsDisabled')}
-        </p>
-      )}
 
       {resolvedActive === 'chooser' && user ? (
         <VerifySheet
@@ -322,7 +295,7 @@ export function ProfileVerificationSection({
       {resolvedActive === 'school' && user && (
         <SchoolEmailVerifyModal
           onClose={() => closeVerify('school')}
-          onVerified={(schoolName, storedProfile) => {
+          onVerified={(schoolName, storedProfile, isPrimary) => {
             if (storedProfile) mergeStoredProfile(storedProfile)
             void refreshSession()
             success(
@@ -331,6 +304,8 @@ export function ProfileVerificationSection({
                 : t('verification.school.verifiedToast'),
             )
             closeVerify('school')
+            // 두 번째 학교부터는 바로 대표 학교를 고를 수 있게 학교 목록을 연다
+            if (isPrimary === false) setActive('schools')
           }}
           onRegistered={() => {
             success(t('verification.school.registrationSentToast'))
@@ -340,21 +315,28 @@ export function ProfileVerificationSection({
         />
       )}
 
-      {resolvedActive === 'phone' && user && (
-        <PhoneVerifyModal
-          onClose={() => {
-            // resetPhoneVerification()
-            setActive(null)
-          }}
-          onVerified={() => {
-            success(t('verification.phone.verifiedToast'))
-            setActive(null)
+      {resolvedActive === 'schools' && user && (
+        <SchoolsSheet
+          schools={schools}
+          onClose={() => setActive(null)}
+          onAddSchool={() => setActive('school')}
+          onChanged={(storedProfile, schoolName) => {
+            if (storedProfile) mergeStoredProfile(storedProfile)
+            success(t('verification.school.primaryChangedToast', { school: schoolName }))
           }}
           onError={(msg) => toastError(msg)}
         />
       )}
 
-      <div id='nyc-phone-recaptcha' className='hidden' />
+      {resolvedActive === 'instagram' && user && (
+        <InstagramVerifySheet
+          state={instagram ?? null}
+          verifiedHandle={profile?.instagramVerified ? profile.instagramHandle : null}
+          onClose={() => setActive(null)}
+          onChanged={(next) => mergeStoredProfile({ instagram: next })}
+          onError={(msg) => toastError(msg)}
+        />
+      )}
     </section>
   )
 }
@@ -362,11 +344,9 @@ export function ProfileVerificationSection({
 function VerificationItemIcon({
   kind,
   verified,
-  muted,
 }: {
-  kind: 'school' | 'workplace' | 'phone' | 'instagram'
+  kind: 'school' | 'workplace' | 'instagram'
   verified: boolean
-  muted?: boolean
 }) {
   if (verified) {
     return (
@@ -390,15 +370,8 @@ function VerificationItemIcon({
   }
 
   const styles = {
-    school: muted
-      ? 'bg-[#f0f1f3] text-[#94a3b8]'
-      : 'bg-[#57068c]/10 text-[#57068c]',
-    workplace: muted
-      ? 'bg-[#f0f1f3] text-[#94a3b8]'
-      : 'bg-[#0f766e]/10 text-[#0f766e]',
-    phone: muted
-      ? 'bg-[#f0f1f3] text-[#94a3b8]'
-      : 'bg-[#2563eb]/10 text-[#2563eb]',
+    school: 'bg-[#57068c]/10 text-[#57068c]',
+    workplace: 'bg-[#0f766e]/10 text-[#0f766e]',
     instagram: 'bg-[#fdf2f8] text-[#db2777]',
   }[kind]
 
@@ -409,7 +382,6 @@ function VerificationItemIcon({
     >
       {kind === 'school' && <SchoolVerifyIcon />}
       {kind === 'workplace' && <WorkplaceRowIcon />}
-      {kind === 'phone' && <PhoneVerifyIcon />}
       {kind === 'instagram' && <InstagramVerifyIcon />}
     </span>
   )
@@ -461,25 +433,6 @@ function SchoolVerifyIcon() {
         d='M6.5 10.8V16c0 .9 2.46 2.25 5.5 2.25s5.5-1.35 5.5-2.25v-5.2'
       />
       <path strokeLinecap='round' strokeLinejoin='round' d='M20 8.25V14' />
-    </svg>
-  )
-}
-
-function PhoneVerifyIcon() {
-  return (
-    <svg
-      viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='1.8'
-      className='size-[18px]'
-      aria-hidden
-    >
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        d='M6.6 3.5h2.2c.6 0 1.1.4 1.2 1l.4 2.4a1.2 1.2 0 0 1-.35 1.05l-1.5 1.5a12.5 12.5 0 0 0 5.6 5.6l1.5-1.5a1.2 1.2 0 0 1 1.05-.35l2.4.4c.6.1 1 .6 1 1.2v2.2c0 .66-.54 1.2-1.2 1.2C10.2 20.5 3.5 13.8 3.5 5.7c0-.66.54-1.2 1.2-1.2Z'
-      />
     </svg>
   )
 }
@@ -830,6 +783,7 @@ function SchoolEmailVerifyModal({
   onVerified: (
     schoolName: string | null,
     profile: Record<string, unknown> | null,
+    isPrimary: boolean,
   ) => void
   onRegistered: () => void
   onError: (msg: string) => void
@@ -838,6 +792,8 @@ function SchoolEmailVerifyModal({
   const tRoot = useT()
   const { user } = useAuth()
   const [step, setStep] = useState<'email' | 'code' | 'register'>('email')
+  // ERP에서 더한 학교 도메인도 '학교 이메일'로 알아보도록 목록을 불러 둔다
+  useVerifiedSchools()
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
   const [schoolNameDraft, setSchoolNameDraft] = useState('')
@@ -932,7 +888,7 @@ function SchoolEmailVerifyModal({
         code,
         tRoot,
       )
-      onVerified(result.schoolName, result.profile)
+      onVerified(result.schoolName, result.profile, result.isPrimary)
     } catch (err) {
       onError(getErrorMessage(err, t('verification.errors.confirmFailed')))
     } finally {
@@ -1117,143 +1073,6 @@ function SchoolEmailVerifyModal({
   )
 }
 
-function PhoneVerifyModal({
-  onClose,
-  onError,
-}: {
-  onClose: () => void
-  onVerified: () => void
-  onError: (msg: string) => void
-}) {
-  const t = useT('me')
-  const { user } = useAuth()
-  const [step] = useState<'phone' | 'code'>('phone')
-  const [phone, setPhone] = useState('')
-  const [e164] = useState('')
-  const [code, setCode] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [cooldown, setCooldown] = useState(0)
-
-  useEffect(() => {
-    if (cooldown <= 0) return
-    const timer = window.setInterval(() => {
-      setCooldown((c) => (c <= 1 ? 0 : c - 1))
-    }, 1000)
-    return () => window.clearInterval(timer)
-  }, [cooldown])
-
-  async function handleSend() {
-    if (!user) return
-    setBusy(true)
-    try {
-      // 임시: 파이어베이스 휴대폰 OTP 비활성화
-      throw new Error(t('verification.phone.unavailable'))
-      /*
-      const normalized = normalizePhoneE164(phone)
-      await sendPhoneOtp(user, normalized)
-      setE164(normalized)
-      setStep('code')
-      setCooldown(Math.ceil(PHONE_OTP_COOLDOWN_MS / 1000))
-      */
-    } catch (err) {
-      // resetPhoneVerification()
-      onError(getErrorMessage(err, t('verification.phone.errors.sendFailed')))
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  async function handleConfirm() {
-    if (!user || !e164) return
-    setBusy(true)
-    try {
-      // 임시: 파이어베이스 휴대폰 확인 비활성화
-      throw new Error(t('verification.phone.unavailable'))
-      /*
-      await confirmPhoneOtp(user, code, e164)
-      onVerified()
-      */
-    } catch (err) {
-      onError(getErrorMessage(err, t('verification.phone.errors.confirmFailed')))
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return (
-    <VerifySheet title={t('verification.phone.title')} onClose={onClose}>
-      {step === 'phone' ? (
-        <>
-          <p className={verifyDescriptionClass}>
-            {t('verification.phone.description', {
-              max: PHONE_OTP_DAILY_MAX,
-              seconds: Math.ceil(PHONE_OTP_COOLDOWN_MS / 1000),
-            })}
-            {isPhoneTestOnly() && ` ${t('verification.phone.testOnly')}`}
-          </p>
-          <input
-            type='tel'
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder='+1 6465550123 / 01012345678'
-            className={verifyInputClass}
-            autoComplete='tel'
-          />
-          <button
-            type='button'
-            disabled={busy || !phone.trim()}
-            onClick={() => void handleSend()}
-            className={verifyPrimaryButtonClass}
-          >
-            {busy ? t('verification.sending') : t('verification.phone.getCode')}
-          </button>
-        </>
-      ) : (
-        <>
-          <p className={verifyDescriptionClass}>
-            {renderWithSlots(t('verification.phone.codeSentTo'), {
-              phone: (
-                <span className='font-medium text-[var(--foreground)]'>
-                  {formatPhoneDisplay(e164)}
-                </span>
-              ),
-            })}
-          </p>
-          <input
-            type='text'
-            inputMode='numeric'
-            value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            placeholder={t('verification.phone.codePlaceholder')}
-            className={`${verifyInputClass} text-center tracking-[0.3em]`}
-            autoComplete='one-time-code'
-          />
-          <div className='space-y-2'>
-            <button
-              type='button'
-              disabled={busy || code.length < 4}
-              onClick={() => void handleConfirm()}
-              className={verifyPrimaryButtonClass}
-            >
-              {busy ? t('verification.checking') : t('verification.confirmButton')}
-            </button>
-            <button
-              type='button'
-              disabled={busy || cooldown > 0}
-              onClick={() => void handleSend()}
-              className={verifyLinkButtonClass}
-            >
-              {cooldown > 0
-                ? t('verification.resendIn', { seconds: cooldown })
-                : t('verification.phone.resendCode')}
-            </button>
-          </div>
-        </>
-      )}
-    </VerifySheet>
-  )
-}
-
 function OtpDigitInputs({
   value,
   onChange,
@@ -1329,5 +1148,295 @@ function OtpDigitInputs({
         />
       ))}
     </div>
+  )
+}
+
+/** 인증한 학교 목록 — 대표 학교(글 배지·학교 게시판)를 고르고, 최대 MAX_VERIFIED_SCHOOLS개까지 더 인증한다 */
+function SchoolsSheet({
+  schools,
+  onClose,
+  onAddSchool,
+  onChanged,
+  onError,
+}: {
+  schools: VerifiedSchoolEntry[]
+  onClose: () => void
+  onAddSchool: () => void
+  onChanged: (profile: Record<string, unknown> | null, schoolName: string) => void
+  onError: (msg: string) => void
+}) {
+  const t = useT('me')
+  const tRoot = useT()
+  const [saving, setSaving] = useState<string | null>(null)
+  const primaryEmail = schools[0]?.email
+  const canAdd = schools.length < MAX_VERIFIED_SCHOOLS
+
+  async function choose(school: VerifiedSchoolEntry) {
+    if (school.email === primaryEmail || saving) return
+    setSaving(school.email)
+    try {
+      const profile = await setPrimarySchool(school.email, tRoot)
+      onChanged(profile, school.name)
+    } catch (err) {
+      onError(getErrorMessage(err, t('verification.errors.confirmFailed')))
+    } finally {
+      setSaving(null)
+    }
+  }
+
+  return (
+    <VerifySheet title={t('verification.school.manageTitle')} onClose={onClose}>
+      <p className={verifyDescriptionClass}>
+        {t('verification.school.manageDescription', { max: MAX_VERIFIED_SCHOOLS })}
+      </p>
+      <ul className='overflow-hidden rounded-2xl ring-1 ring-black/[0.06]'>
+        {schools.map((school, index) => {
+          const primary = school.email === primaryEmail
+          return (
+            <li key={school.email} className={index > 0 ? 'border-t border-[#f0f1f3]' : undefined}>
+              <button
+                type='button'
+                onClick={() => void choose(school)}
+                disabled={Boolean(saving)}
+                className='flex w-full items-center gap-3 px-4 py-3.5 text-left touch-manipulation transition active:bg-[#f8f9fb] disabled:opacity-60'
+              >
+                <span
+                  className={`flex size-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                    primary ? 'border-[var(--brand)]' : 'border-[#d4d7dd]'
+                  }`}
+                  aria-hidden
+                >
+                  {primary && <span className='size-2.5 rounded-full bg-[var(--brand)]' />}
+                </span>
+                <span className='min-w-0 flex-1'>
+                  <span className='flex items-center gap-1.5'>
+                    <span className='truncate text-[14px] font-medium text-[var(--foreground)]'>
+                      {school.name}
+                    </span>
+                    {primary && (
+                      <span className='shrink-0 rounded-md bg-[var(--brand)]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[var(--brand)]'>
+                        {t('verification.school.primary')}
+                      </span>
+                    )}
+                  </span>
+                  <span className='block truncate text-[12px] text-[var(--muted)]'>{school.email}</span>
+                </span>
+                {saving === school.email && (
+                  <span className='size-4 shrink-0 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent' />
+                )}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+      {canAdd ? (
+        <button type='button' onClick={onAddSchool} className={verifyPrimaryButtonClass}>
+          {t('verification.school.addAnother')}
+        </button>
+      ) : (
+        <p className={verifyHintClass}>
+          {t('verification.school.limitReached', { max: MAX_VERIFIED_SCHOOLS })}
+        </p>
+      )}
+    </VerifySheet>
+  )
+}
+
+/**
+ * 인스타그램 DM 인증: 아이디 입력 → 코드 발급 → 미리 쓴 메시지를 복사해 @misaeng.ny에 DM → "보냈어요" → ERP에서 승인.
+ * 인스타그램은 DM 입력칸을 채워 주는 링크가 없어서, 복사와 대화창 열기를 버튼 하나로 묶어 붙여넣기만 남긴다.
+ */
+function InstagramVerifySheet({
+  state,
+  verifiedHandle,
+  onClose,
+  onChanged,
+  onError,
+}: {
+  state: InstagramVerificationState | null
+  verifiedHandle: string | null
+  onClose: () => void
+  onChanged: (next: InstagramVerificationState) => void
+  onError: (msg: string) => void
+}) {
+  const t = useT('me')
+  const tRoot = useT()
+  const format = useFormat()
+  const { success } = useToast()
+  const [handle, setHandle] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [changing, setChanging] = useState(false)
+  const account = MISAENG_INSTAGRAM_HANDLE
+
+  const pending = state?.status === 'pending' && !state.expired && state.code
+  const showForm = changing || (!pending && !verifiedHandle)
+  const message = pending ? t('verification.instagram.dmMessage', { code: state.code ?? '' }) : ''
+
+  async function run(body: Parameters<typeof postInstagramVerification>[0], toast?: string) {
+    setBusy(true)
+    try {
+      const next = await postInstagramVerification(body, tRoot)
+      onChanged(next)
+      setChanging(false)
+      if (toast) success(toast)
+    } catch (err) {
+      onError(getErrorMessage(err, t('verification.errors.sendFailed')))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function copyMessage(openDm: boolean) {
+    // 창은 클릭 즉시 열어야 팝업 차단을 피한다
+    if (openDm) window.open(MISAENG_INSTAGRAM_DM_URL, '_blank', 'noopener,noreferrer')
+    try {
+      await navigator.clipboard.writeText(message)
+      success(t('verification.instagram.copiedToast'))
+    } catch {
+      onError(message)
+    }
+  }
+
+  return (
+    <VerifySheet title={t('verification.instagram.title')} onClose={onClose}>
+      {showForm ? (
+        <>
+          <p className={verifyDescriptionClass}>
+            {t('verification.instagram.intro', { account })}{' '}
+            {t('verification.instagram.privacy')}
+          </p>
+          {state?.status === 'rejected' && !changing && (
+            <div className='rounded-xl bg-red-50 px-3.5 py-3 text-[13px] text-red-700'>
+              <p className='font-semibold'>{t('verification.instagram.rejectedTitle')}</p>
+              <p className='mt-0.5'>
+                {state.rejectReasonCode && state.rejectReasonCode !== 'other'
+                  ? t(`verification.instagram.rejectReasons.${state.rejectReasonCode}`)
+                  : state.rejectReason || t('verification.instagram.rejectReasons.other')}
+              </p>
+            </div>
+          )}
+          {state?.status === 'pending' && state.expired && (
+            <p className='text-[13px] text-amber-700'>{t('verification.instagram.expired')}</p>
+          )}
+          <label className='block space-y-1.5'>
+            <span className={verifyLabelClass}>{t('verification.instagram.handleLabel')}</span>
+            <VerifyClearableInput
+              value={handle}
+              onChange={setHandle}
+              placeholder={t('verification.instagram.handlePlaceholder')}
+              autoCapitalize='none'
+              autoCorrect='off'
+              autoComplete='off'
+              disabled={busy}
+            />
+          </label>
+          <button
+            type='button'
+            disabled={busy || !handle.trim()}
+            onClick={() => void run({ action: 'request', handle })}
+            className={verifyPrimaryButtonClass}
+          >
+            {busy ? t('verification.sending') : t('verification.instagram.getCode')}
+          </button>
+        </>
+      ) : pending ? (
+        <>
+          <p className='text-[13px] leading-relaxed text-[var(--foreground)]'>
+            <span className='mr-1 font-semibold text-[var(--brand)]'>1</span>
+            {t('verification.instagram.step1', { handle: state.handle ?? '', account })}
+          </p>
+
+          <div>
+            <p className={verifyLabelClass}>{t('verification.instagram.previewLabel')}</p>
+            {/* 인스타그램 DM 화면처럼: 위에 상대 계정, 오른쪽에 내가 보낼 말풍선 */}
+            <div className='mt-1.5 rounded-2xl bg-[#f4f5f7] p-3.5'>
+              <div className='flex items-center gap-2'>
+                <span className='flex size-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white'>
+                  <span className='scale-75'>
+                    <InstagramVerifyIcon />
+                  </span>
+                </span>
+                <span className='text-[13px] font-semibold text-[var(--foreground)]'>{account}</span>
+              </div>
+              <div className='mt-3 flex justify-end'>
+                <p className='max-w-[85%] whitespace-pre-line rounded-[1.1rem] rounded-br-md bg-[#3797f0] px-3.5 py-2.5 text-[13px] leading-snug text-white'>
+                  {message}
+                </p>
+              </div>
+              <p className='mt-1 text-right text-[11px] text-[var(--muted)]'>
+                {t('verification.instagram.previewHint')}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type='button'
+            onClick={() => void copyMessage(true)}
+            className={verifyPrimaryButtonClass}
+          >
+            {t('verification.instagram.copyAndOpen')}
+          </button>
+          <button type='button' onClick={() => void copyMessage(false)} className={verifyLinkButtonClass}>
+            {t('verification.instagram.copyOnly')}
+          </button>
+
+          <p className='text-[13px] leading-relaxed text-[var(--foreground)]'>
+            <span className='mr-1 font-semibold text-[var(--brand)]'>2</span>
+            {t('verification.instagram.step2')}
+          </p>
+
+          {state.sentAt ? (
+            <div className='rounded-xl bg-amber-50 px-3.5 py-3'>
+              <p className='text-[13px] font-semibold text-amber-800'>{t('verification.instagram.inReview')}</p>
+              <p className='mt-0.5 text-[12px] text-amber-800/80'>
+                {t('verification.instagram.inReviewDescription', { account })}
+              </p>
+            </div>
+          ) : (
+            <>
+              <p className='text-[13px] leading-relaxed text-[var(--foreground)]'>
+                <span className='mr-1 font-semibold text-[var(--brand)]'>3</span>
+                {t('verification.instagram.step3')}
+              </p>
+              <button
+                type='button'
+                disabled={busy}
+                onClick={() => void run({ action: 'sent' }, t('verification.instagram.sentToast'))}
+                className={verifyPrimaryButtonClass}
+              >
+                {t('verification.instagram.sent')}
+              </button>
+            </>
+          )}
+
+          <ul className='space-y-1 text-[12px] text-[var(--muted)]'>
+            <li>· {t('verification.instagram.noteOtherAccount')}</li>
+            <li>· {t('verification.instagram.notePrivate')}</li>
+            {state.expiresAt ? (
+              <li>
+                · {t('verification.instagram.noteExpiry', { date: format.date(state.expiresAt) })}
+              </li>
+            ) : null}
+          </ul>
+          <button
+            type='button'
+            disabled={busy}
+            onClick={() => void run({ action: 'cancel' }, t('verification.instagram.cancelledToast'))}
+            className={verifyGhostButtonClass}
+          >
+            {t('verification.instagram.cancel')}
+          </button>
+        </>
+      ) : (
+        <>
+          <p className={verifyDescriptionClass}>
+            {t('verification.instagram.verifiedDescription', { handle: verifiedHandle ?? '' })}
+          </p>
+          <button type='button' onClick={() => setChanging(true)} className={verifyGhostButtonClass}>
+            {t('verification.instagram.changeAccount')}
+          </button>
+        </>
+      )}
+    </VerifySheet>
   )
 }

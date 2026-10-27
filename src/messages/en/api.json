@@ -29,7 +29,7 @@
     "requestFailed": "Couldn't complete the request. Please try again."
   },
   "auth": {
-    "ellieoUnavailable": "Can't reach the Ellieo server. Please try again in a moment.",
+    "ellieoUnavailable": "Can't reach the login server right now. Please try again in a moment.",
     "noAccessToken": "We didn't receive an access token.",
     "loginFailed": "Login failed.",
     "signupFailed": "Sign-up failed.",
@@ -51,7 +51,14 @@
     "appleLoginFailed": "Couldn't sign in with Apple. Please try again.",
     "appleSignupFailed": "Couldn't sign up with Apple. Please try again.",
     "consentRequired": "Please agree to the Terms of Use and Privacy Policy to sign up.",
-    "refreshTokenRequired": "Refresh token is missing."
+    "refreshTokenRequired": "Refresh token is missing.",
+    "invalidCredentials": "Incorrect email or password.",
+    "accountNotFound": "No account found with this email. Check the address or sign up.",
+    "emailInUse": "This email is already registered. Log in or reset your password.",
+    "tooManyAttempts": "Too many attempts. Please try again in a moment.",
+    "weakPassword": "Password must be at least 6 characters.",
+    "invalidEmail": "Please enter a valid email address.",
+    "accountDisabled": "This account has been restricted. Please contact the Misaeng team."
   },
   "profile": {
     "nickname": {
@@ -101,7 +108,19 @@
     "workplacePending": "The Misaeng team is reviewing your workplace verification.",
     "workplaceStorageMissing": "Workplace verification storage isn't configured.",
     "workplaceSaveFailed": "Couldn't save the workplace verification request (HTTP {status})",
-    "workEmailError": "Something went wrong while verifying your work email."
+    "workEmailError": "Something went wrong while verifying your work email.",
+    "schoolAlreadyVerified": "You've already verified this school email.",
+    "schoolLimitReached": "You can verify up to {max} schools.",
+    "schoolNotVerified": "This school isn't one you've verified.",
+    "instagram": {
+      "noRequest": "You don't have an Instagram verification in progress.",
+      "invalidHandle": "Check your Instagram username. Only letters, numbers, periods and underscores are allowed.",
+      "alreadyVerified": "This Instagram account is already verified.",
+      "handleTaken": "This Instagram account is already verified, or being verified, by another Misaeng account.",
+      "tooManyRequests": "You can't get more codes today. Please try again tomorrow.",
+      "requestFailed": "Couldn't request Instagram verification.",
+      "saveFailed": "Couldn't save the Instagram verification request."
+    }
   },
   "consent": {
     "termsRequired": "Please agree to the Terms to continue.",
@@ -123,22 +142,23 @@
     "maxUsesReached": "This referral code can be used by up to {max} people."
   },
   "credit": {
-    "loadFailed": "Couldn't load your credit info.",
+    "loadFailed": "Couldn't load your Misaeng Points.",
     "invalidUser": "That user isn't valid.",
-    "saveFailed": "Couldn't save credits (HTTP {status})",
+    "saveFailed": "Couldn't save Misaeng Points (HTTP {status})",
     "reviewListLoadFailed": "Couldn't load the review list.",
     "reviewRequestNotFound": "We couldn't find that request.",
     "reviewAlreadyProcessed": "This request has already been handled.",
     "reviewPostMissing": "The post is missing or has been deleted.",
-    "awardFailed": "Couldn't award credits. Please check the storage settings.",
+    "awardFailed": "Couldn't award Misaeng Points. Please check the storage settings.",
     "processFailed": "Couldn't complete that action.",
     "reviewSaveFailed": "Couldn't save the review request (HTTP {status})",
     "reviewStatusLoadFailed": "Couldn't load the review request status.",
-    "reviewBoardIneligible": "Posts on this board can't request extra credits.",
+    "reviewBoardIneligible": "Posts on this board can't request extra points.",
     "reviewFinalResultRequired": "Add the final result to your timeline first (approved, card received, offer, rejected, etc.).",
     "reviewAlreadyAwarded": "This post has already received a review bonus.",
     "reviewAlreadyPending": "This is already waiting for review.",
-    "reviewRequestFailed": "Couldn't request extra credits."
+    "reviewRequestFailed": "Couldn't request extra points.",
+    "reviewBonusReplaced": "Since the points update, review points are paid after the team reviews each post instead of this bonus. Please use the points review queue in the ERP."
   },
   "postings": {
     "loadFailed": "Couldn't load job postings."
@@ -229,12 +249,22 @@
           "moveInEnd": "Please choose the sublet end date."
         }
       }
+    },
+    "blocks": {
+      "loadFailed": "Couldn't load blocked users.",
+      "failed": "Couldn't block this user. Please try again in a moment.",
+      "unblockFailed": "Couldn't unblock this user. Please try again in a moment.",
+      "targetNotFound": "Couldn't find the post or comment to block.",
+      "self": "You can't block your own post or comment.",
+      "limit": "You can block up to {max} users.",
+      "notFound": "This user is not in your blocked list.",
+      "blockedPost": "This post is from a user you blocked."
     }
   },
   "guest": {
     "invalidRequest": "Please check your request.",
     "nicknameInvalid": "Please enter a display nickname of {min}–{max} characters (not an email address).",
-    "emailInvalid": "Please enter a valid email so we can send you gift card and credit updates.",
+    "emailInvalid": "Please enter a valid email so we can send you gift card and points updates.",
     "linkedinRequired": "Please enter your LinkedIn profile URL. Example: linkedin.com/in/your-name",
     "guidelinesRequired": "Please agree to the community posting guidelines.",
     "titleRequired": "Please enter a title.",
@@ -258,10 +288,118 @@
       "body": "{title}"
     },
     "credit": {
-      "title": "+{amount} credits",
+      "title": "+{amount} Misaeng Points",
       "body": "{label} · Balance {balance}"
     },
     "anonymous": "Anonymous",
-    "someone": "Someone"
+    "someone": "Someone",
+    "verification": {
+      "instagram": {
+        "approved": {
+          "title": "Instagram verified",
+          "body": "Your posts now show the Instagram verified badge."
+        },
+        "rejected": {
+          "title": "Instagram verification wasn't approved",
+          "body": "See the reason on My Page and request again."
+        }
+      }
+    },
+    "reviewDocs": {
+      "deleted": {
+        "title": "Verification documents deleted",
+        "body": "Your verification documents were permanently deleted on {date}. Only the verification result is kept."
+      },
+      "expired": {
+        "title": "Please submit your documents again",
+        "body": "We couldn't review your documents within 7 days, so they were permanently deleted on {date}. You can verify again from your review."
+      },
+      "approved": {
+        "title": "Review verified",
+        "body": "Your review is verified. Your documents will be permanently deleted within 72 hours."
+      },
+      "rejected": {
+        "title": "Your review couldn't be verified",
+        "body": "See the reason in Account > Verification History. Your documents will be permanently deleted within 72 hours."
+      }
+    }
+  },
+  "reviewDocs": {
+    "notReady": "Verification uploads are not available yet. Please try again later.",
+    "failed": "We couldn't process your documents. Please try again later.",
+    "invalidRequest": "Please check your request and try again.",
+    "consentRequired": "Please agree to how verification documents are handled before uploading.",
+    "fileRequired": "Please choose an image to upload.",
+    "tooManyFiles": "You can upload up to {max} files at a time.",
+    "fileTooLarge": "Each file must be 10 MB or smaller.",
+    "heicNotSupported": "Please convert HEIC files to JPG before uploading.",
+    "invalidImage": "We couldn't read this image. Please try another file.",
+    "unsupportedType": "Only JPG, PNG and PDF files can be uploaded.",
+    "boardNotEligible": "Only interview and job reviews and OPT, visa and green card posts can be verified.",
+    "alreadyVerified": "This post is already verified.",
+    "alreadyPending": "We're already reviewing documents for this post.",
+    "dailyLimit": "You can't upload more verification documents today. Please try again tomorrow.",
+    "notFound": "We couldn't find this verification.",
+    "deleteFailed": "We couldn't delete the files right away. We'll keep retrying automatically."
+  },
+  "points": {
+    "notConfigured": "Points are not available yet. Please try again later.",
+    "notActive": "The new points features have not started yet.",
+    "loadFailed": "Could not load your points.",
+    "requestFailed": "Could not process your points request. Please try again later.",
+    "invalidCursor": "Invalid request. Please reload your history from the start.",
+    "insufficient": "Not enough points. (Needed {required}, available {available})",
+    "monthlyCap": "You've reached this month's limit.",
+    "featureDisabled": "This feature is not available right now.",
+    "identityRequired": "Verify your school or work email to use this.",
+    "verificationRequired": "Verify your account (school or work email, or Instagram) to earn points.",
+    "claimNotFound": "Review request not found.",
+    "claimNotPending": "This review request has already been processed.",
+    "boost": {
+      "notAllowed": "Only roommate and sublet posts can be pinned.",
+      "notAuthor": "You can only pin your own posts.",
+      "active": "This post is already pinned (until {date}).",
+      "cooldown": "You can pin this post again from {date}.",
+      "monthlyCap": "You can pin posts up to {max} times a month.",
+      "slotsFull": "All top spots are taken right now. One opens on {date}."
+    },
+    "coffeeChat": {
+      "agreeRequired": "Please agree to the coffee chat notice.",
+      "topicRequired": "Please enter a coffee chat topic.",
+      "topicTooLong": "The topic can be up to {max} characters.",
+      "messageTooLong": "The message can be up to {max} characters.",
+      "monthlyCap": "You can request up to {max} coffee chats a month.",
+      "notFound": "Coffee chat request not found.",
+      "invalidTransition": "This request cannot be changed in its current state.",
+      "cannotCancel": "A scheduled coffee chat cannot be cancelled here. Please contact our team."
+    },
+    "push": {
+      "earned": {
+        "title": "+{amount} {name}",
+        "body": "{reason} · Balance {balance}"
+      },
+      "clawback": {
+        "title": "-{amount} {name} reversed",
+        "body": "Points were reversed under our guidelines · Balance {balance}"
+      },
+      "coffeeChat": {
+        "scheduled": {
+          "title": "Your coffee chat is scheduled",
+          "body": "Check the details on your account page."
+        },
+        "completed": {
+          "title": "Coffee chat completed",
+          "body": "Your reserved {name} have been used."
+        },
+        "cancelled": {
+          "title": "Your coffee chat was cancelled",
+          "body": "Your reserved {name} were not used."
+        },
+        "no_show": {
+          "title": "Coffee chat marked as no-show",
+          "body": "You were marked as absent, so your reserved {name} have been used."
+        }
+      }
+    }
   }
 }

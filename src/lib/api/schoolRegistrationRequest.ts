@@ -15,8 +15,36 @@ export type SchoolRegistrationRequestInput = {
   requesterName?: string | null
 }
 
-/** t는 네임스페이스 없는 번역기(`useT()`). 운영팀에게 가는 메일 본문은 한국어 그대로 둔다. */
+/** 요청을 서버에 저장한다 (ERP → Misaeng → Schools에서 본다) */
+async function storeSchoolRegistrationRequest(schoolName: string, emailDomain: string) {
+  const res = await fetch('/api/schools/registration-request', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ schoolName, emailDomain }),
+  })
+  const data = (await res.json().catch(() => null)) as { error?: string } | null
+  if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`)
+}
+
+/**
+ * t는 네임스페이스 없는 번역기(`useT()`). 운영팀에게 가는 메일 본문은 한국어 그대로 둔다.
+ * 요청은 서버에 저장하고(ERP 목록) 메일도 보낸다. 둘 중 하나만 되어도 성공으로 본다.
+ */
 export async function sendSchoolRegistrationRequest(
+  input: SchoolRegistrationRequestInput,
+  t: Translate,
+) {
+  const schoolName = input.schoolName.trim()
+  const emailDomain = input.emailDomain.trim().toLowerCase()
+  const [stored, mailed] = await Promise.allSettled([
+    storeSchoolRegistrationRequest(schoolName, emailDomain),
+    mailSchoolRegistrationRequest({ ...input, schoolName, emailDomain }, t),
+  ])
+  if (stored.status === 'fulfilled' || mailed.status === 'fulfilled') return
+  throw mailed.reason
+}
+
+async function mailSchoolRegistrationRequest(
   input: SchoolRegistrationRequestInput,
   t: Translate,
 ) {

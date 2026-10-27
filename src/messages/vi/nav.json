@@ -13,7 +13,7 @@
     "me": "Trang của tôi",
     "myPosts": "Bài viết của tôi",
     "myLikes": "Bài viết đã thích",
-    "creditReviews": "Xét duyệt credit"
+    "creditReviews": "Xét duyệt điểm"
   },
   "accountMenu": "Menu tài khoản",
   "openAccountMenu": "Mở menu tài khoản",
@@ -38,7 +38,7 @@
     },
     "links": {
       "housing": "Nhà ở",
-      "credit": "Credit",
+      "credit": "Điểm Misaeng",
       "partners": "Đối tác",
       "companySite": "Trang công ty",
       "about": "Về chúng tôi",

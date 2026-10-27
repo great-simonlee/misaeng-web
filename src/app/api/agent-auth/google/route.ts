@@ -80,7 +80,7 @@ export async function POST(request: Request) {
         if (tokens.accessToken) break
       } else {
         lastStatus = res.status
-        lastError = getAuthErrorMessage(t, data, lastError)
+        lastError = getAuthErrorMessage(t, data, lastError, res.status)
         if (isUpstreamUnavailable(res.status)) {
           return NextResponse.json({ error: lastError }, { status: 503 })
         }

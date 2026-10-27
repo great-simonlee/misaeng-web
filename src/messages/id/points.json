@@ -1,0 +1,42 @@
+{
+  "name": "poin Misaeng",
+  "nameEllieo": "poin Ellieo",
+  "sharedNotice": "Poin kamu dipakai bersama di Misaeng dan Ellieo.",
+  "reasons": {
+    "welcome": "Bonus selamat datang (verifikasi sekolah atau kantor pertama)",
+    "verify_instagram": "Verifikasi Instagram",
+    "profile_complete": "Profil lengkap",
+    "checkin": "Check-in harian",
+    "checkin_streak7": "Check-in 7 hari berturut-turut",
+    "referral": "Ajak teman",
+    "comment": "Komentar",
+    "review": {
+      "base": "Menulis ulasan",
+      "detail": "Ulasan rinci per tahap",
+      "verified": "Terverifikasi dengan dokumen",
+      "pick": "Terpilih sebagai Misaeng Pick",
+      "first_company": "Ulasan pertama untuk perusahaan",
+      "total": "Poin ulasan"
+    },
+    "review_unlock": "Membuka ulasan",
+    "coffee_chat": "Coffee chat 1:1",
+    "coffee_chat_no_show": "Tidak hadir coffee chat",
+    "housing_post_boost": "Sematkan postingan roommate/sublet di atas",
+    "clawback": {
+      "post": "Poin ulasan ditarik",
+      "comment": "Poin komentar ditarik",
+      "admin": "Poin ditarik"
+    },
+    "legacy_opening": "Poin sebelumnya dipindahkan",
+    "adjust": "Penyesuaian poin"
+  },
+  "entryTypes": {
+    "earn": "Didapat",
+    "spend": "Dipakai",
+    "hold": "Ditahan",
+    "release": "Penahanan dibatalkan",
+    "clawback": "Ditarik",
+    "adjust": "Disesuaikan"
+  },
+  "legacyBadge": "Riwayat sebelumnya"
+}
