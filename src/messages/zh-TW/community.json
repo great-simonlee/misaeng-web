@@ -255,6 +255,8 @@
     "companyPageFallback": "公司頁面",
     "loadFailed": "無法載入這篇貼文。",
     "deleteConfirm": "要刪除「{title}」嗎？\n刪除後無法復原。",
+    "deletePointsClawback": "透過這篇文章獲得的 Misaeng 點數 {points}P 將被收回。",
+    "deletePointsPending": "即將發放的 Misaeng 點數 {points}P 將會取消。",
     "deleted": "貼文已刪除",
     "loading": "載入中…",
     "notFoundTitle": "找不到貼文",

@@ -255,6 +255,8 @@
     "companyPageFallback": "Company page",
     "loadFailed": "Couldn't load this post.",
     "deleteConfirm": "Delete \"{title}\"?\nThis can't be undone.",
+    "deletePointsClawback": "The {points}P Misaeng points you earned from this post will be taken back.",
+    "deletePointsPending": "The {points}P Misaeng points waiting to be paid for this post will be cancelled.",
     "deleted": "Post deleted",
     "loading": "Loading…",
     "notFoundTitle": "Post not found",

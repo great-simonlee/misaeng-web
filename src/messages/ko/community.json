@@ -255,6 +255,8 @@
     "companyPageFallback": "회사 페이지",
     "loadFailed": "글을 불러오지 못했어요",
     "deleteConfirm": "\"{title}\" 글을 삭제할까요?\n삭제하면 되돌릴 수 없어요.",
+    "deletePointsClawback": "이 글로 받은 미생 포인트 {points}P가 회수돼요.",
+    "deletePointsPending": "지급 예정인 미생 포인트 {points}P가 취소돼요.",
     "deleted": "글을 삭제했어요",
     "loading": "글을 불러오는 중이에요…",
     "notFoundTitle": "게시글을 찾을 수 없습니다",

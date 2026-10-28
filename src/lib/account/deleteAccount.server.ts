@@ -134,6 +134,8 @@ export type StepOutcome = 'ok' | 'skipped' | 'failed'
 export type DeleteAccountReport = {
   steps: Record<string, StepOutcome | string>
   ellieo: 'deleted' | 'unsupported' | 'failed' | 'skipped'
+  /** Misaeng's own login (Supabase Auth user) */
+  login?: 'deleted' | 'failed' | 'skipped'
   apple: AppleRevokeOutcome
 }
 
@@ -359,11 +361,31 @@ export async function deleteMisaengAccount(input: {
     }
   })
 
-  // 5. Apple + Ellieo
+  // 5. Apple + the login itself: Misaeng's Supabase user, and Ellieo only while the request still used an Ellieo token
   report.apple = await revokeAppleTokens(uid, input.appleAuthorizationCode)
-  report.ellieo = await deleteEllieoAccount(input.accessToken, reason)
+  report.login = await deleteSupabaseLogin(uid)
+  const { isSupabaseToken } = await import('@lib/auth/supabaseAuth.server')
+  if (!input.accessToken || !isSupabaseToken(input.accessToken)) {
+    report.ellieo = await deleteEllieoAccount(input.accessToken, reason)
+  }
 
   invalidateListProfile(uid)
   console.info(`Account deletion ${uid}:`, JSON.stringify(report))
   return report
+}
+
+/** Deletes the Supabase Auth user linked to this uid (cascades its auth_accounts row). The tombstone stays. */
+async function deleteSupabaseLogin(uid: string): Promise<NonNullable<DeleteAccountReport['login']>> {
+  try {
+    const { authUserIdForUid } = await import('@lib/auth/accounts.server')
+    const authUserId = await authUserIdForUid(uid)
+    if (!authUserId) return 'skipped'
+    const { adminDeleteUser } = await import('@lib/auth/supabaseAuth.server')
+    await adminDeleteUser(authUserId)
+    return 'deleted'
+  } catch (error) {
+    // auth tables missing (SQL not run) or Supabase down: the Misaeng data is already gone
+    console.error('Account deletion: Supabase login delete failed', error)
+    return 'failed'
+  }
 }

@@ -15,6 +15,7 @@ import {
 } from '@lib/constants/cities'
 import {
   deleteCommunityPostRequest,
+  postDeleteConfirmText,
   fetchMyCommunityPosts,
   localizeCommunityError,
 } from '@lib/community/client'
@@ -106,11 +107,12 @@ export function MyPostsScreen() {
 
   async function handleDelete(post: MyPostItem) {
     if (!post.canManage) return
-    const ok = window.confirm(
-      t('posts.deleteConfirm', { title: post.title }),
-    )
-    if (!ok) return
     setDeletingId(post.id)
+    const message = await postDeleteConfirmText(post.id, t('posts.deleteConfirm', { title: post.title }), tRoot)
+    if (!window.confirm(message)) {
+      setDeletingId(null)
+      return
+    }
     try {
       await deleteCommunityPostRequest(post.id)
       setPosts((prev) => prev.filter((item) => item.id !== post.id))

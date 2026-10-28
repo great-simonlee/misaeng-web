@@ -95,6 +95,7 @@ export function normalizeFoodCategory(raw: unknown): FoodCategoryId | null {
 /** 맛집: 음식 종류 (브런치·한식 등) */
 export type FoodCuisineId =
   | 'brunch'
+  | 'cafe'
   | 'korean'
   | 'japanese'
   | 'chinese'
@@ -115,6 +116,7 @@ export type FoodCuisineMeta = {
 
 export const FOOD_CUISINES: FoodCuisineMeta[] = [
   { id: 'brunch', label: '브런치' },
+  { id: 'cafe', label: '카페' },
   { id: 'korean', label: '한식' },
   { id: 'japanese', label: '일식' },
   { id: 'chinese', label: '중식' },

@@ -32,6 +32,8 @@ import {
   accountSuspendedResponse,
 } from '@lib/supabase/profile.server'
 import { isSchoolEmail } from '@lib/utils/verification'
+import { isSupabaseAuthMode } from '@lib/auth/accounts.server'
+import { confirmVerificationCode, sendVerificationCode } from '@lib/auth/verificationMail.server'
 
 type SchoolEmailBody = {
   action?: 'send' | 'confirm' | 'primary'
@@ -136,7 +138,9 @@ async function confirmViaGenericCode(t: Translate, email: string, code: string) 
   return { ok: false as const, error: lastError }
 }
 
-async function sendSchoolCode(t: Translate, email: string, managed: boolean) {
+async function sendSchoolCode(t: Translate, email: string, managed: boolean, uid: string) {
+  // Misaeng's own login: Misaeng emails the code (the domain was already checked above)
+  if (isSupabaseAuthMode()) return sendVerificationCode(t, 'school_email', uid, email)
   if (otpPathFor(email, managed) === 'generic') return sendViaGenericCode(t, email)
   const result = await sendViaEllieo(t, email)
   if (!result.ok && result.code === 'SCHOOL_DOMAIN_UNSUPPORTED' && managed) {
@@ -145,7 +149,8 @@ async function sendSchoolCode(t: Translate, email: string, managed: boolean) {
   return result
 }
 
-async function confirmSchoolCode(t: Translate, email: string, code: string, managed: boolean) {
+async function confirmSchoolCode(t: Translate, email: string, code: string, managed: boolean, uid: string) {
+  if (isSupabaseAuthMode()) return confirmVerificationCode(t, 'school_email', uid, email, code)
   if (otpPathFor(email, managed) === 'generic') return confirmViaGenericCode(t, email, code)
   const result = await confirmViaEllieo(t, email, code)
   if (!result.ok && managed) {
@@ -266,7 +271,7 @@ export async function POST(request: Request) {
     if (action === 'send') {
       const limitError = await schoolLimitError(t, user.uid, email)
       if (limitError) return NextResponse.json({ error: limitError }, { status: 409 })
-      const result = await sendSchoolCode(t, email, Boolean(managedSchool))
+      const result = await sendSchoolCode(t, email, Boolean(managedSchool), user.uid)
       if (!result.ok) {
         return NextResponse.json(
           {
@@ -289,7 +294,7 @@ export async function POST(request: Request) {
         )
       }
 
-      const result = await confirmSchoolCode(t, email, code, Boolean(managedSchool))
+      const result = await confirmSchoolCode(t, email, code, Boolean(managedSchool), user.uid)
       if (!result.ok) {
         return NextResponse.json({ error: result.error }, { status: 400 })
       }

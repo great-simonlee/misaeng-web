@@ -41,6 +41,8 @@ export async function GET(request: Request) {
     return NextResponse.json({
       industries,
       companies: filtered.map((c) => ({
+        // 후기(post.companyId)와 회사를 이름이 아닌 ID로 잇기 위해 앱이 사용
+        id: c.id,
         slug: c.slug,
         name: c.name,
         aliases: c.aliases,

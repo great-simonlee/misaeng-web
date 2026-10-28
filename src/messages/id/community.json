@@ -255,6 +255,8 @@
     "companyPageFallback": "Halaman perusahaan",
     "loadFailed": "Gagal memuat postingan ini.",
     "deleteConfirm": "Hapus \"{title}\"?\nTindakan ini tidak bisa dibatalkan.",
+    "deletePointsClawback": "{points}P poin Misaeng yang kamu dapat dari postingan ini akan ditarik kembali.",
+    "deletePointsPending": "{points}P poin Misaeng yang akan dibayarkan untuk postingan ini akan dibatalkan.",
     "deleted": "Postingan dihapus",
     "loading": "Memuat…",
     "notFoundTitle": "Postingan tidak ditemukan",

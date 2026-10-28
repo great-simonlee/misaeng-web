@@ -18,6 +18,9 @@ import {
   getOrCreateDeviceId,
   setEllieoSession,
 } from '../lib/ellieoServer'
+import { supabaseWebSessionResponse } from '../lib/webSession'
+import { isSupabaseAuthMode } from '@lib/auth/accounts.server'
+import { idTokenSignIn } from '@lib/auth/flows.server'
 
 type GoogleAuthBody = {
   idToken?: string
@@ -42,6 +45,23 @@ const ELLIEO_LOGIN_BODIES = (idToken: string) => [
 
 export async function POST(request: Request) {
   const t = await getRequestT(request, 'api')
+  if (isSupabaseAuthMode()) {
+    const body = ((await request.json().catch(() => null)) || {}) as GoogleAuthBody
+    const idToken = body.idToken ?? body.googleIdToken ?? body.token ?? body.credential
+    if (!idToken) return NextResponse.json({ error: t('auth.googleIdTokenRequired') }, { status: 400 })
+    const result = await idTokenSignIn(t, request, 'google', idToken, { consent: body, name: body.name })
+    if (!result.ok && result.status === 428) {
+      // same answer the web already handles for a new Google account without consent
+      const consentCheck = await assertAcceptedCurrentPolicy({
+        acceptedTerms: body.acceptedTerms,
+        termsVersion: body.termsVersion,
+        privacyVersion: body.privacyVersion,
+        t,
+      })
+      if (!consentCheck.ok) return NextResponse.json(consentCheck.body, { status: consentCheck.status })
+    }
+    return supabaseWebSessionResponse(result, t)
+  }
   try {
     if (!getEllieoBaseUrl()) {
       return NextResponse.json(

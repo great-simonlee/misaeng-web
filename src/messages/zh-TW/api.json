@@ -52,7 +52,15 @@
     "tooManyAttempts": "嘗試次數過多，請稍後再試。",
     "weakPassword": "密碼至少需要6個字元。",
     "invalidEmail": "請輸入有效的電子郵件地址。",
-    "accountDisabled": "此帳號已被限制使用，請聯絡 Misaeng 團隊。"
+    "accountDisabled": "此帳號已被限制使用，請聯絡 Misaeng 團隊。",
+    "verificationSent": "驗證碼已寄出，請查看信箱。",
+    "codeRequired": "請輸入驗證碼。",
+    "codeInvalid": "驗證碼不正確，請再確認一次。",
+    "codeExpired": "驗證碼已過期，請重新取得。",
+    "codeCooldown": "請稍後再試。",
+    "emailNotConfirmed": "完成電子郵件驗證後才能登入。請輸入郵件中的驗證碼。",
+    "authUnavailable": "目前無法連線到登入伺服器，請稍後再試。",
+    "emailUnavailable": "目前無法寄送郵件，請稍後再試。"
   },
   "profile": {
     "nickname": {

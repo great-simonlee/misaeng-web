@@ -145,5 +145,7 @@ export async function DELETE(request: Request) {
 
   // web: sign out right away (the app forgets its own tokens)
   await clearEllieoSession().catch(() => undefined)
+  const { clearMisaengSession } = await import('@lib/auth/session.server')
+  await clearMisaengSession().catch(() => undefined)
   return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
 }

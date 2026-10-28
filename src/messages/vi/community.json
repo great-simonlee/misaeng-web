@@ -255,6 +255,8 @@
     "companyPageFallback": "Trang công ty",
     "loadFailed": "Không thể tải bài viết này.",
     "deleteConfirm": "Xóa \"{title}\"?\nKhông thể hoàn tác thao tác này.",
+    "deletePointsClawback": "{points}P điểm Misaeng bạn nhận từ bài viết này sẽ bị thu hồi.",
+    "deletePointsPending": "{points}P điểm Misaeng sắp được trả cho bài viết này sẽ bị hủy.",
     "deleted": "Đã xóa bài viết",
     "loading": "Đang tải…",
     "notFoundTitle": "Không tìm thấy bài viết",

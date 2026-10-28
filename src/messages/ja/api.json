@@ -52,7 +52,15 @@
     "tooManyAttempts": "試行回数が多すぎます。しばらくしてからもう一度お試しください。",
     "weakPassword": "パスワードは6文字以上にしてください。",
     "invalidEmail": "正しいメールアドレスを入力してください。",
-    "accountDisabled": "このアカウントは利用が制限されています。Misaengチームにお問い合わせください。"
+    "accountDisabled": "このアカウントは利用が制限されています。Misaengチームにお問い合わせください。",
+    "verificationSent": "認証番号を送信しました。メールをご確認ください。",
+    "codeRequired": "認証番号を入力してください。",
+    "codeInvalid": "認証番号が正しくありません。もう一度ご確認ください。",
+    "codeExpired": "認証番号の有効期限が切れました。新しい番号を受け取ってください。",
+    "codeCooldown": "しばらくしてからもう一度お試しください。",
+    "emailNotConfirmed": "ログインするにはメール認証が必要です。メールで届いた認証番号を入力してください。",
+    "authUnavailable": "現在ログインサーバーに接続できません。しばらくしてからお試しください。",
+    "emailUnavailable": "現在メールを送信できません。しばらくしてからお試しください。"
   },
   "profile": {
     "nickname": {

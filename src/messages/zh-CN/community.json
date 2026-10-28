@@ -255,6 +255,8 @@
     "companyPageFallback": "公司页面",
     "loadFailed": "无法加载该帖子。",
     "deleteConfirm": "确定删除“{title}”吗？\n删除后无法恢复。",
+    "deletePointsClawback": "通过这篇帖子获得的 Misaeng 积分 {points}P 将被收回。",
+    "deletePointsPending": "即将发放的 Misaeng 积分 {points}P 将会取消。",
     "deleted": "帖子已删除",
     "loading": "加载中…",
     "notFoundTitle": "找不到该帖子",

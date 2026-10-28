@@ -15,6 +15,7 @@ import {
 import {
   CommunityBlockedPostError,
   deleteCommunityPostRequest,
+  postDeleteConfirmText,
   fetchCommunityPost,
   localizeCommunityError,
 } from '@lib/community/client'
@@ -59,6 +60,7 @@ export function CommunityDetailScreen({
   postId,
 }: CommunityDetailScreenProps) {
   const t = useT('community')
+  const tRoot = useT()
   const format = useCommunityFormat()
   const city = useCity()
   const href = useCityPath()
@@ -144,10 +146,8 @@ export function CommunityDetailScreen({
 
   async function handleDelete() {
     if (!post || !user) return
-    const ok = window.confirm(
-      t('detail.deleteConfirm', { title: post.title }),
-    )
-    if (!ok) return
+    const message = await postDeleteConfirmText(post.id, t('detail.deleteConfirm', { title: post.title }), tRoot)
+    if (!window.confirm(message)) return
     try {
       await deleteCommunityPostRequest(post.id)
       success(t('detail.deleted'))

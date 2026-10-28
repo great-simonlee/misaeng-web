@@ -52,7 +52,15 @@
     "tooManyAttempts": "Bạn đã thử quá nhiều lần. Vui lòng thử lại sau ít phút.",
     "weakPassword": "Mật khẩu phải có ít nhất 6 ký tự.",
     "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ.",
-    "accountDisabled": "Tài khoản này đã bị hạn chế. Vui lòng liên hệ đội ngũ Misaeng."
+    "accountDisabled": "Tài khoản này đã bị hạn chế. Vui lòng liên hệ đội ngũ Misaeng.",
+    "verificationSent": "Đã gửi mã xác minh. Vui lòng kiểm tra hộp thư.",
+    "codeRequired": "Vui lòng nhập mã.",
+    "codeInvalid": "Mã không đúng. Vui lòng kiểm tra lại.",
+    "codeExpired": "Mã đã hết hạn. Vui lòng yêu cầu mã mới.",
+    "codeCooldown": "Vui lòng đợi một chút rồi thử lại.",
+    "emailNotConfirmed": "Hãy xác minh email để đăng nhập. Nhập mã đã gửi qua email.",
+    "authUnavailable": "Hiện không kết nối được máy chủ đăng nhập. Vui lòng thử lại sau.",
+    "emailUnavailable": "Hiện không gửi được email. Vui lòng thử lại sau."
   },
   "profile": {
     "nickname": {

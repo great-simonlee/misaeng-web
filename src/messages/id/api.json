@@ -52,7 +52,15 @@
     "tooManyAttempts": "Terlalu banyak percobaan. Silakan coba lagi sebentar lagi.",
     "weakPassword": "Kata sandi minimal 6 karakter.",
     "invalidEmail": "Masukkan alamat email yang valid.",
-    "accountDisabled": "Akun ini dibatasi. Silakan hubungi tim Misaeng."
+    "accountDisabled": "Akun ini dibatasi. Silakan hubungi tim Misaeng.",
+    "verificationSent": "Kode sudah dikirim. Silakan cek email kamu.",
+    "codeRequired": "Masukkan kode.",
+    "codeInvalid": "Kode tidak cocok. Silakan periksa lagi.",
+    "codeExpired": "Kode sudah kedaluwarsa. Minta kode baru.",
+    "codeCooldown": "Tunggu sebentar sebelum meminta lagi.",
+    "emailNotConfirmed": "Verifikasi email kamu untuk masuk. Masukkan kode yang dikirim lewat email.",
+    "authUnavailable": "Server masuk sedang tidak bisa dihubungi. Coba lagi sebentar lagi.",
+    "emailUnavailable": "Email tidak bisa dikirim sekarang. Coba lagi sebentar lagi."
   },
   "profile": {
     "nickname": {

@@ -58,7 +58,15 @@
     "tooManyAttempts": "시도 횟수가 너무 많아요. 잠시 후 다시 시도해 주세요.",
     "weakPassword": "비밀번호는 6자 이상이어야 해요.",
     "invalidEmail": "올바른 이메일 주소를 입력해 주세요.",
-    "accountDisabled": "이용이 제한된 계정이에요. 미생팀에 문의해 주세요."
+    "accountDisabled": "이용이 제한된 계정이에요. 미생팀에 문의해 주세요.",
+    "verificationSent": "인증번호를 보냈어요. 메일함을 확인해 주세요.",
+    "codeRequired": "인증번호를 입력해 주세요.",
+    "codeInvalid": "인증번호가 맞지 않아요. 다시 확인해 주세요.",
+    "codeExpired": "인증번호가 만료되었어요. 새 인증번호를 받아 주세요.",
+    "codeCooldown": "잠시 후 다시 요청해 주세요.",
+    "emailNotConfirmed": "이메일 인증을 마쳐야 로그인할 수 있어요. 메일로 받은 인증번호를 입력해 주세요.",
+    "authUnavailable": "지금 로그인 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.",
+    "emailUnavailable": "지금 메일을 보낼 수 없어요. 잠시 후 다시 시도해 주세요."
   },
   "profile": {
     "nickname": {

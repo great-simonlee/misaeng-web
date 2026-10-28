@@ -49,6 +49,9 @@ export function NycLoginScreen() {
     configured,
     signInEmail,
     signUpEmail,
+    verifyEmail,
+    resendCode,
+    confirmReset,
     signInGoogle,
     resetPassword,
   } = useAuth()
@@ -63,9 +66,12 @@ export function NycLoginScreen() {
   const signedUpRef = useRef(false)
 
   const { locale } = useConsentLocale()
-  const [mode, setMode] = useState<'signin' | 'signup' | 'reset'>('signin')
+  // verify: the code emailed after sign-up · resetCode: the reset code + a new password (Misaeng's own login)
+  const [mode, setMode] = useState<'signin' | 'signup' | 'reset' | 'verify' | 'resetCode'>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [code, setCode] = useState('')
+  const [resending, setResending] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [showTermsError, setShowTermsError] = useState(false)
@@ -91,8 +97,9 @@ export function NycLoginScreen() {
     [acceptedTerms, locale, policy?.privacyVersion, policy?.termsVersion],
   )
 
-  const changeMode = useCallback((nextMode: 'signin' | 'signup' | 'reset') => {
+  const changeMode = useCallback((nextMode: 'signin' | 'signup' | 'reset' | 'verify' | 'resetCode') => {
     setMode(nextMode)
+    setCode('')
     if (nextMode !== 'signup') {
       setAcceptedTerms(false)
       setShowTermsError(false)
@@ -133,9 +140,29 @@ export function NycLoginScreen() {
     setSubmitting(true)
     try {
       if (mode === 'reset') {
-        await resetPassword(email.trim())
+        const { codeSent } = await resetPassword(email.trim())
+        if (codeSent) {
+          success(t('login.toasts.codeSent'))
+          setPassword('')
+          setMode('resetCode')
+          return
+        }
         success(t('login.toasts.resetEmailSent'))
         changeMode('signin')
+        return
+      }
+      if (mode === 'verify') {
+        signedUpRef.current = true
+        await verifyEmail(email.trim(), code.trim())
+        await bindPersistedReferralIfNeeded()
+        success(t('login.toasts.signedUp'))
+        router.replace(afterSignup)
+        return
+      }
+      if (mode === 'resetCode') {
+        await confirmReset(email.trim(), code.trim(), password)
+        success(t('login.toasts.signedIn'))
+        router.replace(next)
         return
       }
       if (mode === 'signin') {
@@ -143,13 +170,24 @@ export function NycLoginScreen() {
         success(t('login.toasts.signedIn'))
       } else {
         signedUpRef.current = true
-        await signUpEmail(email.trim(), password, consentPayload)
+        const { verificationRequired } = await signUpEmail(email.trim(), password, consentPayload)
+        if (verificationRequired) {
+          signedUpRef.current = false
+          success(t('login.toasts.codeSent'))
+          changeMode('verify')
+          return
+        }
         await bindPersistedReferralIfNeeded()
         success(t('login.toasts.signedUp'))
       }
       router.replace(mode === 'signup' ? afterSignup : next)
     } catch (err) {
       signedUpRef.current = false
+      // signed up earlier but never entered the code: send a fresh one and ask for it
+      if (mode === 'signin' && (err as { code?: string | null })?.code === 'auth.emailNotConfirmed') {
+        await resendCode(email.trim()).catch(() => null)
+        changeMode('verify')
+      }
       toastError(
         getErrorMessage(
           err,
@@ -217,17 +255,42 @@ export function NycLoginScreen() {
     [toastError],
   )
 
-  const isResetMode = mode === 'reset'
-  const title = isResetMode
-    ? t('login.resetTitle')
-    : mode === 'signup'
-      ? t('login.signUpTitle')
-      : t('login.signInTitle')
-  const description = isResetMode
-    ? t('login.resetDescription')
-    : mode === 'signup'
-      ? t('login.signUpDescription')
-      : t('login.signInDescription')
+  async function handleResend() {
+    setResending(true)
+    try {
+      if (mode === 'resetCode') await resetPassword(email.trim())
+      else await resendCode(email.trim())
+      success(t('login.toasts.codeResent'))
+    } catch (err) {
+      toastError(getErrorMessage(err, t('login.errors.authFailed')))
+    } finally {
+      setResending(false)
+    }
+  }
+
+  const isCodeMode = mode === 'verify' || mode === 'resetCode'
+  // the reset and code steps hide the tabs and Google (email-only steps)
+  const isResetMode = mode === 'reset' || isCodeMode
+  const title =
+    mode === 'verify'
+      ? t('login.verifyTitle')
+      : mode === 'resetCode'
+        ? t('login.resetCodeTitle')
+        : mode === 'reset'
+          ? t('login.resetTitle')
+          : mode === 'signup'
+            ? t('login.signUpTitle')
+            : t('login.signInTitle')
+  const description =
+    mode === 'verify'
+      ? t('login.verifyDescription', { email: email.trim() })
+      : mode === 'resetCode'
+        ? t('login.resetCodeDescription', { email: email.trim() })
+        : mode === 'reset'
+          ? t('login.resetDescription')
+          : mode === 'signup'
+            ? t('login.signUpDescription')
+            : t('login.signInDescription')
 
   const submitLabel = submitting
     ? t('login.submitting')
@@ -235,7 +298,11 @@ export function NycLoginScreen() {
       ? t('login.submitSignIn')
       : mode === 'signup'
         ? t('login.submitSignUp')
-        : t('login.submitReset')
+        : mode === 'verify'
+          ? t('login.submitVerify')
+          : mode === 'resetCode'
+            ? t('login.submitResetCode')
+            : t('login.submitReset')
 
   return (
     <div className='relative min-h-[100dvh] bg-[linear-gradient(180deg,#eef1f6_0%,#e8edf4_42%,#f4f6fa_100%)]'>
@@ -351,8 +418,47 @@ export function NycLoginScreen() {
                   className={inputClass}
                   autoComplete='email'
                   placeholder='you@example.com'
+                  readOnly={isCodeMode}
                 />
               </label>
+
+              {isCodeMode && (
+                <label className='block'>
+                  <span className='text-[13px] font-medium text-[#344054]'>
+                    {t('login.codeLabel')}
+                  </span>
+                  <input
+                    required
+                    inputMode='numeric'
+                    pattern='[0-9]{6}'
+                    maxLength={6}
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className={`${inputClass} text-center text-[20px] font-semibold tracking-[0.4em]`}
+                    autoComplete='one-time-code'
+                    placeholder='123456'
+                    autoFocus
+                  />
+                </label>
+              )}
+
+              {mode === 'resetCode' && (
+                <label className='block'>
+                  <span className='text-[13px] font-medium text-[#344054]'>
+                    {t('login.newPasswordLabel')}
+                  </span>
+                  <input
+                    required
+                    type='password'
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={inputClass}
+                    autoComplete='new-password'
+                    placeholder={t('login.passwordPlaceholder')}
+                  />
+                </label>
+              )}
 
               {!isResetMode && (
                 <label className='block'>
@@ -416,6 +522,17 @@ export function NycLoginScreen() {
             >
               {submitLabel}
             </button>
+
+            {isCodeMode && (
+              <button
+                type='button'
+                disabled={resending || submitting}
+                onClick={() => void handleResend()}
+                className='w-full text-center text-[13px] font-medium text-[#667085] transition hover:text-brand disabled:opacity-50'
+              >
+                {t('login.resendCode')}
+              </button>
+            )}
           </form>
         </div>
 

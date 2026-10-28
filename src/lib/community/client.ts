@@ -372,6 +372,35 @@ export async function updateCommunityPostRequest(
   return data.post
 }
 
+/** Points the author loses by deleting a post (for the delete confirmation). Never throws: 0/0 on failure. */
+export async function fetchPostDeletionPreview(
+  id: string,
+): Promise<{ clawback: number; pendingCancel: number }> {
+  const none = { clawback: 0, pendingCancel: 0 }
+  if (id.startsWith('mock-')) return none
+  try {
+    const res = await fetch(`/api/community/${encodeURIComponent(id)}/deletion-preview`, { cache: 'no-store' })
+    if (!res.ok) return none
+    const data = (await res.json().catch(() => null)) as { clawback?: number; pendingCancel?: number } | null
+    return { clawback: Math.max(0, data?.clawback ?? 0), pendingCancel: Math.max(0, data?.pendingCancel ?? 0) }
+  } catch {
+    return none
+  }
+}
+
+/** Delete confirmation text: the base question plus the points it takes back (community.detail.* keys). */
+export async function postDeleteConfirmText(
+  id: string,
+  base: string,
+  t: Translate,
+): Promise<string> {
+  const { clawback, pendingCancel } = await fetchPostDeletionPreview(id)
+  const lines = [base]
+  if (clawback > 0) lines.push(t('community.detail.deletePointsClawback', { points: clawback }))
+  if (pendingCancel > 0) lines.push(t('community.detail.deletePointsPending', { points: pendingCancel }))
+  return lines.join('\n\n')
+}
+
 export async function deleteCommunityPostRequest(id: string): Promise<void> {
   if (id.startsWith('mock-')) {
     throw new CommunityClientError(

@@ -4,9 +4,10 @@ import type { CommunityPost } from '@/types/nyc'
 
 import { awardComment, awardProfileComplete, awardReferral, clawbackComment, handleVerificationCompleted, type VerificationKind } from './bonuses.server'
 import { endPostBoost } from './boost.server'
-import { addVerifiedComponent, clawbackPost, createOrRefreshClaim } from './claims.server'
+import { addVerifiedComponent, clawbackPost, createOrRefreshClaim, getClaimByPost } from './claims.server'
 import { getCutoverMs, getPointsEngineState, type PointsEngine } from './engine.server'
-import { decodeHistoryCursor, getPointsBalance, getPointsHistory, type PointsHistoryItem } from './ledger.server'
+import { decodeHistoryCursor, getPointsBalance, getPointsHistory, ledgerNetForSource, type PointsHistoryItem } from './ledger.server'
+import { legacyNetEarned } from './legacy.server'
 import { nyMonthStart } from './time'
 
 /**
@@ -114,6 +115,40 @@ export function onPostDeleted(input: { uid: string; postId: string }) {
       return result
     },
   )
+}
+
+/**
+ * What deleting a post would take back, for the delete confirmation (GET /api/community/[id]/deletion-preview).
+ * `clawback` = points already paid for the post (same sum onPostDeleted takes), `pendingCancel` = the unpaid
+ * part of a pending review claim that deleting cancels. Read-only.
+ */
+export async function previewPostDeletion(input: { uid: string; postId: string }): Promise<{
+  engine: PointsEngine
+  clawback: number
+  pendingCancel: number
+}> {
+  const reasons = ['food', 'status', 'job-review', 'review-bonus'] as const
+  const state = await getPointsEngineState()
+  if (state.engine !== 'ledger') {
+    return {
+      engine: state.engine,
+      clawback: await legacyNetEarned(input.uid, input.postId, [...reasons]),
+      pendingCancel: 0,
+    }
+  }
+  const [net, extra, claim] = await Promise.all([
+    ledgerNetForSource(input.uid, 'post', input.postId),
+    legacyNetEarned(input.uid, input.postId, [...reasons]),
+    getClaimByPost(input.postId),
+  ])
+  let pendingCancel = 0
+  if (claim?.status === 'pending') {
+    for (const [component, amount] of Object.entries(claim.requested)) {
+      if (typeof claim.components[component as keyof typeof claim.components] === 'number') continue
+      pendingCancel += Math.max(0, Math.trunc(amount ?? 0))
+    }
+  }
+  return { engine: 'ledger', clawback: Math.max(0, net + extra), pendingCancel }
 }
 
 /**

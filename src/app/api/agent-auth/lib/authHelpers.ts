@@ -1,10 +1,21 @@
 import { createHash } from 'node:crypto'
 
+import { cookies } from 'next/headers'
+
 import { isAccountDeleted } from '@lib/account/deletedAccount.server'
+import { isPlaceholderEmail, isSupabaseAuthMode } from '@lib/auth/accounts.server'
+import {
+  resolveMisaengCookieSession,
+  upgradeEllieoWebSession,
+  userForMisaengToken,
+} from '@lib/auth/session.server'
+import { isSupabaseToken } from '@lib/auth/supabaseAuth.server'
 import { isMisaengEmail } from '@lib/constants/nyc'
 import type { Translate } from '@lib/i18n/translate'
 
 import {
+  clearEllieoSession,
+  ELLIEO_ACCESS_COOKIE,
   ellieoUpstreamFetch,
   extractEllieoTokens,
   getEllieoAccessToken,
@@ -447,6 +458,7 @@ export async function verifyEllieoAccessToken(accessToken: string): Promise<bool
  * 탈퇴한 계정(프로필 status 'deleted')은 로그인하지 않은 것으로 본다 — `allowDeleted`는 탈퇴 요청을 다시 보낼 때만.
  */
 export async function resolveAuthenticatedSession(options: { allowDeleted?: boolean } = {}) {
+  if (isSupabaseAuthMode()) return resolveSupabaseModeSession(options)
   const bearer = await getRequestBearerToken()
   let accessToken: string | null = null
   if (bearer) {
@@ -474,4 +486,62 @@ export async function resolveAuthenticatedSession(options: { allowDeleted?: bool
 /** 현재 요청의 사용자. 앱은 Bearer 토큰, 웹은 쿠키(만료 시 리프레시 토큰으로 갱신). 탈퇴한 계정은 null. */
 export async function resolveAuthenticatedUser() {
   return (await resolveAuthenticatedSession())?.user ?? null
+}
+
+type ResolvedSession = {
+  user: { uid: string; email: string; displayName: string | null; photoURL: string | null; phoneNumber: string | null; authUserId?: string }
+  accessToken: string
+}
+
+/**
+ * Misaeng's own login (MISAENG_AUTH_PROVIDER=supabase). App: Bearer Supabase token. Web: misaeng_* cookies.
+ * Switch-over: an Ellieo token is still accepted (checked with Ellieo as before) — the app swaps it at its next
+ * /api/app-auth/refresh, the web swaps it right here for a Misaeng session on the same uid.
+ */
+async function resolveSupabaseModeSession(options: { allowDeleted?: boolean }): Promise<ResolvedSession | null> {
+  let resolved: ResolvedSession | null = null
+  const bearer = await getRequestBearerToken()
+  if (bearer) {
+    if (isSupabaseToken(bearer)) {
+      const user = await userForMisaengToken(bearer)
+      resolved = user ? { user, accessToken: bearer } : null
+    } else if (await verifyEllieoAccessToken(bearer)) {
+      const user = normalizeUserFromAccessToken(bearer)
+      resolved = user ? { user, accessToken: bearer } : null
+    }
+  } else {
+    resolved = await resolveMisaengCookieSession()
+    if (!resolved) resolved = await upgradeLegacyWebCookies()
+  }
+  if (!resolved) return null
+  if (!options.allowDeleted && (await isAccountDeleted(resolved.user.uid))) return null
+  return resolved
+}
+
+/** A web visitor with a live Ellieo cookie session → a Misaeng session for the same uid (Ellieo cookies cleared). */
+async function upgradeLegacyWebCookies(): Promise<ResolvedSession | null> {
+  const jar = await cookies()
+  // the cookie itself — never getEllieoAccessToken(), which falls back to the server's API key
+  let access = jar.get(ELLIEO_ACCESS_COOKIE)?.value?.trim() || null
+  if (access && !(await verifyEllieoAccessToken(access))) access = null
+  if (!access && (await getEllieoRefreshToken())) {
+    const refreshed = await refreshEllieoAccessToken().catch(() => null)
+    access = refreshed && (await verifyEllieoAccessToken(refreshed)) ? refreshed : null
+  }
+  if (!access) return null
+  const member = normalizeUserFromAccessToken(access)
+  if (!member) return null
+  if (isPlaceholderEmail(member.email) || (await isAccountDeleted(member.uid))) {
+    return { user: member, accessToken: access }
+  }
+  try {
+    const upgraded = await upgradeEllieoWebSession(member)
+    if (upgraded) {
+      await clearEllieoSession().catch(() => null)
+      return upgraded
+    }
+  } catch (error) {
+    console.error('Ellieo → Misaeng session upgrade failed:', error)
+  }
+  return { user: member, accessToken: access }
 }

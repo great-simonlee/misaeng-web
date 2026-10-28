@@ -13,11 +13,15 @@ import {
 } from '@lib/supabase/avatar.server'
 import { getSupabaseAvatarBucket } from '@lib/supabase/server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
+import { isSupabaseAuthMode } from '@lib/auth/accounts.server'
+import { clearMisaengSession, MISAENG_ACCESS_COOKIE } from '@lib/auth/session.server'
+import { signOut } from '@lib/auth/supabaseAuth.server'
+import { cookies } from 'next/headers'
 
 export async function GET() {
   const baseUrl = getEllieoBaseUrl()
 
-  if (!baseUrl) {
+  if (!baseUrl && !isSupabaseAuthMode()) {
     return NextResponse.json({
       configured: false,
       connected: false,
@@ -62,6 +66,13 @@ export async function GET() {
 }
 
 export async function DELETE() {
+  if (isSupabaseAuthMode()) {
+    const access = (await cookies()).get(MISAENG_ACCESS_COOKIE)?.value?.trim()
+    if (access) await signOut(access)
+    await clearMisaengSession()
+    await clearEllieoSession()
+    return NextResponse.json({ connected: false })
+  }
   const accessToken = await getEllieoAccessToken()
   if (accessToken) {
     await ellieoUpstreamFetch('auth/logout', {

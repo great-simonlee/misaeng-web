@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import { isSupabaseAuthMode } from '@lib/auth/accounts.server'
+import { confirmVerificationCode, sendVerificationCode } from '@lib/auth/verificationMail.server'
 
 import { apiErrorMessage } from '@lib/i18n/apiError'
 import { formatNumber } from '@lib/i18n/format'
@@ -50,7 +52,9 @@ function getCompanyNameError(t: Translate, locale: Locale, value: string) {
   return null
 }
 
-async function sendViaEllieo(t: Translate, email: string) {
+async function sendViaEllieo(t: Translate, email: string, uid: string) {
+  // Misaeng's own login: Misaeng emails the code
+  if (isSupabaseAuthMode()) return sendVerificationCode(t, 'work_email', uid, email)
   const { res, data } = await ellieoAuthorizedFetch('auth/verification/code', {
     method: 'POST',
     body: { email },
@@ -64,7 +68,8 @@ async function sendViaEllieo(t: Translate, email: string) {
   }
 }
 
-async function confirmViaEllieo(t: Translate, email: string, code: string) {
+async function confirmViaEllieo(t: Translate, email: string, code: string, uid: string) {
+  if (isSupabaseAuthMode()) return confirmVerificationCode(t, 'work_email', uid, email, code)
   const bodies = [
     { email, code },
     { email, verificationCode: code },
@@ -143,7 +148,7 @@ export async function POST(request: Request) {
     }
 
     if (action === 'send') {
-      const result = await sendViaEllieo(t, email)
+      const result = await sendViaEllieo(t, email, user.uid)
       if (!result.ok) {
         return NextResponse.json({ error: result.error }, { status: 502 })
       }
@@ -159,7 +164,7 @@ export async function POST(request: Request) {
         )
       }
 
-      const result = await confirmViaEllieo(t, email, code)
+      const result = await confirmViaEllieo(t, email, code, user.uid)
       if (!result.ok) {
         return NextResponse.json({ error: result.error }, { status: 400 })
       }

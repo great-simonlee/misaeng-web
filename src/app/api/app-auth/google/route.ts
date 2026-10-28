@@ -5,10 +5,13 @@ import { apiErrorMessage } from '@lib/i18n/apiError'
 import { getRequestT } from '@lib/i18n/server'
 import { loginOrRegisterWithGoogle, loginWithGoogle } from '../../agent-auth/lib/authHelpers'
 import { getEllieoBaseUrl } from '../../agent-auth/lib/ellieoServer'
+import { isSupabaseAuthMode } from '@lib/auth/accounts.server'
+import { idTokenSignIn } from '@lib/auth/flows.server'
 import {
   APP_DEVICE_ID,
   appSessionResponse,
   consentRequiredResponse,
+  supabaseAppSessionResponse,
   type AppSignInBody,
 } from '../lib/appSession'
 
@@ -24,6 +27,14 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(request: Request) {
   const t = await getRequestT(request, 'api')
+  if (isSupabaseAuthMode()) {
+    const body = ((await request.json().catch(() => null)) || {}) as AppSignInBody
+    const idToken = String(body.idToken || '').trim()
+    if (!idToken) return NextResponse.json({ error: t('auth.googleIdTokenRequired') }, { status: 400 })
+    const result = await idTokenSignIn(t, request, 'google', idToken, { consent: body, name: body.name })
+    if (!result.ok && result.status === 428) return consentRequiredResponse(t)
+    return supabaseAppSessionResponse(result, t)
+  }
   try {
     if (!getEllieoBaseUrl()) {
       return NextResponse.json({ error: t('auth.appConnectMissingLogin') }, { status: 503 })

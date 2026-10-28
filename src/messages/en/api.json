@@ -58,7 +58,15 @@
     "tooManyAttempts": "Too many attempts. Please try again in a moment.",
     "weakPassword": "Password must be at least 6 characters.",
     "invalidEmail": "Please enter a valid email address.",
-    "accountDisabled": "This account has been restricted. Please contact the Misaeng team."
+    "accountDisabled": "This account has been restricted. Please contact the Misaeng team.",
+    "verificationSent": "We sent you a code. Please check your inbox.",
+    "codeRequired": "Please enter the code.",
+    "codeInvalid": "That code doesn't match. Please check it again.",
+    "codeExpired": "The code has expired. Please request a new one.",
+    "codeCooldown": "Please wait a moment before requesting again.",
+    "emailNotConfirmed": "Verify your email to sign in. Enter the code we emailed you.",
+    "authUnavailable": "We can't reach the sign-in server right now. Please try again shortly.",
+    "emailUnavailable": "We can't send email right now. Please try again shortly."
   },
   "profile": {
     "nickname": {

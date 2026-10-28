@@ -47,7 +47,13 @@ interface AuthContextValue {
       privacyVersion: string
       uiLanguage: ConsentUiLanguage
     },
-  ) => Promise<void>
+  ) => Promise<{ verificationRequired: boolean }>
+  /** Misaeng's own login: the 6-digit code emailed after sign-up → signed in. */
+  verifyEmail: (email: string, code: string) => Promise<void>
+  /** Sign-up code again. */
+  resendCode: (email: string) => Promise<void>
+  /** Reset code + new password → signed in. */
+  confirmReset: (email: string, code: string, password: string) => Promise<void>
   signInGoogle: (params: {
     idToken: string
     email?: string | null
@@ -59,7 +65,8 @@ interface AuthContextValue {
       uiLanguage: ConsentUiLanguage
     }
   }) => Promise<void>
-  resetPassword: (email: string) => Promise<void>
+  /** codeSent: a 6-digit code was emailed (Misaeng's own login); otherwise a reset link (Ellieo). */
+  resetPassword: (email: string) => Promise<{ codeSent: boolean }>
   logout: () => Promise<void>
   uploadAvatar: (file: File) => Promise<string>
   saveNickname: (nickname: string) => Promise<string>
@@ -327,11 +334,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
 
     const data = (await response.json().catch(() => null)) as
-      | { error?: string; user?: AuthUser | null }
+      | { error?: string; code?: string | null; user?: AuthUser | null }
       | null
 
     if (!response.ok) {
-      throw new Error(data?.error || t('errors.loginFailed'))
+      throw Object.assign(new Error(data?.error || t('errors.loginFailed')), { code: data?.code ?? null })
     }
 
     await loadSession()
@@ -365,15 +372,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
 
     const data = (await response.json().catch(() => null)) as
-      | { error?: string; user?: AuthUser | null }
+      | { error?: string; code?: string | null; user?: AuthUser | null; verificationRequired?: boolean }
       | null
 
     if (!response.ok) {
-      throw new Error(data?.error || t('errors.signUpFailed'))
+      throw Object.assign(new Error(data?.error || t('errors.signUpFailed')), { code: data?.code ?? null })
     }
+    // Misaeng's own login emails a code first; the account signs in after verifyEmail
+    if (data?.verificationRequired) return { verificationRequired: true }
 
     await loadSession()
+    return { verificationRequired: false }
   }, [loadSession, t])
+
+  /** POST /api/agent-auth/email with a code step (verify | resend | resetConfirm). */
+  const postEmailStep = useCallback(async (body: Record<string, string>, fallback: string) => {
+    const response = await fetch('/api/agent-auth/email', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    const data = (await response.json().catch(() => null)) as { error?: string; code?: string | null } | null
+    if (!response.ok) {
+      throw Object.assign(new Error(data?.error || fallback), { code: data?.code ?? null })
+    }
+  }, [])
+
+  const verifyEmailFn = useCallback(async (email: string, code: string) => {
+    await postEmailStep({ mode: 'verify', email, code }, t('errors.signUpFailed'))
+    await loadSession()
+  }, [loadSession, postEmailStep, t])
+
+  const resendCodeFn = useCallback(async (email: string) => {
+    await postEmailStep({ mode: 'resend', email }, t('errors.signUpFailed'))
+  }, [postEmailStep, t])
+
+  const confirmResetFn = useCallback(async (email: string, code: string, password: string) => {
+    await postEmailStep({ mode: 'resetConfirm', email, code, password }, t('errors.resetPasswordFailed'))
+    await loadSession()
+  }, [loadSession, postEmailStep, t])
 
   const signInGoogleFn = useCallback(
     async (params: {
@@ -431,12 +469,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
       }),
     })
+    const data = (await response.json().catch(() => null)) as
+      | { error?: string; codeSent?: boolean }
+      | null
     if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as
-        | { error?: string }
-        | null
       throw new Error(data?.error || t('errors.resetPasswordFailed'))
     }
+    return { codeSent: Boolean(data?.codeSent) }
   }, [t])
 
   const logout = useCallback(async () => {
@@ -625,6 +664,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isMisaengUser: isMisaengEmail(user?.email),
       signInEmail: signInEmailFn,
       signUpEmail: signUpEmailFn,
+      verifyEmail: verifyEmailFn,
+      resendCode: resendCodeFn,
+      confirmReset: confirmResetFn,
       signInGoogle: signInGoogleFn,
       resetPassword: resetPasswordFn,
       logout,
@@ -646,6 +688,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       configured,
       signInEmailFn,
       signUpEmailFn,
+      verifyEmailFn,
+      resendCodeFn,
+      confirmResetFn,
       signInGoogleFn,
       resetPasswordFn,
       logout,
