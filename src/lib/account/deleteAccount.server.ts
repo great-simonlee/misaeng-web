@@ -323,6 +323,10 @@ export async function deleteMisaengAccount(input: {
     const { cleanupCoffeeChatsForDeletedUser } = await import('@lib/points/coffeeChatMentors.server')
     return cleanupCoffeeChatsForDeletedUser(uid)
   })
+  await step(report, 'reviewQuestions', async () => {
+    const { cleanupQuestionsForDeletedUser } = await import('@lib/points/reviewQuestions.server')
+    return cleanupQuestionsForDeletedUser(uid)
+  })
   await step(report, 'reports', () => forgetReporterEmail(uid))
 
   // 4. community: delete housing posts, anonymize the rest (comments in the background — render-time hiding covers the gap)

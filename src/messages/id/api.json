@@ -337,7 +337,42 @@
         "title": "Coffee chat dibatalkan",
         "body": "{name} membatalkan coffee chat."
       },
-      "refunded": "{amount} poin yang ditahan sudah dikembalikan."
+      "refunded": "{amount} poin yang ditahan sudah dikembalikan.",
+      "times": {
+        "title": "Waktu coffee chat sudah tiba",
+        "body": "{name} mengirim waktu yang cocok. Pilih satu waktu dan tambahkan link untuk mengonfirmasi."
+      },
+      "confirmed": {
+        "title": "Coffee chat dikonfirmasi",
+        "body": "{name} mengonfirmasi waktu. Cek waktu dan link di aplikasi."
+      },
+      "retime": {
+        "title": "Diminta waktu lain",
+        "body": "{name} meminta waktu lain. Silakan kirim lagi waktu yang cocok untukmu."
+      },
+      "expired": {
+        "title": "Permintaan coffee chat ditutup",
+        "body": "Waktu tidak ditetapkan sebelum batas waktu, jadi permintaan dibatalkan."
+      }
+    },
+    "reviewQna": {
+      "asked": {
+        "title": "New question on your review",
+        "body": "“{preview}” Answer within 7 days to earn points."
+      },
+      "answered": {
+        "title": "Your question was answered",
+        "body": "The review author answered your question."
+      },
+      "declined": {
+        "title": "Your question was declined",
+        "body": "The review author chose not to answer this one."
+      },
+      "expired": {
+        "title": "Your question expired",
+        "body": "There was no answer within 7 days."
+      },
+      "refunded": "{amount}P refunded."
     }
   },
   "reviewDocs": {
@@ -388,16 +423,16 @@
       "notFound": "Permintaan coffee chat tidak ditemukan.",
       "invalidTransition": "Tidak bisa diubah pada status saat ini.",
       "cannotCancel": "Coffee chat yang sudah dijadwalkan tidak bisa dibatalkan di sini. Hubungi tim kami.",
-      "mentorConsent": "Pemberitahuan dan persetujuan mentor\n· Ulasanmu di forum tetap anonim. Namun dalam coffee chat, lawan bicaramu mungkin dapat melihat wajah dan namamu.\n· Menjadi mentor tidak mendapatkan imbalan apa pun, termasuk poin. Bonus referral perusahaan mengikuti kebijakan masing-masing perusahaan.\n· Mentor membuat dan membagikan link Zoom sendiri. Misaeng hanya membantu mempertemukan.\n· Saran karier adalah pendapat pribadi, dan Misaeng tidak bertanggung jawab atas isi percakapan.\n· Jika kamu menerima, LinkedIn-mu akan ditampilkan kepada pengirim permintaan.\n· Tombol permintaan coffee chat juga muncul di ulasan wawancara dan pekerjaan yang kamu tulis.",
+      "mentorConsent": "Pemberitahuan dan persetujuan mentor\n· Ulasanmu di forum tetap anonim. Namun dalam coffee chat, lawan bicaramu mungkin dapat melihat wajah dan namamu.\n· Menjadi mentor tidak mendapatkan imbalan apa pun, termasuk poin. Bonus referral perusahaan mengikuti kebijakan masing-masing perusahaan.\n· Saat ada permintaan, kamu mengirim 1–3 waktu yang cocok; pengirim permintaan memilih satu dan mengirim link Zoom atau Google Meet. Misaeng hanya membantu mempertemukan.\n· Saran karier adalah pendapat pribadi, dan Misaeng tidak bertanggung jawab atas isi percakapan.\n· LinkedIn-mu ikut terkirim saat kamu mengirim waktu dan ditampilkan kepada pengirim permintaan setelah mereka mengonfirmasi waktu.\n· Jika kamu membatalkan coffee chat yang sudah dikonfirmasi, poin pengirim permintaan akan dikembalikan.\n· Tombol permintaan coffee chat juga muncul di ulasan wawancara dan pekerjaan yang kamu tulis.",
       "mentorRequired": "Silakan pilih mentor untuk coffee chat.",
       "mentorUnavailable": "Saat ini kamu tidak dapat mengajukan coffee chat dengan mentor ini.",
       "selfRequest": "Kamu tidak dapat mengajukan coffee chat dengan dirimu sendiri.",
       "mentorBusy": "Mentor ini sedang memiliki banyak permintaan yang menunggu jawaban. Silakan coba lagi nanti.",
       "duplicateOpen": "Kamu sudah memiliki permintaan yang menunggu jawaban mentor ini.",
       "timesRequired": "Silakan pilih 1 sampai 3 waktu yang diinginkan.",
-      "timesInvalid": "Waktu yang diinginkan harus minimal 12 jam dari sekarang dan dalam 30 hari.",
-      "scheduledAtInvalid": "Silakan pilih salah satu waktu yang diusulkan yang belum lewat.",
-      "zoomLinkInvalid": "Silakan masukkan link Zoom yang valid (alamat zoom.us yang diawali https://).",
+      "timesInvalid": "Waktu harus minimal 6 jam dari sekarang dan dalam 30 hari.",
+      "scheduledAtInvalid": "Silakan pilih salah satu waktu yang tersedia.",
+      "zoomLinkInvalid": "Silakan masukkan link Zoom atau Google Meet yang valid (diawali https://).",
       "cancelTooLate": "Coffee chat tidak dapat dibatalkan kurang dari 6 jam sebelum dimulai.",
       "invalidAction": "Permintaan ini tidak didukung.",
       "reasonTooLong": "Alasan maksimal {max} karakter.",
@@ -412,7 +447,7 @@
       "nicknameRequired": "Silakan atur nama panggilan sebelum mendaftar sebagai mentor.",
       "linkedinRequired": "Masukkan URL profil LinkedIn-mu.",
       "linkedinInvalid": "Masukkan URL profil LinkedIn yang valid (https://www.linkedin.com/in/…).",
-      "requestDisclaimer": "Coffee chat adalah percakapan sukarela dengan mentor. Misaeng tidak menjamin hasil rujukan, wawancara, atau pekerjaan apa pun. Setiap rujukan sepenuhnya merupakan keputusan pribadi mentor dan tunduk pada kebijakan perusahaan mentor. Misaeng tidak menerima keuntungan finansial apa pun dari coffee chat atau rujukan, dan mentor tidak menerima imbalan dari Misaeng. Saat kamu mengirim permintaan, LinkedIn-mu akan dibagikan kepada mentor."
+      "requestDisclaimer": "Coffee chat adalah percakapan sukarela dengan mentor. Misaeng tidak menjamin hasil rujukan, wawancara, atau pekerjaan apa pun. Setiap rujukan sepenuhnya merupakan keputusan pribadi mentor dan tunduk pada kebijakan perusahaan mentor. Misaeng tidak menerima keuntungan finansial apa pun dari coffee chat atau rujukan, dan mentor tidak menerima imbalan dari Misaeng. Saat kamu mengirim permintaan, LinkedIn-mu akan dibagikan kepada mentor. Saat kamu mengirim permintaan, poin akan ditahan; poin dipotong saat kamu memilih salah satu waktu dari mentor dan mengonfirmasinya dengan link Zoom atau Google Meet. Misaeng tidak memeriksa apakah percakapan benar-benar berlangsung. Setelah dikonfirmasi, poin hanya dikembalikan jika mentor membatalkan atau kamu membatalkan paling lambat 24 jam sebelum mulai. Jika mentor tidak hadir, laporkan di aplikasi."
     },
     "push": {
       "earned": {
@@ -441,6 +476,16 @@
           "body": "Kamu dicatat tidak hadir, jadi {name} yang ditahan sudah dipakai."
         }
       }
+    },
+    "reviewQna": {
+      "tooShort": "Please write at least 5 characters.",
+      "postUnavailable": "You can't ask about this review.",
+      "ownReview": "You can't ask about your own review.",
+      "authorUnavailable": "You can't ask this author right now.",
+      "notFound": "Question not found.",
+      "answerRequired": "Please write an answer.",
+      "closed": "This question is already closed.",
+      "reportReasonRequired": "Masukkan alasan laporan."
     }
   },
   "account": {

@@ -28,7 +28,10 @@
       "admin": "收回积分"
     },
     "legacy_opening": "原有积分结转",
-    "adjust": "积分调整"
+    "adjust": "积分调整",
+    "review_question": "Question to a review author",
+    "review_answer": "Answered a question",
+    "coffee_chat_refund": "咖啡聊天退款"
   },
   "entryTypes": {
     "earn": "获得",

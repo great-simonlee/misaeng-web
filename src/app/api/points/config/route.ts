@@ -42,6 +42,12 @@ export async function GET(request: Request) {
         startDate: config.settings['paywall.start_date'],
         noticeDays: config.settings['paywall.notice_days'],
       },
+      // private Q&A on interview/job reviews (app): off until point setting review_qna.enabled is turned on
+      reviewQna: {
+        enabled: config.settings['review_qna.enabled'] && config.tablesReady,
+        cost: config.rules['spend.review_question'].enabled ? config.rules['spend.review_question'].value : 0,
+        reward: config.rules['earn.review_answer'].enabled ? config.rules['earn.review_answer'].value : 0,
+      },
       coffeeChat: {
         disclaimer: COFFEE_CHAT_DISCLAIMER,
         disclaimerVersion: COFFEE_CHAT_DISCLAIMER_VERSION,

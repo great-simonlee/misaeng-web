@@ -28,7 +28,10 @@
       "admin": "Poin ditarik"
     },
     "legacy_opening": "Poin sebelumnya dipindahkan",
-    "adjust": "Penyesuaian poin"
+    "adjust": "Penyesuaian poin",
+    "review_question": "Question to a review author",
+    "review_answer": "Answered a question",
+    "coffee_chat_refund": "Pengembalian coffee chat"
   },
   "entryTypes": {
     "earn": "Didapat",

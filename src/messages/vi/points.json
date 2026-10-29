@@ -28,7 +28,10 @@
       "admin": "Thu hồi điểm"
     },
     "legacy_opening": "Chuyển điểm trước đây",
-    "adjust": "Điều chỉnh điểm"
+    "adjust": "Điều chỉnh điểm",
+    "review_question": "Question to a review author",
+    "review_answer": "Answered a question",
+    "coffee_chat_refund": "Hoàn điểm coffee chat"
   },
   "entryTypes": {
     "earn": "Nhận",

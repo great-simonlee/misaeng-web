@@ -28,7 +28,10 @@
       "admin": "Points reversed"
     },
     "legacy_opening": "Points carried over",
-    "adjust": "Points adjustment"
+    "adjust": "Points adjustment",
+    "review_question": "Career question to a review author",
+    "review_answer": "Answered a question",
+    "coffee_chat_refund": "Coffee chat refund"
   },
   "entryTypes": {
     "earn": "Earned",

@@ -47,6 +47,7 @@ function coerceSetting<K extends PointSettingKey>(key: K, raw: unknown): PointSe
   switch (key) {
     case 'paywall.enabled':
     case 'coffee_chat.enabled':
+    case 'review_qna.enabled':
       return (typeof raw === 'boolean' ? raw : raw === 'true' ? true : raw === 'false' ? false : fallback) as PointSettings[K]
     case 'paywall.notice_days': {
       const n = Number(raw)

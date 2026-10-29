@@ -65,6 +65,9 @@ export const POINT_RULE_DEFAULTS = {
   'quota.free_unlocks_lifetime': { value: 5, enabled: true, public: true, description: 'Lifetime free unlocks per account (Misaeng + Ellieo)' },
   'spend.coffee_chat': { value: 120, enabled: true, public: true, description: 'Held on request, captured on completion / no-show, released on cancel / decline / expiry' },
   'cap.coffee_chat_monthly': { value: 1, enabled: true, public: true, description: 'Coffee chat requests per month (legacy limit)' },
+  'spend.review_question': { value: 20, enabled: true, public: true, description: 'Private question to an interview/job review author. Held on send, captured on answer, released when declined or unanswered in 7 days' },
+  'earn.review_answer': { value: 10, enabled: true, public: true, description: 'Review author, per answered question' },
+  'cap.review_question_monthly': { value: 3, enabled: true, public: true, description: 'Questions one person can send about the same review per 30 days' },
   'spend.housing_post_boost': { value: 50, enabled: true, public: true, description: 'Roommate/sublet post pinned to the top for rule.housing_boost_days' },
   'rule.housing_boost_days': { value: 7, enabled: true, public: true, description: '' },
   'rule.housing_boost_cooldown_days': { value: 7, enabled: true, public: true, description: 'Days after a boost ends before the same post can be boosted again' },
@@ -99,6 +102,8 @@ export type PointSettings = {
   'points.cutover_at': string | null
   /** Coffee chat v2 (peer mentors, app only). Off until the team turns it on. */
   'coffee_chat.enabled': boolean
+  /** Private Q&A with interview/job review authors (app only). Off until the team turns it on. */
+  'review_qna.enabled': boolean
 }
 
 export type PointSettingKey = keyof PointSettings
@@ -109,6 +114,7 @@ export const POINT_SETTING_DEFAULTS: PointSettings = {
   'paywall.notice_days': 21,
   'points.cutover_at': null,
   'coffee_chat.enabled': false,
+  'review_qna.enabled': false,
 }
 
 export const POINT_SETTING_KEYS = Object.keys(POINT_SETTING_DEFAULTS) as PointSettingKey[]
@@ -139,7 +145,7 @@ export const COFFEE_CHAT_DISCLAIMER =
  * Coffee chat v2: consent a peer mentor agrees to (required checkbox). The text itself is localized
  * (api.points.coffeeChat.mentorConsent in src/messages/<locale>/api.json); bump the version whenever it changes.
  */
-export const COFFEE_CHAT_MENTOR_CONSENT_VERSION = '2026-10-27-linkedin'
+export const COFFEE_CHAT_MENTOR_CONSENT_VERSION = '2026-10-28-mentor-times'
 export const COFFEE_CHAT_MENTOR_CONSENT_KEY = 'points.coffeeChat.mentorConsent'
 
 /**
@@ -147,5 +153,5 @@ export const COFFEE_CHAT_MENTOR_CONSENT_KEY = 'points.coffeeChat.mentorConsent'
  * COFFEE_CHAT_DISCLAIMER plus the LinkedIn exchange, localized (api.points.coffeeChat.requestDisclaimer in
  * src/messages/<locale>/api.json). Bump the version whenever it changes.
  */
-export const COFFEE_CHAT_REQUEST_DISCLAIMER_VERSION = '2026-10-27-linkedin'
+export const COFFEE_CHAT_REQUEST_DISCLAIMER_VERSION = '2026-10-28-mentor-times'
 export const COFFEE_CHAT_REQUEST_DISCLAIMER_KEY = 'points.coffeeChat.requestDisclaimer'

@@ -362,7 +362,42 @@
         "title": "Coffee chat cancelled",
         "body": "{name} cancelled the coffee chat."
       },
-      "refunded": "The {amount} points on hold have been returned."
+      "refunded": "The {amount} points on hold have been returned.",
+      "times": {
+        "title": "Coffee chat times are here",
+        "body": "{name} sent the times that work for them. Pick one and add a link to confirm."
+      },
+      "confirmed": {
+        "title": "Coffee chat confirmed",
+        "body": "{name} confirmed a time. Check the time and link in the app."
+      },
+      "retime": {
+        "title": "Other times requested",
+        "body": "{name} asked for other times. Please send new times that work for you."
+      },
+      "expired": {
+        "title": "Coffee chat request closed",
+        "body": "No time was set before the deadline, so the request was cancelled."
+      }
+    },
+    "reviewQna": {
+      "asked": {
+        "title": "New career question for you",
+        "body": "“{preview}” Answer within 7 days to earn points."
+      },
+      "answered": {
+        "title": "Your question was answered",
+        "body": "The review author answered your question."
+      },
+      "declined": {
+        "title": "Your question was declined",
+        "body": "The review author chose not to answer this one."
+      },
+      "expired": {
+        "title": "Your question expired",
+        "body": "There was no answer within 7 days."
+      },
+      "refunded": "{amount}P refunded."
     }
   },
   "reviewDocs": {
@@ -413,16 +448,16 @@
       "notFound": "Coffee chat request not found.",
       "invalidTransition": "This request cannot be changed in its current state.",
       "cannotCancel": "A scheduled coffee chat cannot be cancelled here. Please contact our team.",
-      "mentorConsent": "Mentor notice and consent\n· Your reviews on the boards stay anonymous. In a coffee chat, however, the other person may see your face and name.\n· Mentoring comes with no reward of any kind, including points. Company referral bonuses follow each company's own program.\n· You create and share your own Zoom link. Misaeng only helps you connect.\n· Career advice is your personal opinion, and Misaeng is not responsible for what is said in the conversation.\n· When you accept, your LinkedIn is shown to the requester.\n· A coffee chat request button also appears on the interview and job reviews you wrote.",
+      "mentorConsent": "Mentor notice and consent\n· Your reviews on the boards stay anonymous. In a coffee chat, however, the other person may see your face and name.\n· Mentoring comes with no reward of any kind, including points. Company referral bonuses follow each company's own program.\n· When a request comes in, you send 1 to 3 times that work for you; the requester picks one and sends a Zoom or Google Meet link. Misaeng only helps you connect.\n· Career advice is your personal opinion, and Misaeng is not responsible for what is said in the conversation.\n· Your LinkedIn goes along with the times you send and is shown to the requester once they confirm a time.\n· If you cancel a confirmed coffee chat, the requester's points are refunded.\n· A coffee chat request button also appears on the interview and job reviews you wrote.",
       "mentorRequired": "Please choose a mentor for your coffee chat.",
       "mentorUnavailable": "You can't request a coffee chat with this mentor right now.",
       "selfRequest": "You can't request a coffee chat with yourself.",
       "mentorBusy": "This mentor has many requests waiting for an answer. Please try again later.",
       "duplicateOpen": "You already have a request waiting for this mentor's answer.",
       "timesRequired": "Please choose 1 to 3 preferred times.",
-      "timesInvalid": "Preferred times must be at least 12 hours from now and within 30 days.",
-      "scheduledAtInvalid": "Please pick one of the proposed times that hasn't passed yet.",
-      "zoomLinkInvalid": "Please enter a valid Zoom link (an https:// zoom.us address).",
+      "timesInvalid": "Times must be at least 6 hours from now and within 30 days.",
+      "scheduledAtInvalid": "Please pick one of the available times.",
+      "zoomLinkInvalid": "Please enter a valid Zoom or Google Meet link (starting with https://).",
       "cancelTooLate": "A coffee chat can't be cancelled less than 6 hours before it starts.",
       "invalidAction": "This request isn't supported.",
       "reasonTooLong": "The reason can be up to {max} characters.",
@@ -437,7 +472,7 @@
       "nicknameRequired": "Please set a nickname before registering as a mentor.",
       "linkedinRequired": "Enter your LinkedIn profile URL.",
       "linkedinInvalid": "Enter a valid LinkedIn profile URL (https://www.linkedin.com/in/…).",
-      "requestDisclaimer": "Coffee chats are voluntary conversations with mentors. Misaeng does not guarantee any referral, interview, or employment outcome. Any referral is made solely at the mentor's personal discretion and is subject to the policies of the mentor's employer. Misaeng does not receive any monetary benefit from coffee chats or referrals, and mentors are not compensated by Misaeng. When you send a request, your LinkedIn is shared with the mentor."
+      "requestDisclaimer": "Coffee chats are voluntary conversations with mentors. Misaeng does not guarantee any referral, interview, or employment outcome. Any referral is made solely at the mentor's personal discretion and is subject to the policies of the mentor's employer. Misaeng does not receive any monetary benefit from coffee chats or referrals, and mentors are not compensated by Misaeng. When you send a request, your LinkedIn is shared with the mentor. When you send a request, points are put on hold; they are spent when you pick one of the mentor's times and confirm it with a Zoom or Google Meet link. Misaeng does not check whether the call took place. After confirming, points are refunded only if the mentor cancels or you cancel at least 24 hours before the start. If the mentor doesn't show up, please report it in the app."
     },
     "push": {
       "earned": {
@@ -466,6 +501,16 @@
           "body": "You were marked as absent, so your reserved {name} have been used."
         }
       }
+    },
+    "reviewQna": {
+      "tooShort": "Please write at least 5 characters.",
+      "postUnavailable": "You can't ask about this review.",
+      "ownReview": "You can't ask about your own review.",
+      "authorUnavailable": "You can't ask this author right now.",
+      "notFound": "Question not found.",
+      "answerRequired": "Please write an answer.",
+      "closed": "This question is already closed.",
+      "reportReasonRequired": "Please enter a reason for the report."
     }
   },
   "account": {

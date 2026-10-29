@@ -28,7 +28,10 @@
       "admin": "포인트 회수"
     },
     "legacy_opening": "이전 포인트 이월",
-    "adjust": "포인트 조정"
+    "adjust": "포인트 조정",
+    "review_question": "후기 작성자에게 커리어 질문",
+    "review_answer": "질문 답변",
+    "coffee_chat_refund": "커피챗 환불"
   },
   "entryTypes": {
     "earn": "적립",

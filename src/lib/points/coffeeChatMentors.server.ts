@@ -12,6 +12,7 @@ import {
   COFFEE_CHAT_REQUEST_DISCLAIMER_VERSION,
 } from './defaults'
 import { isPointsLedgerActive } from './engine.server'
+import { earnPoints } from './ledger.server'
 import { pointsErrors, PointsError } from './errors'
 import { ensureLegacyOpening } from './legacy.server'
 import { notifyCoffeeChatMentor } from './notify.server'
@@ -26,6 +27,14 @@ import { enc, inList, pointsRest, pointsRpc, PointsStoreError, type PointsRpcRes
  *   * Lazy upkeep on every read: requests whose proposed times are all past → cancelled ('admin', note 'expired');
  *     scheduled chats 90 minutes past the start → completed (hold captured).
  * Mentor cards never link to a review (reviews stay anonymous).
+ *
+ * v3 — the mentor proposes the times (supabase/coffee_chat_mentor_times.sql; rows with flow 'mentor_times', all new
+ * requests): the requester sends topic + message + LinkedIn (120P held) → the mentor sends 1–3 times (≥ 6 hours
+ * ahead, ≤ 30 days) with their LinkedIn, or declines, within 5 days → the requester picks one (≥ 3 hours ahead) and
+ * pastes a Zoom / Google Meet link: scheduled, and the points are spent right then (Misaeng can't tell whether a call
+ * took place, so confirming is final). Once, the requester may ask for other times instead. After confirming, only a
+ * cancellation in the app refunds: by the mentor (always) or by the requester 24 hours or more before the start.
+ * "The mentor didn't show up" is a report the team handles by hand.
  *
  * LinkedIn exchange (supabase/coffee_chat_linkedin.sql): the requester sends a LinkedIn URL with every request, the
  * mentor gives one when accepting. Visibility is decided here (see linkedinVisible), never by the client; a mentor's
@@ -42,9 +51,20 @@ export const DECLINE_REASON_MAX = 200
 export const REPORT_REASON_MAX = 1000
 export const ZOOM_LINK_MAX = 300
 export const LINKEDIN_MAX = 200
-const MIN_LEAD_MS = 12 * 60 * 60 * 1000
-const MAX_AHEAD_MS = 30 * 24 * 60 * 60 * 1000
+const HOUR_MS = 60 * 60 * 1000
+const MIN_LEAD_MS = 12 * HOUR_MS
+const MAX_AHEAD_MS = 30 * 24 * HOUR_MS
 const COMPLETE_AFTER_MS = 90 * 60 * 1000
+/** v3: the mentor answers within 5 days of the request (or of the requester's "other times" request). */
+export const MENTOR_RESPOND_MS = 5 * 24 * HOUR_MS
+/** v3: times the mentor sends start at least 6 hours ahead. */
+export const PROPOSE_MIN_LEAD_MS = 6 * HOUR_MS
+/** v3: the requester picks a time at least 3 hours ahead. */
+export const PICK_MIN_LEAD_MS = 3 * HOUR_MS
+/** v3: the requester's own cancellation is refunded 24 hours or more before the start. */
+export const REFUND_CUTOFF_MS = 24 * HOUR_MS
+/** v3: "other times" may be asked once per chat. */
+export const RETIME_MAX = 1
 
 // MARK: rows and views
 
@@ -88,11 +108,39 @@ type ChatRow = {
   report_reason: string | null
   requester_linkedin: string | null
   mentor_linkedin: string | null
+  /** 'mentor_times' = v3 (the mentor proposes the times); null = older rows */
+  flow: 'mentor_times' | null
+  times_proposed_at: string | null
+  retime_count: number
+  retime_requested_at: string | null
+  refunded_at: string | null
   created_at: string
 }
 
 const CHAT_SELECT =
-  'id,user_id,mentor_id,topic,message,status,amount,hold_id,proposed_times,scheduled_at,zoom_link,accepted_at,declined_at,cancelled_by,reported_at,report_reason,requester_linkedin,mentor_linkedin,created_at'
+  'id,user_id,mentor_id,topic,message,status,amount,hold_id,proposed_times,scheduled_at,zoom_link,accepted_at,declined_at,cancelled_by,reported_at,report_reason,requester_linkedin,mentor_linkedin,flow,times_proposed_at,retime_count,retime_requested_at,refunded_at,created_at'
+
+/** PostgREST filter for the chats this file handles: v2 (requester-proposed times) and v3 rows, not ERP v1 ones. */
+const TRACKED_FILTER = 'or=(proposed_times.not.is.null,flow.eq.mentor_times)'
+
+const isV3 = (row: Pick<ChatRow, 'flow'>) => row.flow === 'mentor_times'
+const isTracked = (row: ChatRow) => isV3(row) || Boolean(row.proposed_times)
+
+/** v3, still open: who has to act next. */
+function stageOf(row: ChatRow): 'awaiting_mentor' | 'awaiting_requester' | null {
+  if (!isV3(row) || row.status !== 'requested') return null
+  return row.proposed_times?.length ? 'awaiting_requester' : 'awaiting_mentor'
+}
+
+/** v3: when the mentor's 5 days run out. */
+function respondByMs(row: ChatRow) {
+  return Date.parse(row.retime_requested_at ?? row.created_at) + MENTOR_RESPOND_MS
+}
+
+/** v3: the mentor's times the requester may still pick (≥ 3 hours ahead). */
+function pickableTimes(row: ChatRow, now = Date.now()) {
+  return (row.proposed_times ?? []).filter((time) => Date.parse(time) >= now + PICK_MIN_LEAD_MS)
+}
 
 export type MentorView = {
   userId: string
@@ -132,6 +180,20 @@ export type ChatView = {
   topic: string
   message: string | null
   proposedTimes: string[]
+  /** 'mentor_times' (v3: the mentor proposes) | 'requester_times' (older chats) */
+  flow: 'mentor_times' | 'requester_times'
+  /** v3, open: who acts next */
+  stage: 'awaiting_mentor' | 'awaiting_requester' | null
+  /** v3, awaiting_mentor: the mentor's deadline */
+  respondBy: string | null
+  /** v3, awaiting_requester: the mentor's times the requester may still pick (≥ 3 hours ahead) */
+  pickableTimes: string[]
+  /** v3: the requester may still ask for other times once */
+  canRetime: boolean
+  /** v3, scheduled: cancelling now gets the requester's points back (24 hours or more before the start) */
+  refundable: boolean
+  /** v3: the points were given back after confirming (cancelled by the mentor, or early enough by the requester) */
+  refunded: boolean
   scheduledAt: string | null
   zoomLink: string | null
   declined: boolean
@@ -502,7 +564,7 @@ export async function saveMentor(uid: string, input: MentorInput): Promise<MyMen
 /** Stops being a mentor: open (unanswered) requests are declined (holds released), then the card is deleted. */
 export async function deleteMentor(uid: string, options: { actorDeleted?: boolean } = {}) {
   const open = await pointsRest<ChatRow[]>(
-    `coffee_chat_requests?mentor_id=eq.${enc(uid)}&status=eq.requested&proposed_times=not.is.null&select=${CHAT_SELECT}`,
+    `coffee_chat_requests?mentor_id=eq.${enc(uid)}&status=eq.requested&${TRACKED_FILTER}&select=${CHAT_SELECT}`,
   ).catch(storeError)
   const actorName = options.actorDeleted ? null : (await profileOf(uid))?.nickname ?? null
   let failed = 0
@@ -535,9 +597,36 @@ async function settle(rows: ChatRow[]): Promise<ChatRow[]> {
   const now = Date.now()
   const changed: string[] = []
   for (const row of rows) {
-    if (!row.proposed_times) continue
+    if (!isTracked(row)) continue
     try {
-      if (row.status === 'requested' && row.proposed_times.every((time) => Date.parse(time) <= now)) {
+      const stage = stageOf(row)
+      const v3Expired =
+        (stage === 'awaiting_mentor' && now > respondByMs(row)) ||
+        (stage === 'awaiting_requester' && pickableTimes(row, now).length === 0)
+      if (v3Expired) {
+        const result = await transitionCoffeeChat({
+          id: row.id,
+          action: 'cancel',
+          actor: 'system',
+          actorRole: 'admin',
+          adminNote: 'expired',
+          notify: false,
+        })
+        changed.push(row.id)
+        if (!result.duplicate) {
+          notifyCoffeeChatMentor({
+            kind: 'expired',
+            to: row.user_id,
+            chatId: row.id,
+            actorName: null,
+            refunded: row.hold_id ? row.amount : 0,
+          })
+        }
+      } else if (
+        !isV3(row) &&
+        row.status === 'requested' &&
+        (row.proposed_times ?? []).every((time) => Date.parse(time) <= now)
+      ) {
         await transitionCoffeeChat({ id: row.id, action: 'cancel', actor: 'system', actorRole: 'admin', adminNote: 'expired', notify: false })
         changed.push(row.id)
       } else if (
@@ -600,6 +689,17 @@ async function toChats(rows: ChatRow[], viewerUid: string, t: Translate): Promis
       topic: row.topic,
       message: row.message,
       proposedTimes: (row.proposed_times ?? []).map((time) => new Date(time).toISOString()),
+      flow: isV3(row) ? 'mentor_times' : 'requester_times',
+      stage: stageOf(row),
+      respondBy: stageOf(row) === 'awaiting_mentor' ? new Date(respondByMs(row)).toISOString() : null,
+      pickableTimes: stageOf(row) === 'awaiting_requester' ? pickableTimes(row).map((time) => new Date(time).toISOString()) : [],
+      canRetime: role === 'requester' && stageOf(row) === 'awaiting_requester' && row.retime_count < RETIME_MAX,
+      refundable:
+        isV3(row) &&
+        row.status === 'scheduled' &&
+        Boolean(row.scheduled_at) &&
+        Date.parse(row.scheduled_at as string) - Date.now() >= REFUND_CUTOFF_MS,
+      refunded: Boolean(row.refunded_at),
       scheduledAt: iso(row.scheduled_at),
       zoomLink: row.status === 'scheduled' ? row.zoom_link : null,
       declined: Boolean(row.declined_at),
@@ -615,7 +715,7 @@ async function toChats(rows: ChatRow[], viewerUid: string, t: Translate): Promis
 export async function listChats(uid: string, box: 'sent' | 'received', t: Translate): Promise<ChatView[]> {
   const column = box === 'sent' ? 'user_id' : 'mentor_id'
   const rows = await pointsRest<ChatRow[]>(
-    `coffee_chat_requests?${column}=eq.${enc(uid)}&proposed_times=not.is.null&select=${CHAT_SELECT}&order=created_at.desc&limit=100`,
+    `coffee_chat_requests?${column}=eq.${enc(uid)}&${TRACKED_FILTER}&select=${CHAT_SELECT}&order=created_at.desc&limit=100`,
   ).catch(storeError)
   return toChats(await settle(rows ?? []), uid, t)
 }
@@ -623,8 +723,15 @@ export async function listChats(uid: string, box: 'sent' | 'received', t: Transl
 /** One chat I take part in (settled), or 404. */
 async function getMyChatRow(uid: string, id: string): Promise<ChatRow> {
   const row = await getChatRow(id).catch(storeError)
-  if (!row || !row.proposed_times || (row.user_id !== uid && row.mentor_id !== uid)) throw notFound()
+  if (!row || !isTracked(row) || (row.user_id !== uid && row.mentor_id !== uid)) throw notFound()
   return (await settle([row]))[0]
+}
+
+/** Blocking from a chat: the other participant's uid (server only; never sent to the client), or null. */
+export async function chatCounterpartUid(uid: string, id: string): Promise<string | null> {
+  const row = await getChatRow(id).catch(() => null)
+  if (!row || (row.user_id !== uid && row.mentor_id !== uid)) return null
+  return (row.user_id === uid ? row.mentor_id : row.user_id) || null
 }
 
 export async function getChat(uid: string, id: string, t: Translate): Promise<ChatView> {
@@ -633,13 +740,13 @@ export async function getChat(uid: string, id: string, t: Translate): Promise<Ch
 
 // MARK: request
 
-/** 1–3 distinct ISO times, each ≥ now + 12h and ≤ now + 30d, sorted. */
-export function parseProposedTimes(raw: unknown, now = Date.now()): string[] {
+/** 1–3 distinct ISO times, each ≥ now + `minLead` (12h; 6h for a mentor's v3 times) and ≤ now + 30d, sorted. */
+export function parseProposedTimes(raw: unknown, now = Date.now(), minLead = MIN_LEAD_MS): string[] {
   if (!Array.isArray(raw) || raw.length === 0 || raw.length > 3) {
     throw new PointsError('1-3 proposed times required', 'points.coffeeChat.timesRequired', 400, undefined, 'TIMES_REQUIRED')
   }
   const times = raw.map((value) => (typeof value === 'string' ? Date.parse(value) : NaN))
-  if (times.some((ms) => !Number.isFinite(ms) || ms < now + MIN_LEAD_MS || ms > now + MAX_AHEAD_MS)) {
+  if (times.some((ms) => !Number.isFinite(ms) || ms < now + minLead || ms > now + MAX_AHEAD_MS)) {
     throw new PointsError('Proposed time out of range', 'points.coffeeChat.timesInvalid', 400, undefined, 'TIMES_INVALID')
   }
   return [...new Set(times)].sort((a, b) => a - b).map((ms) => new Date(ms).toISOString())
@@ -650,7 +757,6 @@ export async function requestMentorChat(input: {
   mentorId: string
   topic: string
   message: string | null
-  proposedTimes: string[]
   /** Normalized (parseLinkedinUrl); required. */
   linkedinUrl: string
   requestKey: string | null
@@ -698,7 +804,8 @@ export async function requestMentorChat(input: {
     p_mentor_id: mentorId,
     p_disclaimer_version: COFFEE_CHAT_REQUEST_DISCLAIMER_VERSION,
     p_idempotency_key: key,
-    p_proposed_times: input.proposedTimes,
+    // v3: no times yet — the mentor sends them
+    p_proposed_times: null,
   }).catch(storeError)
   if (!result?.ok) {
     switch (result?.error) {
@@ -719,11 +826,15 @@ export async function requestMentorChat(input: {
     }
   }
   const requestId = String(result.request_id)
-  // request_coffee_chat doesn't know the column; set it right away (before the mentor is told). A repeated
+  // request_coffee_chat doesn't know these columns; set them right away (before the mentor is told). A repeated
   // requestKey keeps the LinkedIn sent first.
   await pointsRest(
     `coffee_chat_requests?id=eq.${enc(requestId)}&user_id=eq.${enc(uid)}&requester_linkedin=is.null`,
-    { method: 'PATCH', prefer: 'return=minimal', body: JSON.stringify({ requester_linkedin: input.linkedinUrl }) },
+    {
+      method: 'PATCH',
+      prefer: 'return=minimal',
+      body: JSON.stringify({ requester_linkedin: input.linkedinUrl, flow: 'mentor_times' }),
+    },
   ).catch(storeError)
   if (!result.duplicate) {
     notifyCoffeeChatMentor({
@@ -739,7 +850,7 @@ export async function requestMentorChat(input: {
 
 // MARK: actions
 
-/** https, host zoom.us / zoom.com (or a subdomain), ≤ 300 chars. Returns the trimmed link or null. */
+/** https, host zoom.us / zoom.com (or a subdomain) or meet.google.com, ≤ 300 chars. Returns the trimmed link or null. */
 export function parseZoomLink(raw: unknown): string | null {
   const link = typeof raw === 'string' ? raw.trim() : ''
   if (!link || link.length > ZOOM_LINK_MAX) return null
@@ -747,7 +858,8 @@ export function parseZoomLink(raw: unknown): string | null {
     const url = new URL(link)
     const host = url.hostname.toLowerCase()
     const zoomHost = ['zoom.us', 'zoom.com'].some((domain) => host === domain || host.endsWith(`.${domain}`))
-    return url.protocol === 'https:' && zoomHost && !url.username && !url.password ? link : null
+    const meetHost = host === 'meet.google.com'
+    return url.protocol === 'https:' && (zoomHost || meetHost) && !url.username && !url.password ? link : null
   } catch {
     return null
   }
@@ -758,9 +870,42 @@ export type ReportReasonCode = (typeof REPORT_REASON_CODES)[number]
 
 export type ChatAction =
   | { action: 'accept'; scheduledAt: string; zoomLink: string; linkedinUrl: string }
+  /** v3, mentor: 1–3 times (already validated) + their LinkedIn */
+  | { action: 'propose'; times: string[]; linkedinUrl: string }
+  /** v3, requester: one of the mentor's times + a Zoom / Meet link → scheduled, points spent */
+  | { action: 'confirm'; scheduledAt: string; zoomLink: string }
+  /** v3, requester: none of the times work → the mentor sends new ones (once) */
+  | { action: 'retime' }
   | { action: 'decline'; reason: string | null }
   | { action: 'cancel' }
   | { action: 'report'; reason: string; reasonCode: ReportReasonCode | null }
+
+/**
+ * v3: gives a confirmed chat's points back (the hold was captured on confirm) as an 'earn' row, once per chat
+ * (idempotency key), and stamps refunded_at. Returns the amount refunded (0 = nothing was spent).
+ */
+async function refundConfirmed(row: ChatRow, actor: string): Promise<number> {
+  if (!isV3(row) || !row.hold_id || row.amount <= 0 || row.refunded_at) return 0
+  const result = await earnPoints({
+    uid: row.user_id,
+    amount: row.amount,
+    reason: 'coffee_chat_refund',
+    sourceType: 'coffee_chat',
+    sourceId: row.id,
+    key: `coffee-refund:${row.id}`,
+    createdBy: actor,
+  })
+  if (!result.ok && !result.duplicate) throw new Error(`coffee chat refund failed: ${row.id}`)
+  await pointsRest(`coffee_chat_requests?id=eq.${enc(row.id)}`, {
+    method: 'PATCH',
+    prefer: 'return=minimal',
+    body: JSON.stringify({ refunded_at: new Date().toISOString(), updated_at: new Date().toISOString() }),
+  }).catch((error) => console.error('Coffee chat refunded_at failed:', row.id, error))
+  return row.amount
+}
+
+const invalidTransition = () =>
+  new PointsError('Not possible now', 'points.coffeeChat.invalidTransition', 409, undefined, 'INVALID_TRANSITION')
 
 export async function actOnChat(uid: string, id: string, input: ChatAction, t: Translate): Promise<ChatView> {
   await assertCoffeeChatEnabled()
@@ -770,8 +915,83 @@ export async function actOnChat(uid: string, id: string, input: ChatAction, t: T
   const myName = (await profileOf(uid))?.nickname ?? null
   const refunded = row.hold_id ? row.amount : 0
 
-  if (input.action === 'accept') {
+  if (input.action === 'propose') {
+    // v3: the mentor sends 1–3 times (and their LinkedIn, shown to the requester once scheduled)
     if (!isMentor) throw notFound()
+    if (stageOf(row) !== 'awaiting_mentor') throw invalidTransition()
+    const mentorRow = await getMentorRow(uid, true).catch(storeError)
+    if (mentorRow?.consent_version !== COFFEE_CHAT_MENTOR_CONSENT_VERSION) {
+      throw new PointsError('Consent outdated', 'points.coffeeChat.mentorConsentOutdated', 409, undefined, 'CONSENT_OUTDATED')
+    }
+    const now = new Date().toISOString()
+    const updated = await pointsRest<ChatRow[]>(
+      `coffee_chat_requests?id=eq.${enc(id)}&mentor_id=eq.${enc(uid)}&status=eq.requested&proposed_times=is.null&select=id`,
+      {
+        method: 'PATCH',
+        prefer: 'return=representation',
+        body: JSON.stringify({
+          proposed_times: input.times,
+          times_proposed_at: now,
+          mentor_linkedin: input.linkedinUrl,
+          updated_at: now,
+        }),
+      },
+    ).catch(storeError)
+    if (!updated?.length) throw invalidTransition()
+    if (mentorRow.linkedin !== input.linkedinUrl) {
+      await pointsRest(`coffee_chat_mentors?user_id=eq.${enc(uid)}`, {
+        method: 'PATCH',
+        prefer: 'return=minimal',
+        body: JSON.stringify({ linkedin: input.linkedinUrl, updated_at: now }),
+      }).catch((error) => console.error('Coffee chat mentor LinkedIn save failed:', error))
+    }
+    notifyCoffeeChatMentor({ kind: 'times', to: row.user_id, chatId: id, actorName: myName })
+  } else if (input.action === 'confirm') {
+    // v3: the requester picks one of the mentor's times and pastes the meeting link → scheduled, points spent
+    if (!isRequester) throw notFound()
+    if (stageOf(row) !== 'awaiting_requester') throw invalidTransition()
+    const wanted = Date.parse(input.scheduledAt)
+    const match = pickableTimes(row).find((time) => Date.parse(time) === wanted)
+    if (!match) {
+      throw new PointsError('Pick one of the times', 'points.coffeeChat.scheduledAtInvalid', 400, undefined, 'SCHEDULED_AT_INVALID')
+    }
+    const result = await transitionCoffeeChat({
+      id,
+      action: 'schedule',
+      actor: uid,
+      actorRole: 'user',
+      scheduledAt: match,
+      zoomLink: input.zoomLink,
+      notify: false,
+    })
+    if (!result.duplicate && row.mentor_id) {
+      notifyCoffeeChatMentor({ kind: 'confirmed', to: row.mentor_id, chatId: id, actorName: myName })
+    }
+  } else if (input.action === 'retime') {
+    // v3: none of the times work → the mentor's times are cleared and they get a fresh 5 days (once per chat)
+    if (!isRequester) throw notFound()
+    if (stageOf(row) !== 'awaiting_requester' || row.retime_count >= RETIME_MAX) throw invalidTransition()
+    const now = new Date().toISOString()
+    const updated = await pointsRest<ChatRow[]>(
+      `coffee_chat_requests?id=eq.${enc(id)}&user_id=eq.${enc(uid)}&status=eq.requested&proposed_times=not.is.null&retime_count=lt.${RETIME_MAX}&select=id`,
+      {
+        method: 'PATCH',
+        prefer: 'return=representation',
+        body: JSON.stringify({
+          proposed_times: null,
+          times_proposed_at: null,
+          retime_count: row.retime_count + 1,
+          retime_requested_at: now,
+          updated_at: now,
+        }),
+      },
+    ).catch(storeError)
+    if (!updated?.length) throw invalidTransition()
+    if (row.mentor_id) notifyCoffeeChatMentor({ kind: 'retime', to: row.mentor_id, chatId: id, actorName: myName })
+  } else if (input.action === 'accept') {
+    // older chats only (the requester proposed the times)
+    if (!isMentor) throw notFound()
+    if (isV3(row)) throw invalidTransition()
     const wanted = Date.parse(input.scheduledAt)
     const match = (row.proposed_times ?? []).find((time) => Date.parse(time) === wanted)
     if (!match || wanted <= Date.now()) {
@@ -824,6 +1044,12 @@ export async function actOnChat(uid: string, id: string, input: ChatAction, t: T
       notifyCoffeeChatMentor({ kind: 'declined', to: row.user_id, chatId: id, actorName: myName, refunded })
     }
   } else if (input.action === 'cancel') {
+    // v3, scheduled: the points were spent on confirm. The mentor cancelling always refunds; the requester only
+    // 24 hours or more before the start (decided now, before the status changes).
+    const confirmedV3 = isV3(row) && row.status === 'scheduled'
+    const refundAfter =
+      confirmedV3 &&
+      (isMentor || (Boolean(row.scheduled_at) && Date.parse(row.scheduled_at as string) - Date.now() >= REFUND_CUTOFF_MS))
     const result = await transitionCoffeeChat({
       id,
       action: 'cancel',
@@ -831,6 +1057,8 @@ export async function actOnChat(uid: string, id: string, input: ChatAction, t: T
       actorRole: isRequester ? 'user' : 'mentor',
       notify: false,
     })
+    let given = confirmedV3 ? 0 : refunded
+    if (refundAfter && !result.duplicate) given = await refundConfirmed(row, uid)
     const other = isRequester ? row.mentor_id : row.user_id
     if (!result.duplicate && other) {
       notifyCoffeeChatMentor({
@@ -839,7 +1067,7 @@ export async function actOnChat(uid: string, id: string, input: ChatAction, t: T
         chatId: id,
         actorName: myName,
         // the requester hears about the refund; the mentor has nothing at stake
-        refunded: isRequester ? 0 : refunded,
+        refunded: isRequester ? 0 : given,
       })
     }
   } else if (input.action === 'report') {
@@ -902,12 +1130,14 @@ export async function cleanupCoffeeChatsForDeletedUser(uid: string): Promise<str
   // as a mentor: unanswered requests are declined by deleteMentor; scheduled ones are cancelled here
   const scheduled =
     (await pointsRest<ChatRow[]>(
-      `coffee_chat_requests?mentor_id=eq.${enc(uid)}&status=eq.scheduled&select=id,user_id,mentor_id,status,amount,hold_id`,
+      `coffee_chat_requests?mentor_id=eq.${enc(uid)}&status=eq.scheduled&select=${CHAT_SELECT}`,
     )) ?? []
   for (const chat of scheduled) {
     try {
       const result = await transitionCoffeeChat({ id: chat.id, action: 'cancel', actor: uid, actorRole: 'mentor', notify: false })
       cancelled += 1
+      // v3: the requester's points were spent on confirm — a mentor leaving gives them back
+      const given = !result.duplicate && isV3(chat) ? await refundConfirmed(chat, 'system') : chat.hold_id ? chat.amount : 0
       if (!result.duplicate) {
         notifyCoffeeChatMentor({
           kind: 'cancelled',
@@ -915,7 +1145,7 @@ export async function cleanupCoffeeChatsForDeletedUser(uid: string): Promise<str
           chatId: chat.id,
           actorName: null,
           actorDeleted: true,
-          refunded: chat.hold_id ? chat.amount : 0,
+          refunded: given,
         })
       }
     } catch (error) {

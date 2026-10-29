@@ -6,7 +6,6 @@ import {
   linkedinInvalid,
   listChats,
   parseLinkedinUrl,
-  parseProposedTimes,
   requestMentorChat,
 } from '@lib/points/coffeeChatMentors.server'
 import { PointsError } from '@lib/points/errors'
@@ -31,9 +30,9 @@ export async function GET(request: Request) {
 }
 
 /**
- * Request a coffee chat with a mentor:
- * { mentorId, topic, message?, proposedTimes: [ISO] (1–3, each ≥ now+12h and ≤ now+30d), linkedinUrl, agreed: true,
- *   requestKey } → 201 Chat (200 on a repeated requestKey). Holds spend.coffee_chat (free when that rule is off).
+ * Request a coffee chat with a mentor (v3: the mentor sends the times afterwards):
+ * { mentorId, topic, message?, linkedinUrl, agreed: true, requestKey } → 201 Chat (200 on a repeated requestKey).
+ * Holds spend.coffee_chat (free when that rule is off). `proposedTimes` from older apps is ignored.
  */
 export async function POST(request: Request) {
   const t = await getRequestT(request, 'api')
@@ -67,7 +66,6 @@ export async function POST(request: Request) {
       mentorId: typeof body.mentorId === 'string' ? body.mentorId.trim() : '',
       topic,
       message: message || null,
-      proposedTimes: parseProposedTimes(body.proposedTimes),
       linkedinUrl,
       requestKey: typeof body.requestKey === 'string' ? body.requestKey.slice(0, 100) : null,
       t,

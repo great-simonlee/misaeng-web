@@ -337,7 +337,42 @@
         "title": "Coffee chat đã bị hủy",
         "body": "{name} đã hủy coffee chat."
       },
-      "refunded": "{amount} điểm đã giữ chỗ đã được hoàn lại."
+      "refunded": "{amount} điểm đã giữ chỗ đã được hoàn lại.",
+      "times": {
+        "title": "Đã có khung giờ coffee chat",
+        "body": "{name} đã gửi các khung giờ phù hợp. Hãy chọn một khung giờ và thêm link để xác nhận."
+      },
+      "confirmed": {
+        "title": "Coffee chat đã được xác nhận",
+        "body": "{name} đã xác nhận thời gian. Hãy xem thời gian và link trong ứng dụng."
+      },
+      "retime": {
+        "title": "Có yêu cầu khung giờ khác",
+        "body": "{name} đã yêu cầu khung giờ khác. Hãy gửi lại các khung giờ phù hợp với bạn."
+      },
+      "expired": {
+        "title": "Yêu cầu coffee chat đã đóng",
+        "body": "Không chốt được thời gian trước hạn nên yêu cầu đã bị hủy."
+      }
+    },
+    "reviewQna": {
+      "asked": {
+        "title": "New question on your review",
+        "body": "“{preview}” Answer within 7 days to earn points."
+      },
+      "answered": {
+        "title": "Your question was answered",
+        "body": "The review author answered your question."
+      },
+      "declined": {
+        "title": "Your question was declined",
+        "body": "The review author chose not to answer this one."
+      },
+      "expired": {
+        "title": "Your question expired",
+        "body": "There was no answer within 7 days."
+      },
+      "refunded": "{amount}P refunded."
     }
   },
   "reviewDocs": {
@@ -388,16 +423,16 @@
       "notFound": "Không tìm thấy yêu cầu coffee chat.",
       "invalidTransition": "Không thể thay đổi ở trạng thái hiện tại.",
       "cannotCancel": "Không thể tự hủy coffee chat đã có lịch. Vui lòng liên hệ đội ngũ vận hành.",
-      "mentorConsent": "Thông báo và đồng ý dành cho mentor\n· Các bài review của bạn trên diễn đàn vẫn được giữ ẩn danh. Tuy nhiên, trong buổi coffee chat, người kia có thể thấy khuôn mặt và tên của bạn.\n· Làm mentor không có bất kỳ phần thưởng nào, kể cả điểm. Thưởng giới thiệu (referral) của công ty tuân theo chính sách riêng của từng công ty.\n· Mentor tự tạo và chia sẻ link Zoom của mình. Misaeng chỉ giúp kết nối.\n· Lời khuyên nghề nghiệp là ý kiến cá nhân, và Misaeng không chịu trách nhiệm về nội dung cuộc trò chuyện.\n· Khi bạn chấp nhận, LinkedIn của bạn sẽ được hiển thị cho người gửi yêu cầu.\n· Nút gửi yêu cầu coffee chat cũng hiển thị trên các bài review phỏng vấn và việc làm bạn đã viết.",
+      "mentorConsent": "Thông báo và đồng ý dành cho mentor\n· Các bài review của bạn trên diễn đàn vẫn được giữ ẩn danh. Tuy nhiên, trong buổi coffee chat, người kia có thể thấy khuôn mặt và tên của bạn.\n· Làm mentor không có bất kỳ phần thưởng nào, kể cả điểm. Thưởng giới thiệu (referral) của công ty tuân theo chính sách riêng của từng công ty.\n· Khi có yêu cầu, bạn gửi 1–3 khung giờ phù hợp; người gửi yêu cầu chọn một và gửi link Zoom hoặc Google Meet. Misaeng chỉ giúp kết nối.\n· Lời khuyên nghề nghiệp là ý kiến cá nhân, và Misaeng không chịu trách nhiệm về nội dung cuộc trò chuyện.\n· LinkedIn của bạn được gửi kèm khi bạn gửi khung giờ và sẽ hiển thị cho người gửi yêu cầu khi họ xác nhận thời gian.\n· Nếu bạn hủy một coffee chat đã xác nhận, điểm của người gửi yêu cầu sẽ được hoàn lại.\n· Nút gửi yêu cầu coffee chat cũng hiển thị trên các bài review phỏng vấn và việc làm bạn đã viết.",
       "mentorRequired": "Vui lòng chọn mentor cho buổi coffee chat.",
       "mentorUnavailable": "Hiện bạn không thể đăng ký coffee chat với mentor này.",
       "selfRequest": "Bạn không thể đăng ký coffee chat với chính mình.",
       "mentorBusy": "Mentor này đang có nhiều yêu cầu chờ trả lời. Vui lòng thử lại sau.",
       "duplicateOpen": "Bạn đã có một yêu cầu đang chờ mentor này trả lời.",
       "timesRequired": "Vui lòng chọn 1 đến 3 khung giờ mong muốn.",
-      "timesInvalid": "Khung giờ mong muốn phải cách hiện tại ít nhất 12 giờ và trong vòng 30 ngày.",
-      "scheduledAtInvalid": "Vui lòng chọn một trong các khung giờ được đề xuất chưa trôi qua.",
-      "zoomLinkInvalid": "Vui lòng nhập link Zoom hợp lệ (địa chỉ zoom.us bắt đầu bằng https://).",
+      "timesInvalid": "Thời gian phải cách hiện tại ít nhất 6 giờ và trong vòng 30 ngày.",
+      "scheduledAtInvalid": "Vui lòng chọn một trong các khung giờ có thể chọn.",
+      "zoomLinkInvalid": "Vui lòng nhập link Zoom hoặc Google Meet hợp lệ (bắt đầu bằng https://).",
       "cancelTooLate": "Không thể hủy trong vòng 6 giờ trước khi bắt đầu.",
       "invalidAction": "Yêu cầu này không được hỗ trợ.",
       "reasonTooLong": "Lý do tối đa {max} ký tự.",
@@ -412,7 +447,7 @@
       "nicknameRequired": "Vui lòng đặt biệt danh trước khi đăng ký làm mentor.",
       "linkedinRequired": "Hãy nhập link hồ sơ LinkedIn của bạn.",
       "linkedinInvalid": "Hãy nhập link hồ sơ LinkedIn hợp lệ (https://www.linkedin.com/in/…).",
-      "requestDisclaimer": "Coffee chat là cuộc trò chuyện tự nguyện với mentor. Misaeng không đảm bảo bất kỳ kết quả giới thiệu, phỏng vấn hay việc làm nào. Mọi sự giới thiệu hoàn toàn do mentor tự quyết định và tuân theo chính sách của công ty mentor. Misaeng không nhận bất kỳ lợi ích tài chính nào từ coffee chat hay việc giới thiệu, và mentor không được Misaeng trả thù lao. Khi gửi yêu cầu, LinkedIn của bạn sẽ được chia sẻ với mentor."
+      "requestDisclaimer": "Coffee chat là cuộc trò chuyện tự nguyện với mentor. Misaeng không đảm bảo bất kỳ kết quả giới thiệu, phỏng vấn hay việc làm nào. Mọi sự giới thiệu hoàn toàn do mentor tự quyết định và tuân theo chính sách của công ty mentor. Misaeng không nhận bất kỳ lợi ích tài chính nào từ coffee chat hay việc giới thiệu, và mentor không được Misaeng trả thù lao. Khi gửi yêu cầu, LinkedIn của bạn sẽ được chia sẻ với mentor. Khi gửi yêu cầu, điểm sẽ được giữ chỗ; điểm bị trừ khi bạn chọn một khung giờ mentor gửi và xác nhận bằng link Zoom hoặc Google Meet. Misaeng không kiểm tra cuộc trò chuyện có diễn ra hay không. Sau khi xác nhận, điểm chỉ được hoàn lại nếu mentor hủy hoặc bạn hủy trước giờ bắt đầu ít nhất 24 giờ. Nếu mentor không xuất hiện, hãy báo cáo trong ứng dụng."
     },
     "push": {
       "earned": {
@@ -441,6 +476,16 @@
           "body": "Bạn được ghi nhận vắng mặt nên số {name} đã tạm giữ đã được sử dụng."
         }
       }
+    },
+    "reviewQna": {
+      "tooShort": "Please write at least 5 characters.",
+      "postUnavailable": "You can't ask about this review.",
+      "ownReview": "You can't ask about your own review.",
+      "authorUnavailable": "You can't ask this author right now.",
+      "notFound": "Question not found.",
+      "answerRequired": "Please write an answer.",
+      "closed": "This question is already closed.",
+      "reportReasonRequired": "Vui lòng nhập lý do báo cáo."
     }
   },
   "account": {

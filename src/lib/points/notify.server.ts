@@ -59,7 +59,8 @@ export function notifyCoffeeChat(uid: string, status: CoffeeChatPushStatus, requ
 }
 
 /** Coffee chat v2 (peer mentors) pushes. Texts: api.push.coffeeChat.* ; data `{ type: 'coffee_chat_<kind>', chatId }`. */
-export type CoffeeChatMentorPush = 'request' | 'accepted' | 'declined' | 'cancelled'
+/** v3 adds: times (mentor → requester), confirmed (requester → mentor), retime (requester → mentor), expired (→ requester) */
+export type CoffeeChatMentorPush = 'request' | 'accepted' | 'declined' | 'cancelled' | 'times' | 'confirmed' | 'retime' | 'expired'
 
 export function notifyCoffeeChatMentor(input: {
   kind: CoffeeChatMentorPush
@@ -86,6 +87,32 @@ export function notifyCoffeeChatMentor(input: {
         body: refund ? `${base} ${refund}` : base,
         data: { type: `coffee_chat_${input.kind}`, chatId: input.chatId },
         threadId: 'coffee-chat',
+      }
+    },
+  })
+}
+
+/** Review Q&A pushes. Texts: api.push.reviewQna.* ; data `{ type: 'review_qna_<kind>', questionId, postId }`. */
+export function notifyReviewQuestion(input: {
+  kind: 'asked' | 'answered' | 'declined' | 'expired'
+  to: string
+  questionId: string
+  postId: string
+  preview?: string
+  /** points released back to the asker (declined / expired) */
+  refunded?: number
+}) {
+  notifyUsers({
+    type: 'account',
+    userIds: [input.to],
+    build: (t) => {
+      const base = t(`api.push.reviewQna.${input.kind}.body`, { preview: previewText(input.preview ?? '', 60) })
+      const refund = input.refunded && input.refunded > 0 ? t('api.push.reviewQna.refunded', { amount: input.refunded }) : ''
+      return {
+        title: t(`api.push.reviewQna.${input.kind}.title`),
+        body: refund ? `${base} ${refund}` : base,
+        data: { type: `review_qna_${input.kind}`, questionId: input.questionId, postId: input.postId },
+        threadId: 'review-qna',
       }
     },
   })

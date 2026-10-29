@@ -337,7 +337,42 @@
         "title": "コーヒーチャットがキャンセルされました",
         "body": "{name}さんがコーヒーチャットをキャンセルしました。"
       },
-      "refunded": "予約していた{amount}ポイントはお返ししました。"
+      "refunded": "予約していた{amount}ポイントはお返ししました。",
+      "times": {
+        "title": "コーヒーチャットの候補時間が届きました",
+        "body": "{name}さんが都合のよい時間を送りました。時間を選んでリンクを入れ、確定してください。"
+      },
+      "confirmed": {
+        "title": "コーヒーチャットが確定しました",
+        "body": "{name}さんが時間を確定しました。アプリで時間とリンクを確認してください。"
+      },
+      "retime": {
+        "title": "別の時間をリクエストされました",
+        "body": "{name}さんが別の時間をリクエストしました。都合のよい時間をもう一度送ってください。"
+      },
+      "expired": {
+        "title": "コーヒーチャットの申請が締め切られました",
+        "body": "期限内に時間が決まらなかったため、申請はキャンセルされました。"
+      }
+    },
+    "reviewQna": {
+      "asked": {
+        "title": "New question on your review",
+        "body": "“{preview}” Answer within 7 days to earn points."
+      },
+      "answered": {
+        "title": "Your question was answered",
+        "body": "The review author answered your question."
+      },
+      "declined": {
+        "title": "Your question was declined",
+        "body": "The review author chose not to answer this one."
+      },
+      "expired": {
+        "title": "Your question expired",
+        "body": "There was no answer within 7 days."
+      },
+      "refunded": "{amount}P refunded."
     }
   },
   "reviewDocs": {
@@ -388,16 +423,16 @@
       "notFound": "コーヒーチャットの申し込みが見つかりません。",
       "invalidTransition": "現在の状態では変更できません。",
       "cannotCancel": "日程が決まったコーヒーチャットはここではキャンセルできません。運営チームにお問い合わせください。",
-      "mentorConsent": "メンターのご案内と同意\n・掲示板に書いた体験談は引き続き匿名のままです。ただし、コーヒーチャットでは相手にあなたの顔と名前が見える場合があります。\n・メンター活動にはポイントを含め、いかなる報酬もありません。会社のリファラル報酬は各社の制度に従います。\n・Zoomリンクはメンターご自身で作成して共有します。Misaengはマッチングのみを行います。\n・キャリアに関するアドバイスは個人の意見であり、会話の内容についてMisaengは責任を負いません。\n・承諾すると、あなたのLinkedInが申請者に公開されます。\n・あなたが書いた面接・就職の体験談にも、コーヒーチャット申請ボタンが表示されます。",
+      "mentorConsent": "メンターのご案内と同意\n・掲示板に書いた体験談は引き続き匿名のままです。ただし、コーヒーチャットでは相手にあなたの顔と名前が見える場合があります。\n・メンター活動にはポイントを含め、いかなる報酬もありません。会社のリファラル報酬は各社の制度に従います。\n・申請が届いたら、都合のよい時間を1〜3つ送ります。申請者がその中から1つを選び、ZoomまたはGoogle Meetのリンクを送ります。Misaengはマッチングのみを行います。\n・キャリアに関するアドバイスは個人の意見であり、会話の内容についてMisaengは責任を負いません。\n・時間を送るとあなたのLinkedInも一緒に伝わり、申請者が時間を確定すると公開されます。\n・確定したコーヒーチャットをあなたがキャンセルすると、申請者にポイントが返金されます。\n・あなたが書いた面接・就職の体験談にも、コーヒーチャット申請ボタンが表示されます。",
       "mentorRequired": "コーヒーチャットを申し込むメンターを選んでください。",
       "mentorUnavailable": "現在このメンターにはコーヒーチャットを申し込めません。",
       "selfRequest": "自分自身にはコーヒーチャットを申し込めません。",
       "mentorBusy": "このメンターには返答待ちの申し込みが多くあります。しばらくしてから再度お申し込みください。",
       "duplicateOpen": "このメンターへの返答待ちの申し込みがすでにあります。",
       "timesRequired": "希望時間を1〜3つ選んでください。",
-      "timesInvalid": "希望時間は現在から12時間以降、30日以内で選んでください。",
-      "scheduledAtInvalid": "申込者が提案した時間のうち、まだ過ぎていない時間を選んでください。",
-      "zoomLinkInvalid": "正しいZoomリンク（https://で始まるzoom.usのアドレス）を入力してください。",
+      "timesInvalid": "時間は今から6時間後以降、30日以内で選んでください。",
+      "scheduledAtInvalid": "選べる時間の中から1つを選んでください。",
+      "zoomLinkInvalid": "正しいZoomまたはGoogle Meetのリンク（https://で始まるもの）を入力してください。",
       "cancelTooLate": "開始6時間前を過ぎるとキャンセルできません。",
       "invalidAction": "サポートされていないリクエストです。",
       "reasonTooLong": "理由は{max}文字まで入力できます。",
@@ -412,7 +447,7 @@
       "nicknameRequired": "メンターに登録するには、先にニックネームを設定してください。",
       "linkedinRequired": "LinkedInプロフィールのURLを入力してください。",
       "linkedinInvalid": "正しいLinkedInプロフィールのURL（https://www.linkedin.com/in/…）を入力してください。",
-      "requestDisclaimer": "コーヒーチャットはメンターとの自由な会話です。Misaengは紹介・面接・就職の結果を保証しません。紹介はすべてメンター個人の判断によるもので、メンターの勤務先の方針に従います。Misaengはコーヒーチャットや紹介によって金銭的な利益を得ることはなく、メンターもMisaengから報酬を受け取りません。申請すると、あなたのLinkedInがメンターに共有されます。"
+      "requestDisclaimer": "コーヒーチャットはメンターとの自由な会話です。Misaengは紹介・面接・就職の結果を保証しません。紹介はすべてメンター個人の判断によるもので、メンターの勤務先の方針に従います。Misaengはコーヒーチャットや紹介によって金銭的な利益を得ることはなく、メンターもMisaengから報酬を受け取りません。申請すると、あなたのLinkedInがメンターに共有されます。申請するとポイントが予約され、メンターが送った時間から1つを選んでZoomまたはGoogle Meetのリンクを入れて確定すると差し引かれます。Misaengは会話が実際に行われたかを確認しません。確定後は、メンターがキャンセルした場合、または開始24時間前までにあなたがキャンセルした場合にのみ返金されます。メンターが現れなかった場合はアプリから報告してください。"
     },
     "push": {
       "earned": {
@@ -441,6 +476,16 @@
           "body": "不参加として処理されたため、予約していた{name}が使用されました。"
         }
       }
+    },
+    "reviewQna": {
+      "tooShort": "Please write at least 5 characters.",
+      "postUnavailable": "You can't ask about this review.",
+      "ownReview": "You can't ask about your own review.",
+      "authorUnavailable": "You can't ask this author right now.",
+      "notFound": "Question not found.",
+      "answerRequired": "Please write an answer.",
+      "closed": "This question is already closed.",
+      "reportReasonRequired": "通報の理由を入力してください。"
     }
   },
   "account": {

@@ -337,7 +337,42 @@
         "title": "咖啡聊天已取消",
         "body": "{name} 取消了咖啡聊天。"
       },
-      "refunded": "预留的 {amount} 积分已退还。"
+      "refunded": "预留的 {amount} 积分已退还。",
+      "times": {
+        "title": "咖啡聊天时间已送达",
+        "body": "{name} 发送了方便的时间。请选择时间并填写链接以确定。"
+      },
+      "confirmed": {
+        "title": "咖啡聊天已确定",
+        "body": "{name} 确定了时间。请在 App 中查看时间和链接。"
+      },
+      "retime": {
+        "title": "对方请求其他时间",
+        "body": "{name} 请求了其他时间。请重新发送你方便的时间。"
+      },
+      "expired": {
+        "title": "咖啡聊天申请已截止",
+        "body": "未在期限内确定时间，申请已取消。"
+      }
+    },
+    "reviewQna": {
+      "asked": {
+        "title": "New question on your review",
+        "body": "“{preview}” Answer within 7 days to earn points."
+      },
+      "answered": {
+        "title": "Your question was answered",
+        "body": "The review author answered your question."
+      },
+      "declined": {
+        "title": "Your question was declined",
+        "body": "The review author chose not to answer this one."
+      },
+      "expired": {
+        "title": "Your question expired",
+        "body": "There was no answer within 7 days."
+      },
+      "refunded": "{amount}P refunded."
     }
   },
   "reviewDocs": {
@@ -388,16 +423,16 @@
       "notFound": "找不到 coffee chat 申请。",
       "invalidTransition": "当前状态下无法更改。",
       "cannotCancel": "已安排时间的 coffee chat 无法在此取消，请联系运营团队。",
-      "mentorConsent": "导师须知与同意\n· 你在论坛发布的经验分享仍将保持匿名。但在咖啡聊天中，对方可能会看到你的面孔和姓名。\n· 担任导师没有任何报酬，包括积分。公司内推奖励以各公司的制度为准。\n· Zoom 链接由导师自行创建并分享。Misaeng 仅提供匹配。\n· 职业建议仅代表个人观点，Misaeng 不对对话内容承担责任。\n· 接受后，你的 LinkedIn 将对申请人公开。\n· 你写的面试·求职经验分享上也会显示咖啡聊天申请按钮。",
+      "mentorConsent": "导师须知与同意\n· 你在论坛发布的经验分享仍将保持匿名。但在咖啡聊天中，对方可能会看到你的面孔和姓名。\n· 担任导师没有任何报酬，包括积分。公司内推奖励以各公司的制度为准。\n· 收到申请后，你发送 1~3 个方便的时间，申请人从中选择一个并发送 Zoom 或 Google Meet 链接。Misaeng 仅提供匹配。\n· 职业建议仅代表个人观点，Misaeng 不对对话内容承担责任。\n· 发送时间时你的 LinkedIn 会一并传达，申请人确定时间后将对其公开。\n· 如果你取消已确定的咖啡聊天，申请人的积分将被退还。\n· 你写的面试·求职经验分享上也会显示咖啡聊天申请按钮。",
       "mentorRequired": "请选择要申请咖啡聊天的导师。",
       "mentorUnavailable": "目前无法向这位导师申请咖啡聊天。",
       "selfRequest": "不能向自己申请咖啡聊天。",
       "mentorBusy": "这位导师目前有很多待回复的申请，请稍后再试。",
       "duplicateOpen": "你已有一个等待这位导师回复的申请。",
       "timesRequired": "请选择 1 到 3 个希望的时间。",
-      "timesInvalid": "希望的时间须在现在起 12 小时之后、30 天之内。",
-      "scheduledAtInvalid": "请从申请人提议的时间中选择一个尚未过去的时间。",
-      "zoomLinkInvalid": "请输入有效的 Zoom 链接（以 https:// 开头的 zoom.us 地址）。",
+      "timesInvalid": "时间须在现在起 6 小时之后、30 天以内。",
+      "scheduledAtInvalid": "请从可选时间中选择一个。",
+      "zoomLinkInvalid": "请输入有效的 Zoom 或 Google Meet 链接（以 https:// 开头）。",
       "cancelTooLate": "开始前 6 小时内无法取消。",
       "invalidAction": "不支持此请求。",
       "reasonTooLong": "原因最多可输入 {max} 个字符。",
@@ -412,7 +447,7 @@
       "nicknameRequired": "注册为导师前，请先设置昵称。",
       "linkedinRequired": "请输入你的 LinkedIn 个人主页链接。",
       "linkedinInvalid": "请输入有效的 LinkedIn 个人主页链接（https://www.linkedin.com/in/…）。",
-      "requestDisclaimer": "咖啡聊天是与导师之间的自愿交流。Misaeng 不保证任何内推、面试或就业结果。内推完全由导师个人决定，并须遵守导师所在公司的政策。Misaeng 不会从咖啡聊天或内推中获得任何金钱利益，导师也不会从 Misaeng 获得报酬。发送申请后，你的 LinkedIn 将分享给导师。"
+      "requestDisclaimer": "咖啡聊天是与导师之间的自愿交流。Misaeng 不保证任何内推、面试或就业结果。内推完全由导师个人决定，并须遵守导师所在公司的政策。Misaeng 不会从咖啡聊天或内推中获得任何金钱利益，导师也不会从 Misaeng 获得报酬。发送申请后，你的 LinkedIn 将分享给导师。发送申请后积分会被预留，从导师发送的时间中选择一个并填入 Zoom 或 Google Meet 链接确定后扣除。Misaeng 不会确认对话是否实际进行。确定后，仅在导师取消或你在开始前 24 小时以上取消时退还积分。如果导师没有出现，请在 App 中举报。"
     },
     "push": {
       "earned": {
@@ -441,6 +476,16 @@
           "body": "已按缺席处理，预留的{name}已被使用。"
         }
       }
+    },
+    "reviewQna": {
+      "tooShort": "Please write at least 5 characters.",
+      "postUnavailable": "You can't ask about this review.",
+      "ownReview": "You can't ask about your own review.",
+      "authorUnavailable": "You can't ask this author right now.",
+      "notFound": "Question not found.",
+      "answerRequired": "Please write an answer.",
+      "closed": "This question is already closed.",
+      "reportReasonRequired": "请填写举报原因。"
     }
   },
   "account": {

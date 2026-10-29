@@ -16,6 +16,8 @@ import {
   isCommunityStorageConfigured,
 } from '@lib/supabase/community.server'
 import { listStoredCommunityComments } from '@lib/supabase/communityComments.server'
+import { chatCounterpartUid } from '@lib/points/coffeeChatMentors.server'
+import { questionCounterpartUid } from '@lib/points/reviewQuestions.server'
 import {
   getSupabaseProfile,
   upsertSupabaseProfile,
@@ -29,6 +31,7 @@ export const dynamic = 'force-dynamic'
  * 사용자 차단 (App Store 1.2) — 내 프로필의 blockedUsers.
  * GET    → { blocks: { id, label, anonymous, createdAt }[] }  (uid는 내보내지 않음)
  * POST   { postId, commentId? } → 서버가 그 글·댓글의 작성자를 찾아 차단. { block, blocks }
+ *        { reviewQuestionId } | { coffeeChatId } → 앱의 후기 질문·커피챗 상대방을 차단 (참여자만)
  * DELETE { id } → 차단 해제. { ok, blocks }
  */
 
@@ -60,7 +63,12 @@ export async function GET(request: Request) {
   }
 }
 
-type CreateBody = { postId?: string; commentId?: string | null }
+type CreateBody = {
+  postId?: string
+  commentId?: string | null
+  reviewQuestionId?: string
+  coffeeChatId?: string
+}
 
 export async function POST(request: Request) {
   const { user, t, locale } = await requireUser(request)
@@ -77,31 +85,46 @@ export async function POST(request: Request) {
   const payload = (await request.json().catch(() => null)) as CreateBody | null
   const postId = String(payload?.postId || '').trim()
   const commentId = String(payload?.commentId || '').trim()
-  if (!postId || postId.startsWith('mock-')) {
+  const questionId = String(payload?.reviewQuestionId || '').trim()
+  const chatId = String(payload?.coffeeChatId || '').trim()
+  if ((!postId || postId.startsWith('mock-')) && !questionId && !chatId) {
     return NextResponse.json({ error: t('community.blocks.targetNotFound') }, { status: 404 })
   }
 
   try {
-    const post = await getStoredCommunityPost(postId)
-    if (!post) {
-      return NextResponse.json({ error: t('community.blocks.targetNotFound') }, { status: 404 })
-    }
-    const anonymous = isAnonymousBoard(post.categoryId)
-
     let targetUid = ''
     let label: string | null = null
-    if (commentId) {
-      const comment = (await listStoredCommunityComments(postId)).find(
-        (item) => item.id === commentId,
-      )
-      if (!comment || comment.status !== 'open') {
+    let anonymous = false
+    if (questionId || chatId) {
+      // 후기 질문·커피챗: 참여자만, 상대방 uid는 서버에서만 찾는다
+      targetUid =
+        (questionId
+          ? await questionCounterpartUid(user.uid, questionId)
+          : await chatCounterpartUid(user.uid, chatId)) || ''
+      if (targetUid) {
+        const target = await getSupabaseProfile(targetUid).catch(() => null)
+        label = target?.nickname?.trim() || null
+      }
+    } else {
+      const post = await getStoredCommunityPost(postId)
+      if (!post) {
         return NextResponse.json({ error: t('community.blocks.targetNotFound') }, { status: 404 })
       }
-      targetUid = comment.authorUid
-      label = comment.authorNickname?.trim() || null
-    } else {
-      targetUid = post.authorUid
-      label = post.authorNickname?.trim() || null
+      anonymous = isAnonymousBoard(post.categoryId)
+
+      if (commentId) {
+        const comment = (await listStoredCommunityComments(postId)).find(
+          (item) => item.id === commentId,
+        )
+        if (!comment || comment.status !== 'open') {
+          return NextResponse.json({ error: t('community.blocks.targetNotFound') }, { status: 404 })
+        }
+        targetUid = comment.authorUid
+        label = comment.authorNickname?.trim() || null
+      } else {
+        targetUid = post.authorUid
+        label = post.authorNickname?.trim() || null
+      }
     }
 
     if (!targetUid) {
@@ -116,7 +139,10 @@ export async function POST(request: Request) {
     const existing = readBlockedUsers(profile)
     const already = existing.find((item) => item.uid === targetUid)
     if (already) {
-      return NextResponse.json({ block: toPublicBlockedUser(already), blocks: newestFirst(existing) })
+      return NextResponse.json({
+        block: toPublicBlockedUser(already),
+        blocks: newestFirst(existing),
+      })
     }
     if (existing.length >= MAX_BLOCKED_USERS) {
       return NextResponse.json(

@@ -28,7 +28,10 @@
       "admin": "ポイントの回収"
     },
     "legacy_opening": "以前のポイントの繰越",
-    "adjust": "ポイント調整"
+    "adjust": "ポイント調整",
+    "review_question": "Question to a review author",
+    "review_answer": "Answered a question",
+    "coffee_chat_refund": "コーヒーチャット返金"
   },
   "entryTypes": {
     "earn": "獲得",

@@ -12,6 +12,7 @@ function validSetting(key: PointSettingKey, raw: unknown): boolean {
   switch (key) {
     case 'paywall.enabled':
     case 'coffee_chat.enabled':
+    case 'review_qna.enabled':
       return typeof raw === 'boolean'
     case 'paywall.start_date':
       return raw === null || (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw))

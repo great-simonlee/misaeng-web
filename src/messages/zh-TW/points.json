@@ -28,7 +28,10 @@
       "admin": "收回積分"
     },
     "legacy_opening": "原有積分結轉",
-    "adjust": "積分調整"
+    "adjust": "積分調整",
+    "review_question": "Question to a review author",
+    "review_answer": "Answered a question",
+    "coffee_chat_refund": "咖啡聊天退款"
   },
   "entryTypes": {
     "earn": "獲得",
