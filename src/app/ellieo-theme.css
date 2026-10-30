@@ -186,3 +186,38 @@
 [data-brand='ellieo'] [data-ui='surface'] span.rounded-full:not([class*='size-']):is([class*=' px-'], [class^='px-']) {
   border-radius: 0.375rem;
 }
+
+/* ---------- Company directory / company detail / job postings hero ---------- */
+/* Flat navy panel like the home hero: no glow blobs, no grid */
+[data-brand='ellieo'] [data-ui='hero-panel'] {
+  border-radius: 1rem;
+  background: var(--navy);
+  box-shadow: none;
+}
+
+[data-brand='ellieo'] [data-ui='hero-decor'] {
+  display: none;
+}
+
+/* Featured company: 1px brand line instead of the orange→violet gradient frame */
+[data-brand='ellieo'] [data-ui='featured-card'] {
+  border-radius: 0.875rem;
+  background: var(--brand);
+}
+
+[data-brand='ellieo'] [data-ui='featured-card'] > span {
+  border-radius: calc(0.875rem - 1px);
+}
+
+/* A–Z index letters: solid ink instead of a fading gradient */
+[data-brand='ellieo'] [data-ui='index-letter'] {
+  background: none;
+  color: var(--foreground);
+  -webkit-text-fill-color: currentColor;
+  font-weight: 800;
+}
+
+/* Highlighted hero numbers: Ellieo sun yellow instead of Misaeng coral */
+[data-brand='ellieo'] [data-ui='hero-stat-accent'] {
+  color: var(--ellieo-sun);
+}

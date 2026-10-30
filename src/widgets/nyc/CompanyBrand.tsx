@@ -114,12 +114,13 @@ export function CompanyHeroPanel({
 }) {
   return (
     <div
+      data-ui='hero-panel'
       className={cn(
         'relative overflow-hidden rounded-[1.5rem] bg-[#0b1020] px-5 pb-5 pt-6 text-white shadow-[0_24px_60px_-30px_rgba(15,23,42,0.5)] sm:px-7 sm:pb-6 sm:pt-7',
         className
       )}
     >
-      <div aria-hidden className='pointer-events-none absolute inset-0'>
+      <div aria-hidden data-ui='hero-decor' className='pointer-events-none absolute inset-0'>
         <div className='absolute -right-24 -top-32 size-[26rem] rounded-full bg-[var(--brand)] opacity-25 blur-[110px]' />
         <div className='absolute -bottom-40 -left-20 size-[22rem] rounded-full bg-[#6d5dfc] opacity-20 blur-[110px]' />
         <div

@@ -366,6 +366,7 @@ export function CompanyListScreen() {
                         <div className='relative'>
                           <span
                             aria-hidden
+                            data-ui='index-letter'
                             className='block bg-gradient-to-b from-[var(--foreground)] to-[var(--foreground)]/25 bg-clip-text text-[1.35rem] font-black leading-none tracking-[-0.06em] text-transparent sm:sticky sm:top-24 sm:text-[2.75rem]'
                           >
                             {label}
@@ -483,7 +484,7 @@ function HeroStat({
   const format = useFormat()
   return (
     <div className='flex items-baseline gap-1'>
-      <dd className={cn('font-semibold tabular-nums', accent ? 'text-[#ff8a65]' : 'text-white')}>
+      <dd data-ui={accent ? 'hero-stat-accent' : undefined} className={cn('font-semibold tabular-nums', accent ? 'text-[#ff8a65]' : 'text-white')}>
         {value === null ? (
           <span className='inline-block h-3 w-5 animate-pulse rounded bg-white/15 align-middle' />
         ) : (
@@ -581,11 +582,13 @@ function FeaturedCard({ company, href }: { company: CompanyListItem; href: strin
   return (
     <Link
       href={href}
+      data-ui='featured-card'
       className='group relative block h-full rounded-[1.4rem] bg-gradient-to-br from-[var(--brand)] via-[#ff9a76] to-[#6d5dfc] p-px touch-manipulation transition duration-200 hover:shadow-[0_8px_22px_-10px_rgb(var(--brand-rgb)/0.3)] active:scale-[0.99]'
     >
       <span className='relative flex h-full items-center gap-4 overflow-hidden rounded-[calc(1.4rem-1px)] bg-white p-4 sm:p-5'>
         <span
           aria-hidden
+          data-ui='hero-decor'
           className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgb(var(--brand-rgb)/0.10),transparent_55%)]'
         />
         <CompanyMark company={company} className='relative size-14 text-[20px]' />

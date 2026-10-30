@@ -12,6 +12,7 @@
 - 사용자 결정 (DECISIONS.md에 아직 미기록 → 재개 시 기록): ① 언어 = **en 기본(접두사 없음) + vi(`/vi`)**, 다른 언어 없음 (브리프의 vi 기본을 뒤집음) ② **미생과 완전히 다른 새 디자인**.
 - 완료: ja·zh-CN·zh-TW·id 문구/약관 번역/CJK 글꼴 삭제, Ellieo 언어 설정·proxy·언어 메뉴(EN/VI), 새 테마 `src/app/ellieo-theme.css` + Be Vietnam Pro(`src/lib/fonts/ellieo.ts`), Ellieo 전용 `src/screens/ellieo/EllieoHomeScreen.tsx`, `src/widgets/ellieo/*`(Navbar, Footer, HousingCard, AuthNote, VsaPartnersSection 기본 숨김, 하단 탭 nav), 한인 학생회·인플루언서 영역 Ellieo에서 숨김.
 - 1차 스크린샷: `~/Simon/devlog/ellieo/shots-2026-10-30/` (home·vihome·housing·vihousing·board·post·login, m=390 / d=1440), 이전 화면은 `before/`.
+- 10-30 저녁 재개: 회사 목록·회사 상세·채용 공고 히어로를 Ellieo 스타일로(평평한 남색, 글로우·격자 제거, 추천 회사 파란 테두리, A–Z 글자 단색, 강조 숫자 노란색). 공용 컴포넌트에는 `data-ui` 속성만 추가하고 스타일은 `ellieo-theme.css`에만 둠(미생 화면 영향 없음). 390px 가로 넘침 없음 확인(/nyc, companies, postings, me, housing, partners, /vi/nyc), 날짜는 `7 Nov`처럼 일·월 순서 확인.
 - 남은 일: ① 미생 화면 변화 없음 확인 마무리(중단 직전 "페이지 높이가 운영과 일치" 확인 중) ② 베트남어 화면 점검(문구 원어민 검수 필요 표시) ③ 나머지 화면(글 상세 세부, 마이페이지, 회사/후기 등) 새 디자인 적용 ④ 390px 가로 넘침 재확인 ⑤ 날짜 일/월/년 표기 확인 ⑥ DECISIONS.md·STATUS.md 정리 후 정식 커밋 ⑦ ERP 후속(STATUS에 기록만): POSTING_LOCALES·번역 배치 대상, consent_logs `ui_language` 제약.
 - 재개 방법: `cd ~/Simon/ellieo-website && npx next dev --port 3100` → http://localhost:3100/nyc. 미생 비교가 필요하면 `NEXT_PUBLIC_BRAND=misaeng NEXT_DIST_DIR=.next-misaeng npx next dev --port 3101` 후 끝나면 서버 종료·`.next-misaeng` 삭제 (디스크 부족 주의: 시작 전 `df -h /`).
 
