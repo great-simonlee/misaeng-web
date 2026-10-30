@@ -172,10 +172,7 @@
       }
     },
     "vsa": {
-      "title": "Hội sinh viên đối tác",
-      "body": "Các Hội Sinh viên Việt Nam (VSA) ở New York hợp tác với Ellieo.",
-      "partnerBadge": "Đối tác",
-      "members": "{count} thành viên"
+      "title": "Hội sinh viên đối tác"
     },
     "intro": {
       "title": "Có gì mới ở {city}"
@@ -184,8 +181,6 @@
     "sampleData": "Dữ liệu mẫu",
     "creators": {
       "title": "Nhà sáng tạo trên Ellieo",
-      "body": "Những nhà sáng tạo người Việt tại Mỹ chia sẻ kinh nghiệm sống, việc làm và visa với thành viên.",
-      "followers": "{count} người theo dõi",
       "platforms": {
         "instagram": "Instagram",
         "youtube": "YouTube",

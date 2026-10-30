@@ -172,10 +172,7 @@
       }
     },
     "vsa": {
-      "title": "Partner student associations",
-      "body": "Vietnamese Student Associations we work with in New York.",
-      "partnerBadge": "Partner",
-      "members": "{count} members"
+      "title": "Partner student associations"
     },
     "intro": {
       "title": "What's new in {city}"
@@ -184,8 +181,6 @@
     "sampleData": "Sample data",
     "creators": {
       "title": "Creators on Ellieo",
-      "body": "Vietnamese creators in the US who share life, career and visa tips with our members.",
-      "followers": "{count} followers",
       "platforms": {
         "instagram": "Instagram",
         "youtube": "YouTube",

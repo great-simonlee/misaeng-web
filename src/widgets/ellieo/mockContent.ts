@@ -17,7 +17,6 @@ export type EllieoPartnerOrg = {
   mark: string
   name: string
   school: string
-  members: number
   /** Logo circle color */
   color: string
   instagram?: string
@@ -28,7 +27,6 @@ export type EllieoCreator = {
   name: string
   platform: 'instagram' | 'youtube' | 'tiktok'
   followers: number
-  topic: Localized
   color: string
   handle?: string
 }
@@ -48,11 +46,11 @@ export const ELLIEO_PARTNER_ORGS: readonly EllieoPartnerOrg[] = []
 export const ELLIEO_CREATORS: readonly EllieoCreator[] = []
 
 const MOCK_PARTNER_ORGS: readonly EllieoPartnerOrg[] = [
-  { id: 'mock-nyu', mark: 'NYU', name: 'NYU Vietnamese Student Association', school: 'New York University', members: 240, color: '#57068c' },
-  { id: 'mock-columbia', mark: 'CU', name: 'Columbia Vietnamese Students Association', school: 'Columbia University', members: 180, color: '#1d4f91' },
-  { id: 'mock-baruch', mark: 'BC', name: 'Baruch Vietnamese Student Association', school: 'Baruch College', members: 150, color: '#0e7c86' },
-  { id: 'mock-pace', mark: 'PACE', name: 'Pace Vietnamese Student Association', school: 'Pace University', members: 95, color: '#c8102e' },
-  { id: 'mock-sbu', mark: 'SBU', name: 'Stony Brook Vietnamese Student Association', school: 'Stony Brook University', members: 210, color: '#990000' },
+  { id: 'mock-nyu', mark: 'NYU', name: 'NYU VSA', school: 'New York University', color: '#57068c' },
+  { id: 'mock-columbia', mark: 'CU', name: 'Columbia VSA', school: 'Columbia University', color: '#1d4f91' },
+  { id: 'mock-baruch', mark: 'BC', name: 'Baruch VSA', school: 'Baruch College', color: '#0e7c86' },
+  { id: 'mock-pace', mark: 'PU', name: 'Pace VSA', school: 'Pace University', color: '#c8102e' },
+  { id: 'mock-sbu', mark: 'SBU', name: 'Stony Brook VSA', school: 'Stony Brook University', color: '#990000' },
 ]
 
 const MOCK_CREATORS: readonly EllieoCreator[] = [
@@ -61,7 +59,6 @@ const MOCK_CREATORS: readonly EllieoCreator[] = [
     name: 'Linh Nguyễn',
     platform: 'youtube',
     followers: 48_000,
-    topic: { en: 'Student life vlogs in Manhattan', vi: 'Vlog đời sống du học sinh ở Manhattan' },
     color: '#f2a516',
   },
   {
@@ -69,7 +66,6 @@ const MOCK_CREATORS: readonly EllieoCreator[] = [
     name: 'Minh Trần',
     platform: 'tiktok',
     followers: 120_000,
-    topic: { en: 'OPT, H-1B and first-job tips', vi: 'Mẹo OPT, H-1B và công việc đầu tiên' },
     color: '#1f5eff',
   },
   {
@@ -77,7 +73,6 @@ const MOCK_CREATORS: readonly EllieoCreator[] = [
     name: 'Thảo Phạm',
     platform: 'instagram',
     followers: 35_000,
-    topic: { en: 'Vietnamese food spots in NYC', vi: 'Quán ăn Việt ở New York' },
     color: '#0b8f6a',
   },
   {
@@ -85,7 +80,6 @@ const MOCK_CREATORS: readonly EllieoCreator[] = [
     name: 'Huy Lê',
     platform: 'youtube',
     followers: 22_000,
-    topic: { en: 'Renting and budgeting as a student', vi: 'Thuê nhà và quản lý chi tiêu khi đi học' },
     color: '#7a4cff',
   },
 ]

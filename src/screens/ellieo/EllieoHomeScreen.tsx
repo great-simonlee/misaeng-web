@@ -25,7 +25,6 @@ import {
   getPartnerOrgs,
   isMockList,
   type EllieoCreator,
-  type EllieoPartnerOrg,
 } from '@widgets/ellieo/mockContent'
 import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 
@@ -163,62 +162,22 @@ export function EllieoHomeScreen() {
 
 function PartnerOrgsSection() {
   const t = useT('hub')
-  const format = useFormat()
   const orgs = getPartnerOrgs()
   if (orgs.length === 0) return null
 
   return (
-    <section className='mx-auto w-full max-w-7xl pt-8 sm:pt-10'>
-      <div className='px-4 sm:px-6 lg:px-8'>
-        <SectionHeading
-          title={t('ellieo.vsa.title')}
-          body={t('ellieo.vsa.body')}
-          aside={isMockList(orgs, ELLIEO_PARTNER_ORGS) ? <SampleTag /> : null}
-        />
-      </div>
-      <ScrollRow five={orgs.length === 5}>
-        {orgs.map((org) => (
-          <li key={org.id} className='w-[15.5rem] shrink-0 snap-start lg:w-auto'>
-            <PartnerOrgCard org={org} members={t('ellieo.vsa.members', { count: format.number(org.members) })} />
-          </li>
-        ))}
-      </ScrollRow>
-    </section>
-  )
-}
-
-function PartnerOrgCard({ org, members }: { org: EllieoPartnerOrg; members: string }) {
-  const t = useT('hub')
-  return (
-    <div className='flex h-full flex-col rounded-2xl bg-white p-4 ring-1 ring-[var(--border)]'>
-      <div className='flex items-center gap-3'>
-        <span
-          aria-hidden
-          className='inline-flex size-12 shrink-0 items-center justify-center rounded-full text-[12px] font-bold tracking-tight text-white'
-          style={{ background: org.color }}
-        >
-          {org.mark}
-        </span>
-        <span className='rounded-md bg-[var(--brand-soft)] px-2 py-0.5 text-[11.5px] font-semibold text-[var(--brand)]'>
-          {t('ellieo.vsa.partnerBadge')}
-        </span>
-      </div>
-      <p className='mt-3 line-clamp-2 text-[15px] font-semibold leading-snug text-[var(--foreground)]'>{org.name}</p>
-      <p className='mt-1 text-[13px] text-[var(--muted)]'>{org.school}</p>
-      <p className='mt-auto pt-3 text-[13px] font-medium text-[var(--muted-foreground)]'>
-        {members}
-        {org.instagram ? (
-          <a
-            href={`https://instagram.com/${org.instagram}`}
-            target='_blank'
-            rel='noopener noreferrer'
-            className='ml-2 text-[var(--brand)] hover:underline'
-          >
-            @{org.instagram}
-          </a>
-        ) : null}
-      </p>
-    </div>
+    <PeopleSection
+      title={t('ellieo.vsa.title')}
+      sample={isMockList(orgs, ELLIEO_PARTNER_ORGS)}
+      items={orgs.map((org) => ({
+        id: org.id,
+        mark: org.mark,
+        color: org.color,
+        name: org.name,
+        detail: org.school,
+        url: org.instagram ? `https://instagram.com/${org.instagram}` : null,
+      }))}
+    />
   )
 }
 
@@ -230,59 +189,70 @@ const PLATFORM_URL: Record<EllieoCreator['platform'], (handle: string) => string
 
 function CreatorsSection() {
   const t = useT('hub')
-  const locale = useLocale()
   const format = useFormat()
   const creators = getCreators()
   if (creators.length === 0) return null
 
   return (
+    <PeopleSection
+      title={t('ellieo.creators.title')}
+      sample={isMockList(creators, ELLIEO_CREATORS)}
+      items={creators.map((creator) => ({
+        id: creator.id,
+        mark: creator.name.charAt(0),
+        color: creator.color,
+        name: creator.name,
+        detail: `${t(`ellieo.creators.platforms.${creator.platform}`)} · ${format.number(creator.followers, {
+          notation: 'compact',
+          maximumFractionDigits: 1,
+        })}`,
+        url: creator.handle ? PLATFORM_URL[creator.platform](creator.handle) : null,
+      }))}
+    />
+  )
+}
+
+type PersonItem = { id: string; mark: string; color: string; name: string; detail: string; url: string | null }
+
+/** Partner VSAs and creators: one compact row per entry (mark, name, one detail line) */
+function PeopleSection({ title, sample, items }: { title: string; sample: boolean; items: PersonItem[] }) {
+  return (
     <section className='mx-auto w-full max-w-7xl pt-8 sm:pt-10'>
-      <div className='px-4 sm:px-6 lg:px-8'>
-        <SectionHeading
-          title={t('ellieo.creators.title')}
-          body={t('ellieo.creators.body')}
-          aside={isMockList(creators, ELLIEO_CREATORS) ? <SampleTag /> : null}
-        />
+      <div className='flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-8'>
+        <h2 className='text-[1.1rem] font-bold tracking-[-0.02em] text-[var(--foreground)] sm:text-[1.2rem]'>{title}</h2>
+        {sample ? <SampleTag /> : null}
       </div>
-      <ScrollRow>
-        {creators.map((creator) => {
+      <ScrollRow five={items.length === 5}>
+        {items.map((item) => {
           const inner = (
             <>
               <span
                 aria-hidden
-                className='inline-flex size-14 shrink-0 items-center justify-center rounded-full text-[18px] font-bold text-white ring-4 ring-white'
-                style={{ background: creator.color }}
+                className='inline-flex size-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold tracking-tight text-white'
+                style={{ background: item.color }}
               >
-                {creator.name.charAt(0)}
+                {item.mark}
               </span>
               <span className='min-w-0'>
-                <span className='block truncate text-[15px] font-semibold text-[var(--foreground)]'>{creator.name}</span>
-                <span className='mt-0.5 block text-[12.5px] font-medium text-[var(--muted)]'>
-                  {t(`ellieo.creators.platforms.${creator.platform}`)} ·{' '}
-                  {t('ellieo.creators.followers', {
-                    count: format.number(creator.followers, { notation: 'compact', maximumFractionDigits: 1 }),
-                  })}
-                </span>
-                <span className='mt-1.5 line-clamp-2 block text-[13.5px] leading-snug text-[var(--muted-foreground)]'>
-                  {locale === 'vi' ? creator.topic.vi : creator.topic.en}
-                </span>
+                <span className='block truncate text-[14px] font-semibold text-[var(--foreground)]'>{item.name}</span>
+                <span className='block truncate text-[12.5px] text-[var(--muted)]'>{item.detail}</span>
               </span>
             </>
           )
-          const cardClass = 'flex h-full items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-[var(--border)]'
+          const rowClass = 'flex items-center gap-2.5 rounded-xl bg-white px-3 py-2.5 ring-1 ring-[var(--border)]'
           return (
-            <li key={creator.id} className='w-[17rem] shrink-0 snap-start lg:w-auto'>
-              {creator.handle ? (
+            <li key={item.id} className='w-[13.5rem] shrink-0 snap-start lg:w-auto'>
+              {item.url ? (
                 <a
-                  href={PLATFORM_URL[creator.platform](creator.handle)}
+                  href={item.url}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className={cn(cardClass, 'transition hover:ring-[var(--border-muted)]')}
+                  className={cn(rowClass, 'transition hover:ring-[var(--border-muted)]')}
                 >
                   {inner}
                 </a>
               ) : (
-                <div className={cardClass}>{inner}</div>
+                <div className={rowClass}>{inner}</div>
               )}
             </li>
           )
@@ -291,7 +261,6 @@ function CreatorsSection() {
     </section>
   )
 }
-
 function LatestHousingSection() {
   const t = useT('hub')
   const city = useCity()
@@ -341,6 +310,8 @@ function CommunitySection() {
   const format = useFormat()
   const href = useCityPath()
   const posts = getCommunityHighlights()
+  // Fixed at mount so "3 hours ago" doesn't change between renders
+  const [now] = useState(() => Date.now())
   if (posts.length === 0) return null
 
   return (
@@ -358,7 +329,7 @@ function CommunitySection() {
                 <span className='flex items-center gap-2 text-[12px] font-semibold text-[var(--brand)]'>
                   {tc(`categories.${post.board}.title`)}
                   <span className='font-normal text-[var(--muted)]'>
-                    · {format.relative(Date.now() - post.hoursAgo * 3_600_000)}
+                    · {format.relative(now - post.hoursAgo * 3_600_000)}
                   </span>
                 </span>
                 <span className='mt-1 line-clamp-2 text-[15.5px] font-semibold leading-snug text-[var(--foreground)] group-hover:text-[var(--brand)]'>
@@ -389,7 +360,7 @@ function CommunitySection() {
 /** Horizontal swipe row on phones/tablets, plain grid on desktop */
 function ScrollRow({ children, five = false }: { children: React.ReactNode; five?: boolean }) {
   return (
-    <div className='mt-4 overflow-x-auto pb-1 [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden'>
+    <div className='mt-3 overflow-x-auto pb-1 [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden'>
       <ul
         className={cn(
           'flex snap-x snap-mandatory gap-3 px-4 sm:px-6 lg:grid lg:snap-none lg:px-8',
