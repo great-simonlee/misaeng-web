@@ -153,23 +153,7 @@
   "ellieo": {
     "hero": {
       "eyebrow": "{city} · Verified international students",
-      "join": "Join with your school email",
-      "points": {
-        "reports": "Reports reviewed within {hours} hours"
-      }
-    },
-    "boards": {
-      "title": "Explore the boards"
-    },
-    "safety": {
-      "kicker": "Safety first",
-      "title": "A community you can trust",
-      "steps": {
-        "report": {
-          "title": "Report anything suspicious",
-          "body": "Upfront payment requests, fake landlords, fake job offers, or impersonation: tap Report."
-        }
-      }
+      "join": "Join with your school email"
     },
     "vsa": {
       "title": "Partner student associations"

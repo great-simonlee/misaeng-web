@@ -8,7 +8,6 @@ import { LoadingState, MarqueeRow } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
-import { BRAND_CONFIG } from '@lib/brand'
 import { captureReferralFromLocation } from '@lib/community/referral'
 import { cityLoginPath } from '@lib/constants/cities'
 import { NYC_MAGAZINE_PREVIEWS } from '@lib/constants/nyc'
@@ -16,7 +15,7 @@ import { fetchHousingListings } from '@lib/housing/fetchListings'
 import { useFormat, useLocale, useT } from '@lib/i18n/client'
 import type { HousingListing } from '@/types/nyc'
 import { EllieoHousingCard } from '@widgets/ellieo/EllieoHousingCard'
-import { ArrowRightIcon, ChatIcon, FlagIcon, ShieldCheckIcon } from '@widgets/ellieo/icons'
+import { ArrowRightIcon, ChatIcon, ShieldCheckIcon } from '@widgets/ellieo/icons'
 import {
   ELLIEO_CREATORS,
   ELLIEO_PARTNER_ORGS,
@@ -31,19 +30,16 @@ import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 const HOUSING_PREVIEW_COUNT = 4
 
 /**
- * Ellieo city home. Content first: a slim intro with board shortcuts, then partner student
- * associations and creators, the newest housing and community posts, and only then the boards
- * and the safety promise (the footer also carries the trust points).
+ * Ellieo city home. Content first: a one-line intro, then partner student associations and
+ * creators, the newest housing and community posts, and the magazine. Board links are in the
+ * header / bottom tab bar and the trust promises in the footer, so the home doesn't repeat them.
  * Copy: hub.ellieo.* (en + vi). Sample partners/posts: widgets/ellieo/mockContent.
  */
 export function EllieoHomeScreen() {
   const t = useT('hub')
-  const tc = useT('community')
   const city = useCity()
   const cityInfo = useCityInfo()
-  const href = useCityPath()
   const { user, loading } = useAuth()
-  const sla = BRAND_CONFIG.trust.reportSlaHours
 
   useEffect(() => {
     captureReferralFromLocation()
@@ -51,78 +47,31 @@ export function EllieoHomeScreen() {
 
   return (
     <div className='min-w-0 bg-[var(--background)]'>
-      {/* Slim intro: who this is for + board shortcuts */}
-      <section className='border-b border-[var(--border)] bg-white'>
-        <div className='mx-auto w-full max-w-7xl px-4 pb-5 pt-6 sm:px-6 sm:pt-8 lg:px-8'>
-          <div className='flex flex-wrap items-end justify-between gap-3'>
-            <div className='min-w-0'>
-              <p className='inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--ellieo-jade)]'>
-                <ShieldCheckIcon className='size-4' />
-                {t('ellieo.hero.eyebrow', { city: cityInfo.shortLabel })}
-              </p>
-              <h1 className='mt-1.5 text-[1.5rem] font-bold tracking-[-0.025em] text-[var(--foreground)] sm:text-[1.9rem]'>
-                {t('ellieo.intro.title', { city: cityInfo.shortLabel })}
-              </h1>
-            </div>
-            {!loading && !user ? (
-              <Link
-                href={`${cityLoginPath(city)}?mode=signup`}
-                className='inline-flex h-10 items-center gap-1.5 rounded-[10px] bg-[var(--brand)] px-4 text-[14px] font-semibold text-white transition hover:bg-[var(--brand-hover)]'
-              >
-                {t('ellieo.hero.join')}
-                <ArrowRightIcon className='size-4' />
-              </Link>
-            ) : null}
-          </div>
-          <nav aria-label={t('ellieo.boards.title')} className='-mx-4 mt-4 overflow-x-auto px-4 sm:mx-0 sm:px-0'>
-            <ul className='flex w-max gap-2 sm:w-auto sm:flex-wrap'>
-              {ELLIEO_BOARDS.filter((board) => board.available).map((board) => {
-                const Icon = board.icon
-                return (
-                  <li key={board.id}>
-                    <Link
-                      href={href(board.path)}
-                      className='inline-flex h-10 items-center gap-2 rounded-[10px] bg-[var(--background)] px-3.5 text-[14px] font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] transition hover:bg-[var(--brand-soft)] hover:text-[var(--brand)] hover:ring-[var(--brand-subtle)]'
-                    >
-                      <Icon className='size-[18px] text-[var(--brand)]' />
-                      {tc(`categories.${board.id}.title`)}
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
-          </nav>
-        </div>
+      {/* Slim intro. Board links live in the header (desktop) and the bottom tab bar (mobile), so none here */}
+      <section className='mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8'>
+        <p className='inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--ellieo-jade)]'>
+          <ShieldCheckIcon className='size-4' />
+          {t('ellieo.hero.eyebrow', { city: cityInfo.shortLabel })}
+        </p>
+        <h1 className='mt-1.5 text-[1.5rem] font-bold tracking-[-0.025em] text-[var(--foreground)] sm:text-[1.9rem]'>
+          {t('ellieo.intro.title', { city: cityInfo.shortLabel })}
+        </h1>
+        {/* Desktop header already has Join; phones only get it here */}
+        {!loading && !user ? (
+          <Link
+            href={`${cityLoginPath(city)}?mode=signup`}
+            className='mt-4 inline-flex h-11 items-center gap-1.5 rounded-[10px] bg-[var(--brand)] px-4 text-[14.5px] font-semibold text-white transition hover:bg-[var(--brand-hover)] lg:hidden'
+          >
+            {t('ellieo.hero.join')}
+            <ArrowRightIcon className='size-4' />
+          </Link>
+        ) : null}
       </section>
 
       <PartnerOrgsSection />
       <CreatorsSection />
       <LatestHousingSection />
       <CommunitySection />
-
-      {/* Safety: short version, after the content */}
-      <section className='mx-auto w-full max-w-7xl px-4 pt-10 sm:px-6 sm:pt-14 lg:px-8'>
-        <div className='flex flex-col gap-4 rounded-2xl bg-white p-5 ring-1 ring-[var(--border)] sm:flex-row sm:items-center sm:justify-between sm:p-6'>
-          <div className='min-w-0'>
-            <p className='inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--ellieo-jade)]'>
-              <ShieldCheckIcon className='size-4' />
-              {t('ellieo.safety.kicker')}
-            </p>
-            <h2 className='mt-1 text-[1.15rem] font-bold tracking-[-0.02em] text-[var(--foreground)] sm:text-[1.3rem]'>
-              {t('ellieo.safety.title')}
-            </h2>
-            <p className='mt-1.5 max-w-2xl text-[14px] leading-relaxed text-[var(--muted)]'>
-              {t('ellieo.safety.steps.report.body')}
-            </p>
-          </div>
-          {sla ? (
-            <p className='inline-flex shrink-0 items-center gap-2 rounded-[10px] bg-[var(--ellieo-jade-soft)] px-3.5 py-2.5 text-[14px] font-semibold text-[var(--ellieo-jade)]'>
-              <FlagIcon className='size-[18px]' />
-              {t('ellieo.hero.points.reports', { hours: sla })}
-            </p>
-          ) : null}
-        </div>
-      </section>
 
       {/* Magazine preview */}
       <section className='mx-auto w-full max-w-7xl px-4 pb-14 pt-10 sm:px-6 sm:pb-20 sm:pt-14 lg:px-8'>
@@ -218,9 +167,8 @@ type PersonItem = { id: string; mark: string; color: string; name: string; detai
 function PeopleSection({ title, sample, items }: { title: string; sample: boolean; items: PersonItem[] }) {
   return (
     <section className='mx-auto w-full max-w-7xl pt-8 sm:pt-10'>
-      <div className='flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-8'>
-        <h2 className='text-[1.1rem] font-bold tracking-[-0.02em] text-[var(--foreground)] sm:text-[1.2rem]'>{title}</h2>
-        {sample ? <SampleTag /> : null}
+      <div className='px-4 sm:px-6 lg:px-8'>
+        <SectionHeading title={title} aside={sample ? <SampleTag /> : null} />
       </div>
       {/* Slides by itself; pauses on hover, stops for reduced motion (partner-marquee in globals.css) */}
       <MarqueeRow className='mt-3 lg:mx-8'>
@@ -370,12 +318,13 @@ function ScrollRow({ children }: { children: React.ReactNode }) {
 
 function SectionHeading({ title, body, aside }: { title: string; body?: string; aside?: React.ReactNode }) {
   return (
-    <div className='flex flex-wrap items-end justify-between gap-x-4 gap-y-2'>
-      <div className='min-w-0'>
-        <h2 className='text-[1.25rem] font-bold tracking-[-0.02em] text-[var(--foreground)] sm:text-[1.45rem]'>{title}</h2>
-        {body ? <p className='mt-1 max-w-2xl text-[14.5px] leading-relaxed text-[var(--muted)]'>{body}</p> : null}
+    <div className='min-w-0'>
+      {/* aside (See all / Sample data) stays on the title line, even on phones */}
+      <div className='flex items-center justify-between gap-3'>
+        <h2 className='min-w-0 text-[1.25rem] font-bold tracking-[-0.02em] text-[var(--foreground)] sm:text-[1.45rem]'>{title}</h2>
+        {aside ? <div className='shrink-0'>{aside}</div> : null}
       </div>
-      {aside}
+      {body ? <p className='mt-1 max-w-2xl text-[14.5px] leading-relaxed text-[var(--muted)]'>{body}</p> : null}
     </div>
   )
 }

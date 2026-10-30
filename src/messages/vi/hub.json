@@ -153,23 +153,7 @@
   "ellieo": {
     "hero": {
       "eyebrow": "{city} · Du học sinh đã xác minh",
-      "join": "Tham gia bằng email trường học",
-      "points": {
-        "reports": "Báo cáo được kiểm tra trong vòng {hours} giờ"
-      }
-    },
-    "boards": {
-      "title": "Khám phá các chuyên mục"
-    },
-    "safety": {
-      "kicker": "An toàn là trên hết",
-      "title": "Một cộng đồng bạn có thể tin tưởng",
-      "steps": {
-        "report": {
-          "title": "Báo cáo điều đáng ngờ",
-          "body": "Yêu cầu chuyển tiền trước, chủ nhà giả, việc làm giả hay mạo danh: hãy bấm Báo cáo."
-        }
-      }
+      "join": "Tham gia bằng email trường học"
     },
     "vsa": {
       "title": "Hội sinh viên đối tác"
