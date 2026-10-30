@@ -17,7 +17,7 @@ export function BoardPageShell({
   className,
 }: BoardPageShellProps) {
   return (
-    <div className={cn('relative min-h-screen bg-white', className)}>
+    <div data-ui='canvas' className={cn('relative min-h-screen bg-white', className)}>
       <div
         className={cn(
           'relative mx-auto w-full',
@@ -46,6 +46,7 @@ export function BoardSurface({
 }: BoardSurfaceProps) {
   return (
     <Tag
+      data-ui='surface'
       className={cn(
         'rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.05),0_12px_32px_rgba(15,23,42,0.07)] ring-1 ring-black/[0.05]',
         className,
@@ -69,6 +70,7 @@ export function BoardMetaChip({
 }: BoardMetaChipProps) {
   return (
     <span
+      data-ui='meta-chip'
       className={cn(
         'inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-tight',
         tone === 'neutral' && 'bg-[#f1f2f4] text-[var(--muted-foreground)]',

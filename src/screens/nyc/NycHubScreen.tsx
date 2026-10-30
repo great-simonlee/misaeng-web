@@ -56,8 +56,8 @@ export function NycHubScreen() {
             <BoardHighlightCards />
           </div>
 
-          <PartnerSchoolsMarquee />
-          <PartnerInfluencersSection />
+          {BRAND_CONFIG.sections.koreanPartnerSchools ? <PartnerSchoolsMarquee /> : null}
+          {BRAND_CONFIG.sections.partnerInfluencers ? <PartnerInfluencersSection /> : null}
 
           {/* 임시: 파이어베이스 배너 비활성화
           {!configured && (

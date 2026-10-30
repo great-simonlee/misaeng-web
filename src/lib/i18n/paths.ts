@@ -45,7 +45,7 @@ export function isServicePathname(pathname: string): boolean {
   return isCityId(first)
 }
 
-/** 같은 페이지를 다른 언어 주소로. `/vi/nyc/food` + ja → `/ja/nyc/food` */
+/** 같은 페이지를 다른 언어 주소로. `/nyc/food` + vi → `/vi/nyc/food` */
 export function switchLocalePath(pathname: string, locale: Locale): string {
   return localePath(locale, stripLocalePrefix(pathname))
 }

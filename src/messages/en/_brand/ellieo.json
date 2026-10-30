@@ -1,0 +1,47 @@
+{
+  "community": {
+    "categories": {
+      "housing": {
+        "description": "Verified {city} listings from the Ellieo housing team"
+      },
+      "anonymous": {
+        "title": "Anonymous Q&A",
+        "description": "Ask what you'd rather not put your name on"
+      }
+    }
+  },
+  "nav": {
+    "links": {
+      "anonymous": "Anonymous Q&A"
+    }
+  },
+  "hub": {
+    "magazine": {
+      "kicker": "Ellieo Guides",
+      "title": "Life in New York, explained",
+      "description": "Short guides from our editors on food, neighborhoods, and things to do, separate from the boards.",
+      "items": {
+        "mag-1": {
+          "tag": "Food",
+          "title": "Late-night eats near campus",
+          "excerpt": "Where to get a warm bowl after a long study session."
+        },
+        "mag-2": {
+          "tag": "Events",
+          "title": "International student meetups this month",
+          "excerpt": "Casual evenings to meet students from other schools."
+        },
+        "mag-3": {
+          "tag": "Things to do",
+          "title": "An indoor route for rainy days",
+          "excerpt": "From museums to cafés, all in one day."
+        },
+        "mag-4": {
+          "tag": "Neighborhoods",
+          "title": "A first look at Astoria",
+          "excerpt": "Rent, commute, and food for students thinking of moving there."
+        }
+      }
+    }
+  }
+}

@@ -35,9 +35,9 @@ export function BoardListToolbar({
 }: BoardListToolbarProps) {
   const t = useT('community')
   return (
-    <header className={cn('pt-4 sm:pt-5 lg:pt-6', className)}>
+    <header data-ui='board-header' className={cn('pt-4 sm:pt-5 lg:pt-6', className)}>
       <div className='flex items-center justify-between gap-3'>
-        <h1 className='min-w-0 flex-1 truncate text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]'>
+        <h1 data-ui='board-title' className='min-w-0 flex-1 truncate text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]'>
           {breadcrumbLabel}
         </h1>
 
@@ -72,6 +72,7 @@ export function BoardListToolbar({
             {showWrite ? (
               <Link
                 href={writeHref}
+                data-ui='primary-action'
                 className='inline-flex h-9 max-w-[10rem] items-center gap-1.5 rounded-full bg-[var(--brand)] px-3.5 text-[13px] font-semibold leading-none text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] hover:shadow-[0_6px_18px_rgb(var(--brand-rgb)/0.34)] active:scale-[0.98] sm:max-w-none sm:px-4'
               >
                 <WriteIcon className='size-3.5 shrink-0' />

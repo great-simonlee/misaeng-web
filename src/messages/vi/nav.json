@@ -50,5 +50,41 @@
       "privacy": "Chính sách quyền riêng tư",
       "ads": "Quảng cáo & hợp tác"
     }
+  },
+  "ellieo": {
+    "short": {
+      "housing": "Nhà ở",
+      "status": "Visa",
+      "job-review": "Việc làm",
+      "roommate": "Ở ghép",
+      "food": "Ăn uống",
+      "anonymous": "Ẩn danh",
+      "marketplace": "Mua bán",
+      "events": "Sự kiện"
+    },
+    "tabs": {
+      "home": "Trang chủ",
+      "housing": "Nhà ở",
+      "boards": "Chuyên mục",
+      "jobs": "Việc làm",
+      "me": "Tôi"
+    },
+    "join": "Tham gia Ellieo",
+    "boardsTitle": "Tất cả chuyên mục",
+    "comingSoon": "Sắp ra mắt",
+    "footerTagline": "Cộng đồng du học sinh tại Mỹ. Mọi thành viên đều được xác minh bằng email trường học hoặc email công ty.",
+    "legalGroup": "Pháp lý",
+    "operatedBy": "Vận hành bởi {company}, {city}",
+    "license": "Giấy phép bất động sản bang New York: {number}",
+    "brokerage": "Công ty môi giới: {name}",
+    "trademark": "{brand}® là nhãn hiệu đã đăng ký (USPTO số {number}).",
+    "trust": {
+      "verifiedTitle": "Chỉ thành viên đã xác minh",
+      "verifiedBody": "Muốn đăng bài, bình luận hay nhắn tin, bạn cần xác minh email trường học hoặc email công ty.",
+      "noDepositTitle": "Không đặt cọc trước",
+      "noDepositBody": "Tin đăng của đội ngũ nhà ở không bao giờ yêu cầu bạn chuyển tiền trước khi ký hợp đồng.",
+      "reportTitle": "Xử lý báo cáo nhanh chóng",
+      "reportBody": "Thấy điều gì đáng ngờ, hãy báo cáo ngay. Đội ngũ Ellieo sẽ kiểm tra trong vòng {hours} giờ."
+    }
   }
 }

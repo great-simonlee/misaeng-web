@@ -19,6 +19,7 @@ import { AuthConfigBanner } from '@widgets/nyc/AuthConfigBanner'
 import { GoogleSignInButton } from '@widgets/nyc/GoogleSignInButton'
 import { isAppConnectConfigured } from '@lib/constants/appConnect'
 import { BRAND_CONFIG } from '@lib/brand'
+import { EllieoAuthNote } from '@widgets/ellieo/EllieoAuthNote'
 import { useT } from '@lib/i18n/client'
 import { isGoogleSignInConfigured } from '@lib/google/config'
 import {
@@ -67,7 +68,10 @@ export function NycLoginScreen() {
 
   const { locale } = useConsentLocale()
   // verify: the code emailed after sign-up · resetCode: the reset code + a new password (Misaeng's own login)
-  const [mode, setMode] = useState<'signin' | 'signup' | 'reset' | 'verify' | 'resetCode'>('signin')
+  // `?mode=signup` (Ellieo header "Join") opens the sign-up tab directly
+  const [mode, setMode] = useState<'signin' | 'signup' | 'reset' | 'verify' | 'resetCode'>(() =>
+    searchParams.get('mode') === 'signup' ? 'signup' : 'signin',
+  )
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [code, setCode] = useState('')
@@ -305,16 +309,16 @@ export function NycLoginScreen() {
             : t('login.submitReset')
 
   return (
-    <div className='relative min-h-[100dvh] bg-[linear-gradient(180deg,#eef1f6_0%,#e8edf4_42%,#f4f6fa_100%)]'>
-      <div className='pointer-events-none absolute inset-0 overflow-hidden' aria-hidden>
+    <div data-ui='auth-page' className='relative min-h-[100dvh] bg-[linear-gradient(180deg,#eef1f6_0%,#e8edf4_42%,#f4f6fa_100%)]'>
+      <div data-ui='auth-decor' className='pointer-events-none absolute inset-0 overflow-hidden' aria-hidden>
         <div className='absolute -left-20 -top-28 h-72 w-72 rounded-full bg-brand/20 blur-3xl' />
         <div className='absolute right-[-72px] top-[14%] h-80 w-80 rounded-full bg-brand-bright/22 blur-3xl' />
       </div>
 
       <div className='relative mx-auto flex min-h-[100dvh] max-w-[420px] flex-col justify-center px-4 py-8 sm:px-6 sm:py-10'>
-        <div className='rounded-[1.5rem] border border-white/80 bg-white/92 p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_20px_48px_rgba(15,23,42,0.10)] backdrop-blur-sm sm:p-6'>
+        <div data-ui='auth-card' className='rounded-[1.5rem] border border-white/80 bg-white/92 p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_20px_48px_rgba(15,23,42,0.10)] backdrop-blur-sm sm:p-6'>
           <header>
-            <p className='text-[11px] font-medium tracking-[0.22em] text-[#8b95a7]'>
+            <p data-ui='auth-eyebrow' className='text-[11px] font-medium tracking-[0.22em] text-[#8b95a7]'>
               {t('login.eyebrow', { brand: BRAND_CONFIG.name.toUpperCase() })}
             </p>
             <h1 className='mt-1.5 text-[1.5rem] font-semibold leading-tight tracking-[-0.025em] text-[var(--foreground)]'>
@@ -327,6 +331,7 @@ export function NycLoginScreen() {
 
           {!isResetMode && (
             <div
+              data-ui='auth-tabs'
               className='mt-5 rounded-full bg-[#edf0f5] p-1'
               role='tablist'
               aria-label={t('login.modeTabsAria')}
@@ -515,6 +520,7 @@ export function NycLoginScreen() {
 
             <button
               type='submit'
+              data-ui='auth-submit'
               disabled={
                 submitting || !isAppConnectConfigured() || !canSubmitAuth
               }
@@ -535,6 +541,8 @@ export function NycLoginScreen() {
             )}
           </form>
         </div>
+
+        {BRAND_CONFIG.theme === 'ellieo' ? <EllieoAuthNote /> : null}
 
         <footer className='mt-4 space-y-1.5 text-center'>
           <p className='text-[14px] font-normal text-[#667085]'>

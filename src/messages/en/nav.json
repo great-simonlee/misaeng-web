@@ -50,5 +50,41 @@
       "privacy": "Privacy Policy",
       "ads": "Ads & partnerships"
     }
+  },
+  "ellieo": {
+    "short": {
+      "housing": "Housing",
+      "status": "Visa",
+      "job-review": "Jobs",
+      "roommate": "Roommates",
+      "food": "Food",
+      "anonymous": "Anonymous",
+      "marketplace": "Marketplace",
+      "events": "Events"
+    },
+    "tabs": {
+      "home": "Home",
+      "housing": "Housing",
+      "boards": "Boards",
+      "jobs": "Jobs",
+      "me": "Me"
+    },
+    "join": "Join Ellieo",
+    "boardsTitle": "All boards",
+    "comingSoon": "Coming soon",
+    "footerTagline": "The community for international students in the US. Every member is verified with a school or work email.",
+    "legalGroup": "Legal",
+    "operatedBy": "Operated by {company}, {city}",
+    "license": "New York State real estate license: {number}",
+    "brokerage": "Brokerage: {name}",
+    "trademark": "{brand}® is a registered trademark (USPTO Reg. No. {number}).",
+    "trust": {
+      "verifiedTitle": "Verified members only",
+      "verifiedBody": "Posting, comments, and messages require a school or work email.",
+      "noDepositTitle": "No upfront deposits",
+      "noDepositBody": "Listings from our housing team never ask you to pay before signing.",
+      "reportTitle": "Reports reviewed fast",
+      "reportBody": "Report anything suspicious. Our team reviews it within {hours} hours."
+    }
   }
 }

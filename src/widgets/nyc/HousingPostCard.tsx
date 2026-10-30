@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { HousingPricePair, SchoolBadge } from '@components'
+import { BRAND_CONFIG } from '@lib/brand'
 import { hrefForHousingListing } from '@lib/constants/cities'
 import { usePagedGallery } from '@hooks/usePagedGallery'
 import {
@@ -32,6 +33,7 @@ import type {
   HousingRoom,
   HousingRoommateComposition,
 } from '@/types/nyc'
+import { EllieoHousingCard } from '@widgets/ellieo/EllieoHousingCard'
 import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
 
 interface HousingPostCardProps {
@@ -40,7 +42,12 @@ interface HousingPostCardProps {
   highlightRoomType?: string | 'all'
 }
 
-export function HousingPostCard({
+/** 하우징 목록 카드: 브랜드 테마별 화면 (데이터·링크는 같다) */
+export const HousingPostCard = (BRAND_CONFIG.theme === 'ellieo'
+  ? EllieoHousingCard
+  : MisaengHousingPostCard) as (props: HousingPostCardProps) => React.ReactNode
+
+function MisaengHousingPostCard({
   listing,
   highlightRoomType = 'all',
 }: HousingPostCardProps) {

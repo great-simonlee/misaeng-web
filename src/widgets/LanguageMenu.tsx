@@ -14,12 +14,13 @@ import { savePreferredLocale } from '@lib/i18n/preference.client'
 /**
  * 헤더 언어 메뉴. 로그인하지 않은 방문자도 쓸 수 있고, 로그인했다면 프로필 선호 언어도 같이 바꾼다.
  * `variant='list'`는 모바일 메뉴 안에 펼친 목록으로 그린다.
+ * `variant='segmented'`는 언어가 둘뿐인 브랜드(Ellieo: EN / VI)의 헤더용 두 칸 스위치다.
  */
 export function LanguageMenu({
   variant = 'dropdown',
   className,
 }: {
-  variant?: 'dropdown' | 'list'
+  variant?: 'dropdown' | 'list' | 'segmented'
   className?: string
 }) {
   const locale = useLocale()
@@ -78,6 +79,39 @@ export function LanguageMenu({
       {code === locale ? <CheckIcon /> : null}
     </button>
   ))
+
+  if (variant === 'segmented') {
+    return (
+      <div
+        className={cn(
+          'inline-flex h-8 items-center rounded-lg bg-[var(--surface)] p-0.5 ring-1 ring-[var(--border)]',
+          className,
+        )}
+        role='radiogroup'
+        aria-label={t('menuAria')}
+      >
+        {locales.map((code) => (
+          <button
+            key={code}
+            type='button'
+            role='radio'
+            aria-checked={code === locale}
+            aria-label={LOCALE_NATIVE_NAMES[code]}
+            title={LOCALE_NATIVE_NAMES[code]}
+            onClick={() => choose(code)}
+            className={cn(
+              'inline-flex h-7 min-w-[2.25rem] items-center justify-center rounded-md px-2 text-[12px] font-semibold uppercase tracking-wide touch-manipulation transition',
+              code === locale
+                ? 'bg-white text-[var(--foreground)] shadow-[0_1px_2px_rgba(14,26,47,0.12)]'
+                : 'text-[var(--muted)] hover:text-[var(--foreground)]',
+            )}
+          >
+            {code}
+          </button>
+        ))}
+      </div>
+    )
+  }
 
   if (variant === 'list') {
     return (

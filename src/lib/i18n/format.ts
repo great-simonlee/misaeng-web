@@ -1,3 +1,5 @@
+import { BRAND_CONFIG } from '@lib/brand'
+
 import type { Locale } from './locales'
 
 /**
@@ -12,7 +14,8 @@ export function formatDate(
 ): string {
   const date = value instanceof Date ? value : new Date(value)
   if (Number.isNaN(date.getTime())) return ''
-  return new Intl.DateTimeFormat(locale, options).format(date)
+  // 브랜드별 날짜 순서 (Ellieo: 일/월/년). 가격·숫자 표기는 그대로 둔다.
+  return new Intl.DateTimeFormat(BRAND_CONFIG.dateLocales[locale] ?? locale, options).format(date)
 }
 
 export function formatNumber(

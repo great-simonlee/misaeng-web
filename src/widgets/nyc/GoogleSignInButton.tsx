@@ -261,6 +261,7 @@ function GoogleSignInInner({
     <div ref={containerRef} className='relative w-full min-h-[48px]'>
       <div
         aria-hidden
+        data-ui='auth-google'
         className={`pointer-events-none flex min-h-[48px] w-full items-center justify-center gap-3 rounded-full border border-[#dde2ea] bg-white px-4 text-[15px] font-medium text-[#344054] transition ${
           isDisabled ? 'opacity-50' : ''
         }`}

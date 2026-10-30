@@ -633,6 +633,7 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
 
       {isFoodBoard ? (
         <div
+          data-ui='floating-bottom'
           className={cn(
             'pointer-events-none fixed inset-x-0 bottom-0 z-[95] flex justify-center pb-[max(1.25rem,env(safe-area-inset-bottom))] transition duration-200 ease-out',
             mapFabHidden ? 'translate-y-3 opacity-0' : 'translate-y-0 opacity-100'

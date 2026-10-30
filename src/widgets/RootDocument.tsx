@@ -5,16 +5,19 @@ import { AuthProvider } from '@hooks/useAuth'
 import { ToastProvider } from '@hooks/useToast'
 import { ConsentLocaleProvider } from '@components/consent/ConsentLocaleProvider'
 import { ReconsentGate } from '@components/consent/ReconsentGate'
-import { BRAND } from '@lib/brand'
+import { BRAND, BRAND_CONFIG } from '@lib/brand'
 import { LocaleProvider } from '@lib/i18n/client'
 import type { Locale } from '@lib/i18n/locales'
 import type { MessageTree } from '@lib/i18n/translate'
-import { cjkFontVariables } from '@lib/fonts/cjk'
+import { beVietnamPro } from '@lib/fonts/ellieo'
 import { pretendard } from '@lib/fonts/pretendard'
 import { SiteFooter } from '@widgets/SiteFooter'
 import { PreferredLocaleSync } from '@widgets/PreferredLocaleSync'
 import { SiteHeader } from '@widgets/SiteHeader'
 import { SiteMain } from '@widgets/SiteMain'
+
+/** Ellieo만 Be Vietnam Pro를 내려받는다. Misaeng은 Pretendard 그대로 */
+const brandFontVariable = BRAND_CONFIG.theme === 'ellieo' ? beVietnamPro.variable : ''
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -59,7 +62,7 @@ export function RootDocument({
       {/* overflow-x-clip (not hidden): hidden turns <body> into a scroll container and breaks position: sticky.
           Horizontal scroll is still blocked by html { overflow-x: hidden } in globals.css. */}
       <body
-        className={`${pretendard.variable} ${geistMono.variable} ${cjkFontVariables} min-w-0 overflow-x-clip antialiased bg-[var(--background)] text-[var(--foreground)]`}
+        className={`${pretendard.variable} ${geistMono.variable} ${brandFontVariable} min-w-0 overflow-x-clip antialiased bg-[var(--background)] text-[var(--foreground)]`}
         suppressHydrationWarning
       >
         <LocaleProvider locale={i18n.locale} messages={i18n.messages}>

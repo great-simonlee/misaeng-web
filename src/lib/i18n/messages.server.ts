@@ -1,3 +1,5 @@
+import { BRAND } from '@lib/brand'
+
 import type { Locale } from './locales'
 import { mergeMessages, type MessageTree } from './translate'
 
@@ -44,6 +46,21 @@ async function loadLocale(locale: Locale): Promise<MessageTree> {
   return Object.fromEntries(entries)
 }
 
+/**
+ * 브랜드별 문구 덮어쓰기: `src/messages/{locale}/_brand/{brand}.json` ({ namespace: { key: … } }).
+ * 같은 기능인데 브랜드명이 문구에 박힌 곳(예: "Misaeng 팀이 올린 매물")만 둔다. 없으면 빈 객체.
+ */
+async function loadBrandOverlay(locale: Locale): Promise<MessageTree> {
+  try {
+    const mod = (await import(`../../messages/${locale}/_brand/${BRAND}.json`)) as {
+      default: MessageTree
+    }
+    return mod.default ?? {}
+  } catch {
+    return {}
+  }
+}
+
 const cache = new Map<Locale, Promise<MessageTree>>()
 
 /**
@@ -55,7 +72,14 @@ export function getMessages(locale: Locale): Promise<MessageTree> {
   if (cached) return cached
   const chain: Locale[] = locale === 'ko' ? ['en', 'ko'] : ['ko', 'en', locale]
   const unique = [...new Set(chain)]
-  const promise = Promise.all(unique.map(loadLocale)).then((trees) => mergeMessages(...trees))
+  const promise = Promise.all([
+    ...unique.map(loadLocale),
+    ...unique.map(loadBrandOverlay),
+  ]).then((trees) => {
+    const base = trees.slice(0, unique.length)
+    const overlays = trees.slice(unique.length)
+    return mergeMessages(...base, ...overlays)
+  })
   if (process.env.NODE_ENV === 'production') cache.set(locale, promise)
   return promise
 }

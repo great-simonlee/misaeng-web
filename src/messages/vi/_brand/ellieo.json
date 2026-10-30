@@ -1,0 +1,47 @@
+{
+  "community": {
+    "categories": {
+      "housing": {
+        "description": "Tin đăng nhà ở tại {city} đã được đội ngũ Ellieo kiểm tra"
+      },
+      "anonymous": {
+        "title": "Hỏi đáp ẩn danh",
+        "description": "Hỏi những điều bạn không muốn ghi tên"
+      }
+    }
+  },
+  "nav": {
+    "links": {
+      "anonymous": "Hỏi đáp ẩn danh"
+    }
+  },
+  "hub": {
+    "magazine": {
+      "kicker": "Cẩm nang Ellieo",
+      "title": "Cuộc sống ở New York, giải thích dễ hiểu",
+      "description": "Cẩm nang ngắn từ biên tập viên về ăn uống, khu phố và điểm vui chơi, tách riêng khỏi các chuyên mục.",
+      "items": {
+        "mag-1": {
+          "tag": "Ăn uống",
+          "title": "Quán ăn khuya gần trường",
+          "excerpt": "Nơi có món nóng sau một buổi học muộn."
+        },
+        "mag-2": {
+          "tag": "Sự kiện",
+          "title": "Gặp gỡ du học sinh trong tháng này",
+          "excerpt": "Những buổi tối thân mật để làm quen với sinh viên các trường khác."
+        },
+        "mag-3": {
+          "tag": "Vui chơi",
+          "title": "Lịch trình trong nhà cho ngày mưa",
+          "excerpt": "Từ bảo tàng đến quán cà phê, gói gọn trong một ngày."
+        },
+        "mag-4": {
+          "tag": "Khu phố",
+          "title": "Làm quen với Astoria",
+          "excerpt": "Giá thuê, đi lại và ăn uống cho sinh viên đang tính chuyển đến."
+        }
+      }
+    }
+  }
+}

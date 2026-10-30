@@ -20,7 +20,7 @@ export function ChipScrollRow({
   leading,
   ariaLabel,
   className,
-  edgeColor = '#ffffff',
+  edgeColor = 'var(--background)',
 }: ChipScrollRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const t = useT('common')
@@ -63,7 +63,7 @@ export function ChipScrollRow({
   }, [])
 
   return (
-    <div className={cn('flex shrink-0 items-center gap-2 sm:gap-2.5', className)}>
+    <div data-ui='chip-row' className={cn('flex shrink-0 items-center gap-2 sm:gap-2.5', className)}>
       {leading ? <div className='shrink-0 py-0.5'>{leading}</div> : null}
 
       {leading ? (

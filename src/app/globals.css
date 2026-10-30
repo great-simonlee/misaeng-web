@@ -1,4 +1,10 @@
 @import 'tailwindcss';
+/* Ellieo 화면 규칙 ([data-brand='ellieo'] 아래에서만 적용, Misaeng 무영향) */
+@import './ellieo-theme.css';
+/* Extra Next dist dirs (second dev server, verify builds) hold compressed caches; never scan them for classes */
+@source not '../../.next-misaeng';
+@source not '../../.next-verify';
+@source not '../../.next-ellieo';
 
 /* 기본: 밝은 테마 */
 :root {
@@ -35,14 +41,51 @@
   --btn-secondary-hover: #f1f5f9;
 }
 
+/* Ellieo 토큰: 색·글꼴·모서리·그림자. 화면 규칙은 ellieo-theme.css (src/lib/brand의 colors와 같게) */
 [data-brand='ellieo'] {
-  --brand-rgb: 47 109 246;
-  --brand: #2f6df6;
-  --brand-hover: #2455c4;
-  --brand-deep: #1f4fc0;
-  --brand-bright: #4a82ff;
-  --brand-soft: #f5f8ff;
-  --brand-subtle: #ebf1ff;
+  --background: #f4f6fa;
+  --foreground: #0e1a2f;
+  --surface: #eef1f6;
+  --surface-elevated: #ffffff;
+  --border: #dfe4ec;
+  --border-muted: #c9d1dd;
+  --muted: #5b6779;
+  --muted-foreground: #3e4a5c;
+  --navy: #0e1a2f;
+  --navy-light: #1b2a45;
+  --navy-muted: #2c3b57;
+  --brand-rgb: 31 94 255;
+  --brand: #1f5eff;
+  --brand-hover: #1748c7;
+  --brand-deep: #143fb0;
+  --brand-bright: #3d7bff;
+  --brand-soft: #f0f5ff;
+  --brand-subtle: #e2ebff;
+  --btn-secondary-border: #dfe4ec;
+  --btn-secondary-hover: #eef1f6;
+  /* 신뢰 표시 (인증·선입금 없음) */
+  --ellieo-jade: #0b8f6a;
+  --ellieo-jade-soft: #e2f5ee;
+  --ellieo-sun: #f2a516;
+  --ellieo-sun-soft: #fff4dc;
+  --font-ellieo-stack: var(--font-ellieo), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Tailwind 모서리·그림자 토큰: Misaeng보다 각지고 그림자 대신 선 */
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.625rem;
+  --radius-2xl: 0.75rem;
+  --radius-3xl: 1rem;
+  --shadow-sm: 0 1px 0 rgb(14 26 47 / 0.04);
+  --shadow-md: 0 1px 0 rgb(14 26 47 / 0.04), 0 0 0 1px rgb(14 26 47 / 0.06);
+  --shadow-lg: 0 12px 28px -18px rgb(14 26 47 / 0.35), 0 0 0 1px rgb(14 26 47 / 0.06);
+  --shadow-xl: 0 18px 40px -20px rgb(14 26 47 / 0.4), 0 0 0 1px rgb(14 26 47 / 0.06);
+  /* 모바일 하단 탭 바 높이 (고정 버튼이 탭 바 위에 뜨게) */
+  --bottom-nav-h: calc(3.75rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 64rem) {
+  [data-brand='ellieo'] {
+    --bottom-nav-h: 0px;
+  }
 }
 
 @theme inline {
@@ -64,17 +107,6 @@
   --color-accent-muted: var(--accent-muted);
   --font-sans: var(--font-pretendard);
   --font-mono: var(--font-geist-mono);
-}
-
-/* 일본어·중국어는 그 언어 한자 모양 글꼴을 Pretendard보다 앞에 둔다 (src/lib/fonts/cjk.ts) */
-:lang(ja) {
-  font-family: var(--font-noto-jp), var(--font-pretendard), system-ui, sans-serif;
-}
-:lang(zh-CN) {
-  font-family: var(--font-noto-sc), var(--font-pretendard), system-ui, sans-serif;
-}
-:lang(zh-TW) {
-  font-family: var(--font-noto-tc), var(--font-pretendard), system-ui, sans-serif;
 }
 
 body {

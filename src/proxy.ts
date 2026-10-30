@@ -6,10 +6,18 @@ import {
   brandLocalePath,
   indexedBrandFor,
   isServiceLocale,
+  OTHER_BRAND_CONFIG,
   resolveServiceLocale,
 } from '@lib/brand'
 import { isCityId } from '@lib/constants/cities'
-import { isLocale, LOCALE_COOKIE, LOCALES, parseLocale, type Locale } from '@lib/i18n/locales'
+import {
+  isLocale,
+  LOCALE_COOKIE,
+  LOCALES,
+  parseLocale,
+  REMOVED_LOCALE_PREFIXES,
+  type Locale,
+} from '@lib/i18n/locales'
 
 /**
  * 서비스 언어 라우팅 + 검색 신호.
@@ -18,6 +26,8 @@ import { isLocale, LOCALE_COOKIE, LOCALES, parseLocale, type Locale } from '@lib
  * - `/nyc/...`      → 브랜드 기본 언어. 내부적으로 `/{기본언어}/nyc/...`로 rewrite
  * - `/vi/nyc/...`   → 그 언어. 기본 언어 접두사(`/ko/nyc` on misaeng)는 접두사 없는 주소로 308
  * - 브랜드가 지원하지 않는 언어(`/vi/nyc` on misaeng)는 대체 언어로 308
+ * - 다른 브랜드 언어(`/ko/nyc` on ellieo)는 그 브랜드 도메인으로 301
+ * - 삭제한 언어(`/ja`, `/zh-CN`, `/zh-TW`, `/id`)는 같은 경로의 대체 언어 주소로 301
  *
  * 언어 선택 (접두사 없는 주소로 들어왔을 때만)
  * 1. 언어 쿠키 — 언어 메뉴·마이페이지·가입에서 고른 언어
@@ -55,6 +65,24 @@ export function proxy(request: NextRequest) {
     }
   }
 
+  const removed = removedLocalePrefix(first)
+  if (removed) {
+    const rest = `/${segments.slice(1).join('/')}`
+    // 도시 서비스 경로는 대체 언어로, 그 밖의 경로는 접두사만 뗀다
+    const target =
+      rest === '/' || isCityId(segments[1])
+        ? brandLocalePath(BRAND_CONFIG, BRAND_CONFIG.fallbackLocale, rest === '/' ? '/nyc' : rest)
+        : rest
+    return redirectTo(request, target, 301)
+  }
+
+  if (isLocale(first) && BRAND_CONFIG.otherBrandLocales.includes(first)) {
+    const rest = `/${segments.slice(1).join('/')}`
+    const other = OTHER_BRAND_CONFIG
+    const target = brandLocalePath(other, first, rest === '/' ? '/nyc' : rest)
+    return NextResponse.redirect(`${other.productionUrl}${target}${search}`, 301)
+  }
+
   if (isLocale(first)) {
     const rest = `/${segments.slice(1).join('/')}`
     if (!isCityId(segments[1])) {
@@ -88,7 +116,13 @@ export function proxy(request: NextRequest) {
   return NextResponse.next()
 }
 
-function redirectTo(request: NextRequest, pathname: string, status: 307 | 308) {
+function removedLocalePrefix(segment: string | undefined) {
+  if (!segment) return null
+  const lower = segment.toLowerCase()
+  return REMOVED_LOCALE_PREFIXES.find((code) => code.toLowerCase() === lower) ?? null
+}
+
+function redirectTo(request: NextRequest, pathname: string, status: 301 | 307 | 308) {
   const url = request.nextUrl.clone()
   url.pathname = pathname
   return NextResponse.redirect(url, status)
