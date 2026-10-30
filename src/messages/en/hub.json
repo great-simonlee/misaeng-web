@@ -153,48 +153,52 @@
   "ellieo": {
     "hero": {
       "eyebrow": "{city} · Verified international students",
-      "title": "The community for international students in the US",
-      "body": "Housing, visas, jobs, and everyday life in the US, shared by students who are verified with a school or work email. You always know who you're talking to.",
       "join": "Join with your school email",
-      "browseHousing": "Browse housing",
       "points": {
-        "verified": "Every member verified by school or work email",
-        "noDeposit": "No upfront deposits on our housing listings",
         "reports": "Reports reviewed within {hours} hours"
       }
     },
-    "start": {
-      "title": "Start here",
-      "body": "The two things new students ask about most.",
-      "housing": "Verified {city} listings from our housing team. Whole units and private rooms.",
-      "status": "Real CPT, OPT, visa, and green card timelines from people who went through them."
-    },
     "boards": {
-      "title": "Explore the boards",
-      "body": "Ask questions, share what you know, and find people going through the same thing."
+      "title": "Explore the boards"
     },
     "safety": {
       "kicker": "Safety first",
       "title": "A community you can trust",
-      "body": "Ellieo is a community of verified international students in the US. Every member is verified with a school or work email, so you always know who you're talking to. Together, we keep this community safe and trustworthy. See something suspicious? Report it, and our team will review it within {hours} hours.",
       "steps": {
-        "verify": {
-          "title": "Verify your email",
-          "body": "Sign up with your school or work email to post, comment, and message."
-        },
         "report": {
           "title": "Report anything suspicious",
           "body": "Upfront payment requests, fake landlords, fake job offers, or impersonation: tap Report."
-        },
-        "review": {
-          "title": "We review it",
-          "body": "Our team checks every report within {hours} hours and keeps you posted on the result."
         }
       }
     },
     "vsa": {
       "title": "Partner student associations",
-      "body": "Vietnamese Student Associations we work with in New York."
+      "body": "Vietnamese Student Associations we work with in New York.",
+      "partnerBadge": "Partner",
+      "members": "{count} members"
+    },
+    "intro": {
+      "title": "What's new in {city}"
+    },
+    "seeAll": "See all",
+    "sampleData": "Sample data",
+    "creators": {
+      "title": "Creators on Ellieo",
+      "body": "Vietnamese creators in the US who share life, career and visa tips with our members.",
+      "followers": "{count} followers",
+      "platforms": {
+        "instagram": "Instagram",
+        "youtube": "YouTube",
+        "tiktok": "TikTok"
+      }
+    },
+    "latestHousing": {
+      "title": "New housing listings",
+      "body": "Checked by our housing team. No upfront deposits."
+    },
+    "community": {
+      "title": "From the community",
+      "body": "What verified members are asking and sharing this week."
     }
   }
 }

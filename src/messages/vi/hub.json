@@ -153,48 +153,52 @@
   "ellieo": {
     "hero": {
       "eyebrow": "{city} · Du học sinh đã xác minh",
-      "title": "Cộng đồng du học sinh tại Mỹ",
-      "body": "Nhà ở, visa, việc làm và cuộc sống hằng ngày ở Mỹ, được chia sẻ bởi những du học sinh đã xác minh bằng email trường học hoặc email công ty. Bạn luôn biết mình đang trò chuyện với ai.",
       "join": "Tham gia bằng email trường học",
-      "browseHousing": "Xem nhà ở",
       "points": {
-        "verified": "Mọi thành viên đều xác minh bằng email trường học hoặc công ty",
-        "noDeposit": "Tin đăng nhà ở của chúng tôi không yêu cầu đặt cọc trước",
         "reports": "Báo cáo được kiểm tra trong vòng {hours} giờ"
       }
     },
-    "start": {
-      "title": "Bắt đầu từ đây",
-      "body": "Hai điều du học sinh mới hỏi nhiều nhất.",
-      "housing": "Tin đăng nhà ở tại {city} đã được đội ngũ nhà ở kiểm tra. Có cả căn hộ nguyên căn và phòng riêng.",
-      "status": "Lộ trình CPT, OPT, visa và thẻ xanh thực tế từ những người đã trải qua."
-    },
     "boards": {
-      "title": "Khám phá các chuyên mục",
-      "body": "Đặt câu hỏi, chia sẻ kinh nghiệm và tìm những người đang trải qua điều giống bạn."
+      "title": "Khám phá các chuyên mục"
     },
     "safety": {
       "kicker": "An toàn là trên hết",
       "title": "Một cộng đồng bạn có thể tin tưởng",
-      "body": "Ellieo là cộng đồng du học sinh tại Mỹ, nơi mọi thành viên đều được xác minh bằng email trường học hoặc email công ty. Chúng ta cùng nhau xây dựng một cộng đồng an toàn và đáng tin cậy. Nếu thấy điều gì đáng ngờ, hãy báo cáo ngay, đội ngũ Ellieo sẽ kiểm tra trong vòng {hours} giờ.",
       "steps": {
-        "verify": {
-          "title": "Xác minh email",
-          "body": "Đăng ký bằng email trường học hoặc email công ty để đăng bài, bình luận và nhắn tin."
-        },
         "report": {
           "title": "Báo cáo điều đáng ngờ",
           "body": "Yêu cầu chuyển tiền trước, chủ nhà giả, việc làm giả hay mạo danh: hãy bấm Báo cáo."
-        },
-        "review": {
-          "title": "Chúng tôi kiểm tra",
-          "body": "Đội ngũ Ellieo kiểm tra mọi báo cáo trong vòng {hours} giờ và báo kết quả cho bạn."
         }
       }
     },
     "vsa": {
       "title": "Hội sinh viên đối tác",
-      "body": "Các Hội Sinh viên Việt Nam (VSA) tại New York đồng hành cùng Ellieo."
+      "body": "Các Hội Sinh viên Việt Nam (VSA) ở New York hợp tác với Ellieo.",
+      "partnerBadge": "Đối tác",
+      "members": "{count} thành viên"
+    },
+    "intro": {
+      "title": "Có gì mới ở {city}"
+    },
+    "seeAll": "Xem tất cả",
+    "sampleData": "Dữ liệu mẫu",
+    "creators": {
+      "title": "Nhà sáng tạo trên Ellieo",
+      "body": "Những nhà sáng tạo người Việt tại Mỹ chia sẻ kinh nghiệm sống, việc làm và visa với thành viên.",
+      "followers": "{count} người theo dõi",
+      "platforms": {
+        "instagram": "Instagram",
+        "youtube": "YouTube",
+        "tiktok": "TikTok"
+      }
+    },
+    "latestHousing": {
+      "title": "Tin nhà mới",
+      "body": "Đội ngũ nhà ở của chúng tôi đã kiểm tra. Không đặt cọc trước."
+    },
+    "community": {
+      "title": "Từ cộng đồng",
+      "body": "Những gì thành viên đã xác minh đang hỏi và chia sẻ tuần này."
     }
   }
 }

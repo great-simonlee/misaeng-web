@@ -48,8 +48,6 @@ export type BrandConfig = {
     koreanPartnerSchools: boolean
     /** 한인 인플루언서 카드 */
     partnerInfluencers: boolean
-    /** 베트남 학생회(VSA) 파트너 영역. 파트너가 생기면 켠다 */
-    vsaPartners: boolean
   }
   /**
    * 신뢰 표시 (하단). 빈 값은 화면에서 숨긴다.
@@ -92,7 +90,7 @@ const MISAENG: BrandConfig = {
   hasCorporateSite: true,
   hasMobileAppPage: true,
   theme: 'misaeng',
-  sections: { koreanPartnerSchools: true, partnerInfluencers: true, vsaPartners: false },
+  sections: { koreanPartnerSchools: true, partnerInfluencers: true },
   trust: {
     operator: null,
     realEstateLicense: '',
@@ -124,7 +122,7 @@ const ELLIEO: BrandConfig = {
   hasCorporateSite: false,
   hasMobileAppPage: true,
   theme: 'ellieo',
-  sections: { koreanPartnerSchools: false, partnerInfluencers: false, vsaPartners: false },
+  sections: { koreanPartnerSchools: false, partnerInfluencers: false },
   trust: {
     operator: { name: 'Misaeng LLC', city: 'New York' },
     // 확인 필요: NY real estate license no. / brokerage name. Hidden while empty.
