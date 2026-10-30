@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import { LoadingState } from '@components'
+import { LoadingState, MarqueeRow } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
@@ -214,7 +214,7 @@ function CreatorsSection() {
 
 type PersonItem = { id: string; mark: string; color: string; name: string; detail: string; url: string | null }
 
-/** Partner VSAs and creators: one compact row per entry (mark, name, one detail line) */
+/** Partner VSAs and creators: compact entries (mark, name, one detail line) that slide across on their own */
 function PeopleSection({ title, sample, items }: { title: string; sample: boolean; items: PersonItem[] }) {
   return (
     <section className='mx-auto w-full max-w-7xl pt-8 sm:pt-10'>
@@ -222,7 +222,8 @@ function PeopleSection({ title, sample, items }: { title: string; sample: boolea
         <h2 className='text-[1.1rem] font-bold tracking-[-0.02em] text-[var(--foreground)] sm:text-[1.2rem]'>{title}</h2>
         {sample ? <SampleTag /> : null}
       </div>
-      <ScrollRow five={items.length === 5}>
+      {/* Slides by itself; pauses on hover, stops for reduced motion (partner-marquee in globals.css) */}
+      <MarqueeRow className='mt-3 lg:mx-8'>
         {items.map((item) => {
           const inner = (
             <>
@@ -239,25 +240,24 @@ function PeopleSection({ title, sample, items }: { title: string; sample: boolea
               </span>
             </>
           )
-          const rowClass = 'flex items-center gap-2.5 rounded-xl bg-white px-3 py-2.5 ring-1 ring-[var(--border)]'
-          return (
-            <li key={item.id} className='w-[13.5rem] shrink-0 snap-start lg:w-auto'>
-              {item.url ? (
-                <a
-                  href={item.url}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className={cn(rowClass, 'transition hover:ring-[var(--border-muted)]')}
-                >
-                  {inner}
-                </a>
-              ) : (
-                <div className={rowClass}>{inner}</div>
-              )}
-            </li>
+          const rowClass = 'flex w-[13.5rem] shrink-0 items-center gap-2.5 rounded-xl bg-white px-3 py-2.5 ring-1 ring-inset ring-[var(--border)]'
+          return item.url ? (
+            <a
+              key={item.id}
+              href={item.url}
+              target='_blank'
+              rel='noopener noreferrer'
+              className={cn(rowClass, 'transition hover:ring-[var(--border-muted)]')}
+            >
+              {inner}
+            </a>
+          ) : (
+            <div key={item.id} className={rowClass}>
+              {inner}
+            </div>
           )
         })}
-      </ScrollRow>
+      </MarqueeRow>
     </section>
   )
 }
@@ -358,15 +358,10 @@ function CommunitySection() {
 }
 
 /** Horizontal swipe row on phones/tablets, plain grid on desktop */
-function ScrollRow({ children, five = false }: { children: React.ReactNode; five?: boolean }) {
+function ScrollRow({ children }: { children: React.ReactNode }) {
   return (
     <div className='mt-3 overflow-x-auto pb-1 [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden'>
-      <ul
-        className={cn(
-          'flex snap-x snap-mandatory gap-3 px-4 sm:px-6 lg:grid lg:snap-none lg:px-8',
-          five ? 'lg:grid-cols-5' : 'lg:grid-cols-4',
-        )}
-      >
+      <ul className='flex snap-x snap-mandatory gap-3 px-4 sm:px-6 lg:grid lg:snap-none lg:grid-cols-4 lg:px-8'>
         {children}
       </ul>
     </div>
