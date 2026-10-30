@@ -48,19 +48,19 @@ export function EllieoHomeScreen() {
   return (
     <div className='min-w-0 bg-[var(--background)]'>
       {/* Slim intro. Board links live in the header (desktop) and the bottom tab bar (mobile), so none here */}
-      <section className='mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8'>
+      <section className='mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8'>
         <p className='inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--ellieo-jade)]'>
           <ShieldCheckIcon className='size-4' />
           {t('ellieo.hero.eyebrow', { city: cityInfo.shortLabel })}
         </p>
-        <h1 className='mt-1.5 text-[1.5rem] font-bold tracking-[-0.025em] text-[var(--foreground)] sm:text-[1.9rem]'>
+        <h1 className='mt-1 text-[1.4rem] font-bold tracking-[-0.025em] text-[var(--foreground)] sm:text-[1.65rem]'>
           {t('ellieo.intro.title', { city: cityInfo.shortLabel })}
         </h1>
         {/* Desktop header already has Join; phones only get it here */}
         {!loading && !user ? (
           <Link
             href={`${cityLoginPath(city)}?mode=signup`}
-            className='mt-4 inline-flex h-11 items-center gap-1.5 rounded-[10px] bg-[var(--brand)] px-4 text-[14.5px] font-semibold text-white transition hover:bg-[var(--brand-hover)] lg:hidden'
+            className='mt-3 inline-flex h-10 items-center gap-1.5 rounded-[10px] bg-[var(--brand)] px-4 text-[14.5px] font-semibold text-white transition hover:bg-[var(--brand-hover)] lg:hidden'
           >
             {t('ellieo.hero.join')}
             <ArrowRightIcon className='size-4' />
@@ -74,7 +74,7 @@ export function EllieoHomeScreen() {
       <CommunitySection />
 
       {/* Magazine preview */}
-      <section className='mx-auto w-full max-w-7xl px-4 pb-14 pt-10 sm:px-6 sm:pb-20 sm:pt-14 lg:px-8'>
+      <section className='mx-auto w-full max-w-7xl px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-10 lg:px-8'>
         <SectionHeading
           title={t('magazine.title')}
           body={t('magazine.description')}
@@ -84,7 +84,7 @@ export function EllieoHomeScreen() {
             </span>
           }
         />
-        <ul className='mt-5 grid gap-3 md:grid-cols-2'>
+        <ul className='mt-4 grid gap-3 md:grid-cols-2'>
           {NYC_MAGAZINE_PREVIEWS.map((item) => (
             <li key={item.id} className='flex min-w-0 gap-3.5 rounded-xl bg-white p-3 ring-1 ring-[var(--border)]'>
               <span className='relative aspect-square w-24 shrink-0 overflow-hidden rounded-lg bg-[var(--surface)] sm:w-28'>
@@ -166,18 +166,18 @@ type PersonItem = { id: string; mark: string; color: string; name: string; detai
 /** Partner VSAs and creators: compact entries (mark, name, one detail line) that slide across on their own */
 function PeopleSection({ title, sample, items }: { title: string; sample: boolean; items: PersonItem[] }) {
   return (
-    <section className='mx-auto w-full max-w-7xl pt-8 sm:pt-10'>
+    <section className='mx-auto w-full max-w-7xl pt-5 sm:pt-6'>
       <div className='px-4 sm:px-6 lg:px-8'>
-        <SectionHeading title={title} aside={sample ? <SampleTag /> : null} />
+        <SectionHeading size='sm' title={title} aside={sample ? <SampleTag /> : null} />
       </div>
       {/* Slides by itself; pauses on hover, stops for reduced motion (partner-marquee in globals.css) */}
-      <MarqueeRow className='mt-3 lg:mx-8'>
+      <MarqueeRow className='mt-2 lg:mx-8'>
         {items.map((item) => {
           const inner = (
             <>
               <span
                 aria-hidden
-                className='inline-flex size-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold tracking-tight text-white'
+                className='inline-flex size-8 shrink-0 items-center justify-center rounded-full text-[10.5px] font-bold tracking-tight text-white'
                 style={{ background: item.color }}
               >
                 {item.mark}
@@ -188,7 +188,7 @@ function PeopleSection({ title, sample, items }: { title: string; sample: boolea
               </span>
             </>
           )
-          const rowClass = 'flex w-[13.5rem] shrink-0 items-center gap-2.5 rounded-xl bg-white px-3 py-2.5 ring-1 ring-inset ring-[var(--border)]'
+          const rowClass = 'flex w-[13.5rem] shrink-0 items-center gap-2.5 rounded-xl bg-white px-3 py-2 ring-1 ring-inset ring-[var(--border)]'
           return item.url ? (
             <a
               key={item.id}
@@ -228,7 +228,7 @@ function LatestHousingSection() {
   if (listings && listings.length === 0) return null
 
   return (
-    <section className='mx-auto w-full max-w-7xl pt-10 sm:pt-14'>
+    <section className='mx-auto w-full max-w-7xl pt-8 sm:pt-10'>
       <div className='px-4 sm:px-6 lg:px-8'>
         <SectionHeading
           title={t('ellieo.latestHousing.title')}
@@ -263,9 +263,9 @@ function CommunitySection() {
   if (posts.length === 0) return null
 
   return (
-    <section className='mx-auto w-full max-w-7xl px-4 pt-10 sm:px-6 sm:pt-14 lg:px-8'>
+    <section className='mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8'>
       <SectionHeading title={t('ellieo.community.title')} body={t('ellieo.community.body')} aside={<SampleTag />} />
-      <ul className='mt-5 grid gap-2.5 md:grid-cols-2'>
+      <ul className='mt-4 grid gap-2.5 md:grid-cols-2'>
         {posts.map((post) => {
           const board = ELLIEO_BOARDS.find((item) => item.id === post.board)
           return (
@@ -316,15 +316,33 @@ function ScrollRow({ children }: { children: React.ReactNode }) {
   )
 }
 
-function SectionHeading({ title, body, aside }: { title: string; body?: string; aside?: React.ReactNode }) {
+function SectionHeading({
+  title,
+  body,
+  aside,
+  size = 'md',
+}: {
+  title: string
+  body?: string
+  aside?: React.ReactNode
+  /** sm: the compact partner/creator rows */
+  size?: 'sm' | 'md'
+}) {
   return (
     <div className='min-w-0'>
       {/* aside (See all / Sample data) stays on the title line, even on phones */}
       <div className='flex items-center justify-between gap-3'>
-        <h2 className='min-w-0 text-[1.25rem] font-bold tracking-[-0.02em] text-[var(--foreground)] sm:text-[1.45rem]'>{title}</h2>
+        <h2
+          className={cn(
+            'min-w-0 font-bold tracking-[-0.02em] text-[var(--foreground)]',
+            size === 'sm' ? 'text-[1.05rem] sm:text-[1.15rem]' : 'text-[1.2rem] sm:text-[1.35rem]',
+          )}
+        >
+          {title}
+        </h2>
         {aside ? <div className='shrink-0'>{aside}</div> : null}
       </div>
-      {body ? <p className='mt-1 max-w-2xl text-[14.5px] leading-relaxed text-[var(--muted)]'>{body}</p> : null}
+      {body ? <p className='mt-0.5 max-w-2xl text-[14px] leading-relaxed text-[var(--muted)]'>{body}</p> : null}
     </div>
   )
 }
