@@ -1,10 +1,10 @@
 {
   "meta": {
-    "description": "How Misaeng Points work at {brand} NYC: earning, using, limits and FAQ. Collect points with food, OPT and job reviews and comments, then use them for coffee chats, lawyer consultations, career mentoring and more.",
+    "description": "How Misaeng Points work at {brand}: earning, using, limits and FAQ. Collect points with food, OPT and job reviews and comments, then use them for coffee chats, lawyer consultations, career mentoring and more.",
     "reviewsDescription": "Review requests for extra points on final-result posts."
   },
   "header": {
-    "eyebrow": "{brand} NYC",
+    "eyebrow": "{brand}",
     "title": "Misaeng Points Guide",
     "intro": "Use the points you earn by helping the community to request rewards like coffee chats and immigration lawyer consultations. Points can't be cashed out, and you need student or professional verification.",
     "tagInteger": "Whole numbers only",
@@ -317,7 +317,7 @@
   "faq": {
     "cash": {
       "q": "Can I exchange points for cash?",
-      "a": "No. Misaeng Points can't be cashed out, refunded, transferred, sold or moved to another account. You can only use them for reward programs set by {brand} NYC."
+      "a": "No. Misaeng Points can't be cashed out, refunded, transferred, sold or moved to another account. You can only use them for reward programs set by {brand}."
     },
     "comments": {
       "q": "Can I earn a lot just by commenting?",

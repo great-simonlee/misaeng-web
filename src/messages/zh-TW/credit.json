@@ -1,10 +1,10 @@
 {
   "meta": {
-    "description": "{brand} NYC Misaeng 點數說明：如何獲得、使用、限制與常見問題。透過美食、OPT、求職評價與留言累積點數，再用來兌換 coffee chat、律師諮詢、職涯導師等。",
+    "description": "{brand} Misaeng 點數說明：如何獲得、使用、限制與常見問題。透過美食、OPT、求職評價與留言累積點數，再用來兌換 coffee chat、律師諮詢、職涯導師等。",
     "reviewsDescription": "審核含最終結果貼文的額外點數申請。"
   },
   "header": {
-    "eyebrow": "{brand} NYC",
+    "eyebrow": "{brand}",
     "title": "Misaeng 點數指南",
     "intro": "用幫助社群賺到的點數，申請 coffee chat、移民律師諮詢等獎勵。點數無法兌換現金，且需要完成學生或上班族認證。",
     "tagInteger": "僅限整數",
@@ -314,7 +314,7 @@
   "faq": {
     "cash": {
       "q": "點數可以換現金嗎？",
-      "a": "不行。Misaeng 點數無法兌換現金、退款、轉讓、出售或移轉到其他帳號，只能用於 {brand} NYC 指定的獎勵方案。"
+      "a": "不行。Misaeng 點數無法兌換現金、退款、轉讓、出售或移轉到其他帳號，只能用於 {brand} 指定的獎勵方案。"
     },
     "comments": {
       "q": "只靠留言可以賺很多點數嗎？",

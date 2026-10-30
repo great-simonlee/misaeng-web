@@ -10,6 +10,10 @@
     "boston": {
       "headline": "一起把波士顿生活过好",
       "description": "留学生和职场人分享波士顿生活攻略的地方。"
+    },
+    "dc": {
+      "headline": "一起把华盛顿特区生活过好",
+      "description": "留学生和职场人分享华盛顿特区生活攻略的地方。"
     }
   },
   "magazine": {
@@ -99,7 +103,7 @@
   },
   "introCarousel": {
     "intro": {
-      "kicker": "{brand} NYC",
+      "kicker": "{brand}",
       "headline": "纽约留学生都该知道的地方",
       "body": "我们与各校韩国学生会合作，把签证、求职、美食和活动信息汇集在一起，还能对接专家。"
     },
@@ -140,7 +144,7 @@
     }
   },
   "carouselTest": {
-    "kicker": "{brand} NYC · 轮播草稿",
+    "kicker": "{brand} · 轮播草稿",
     "title": "介绍轮播",
     "description": "全幅照片背景 · 1080×1080 · 左右滑动。每张幻灯片都有与主题匹配的氛围遮罩。",
     "photoNote": "背景使用的是 Unsplash 上的纽约和生活方式照片。建议正式发布前替换为高清品牌照片。",

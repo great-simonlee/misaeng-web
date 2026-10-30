@@ -10,6 +10,10 @@
     "boston": {
       "headline": "一起打造波士頓生活",
       "description": "留學生與上班族分享波士頓生活大小事的地方。"
+    },
+    "dc": {
+      "headline": "一起打造華盛頓特區生活",
+      "description": "留學生與上班族分享華盛頓特區生活大小事的地方。"
     }
   },
   "magazine": {
@@ -99,7 +103,7 @@
   },
   "introCarousel": {
     "intro": {
-      "kicker": "{brand} NYC",
+      "kicker": "{brand}",
       "headline": "在紐約的學生都該知道的地方",
       "body": "我們與各校韓國學生會合作，把簽證、求職、美食、活動資訊整合在一起，還能連結專家。"
     },
@@ -140,7 +144,7 @@
     }
   },
   "carouselTest": {
-    "kicker": "{brand} NYC · 輪播草稿",
+    "kicker": "{brand} · 輪播草稿",
     "title": "介紹輪播",
     "description": "滿版照片背景 · 1080×1080 · 左右滑動。每張投影片都依主題搭配不同氛圍的疊色。",
     "photoNote": "背景使用 Unsplash 的紐約與生活風格照片，建議發布前換成高解析度的品牌照片。",

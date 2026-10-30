@@ -1,10 +1,10 @@
 {
   "meta": {
-    "description": "{brand} NYC Misaeng 积分说明：获取、使用、限制和常见问题。通过美食、OPT 和求职经验分享以及评论积累积分，再用来兑换 coffee chat、律师咨询、职业辅导等。",
+    "description": "{brand} Misaeng 积分说明：获取、使用、限制和常见问题。通过美食、OPT 和求职经验分享以及评论积累积分，再用来兑换 coffee chat、律师咨询、职业辅导等。",
     "reviewsDescription": "审核最终结果帖子的额外积分申请。"
   },
   "header": {
-    "eyebrow": "{brand} NYC",
+    "eyebrow": "{brand}",
     "title": "Misaeng 积分指南",
     "intro": "用帮助社区获得的积分申请 coffee chat、移民律师咨询等奖励。积分不能兑换现金，并且需要完成学生或职场人验证。",
     "tagInteger": "仅限整数",
@@ -314,7 +314,7 @@
   "faq": {
     "cash": {
       "q": "积分可以兑换现金吗？",
-      "a": "不可以。Misaeng 积分不能兑现、退款、转让、出售或转移到其他账号，只能用于 {brand} NYC 设定的奖励项目。"
+      "a": "不可以。Misaeng 积分不能兑现、退款、转让、出售或转移到其他账号，只能用于 {brand} 设定的奖励项目。"
     },
     "comments": {
       "q": "只靠评论能赚很多积分吗？",

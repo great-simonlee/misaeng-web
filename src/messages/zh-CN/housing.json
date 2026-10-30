@@ -223,7 +223,7 @@
   },
   "list": {
     "title": "租房",
-    "subtitle": "{brand} 精选的纽约房源 · 整套和单间一站找齐。",
+    "subtitle": "{brand} 精选的 {city} 房源 · 整套和单间一站找齐。",
     "filters": "筛选",
     "quickFilters": "快捷筛选",
     "previousFilters": "显示上一组筛选",
@@ -483,10 +483,15 @@
       "bronx": "布朗克斯",
       "staten-island": "史泰登岛",
       "new-jersey": "新泽西",
+      "connecticut": "康涅狄格",
       "boston": "波士顿",
       "cambridge": "剑桥",
       "somerville": "萨默维尔",
-      "brookline": "布鲁克莱恩"
+      "brookline": "布鲁克莱恩",
+      "rhode-island": "罗德岛",
+      "washington-dc": "华盛顿特区",
+      "virginia": "弗吉尼亚",
+      "maryland": "马里兰"
     },
     "detail": {
       "type": "类型",

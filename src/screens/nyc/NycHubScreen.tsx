@@ -70,8 +70,13 @@ export function NycHubScreen() {
       </header>
 
       <main className='mx-auto max-w-7xl space-y-10 px-4 py-8 sm:px-6 sm:py-10 lg:px-8'>
-        <MagazinePreviewSection />
-        <ProfessionalsSection />
+        {/* 매거진·전문가 예시는 뉴욕 내용이라 뉴욕에서만 보여 준다 */}
+        {cityInfo.id === 'nyc' ? (
+          <>
+            <MagazinePreviewSection />
+            <ProfessionalsSection />
+          </>
+        ) : null}
       </main>
     </div>
   )

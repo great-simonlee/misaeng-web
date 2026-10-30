@@ -10,6 +10,10 @@
     "boston": {
       "headline": "Cùng nhau sống tốt ở Boston",
       "description": "Nơi du học sinh và người đi làm quốc tế chia sẻ kinh nghiệm sống ở Boston."
+    },
+    "dc": {
+      "headline": "Cùng nhau sống tốt ở Washington DC",
+      "description": "Nơi du học sinh và người đi làm quốc tế chia sẻ kinh nghiệm sống ở Washington DC."
     }
   },
   "magazine": {
@@ -99,7 +103,7 @@
   },
   "introCarousel": {
     "intro": {
-      "kicker": "{brand} NYC",
+      "kicker": "{brand}",
       "headline": "Nơi mọi sinh viên ở New York nên biết",
       "body": "Chúng tôi hợp tác với hội sinh viên Hàn Quốc ở từng trường để tập hợp thông tin visa, việc làm, ăn uống và sự kiện vào một nơi. Kèm theo kết nối với chuyên gia."
     },
@@ -140,7 +144,7 @@
     }
   },
   "carouselTest": {
-    "kicker": "{brand} NYC · Bản nháp carousel",
+    "kicker": "{brand} · Bản nháp carousel",
     "title": "Carousel giới thiệu",
     "description": "Nền ảnh tràn viền · 1080×1080 · vuốt trái phải. Mỗi slide có lớp phủ màu riêng theo chủ đề.",
     "photoNote": "Ảnh nền là ảnh New York và đời sống từ Unsplash. Nên thay bằng ảnh thương hiệu độ phân giải cao trước khi đăng.",

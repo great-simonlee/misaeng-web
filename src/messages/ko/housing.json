@@ -223,7 +223,7 @@
   },
   "list": {
     "title": "하우징",
-    "subtitle": "{brand|이/가} 엄선한 NYC 매물 · 유닛과 개인 방을 한곳에서 찾아보세요.",
+    "subtitle": "{brand|이/가} 엄선한 {city} 매물 · 유닛과 개인 방을 한곳에서 찾아보세요.",
     "filters": "필터",
     "quickFilters": "빠른 필터",
     "previousFilters": "이전 필터 보기",
@@ -483,10 +483,15 @@
       "bronx": "브롱스",
       "staten-island": "스태튼아일랜드",
       "new-jersey": "뉴저지",
+      "connecticut": "코네티컷",
       "boston": "보스턴",
       "cambridge": "케임브리지",
       "somerville": "서머빌",
-      "brookline": "브루클라인"
+      "brookline": "브루클라인",
+      "rhode-island": "로드아일랜드",
+      "washington-dc": "Washington DC",
+      "virginia": "버지니아",
+      "maryland": "메릴랜드"
     },
     "detail": {
       "type": "유형",

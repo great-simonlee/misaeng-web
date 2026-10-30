@@ -1,10 +1,10 @@
 {
   "meta": {
-    "description": "Cách hoạt động của điểm Misaeng tại {brand} NYC: cách kiếm, cách dùng, giới hạn và câu hỏi thường gặp. Tích điểm qua review ăn uống, OPT, việc làm và bình luận, rồi dùng cho coffee chat, tư vấn luật sư, cố vấn nghề nghiệp và nhiều hơn nữa.",
+    "description": "Cách hoạt động của điểm Misaeng tại {brand}: cách kiếm, cách dùng, giới hạn và câu hỏi thường gặp. Tích điểm qua review ăn uống, OPT, việc làm và bình luận, rồi dùng cho coffee chat, tư vấn luật sư, cố vấn nghề nghiệp và nhiều hơn nữa.",
     "reviewsDescription": "Xét duyệt yêu cầu thêm điểm cho các bài viết có kết quả cuối cùng."
   },
   "header": {
-    "eyebrow": "{brand} NYC",
+    "eyebrow": "{brand}",
     "title": "Hướng dẫn điểm Misaeng",
     "intro": "Dùng điểm kiếm được khi giúp đỡ cộng đồng để yêu cầu các phần thưởng như coffee chat hay tư vấn với luật sư di trú. Điểm không thể quy đổi thành tiền mặt và bạn cần xác minh là sinh viên hoặc người đi làm.",
     "tagInteger": "Chỉ số nguyên",
@@ -314,7 +314,7 @@
   "faq": {
     "cash": {
       "q": "Tôi có thể đổi điểm thành tiền mặt không?",
-      "a": "Không. Điểm Misaeng không thể quy đổi thành tiền mặt, hoàn tiền, chuyển nhượng, bán hay chuyển sang tài khoản khác. Bạn chỉ có thể dùng cho các chương trình phần thưởng do {brand} NYC quy định."
+      "a": "Không. Điểm Misaeng không thể quy đổi thành tiền mặt, hoàn tiền, chuyển nhượng, bán hay chuyển sang tài khoản khác. Bạn chỉ có thể dùng cho các chương trình phần thưởng do {brand} quy định."
     },
     "comments": {
       "q": "Chỉ bình luận thôi có kiếm được nhiều điểm không?",

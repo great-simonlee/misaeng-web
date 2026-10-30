@@ -223,7 +223,7 @@
   },
   "list": {
     "title": "住まい",
-    "subtitle": "{brand}が厳選したNYCの物件 · ユニット全体も個室もまとめて探せます。",
+    "subtitle": "{brand}が厳選した{city}の物件 · ユニット全体も個室もまとめて探せます。",
     "filters": "フィルター",
     "quickFilters": "クイックフィルター",
     "previousFilters": "前のフィルターを表示",
@@ -483,10 +483,15 @@
       "bronx": "ブロンクス",
       "staten-island": "スタテンアイランド",
       "new-jersey": "ニュージャージー",
+      "connecticut": "コネチカット",
       "boston": "ボストン",
       "cambridge": "ケンブリッジ",
       "somerville": "サマービル",
-      "brookline": "ブルックライン"
+      "brookline": "ブルックライン",
+      "rhode-island": "ロードアイランド",
+      "washington-dc": "ワシントンDC",
+      "virginia": "バージニア",
+      "maryland": "メリーランド"
     },
     "detail": {
       "type": "タイプ",

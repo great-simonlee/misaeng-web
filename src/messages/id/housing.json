@@ -223,7 +223,7 @@
   },
   "list": {
     "title": "Hunian",
-    "subtitle": "Listing NYC pilihan {brand} · Cari unit utuh dan kamar pribadi di satu tempat.",
+    "subtitle": "Listing {city} pilihan {brand} · Cari unit utuh dan kamar pribadi di satu tempat.",
     "filters": "Filter",
     "quickFilters": "Filter cepat",
     "previousFilters": "Tampilkan filter sebelumnya",
@@ -483,10 +483,15 @@
       "bronx": "Bronx",
       "staten-island": "Staten Island",
       "new-jersey": "New Jersey",
+      "connecticut": "Connecticut",
       "boston": "Boston",
       "cambridge": "Cambridge",
       "somerville": "Somerville",
-      "brookline": "Brookline"
+      "brookline": "Brookline",
+      "rhode-island": "Rhode Island",
+      "washington-dc": "Washington DC",
+      "virginia": "Virginia",
+      "maryland": "Maryland"
     },
     "detail": {
       "type": "Jenis",

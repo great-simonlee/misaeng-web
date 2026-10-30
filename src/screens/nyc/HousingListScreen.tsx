@@ -15,7 +15,6 @@ import {
   HOUSING_AMENITY_PERKS,
   HOUSING_BENEFIT_PERKS,
   HOUSING_LISTING_KINDS,
-  HOUSING_NEIGHBORHOODS,
   HOUSING_PERKS,
   HOUSING_PRICE_STEP,
   HOUSING_ROOM_TYPES,
@@ -25,6 +24,8 @@ import {
 } from '@lib/constants/housingMock'
 import { useCity } from '@hooks/useCity'
 import { BRAND_CONFIG } from '@lib/brand'
+import { getCity } from '@lib/constants/cities'
+import { orderHousingAreas } from '@lib/housing/areas'
 import { fetchHousingListings } from '@lib/housing/fetchListings'
 import { useT } from '@lib/i18n/client'
 import type { Translate } from '@lib/i18n/translate'
@@ -236,17 +237,12 @@ export function HousingListScreen() {
 
   const neighborhoodOptions = useMemo(() => {
     const counts: Record<string, number> = {}
-    for (const area of HOUSING_NEIGHBORHOODS) counts[area] = 0
     for (const listing of posts) {
       counts[getListingArea(listing)] =
         (counts[getListingArea(listing)] ?? 0) + 1
     }
-    const withPosts = HOUSING_NEIGHBORHOODS.filter((area) => counts[area] > 0)
-    const withoutPosts = HOUSING_NEIGHBORHOODS.filter(
-      (area) => counts[area] === 0,
-    )
-    return { ordered: [...withPosts, ...withoutPosts], counts }
-  }, [posts])
+    return { ordered: orderHousingAreas(city, counts), counts }
+  }, [posts, city])
 
   const summaryLabel = useMemo(() => {
     const parts: string[] = []
@@ -433,7 +429,10 @@ export function HousingListScreen() {
           {t('list.title')}
         </h1>
         <p className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>
-          {t('list.subtitle', { brand: BRAND_CONFIG.name })}
+          {t('list.subtitle', {
+            brand: BRAND_CONFIG.name,
+            city: getCity(city).name,
+          })}
         </p>
 
         {/* 필터 + 빠른 태그 (예전 디자인) */}

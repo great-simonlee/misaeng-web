@@ -46,7 +46,8 @@ export type PublicPosting = {
 /** 도시 사이트별로 먼저 보여 줄 지역 (영문 "New York, NY"와 한국어 "뉴욕 (New York, NY)" 모두) */
 const CITY_REGION_PATTERNS: Record<CityId, RegExp> = {
   nyc: /new york|\bnyc\b|manhattan|brooklyn|뉴욕/i,
-  boston: /boston|cambridge, ma|보스턴/i,
+  boston: /boston|cambridge, ma|providence|보스턴|프로비던스/i,
+  dc: /washington,? d\.?c\b|, dc\b|arlington, va|alexandria, va|bethesda|mclean|reston|워싱턴 ?d\.?c/i,
 }
 
 /** 보고 있는 도시의 지역을 맨 앞으로 (나머지 순서는 그대로) */

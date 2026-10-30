@@ -1,10 +1,10 @@
 {
   "meta": {
-    "description": "Cara kerja poin Misaeng di {brand} NYC: cara mendapatkan, memakai, batasan, dan FAQ. Kumpulkan poin lewat ulasan kuliner, OPT, kerja, dan komentar, lalu pakai untuk coffee chat, konsultasi pengacara, mentoring karier, dan lainnya.",
+    "description": "Cara kerja poin Misaeng di {brand}: cara mendapatkan, memakai, batasan, dan FAQ. Kumpulkan poin lewat ulasan kuliner, OPT, kerja, dan komentar, lalu pakai untuk coffee chat, konsultasi pengacara, mentoring karier, dan lainnya.",
     "reviewsDescription": "Peninjauan permintaan poin tambahan untuk postingan dengan hasil akhir."
   },
   "header": {
-    "eyebrow": "{brand} NYC",
+    "eyebrow": "{brand}",
     "title": "Panduan Poin Misaeng",
     "intro": "Pakai poin yang kamu dapat dari membantu komunitas untuk mengajukan hadiah seperti coffee chat dan konsultasi pengacara imigrasi. Poin tidak bisa dicairkan, dan kamu perlu verifikasi pelajar atau profesional.",
     "tagInteger": "Hanya bilangan bulat",
@@ -314,7 +314,7 @@
   "faq": {
     "cash": {
       "q": "Apakah poin bisa ditukar dengan uang?",
-      "a": "Tidak. Poin Misaeng tidak bisa dicairkan, dikembalikan, ditransfer, dijual, atau dipindahkan ke akun lain. Poin hanya bisa dipakai untuk program hadiah yang ditetapkan {brand} NYC."
+      "a": "Tidak. Poin Misaeng tidak bisa dicairkan, dikembalikan, ditransfer, dijual, atau dipindahkan ke akun lain. Poin hanya bisa dipakai untuk program hadiah yang ditetapkan {brand}."
     },
     "comments": {
       "q": "Apakah bisa dapat banyak hanya dari berkomentar?",

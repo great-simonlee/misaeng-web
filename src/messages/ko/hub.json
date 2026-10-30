@@ -10,6 +10,10 @@
     "boston": {
       "headline": "보스턴에서 함께 살아가는 이야기",
       "description": "유학생 · 직장인을 위한 Boston 정보 공유 공간이에요."
+    },
+    "dc": {
+      "headline": "Washington DC에서 함께 살아가는 이야기",
+      "description": "유학생 · 직장인을 위한 Washington DC 정보 공유 공간이에요."
     }
   },
   "magazine": {
@@ -99,7 +103,7 @@
   },
   "introCarousel": {
     "intro": {
-      "kicker": "{brand} NYC",
+      "kicker": "{brand}",
       "headline": "뉴욕 유학생이라면 다 알아야 하는 곳",
       "body": "각 학교 한인 유학생회와 손잡고 비자, 취업, 맛집, 이벤트 정보를 한곳에 모았습니다. 전문가 연결까지."
     },
@@ -140,7 +144,7 @@
     }
   },
   "carouselTest": {
-    "kicker": "{brand} NYC · 캐러셀 시안",
+    "kicker": "{brand} · 캐러셀 시안",
     "title": "소개 캐러셀",
     "description": "사진 전체 배경 · 1080×1080 기준 · 좌우 스크롤. 슬라이드마다 주제별 분위기 오버레이를 다르게 적용했습니다.",
     "photoNote": "배경은 Unsplash 뉴욕·라이프스타일 실사이며, 발행 전 고해상도 브랜드 사진으로 교체를 권장합니다.",

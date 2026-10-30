@@ -10,6 +10,10 @@
     "boston": {
       "headline": "Menjalani hidup di Boston bersama-sama",
       "description": "Tempat pelajar dan profesional internasional berbagi tips seputar Boston."
+    },
+    "dc": {
+      "headline": "Menjalani hidup di Washington DC bersama-sama",
+      "description": "Tempat pelajar dan profesional internasional berbagi tips seputar Washington DC."
     }
   },
   "magazine": {
@@ -99,7 +103,7 @@
   },
   "introCarousel": {
     "intro": {
-      "kicker": "{brand} NYC",
+      "kicker": "{brand}",
       "headline": "Tempat yang wajib diketahui setiap pelajar di New York",
       "body": "Kami bekerja sama dengan asosiasi mahasiswa Korea di tiap kampus untuk mengumpulkan info visa, kerja, kuliner, dan acara di satu tempat. Plus koneksi ke para pakar."
     },
@@ -140,7 +144,7 @@
     }
   },
   "carouselTest": {
-    "kicker": "{brand} NYC · Draf carousel",
+    "kicker": "{brand} · Draf carousel",
     "title": "Carousel intro",
     "description": "Latar foto full-bleed · 1080×1080 · geser ke kiri dan kanan. Setiap slide punya overlay suasana sendiri sesuai topiknya.",
     "photoNote": "Latar belakangnya adalah foto New York dan gaya hidup dari Unsplash. Sebaiknya ganti dengan foto brand beresolusi tinggi sebelum dipublikasikan.",

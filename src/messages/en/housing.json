@@ -226,7 +226,7 @@
   },
   "list": {
     "title": "Housing",
-    "subtitle": "NYC listings hand-picked by {brand} · Find whole units and private rooms in one place.",
+    "subtitle": "{city} listings hand-picked by {brand} · Find whole units and private rooms in one place.",
     "filters": "Filters",
     "quickFilters": "Quick filters",
     "previousFilters": "Show previous filters",
@@ -495,10 +495,15 @@
       "bronx": "Bronx",
       "staten-island": "Staten Island",
       "new-jersey": "New Jersey",
+      "connecticut": "Connecticut",
       "boston": "Boston",
       "cambridge": "Cambridge",
       "somerville": "Somerville",
-      "brookline": "Brookline"
+      "brookline": "Brookline",
+      "rhode-island": "Rhode Island",
+      "washington-dc": "Washington DC",
+      "virginia": "Virginia",
+      "maryland": "Maryland"
     },
     "detail": {
       "type": "Type",

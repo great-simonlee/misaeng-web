@@ -223,7 +223,7 @@
   },
   "list": {
     "title": "租屋",
-    "subtitle": "{brand} 精選的 NYC 房源 · 整層與獨立房間一次找。",
+    "subtitle": "{brand} 精選的 {city} 房源 · 整層與獨立房間一次找。",
     "filters": "篩選",
     "quickFilters": "快速篩選",
     "previousFilters": "顯示前面的篩選",
@@ -483,10 +483,15 @@
       "bronx": "布朗克斯",
       "staten-island": "史泰登島",
       "new-jersey": "紐澤西",
+      "connecticut": "康乃狄克",
       "boston": "波士頓",
       "cambridge": "劍橋",
       "somerville": "薩默維爾",
-      "brookline": "布魯克萊恩"
+      "brookline": "布魯克萊恩",
+      "rhode-island": "羅德島",
+      "washington-dc": "華盛頓特區",
+      "virginia": "維吉尼亞",
+      "maryland": "馬里蘭"
     },
     "detail": {
       "type": "類型",

@@ -1,7 +1,7 @@
 import { isLocale } from '@lib/i18n/locales'
 
 /** 도시 사이트 슬러그. URL 첫 세그먼트(언어 접두사 다음)와 동일하다. */
-export const CITY_IDS = ['nyc', 'boston'] as const
+export const CITY_IDS = ['nyc', 'boston', 'dc'] as const
 
 export type CityId = (typeof CITY_IDS)[number]
 
@@ -15,6 +15,8 @@ export const CITIES: Record<
     name: string
     shortLabel: string
     brand: string
+    /** 도시 선택에서 이름 아래에 작게 쓰는 주 약자. 중심은 도시이고, 주변 주는 범위만 알려 준다 */
+    regions: string
   }
 > = {
   nyc: {
@@ -22,12 +24,21 @@ export const CITIES: Record<
     name: 'New York',
     shortLabel: 'NYC',
     brand: 'MISAENG NYC',
+    regions: 'NY · NJ · CT',
   },
   boston: {
     id: 'boston',
     name: 'Boston',
     shortLabel: 'Boston',
     brand: 'MISAENG BOSTON',
+    regions: 'MA · RI',
+  },
+  dc: {
+    id: 'dc',
+    name: 'Washington DC',
+    shortLabel: 'DC',
+    brand: 'MISAENG DC',
+    regions: 'DC · MD · VA',
   },
 }
 

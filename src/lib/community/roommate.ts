@@ -451,6 +451,14 @@ export const ROOMMATE_AREA_GROUPS: Record<string, { id: string; aliases: string[
         'newport', '뉴포트', 'cliffside', 'englewood', '잉글우드', 'ridgefield', 'leonia',
       ],
     },
+    {
+      id: 'connecticut',
+      aliases: [
+        'connecticut', '코네티컷', '커네티컷', 'stamford', '스탬퍼드', '스탠포드', 'greenwich, ct',
+        'norwalk', 'new haven', '뉴헤이븐', '뉴 헤이븐', 'yale', '예일', 'hartford', '하트퍼드', 'storrs',
+        'uconn', 'bridgeport',
+      ],
+    },
   ],
   boston: [
     {
@@ -470,6 +478,39 @@ export const ROOMMATE_AREA_GROUPS: Record<string, { id: string; aliases: string[
     },
     { id: 'somerville', aliases: ['somerville', '서머빌', '소머빌', 'davis square', 'union square'] },
     { id: 'brookline', aliases: ['brookline', '브루클라인', 'coolidge'] },
+    {
+      id: 'rhode-island',
+      aliases: [
+        'rhode island', 'ri', '로드아일랜드', '로드 아일랜드', 'providence', '프로비던스', '프로비덴스',
+        'brown university', '브라운대', 'risd', 'newport, ri',
+      ],
+    },
+  ],
+  dc: [
+    {
+      id: 'washington-dc',
+      aliases: [
+        'washington dc', 'washington, dc', 'd.c.', 'dc', '워싱턴', '디씨', 'georgetown', '조지타운',
+        'foggy bottom', 'dupont', 'adams morgan', 'capitol hill', 'navy yard', 'columbia heights', 'u street',
+        'logan circle', 'noma', 'gwu', 'george washington', 'howard', 'american university', 'tenleytown',
+      ],
+    },
+    {
+      id: 'virginia',
+      aliases: [
+        'virginia', 'va', '버지니아', 'arlington', '알링턴', 'rosslyn', 'ballston', 'clarendon', 'crystal city',
+        'alexandria', '알렉산드리아', 'fairfax', '페어팩스', 'annandale', '애넌데일', 'centreville', '센터빌',
+        'mclean', 'tysons', 'reston', 'herndon', 'vienna', 'falls church', 'gmu', 'george mason',
+      ],
+    },
+    {
+      id: 'maryland',
+      aliases: [
+        'maryland', 'md', '메릴랜드', 'bethesda', '베데스다', 'silver spring', '실버스프링', 'rockville', '락빌',
+        'college park', '칼리지파크', 'umd', 'gaithersburg', 'ellicott city', '엘리콧시티', 'columbia, md',
+        'hyattsville', 'chevy chase',
+      ],
+    },
   ],
 }
 
