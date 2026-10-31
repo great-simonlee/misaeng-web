@@ -317,7 +317,7 @@ export function CommunityCommentsSection({
   }
 
   return (
-    <section className='mt-6 overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.05] sm:mt-7'>
+    <section data-ui='comments' className='mt-6 overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.05] sm:mt-7'>
       <div className='px-5 py-5 sm:px-6'>
         <div className='flex items-center justify-between gap-3'>
           <h2 className='text-[16px] font-semibold tracking-tight text-[var(--foreground)]'>

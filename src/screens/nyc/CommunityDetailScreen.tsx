@@ -38,6 +38,7 @@ import {
   boardToneForId,
 } from '@widgets/nyc/BoardPageShell'
 import { EllieoBoardRail } from '@widgets/ellieo/EllieoBoardRail'
+import { EllieoTimelineDetail } from '@widgets/ellieo/EllieoTimelineDetail'
 import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 import { CommunityCommentsSection } from '@widgets/nyc/CommunityCommentsSection'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
@@ -165,7 +166,8 @@ export function CommunityDetailScreen({
   }
 
   // 면접·취업 후기는 회사 페이지와 같은 넓은 폭
-  const shellWidth = boardId === 'job-review' ? 'wide' : 'narrow'
+  // Ellieo: every detail uses the same column + side rail
+  const shellWidth = boardId === 'job-review' && BRAND_CONFIG.theme !== 'ellieo' ? 'wide' : 'narrow'
 
   if (loading) {
     return (
@@ -253,7 +255,7 @@ export function CommunityDetailScreen({
     <PullToRefresh onRefresh={refreshPost}>
       <BoardPageShell
         width={shellWidth}
-        aside={BRAND_CONFIG.theme === 'ellieo' && shellWidth === 'narrow' ? <EllieoBoardRail /> : undefined}
+        aside={BRAND_CONFIG.theme === 'ellieo' && !isFood ? <EllieoBoardRail /> : undefined}
       >
         <div
           className={
@@ -288,6 +290,15 @@ export function CommunityDetailScreen({
               contentLang={translated.lang}
               boardId={boardId}
               boardTitle={title}
+              isAuthor={isAuthor}
+              onDelete={() => void handleDelete()}
+            />
+          ) : BRAND_CONFIG.theme === 'ellieo' && (isCptOpt || isJobReview) ? (
+            <EllieoTimelineDetail
+              post={post}
+              translationNotice={translationNotice}
+              contentLang={translated.lang}
+              boardId={boardId}
               isAuthor={isAuthor}
               onDelete={() => void handleDelete()}
             />

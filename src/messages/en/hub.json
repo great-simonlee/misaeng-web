@@ -212,6 +212,10 @@
     "row": {
       "steps": "{count} steps",
       "views": "{count} views"
+    },
+    "detail": {
+      "latest": "Latest",
+      "updated": "updated {date}"
     }
   }
 }

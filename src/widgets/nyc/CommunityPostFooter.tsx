@@ -43,7 +43,7 @@ export function CommunityPostFooter({
   const photoURL = anonymous ? null : post.authorPhotoURL?.trim() || null
 
   return (
-    <div className='rounded-2xl border border-black/[0.04] bg-[#f7f8fa] px-4 py-3.5 sm:px-5 sm:py-4'>
+    <div data-ui='post-footer' className='rounded-2xl border border-black/[0.04] bg-[#f7f8fa] px-4 py-3.5 sm:px-5 sm:py-4'>
       <div className='flex items-center justify-between gap-3'>
         <div className='flex min-w-0 items-center gap-3'>
           {!anonymous ? (

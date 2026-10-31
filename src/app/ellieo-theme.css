@@ -502,3 +502,37 @@
     animation-duration: 0.01s;
   }
 }
+
+/* ---------- Post detail: actions and comments as open sections, not boxes ---------- */
+[data-brand='ellieo'] [data-ui='post-footer'] {
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+[data-brand='ellieo'] [data-ui='post-footer'] > div + div {
+  border-top: 0;
+  padding-top: 0.5rem;
+}
+
+[data-brand='ellieo'] [data-ui='comments'] {
+  border-radius: 0;
+  box-shadow: none;
+  --tw-ring-shadow: 0 0 #0000;
+  overflow: visible;
+}
+
+[data-brand='ellieo'] [data-ui='comments'] > div {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+[data-brand='ellieo'] [data-ui='comments'] h2 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}

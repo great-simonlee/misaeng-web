@@ -212,6 +212,10 @@
     "row": {
       "steps": "{count} bước",
       "views": "{count} lượt xem"
+    },
+    "detail": {
+      "latest": "Mới nhất",
+      "updated": "cập nhật {date}"
     }
   }
 }
