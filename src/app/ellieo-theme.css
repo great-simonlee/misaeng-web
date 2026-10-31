@@ -422,3 +422,8 @@
 [data-brand='ellieo'] p {
   text-wrap: pretty;
 }
+
+/* Wide letter-spacing breaks up Vietnamese words with tone marks ("T r ư ớ c"): keep eyebrows tight */
+[data-brand='ellieo'] :is(.tracking-wide, .tracking-wider, .tracking-widest, [class*='tracking-[0.1'], [class*='tracking-[0.2'], [class*='tracking-[0.3']) {
+  letter-spacing: 0.01em;
+}
