@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
 import { BottomSheet } from '@components'
-import { useAuth } from '@hooks/useAuth'
+import { useEllieoViewer } from '@hooks/useEllieoViewer'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
 import { BRAND_CONFIG } from '@lib/brand'
@@ -46,7 +46,7 @@ export function EllieoNavbar() {
   const href = useCityPath()
   const t = useT('nav')
   const tc = useT('community')
-  const { user, loading, avatarURL, displayName, isMisaengUser } = useAuth()
+  const { user, loading, avatarURL, displayName, isMisaengUser } = useEllieoViewer()
   const [cityOpen, setCityOpen] = useState(false)
   const [boardsOpen, setBoardsOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)

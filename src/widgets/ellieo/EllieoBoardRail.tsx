@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { LoadingState } from '@components'
-import { useAuth } from '@hooks/useAuth'
+import { useEllieoViewer } from '@hooks/useEllieoViewer'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
 import { cityLoginPath, hrefForCommunityPost } from '@lib/constants/cities'
@@ -42,7 +42,7 @@ function ProfileCard() {
   const t = useT('hub')
   const city = useCity()
   const href = useCityPath()
-  const { user, profile, displayName, avatarURL, loading } = useAuth()
+  const { user, profile, displayName, avatarURL, loading } = useEllieoViewer()
 
   if (loading) return <div className='h-[9.5rem] rounded-2xl border border-[var(--border)]' aria-hidden />
 
