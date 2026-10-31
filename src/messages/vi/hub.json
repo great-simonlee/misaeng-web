@@ -193,6 +193,21 @@
       "joinTitle": "Trở thành đối tác",
       "joinBody": "Bạn điều hành một Hội Sinh viên Việt Nam hoặc làm nội dung cho du học sinh tại Mỹ? Gửi email cho chúng tôi, chúng tôi sẽ phản hồi sớm.",
       "back": "Về trang chủ"
+    },
+    "rail": {
+      "guestTitle": "Tham gia cộng đồng Ellieo",
+      "guestBody": "Xác minh email trường hoặc công ty để đăng bài, bình luận và nhắn tin với các bạn khác.",
+      "join": "Tham gia",
+      "login": "Đăng nhập",
+      "verify": "Xác minh trường",
+      "myPosts": "Bài của tôi",
+      "myLikes": "Đã lưu",
+      "myPage": "Trang của tôi",
+      "postsTitle": "Trên Ellieo",
+      "latest": "Mới nhất",
+      "liked": "Nhiều thích",
+      "discussed": "Nhiều bình luận",
+      "empty": "Chưa có bài viết."
     }
   }
 }

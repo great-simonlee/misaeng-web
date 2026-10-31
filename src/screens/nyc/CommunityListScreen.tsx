@@ -74,7 +74,7 @@ import {
   AnonymousBoardNoticeModal,
   useAnonymousBoardNotice,
 } from '@widgets/nyc/AnonymousBoardNoticeModal'
-import { EllieoSideRail } from '@widgets/ellieo/EllieoRail'
+import { EllieoBoardRail } from '@widgets/ellieo/EllieoBoardRail'
 import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
@@ -587,7 +587,7 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
   return (
     <BoardPageShell
       width={isFoodBoard ? 'wide' : 'narrow'}
-      aside={BRAND_CONFIG.theme === 'ellieo' && !isFoodBoard ? <EllieoSideRail /> : undefined}
+      aside={BRAND_CONFIG.theme === 'ellieo' ? <EllieoBoardRail /> : undefined}
     >
       <BoardListToolbar
         breadcrumbLabel={title}

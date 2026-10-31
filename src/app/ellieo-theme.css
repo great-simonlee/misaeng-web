@@ -389,3 +389,10 @@
   outline: none;
   box-shadow: 0 0 0 3px rgb(var(--brand-rgb) / 0.18);
 }
+
+/* Wide pages (housing, food) with the side rail: photo grids drop from 4 to 3 columns */
+@media (min-width: 64rem) {
+  [data-brand='ellieo'] [data-ui='shell-grid'] .lg\:grid-cols-4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

@@ -38,7 +38,7 @@ import { communityBoardKey } from '@lib/constants/nyc'
 import { cn } from '@lib'
 import { BRAND_CONFIG } from '@lib/brand'
 import type { CommunityPost } from '@/types/nyc'
-import { EllieoSideRail } from '@widgets/ellieo/EllieoRail'
+import { EllieoBoardRail } from '@widgets/ellieo/EllieoBoardRail'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
@@ -385,7 +385,7 @@ export function RoommateListScreen() {
       <BoardPageShell
         width='narrow'
         className='flex flex-1 flex-col'
-        aside={BRAND_CONFIG.theme === 'ellieo' ? <EllieoSideRail hideRoommates /> : undefined}
+        aside={BRAND_CONFIG.theme === 'ellieo' ? <EllieoBoardRail /> : undefined}
       >
         <BoardListToolbar
           breadcrumbLabel={t('roommate.list.breadcrumb')}

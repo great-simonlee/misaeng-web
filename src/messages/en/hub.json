@@ -193,6 +193,21 @@
       "joinTitle": "Become a partner",
       "joinBody": "Run a Vietnamese Student Association or create content for students in the US? Email us and we'll get back to you.",
       "back": "Back to home"
+    },
+    "rail": {
+      "guestTitle": "Join the Ellieo community",
+      "guestBody": "Verify your school or work email to post, comment, and message other students.",
+      "join": "Join",
+      "login": "Log in",
+      "verify": "Verify your school",
+      "myPosts": "My posts",
+      "myLikes": "Saved",
+      "myPage": "My page",
+      "postsTitle": "Across Ellieo",
+      "latest": "Latest",
+      "liked": "Most liked",
+      "discussed": "Most talked",
+      "empty": "No posts yet."
     }
   }
 }

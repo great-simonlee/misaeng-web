@@ -35,6 +35,7 @@ import type {
   HousingRoomType,
   HousingUnitType,
 } from '@/types/nyc'
+import { EllieoBoardRail } from '@widgets/ellieo/EllieoBoardRail'
 import { HousingPostCard } from '@widgets/nyc/HousingPostCard'
 import { HousingPostCardSkeletonGrid } from '@widgets/nyc/HousingPostCardSkeleton'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
@@ -427,7 +428,11 @@ export function HousingListScreen() {
 
   return (
     <PullToRefresh onRefresh={refreshListings} className='flex flex-1 flex-col'>
-    <BoardPageShell width='wide' className='flex flex-1 flex-col'>
+    <BoardPageShell
+      width='wide'
+      className='flex flex-1 flex-col'
+      aside={BRAND_CONFIG.theme === 'ellieo' ? <EllieoBoardRail /> : undefined}
+    >
       <header data-ui='board-header' className='pt-5 sm:pt-8 lg:pt-10'>
         <h1 data-ui='board-title' className='text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]'>
           {t('list.title')}

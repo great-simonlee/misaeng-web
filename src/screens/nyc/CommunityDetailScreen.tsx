@@ -37,7 +37,7 @@ import {
   BoardSurface,
   boardToneForId,
 } from '@widgets/nyc/BoardPageShell'
-import { EllieoSideRail } from '@widgets/ellieo/EllieoRail'
+import { EllieoBoardRail } from '@widgets/ellieo/EllieoBoardRail'
 import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 import { CommunityCommentsSection } from '@widgets/nyc/CommunityCommentsSection'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
@@ -253,7 +253,7 @@ export function CommunityDetailScreen({
     <PullToRefresh onRefresh={refreshPost}>
       <BoardPageShell
         width={shellWidth}
-        aside={BRAND_CONFIG.theme === 'ellieo' && shellWidth === 'narrow' ? <EllieoSideRail /> : undefined}
+        aside={BRAND_CONFIG.theme === 'ellieo' && shellWidth === 'narrow' ? <EllieoBoardRail /> : undefined}
       >
         <div
           className={

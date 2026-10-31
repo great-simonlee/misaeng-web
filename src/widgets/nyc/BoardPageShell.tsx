@@ -8,7 +8,7 @@ type BoardPageShellProps = {
   /** 좁은 커뮤니티 피드 vs 넓은 하우징 그리드 */
   width?: 'narrow' | 'wide'
   className?: string
-  /** Desktop side rail next to the content (Ellieo passes EllieoSideRail; Misaeng passes nothing) */
+  /** Desktop side rail next to the content (Ellieo passes EllieoBoardRail; Misaeng passes nothing) */
   aside?: ReactNode
 }
 
