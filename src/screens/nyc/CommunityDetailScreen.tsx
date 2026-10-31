@@ -27,6 +27,7 @@ import {
   isStatusCommunityBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
+import { BRAND_CONFIG } from '@lib/brand'
 import { useT } from '@lib/i18n/client'
 import type { CommunityPost } from '@/types/nyc'
 import {
@@ -36,6 +37,7 @@ import {
   BoardSurface,
   boardToneForId,
 } from '@widgets/nyc/BoardPageShell'
+import { EllieoSideRail } from '@widgets/ellieo/EllieoRail'
 import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 import { CommunityCommentsSection } from '@widgets/nyc/CommunityCommentsSection'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
@@ -249,7 +251,10 @@ export function CommunityDetailScreen({
 
   return (
     <PullToRefresh onRefresh={refreshPost}>
-      <BoardPageShell width={shellWidth}>
+      <BoardPageShell
+        width={shellWidth}
+        aside={BRAND_CONFIG.theme === 'ellieo' && shellWidth === 'narrow' ? <EllieoSideRail /> : undefined}
+      >
         <div
           className={
             isFood

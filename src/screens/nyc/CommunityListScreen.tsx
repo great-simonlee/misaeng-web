@@ -68,11 +68,13 @@ import {
 } from '@lib/constants/statusEmployer'
 import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
+import { BRAND_CONFIG } from '@lib/brand'
 import type { CommunityPost, FoodCategoryId } from '@/types/nyc'
 import {
   AnonymousBoardNoticeModal,
   useAnonymousBoardNotice,
 } from '@widgets/nyc/AnonymousBoardNoticeModal'
+import { EllieoSideRail } from '@widgets/ellieo/EllieoRail'
 import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
@@ -583,7 +585,10 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
   )
 
   return (
-    <BoardPageShell width={isFoodBoard ? 'wide' : 'narrow'}>
+    <BoardPageShell
+      width={isFoodBoard ? 'wide' : 'narrow'}
+      aside={BRAND_CONFIG.theme === 'ellieo' && !isFoodBoard ? <EllieoSideRail /> : undefined}
+    >
       <BoardListToolbar
         breadcrumbLabel={title}
         intro={t(communityBoardKey(boardId, 'listIntro'), {

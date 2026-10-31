@@ -378,3 +378,14 @@
 [data-brand='ellieo'] [data-ui='callout']:hover {
   background: var(--surface);
 }
+
+/* Narrow pages with the side rail: the grid spans the frame, the content column sizes itself */
+[data-brand='ellieo'] [data-shell='narrow'] > [data-ui='shell-grid'] {
+  max-width: none;
+}
+
+/* Header tabs: keyboard focus as a soft halo instead of a hard blue outline */
+[data-brand='ellieo'] header nav a:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(var(--brand-rgb) / 0.18);
+}

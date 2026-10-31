@@ -8,6 +8,8 @@ type BoardPageShellProps = {
   /** 좁은 커뮤니티 피드 vs 넓은 하우징 그리드 */
   width?: 'narrow' | 'wide'
   className?: string
+  /** Desktop side rail next to the content (Ellieo passes EllieoSideRail; Misaeng passes nothing) */
+  aside?: ReactNode
 }
 
 /** 목록·상세 공통 페이지 캔버스 */
@@ -15,6 +17,7 @@ export function BoardPageShell({
   children,
   width = 'narrow',
   className,
+  aside,
 }: BoardPageShellProps) {
   return (
     <div data-ui='canvas' className={cn('relative min-h-screen bg-white', className)}>
@@ -27,7 +30,14 @@ export function BoardPageShell({
             : 'max-w-2xl px-4 sm:px-5',
         )}
       >
-        {children}
+        {aside ? (
+          <div data-ui='shell-grid' className='grid gap-10 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-14'>
+            <div className='min-w-0'>{children}</div>
+            <div className='hidden pb-12 pt-8 lg:block'>{aside}</div>
+          </div>
+        ) : (
+          children
+        )}
       </div>
     </div>
   )
