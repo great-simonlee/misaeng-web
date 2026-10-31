@@ -70,7 +70,6 @@
       "me": "Me"
     },
     "join": "Join Ellieo",
-    "boardsTitle": "All boards",
     "comingSoon": "Coming soon",
     "footerTagline": "The community for international students in the US. Every member is verified with a school or work email.",
     "legalGroup": "Legal",
@@ -87,6 +86,7 @@
       "noDepositBody": "Our housing team never asks you to pay before you sign a lease.",
       "reportTitle": "Reports reviewed within {hours} hours",
       "reportBody": "Report anything suspicious and our team will review it and follow up."
-    }
+    },
+    "language": "Language"
   }
 }

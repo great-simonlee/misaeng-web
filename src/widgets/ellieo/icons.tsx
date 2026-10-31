@@ -173,3 +173,9 @@ export const HeartIcon = (p: IconProps) => (
     <path d='M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20Z' />
   </Base>
 )
+
+export const MenuIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M4 7h16M4 12h16M4 17h16' />
+  </Base>
+)

@@ -98,16 +98,9 @@
   color: var(--brand);
 }
 
-/* ---------- Mobile bottom tab bar: keep page content and floating buttons above it ---------- */
-@media (max-width: 63.999rem) {
-  [data-brand='ellieo'] body {
-    padding-bottom: var(--bottom-nav-h);
-  }
-}
-
-/* Fixed floating actions anchored to bottom-0 (e.g. food map button) sit above the tab bar */
-[data-brand='ellieo'] [data-ui='floating-bottom'] {
-  bottom: var(--bottom-nav-h);
+/* No bottom tab bar on Ellieo (menu and profile are top right) */
+html[data-brand='ellieo'] {
+  --bottom-nav-h: 0px;
 }
 
 /* Long Vietnamese board names wrap instead of being cut mid-word */
