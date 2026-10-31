@@ -25,7 +25,7 @@ function boardKey(categoryId: string): string {
 }
 
 /**
- * Right rail on every Ellieo board page: my profile on top, then posts from all boards
+ * Right rail on every Ellieo board page (tabs are underlined text, not pills, so long Vietnamese labels fit): my profile on top, then posts from all boards
  * as Latest / Most liked / Most discussed tabs. Same rail everywhere so pages feel like one site.
  */
 export function EllieoBoardRail() {
@@ -175,16 +175,20 @@ function PopularPosts() {
       <h2 className='text-[1.1rem] font-extrabold tracking-[-0.02em] text-[var(--foreground)]'>
         {t('ellieo.rail.postsTitle')}
       </h2>
-      <div role='tablist' aria-label={t('ellieo.rail.postsTitle')} className='mt-3 grid grid-cols-3 gap-1.5'>
+      <div role='tablist' aria-label={t('ellieo.rail.postsTitle')} className='mt-2 flex flex-wrap gap-x-5 gap-y-1 border-b border-[var(--border)]'>
         {tabs.map((item) => (
           <button
             key={item.id}
             type='button'
             role='tab'
             aria-selected={tab === item.id}
-            data-ui='chip'
             onClick={() => setTab(item.id)}
-            className='inline-flex h-8 items-center justify-center whitespace-nowrap rounded-full border px-2 text-[12.5px] font-semibold'
+            className={cn(
+              '-mb-px whitespace-nowrap border-b-2 pb-2 pt-1 text-[13.5px] font-semibold transition',
+              tab === item.id
+                ? 'border-[var(--foreground)] text-[var(--foreground)]'
+                : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]',
+            )}
           >
             {item.label}
           </button>

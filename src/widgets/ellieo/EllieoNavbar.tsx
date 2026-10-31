@@ -143,13 +143,14 @@ export function EllieoNavbar() {
                   href={target}
                   aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13.5px] font-medium whitespace-nowrap transition xl:px-3',
+                    'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13.5px] font-medium whitespace-nowrap transition xl:px-3',
                     active
                       ? 'bg-[var(--brand-subtle)] text-[var(--brand-deep)]'
                       : 'text-[var(--muted-foreground)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]',
                   )}
                 >
-                  <Icon className='size-[18px]' />
+                  {/* Icons only from 1280px: below that the labels need the room (Vietnamese labels are long) */}
+                  <Icon className='hidden size-[18px] xl:block' />
                   {t(`ellieo.short.${board.id}`)}
                 </Link>
               )

@@ -396,3 +396,29 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* ---------- Long labels (Vietnamese runs ~30% longer than English): wrap instead of cutting words ---------- */
+/* Industry tag on company cards: "Tiêu dùng & Bán lẻ" wraps to two short lines instead of "Tiêu dùng & ..." */
+[data-brand='ellieo'] [data-ui='tag-text'] {
+  overflow: visible;
+  white-space: normal;
+  text-overflow: clip;
+  line-height: 1.25;
+}
+
+/* Jobs callout description: up to two lines on phones */
+[data-brand='ellieo'] [data-ui='callout-body'] {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* No lone last words ("…của từng công / ty."): balance headings, avoid orphans in paragraphs */
+[data-brand='ellieo'] :is(h1, h2, h3) {
+  text-wrap: balance;
+}
+
+[data-brand='ellieo'] p {
+  text-wrap: pretty;
+}

@@ -99,7 +99,7 @@ export function IndustryTag({
         className='size-2 shrink-0 rounded-[3px] shadow-[inset_0_0_0_0.5px_rgba(0,0,0,0.08)]'
         style={{ backgroundImage: tintGradient(tintFor(industry)) }}
       />
-      <span className='truncate'>{industryLabel(industry, label)}</span>
+      <span data-ui='tag-text' className='truncate'>{industryLabel(industry, label)}</span>
     </span>
   )
 }

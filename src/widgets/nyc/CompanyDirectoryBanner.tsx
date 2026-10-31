@@ -22,7 +22,7 @@ export function CompanyDirectoryBanner() {
         <span className='block text-[14px] font-semibold tracking-tight text-[var(--foreground)] sm:text-[15px]'>
           {t('banner.title')}
         </span>
-        <span className='mt-0.5 block truncate text-[12px] text-[var(--muted)] sm:text-[13px]'>
+        <span data-ui='callout-body' className='mt-0.5 block truncate text-[12px] text-[var(--muted)] sm:text-[13px]'>
           {t('banner.description')}
         </span>
       </span>
