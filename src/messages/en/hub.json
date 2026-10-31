@@ -151,10 +151,6 @@
     "button": "Send an Instagram DM"
   },
   "ellieo": {
-    "hero": {
-      "eyebrow": "{city} · Verified international students",
-      "join": "Join with your school email"
-    },
     "intro": {
       "title": "What's new in {city}"
     },

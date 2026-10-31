@@ -5,10 +5,8 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { LoadingState, MarqueeRow } from '@components'
-import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { captureReferralFromLocation } from '@lib/community/referral'
-import { cityLoginPath } from '@lib/constants/cities'
 import { NYC_MAGAZINE_PREVIEWS } from '@lib/constants/nyc'
 import { fetchHousingListings } from '@lib/housing/fetchListings'
 import { useFormat, useLocale, useT } from '@lib/i18n/client'
@@ -36,9 +34,7 @@ const HOUSING_PREVIEW_COUNT = 4
  */
 export function EllieoHomeScreen() {
   const t = useT('hub')
-  const city = useCity()
   const cityInfo = useCityInfo()
-  const { user, loading } = useAuth()
 
   useEffect(() => {
     captureReferralFromLocation()
@@ -49,19 +45,6 @@ export function EllieoHomeScreen() {
       <h1 className='sr-only'>{t('ellieo.intro.title', { city: cityInfo.shortLabel })}</h1>
 
       <StoriesStrip />
-
-      {/* Phones: the header has no Join button, so offer it once under the stories */}
-      {!loading && !user ? (
-        <div className='mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 lg:hidden'>
-          <Link
-            href={`${cityLoginPath(city)}?mode=signup`}
-            className='flex h-11 items-center justify-center gap-1.5 rounded-full bg-[var(--brand)] text-[14.5px] font-semibold text-white transition active:scale-[0.99]'
-          >
-            {t('ellieo.hero.join')}
-            <ArrowRightIcon className='size-4' />
-          </Link>
-        </div>
-      ) : null}
 
       <NewListings />
 
