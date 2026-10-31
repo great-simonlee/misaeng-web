@@ -179,10 +179,39 @@
 
 /* ---------- Company directory / company detail / job postings hero ---------- */
 /* Flat navy panel like the home hero: no glow blobs, no grid */
+/* Light panel (same family as the footer trust panel); the shared markup is written for a dark panel,
+   so white text/fills inside are remapped to ink, muted text, white cards and border lines */
 [data-brand='ellieo'] [data-ui='hero-panel'] {
-  border-radius: 1rem;
-  background: var(--navy);
-  box-shadow: none;
+  border-radius: 1.25rem;
+  background: #f8f9fc;
+  color: var(--foreground);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+[data-brand='ellieo'] [data-ui='hero-panel'] .text-white {
+  color: var(--foreground);
+}
+
+[data-brand='ellieo'] [data-ui='hero-panel'] [class*='text-white/'] {
+  color: var(--muted);
+}
+
+[data-brand='ellieo'] [data-ui='hero-panel'] [class*='bg-white/'] {
+  background: #fff;
+}
+
+[data-brand='ellieo'] [data-ui='hero-panel'] [class*='ring-white/'] {
+  --tw-ring-color: var(--border);
+}
+
+/* Thin dividers between hero stats */
+[data-brand='ellieo'] [data-ui='hero-panel'] span[class*='bg-white/15'] {
+  background: var(--border);
+}
+
+/* Search box: line instead of a dark-background shadow */
+[data-brand='ellieo'] [data-ui='hero-panel'] [class*='shadow-[0_10px_30px'] {
+  box-shadow: 0 0 0 1px var(--border);
 }
 
 [data-brand='ellieo'] [data-ui='hero-decor'] {
@@ -207,7 +236,7 @@
   font-weight: 800;
 }
 
-/* Highlighted hero numbers: Ellieo sun yellow instead of Misaeng coral */
+/* Highlighted hero numbers: brand blue instead of Misaeng coral */
 [data-brand='ellieo'] [data-ui='hero-stat-accent'] {
-  color: var(--ellieo-sun);
+  color: var(--brand);
 }
