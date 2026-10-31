@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useCityInfo, useCityPath } from '@hooks/useCity'
 import { BRAND_CONFIG } from '@lib/brand'
 import { useT } from '@lib/i18n/client'
-import { BadgeCheckIcon, FlagIcon, MailIcon, NoCashIcon } from '@widgets/ellieo/icons'
+import { MailIcon, ShieldCheckIcon } from '@widgets/ellieo/icons'
 import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 
 /** Ellieo's own contact address (legal notices in the Terms/Privacy Policy still name Misaeng LLC's address) */
@@ -28,10 +28,27 @@ export function EllieoFooter() {
   const sla = trust.reportSlaHours
 
   const trustItems = [
-    { icon: BadgeCheckIcon, title: t('ellieo.trust.verifiedTitle'), body: t('ellieo.trust.verifiedBody') },
-    { icon: NoCashIcon, title: t('ellieo.trust.noDepositTitle'), body: t('ellieo.trust.noDepositBody') },
+    {
+      value: t('ellieo.trust.verifiedValue'),
+      title: t('ellieo.trust.verifiedTitle'),
+      body: t('ellieo.trust.verifiedBody'),
+      tone: 'text-[#7fd8b8]',
+    },
+    {
+      value: t('ellieo.trust.noDepositValue'),
+      title: t('ellieo.trust.noDepositTitle'),
+      body: t('ellieo.trust.noDepositBody'),
+      tone: 'text-[#ffd27a]',
+    },
     ...(sla
-      ? [{ icon: FlagIcon, title: t('ellieo.trust.reportTitle'), body: t('ellieo.trust.reportBody', { hours: sla }) }]
+      ? [
+          {
+            value: t('ellieo.trust.reportValue', { hours: sla }),
+            title: t('ellieo.trust.reportTitle'),
+            body: t('ellieo.trust.reportBody'),
+            tone: 'text-[#8fb3ff]',
+          },
+        ]
       : []),
   ]
 
@@ -61,21 +78,26 @@ export function EllieoFooter() {
 
   return (
     <footer className='mt-auto bg-white pt-8 text-[var(--foreground)]'>
-      {/* Trust: one navy card */}
+      {/* Trust: one navy card. A short promise on the left, the three commitments as big numbers */}
       <div className='mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <ul className='grid gap-4 rounded-2xl bg-[var(--navy)] px-5 py-5 text-white sm:grid-cols-3 sm:gap-6 sm:px-6'>
-          {trustItems.map(({ icon: Icon, title, body }) => (
-            <li key={title} className='flex min-w-0 gap-3'>
-              <span className='inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-[#7fd8b8]'>
-                <Icon className='size-[18px]' />
-              </span>
-              <span className='min-w-0'>
-                <span className='block text-[13.5px] font-semibold'>{title}</span>
-                <span className='mt-0.5 block text-[12.5px] leading-relaxed text-white/65'>{body}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
+        <div className='grid gap-6 rounded-2xl bg-[var(--navy)] px-5 py-6 text-white sm:px-7 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,3fr)] lg:items-center lg:gap-10'>
+          <div className='min-w-0'>
+            <p className='inline-flex items-center gap-1.5 text-[16px] font-bold tracking-[-0.01em]'>
+              <ShieldCheckIcon className='size-5 text-[#7fd8b8]' />
+              {t('ellieo.trust.headline')}
+            </p>
+            <p className='mt-1 text-[13px] leading-relaxed text-white/65'>{t('ellieo.trust.subline')}</p>
+          </div>
+          <ul className='grid gap-5 sm:grid-cols-3 sm:gap-6'>
+            {trustItems.map(({ value, title, body, tone }) => (
+              <li key={title} className='min-w-0 border-white/10 sm:border-l sm:pl-6'>
+                <p className={`text-[1.75rem] font-extrabold leading-none tracking-[-0.03em] ${tone}`}>{value}</p>
+                <p className='mt-2 text-[13.5px] font-semibold'>{title}</p>
+                <p className='mt-0.5 text-[12.5px] leading-relaxed text-white/60'>{body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div className='mx-auto w-full max-w-7xl px-4 pb-6 pt-8 sm:px-6 lg:px-8'>

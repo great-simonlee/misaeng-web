@@ -79,12 +79,17 @@
     "brokerage": "Công ty môi giới: {name}",
     "trademark": "{brand}® là nhãn hiệu đã đăng ký (USPTO số {number}).",
     "trust": {
-      "verifiedTitle": "Chỉ thành viên đã xác minh",
-      "verifiedBody": "Muốn đăng bài, bình luận hay nhắn tin, bạn cần xác minh email trường học hoặc email công ty.",
-      "noDepositTitle": "Không đặt cọc trước",
-      "noDepositBody": "Tin đăng của đội ngũ nhà ở không bao giờ yêu cầu bạn chuyển tiền trước khi ký hợp đồng.",
-      "reportTitle": "Xử lý báo cáo nhanh chóng",
-      "reportBody": "Thấy điều gì đáng ngờ, hãy báo cáo ngay. Đội ngũ Ellieo sẽ kiểm tra trong vòng {hours} giờ."
+      "headline": "An toàn ngay từ đầu",
+      "subline": "Để bạn luôn biết mình đang trò chuyện với ai.",
+      "verifiedValue": "Xác minh",
+      "verifiedTitle": "Email trường hoặc công ty",
+      "verifiedBody": "Thành viên xác minh để đăng bài, bình luận và nhắn tin.",
+      "noDepositValue": "$0",
+      "noDepositTitle": "Đặt cọc trước với tin nhà của chúng tôi",
+      "noDepositBody": "Đội ngũ nhà ở không bao giờ yêu cầu bạn chuyển tiền trước khi ký hợp đồng.",
+      "reportValue": "{hours} giờ",
+      "reportTitle": "Để kiểm tra mọi báo cáo",
+      "reportBody": "Thấy điều gì đáng ngờ? Bấm Báo cáo, chúng tôi sẽ kiểm tra."
     }
   }
 }

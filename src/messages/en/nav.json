@@ -79,12 +79,17 @@
     "brokerage": "Brokerage: {name}",
     "trademark": "{brand}® is a registered trademark (USPTO Reg. No. {number}).",
     "trust": {
-      "verifiedTitle": "Verified members only",
-      "verifiedBody": "Posting, comments, and messages require a school or work email.",
-      "noDepositTitle": "No upfront deposits",
-      "noDepositBody": "Listings from our housing team never ask you to pay before signing.",
-      "reportTitle": "Reports reviewed fast",
-      "reportBody": "Report anything suspicious. Our team reviews it within {hours} hours."
+      "headline": "Safe by design",
+      "subline": "Built so you always know who you're talking to.",
+      "verifiedValue": "Verified",
+      "verifiedTitle": "School or work email",
+      "verifiedBody": "Members verify to post, comment and message.",
+      "noDepositValue": "$0",
+      "noDepositTitle": "Upfront on our listings",
+      "noDepositBody": "Our housing team never asks you to pay before you sign.",
+      "reportValue": "{hours}h",
+      "reportTitle": "To review every report",
+      "reportBody": "See something off? Tap Report and we'll check it."
     }
   }
 }
