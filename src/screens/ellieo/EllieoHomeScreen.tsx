@@ -269,6 +269,9 @@ const BOARD_TONE: Partial<Record<NycCategoryId, string>> = {
   marketplace: '#12a4c7',
 }
 
+/** Housing and roommates/sublets have their own blocks in the side rail, so the feed leaves them out */
+const FEED_EXCLUDED_BOARDS: readonly NycCategoryId[] = ['housing', 'roommate']
+
 /** Posts at or above this many likes get the Trending tag */
 const TRENDING_LIKES = 40
 
@@ -290,7 +293,7 @@ function CommunityFeed() {
   const locale = useLocale()
   const format = useFormat()
   const href = useCityPath()
-  const posts = getCommunityHighlights()
+  const posts = getCommunityHighlights().filter((post) => !FEED_EXCLUDED_BOARDS.includes(post.board))
   const [filter, setFilter] = useState<NycCategoryId | 'all'>('all')
   // Fixed at mount so "3 hours ago" doesn't change between renders
   const [now] = useState(() => Date.now())
@@ -336,23 +339,26 @@ function CommunityFeed() {
           const board = ELLIEO_BOARDS.find((item) => item.id === post.board)
           const BoardIcon = board?.icon
           const tone = BOARD_TONE[post.board] ?? '#5b6779'
+          const anonymous = post.board === 'anonymous'
           return (
             <li key={post.id} className='border-b border-[var(--border)] last:border-b-0'>
               <Link href={href(board?.path ?? '/')} className='group block py-3.5'>
-                {/* Author line: one row */}
+                {/* Author line: one row. Anonymous Q&A hides nickname and school, like the board itself (lib/community/anonymous) */}
                 <span className='flex items-center gap-2'>
                   <span
                     aria-hidden
                     className='flex size-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold uppercase text-white'
-                    style={{ background: gradientFor(post.nickname) }}
+                    style={{ background: anonymous ? '#9aa4b2' : gradientFor(post.nickname) }}
                   >
-                    {post.nickname.charAt(0)}
+                    {anonymous ? '?' : post.nickname.charAt(0)}
                   </span>
                   <span className='flex min-w-0 flex-1 items-center gap-1 text-[12.5px]'>
-                    <span className='truncate font-semibold text-[var(--foreground)]'>{post.nickname}</span>
+                    <span className='truncate font-semibold text-[var(--foreground)]'>
+                      {anonymous ? t('ellieo.community.anonymous') : post.nickname}
+                    </span>
                     <BadgeCheckIcon className='size-3.5 shrink-0 text-[var(--ellieo-jade)]' />
                     <span className='truncate text-[var(--muted)]'>
-                      · {shortSchool(post.school)} · {format.relative(now - post.hoursAgo * 3_600_000)}
+                      {anonymous ? '' : ` · ${shortSchool(post.school)}`} · {format.relative(now - post.hoursAgo * 3_600_000)}
                     </span>
                   </span>
                   <span

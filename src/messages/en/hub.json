@@ -169,7 +169,8 @@
     "community": {
       "title": "Community",
       "all": "All",
-      "trending": "Trending"
+      "trending": "Trending",
+      "anonymous": "Anonymous"
     },
     "perMonth": "/mo",
     "stories": {

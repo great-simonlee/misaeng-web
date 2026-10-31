@@ -169,7 +169,8 @@
     "community": {
       "title": "Cộng đồng",
       "all": "Tất cả",
-      "trending": "Nổi bật"
+      "trending": "Nổi bật",
+      "anonymous": "Ẩn danh"
     },
     "perMonth": "/tháng",
     "stories": {
