@@ -4,17 +4,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { useCityInfo, useCityPath } from '@hooks/useCity'
-import { BRAND_CONFIG, brandConfig } from '@lib/brand'
+import { BRAND_CONFIG } from '@lib/brand'
 import { useT } from '@lib/i18n/client'
 import { BadgeCheckIcon, FlagIcon, MailIcon, NoCashIcon } from '@widgets/ellieo/icons'
 import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 
-const CONTACT_EMAIL = 'info@misaeng.com'
+/** Ellieo's own contact address (legal notices in the Terms/Privacy Policy still name Misaeng LLC's address) */
+const CONTACT_EMAIL = 'info@ellieo.com'
 
-/** Misaeng LLC company pages (Ellieo has no corporate site of its own) */
-function misaengHref(path: string) {
-  return `${brandConfig('misaeng').productionUrl}${path}`
-}
 
 /**
  * Ellieo footer. Trust-first (brief §3): the three safety promises in a navy card on top,
@@ -44,7 +41,7 @@ export function EllieoFooter() {
   }))
   const support = [
     { href: href('/me'), label: t('footer.links.me') },
-    { href: misaengHref('/contact'), label: t('footer.links.contact') },
+    { href: `mailto:${CONTACT_EMAIL}`, label: t('footer.links.contact') },
   ]
   const legal = [
     { href: href('/terms-of-use'), label: t('footer.links.terms') },
@@ -125,7 +122,7 @@ function LinkColumn({ title, links }: { title: string; links: { href: string; la
       <ul className='mt-2.5 space-y-1.5'>
         {links.map((item) => (
           <li key={item.href}>
-            {item.href.startsWith('http') ? (
+            {/^(https?:|mailto:)/.test(item.href) ? (
               <a href={item.href} className='text-[13.5px] text-[var(--muted-foreground)] transition hover:text-[var(--brand)]'>
                 {item.label}
               </a>
