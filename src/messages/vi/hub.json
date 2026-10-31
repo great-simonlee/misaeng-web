@@ -167,7 +167,11 @@
       "title": "Tin nhà mới"
     },
     "community": {
-      "title": "Cộng đồng"
+      "title": "Cộng đồng",
+      "composer": "Hỏi gì về New York, hay chia sẻ mẹo…",
+      "post": "Đăng",
+      "all": "Tất cả",
+      "trending": "Nổi bật"
     },
     "perMonth": "/tháng",
     "stories": {

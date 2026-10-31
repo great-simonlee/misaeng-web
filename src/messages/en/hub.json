@@ -167,7 +167,11 @@
       "title": "New listings"
     },
     "community": {
-      "title": "Community"
+      "title": "Community",
+      "composer": "Ask NYC anything, share a tip…",
+      "post": "Post",
+      "all": "All",
+      "trending": "Trending"
     },
     "perMonth": "/mo",
     "stories": {

@@ -36,6 +36,8 @@ export type EllieoCommunityPost = {
   board: NycCategoryId
   title: Localized
   excerpt: Localized
+  /** Display nickname (members post under a nickname; the school badge is the verification) */
+  nickname: string
   school: string
   hoursAgo: number
   likes: number
@@ -94,6 +96,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
       en: 'Filed online in March, no RFE. Sharing every date from I-20 to the EAD card in my mailbox.',
       vi: 'Nộp online tháng 3, không bị RFE. Chia sẻ từng mốc từ I-20 đến lúc nhận thẻ EAD.',
     },
+    nickname: 'minh.opt',
     school: 'Baruch College',
     hoursAgo: 3,
     likes: 24,
@@ -107,6 +110,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
       en: 'Private room in a 2BR, $1,450/month, no broker fee. Quiet, non-smoker, cooks Vietnamese food a lot.',
       vi: 'Phòng riêng trong căn 2PN, $1,450/tháng, không phí môi giới. Mình yên tĩnh, không hút thuốc, hay nấu đồ Việt.',
     },
+    nickname: 'linhh_nyc',
     school: 'New York University',
     hoursAgo: 6,
     likes: 9,
@@ -120,6 +124,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
       en: 'Ranked by broth, price and how close they are to the subway. Number one surprised me.',
       vi: 'Xếp theo nước dùng, giá và độ gần ga tàu điện ngầm. Quán số 1 làm mình bất ngờ.',
     },
+    nickname: 'phoholic',
     school: 'Columbia University',
     hoursAgo: 20,
     likes: 57,
@@ -133,6 +138,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
       en: 'Two rounds, behavioral plus a short case. They asked about sponsorship in the first call.',
       vi: 'Hai vòng, phỏng vấn hành vi và một case ngắn. Họ hỏi về bảo lãnh visa ngay cuộc gọi đầu.',
     },
+    nickname: 'an.audits',
     school: 'Pace University',
     hoursAgo: 28,
     likes: 18,
@@ -146,6 +152,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
       en: 'A landlord on Facebook wants Zelle before showing the room. Feels off. Has anyone seen this?',
       vi: 'Chủ nhà trên Facebook muốn chuyển Zelle trước khi cho xem phòng. Thấy không ổn, có ai gặp chưa?',
     },
+    nickname: 'newinqueens',
     school: 'Stony Brook University',
     hoursAgo: 40,
     likes: 33,
@@ -159,6 +166,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
       en: 'Thinking of a potluck in Queens in February. Bring one dish from your hometown.',
       vi: 'Dự định tổ chức potluck ở Queens vào tháng 2. Mỗi người mang một món quê nhà.',
     },
+    nickname: 'tet.nyc',
     school: 'Hunter College',
     hoursAgo: 52,
     likes: 46,
