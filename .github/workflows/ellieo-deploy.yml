@@ -1,0 +1,111 @@
+name: Deploy ellieo.com
+
+# ellieo.com runs on the EC2 instance "ellieo" (private subnet, no SSH), next to the
+# legacy Ellieo app API. GitHub reaches it through AWS SSM Run Command, using the
+# IAM role below via GitHub OIDC (no AWS keys stored in GitHub).
+#
+# On the server (as ubuntu, in ~/ellieo-web-new):
+#   fetch origin/main -> npm ci (only if the lockfile changed) -> build into .next-build
+#   -> stop pm2 "ellieo-web" -> swap .next (old build kept as .next-prev) -> start.
+# The site keeps serving during the build; the swap takes a few seconds.
+# Secrets stay in the server's .env.local and are never sent from here.
+#
+# This file also lives in misaeng-web; the repository check keeps it from running there.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ellieo-deploy
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ROLE_ARN: arn:aws:iam::215280010165:role/ellieo-github-deploy
+  INSTANCE_ID: i-0483202cdc798751c
+
+jobs:
+  deploy:
+    if: github.repository == 'misaeng-labs/ellieo-web-demo'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Run deploy on the server
+        run: |
+          cat > deploy.sh <<'EOF'
+          set -euo pipefail
+          cd /home/ubuntu/ellieo-web-new
+          # brand is required at build time; the default brand is misaeng
+          grep -q '^NEXT_PUBLIC_BRAND=ellieo' .env.local || echo 'NEXT_PUBLIC_BRAND=ellieo' >> .env.local
+          old_lock=$(sha1sum package-lock.json | cut -d' ' -f1)
+          git fetch -q origin main
+          git reset -q --hard origin/main
+          echo "Building $(git log --oneline -1)"
+          if [ "$old_lock" != "$(sha1sum package-lock.json | cut -d' ' -f1)" ]; then npm ci --no-audit --no-fund; fi
+          rm -rf .next-build
+          NEXT_DIST_DIR=.next-build npm run build
+          git checkout -q -- next-env.d.ts 2>/dev/null || true
+          pm2 stop ellieo-web
+          rm -rf .next-prev
+          mv .next .next-prev
+          mv .next-build .next
+          pm2 start ellieo-web
+          pm2 save
+          echo "Deployed $(git log --oneline -1)"
+          EOF
+
+          # run as ubuntu with the same PATH pm2's systemd unit uses (node via mise, pm2 via pnpm)
+          script_b64=$(base64 -w0 deploy.sh)
+          remote="echo $script_b64 | base64 -d > /tmp/ellieo-deploy.sh && chown ubuntu /tmp/ellieo-deploy.sh && sudo -u ubuntu env HOME=/home/ubuntu PM2_HOME=/home/ubuntu/.pm2 PATH=/home/ubuntu/.local/share/pnpm:/home/ubuntu/.local/share/mise/installs/node/22.18.0/bin:/usr/local/bin:/usr/bin:/bin bash /tmp/ellieo-deploy.sh; rc=\$?; rm -f /tmp/ellieo-deploy.sh; exit \$rc"
+          params=$(jq -nc --arg c "$remote" '{commands: [$c], executionTimeout: ["1800"]}')
+
+          cmd_id=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name AWS-RunShellScript \
+            --comment "ellieo.com deploy ${GITHUB_SHA::7}" \
+            --parameters "$params" \
+            --query Command.CommandId --output text)
+          echo "SSM command: $cmd_id"
+
+          status=Pending
+          for _ in $(seq 1 180); do
+            sleep 10
+            status=$(aws ssm get-command-invocation --command-id "$cmd_id" --instance-id "$INSTANCE_ID" \
+              --query Status --output text 2>/dev/null || echo Pending)
+            case "$status" in Pending|InProgress|Delayed) continue ;; *) break ;; esac
+          done
+
+          echo "----- server output (tail) -----"
+          aws ssm get-command-invocation --command-id "$cmd_id" --instance-id "$INSTANCE_ID" \
+            --query StandardOutputContent --output text | tail -40
+          echo "----- server errors (tail) -----"
+          aws ssm get-command-invocation --command-id "$cmd_id" --instance-id "$INSTANCE_ID" \
+            --query StandardErrorContent --output text | tail -40
+          echo "Status: $status"
+          [ "$status" = Success ]
+
+      - name: Check ellieo.com
+        run: |
+          sleep 5
+          fail=0
+          check() {
+            code=$(curl -s -o /dev/null -w '%{http_code}' "https://ellieo.com$1")
+            echo "$1 -> $code (want $2)"
+            [ "$code" = "$2" ] || fail=1
+          }
+          check /nyc 200
+          check /vi/nyc 200
+          check /check 200
+          check /.well-known/apple-app-site-association 200
+          curl -s https://ellieo.com/nyc | grep -q '<title>Ellieo' || { echo "title is not Ellieo"; fail=1; }
+          exit $fail
