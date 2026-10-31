@@ -208,6 +208,11 @@
       "liked": "Most liked",
       "discussed": "Most talked",
       "empty": "No posts yet."
+    },
+    "row": {
+      "steps": "{count} steps",
+      "days": "{count} days",
+      "views": "{count} views"
     }
   }
 }

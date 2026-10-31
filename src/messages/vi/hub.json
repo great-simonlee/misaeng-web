@@ -208,6 +208,11 @@
       "liked": "Yêu thích",
       "discussed": "Bàn luận",
       "empty": "Chưa có bài viết."
+    },
+    "row": {
+      "steps": "{count} bước",
+      "days": "{count} ngày",
+      "views": "{count} lượt xem"
     }
   }
 }

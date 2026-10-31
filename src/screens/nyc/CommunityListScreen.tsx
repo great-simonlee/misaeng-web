@@ -75,6 +75,7 @@ import {
   useAnonymousBoardNotice,
 } from '@widgets/nyc/AnonymousBoardNoticeModal'
 import { EllieoBoardRail } from '@widgets/ellieo/EllieoBoardRail'
+import { EllieoPostRow } from '@widgets/ellieo/EllieoPostRow'
 import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
@@ -573,12 +574,18 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
           className={
             isFoodBoard
               ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-5'
-              : 'flex flex-col gap-4 sm:gap-5'
+              : BRAND_CONFIG.theme === 'ellieo'
+                ? 'flex flex-col'
+                : 'flex flex-col gap-4 sm:gap-5'
           }
         >
-          {filteredPosts.map((post) => (
-            <CommunityPostCard key={post.id} post={post} boardId={boardId} />
-          ))}
+          {filteredPosts.map((post) =>
+            BRAND_CONFIG.theme === 'ellieo' && !isFoodBoard ? (
+              <EllieoPostRow key={post.id} post={post} boardId={boardId} />
+            ) : (
+              <CommunityPostCard key={post.id} post={post} boardId={boardId} />
+            ),
+          )}
         </div>
       )}
     </section>
