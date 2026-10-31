@@ -167,3 +167,9 @@ export const BookIcon = (p: IconProps) => (
     <path d='M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5v-13ZM20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5v-13Z' />
   </Base>
 )
+
+export const HeartIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20Z' />
+  </Base>
+)

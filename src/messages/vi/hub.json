@@ -155,16 +155,12 @@
       "eyebrow": "{city} · Du học sinh đã xác minh",
       "join": "Tham gia bằng email trường học"
     },
-    "vsa": {
-      "title": "Hội sinh viên đối tác"
-    },
     "intro": {
       "title": "Có gì mới ở {city}"
     },
     "seeAll": "Xem tất cả",
     "sampleData": "Dữ liệu mẫu",
     "creators": {
-      "title": "Nhà sáng tạo trên Ellieo",
       "platforms": {
         "instagram": "Instagram",
         "youtube": "YouTube",
@@ -172,12 +168,15 @@
       }
     },
     "latestHousing": {
-      "title": "Tin nhà mới",
-      "body": "Đội ngũ nhà ở của chúng tôi đã kiểm tra. Không đặt cọc trước."
+      "title": "Tin nhà mới"
     },
     "community": {
-      "title": "Từ cộng đồng",
-      "body": "Những gì thành viên đã xác minh đang hỏi và chia sẻ tuần này."
+      "title": "Cộng đồng"
+    },
+    "perMonth": "/tháng",
+    "stories": {
+      "title": "Đối tác & nhà sáng tạo",
+      "partner": "VSA đối tác"
     }
   }
 }

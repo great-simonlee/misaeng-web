@@ -155,16 +155,12 @@
       "eyebrow": "{city} · Verified international students",
       "join": "Join with your school email"
     },
-    "vsa": {
-      "title": "Partner student associations"
-    },
     "intro": {
       "title": "What's new in {city}"
     },
     "seeAll": "See all",
     "sampleData": "Sample data",
     "creators": {
-      "title": "Creators on Ellieo",
       "platforms": {
         "instagram": "Instagram",
         "youtube": "YouTube",
@@ -172,12 +168,15 @@
       }
     },
     "latestHousing": {
-      "title": "New housing listings",
-      "body": "Checked by our housing team. No upfront deposits."
+      "title": "New listings"
     },
     "community": {
-      "title": "From the community",
-      "body": "What verified members are asking and sharing this week."
+      "title": "Community"
+    },
+    "perMonth": "/mo",
+    "stories": {
+      "title": "Partners & creators",
+      "partner": "Partner VSA"
     }
   }
 }

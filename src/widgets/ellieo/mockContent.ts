@@ -38,6 +38,7 @@ export type EllieoCommunityPost = {
   excerpt: Localized
   school: string
   hoursAgo: number
+  likes: number
   comments: number
 }
 
@@ -50,7 +51,7 @@ const MOCK_PARTNER_ORGS: readonly EllieoPartnerOrg[] = [
   { id: 'mock-columbia', mark: 'CU', name: 'Columbia VSA', school: 'Columbia University', color: '#1d4f91' },
   { id: 'mock-baruch', mark: 'BC', name: 'Baruch VSA', school: 'Baruch College', color: '#0e7c86' },
   { id: 'mock-pace', mark: 'PU', name: 'Pace VSA', school: 'Pace University', color: '#c8102e' },
-  { id: 'mock-sbu', mark: 'SBU', name: 'Stony Brook VSA', school: 'Stony Brook University', color: '#990000' },
+  { id: 'mock-sbu', mark: 'SBU', name: 'SBU VSA', school: 'Stony Brook University', color: '#990000' },
 ]
 
 const MOCK_CREATORS: readonly EllieoCreator[] = [
@@ -95,6 +96,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
     },
     school: 'Baruch College',
     hoursAgo: 3,
+    likes: 24,
     comments: 14,
   },
   {
@@ -107,6 +109,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
     },
     school: 'New York University',
     hoursAgo: 6,
+    likes: 9,
     comments: 8,
   },
   {
@@ -119,6 +122,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
     },
     school: 'Columbia University',
     hoursAgo: 20,
+    likes: 57,
     comments: 23,
   },
   {
@@ -131,6 +135,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
     },
     school: 'Pace University',
     hoursAgo: 28,
+    likes: 18,
     comments: 11,
   },
   {
@@ -143,6 +148,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
     },
     school: 'Stony Brook University',
     hoursAgo: 40,
+    likes: 33,
     comments: 19,
   },
   {
@@ -155,6 +161,7 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
     },
     school: 'Hunter College',
     hoursAgo: 52,
+    likes: 46,
     comments: 31,
   },
 ]
