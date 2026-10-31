@@ -19,7 +19,7 @@ import {
   type EllieoCreator,
 } from '@widgets/ellieo/mockContent'
 import { EllieoSideRail, FeedHeading, SampleTag, shortSchool } from '@widgets/ellieo/EllieoRail'
-import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
+import { BOARD_TONE, ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 
 /**
  * Ellieo city home, social-feed style: a stories strip of partner student associations and creators,
@@ -159,16 +159,6 @@ const AVATAR_GRADIENTS = [
 ]
 
 /** Board tag colors in the feed (text on a soft tint of the same hue) */
-const BOARD_TONE: Partial<Record<NycCategoryId, string>> = {
-  status: '#1f5eff',
-  housing: '#0b8f6a',
-  roommate: '#7a4cff',
-  food: '#d4870a',
-  'job-review': '#0e1a2f',
-  events: '#d6336c',
-  anonymous: '#5b6779',
-  marketplace: '#12a4c7',
-}
 
 /** Housing and roommates/sublets have their own blocks in the side rail, so the feed leaves them out */
 const FEED_EXCLUDED_BOARDS: readonly NycCategoryId[] = ['housing', 'roommate']

@@ -8,10 +8,11 @@ import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
 import { cityLoginPath, hrefForCommunityPost } from '@lib/constants/cities'
-import type { NycCommunityBoardId } from '@lib/constants/nyc'
+import type { NycCategoryId, NycCommunityBoardId } from '@lib/constants/nyc'
 import { useFormat, useT } from '@lib/i18n/client'
 import type { CommunityPost } from '@/types/nyc'
 import { BadgeCheckIcon, ChatIcon, HeartIcon } from '@widgets/ellieo/icons'
+import { BOARD_TONE, ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 
 /** Open boards whose posts the rail mixes (housing/roommates have their own pages; events/marketplace aren't open yet) */
 const RAIL_BOARDS: readonly NycCommunityBoardId[] = ['status', 'job-review', 'anonymous', 'food']
@@ -25,7 +26,7 @@ function boardKey(categoryId: string): string {
 }
 
 /**
- * Right rail on every Ellieo board page (tabs are underlined text, not pills, so long Vietnamese labels fit): my profile on top, then posts from all boards
+ * Right rail on every Ellieo board page: my profile on top, then posts from all boards
  * as Latest / Most liked / Most discussed tabs. Same rail everywhere so pages feel like one site.
  */
 export function EllieoBoardRail() {
@@ -128,6 +129,8 @@ function PopularPosts() {
   const city = useCity()
   const [tab, setTab] = useState<RailTab>('latest')
   const [posts, setPosts] = useState<CommunityPost[] | null>(null)
+  // Fixed at mount so "2 days ago" doesn't change between renders
+  const [now] = useState(() => Date.now())
 
   useEffect(() => {
     let cancelled = false
@@ -172,10 +175,22 @@ function PopularPosts() {
 
   return (
     <section className='min-w-0'>
-      <h2 className='text-[1.1rem] font-extrabold tracking-[-0.02em] text-[var(--foreground)]'>
-        {t('ellieo.rail.postsTitle')}
-      </h2>
-      <div role='tablist' aria-label={t('ellieo.rail.postsTitle')} className='mt-2 flex flex-wrap gap-x-5 gap-y-1 border-b border-[var(--border)]'>
+      <div className='flex items-center gap-2'>
+        <span aria-hidden className='relative flex size-2.5'>
+          <span className='absolute inline-flex size-full animate-ping rounded-full bg-[var(--brand)] opacity-40 motion-reduce:animate-none' />
+          <span className='relative inline-flex size-2.5 rounded-full bg-[var(--brand)]' />
+        </span>
+        <h2 className='text-[1.1rem] font-extrabold tracking-[-0.02em] text-[var(--foreground)]'>
+          {t('ellieo.rail.postsTitle')}
+        </h2>
+      </div>
+
+      {/* Segmented control: one soft track, the active option is a white pill */}
+      <div
+        role='tablist'
+        aria-label={t('ellieo.rail.postsTitle')}
+        className='mt-3 grid grid-cols-3 rounded-full bg-[var(--surface)] p-1'
+      >
         {tabs.map((item) => (
           <button
             key={item.id}
@@ -184,53 +199,70 @@ function PopularPosts() {
             aria-selected={tab === item.id}
             onClick={() => setTab(item.id)}
             className={cn(
-              '-mb-px whitespace-nowrap border-b-2 pb-2 pt-1 text-[13.5px] font-semibold transition',
+              'h-8 truncate rounded-full px-2 text-[12.5px] font-semibold transition',
               tab === item.id
-                ? 'border-[var(--foreground)] text-[var(--foreground)]'
-                : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]',
+                ? 'bg-white text-[var(--foreground)] shadow-[0_1px_3px_rgb(14_26_47/0.12)]'
+                : 'text-[var(--muted)] hover:text-[var(--foreground)]',
             )}
           >
             {item.label}
           </button>
         ))}
       </div>
+
       {posts === null ? (
         <LoadingState className='py-10' />
       ) : shown.length === 0 ? (
         <p className='py-6 text-[13px] text-[var(--muted)]'>{t('ellieo.rail.empty')}</p>
       ) : (
-        <ol className='mt-2'>
-          {shown.map((post, index) => (
-            <li key={post.id} className='border-b border-[var(--border)] last:border-b-0'>
-              <Link href={hrefForCommunityPost(post, city)} data-ui='hover-row' className='group flex gap-3 py-3'>
-                <span
-                  className={cn(
-                    'w-4 shrink-0 pt-px text-[14px] font-extrabold tabular-nums',
-                    index < 3 ? 'text-[var(--brand)]' : 'text-[var(--muted)]',
-                  )}
+        <ul className='mt-3 space-y-1'>
+          {shown.map((post) => {
+            const key = boardKey(post.categoryId) as NycCategoryId
+            const board = ELLIEO_BOARDS.find((item) => item.id === key)
+            const Icon = board?.icon
+            const tone = BOARD_TONE[key] ?? '#5b6779'
+            return (
+              <li key={post.id}>
+                <Link
+                  href={hrefForCommunityPost(post, city)}
+                  data-ui='hover-row'
+                  className='group flex items-start gap-3 py-2.5'
                 >
-                  {index + 1}
-                </span>
-                <span className='min-w-0 flex-1'>
-                  <span className='line-clamp-2 text-[14px] font-semibold leading-snug text-[var(--foreground)] group-hover:text-[var(--brand)]'>
-                    {post.title}
+                  {/* Board icon tile: tells the board at a glance */}
+                  <span
+                    aria-hidden
+                    className='mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl'
+                    style={{ color: tone, background: `${tone}14` }}
+                  >
+                    {Icon ? <Icon className='size-[18px]' /> : null}
                   </span>
-                  <span className='mt-1 flex items-center gap-2.5 text-[12px] text-[var(--muted)]'>
-                    <span className='truncate'>{tc(`categories.${boardKey(post.categoryId)}.title`)}</span>
-                    <span className='inline-flex shrink-0 items-center gap-1'>
-                      <HeartIcon className='size-3.5' />
-                      {format.number(post.recommendCount)}
+                  <span className='min-w-0 flex-1'>
+                    <span className='line-clamp-2 text-[14px] font-semibold leading-snug text-[var(--foreground)]'>
+                      {post.title}
                     </span>
-                    <span className='inline-flex shrink-0 items-center gap-1'>
-                      <ChatIcon className='size-3.5' />
-                      {format.number(post.commentCount)}
+                    <span className='mt-1 flex min-w-0 items-center gap-1.5 text-[12px] text-[var(--muted)]'>
+                      <span className='truncate'>{tc(`categories.${key}.title`)}</span>
+                      <span aria-hidden>·</span>
+                      <span className='shrink-0'>{format.relative(post.createdAt > now ? now : post.createdAt)}</span>
+                      {tab === 'liked' && post.recommendCount > 0 ? (
+                        <span className='ml-auto inline-flex shrink-0 items-center gap-0.5 font-semibold text-[#e0475b]'>
+                          <HeartIcon className='size-3.5' />
+                          {format.number(post.recommendCount)}
+                        </span>
+                      ) : null}
+                      {tab === 'discussed' && post.commentCount > 0 ? (
+                        <span className='ml-auto inline-flex shrink-0 items-center gap-0.5 font-semibold text-[var(--brand)]'>
+                          <ChatIcon className='size-3.5' />
+                          {format.number(post.commentCount)}
+                        </span>
+                      ) : null}
                     </span>
                   </span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ol>
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
       )}
     </section>
   )

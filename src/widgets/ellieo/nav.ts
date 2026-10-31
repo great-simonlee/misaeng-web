@@ -59,3 +59,15 @@ export const ELLIEO_BOARDS: EllieoBoard[] = ORDER.map((id) => {
     primary: category.available,
   }
 })
+
+/** Board accent colors (feed tags, rail icons): text on a soft tint of the same hue */
+export const BOARD_TONE: Partial<Record<NycCategoryId, string>> = {
+  status: '#1f5eff',
+  housing: '#0b8f6a',
+  roommate: '#7a4cff',
+  food: '#d4870a',
+  'job-review': '#0e1a2f',
+  events: '#d6336c',
+  anonymous: '#5b6779',
+  marketplace: '#12a4c7',
+}
