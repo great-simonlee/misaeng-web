@@ -175,6 +175,12 @@
     "stories": {
       "title": "Partners & Creators",
       "partner": "Partner VSA"
-    }
+    },
+    "roommates": {
+      "roommate": "Roommate",
+      "sublet": "Sublet",
+      "from": "from {date}"
+    },
+    "sampleShort": "Sample"
   }
 }

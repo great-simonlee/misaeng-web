@@ -174,6 +174,57 @@ const MOCK_POSTS: readonly EllieoCommunityPost[] = [
   },
 ]
 
+export type EllieoRoommatePost = {
+  id: string
+  kind: 'roommate' | 'sublet'
+  title: Localized
+  area: string
+  /** Monthly rent in USD */
+  rent: number
+  /** ISO date (move-in or sublet start) */
+  from: string
+  school: string
+}
+
+const MOCK_ROOMMATES: readonly EllieoRoommatePost[] = [
+  {
+    id: 'mock-r1',
+    kind: 'roommate',
+    title: { en: 'Female roommate wanted, 2BR near NYU', vi: 'Tìm bạn nữ ở ghép, căn 2PN gần NYU' },
+    area: 'East Village',
+    rent: 1450,
+    from: '2027-01-01',
+    school: 'New York University',
+  },
+  {
+    id: 'mock-r2',
+    kind: 'sublet',
+    title: { en: 'Winter break sublet, private room', vi: 'Cho thuê lại phòng riêng dịp nghỉ đông' },
+    area: 'Long Island City',
+    rent: 1200,
+    from: '2026-12-15',
+    school: 'Baruch College',
+  },
+  {
+    id: 'mock-r3',
+    kind: 'roommate',
+    title: { en: 'Looking for 1 more for a 3BR in Astoria', vi: 'Cần thêm 1 người cho căn 3PN ở Astoria' },
+    area: 'Astoria',
+    rent: 1100,
+    from: '2027-02-01',
+    school: 'Columbia University',
+  },
+  {
+    id: 'mock-r4',
+    kind: 'sublet',
+    title: { en: 'Spring semester sublet, 5 min to Pace', vi: 'Cho thuê lại học kỳ xuân, 5 phút tới Pace' },
+    area: 'Financial District',
+    rent: 1650,
+    from: '2027-01-20',
+    school: 'Pace University',
+  },
+]
+
 export function getPartnerOrgs(): readonly EllieoPartnerOrg[] {
   return ELLIEO_PARTNER_ORGS.length > 0 || !ELLIEO_MOCK_CONTENT ? ELLIEO_PARTNER_ORGS : MOCK_PARTNER_ORGS
 }
@@ -185,6 +236,11 @@ export function getCreators(): readonly EllieoCreator[] {
 /** Vietnamese community posts don't exist yet; real Misaeng posts are Korean, so the home doesn't show them */
 export function getCommunityHighlights(): readonly EllieoCommunityPost[] {
   return ELLIEO_MOCK_CONTENT ? MOCK_POSTS : []
+}
+
+/** Vietnamese roommate/sublet posts don't exist yet (real ones are Misaeng's, in Korean) */
+export function getRoommateHighlights(): readonly EllieoRoommatePost[] {
+  return ELLIEO_MOCK_CONTENT ? MOCK_ROOMMATES : []
 }
 
 /** True when the list shown is sample data (labels the section so nobody mistakes it for real partners) */

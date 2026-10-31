@@ -1,17 +1,16 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { LoadingState, MarqueeRow } from '@components'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { captureReferralFromLocation } from '@lib/community/referral'
-import { NYC_MAGAZINE_PREVIEWS, type NycCategoryId } from '@lib/constants/nyc'
+import type { NycCategoryId } from '@lib/constants/nyc'
 import { fetchHousingListings } from '@lib/housing/fetchListings'
 import { useFormat, useLocale, useT } from '@lib/i18n/client'
 import type { HousingListing } from '@/types/nyc'
-import { EllieoHousingTile } from '@widgets/ellieo/EllieoHousingTile'
+import { EllieoHousingRow } from '@widgets/ellieo/EllieoHousingRow'
 import { ArrowRightIcon, BadgeCheckIcon, ChatIcon, HeartIcon } from '@widgets/ellieo/icons'
 import {
   ELLIEO_CREATORS,
@@ -19,6 +18,7 @@ import {
   getCommunityHighlights,
   getCreators,
   getPartnerOrgs,
+  getRoommateHighlights,
   isMockList,
   type EllieoCreator,
 } from '@widgets/ellieo/mockContent'
@@ -28,7 +28,7 @@ const HOUSING_PREVIEW_COUNT = 4
 
 /**
  * Ellieo city home, social-feed style: a stories strip of partner student associations and creators,
- * photo-first new listings, then the community feed (with the magazine beside it on desktop).
+ * then the community feed with a side rail of new listings and roommates/sublets (below the feed on phones).
  * White page, no boxed cards; board links live in the header / bottom tab bar, trust promises in the footer.
  * Copy: hub.ellieo.* (en + vi). Sample partners/posts: widgets/ellieo/mockContent.
  */
@@ -46,11 +46,13 @@ export function EllieoHomeScreen() {
 
       <StoriesStrip />
 
-      <NewListings />
-
-      <div className='mx-auto grid w-full max-w-7xl gap-10 px-4 pb-14 pt-8 sm:px-6 sm:pt-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 lg:px-8'>
+      {/* Feed on the left; new listings and roommates/sublets as two separate blocks in the side rail */}
+      <div className='mx-auto grid w-full max-w-7xl gap-10 px-4 pb-14 pt-7 sm:px-6 sm:pt-9 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 lg:px-8'>
         <CommunityFeed />
-        <MagazineRail />
+        <aside className='flex min-w-0 flex-col gap-9'>
+          <NewListingsRail />
+          <RoommatesRail />
+        </aside>
       </div>
     </div>
   )
@@ -146,9 +148,9 @@ function StoriesStrip() {
   )
 }
 
-/* ---------- New listings: photo tiles ---------- */
+/* ---------- Side rail: new listings ---------- */
 
-function NewListings() {
+function NewListingsRail() {
   const t = useT('hub')
   const city = useCity()
   const href = useCityPath()
@@ -167,23 +169,79 @@ function NewListings() {
   if (listings && listings.length === 0) return null
 
   return (
-    <section className='mx-auto w-full max-w-7xl pt-7 sm:pt-9'>
-      <div className='px-4 sm:px-6 lg:px-8'>
-        <FeedHeading title={t('ellieo.latestHousing.title')} href={href('/housing')} linkLabel={t('ellieo.seeAll')} />
-      </div>
+    <section className='min-w-0'>
+      <FeedHeading size='sm' title={t('ellieo.latestHousing.title')} href={href('/housing')} linkLabel={t('ellieo.seeAll')} />
       {listings === null ? (
-        <LoadingState className='py-12' />
+        <LoadingState className='py-10' />
       ) : (
-        <div className='mt-3 overflow-x-auto [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden'>
-          <ul className='flex snap-x snap-mandatory gap-3 px-4 sm:px-6 lg:grid lg:snap-none lg:grid-cols-4 lg:gap-5 lg:px-8'>
-            {listings.map((listing) => (
-              <li key={listing.id} className='w-[82%] max-w-[21rem] shrink-0 snap-start sm:w-[18rem] lg:w-auto lg:max-w-none'>
-                <EllieoHousingTile listing={listing} />
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul className='mt-1.5 divide-y divide-[var(--border)]'>
+          {listings.map((listing) => (
+            <li key={listing.id}>
+              <EllieoHousingRow listing={listing} />
+            </li>
+          ))}
+        </ul>
       )}
+    </section>
+  )
+}
+
+/* ---------- Side rail: roommates and sublets ---------- */
+
+function RoommatesRail() {
+  const t = useT('hub')
+  const tc = useT('community')
+  const locale = useLocale()
+  const format = useFormat()
+  const href = useCityPath()
+  const posts = getRoommateHighlights()
+  if (posts.length === 0) return null
+  const boardPath = ELLIEO_BOARDS.find((board) => board.id === 'roommate')?.path ?? '/roommate'
+
+  return (
+    <section className='min-w-0'>
+      <FeedHeading
+        size='sm'
+        title={tc('categories.roommate.title')}
+        href={href(boardPath)}
+        linkLabel={t('ellieo.seeAll')}
+        aside={<SampleTag short />}
+      />
+      <ul className='mt-1.5 divide-y divide-[var(--border)]'>
+        {posts.map((post) => (
+          <li key={post.id}>
+            <Link href={href(boardPath)} className='group block py-2.5'>
+              <span className='flex items-center gap-1.5'>
+                <span
+                  className={
+                    post.kind === 'sublet'
+                      ? 'rounded-full bg-[var(--ellieo-sun-soft)] px-2 py-px text-[11px] font-bold text-[#9a6200]'
+                      : 'rounded-full bg-[#7a4cff14] px-2 py-px text-[11px] font-bold text-[#7a4cff]'
+                  }
+                >
+                  {t(`ellieo.roommates.${post.kind}`)}
+                </span>
+                <span className='truncate text-[12px] text-[var(--muted)]'>{shortSchool(post.school)}</span>
+              </span>
+              <span className='mt-1 line-clamp-1 text-[14.5px] font-semibold text-[var(--foreground)] group-hover:text-[var(--brand)]'>
+                {locale === 'vi' ? post.title.vi : post.title.en}
+              </span>
+              <span className='mt-0.5 block truncate text-[12.5px] text-[var(--muted)]'>
+                <span className='font-semibold text-[var(--foreground)]'>
+                  {format.usd(post.rent, 0)}
+                  {t('ellieo.perMonth')}
+                </span>
+                {' · '}
+                {post.area}
+                {' · '}
+                {t('ellieo.roommates.from', {
+                  date: format.date(`${post.from}T12:00:00`, { day: 'numeric', month: 'short' }),
+                })}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }
@@ -340,41 +398,6 @@ function CommunityFeed() {
   )
 }
 
-/* ---------- Magazine: side rail on desktop, below the feed on phones ---------- */
-
-function MagazineRail() {
-  const t = useT('hub')
-  return (
-    <aside className='min-w-0'>
-      <FeedHeading
-        title={t('magazine.title')}
-        aside={
-          <span className='rounded-full bg-[var(--surface)] px-2.5 py-0.5 text-[12px] font-semibold text-[var(--muted-foreground)]'>
-            {t('comingSoon')}
-          </span>
-        }
-      />
-      <ul className='mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-1'>
-        {NYC_MAGAZINE_PREVIEWS.map((item) => (
-          <li key={item.id} className='flex min-w-0 items-center gap-3'>
-            <span className='relative aspect-square w-[4.5rem] shrink-0 overflow-hidden rounded-xl bg-[var(--surface)]'>
-              <Image src={item.image} alt='' fill loading='eager' className='object-cover' sizes='72px' />
-            </span>
-            <span className='min-w-0'>
-              <span className='block text-[12px] font-semibold text-[var(--brand)]'>
-                {t(`magazine.items.${item.id}.tag`)}
-              </span>
-              <span className='mt-0.5 line-clamp-2 block text-[14.5px] font-semibold leading-snug text-[var(--foreground)]'>
-                {t(`magazine.items.${item.id}.title`)}
-              </span>
-            </span>
-          </li>
-        ))}
-      </ul>
-    </aside>
-  )
-}
-
 /* ---------- Shared bits ---------- */
 
 function FeedHeading({
@@ -382,37 +405,48 @@ function FeedHeading({
   href,
   linkLabel,
   aside,
+  size = 'md',
 }: {
   title: string
   href?: string
   linkLabel?: string
   aside?: React.ReactNode
+  /** sm: side rail blocks */
+  size?: 'sm' | 'md'
 }) {
   return (
     <div className='flex items-center justify-between gap-3'>
-      <h2 className='min-w-0 text-[1.3rem] font-extrabold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.5rem]'>
+      <h2
+        className={
+          size === 'sm'
+            ? 'min-w-0 text-[1.1rem] font-extrabold leading-snug tracking-[-0.02em] text-[var(--foreground)]'
+            : 'min-w-0 text-[1.3rem] font-extrabold tracking-[-0.03em] text-[var(--foreground)] sm:text-[1.5rem]'
+        }
+      >
         {title}
       </h2>
-      {href && linkLabel ? (
-        <Link
-          href={href}
-          className='inline-flex shrink-0 items-center gap-0.5 text-[14px] font-semibold text-[var(--foreground)] hover:text-[var(--brand)]'
-        >
-          {linkLabel}
-          <ArrowRightIcon className='size-4' />
-        </Link>
-      ) : null}
-      {aside ? <div className='shrink-0'>{aside}</div> : null}
+      <div className='flex shrink-0 items-center gap-2'>
+        {aside}
+        {href && linkLabel ? (
+          <Link
+            href={href}
+            className='inline-flex items-center gap-0.5 text-[13.5px] font-semibold text-[var(--foreground)] hover:text-[var(--brand)]'
+          >
+            {linkLabel}
+            <ArrowRightIcon className='size-4' />
+          </Link>
+        ) : null}
+      </div>
     </div>
   )
 }
 
 /** Marks sample (mock) data during design review; mock data never ships to production */
-function SampleTag() {
+function SampleTag({ short = false }: { short?: boolean }) {
   const t = useT('hub')
   return (
-    <span className='rounded-full bg-[var(--ellieo-sun-soft)] px-2.5 py-0.5 text-[12px] font-semibold text-[#9a6200]'>
-      {t('ellieo.sampleData')}
+    <span className='whitespace-nowrap rounded-full bg-[var(--ellieo-sun-soft)] px-2.5 py-0.5 text-[12px] font-semibold text-[#9a6200]'>
+      {t(short ? 'ellieo.sampleShort' : 'ellieo.sampleData')}
     </span>
   )
 }

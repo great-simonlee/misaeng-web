@@ -175,6 +175,12 @@
     "stories": {
       "title": "Đối tác & nhà sáng tạo",
       "partner": "VSA đối tác"
-    }
+    },
+    "roommates": {
+      "roommate": "Ở ghép",
+      "sublet": "Thuê lại",
+      "from": "từ {date}"
+    },
+    "sampleShort": "Mẫu"
   }
 }
