@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useCity } from '@hooks/useCity'
 import { cn } from '@lib'
 import { getCommunityAuthorDisplayName } from '@lib/community/author'
+import { htmlToPlainText } from '@lib/community/html'
 import { sortJobReviewTimelineByDate } from '@lib/community/jobReview'
 import { hrefForCommunityPost } from '@lib/constants/cities'
 import type { NycCommunityBoardId } from '@lib/constants/nyc'
@@ -23,7 +24,6 @@ const AVATAR_GRADIENTS = [
   'linear-gradient(135deg, #f2a516, #ff5a5f)',
   'linear-gradient(135deg, #7a4cff, #c13584)',
 ]
-const DAY_MS = 86_400_000
 const MAX_DOTS = 6
 
 function gradientFor(text: string): string {
@@ -52,42 +52,26 @@ function AuthorAvatar({ photo, name, anonymous }: { photo: string | null; name: 
   )
 }
 
-/** Days between the first and last YYYY-MM-DD dates, or null when the dates aren't usable */
-function spanDays(dates: string[]): number | null {
-  const times = dates
-    .map((date) => (/^\d{4}-\d{2}-\d{2}$/.test(date.trim()) ? Date.parse(`${date.trim()}T12:00:00`) : NaN))
-    .filter((time) => Number.isFinite(time))
-    .sort((a, b) => a - b)
-  if (times.length < 2) return null
-  return Math.round((times[times.length - 1] - times[0]) / DAY_MS)
-}
-
-/** Steps and the label of the last one, for visa (status) and job review posts */
+/** Step count and the last step's stage notes (plain text), for visa (status) and job review posts */
 function getTimeline(post: CommunityPost, boardId: NycCommunityBoardId) {
   if (boardId === 'status') {
     const steps = [...(post.cptOptTimeline ?? [])].sort((a, b) => a.date.localeCompare(b.date))
     const last = steps.at(-1)
-    return {
-      count: steps.length,
-      last: last ? (last.resultReceived || last.submitted || last.prepared).trim() : '',
-      days: spanDays(steps.map((step) => step.date)),
-    }
+    const notes = last ? htmlToPlainText(last.stageReviewHtml ?? '').trim() : ''
+    return { count: steps.length, last: notes || (last ? (last.resultReceived || last.submitted || last.prepared).trim() : '') }
   }
   if (boardId === 'job-review') {
     const steps = sortJobReviewTimelineByDate(post.jobReviewTimeline ?? [])
     const last = steps.at(-1)
-    return {
-      count: steps.length,
-      last: last ? last.stageLabel.trim() : '',
-      days: spanDays(steps.map((step) => step.date)),
-    }
+    const notes = last ? htmlToPlainText(last.stageReviewHtml ?? '').trim() : ''
+    return { count: steps.length, last: notes || (last ? last.stageLabel.trim() : '') }
   }
-  return { count: 0, last: '', days: null }
+  return { count: 0, last: '' }
 }
 
 /**
  * Ellieo board list item, same shape as the home community feed:
- * author line → title → one-line excerpt → step dots (visa / job reviews) → reactions.
+ * author line → title → one-line excerpt → [step dots + last step's notes | reactions] on one row.
  * Misaeng keeps CommunityPostCard.
  */
 export function EllieoPostRow({ post, boardId }: { post: CommunityPost; boardId: NycCommunityBoardId }) {
@@ -131,45 +115,43 @@ export function EllieoPostRow({ post, boardId }: { post: CommunityPost; boardId:
             <span className='mt-1 line-clamp-1 text-[14px] leading-relaxed text-[var(--muted)]'>{excerpt}</span>
           ) : null}
 
-          {/* Steps: one dot per step, the last one filled, then the last step and how long it took */}
-          {timeline.count > 0 ? (
-            <span className='mt-3 flex min-w-0 items-center gap-2.5 rounded-xl bg-[#f8f9fc] px-3 py-2'>
-              <span aria-hidden className='flex shrink-0 items-center'>
-                {Array.from({ length: dots }, (_, index) => (
-                  <span key={index} className='flex items-center'>
-                    {index > 0 ? <span className='h-px w-3 bg-[var(--brand)]/35' /> : null}
-                    <span
-                      className={cn(
-                        'size-2 rounded-full',
-                        index === dots - 1 ? 'bg-[var(--brand)] ring-[3px] ring-[var(--brand)]/15' : 'bg-[var(--brand)]/45',
-                      )}
-                    />
-                  </span>
-                ))}
-              </span>
-              <span className='min-w-0 truncate text-[12.5px] font-medium text-[var(--muted-foreground)]'>
-                {th('ellieo.row.steps', { count: timeline.count })}
-                {timeline.last ? <span className='text-[var(--foreground)]'> · {timeline.last}</span> : null}
-              </span>
-              {timeline.days !== null ? (
-                <span className='ml-auto shrink-0 text-[12.5px] font-bold text-[var(--brand-deep)]'>
-                  {th('ellieo.row.days', { count: timeline.days })}
+          {/* Steps (visa / job reviews) on the left, reactions pinned to the right of the same row */}
+          <span className='mt-3 flex min-w-0 items-center gap-3'>
+            {timeline.count > 0 ? (
+              <span className='flex min-w-0 flex-1 items-center gap-2.5 rounded-xl bg-[#f8f9fc] px-3 py-2'>
+                <span aria-hidden className='flex shrink-0 items-center'>
+                  {Array.from({ length: dots }, (_, index) => (
+                    <span key={index} className='flex items-center'>
+                      {index > 0 ? <span className='h-px w-3 bg-[var(--brand)]/35' /> : null}
+                      <span
+                        className={cn(
+                          'size-2 rounded-full',
+                          index === dots - 1 ? 'bg-[var(--brand)] ring-[3px] ring-[var(--brand)]/15' : 'bg-[var(--brand)]/45',
+                        )}
+                      />
+                    </span>
+                  ))}
                 </span>
-              ) : null}
+                {/* One line: "4 steps · <last step's notes>…" */}
+                <span className='min-w-0 truncate text-[12.5px] font-medium text-[var(--muted-foreground)]'>
+                  {th('ellieo.row.steps', { count: timeline.count })}
+                  {timeline.last ? <span className='font-normal text-[var(--foreground)]'> · {timeline.last}</span> : null}
+                </span>
+              </span>
+            ) : (
+              <span className='flex-1' />
+            )}
+            <span className='flex shrink-0 items-center gap-3.5 text-[12.5px] font-medium text-[var(--muted)]'>
+              <span className='inline-flex items-center gap-1'>
+                <HeartIcon className='size-4' />
+                {format.number(post.recommendCount)}
+              </span>
+              <span className='inline-flex items-center gap-1'>
+                <ChatIcon className='size-4' />
+                {format.number(post.commentCount)}
+              </span>
+              <span>{th('ellieo.row.views', { count: format.number(post.viewCount) })}</span>
             </span>
-          ) : null}
-
-          {/* Reactions */}
-          <span className='mt-3 flex items-center gap-4 text-[12.5px] font-medium text-[var(--muted)]'>
-            <span className='inline-flex items-center gap-1'>
-              <HeartIcon className='size-4' />
-              {format.number(post.recommendCount)}
-            </span>
-            <span className='inline-flex items-center gap-1'>
-              <ChatIcon className='size-4' />
-              {format.number(post.commentCount)}
-            </span>
-            <span>{th('ellieo.row.views', { count: format.number(post.viewCount) })}</span>
           </span>
         </Link>
         {/* Save, outside the link so it doesn't open the post */}

@@ -211,7 +211,6 @@
     },
     "row": {
       "steps": "{count} bước",
-      "days": "{count} ngày",
       "views": "{count} lượt xem"
     }
   }

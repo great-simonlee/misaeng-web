@@ -211,7 +211,6 @@
     },
     "row": {
       "steps": "{count} steps",
-      "days": "{count} days",
       "views": "{count} views"
     }
   }
