@@ -182,6 +182,17 @@
       "sublet": "Sublet",
       "from": "from {date}"
     },
-    "sampleShort": "Sample"
+    "sampleShort": "Sample",
+    "partnersPage": {
+      "title": "Partners",
+      "body": "Vietnamese Student Associations and creators who work with Ellieo to help students settle in the US.",
+      "vsas": "Student associations",
+      "creators": "Creators",
+      "emptyVsas": "Partner student associations will appear here soon.",
+      "emptyCreators": "Partner creators will appear here soon.",
+      "joinTitle": "Become a partner",
+      "joinBody": "Run a Vietnamese Student Association or create content for students in the US? Email us and we'll get back to you.",
+      "back": "Back to home"
+    }
   }
 }

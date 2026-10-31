@@ -621,13 +621,16 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               >
                 {t('detail.emailInquiry')}
               </a>
-              <button
-                type='button'
-                onClick={handleKakaoInquiry}
-                className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-[#E8D84A] bg-[#FEE500] px-5 text-sm font-semibold text-[#191919] touch-manipulation transition hover:brightness-95'
-              >
-                {t('detail.kakaoInquiry')}
-              </button>
+              {/* KakaoTalk is a Korean messenger: Misaeng only */}
+              {BRAND_CONFIG.theme === 'misaeng' ? (
+                <button
+                  type='button'
+                  onClick={handleKakaoInquiry}
+                  className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-[#E8D84A] bg-[#FEE500] px-5 text-sm font-semibold text-[#191919] touch-manipulation transition hover:brightness-95'
+                >
+                  {t('detail.kakaoInquiry')}
+                </button>
+              ) : null}
               <button
                 type='button'
                 onClick={() => void handleShare()}

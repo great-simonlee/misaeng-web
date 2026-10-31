@@ -136,12 +136,11 @@
 }
 
 [data-brand='ellieo'] [data-ui='auth-card'] {
-  border-radius: 1rem;
+  border-radius: 1.25rem;
   border-color: var(--border);
   background: #fff;
-  box-shadow: none;
+  box-shadow: 0 12px 32px -24px rgb(14 26 47 / 0.35);
   backdrop-filter: none;
-  border-top: 4px solid var(--brand);
 }
 
 [data-brand='ellieo'] [data-ui='auth-eyebrow'] {

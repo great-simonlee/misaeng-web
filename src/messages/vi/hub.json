@@ -182,6 +182,17 @@
       "sublet": "Thuê lại",
       "from": "từ {date}"
     },
-    "sampleShort": "Mẫu"
+    "sampleShort": "Mẫu",
+    "partnersPage": {
+      "title": "Đối tác",
+      "body": "Các Hội Sinh viên Việt Nam và nhà sáng tạo hợp tác với Ellieo để giúp du học sinh ổn định cuộc sống tại Mỹ.",
+      "vsas": "Hội sinh viên",
+      "creators": "Nhà sáng tạo",
+      "emptyVsas": "Hội sinh viên đối tác sẽ sớm xuất hiện tại đây.",
+      "emptyCreators": "Nhà sáng tạo đối tác sẽ sớm xuất hiện tại đây.",
+      "joinTitle": "Trở thành đối tác",
+      "joinBody": "Bạn điều hành một Hội Sinh viên Việt Nam hoặc làm nội dung cho du học sinh tại Mỹ? Gửi email cho chúng tôi, chúng tôi sẽ phản hồi sớm.",
+      "back": "Về trang chủ"
+    }
   }
 }

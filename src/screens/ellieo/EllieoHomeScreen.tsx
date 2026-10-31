@@ -75,6 +75,7 @@ const CREATOR_RING = 'conic-gradient(from 210deg, #f2a516, #ff5a5f, #c13584, #f2
 
 function StoriesStrip() {
   const t = useT('hub')
+  const href = useCityPath()
   const format = useFormat()
   const orgs = getPartnerOrgs()
   const creators = getCreators()
@@ -109,7 +110,12 @@ function StoriesStrip() {
     <section className='mx-auto w-full max-w-7xl pt-4 sm:pt-6'>
       <div className='flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-8'>
         <h2 className='text-[13px] font-semibold text-[var(--muted)]'>{t('ellieo.stories.title')}</h2>
-        {sample ? <SampleTag /> : null}
+        <div className='flex shrink-0 items-center gap-2'>
+          {sample ? <SampleTag /> : null}
+          <Link href={href('/partners')} className='text-[13px] font-semibold text-[var(--foreground)] hover:text-[var(--brand)]'>
+            {t('ellieo.seeAll')}
+          </Link>
+        </div>
       </div>
       {/* Slides by itself; pauses on hover, stops for reduced motion (partner-marquee in globals.css) */}
       <MarqueeRow className='mt-2 lg:mx-8'>
