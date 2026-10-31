@@ -299,10 +299,11 @@ export function NycNavbar() {
         )}
       >
         <div className='relative mx-auto grid h-14 w-full max-w-7xl min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-4 sm:h-16 sm:gap-3 sm:px-6 lg:px-8'>
-          <div className='flex min-h-[44px] shrink-0 items-center gap-1.5 justify-self-start sm:gap-2'>
+          {/* 로고 | 핀 + 도시 ▾ (Ellieo 헤더와 같은 구성) */}
+          <div className='flex min-h-[44px] shrink-0 items-center gap-2 justify-self-start sm:gap-2.5'>
             <Link
               href={href()}
-              className='flex items-center transition-opacity active:opacity-80'
+              className='relative flex items-center transition-opacity active:opacity-80'
               aria-label={t('homeAria', { city: cityInfo.shortLabel })}
             >
               <Image
@@ -316,17 +317,21 @@ export function NycNavbar() {
                 className='h-6 w-auto max-w-[96px] object-contain sm:h-[2.025rem] sm:max-w-none'
                 priority
               />
+              {/* Misaeng logo is a USPTO registered mark */}
+              <sup className='ml-0.5 self-start text-[9px] font-semibold text-[var(--muted)]'>®</sup>
             </Link>
+            <span className='h-5 w-px bg-black/10' aria-hidden />
             <button
               type='button'
               onClick={() => setCityOpen(true)}
-              className='inline-flex items-center gap-0.5 whitespace-nowrap rounded-full bg-brand/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-brand touch-manipulation transition hover:bg-brand/15 sm:px-2 sm:text-[10px]'
+              className='inline-flex min-h-[36px] items-center gap-1 whitespace-nowrap text-[13px] font-medium text-[var(--muted-foreground)] touch-manipulation transition hover:text-[var(--foreground)]'
               aria-haspopup='dialog'
               aria-expanded={cityOpen}
               aria-label={t('selectCity')}
             >
-              {cityInfo.name}
-              <ChevronIcon className='size-2.5 sm:size-3' />
+              <PinIcon className='size-4 text-brand' />
+              {cityInfo.shortLabel}
+              <ChevronIcon className='size-3.5' />
             </button>
           </div>
 
@@ -437,6 +442,24 @@ export function NycNavbar() {
         currentCity={city}
       />
     </>
+  )
+}
+
+function PinIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth={1.75}
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      className={className}
+      aria-hidden
+    >
+      <path d='M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z' />
+      <circle cx='12' cy='10' r='2.4' />
+    </svg>
   )
 }
 
