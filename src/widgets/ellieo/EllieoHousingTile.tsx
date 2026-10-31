@@ -33,7 +33,7 @@ export function EllieoHousingTile({ listing }: { listing: HousingListing }) {
   return (
     <article className='group relative'>
       <Link href={href} className='block touch-manipulation'>
-        <span className='relative block aspect-[4/5] overflow-hidden rounded-2xl bg-[var(--surface)]'>
+        <span className='relative block aspect-[4/3] overflow-hidden rounded-2xl bg-[var(--surface)]'>
           {cover ? (
             <Image
               src={cover}

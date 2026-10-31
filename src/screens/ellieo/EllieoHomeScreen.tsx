@@ -177,7 +177,7 @@ function NewListings() {
         <div className='mt-3 overflow-x-auto [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden'>
           <ul className='flex snap-x snap-mandatory gap-3 px-4 sm:px-6 lg:grid lg:snap-none lg:grid-cols-4 lg:gap-5 lg:px-8'>
             {listings.map((listing) => (
-              <li key={listing.id} className='w-[68%] max-w-[17rem] shrink-0 snap-start sm:w-[15rem] lg:w-auto lg:max-w-none'>
+              <li key={listing.id} className='w-[82%] max-w-[21rem] shrink-0 snap-start sm:w-[18rem] lg:w-auto lg:max-w-none'>
                 <EllieoHousingTile listing={listing} />
               </li>
             ))}
