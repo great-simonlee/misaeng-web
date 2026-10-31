@@ -130,24 +130,24 @@ function StoriesStrip() {
         {stories.map((story) => {
           const inner = (
             <>
-              <span className='rounded-full p-[2.5px]' style={{ background: story.ring }}>
-                <span className='block rounded-full bg-white p-[2.5px]'>
+              <span className='rounded-full p-[2px]' style={{ background: story.ring }}>
+                <span className='block rounded-full bg-white p-[2px]'>
                   <span
                     aria-hidden
-                    className='flex size-[3.75rem] items-center justify-center rounded-full text-[14px] font-bold tracking-tight text-white'
+                    className='flex size-[3.25rem] items-center justify-center rounded-full text-[13px] font-bold tracking-tight text-white'
                     style={{ background: story.color }}
                   >
                     {story.mark}
                   </span>
                 </span>
               </span>
-              <span className='mt-1.5 block w-full truncate text-center text-[12.5px] font-semibold text-[var(--foreground)]'>
+              <span className='mt-1 block w-full truncate text-center text-[12px] font-semibold text-[var(--foreground)]'>
                 {story.name}
               </span>
-              <span className='block w-full truncate text-center text-[11px] text-[var(--muted)]'>{story.caption}</span>
+              <span className='block w-full truncate text-center text-[10.5px] text-[var(--muted)]'>{story.caption}</span>
             </>
           )
-          const itemClass = 'flex w-[6.25rem] shrink-0 flex-col items-center px-0.5 py-1'
+          const itemClass = 'flex w-[5.5rem] shrink-0 flex-col items-center px-0.5 py-1'
           return story.url ? (
             <a key={story.id} href={story.url} target='_blank' rel='noopener noreferrer' className={itemClass}>
               {inner}
