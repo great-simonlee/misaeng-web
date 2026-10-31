@@ -79,17 +79,14 @@
     "brokerage": "Brokerage: {name}",
     "trademark": "{brand}® is a registered trademark (USPTO Reg. No. {number}).",
     "trust": {
-      "headline": "Safe by design",
-      "subline": "Built so you always know who you're talking to.",
-      "verifiedValue": "Verified",
-      "verifiedTitle": "School or work email",
-      "verifiedBody": "Members verify to post, comment and message.",
-      "noDepositValue": "$0",
-      "noDepositTitle": "Upfront on our listings",
-      "noDepositBody": "Our housing team never asks you to pay before you sign.",
-      "reportValue": "{hours}h",
-      "reportTitle": "To review every report",
-      "reportBody": "See something off? Tap Report and we'll check it."
+      "headline": "Your safety comes first",
+      "subline": "Ellieo is operated by {company} in {city}. These are our commitments to every member.",
+      "verifiedTitle": "Verified members",
+      "verifiedBody": "Members verify a school or work email before they can post, comment or message.",
+      "noDepositTitle": "No upfront payments",
+      "noDepositBody": "Our housing team never asks you to pay before you sign a lease.",
+      "reportTitle": "Reports reviewed within {hours} hours",
+      "reportBody": "Report anything suspicious and our team will review it and follow up."
     }
   }
 }
