@@ -44,6 +44,10 @@ export function LoadingSpinner({
   const dims = SIZE_MAP[size]
   const accessibleName = ariaLabel ?? label ?? t('ui.loading.aria')
 
+  if (BRAND_CONFIG.theme === 'ellieo') {
+    return <EllieoLoading size={size} label={label} accessibleName={accessibleName} className={className} />
+  }
+
   return (
     <div
       className={cn(
@@ -90,6 +94,61 @@ export function LoadingSpinner({
         <span className='text-[13px] font-medium text-[var(--muted)] sm:text-sm'>
           {label}
         </span>
+      ) : (
+        <span className='sr-only'>{accessibleName}</span>
+      )}
+    </div>
+  )
+}
+
+/** Ellieo logo width per size; the app's section loader uses 48pt */
+const ELLIEO_LOGO_PX = { sm: 32, md: 48, lg: 56 } as const
+const ELLIEO_WAVE_SCALE = { sm: 0.6, md: 0.8, lg: 0.9 } as const
+
+/**
+ * Ellieo loader, same as the Misaeng app's SectionLoading (ios/Misaeng/Components/LoadingWave.swift):
+ * the logo over five short bars rising and falling in one wave, left → right, fading in after 350ms
+ * so fast loads never flash it. Logo and bars use the Ellieo cyan → blue gradient. Motion: globals ellieo-wave.
+ */
+function EllieoLoading({
+  size,
+  label,
+  accessibleName,
+  className,
+}: {
+  size: LoadingSpinnerSize
+  label?: string
+  accessibleName: string
+  className?: string
+}) {
+  const scale = ELLIEO_WAVE_SCALE[size]
+  return (
+    <div
+      className={cn('ellieo-loading inline-flex flex-col items-center justify-center gap-3.5', className)}
+      role='status'
+      aria-live='polite'
+      aria-label={accessibleName}
+    >
+      <Image
+        src={BRAND_CONFIG.assets.square}
+        alt=''
+        width={ELLIEO_LOGO_PX[size]}
+        height={ELLIEO_LOGO_PX[size]}
+        className='object-contain'
+        style={{ width: ELLIEO_LOGO_PX[size], height: ELLIEO_LOGO_PX[size] }}
+        priority
+      />
+      <span aria-hidden className='flex items-center' style={{ gap: 5 * scale, height: 22 * scale }}>
+        {Array.from({ length: 5 }, (_, index) => (
+          <span
+            key={index}
+            className='ellieo-wave-bar rounded-full'
+            style={{ width: 4 * scale, height: 22 * scale, animationDelay: `${(index * 0.096).toFixed(3)}s` }}
+          />
+        ))}
+      </span>
+      {label ? (
+        <span className='text-[13px] font-medium text-[var(--muted)]'>{label}</span>
       ) : (
         <span className='sr-only'>{accessibleName}</span>
       )}

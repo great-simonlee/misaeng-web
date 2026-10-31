@@ -455,3 +455,50 @@
 [data-brand='ellieo'] [data-ui='hover-row'] .group-hover\:text-\[var\(--brand\)\] {
   color: inherit;
 }
+
+/* ---------- Loading: logo + five-bar wave, same timing as the Misaeng app (LoadingWave.swift) ---------- */
+/* One wave every 1.1s; neighbouring bars 0.55 rad apart (0.096s); bars 6 → 22px tall, 35% → 100% opacity */
+@keyframes ellieo-wave {
+  0%,
+  100% {
+    transform: scaleY(0.2727);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ellieo-loading-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ellieo-wave-bar {
+  background: linear-gradient(180deg, #00b8f0, #1f6bff);
+  animation: ellieo-wave 1.1s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Fade in after 350ms so quick loads go straight to the content */
+.ellieo-loading {
+  opacity: 0;
+  animation: ellieo-loading-in 0.25s ease-out 0.35s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ellieo-wave-bar {
+    animation: none;
+    transform: scaleY(0.6);
+    opacity: 0.8;
+  }
+
+  .ellieo-loading {
+    animation-duration: 0.01s;
+  }
+}
