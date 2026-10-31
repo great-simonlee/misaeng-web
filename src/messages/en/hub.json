@@ -193,14 +193,6 @@
       "joinTitle": "Become a partner",
       "joinBody": "Run a Vietnamese Student Association or create content for students in the US? Email us and we'll get back to you.",
       "back": "Back to home"
-    },
-    "commute": {
-      "label": "Commute to",
-      "pick": "Pick your school",
-      "pickShort": "your school",
-      "minutes": "≈ {minutes} min to {school}",
-      "estimateNote": "Typical subway time from this neighborhood, incl. walking. An estimate, not live directions.",
-      "sorted": "Closest to {school} first"
     }
   }
 }

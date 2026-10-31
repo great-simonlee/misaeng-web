@@ -24,9 +24,7 @@ import {
   type HousingListingKind,
 } from '@lib/constants/housingMock'
 import { useCity } from '@hooks/useCity'
-import { useMySchool } from '@hooks/useMySchool'
 import { BRAND_CONFIG } from '@lib/brand'
-import { estimateCommuteMinutes } from '@lib/housing/commute'
 import { fetchHousingListings } from '@lib/housing/fetchListings'
 import { useT } from '@lib/i18n/client'
 import type { Translate } from '@lib/i18n/translate'
@@ -37,7 +35,6 @@ import type {
   HousingRoomType,
   HousingUnitType,
 } from '@/types/nyc'
-import { CommuteSchoolPicker } from '@widgets/ellieo/Commute'
 import { HousingPostCard } from '@widgets/nyc/HousingPostCard'
 import { HousingPostCardSkeletonGrid } from '@widgets/nyc/HousingPostCardSkeleton'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
@@ -183,10 +180,8 @@ export function HousingListScreen() {
     setLoading(false)
   }, [city])
 
-  // Ellieo: with a school picked, listings closest to it come first (estimates, src/lib/housing/commute)
-  const [commuteSchoolId] = useMySchool()
   const filteredPosts = useMemo(() => {
-    const matched = posts.filter((listing) => {
+    return posts.filter((listing) => {
       const matchUnit =
         listingKind !== 'unit' ||
         unitType === 'all' ||
@@ -209,14 +204,7 @@ export function HousingListScreen() {
       )
       return matchUnit && matchRoom && matchArea && matchPerks && matchPrice
     })
-    if (BRAND_CONFIG.theme !== 'ellieo' || !commuteSchoolId) return matched
-    return [...matched].sort(
-      (x, y) =>
-        (estimateCommuteMinutes(x.property.area, commuteSchoolId) ?? Infinity) -
-        (estimateCommuteMinutes(y.property.area, commuteSchoolId) ?? Infinity),
-    )
   }, [
-    commuteSchoolId,
     posts,
     listingKind,
     unitType,
@@ -447,7 +435,6 @@ export function HousingListScreen() {
         <p data-ui='board-description' className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>
           {t('list.subtitle', { brand: BRAND_CONFIG.name })}
         </p>
-        {BRAND_CONFIG.theme === 'ellieo' ? <CommuteSchoolPicker className='mt-4' /> : null}
 
         {/* 필터 + 빠른 태그 (예전 디자인) */}
         <div className='mt-4 flex items-center gap-2 sm:mt-5 sm:gap-2.5'>
