@@ -92,7 +92,7 @@ export function RoommatesRail() {
       <ul className='mt-1.5 divide-y divide-[var(--border)]'>
         {posts.map((post) => (
           <li key={post.id}>
-            <Link href={href(boardPath)} className='group block py-2.5'>
+            <Link href={href(boardPath)} data-ui='hover-row' className='group block py-2.5'>
               <span className='flex items-center gap-1.5'>
                 <span
                   className={

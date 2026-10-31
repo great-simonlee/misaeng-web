@@ -427,3 +427,31 @@
 [data-brand='ellieo'] :is(.tracking-wide, .tracking-wider, .tracking-widest, [class*='tracking-[0.1'], [class*='tracking-[0.2'], [class*='tracking-[0.3']) {
   letter-spacing: 0.01em;
 }
+
+/* ---------- Hover: roomy, soft highlights instead of tight boxes ---------- */
+/* List rows (feeds, rails, board lists): the highlight reaches 12px past the text on each side,
+   so it reads as a calm row, not a box hugging the words. Layout doesn't move (negative margin = padding) */
+[data-brand='ellieo'] [data-ui='hover-row'],
+[data-brand='ellieo'] [data-ui='surface'][data-surface='row'] > a {
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  border-radius: 1rem;
+  transition: background-color 0.15s ease;
+}
+
+[data-brand='ellieo'] [data-ui='hover-row']:hover,
+[data-brand='ellieo'] [data-ui='surface'][data-surface='row'] > a:hover {
+  background-color: #f6f8fb;
+}
+
+/* Dividers stay at the text edge, not under the wider highlight */
+[data-brand='ellieo'] [data-ui='surface'][data-surface='row'] {
+  overflow: visible;
+}
+
+/* Titles don't jump to brand blue on hover; the row highlight is the cue */
+[data-brand='ellieo'] [data-ui='hover-row'] .group-hover\:text-\[var\(--brand\)\] {
+  color: inherit;
+}

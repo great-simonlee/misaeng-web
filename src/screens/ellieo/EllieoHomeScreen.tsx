@@ -237,7 +237,7 @@ function CommunityFeed() {
           const anonymous = post.board === 'anonymous'
           return (
             <li key={post.id} className='border-b border-[var(--border)] last:border-b-0'>
-              <Link href={href(board?.path ?? '/')} className='group block py-3.5'>
+              <Link href={href(board?.path ?? '/')} data-ui='hover-row' className='group block py-3.5'>
                 {/* Author line: one row. Anonymous Q&A hides nickname and school, like the board itself (lib/community/anonymous) */}
                 <span className='flex items-center gap-2'>
                   <span

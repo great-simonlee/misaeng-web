@@ -28,7 +28,7 @@ export function EllieoHousingRow({ listing }: { listing: HousingListing }) {
   const badge = translateListingCardBadges(listing, getListingCardBadges(listing), t)[0]
 
   return (
-    <Link href={hrefForHousingListing(listing)} className='group flex min-w-0 items-center gap-3 py-2.5'>
+    <Link href={hrefForHousingListing(listing)} data-ui='hover-row' className='group flex min-w-0 items-center gap-3 py-2.5'>
       <span className='relative aspect-[4/3] w-24 shrink-0 overflow-hidden rounded-xl bg-[var(--surface)]'>
         {cover ? (
           <Image

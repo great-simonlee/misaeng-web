@@ -202,7 +202,7 @@ function PopularPosts() {
         <ol className='mt-2'>
           {shown.map((post, index) => (
             <li key={post.id} className='border-b border-[var(--border)] last:border-b-0'>
-              <Link href={hrefForCommunityPost(post, city)} className='group flex gap-3 py-3'>
+              <Link href={hrefForCommunityPost(post, city)} data-ui='hover-row' className='group flex gap-3 py-3'>
                 <span
                   className={cn(
                     'w-4 shrink-0 pt-px text-[14px] font-extrabold tabular-nums',

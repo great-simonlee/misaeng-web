@@ -143,10 +143,10 @@ export function EllieoNavbar() {
                   href={target}
                   aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13.5px] font-medium whitespace-nowrap transition xl:px-3',
+                    'inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[14px] font-medium whitespace-nowrap transition-colors duration-150 xl:px-4',
                     active
-                      ? 'bg-[var(--brand-subtle)] text-[var(--brand-deep)]'
-                      : 'text-[var(--muted-foreground)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]',
+                      ? 'bg-[var(--brand-soft)] font-semibold text-[var(--brand-deep)]'
+                      : 'text-[var(--muted-foreground)] hover:bg-[#f3f5f9] hover:text-[var(--foreground)]',
                   )}
                 >
                   {/* Icons only from 1280px: below that the labels need the room (Vietnamese labels are long) */}
