@@ -155,7 +155,8 @@ export function EllieoPostRow({ post, boardId }: { post: CommunityPost; boardId:
           </span>
         </Link>
         {/* Save, outside the link so it doesn't open the post */}
-        <div className='absolute right-0 top-3'>
+        {/* Vertically centred on the author line (py-4 + 28px avatar → centre at 30px), 12px after the type tag */}
+        <div className='absolute right-2 top-5 flex'>
           <PostLikeButton kind='community' id={post.id} boardId={boardId} variant='icon' />
         </div>
       </div>
