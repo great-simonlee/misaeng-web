@@ -55,9 +55,9 @@
   box-shadow: 0 0 0 1px var(--border-muted), 0 8px 20px -16px rgb(14 26 47 / 0.45);
 }
 
-/* Small meta chips on cards: square tags instead of pills */
+/* Small meta chips on cards: soft pills */
 [data-brand='ellieo'] [data-ui='meta-chip'] {
-  border-radius: 0.375rem;
+  border-radius: 999px;
   padding: 0.125rem 0.5rem;
   font-size: 0.75rem;
   line-height: 1.5;
@@ -82,17 +82,11 @@
   box-shadow: none;
 }
 
-/* ---------- Controls: Ellieo uses 10px rounded rectangles where Misaeng uses pills ---------- */
-/* Pill-shaped text controls (chips, filter buttons, CTA buttons). Circles (avatars, icon buttons) carry size-* and are left alone. */
-[data-brand='ellieo'] main :is(a, button, label).rounded-full:not([class*='size-']):is([class*=' px-'], [class^='px-'], [class*=':px-']) {
-  border-radius: 0.625rem;
-}
-
-/* Selected chip in a scroll row: brand blue instead of near-black */
+/* Selected chip in a scroll row: ink pill, same as the home feed chips */
 [data-brand='ellieo'] [data-ui='chip-row'] [role='listbox'] > :is(button, a)[aria-selected='true'],
 [data-brand='ellieo'] [data-ui='chip-row'] [role='listbox'] > :is(button, a)[aria-pressed='true'] {
-  background: var(--brand);
-  border-color: var(--brand);
+  background: var(--foreground);
+  border-color: var(--foreground);
   color: #fff;
 }
 
@@ -182,10 +176,7 @@
   filter: none;
 }
 
-/* Card badges and tags inside surfaces: square tags, like the meta chips */
-[data-brand='ellieo'] [data-ui='surface'] span.rounded-full:not([class*='size-']):is([class*=' px-'], [class^='px-']) {
-  border-radius: 0.375rem;
-}
+
 
 /* ---------- Company directory / company detail / job postings hero ---------- */
 /* Flat navy panel like the home hero: no glow blobs, no grid */

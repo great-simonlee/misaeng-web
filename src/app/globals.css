@@ -43,7 +43,8 @@
 
 /* Ellieo 토큰: 색·글꼴·모서리·그림자. 화면 규칙은 ellieo-theme.css (src/lib/brand의 colors와 같게) */
 [data-brand='ellieo'] {
-  --background: #f4f6fa;
+  /* White canvas everywhere (feed style); --surface is the soft fill for chips, inputs and panels */
+  --background: #ffffff;
   --foreground: #0e1a2f;
   --surface: #eef1f6;
   --surface-elevated: #ffffff;

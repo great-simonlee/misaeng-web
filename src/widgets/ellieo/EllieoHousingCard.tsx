@@ -59,8 +59,8 @@ export function EllieoHousingCard({
   )
 
   return (
-    <article className='group flex flex-col rounded-[14px] bg-white p-2 ring-1 ring-[var(--border)] transition hover:ring-[var(--border-muted)]'>
-      <div className='relative aspect-[4/3] overflow-hidden rounded-[10px] bg-[var(--surface)]'>
+    <article className='group flex flex-col'>
+      <div className='relative aspect-[4/3] overflow-hidden rounded-2xl bg-[var(--surface)]'>
         {images.length > 0 ? (
           <div
             ref={galleryRef}
@@ -110,7 +110,7 @@ export function EllieoHousingCard({
         ) : null}
       </div>
 
-      <div className='flex flex-1 flex-col px-2 pb-2 pt-3'>
+      <div className='flex flex-1 flex-col pt-3'>
         {badges.length > 0 ? (
           <div className='mb-2 flex flex-wrap gap-1'>
             {badges.map((badge, index) => (
@@ -151,7 +151,7 @@ export function EllieoHousingCard({
         </Link>
 
         {showOptionRows ? (
-          <ul className='mt-3 divide-y divide-[var(--border)] overflow-hidden rounded-[10px] ring-1 ring-[var(--border)]'>
+          <ul className='mt-3 divide-y divide-[var(--border)] overflow-hidden rounded-xl bg-[var(--surface)]/60'>
             {roomRows.map((room, index) => {
               const key = getRoomSelectionKey(room, index)
               const highlighted = highlightRoomType !== 'all' && room.type === highlightRoomType
@@ -161,7 +161,7 @@ export function EllieoHousingCard({
                     href={hrefForHousingListing(listing, `?room=${key}`)}
                     className={cn(
                       'flex items-center justify-between gap-2 px-3 py-2 transition',
-                      highlighted ? 'bg-[var(--brand-soft)]' : 'hover:bg-[var(--background)]',
+                      highlighted ? 'bg-[var(--brand-soft)]' : 'hover:bg-[var(--surface)]',
                     )}
                   >
                     <span className='min-w-0 text-[13px] font-medium leading-snug text-[var(--foreground)]'>
