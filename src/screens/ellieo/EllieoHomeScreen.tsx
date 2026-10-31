@@ -241,27 +241,14 @@ function CommunityFeed() {
   // Chips only for boards that have posts, in the Ellieo board order
   const boards = ELLIEO_BOARDS.filter((board) => posts.some((post) => post.board === board.id))
   const visible = filter === 'all' ? posts : posts.filter((post) => post.board === filter)
-  const writeBoard = ELLIEO_BOARDS.find((board) => board.id === (filter === 'all' ? 'anonymous' : filter))
 
   return (
     <section className='min-w-0'>
       <FeedHeading title={t('ellieo.community.title')} aside={<SampleTag />} />
 
-      {/* Composer: looks like an input, opens the write page of the selected board */}
-      <Link
-        href={href(`${writeBoard?.path ?? '/anonymous'}/new`)}
-        className='mt-4 flex items-center gap-3 rounded-full bg-[var(--surface)] py-1.5 pl-1.5 pr-1.5 transition hover:bg-[var(--border)]'
-      >
-        <span aria-hidden className='size-9 shrink-0 rounded-full bg-[linear-gradient(135deg,#1f5eff,#12b5cb)]' />
-        <span className='min-w-0 flex-1 truncate text-[14.5px] text-[var(--muted)]'>{t('ellieo.community.composer')}</span>
-        <span className='shrink-0 rounded-full bg-[var(--foreground)] px-4 py-2 text-[13.5px] font-semibold text-white'>
-          {t('ellieo.community.post')}
-        </span>
-      </Link>
-
       {/* Board filter chips */}
-      <div className='-mx-4 mt-4 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden'>
-        <div role='tablist' aria-label={t('ellieo.community.title')} className='flex w-max gap-2'>
+      <div className='-mx-4 mt-3 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden'>
+        <div role='tablist' aria-label={t('ellieo.community.title')} className='flex w-max gap-1.5'>
           {[{ id: 'all' as const, label: t('ellieo.community.all') }, ...boards.map((board) => ({ id: board.id, label: tc(`categories.${board.id}.title`) }))].map(
             (chip) => {
               const active = filter === chip.id
@@ -274,8 +261,8 @@ function CommunityFeed() {
                   onClick={() => setFilter(chip.id)}
                   className={
                     active
-                      ? 'h-9 rounded-full bg-[var(--foreground)] px-4 text-[13.5px] font-semibold text-white'
-                      : 'h-9 rounded-full bg-white px-4 text-[13.5px] font-semibold text-[var(--muted-foreground)] ring-1 ring-inset ring-[var(--border)] transition hover:ring-[var(--border-muted)]'
+                      ? 'h-8 rounded-full bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white'
+                      : 'h-8 rounded-full bg-white px-3.5 text-[13px] font-semibold text-[var(--muted-foreground)] ring-1 ring-inset ring-[var(--border)] transition hover:ring-[var(--border-muted)]'
                   }
                 >
                   {chip.label}
@@ -286,62 +273,61 @@ function CommunityFeed() {
         </div>
       </div>
 
-      <ul className='mt-2'>
+      <ul className='mt-1'>
         {visible.map((post) => {
           const board = ELLIEO_BOARDS.find((item) => item.id === post.board)
           const BoardIcon = board?.icon
           const tone = BOARD_TONE[post.board] ?? '#5b6779'
           return (
             <li key={post.id} className='border-b border-[var(--border)] last:border-b-0'>
-              <Link href={href(board?.path ?? '/')} className='group block py-5'>
-                {/* Author line */}
-                <span className='flex items-center gap-2.5'>
+              <Link href={href(board?.path ?? '/')} className='group block py-3.5'>
+                {/* Author line: one row */}
+                <span className='flex items-center gap-2'>
                   <span
                     aria-hidden
-                    className='flex size-9 shrink-0 items-center justify-center rounded-full text-[13px] font-bold uppercase text-white'
+                    className='flex size-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold uppercase text-white'
                     style={{ background: gradientFor(post.nickname) }}
                   >
                     {post.nickname.charAt(0)}
                   </span>
-                  <span className='min-w-0 flex-1'>
-                    <span className='flex min-w-0 items-center gap-1 text-[14px] font-semibold text-[var(--foreground)]'>
-                      <span className='truncate'>{post.nickname}</span>
-                      <BadgeCheckIcon className='size-4 shrink-0 text-[var(--ellieo-jade)]' />
-                    </span>
-                    <span className='block truncate text-[12.5px] text-[var(--muted)]'>
-                      {shortSchool(post.school)} · {format.relative(now - post.hoursAgo * 3_600_000)}
+                  <span className='flex min-w-0 flex-1 items-center gap-1 text-[12.5px]'>
+                    <span className='truncate font-semibold text-[var(--foreground)]'>{post.nickname}</span>
+                    <BadgeCheckIcon className='size-3.5 shrink-0 text-[var(--ellieo-jade)]' />
+                    <span className='truncate text-[var(--muted)]'>
+                      · {shortSchool(post.school)} · {format.relative(now - post.hoursAgo * 3_600_000)}
                     </span>
                   </span>
                   <span
-                    className='inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-semibold'
+                    className='inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-1 text-[11.5px] font-semibold sm:px-2 sm:py-0.5'
                     style={{ color: tone, background: `${tone}14` }}
                   >
-                    {BoardIcon ? <BoardIcon className='size-3.5' /> : null}
-                    {tc(`categories.${post.board}.title`)}
+                    {BoardIcon ? <BoardIcon className='size-3' /> : null}
+                    {/* Phones: icon only, so the nickname has room */}
+                    <span className='sr-only sm:not-sr-only'>{tc(`categories.${post.board}.title`)}</span>
                   </span>
                 </span>
 
                 {/* Body */}
-                <span className='mt-3 block text-[16.5px] font-bold leading-snug tracking-[-0.015em] text-[var(--foreground)] group-hover:text-[var(--brand)]'>
+                <span className='mt-1.5 line-clamp-1 text-[15px] font-bold leading-snug tracking-[-0.01em] text-[var(--foreground)] group-hover:text-[var(--brand)]'>
                   {post.likes >= TRENDING_LIKES ? (
-                    <span className='mr-1.5 inline-flex -translate-y-px items-center rounded-full bg-[var(--ellieo-sun-soft)] px-2 py-0.5 align-middle text-[11.5px] font-bold text-[#9a6200]'>
+                    <span className='mr-1.5 inline-flex -translate-y-px items-center rounded-full bg-[var(--ellieo-sun-soft)] px-1.5 py-px align-middle text-[11px] font-bold text-[#9a6200]'>
                       {t('ellieo.community.trending')}
                     </span>
                   ) : null}
                   {locale === 'vi' ? post.title.vi : post.title.en}
                 </span>
-                <span className='mt-1 line-clamp-2 block text-[14.5px] leading-relaxed text-[var(--muted-foreground)]'>
+                <span className='mt-0.5 line-clamp-1 text-[13.5px] leading-relaxed text-[var(--muted)]'>
                   {locale === 'vi' ? post.excerpt.vi : post.excerpt.en}
                 </span>
 
                 {/* Reactions */}
-                <span className='mt-3 flex items-center gap-1 text-[13px] font-semibold text-[var(--muted)]'>
-                  <span className='inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 transition group-hover:bg-[var(--surface)]'>
-                    <HeartIcon className='size-[18px]' />
+                <span className='mt-1.5 flex items-center gap-3.5 text-[12.5px] font-medium text-[var(--muted)]'>
+                  <span className='inline-flex items-center gap-1'>
+                    <HeartIcon className='size-4' />
                     {format.number(post.likes)}
                   </span>
-                  <span className='inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 transition group-hover:bg-[var(--surface)]'>
-                    <ChatIcon className='size-[18px]' />
+                  <span className='inline-flex items-center gap-1'>
+                    <ChatIcon className='size-4' />
                     {format.number(post.comments)}
                   </span>
                 </span>
