@@ -193,6 +193,14 @@
       "joinTitle": "Trở thành đối tác",
       "joinBody": "Bạn điều hành một Hội Sinh viên Việt Nam hoặc làm nội dung cho du học sinh tại Mỹ? Gửi email cho chúng tôi, chúng tôi sẽ phản hồi sớm.",
       "back": "Về trang chủ"
+    },
+    "commute": {
+      "label": "Đi học đến",
+      "pick": "Chọn trường của bạn",
+      "pickShort": "trường của bạn",
+      "minutes": "≈ {minutes} phút tới {school}",
+      "estimateNote": "Thời gian đi tàu điện ngầm thường gặp từ khu này, gồm cả đi bộ. Chỉ là ước tính, không phải chỉ đường trực tiếp.",
+      "sorted": "Gần {school} nhất trước"
     }
   }
 }

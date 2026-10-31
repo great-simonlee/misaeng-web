@@ -5,9 +5,12 @@ import { useEffect, useState } from 'react'
 
 import { LoadingState } from '@components'
 import { useCity, useCityPath } from '@hooks/useCity'
+import { useMySchool } from '@hooks/useMySchool'
+import { commuteSchool, estimateCommuteMinutes } from '@lib/housing/commute'
 import { fetchHousingListings } from '@lib/housing/fetchListings'
 import { useFormat, useLocale, useT } from '@lib/i18n/client'
 import type { HousingListing } from '@/types/nyc'
+import { CommuteSchoolPicker } from '@widgets/ellieo/Commute'
 import { EllieoHousingRow } from '@widgets/ellieo/EllieoHousingRow'
 import { ArrowRightIcon } from '@widgets/ellieo/icons'
 import { getRoommateHighlights } from '@widgets/ellieo/mockContent'
@@ -36,12 +39,13 @@ export function NewListingsRail() {
   const t = useT('hub')
   const city = useCity()
   const href = useCityPath()
+  const [schoolId] = useMySchool()
   const [listings, setListings] = useState<HousingListing[] | null>(null)
 
   useEffect(() => {
     let cancelled = false
     void fetchHousingListings(city).then((all) => {
-      if (!cancelled) setListings(all.slice(0, HOUSING_PREVIEW_COUNT))
+      if (!cancelled) setListings(all)
     })
     return () => {
       cancelled = true
@@ -50,14 +54,32 @@ export function NewListingsRail() {
 
   if (listings && listings.length === 0) return null
 
+  // With a school picked: closest first (unknown neighborhoods last, newest order kept within a tie)
+  const shown = (
+    schoolId && listings
+      ? [...listings].sort(
+          (x, y) =>
+            (estimateCommuteMinutes(x.property.area, schoolId) ?? Infinity) -
+            (estimateCommuteMinutes(y.property.area, schoolId) ?? Infinity),
+        )
+      : (listings ?? [])
+  ).slice(0, HOUSING_PREVIEW_COUNT)
+  const school = commuteSchool(schoolId)
+
   return (
     <section className='min-w-0'>
       <FeedHeading size='sm' title={t('ellieo.latestHousing.title')} href={href('/housing')} linkLabel={t('ellieo.seeAll')} />
+      <div className='mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5'>
+        <CommuteSchoolPicker />
+        {school ? (
+          <span className='text-[12.5px] text-[var(--muted)]'>{t('ellieo.commute.sorted', { school: school.short })}</span>
+        ) : null}
+      </div>
       {listings === null ? (
         <LoadingState className='py-10' />
       ) : (
         <ul className='mt-1.5 divide-y divide-[var(--border)]'>
-          {listings.map((listing) => (
+          {shown.map((listing) => (
             <li key={listing.id}>
               <EllieoHousingRow listing={listing} />
             </li>

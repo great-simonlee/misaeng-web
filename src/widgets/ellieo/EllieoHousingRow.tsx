@@ -15,6 +15,7 @@ import { shouldUnoptimizeHousingImage } from '@lib/housing/fetchListings'
 import { translateListingCardBadges } from '@lib/housing/listing'
 import { useFormat, useT } from '@lib/i18n/client'
 import type { HousingListing } from '@/types/nyc'
+import { CommuteLine } from '@widgets/ellieo/Commute'
 
 /**
  * Compact listing row for the Ellieo home side rail: landscape thumbnail, price, one detail line, one perk.
@@ -49,8 +50,11 @@ export function EllieoHousingRow({ listing }: { listing: HousingListing }) {
         <span className='block truncate text-[12.5px] text-[var(--muted)]'>
           {formatListingBedBath(listing)} · {getListingArea(listing)}
         </span>
+        <span className='mt-0.5 block'>
+          <CommuteLine area={listing.property.area} />
+        </span>
         {badge ? (
-          <span className='mt-1 inline-block rounded-full bg-[var(--ellieo-jade-soft)] px-2 py-px text-[11px] font-semibold text-[var(--ellieo-jade)]'>
+          <span className='mt-1 block w-fit rounded-full bg-[var(--ellieo-jade-soft)] px-2 py-px text-[11px] font-semibold text-[var(--ellieo-jade)]'>
             {badge.label}
           </span>
         ) : null}

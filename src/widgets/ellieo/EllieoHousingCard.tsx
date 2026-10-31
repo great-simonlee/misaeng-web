@@ -28,6 +28,7 @@ import { shouldUnoptimizeHousingImage } from '@lib/housing/fetchListings'
 import { translateListingCardBadges } from '@lib/housing/listing'
 import { useT } from '@lib/i18n/client'
 import type { HousingListing } from '@/types/nyc'
+import { CommuteLine } from '@widgets/ellieo/Commute'
 import { CalendarIcon, PinIcon } from '@widgets/ellieo/icons'
 import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
 
@@ -149,6 +150,7 @@ export function EllieoHousingCard({
             </span>
           </p>
         </Link>
+        <CommuteLine area={listing.property.area} className='mt-1.5' />
 
         {showOptionRows ? (
           <ul className='mt-3 divide-y divide-[var(--border)] overflow-hidden rounded-xl bg-[var(--surface)]/60'>

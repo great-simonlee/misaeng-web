@@ -173,3 +173,10 @@ export const HeartIcon = (p: IconProps) => (
     <path d='M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20Z' />
   </Base>
 )
+
+export const TrainIcon = (p: IconProps) => (
+  <Base {...p}>
+    <rect x='5' y='3.5' width='14' height='13' rx='3' />
+    <path d='M5 10.5h14M9 13.5h.01M15 13.5h.01M8.5 20.5l1.5-4M15.5 20.5l-1.5-4' />
+  </Base>
+)
