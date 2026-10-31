@@ -191,7 +191,7 @@ export function EllieoTimelineDetail({ post, boardId, isAuthor, onDelete, transl
       ) : null}
 
       {/* Timeline */}
-      <section className='mt-9'>
+      <section className='mt-8 border-t border-[var(--border)] pt-7'>
         <h2 className='text-[1.15rem] font-extrabold tracking-[-0.02em] text-[var(--foreground)]'>
           {t(`${prefix}.detail.timelineTitle`, { count: steps.length })}
         </h2>
@@ -200,7 +200,7 @@ export function EllieoTimelineDetail({ post, boardId, isAuthor, onDelete, transl
             {isJob ? t('jobReview.detail.emptyBody') : t('detail.noDate')}
           </p>
         ) : (
-          <ol className='mt-5'>
+          <ol className='mt-4'>
             {steps.map((step, index) => (
               <TimelineStep key={step.id} step={step} index={index} last={index === steps.length - 1} />
             ))}
@@ -210,7 +210,7 @@ export function EllieoTimelineDetail({ post, boardId, isAuthor, onDelete, transl
 
       {/* Tips */}
       {tipsHtml ? (
-        <section className='mt-8 rounded-2xl bg-[var(--ellieo-sun-soft)]/70 p-5 sm:p-6'>
+        <section className='mt-6 rounded-2xl border border-[#f5dfae] bg-[var(--ellieo-sun-soft)]/70 p-5 sm:p-6'>
           <h2 className='flex items-center gap-2 text-[14px] font-bold text-[#8a5800]'>
             <FlagIcon className='size-4' />
             {t(`${prefix}.detail.tipsTitle`)}
@@ -237,6 +237,18 @@ export function EllieoTimelineDetail({ post, boardId, isAuthor, onDelete, transl
   )
 }
 
+/** Field accent dots: what was prepared/applied (blue), sent (amber), the result (green), what's next (purple) */
+const FIELD_TONE: Record<string, string> = {
+  prepared: '#3b82f6',
+  submitted: '#f59e0b',
+  resultReceived: '#10b981',
+  nextStep: '#8b5cf6',
+  platform: '#3b82f6',
+  documentsSubmitted: '#f59e0b',
+  interviewRound: '#8b5cf6',
+  outcome: '#10b981',
+}
+
 function TimelineStep({ step, index, last }: { step: Step; index: number; last: boolean }) {
   const t = useT('reviews')
   const th = useT('hub')
@@ -244,52 +256,66 @@ function TimelineStep({ step, index, last }: { step: Step; index: number; last: 
   const hasNotes = Boolean(htmlToPlainText(step.notesHtml))
 
   return (
-    <li className='relative flex gap-4'>
-      {/* Rail: numbered dot, line down to the next step */}
-      <div className='relative flex w-8 shrink-0 flex-col items-center'>
+    <li className='relative flex gap-3 sm:gap-4'>
+      {/* Rail: numbered dot level with the card header, line down to the next step */}
+      <div className='relative flex w-8 shrink-0 flex-col items-center pt-3.5'>
         <span
           className={cn(
             'z-[1] flex size-8 items-center justify-center rounded-full text-[13px] font-bold',
             step.latest
               ? 'bg-[var(--brand)] text-white ring-4 ring-[var(--brand)]/15'
-              : 'bg-[var(--brand-soft)] text-[var(--brand-deep)]',
+              : 'border border-[var(--brand-subtle)] bg-white text-[var(--brand-deep)]',
           )}
         >
           {index + 1}
         </span>
-        {!last ? <span aria-hidden className='w-px flex-1 bg-[var(--border-muted)]' /> : null}
+        {!last ? <span aria-hidden className='-mb-3.5 w-0.5 flex-1 bg-[var(--brand-subtle)]' /> : null}
       </div>
 
-      <div className={cn('min-w-0 flex-1', last ? 'pb-2' : 'pb-8')}>
-        <p className='flex flex-wrap items-center gap-x-2 gap-y-1 pt-1'>
-          <span className='text-[15.5px] font-bold text-[var(--foreground)]'>{step.headline || step.date}</span>
+      {/* One card per step */}
+      <div
+        className={cn(
+          'mb-4 min-w-0 flex-1 overflow-hidden rounded-2xl border bg-white',
+          step.latest ? 'border-[var(--brand)]/35 shadow-[0_6px_20px_-14px_rgb(31_94_255/0.5)]' : 'border-[var(--border)]',
+        )}
+      >
+        <div
+          className={cn(
+            'flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-[var(--border)] px-4 py-3 sm:px-5',
+            step.latest ? 'bg-[var(--brand-soft)]' : 'bg-[#f8f9fc]',
+          )}
+        >
+          <span className='text-[15px] font-bold text-[var(--foreground)]'>{step.headline || step.date}</span>
           {step.headline ? <span className='text-[13px] text-[var(--muted)]'>{step.date}</span> : null}
           {step.latest ? (
-            <span className='rounded-full bg-[var(--brand-soft)] px-2 py-0.5 text-[11px] font-bold text-[var(--brand-deep)]'>
+            <span className='ml-auto rounded-full bg-[var(--brand)] px-2 py-0.5 text-[11px] font-bold text-white'>
               {th('ellieo.detail.latest')}
             </span>
           ) : null}
-        </p>
+        </div>
 
         {filled.length > 0 ? (
-          <dl className='mt-2.5 grid gap-x-6 gap-y-2 sm:grid-cols-2'>
+          <dl className='grid gap-x-6 gap-y-3 px-4 py-3.5 sm:grid-cols-2 sm:px-5'>
             {filled.map((field) => (
               // Long answers take the full width instead of a squeezed half column
               <div key={field.key} className={cn('min-w-0', field.value.length > 60 && 'sm:col-span-2')}>
-                <dt className='text-[11.5px] font-semibold uppercase tracking-[0.02em] text-[var(--muted)]'>
+                <dt className='flex items-center gap-1.5 text-[12px] font-semibold text-[var(--muted-foreground)]'>
+                  <span
+                    aria-hidden
+                    className='size-1.5 rounded-full'
+                    style={{ background: FIELD_TONE[field.key] ?? '#94a3b8' }}
+                  />
                   {field.label}
                 </dt>
-                <dd className='mt-0.5 text-[14px] leading-snug text-[var(--foreground)]'>{field.value}</dd>
+                <dd className='mt-0.5 pl-3 text-[14.5px] leading-[1.55] text-[var(--foreground)]'>{field.value}</dd>
               </div>
             ))}
           </dl>
         ) : null}
 
         {hasNotes ? (
-          <div className='mt-3 rounded-2xl bg-[#f8f9fc] px-4 py-3.5'>
-            <p className='text-[11.5px] font-semibold uppercase tracking-[0.02em] text-[var(--muted)]'>
-              {t('detail.stageReview')}
-            </p>
+          <div className={cn('px-4 py-3.5 sm:px-5', filled.length > 0 && 'border-t border-dashed border-[var(--border)]')}>
+            <p className='text-[12px] font-semibold text-[var(--muted-foreground)]'>{t('detail.stageReview')}</p>
             <CommunityRichBody html={step.notesHtml} className='mt-1 !text-[14.5px] !leading-[1.7] text-[var(--foreground)]' />
           </div>
         ) : null}
