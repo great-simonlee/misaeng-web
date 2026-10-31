@@ -65,22 +65,14 @@
 
 /* Board header (title + filter/write) */
 [data-brand='ellieo'] [data-ui='board-title'] {
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.25;
+  font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
   padding-bottom: 0.1em;
 }
 
-[data-brand='ellieo'] [data-ui='board-header'] {
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 1rem;
-}
 
-/* Primary write button: solid brand rectangle, no glow */
-[data-brand='ellieo'] [data-ui='primary-action'] {
-  border-radius: 0.625rem;
-  box-shadow: none;
-}
 
 /* Selected chip in a scroll row: ink pill, same as the home feed chips */
 [data-brand='ellieo'] [data-ui='chip-row'] [role='listbox'] > :is(button, a)[aria-selected='true'],
@@ -161,11 +153,11 @@
 
 [data-brand='ellieo'] [data-ui='auth-google'],
 [data-brand='ellieo'] [data-ui='auth-google'] + * {
-  border-radius: 0.625rem;
+  border-radius: 999px;
 }
 
 [data-brand='ellieo'] [data-ui='auth-submit'] {
-  border-radius: 0.625rem;
+  border-radius: 999px;
   background: var(--brand);
   box-shadow: none;
 }
@@ -239,4 +231,150 @@
 /* Highlighted hero numbers: brand blue instead of Misaeng coral */
 [data-brand='ellieo'] [data-ui='hero-stat-accent'] {
   color: var(--brand);
+}
+
+
+/* =====================================================================
+   One page system for every Ellieo page (same as the home):
+   page frame, header, chips, list items, panels, buttons
+   ===================================================================== */
+
+/* Frame: every page lines up with the header (max-w-7xl). Narrow pages keep a readable
+   48rem column, left-aligned like the home feed */
+[data-brand='ellieo'] [data-shell='narrow'] {
+  max-width: 80rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 40rem) {
+  [data-brand='ellieo'] [data-shell='narrow'] {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  [data-brand='ellieo'] [data-shell='narrow'] {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+[data-brand='ellieo'] [data-shell='narrow'] > * {
+  max-width: 48rem;
+}
+
+/* Header: same top space, title, description on every page */
+[data-brand='ellieo'] [data-ui='board-header'] {
+  padding-top: 2rem;
+  border: 0;
+}
+
+[data-brand='ellieo'] [data-ui='board-description'] {
+  margin-top: 0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Chips: one pill everywhere (filters, quick tags, board chips), ink when selected */
+[data-brand='ellieo'] [data-ui='chip'] {
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  padding: 0 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  box-shadow: none;
+}
+
+[data-brand='ellieo'] [data-ui='chip']:hover {
+  border-color: var(--border-muted);
+  color: var(--foreground);
+}
+
+[data-brand='ellieo'] [data-ui='chip'][aria-selected='true'],
+[data-brand='ellieo'] [data-ui='chip'][aria-pressed='true'] {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: #fff;
+}
+
+/* Panels (detail bodies, comments, author box): light line, no shadow */
+[data-brand='ellieo'] [data-ui='surface'][data-surface='panel'] {
+  border-radius: 1rem;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+/* Text post in a list: feed row like the home (no box, divider line) */
+[data-brand='ellieo'] [data-ui='surface'][data-surface='row'] {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  border-bottom: 1px solid var(--border);
+  transform: none;
+}
+
+[data-brand='ellieo'] [data-ui='surface'][data-surface='row'] > a {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+[data-brand='ellieo'] [data-ui='surface'][data-surface='row']:hover {
+  box-shadow: none;
+}
+
+/* Photo card in a list (food): like the housing cards, rounded photo and no box */
+[data-brand='ellieo'] [data-ui='surface'][data-surface='photo'] {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  transform: none;
+}
+
+[data-brand='ellieo'] [data-ui='surface'][data-surface='photo'] > a > div:first-child {
+  border-radius: 1rem;
+}
+
+[data-brand='ellieo'] [data-ui='surface'][data-surface='photo'] > a > div:nth-child(2) {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Empty state: plain, no box */
+[data-brand='ellieo'] [data-ui='empty-state'] {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/* Buttons: pills everywhere, no glow */
+[data-brand='ellieo'] [data-ui='primary-action'] {
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+/* Mouse clicks don't leave a focus box on links/buttons (keyboard focus still shows) */
+[data-brand='ellieo'] :is(a, button):focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Food chip bar: no divider until it sticks under the header */
+[data-brand='ellieo'] [data-ui='chip-bar']:not([data-stuck]) {
+  border-bottom-color: transparent;
+}
+
+/* Callout links (e.g. company careers pages on Jobs): the light panel, not Misaeng's peach */
+[data-brand='ellieo'] [data-ui='callout'] {
+  background: #f8f9fc;
+  --tw-ring-color: var(--border);
+}
+
+[data-brand='ellieo'] [data-ui='callout']:hover {
+  background: var(--surface);
 }

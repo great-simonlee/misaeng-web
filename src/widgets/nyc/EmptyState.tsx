@@ -21,6 +21,7 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
+      data-ui='empty-state'
       className={cn(
         'rounded-[1.25rem] bg-white px-6 py-14 text-center shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_28px_rgba(15,23,42,0.045)] ring-1 ring-black/[0.03] sm:px-8 sm:py-16',
         className,

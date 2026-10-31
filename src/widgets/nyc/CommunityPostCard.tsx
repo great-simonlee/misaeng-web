@@ -141,6 +141,7 @@ function FoodListingCard({
   return (
     <BoardSurface
       as='article'
+      variant='photo'
       className='group flex h-full flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_22px_44px_rgba(15,23,42,0.09)]'
     >
       <Link
@@ -263,6 +264,7 @@ function CptOptListingCard({
   return (
     <BoardSurface
       as='article'
+      variant='row'
       className='group overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_20px_40px_rgba(15,23,42,0.08)]'
     >
       <Link
@@ -350,6 +352,7 @@ function JobReviewListingCard({
   return (
     <BoardSurface
       as='article'
+      variant='row'
       className='group overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_20px_40px_rgba(15,23,42,0.08)]'
     >
       <Link
@@ -467,6 +470,7 @@ function TextListingCard({
   return (
     <BoardSurface
       as='article'
+      variant='row'
       className='group overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_20px_40px_rgba(15,23,42,0.08)]'
     >
       <Link

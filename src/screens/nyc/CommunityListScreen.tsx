@@ -225,6 +225,8 @@ function FoodCategoryStickyBar({
       <div ref={sentinelRef} className='h-0 w-full' aria-hidden />
       <div
         ref={barRef}
+        data-ui='chip-bar'
+        data-stuck={stuck || undefined}
         className={cn(
           'z-[90] border-b border-black/[0.04] bg-white/95 backdrop-blur-md supports-[backdrop-filter]:bg-white/85',
           stuck

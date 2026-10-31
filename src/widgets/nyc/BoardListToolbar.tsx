@@ -45,6 +45,7 @@ export function BoardListToolbar({
           <div className='flex shrink-0 items-center gap-2'>
             {showFilter && onFilterClick ? (
               <button
+                data-ui='chip'
                 type='button'
                 onClick={onFilterClick}
                 aria-label={
@@ -84,7 +85,7 @@ export function BoardListToolbar({
       </div>
 
       {intro ? (
-        <p className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>
+        <p data-ui='board-description' className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>
           {intro}
         </p>
       ) : null}
@@ -113,6 +114,7 @@ export function BoardQuickChip({
       type='button'
       role='option'
       aria-selected={active}
+      data-ui='chip'
       onClick={onClick}
       className={cn(
         'inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[12px] font-medium leading-none touch-manipulation transition sm:h-9 sm:px-3.5 sm:text-[13px]',

@@ -19,6 +19,7 @@ export function BoardPageShell({
   return (
     <div data-ui='canvas' className={cn('relative min-h-screen bg-white', className)}>
       <div
+        data-shell={width}
         className={cn(
           'relative mx-auto w-full',
           width === 'wide'
@@ -36,6 +37,8 @@ type BoardSurfaceProps = {
   children: ReactNode
   className?: string
   as?: 'div' | 'article' | 'section'
+  /** List items: `row` (text post) or `photo` (photo card). Ellieo draws these without a box (ellieo-theme.css) */
+  variant?: 'panel' | 'row' | 'photo'
 }
 
 /** 흰 표면 카드 (목록 아이템·상세 본문) */
@@ -43,10 +46,12 @@ export function BoardSurface({
   children,
   className,
   as: Tag = 'div',
+  variant = 'panel',
 }: BoardSurfaceProps) {
   return (
     <Tag
       data-ui='surface'
+      data-surface={variant}
       className={cn(
         'rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.05),0_12px_32px_rgba(15,23,42,0.07)] ring-1 ring-black/[0.05]',
         className,

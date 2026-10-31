@@ -210,6 +210,7 @@ export function RoommatePostCard({ post, preview = false }: RoommatePostCardProp
   return (
     <BoardSurface
       as='article'
+      variant='row'
       className={cn(
         'group overflow-hidden',
         !preview &&

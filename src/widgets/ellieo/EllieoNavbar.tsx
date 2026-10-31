@@ -143,7 +143,7 @@ export function EllieoNavbar() {
                   href={target}
                   aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-[13.5px] font-medium whitespace-nowrap transition xl:px-3',
+                    'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13.5px] font-medium whitespace-nowrap transition xl:px-3',
                     active
                       ? 'bg-[var(--brand-subtle)] text-[var(--brand-deep)]'
                       : 'text-[var(--muted-foreground)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]',
@@ -168,7 +168,7 @@ export function EllieoNavbar() {
                   aria-haspopup='menu'
                   aria-expanded={accountOpen}
                   aria-label={accountOpen ? t('closeAccountMenu') : t('openAccountMenu')}
-                  className='inline-flex h-9 items-center gap-2 rounded-lg pl-1 pr-2 text-[13px] font-medium text-[var(--foreground)] transition hover:bg-[var(--surface)]'
+                  className='inline-flex h-9 items-center gap-2 rounded-full pl-1 pr-2.5 text-[13px] font-medium text-[var(--foreground)] transition hover:bg-[var(--surface)]'
                 >
                   <Avatar photoURL={avatarURL} name={displayName} />
                   <span className='max-w-[8rem] truncate'>{displayName || t('profileAltFallback')}</span>
@@ -202,13 +202,13 @@ export function EllieoNavbar() {
               <div className='hidden items-center gap-1.5 lg:flex'>
                 <Link
                   href={loginHref}
-                  className='inline-flex h-9 items-center rounded-lg px-3 text-[13.5px] font-semibold text-[var(--foreground)] transition hover:bg-[var(--surface)]'
+                  className='inline-flex h-9 items-center rounded-full px-3.5 text-[13.5px] font-semibold text-[var(--foreground)] transition hover:bg-[var(--surface)]'
                 >
                   {t('login')}
                 </Link>
                 <Link
                   href={joinHref}
-                  className='inline-flex h-9 items-center rounded-lg bg-[var(--brand)] px-3.5 text-[13.5px] font-semibold text-white transition hover:bg-[var(--brand-hover)]'
+                  className='inline-flex h-9 items-center rounded-full bg-[var(--brand)] px-4 text-[13.5px] font-semibold text-white transition hover:bg-[var(--brand-hover)]'
                 >
                   {t('ellieo.join')}
                 </Link>
@@ -330,13 +330,13 @@ export function EllieoNavbar() {
             <div className='mt-4 grid grid-cols-2 gap-2 border-t border-[var(--border)] pt-4'>
               <Link
                 href={loginHref}
-                className='inline-flex h-11 items-center justify-center rounded-[10px] border border-[var(--border)] text-[15px] font-semibold text-[var(--foreground)]'
+                className='inline-flex h-11 items-center justify-center rounded-full border border-[var(--border)] text-[15px] font-semibold text-[var(--foreground)]'
               >
                 {t('login')}
               </Link>
               <Link
                 href={joinHref}
-                className='inline-flex h-11 items-center justify-center rounded-[10px] bg-[var(--brand)] text-[15px] font-semibold text-white'
+                className='inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand)] text-[15px] font-semibold text-white'
               >
                 {t('ellieo.join')}
               </Link>

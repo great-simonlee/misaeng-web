@@ -12,6 +12,7 @@ export function CompanyDirectoryBanner() {
   return (
     <Link
       href={href('/companies')}
+      data-ui='callout'
       className='group flex w-full items-center gap-3 rounded-2xl bg-[#fff5f1] px-4 py-3 ring-1 ring-[var(--brand)]/15 touch-manipulation transition hover:bg-[#ffede5] hover:ring-[var(--brand)]/30 active:scale-[0.995] sm:gap-4 sm:px-5 sm:py-3.5'
     >
       <span className='flex size-9 shrink-0 items-center justify-center rounded-xl bg-white text-[var(--brand)] shadow-sm ring-1 ring-black/[0.04] sm:size-10'>

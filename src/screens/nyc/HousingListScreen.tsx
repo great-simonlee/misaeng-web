@@ -428,11 +428,11 @@ export function HousingListScreen() {
   return (
     <PullToRefresh onRefresh={refreshListings} className='flex flex-1 flex-col'>
     <BoardPageShell width='wide' className='flex flex-1 flex-col'>
-      <header className='pt-5 sm:pt-8 lg:pt-10'>
-        <h1 className='text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]'>
+      <header data-ui='board-header' className='pt-5 sm:pt-8 lg:pt-10'>
+        <h1 data-ui='board-title' className='text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]'>
           {t('list.title')}
         </h1>
-        <p className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>
+        <p data-ui='board-description' className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>
           {t('list.subtitle', { brand: BRAND_CONFIG.name })}
         </p>
 
@@ -440,6 +440,7 @@ export function HousingListScreen() {
         <div className='mt-4 flex items-center gap-2 sm:mt-5 sm:gap-2.5'>
           <button
             type='button'
+            data-ui='chip'
             onClick={openFilters}
             className={cn(
               'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[12px] font-semibold touch-manipulation transition sm:h-9 sm:px-3.5 sm:text-[13px]',
@@ -881,6 +882,7 @@ function QuickChip({
       type='button'
       role='option'
       aria-selected={active}
+      data-ui='chip'
       onClick={onClick}
       className={cn(
         'inline-flex h-9 shrink-0 items-center rounded-full border px-3 text-[12px] font-medium leading-none touch-manipulation transition sm:px-3.5 sm:text-[13px]',
