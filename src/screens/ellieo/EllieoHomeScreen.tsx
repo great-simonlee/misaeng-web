@@ -41,13 +41,14 @@ export function EllieoHomeScreen() {
   }, [])
 
   return (
-    <div className='min-w-0 bg-white'>
+    // flex-1: fill the layout's main column so no gray canvas shows above the footer
+    <div className='min-w-0 flex-1 bg-white'>
       <h1 className='sr-only'>{t('ellieo.intro.title', { city: cityInfo.shortLabel })}</h1>
 
       <StoriesStrip />
 
       {/* Feed on the left; new listings and roommates/sublets as two separate blocks in the side rail */}
-      <div className='mx-auto grid w-full max-w-7xl gap-10 px-4 pb-14 pt-7 sm:px-6 sm:pt-9 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 lg:px-8'>
+      <div className='mx-auto grid w-full max-w-7xl gap-10 px-4 pb-2 pt-7 sm:px-6 sm:pt-9 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 lg:px-8'>
         <CommunityFeed />
         <aside className='flex min-w-0 flex-col gap-9'>
           <NewListingsRail />

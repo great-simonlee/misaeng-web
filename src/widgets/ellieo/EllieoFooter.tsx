@@ -17,8 +17,9 @@ function misaengHref(path: string) {
 }
 
 /**
- * Ellieo footer. Light, trust-first (brief §3): what makes the community safe sits on top,
- * the operator line ("Operated by Misaeng LLC, New York") and license/brokerage lines at the bottom.
+ * Ellieo footer. Trust-first (brief §3): the three safety promises in a navy card on top,
+ * compact link columns, then one small line with the operator ("Operated by Misaeng LLC, New York"),
+ * license/brokerage, trademark and copyright.
  * License and brokerage come from BRAND_CONFIG.trust and stay hidden until filled in.
  */
 export function EllieoFooter() {
@@ -50,27 +51,38 @@ export function EllieoFooter() {
     { href: href('/privacy-policy'), label: t('footer.links.privacy') },
   ]
 
+  // Bottom line: operator, license/brokerage (hidden until filled in), trademark, copyright, joined on one line
+  const legalLine = [
+    trust.operator ? t('ellieo.operatedBy', { company: trust.operator.name, city: trust.operator.city }) : null,
+    trust.realEstateLicense ? t('ellieo.license', { number: trust.realEstateLicense }) : null,
+    trust.brokerage ? t('ellieo.brokerage', { name: trust.brokerage }) : null,
+    trust.trademarkRegNo ? t('ellieo.trademark', { brand: BRAND_CONFIG.name, number: trust.trademarkRegNo }) : null,
+    '© 2026 Misaeng LLC',
+  ]
+    .filter((item): item is string => Boolean(item))
+    .map((item) => item.replace(/\.$/, ''))
+
   return (
-    <footer className='mt-auto border-t border-[var(--border)] bg-white text-[var(--foreground)]'>
-      {/* Trust strip */}
-      <div className='border-b border-[var(--border)] bg-[var(--background)]'>
-        <ul className='mx-auto grid w-full max-w-7xl gap-4 px-4 py-6 sm:grid-cols-3 sm:gap-6 sm:px-6 lg:px-8'>
+    <footer className='mt-auto bg-white pt-8 text-[var(--foreground)]'>
+      {/* Trust: one navy card */}
+      <div className='mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'>
+        <ul className='grid gap-4 rounded-2xl bg-[var(--navy)] px-5 py-5 text-white sm:grid-cols-3 sm:gap-6 sm:px-6'>
           {trustItems.map(({ icon: Icon, title, body }) => (
             <li key={title} className='flex min-w-0 gap-3'>
-              <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-[var(--ellieo-jade-soft)] text-[var(--ellieo-jade)]'>
-                <Icon className='size-5' />
+              <span className='inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-[#7fd8b8]'>
+                <Icon className='size-[18px]' />
               </span>
               <span className='min-w-0'>
-                <span className='block text-[14px] font-semibold'>{title}</span>
-                <span className='block text-[13px] leading-relaxed text-[var(--muted)]'>{body}</span>
+                <span className='block text-[13.5px] font-semibold'>{title}</span>
+                <span className='mt-0.5 block text-[12.5px] leading-relaxed text-white/65'>{body}</span>
               </span>
             </li>
           ))}
         </ul>
       </div>
 
-      <div className='mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
-        <div className='grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]'>
+      <div className='mx-auto w-full max-w-7xl px-4 pb-6 pt-8 sm:px-6 lg:px-8'>
+        <div className='grid grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))]'>
           <div className='col-span-2 min-w-0 md:col-span-1'>
             <Link href={href()} className='inline-flex items-center' aria-label={t('homeAria', { city: cityInfo.shortLabel })}>
               <Image
@@ -78,16 +90,16 @@ export function EllieoFooter() {
                 alt={BRAND_CONFIG.name}
                 width={BRAND_CONFIG.assets.banner.width}
                 height={BRAND_CONFIG.assets.banner.height}
-                className='h-6 w-auto'
+                className='h-5 w-auto'
               />
               {trust.registeredMark ? (
-                <sup className='ml-0.5 self-start text-[9px] font-semibold text-[var(--muted)]'>®</sup>
+                <sup className='ml-0.5 self-start text-[8px] font-semibold text-[var(--muted)]'>®</sup>
               ) : null}
             </Link>
-            <p className='mt-3 max-w-sm text-[14px] leading-relaxed text-[var(--muted)]'>{t('ellieo.footerTagline')}</p>
+            <p className='mt-2.5 max-w-xs text-[13px] leading-relaxed text-[var(--muted)]'>{t('ellieo.footerTagline')}</p>
             <a
               href={`mailto:${CONTACT_EMAIL}`}
-              className='mt-4 inline-flex items-center gap-2 text-[14px] font-semibold text-[var(--brand)] hover:text-[var(--brand-hover)]'
+              className='mt-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--foreground)] hover:text-[var(--brand)]'
             >
               <MailIcon className='size-4' />
               {CONTACT_EMAIL}
@@ -98,21 +110,9 @@ export function EllieoFooter() {
           <LinkColumn title={t('ellieo.legalGroup')} links={legal} />
         </div>
 
-        <div className='mt-8 space-y-1.5 border-t border-[var(--border)] pt-5 text-[12.5px] leading-relaxed text-[var(--muted)]'>
-          {trust.operator ? (
-            <p className='font-medium text-[var(--muted-foreground)]'>
-              {t('ellieo.operatedBy', { company: trust.operator.name, city: trust.operator.city })}
-            </p>
-          ) : null}
-          {trust.realEstateLicense ? (
-            <p>{t('ellieo.license', { number: trust.realEstateLicense })}</p>
-          ) : null}
-          {trust.brokerage ? <p>{t('ellieo.brokerage', { name: trust.brokerage })}</p> : null}
-          {trust.trademarkRegNo ? (
-            <p>{t('ellieo.trademark', { brand: BRAND_CONFIG.name, number: trust.trademarkRegNo })}</p>
-          ) : null}
-          <p>© 2026 Misaeng LLC. All rights reserved.</p>
-        </div>
+        <p className='mt-7 border-t border-[var(--border)] pt-4 text-[12px] leading-relaxed text-[var(--muted)]'>
+          {legalLine.join(' · ')}
+        </p>
       </div>
     </footer>
   )
@@ -121,16 +121,16 @@ export function EllieoFooter() {
 function LinkColumn({ title, links }: { title: string; links: { href: string; label: string }[] }) {
   return (
     <div className='min-w-0'>
-      <p className='text-[13px] font-semibold text-[var(--foreground)]'>{title}</p>
-      <ul className='mt-3 space-y-2'>
+      <p className='text-[12px] font-semibold uppercase tracking-[0.04em] text-[var(--muted)]'>{title}</p>
+      <ul className='mt-2.5 space-y-1.5'>
         {links.map((item) => (
           <li key={item.href}>
             {item.href.startsWith('http') ? (
-              <a href={item.href} className='text-[14px] text-[var(--muted)] transition hover:text-[var(--foreground)]'>
+              <a href={item.href} className='text-[13.5px] text-[var(--muted-foreground)] transition hover:text-[var(--brand)]'>
                 {item.label}
               </a>
             ) : (
-              <Link href={item.href} className='text-[14px] text-[var(--muted)] transition hover:text-[var(--foreground)]'>
+              <Link href={item.href} className='text-[13.5px] text-[var(--muted-foreground)] transition hover:text-[var(--brand)]'>
                 {item.label}
               </Link>
             )}
