@@ -101,13 +101,13 @@ export function LoadingSpinner({
   )
 }
 
-/** Ellieo logo width per size; the app's section loader uses 48pt */
-const ELLIEO_LOGO_PX = { sm: 32, md: 48, lg: 56 } as const
+/** Ellieo vertical logo (symbol over ELLIEO) width per size; the wordmark needs more room than the app's 48pt symbol */
+const ELLIEO_LOGO_PX = { sm: 52, md: 76, lg: 92 } as const
 const ELLIEO_WAVE_SCALE = { sm: 0.6, md: 0.8, lg: 0.9 } as const
 
 /**
  * Ellieo loader, same as the Misaeng app's SectionLoading (ios/Misaeng/Components/LoadingWave.swift):
- * the logo over five short bars rising and falling in one wave, left → right, fading in after 350ms
+ * the vertical logo (symbol over ELLIEO) over five short bars rising and falling in one wave, left → right, fading in after 350ms
  * so fast loads never flash it. Logo and bars use the Ellieo cyan → blue gradient. Motion: globals ellieo-wave.
  */
 function EllieoLoading({
@@ -130,7 +130,7 @@ function EllieoLoading({
       aria-label={accessibleName}
     >
       <Image
-        src={BRAND_CONFIG.assets.square}
+        src={BRAND_CONFIG.assets.vertical ?? BRAND_CONFIG.assets.square}
         alt=''
         width={ELLIEO_LOGO_PX[size]}
         height={ELLIEO_LOGO_PX[size]}

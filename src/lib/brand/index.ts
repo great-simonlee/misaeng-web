@@ -72,6 +72,8 @@ export type BrandConfig = {
     banner: { src: string; width: number; height: number }
     /** 정사각형 아이콘 (로딩, 푸터) */
     square: string
+    /** Symbol over the wordmark (loading screens). Falls back to `square` when absent */
+    vertical?: string
     favicon: string
   }
 }
@@ -136,6 +138,7 @@ const ELLIEO: BrandConfig = {
   assets: {
     banner: { src: '/brand/ellieo-banner.png', width: 1073, height: 296 },
     square: '/img/ellieo_logo.png',
+    vertical: '/brand/ellieo-logo-vertical.png',
     favicon: '/brand/ellieo-favicon.ico',
   },
 }
