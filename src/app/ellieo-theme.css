@@ -529,3 +529,118 @@ html[data-brand='ellieo'] {
   font-weight: 800;
   letter-spacing: -0.02em;
 }
+
+
+/* =====================================================================
+   Phones (< 640px): compact versions of the wide-screen panels
+   ===================================================================== */
+
+/* Chip scroll arrows stay 24px but get a 40px tap area */
+[data-brand='ellieo'] [data-ui='chip-arrow']::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+@media (max-width: 639px) {
+  /* Company directory / postings / company hero: flat and short — no panel box, no logo marquee */
+  [data-brand='ellieo'] [data-ui='hero-panel'] {
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0.25rem 0 0;
+  }
+
+  [data-brand='ellieo'] [data-ui='hero-panel'] input[type='search'],
+  [data-brand='ellieo'] [data-ui='hero-panel'] [class*='shadow-[0_10px_30px'] {
+    margin-top: 0.875rem;
+  }
+
+  [data-brand='ellieo'] [data-ui='hero-panel'] input[type='search'] {
+    height: 2.75rem;
+    box-shadow: 0 0 0 1px var(--border);
+  }
+
+  [data-brand='ellieo'] [data-ui='hero-panel'] [class*='h-[52px]'] {
+    height: 2.75rem;
+  }
+
+  [data-brand='ellieo'] [data-ui='hero-marquee'] {
+    display: none;
+  }
+
+  /* Company cards: one full-width row each (logo · name · industry, badges under the name) */
+  [data-brand='ellieo'] [data-ui='company-grid'] {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  [data-brand='ellieo'] [data-ui='company-card'] {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+    column-gap: 0.75rem;
+    row-gap: 0.25rem;
+    align-items: center;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 0;
+  }
+
+  [data-brand='ellieo'] [data-ui='company-card']:hover {
+    box-shadow: none;
+  }
+
+  [data-brand='ellieo'] [data-ui='company-card'] > div:first-child {
+    display: contents;
+  }
+
+  [data-brand='ellieo'] [data-ui='company-card'] > div:first-child > :first-child {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  [data-brand='ellieo'] [data-ui='company-card'] > div:first-child > span {
+    grid-column: 3;
+    grid-row: 1;
+    max-width: 9.5rem;
+    overflow: hidden;
+  }
+
+  [data-brand='ellieo'] [data-ui='company-card'] > div:first-child > span * {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  [data-brand='ellieo'] [data-ui='company-card'] > span:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: 0;
+    -webkit-line-clamp: 1;
+  }
+
+  [data-brand='ellieo'] [data-ui='company-card'] > span:nth-child(3) {
+    grid-column: 2 / span 2;
+    grid-row: 2;
+    margin-top: 0;
+  }
+
+  /* Postings: the three filter rows sit closer together */
+  [data-brand='ellieo'] [data-ui='filter-stack'] {
+    margin-top: 1rem;
+  }
+
+  [data-brand='ellieo'] [data-ui='filter-stack'] > * + * {
+    margin-top: 0.5rem;
+  }
+
+  /* Food map/list toggle: smaller pill so it covers less of the list */
+  [data-brand='ellieo'] [data-ui='floating-bottom'] > button {
+    height: 2.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 13px;
+  }
+}

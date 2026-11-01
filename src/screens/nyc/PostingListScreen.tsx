@@ -112,7 +112,7 @@ export function PostingListScreen() {
         </CompanyHeroPanel>
       </header>
 
-      <div className='mt-6 space-y-3'>
+      <div data-ui='filter-stack' className='mt-6 space-y-3'>
         <ChipScrollRow
           leading={<Chip label={t('postings.allLevels')} count={postings.length} active={kind === 'all'} onClick={() => setKind('all')} />}
         >

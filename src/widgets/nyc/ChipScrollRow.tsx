@@ -104,6 +104,7 @@ export function ChipScrollRow({
             />
             <button
               type='button'
+              data-ui='chip-arrow'
               aria-label={t('ui.chipScroll.previous')}
               onClick={() => scrollByDir('left')}
               className='pointer-events-auto relative ml-0.5 inline-flex size-6 items-center justify-center rounded-full border border-[#dddddd] bg-white text-[var(--foreground)] shadow-sm touch-manipulation'
@@ -129,6 +130,7 @@ export function ChipScrollRow({
             />
             <button
               type='button'
+              data-ui='chip-arrow'
               aria-label={t('ui.chipScroll.next')}
               onClick={() => scrollByDir('right')}
               className='pointer-events-auto relative mr-0.5 inline-flex size-6 items-center justify-center rounded-full border border-[#dddddd] bg-white text-[var(--foreground)] shadow-sm touch-manipulation'

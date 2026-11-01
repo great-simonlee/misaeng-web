@@ -233,6 +233,7 @@ export function CompanyListScreen() {
 
           {marquee.length >= 6 ? (
             <div
+              data-ui='hero-marquee'
               className='partner-marquee relative -mx-5 mt-6 overflow-hidden sm:-mx-7 sm:mt-8'
               aria-hidden
             >
@@ -447,7 +448,7 @@ function CompanyCardGrid({
   hideIndustry?: boolean
 }) {
   return (
-    <ul className='grid min-w-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'>
+    <ul data-ui='company-grid' className='grid min-w-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'>
       {companies.map((company, i) => (
         <li key={company.slug} className={cardEnter} style={enterDelay(delayOffset + i)}>
           <CompanyCard company={company} href={hrefFor(company.slug)} hideIndustry={hideIndustry} />
@@ -554,6 +555,7 @@ function CompanyCard({
   return (
     <Link
       href={href}
+      data-ui='company-card'
       className='group relative flex h-full flex-col rounded-[1.25rem] bg-white p-3.5 ring-1 ring-black/[0.06] touch-manipulation transition duration-200 ease-out hover:shadow-[0_6px_18px_-8px_rgba(15,23,42,0.16)] hover:ring-black/[0.12] active:scale-[0.99] sm:p-4'
     >
       <div className='flex items-start justify-between gap-2'>

@@ -84,33 +84,41 @@ export function EllieoFooter() {
       {/* Trust: quiet, light panel. Who runs Ellieo, then the three commitments. Home only */}
       {isHome ? (
         <div className='mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <section className='grid gap-6 rounded-2xl border border-[var(--border)] bg-[#f8f9fc] px-5 py-6 sm:px-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] lg:gap-10'>
-            <div className='min-w-0'>
-              <span className='inline-flex size-10 items-center justify-center rounded-xl bg-[var(--navy)] text-white'>
+          <section className='grid gap-4 rounded-2xl border border-[var(--border)] bg-[#f8f9fc] px-4 py-5 sm:gap-6 sm:px-7 sm:py-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] lg:gap-10'>
+            {/* Phones: shield beside the headline; lg+: stacked */}
+            <div className='flex min-w-0 items-start gap-3 lg:block'>
+              <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-[var(--navy)] text-white sm:size-10'>
                 <ShieldCheckIcon className='size-5' />
               </span>
-              <h2 className='mt-3 text-[16px] font-bold tracking-[-0.01em] text-[var(--foreground)]'>
-                {t('ellieo.trust.headline')}
-              </h2>
-              {trust.operator ? (
-                <p className='mt-1 text-[13px] leading-relaxed text-[var(--muted)]'>
-                  {t('ellieo.trust.subline', {
-                    company: trust.operator.name,
-                    city: trust.operator.city,
-                  })}
-                </p>
-              ) : null}
-            </div>
-            <ul className='grid gap-5 sm:grid-cols-3 sm:gap-8'>
-              {trustItems.map(({ icon: Icon, title, body }) => (
-                <li key={title} className='min-w-0'>
-                  <span className='inline-flex size-9 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--navy)]'>
-                    <Icon className='size-[18px]' />
-                  </span>
-                  <p className='mt-2.5 text-[14px] font-semibold text-[var(--foreground)]'>
-                    {title}
+              <div className='min-w-0'>
+                <h2 className='text-[15px] font-bold tracking-[-0.01em] text-[var(--foreground)] sm:text-[16px] lg:mt-3'>
+                  {t('ellieo.trust.headline')}
+                </h2>
+                {trust.operator ? (
+                  <p className='mt-1 text-[13px] leading-relaxed text-[var(--muted)]'>
+                    {t('ellieo.trust.subline', {
+                      company: trust.operator.name,
+                      city: trust.operator.city,
+                    })}
                   </p>
-                  <p className='mt-1 text-[13px] leading-relaxed text-[var(--muted)]'>{body}</p>
+                ) : null}
+              </div>
+            </div>
+            {/* Phones: compact rows (icon left); sm+: three columns */}
+            <ul className='grid gap-3.5 sm:grid-cols-3 sm:gap-8'>
+              {trustItems.map(({ icon: Icon, title, body }) => (
+                <li key={title} className='flex min-w-0 gap-3 sm:block'>
+                  <span className='inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--navy)] sm:size-9'>
+                    <Icon className='size-4 sm:size-[18px]' />
+                  </span>
+                  <div className='min-w-0'>
+                    <p className='text-[13.5px] font-semibold text-[var(--foreground)] sm:mt-2.5 sm:text-[14px]'>
+                      {title}
+                    </p>
+                    <p className='mt-0.5 text-[12.5px] leading-relaxed text-[var(--muted)] sm:mt-1 sm:text-[13px]'>
+                      {body}
+                    </p>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -141,14 +149,14 @@ export function EllieoFooter() {
           </Link>
           <nav
             aria-label={t('ellieo.legalGroup')}
-            className='flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px]'
+            className='grid w-full grid-cols-2 gap-x-4 gap-y-1 text-[13px] sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-y-1.5'
           >
             {[...support, ...legal].map((item) =>
               /^(https?:|mailto:)/.test(item.href) ? (
                 <a
                   key={item.href}
                   href={item.href}
-                  className='text-[var(--muted-foreground)] transition hover:text-[var(--brand)]'
+                  className='py-1 text-[var(--muted-foreground)] transition hover:text-[var(--brand)] sm:py-0'
                 >
                   {item.label}
                 </a>
@@ -156,7 +164,7 @@ export function EllieoFooter() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className='text-[var(--muted-foreground)] transition hover:text-[var(--brand)]'
+                  className='py-1 text-[var(--muted-foreground)] transition hover:text-[var(--brand)] sm:py-0'
                 >
                   {item.label}
                 </Link>
@@ -164,7 +172,7 @@ export function EllieoFooter() {
             )}
             <a
               href={`mailto:${CONTACT_EMAIL}`}
-              className='inline-flex items-center gap-1 font-semibold text-[var(--foreground)] hover:text-[var(--brand)]'
+              className='col-span-2 inline-flex items-center gap-1 py-1 font-semibold text-[var(--foreground)] hover:text-[var(--brand)] sm:py-0'
             >
               <MailIcon className='size-3.5' />
               {CONTACT_EMAIL}

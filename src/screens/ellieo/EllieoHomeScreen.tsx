@@ -192,6 +192,56 @@ function StoriesStrip() {
   )
 }
 
+/* ---------- No feed yet: board shortcuts instead of an empty column ---------- */
+
+/** Housing has its own block in the side rail, so the shortcuts start at visa */
+function ExploreBoards() {
+  const t = useT('hub')
+  const tc = useT('community')
+  const href = useCityPath()
+  const cityInfo = useCityInfo()
+  const boards = ELLIEO_BOARDS.filter((board) => board.available && board.id !== 'housing')
+
+  return (
+    <section className='min-w-0'>
+      <FeedHeading title={t('ellieo.explore.title')} />
+      <p className='mt-1 text-[13.5px] leading-relaxed text-[var(--muted)]'>
+        {t('ellieo.explore.subtitle', { city: cityInfo.shortLabel })}
+      </p>
+      <ul className='mt-4 grid grid-cols-1 gap-2 min-[480px]:grid-cols-2'>
+        {boards.map((board) => {
+          const Icon = board.icon
+          const tone = BOARD_TONE[board.id] ?? '#5b6779'
+          return (
+            <li key={board.id}>
+              <Link
+                href={href(board.path)}
+                className='group flex min-h-[3.75rem] items-center gap-3 rounded-xl px-3 py-2.5 ring-1 ring-inset ring-[var(--border)] transition hover:bg-[#f8f9fc]'
+              >
+                <span
+                  aria-hidden
+                  className='flex size-10 shrink-0 items-center justify-center rounded-full'
+                  style={{ color: tone, background: `${tone}14` }}
+                >
+                  <Icon className='size-[18px]' />
+                </span>
+                <span className='min-w-0 flex-1'>
+                  <span className='block truncate text-[14.5px] font-semibold text-[var(--foreground)] group-hover:text-[var(--brand)]'>
+                    {tc(`categories.${board.id}.title`)}
+                  </span>
+                  <span className='block truncate text-[12.5px] text-[var(--muted)]'>
+                    {tc(`categories.${board.id}.description`, { city: cityInfo.shortLabel })}
+                  </span>
+                </span>
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+    </section>
+  )
+}
+
 /* ---------- Community feed ---------- */
 
 const AVATAR_GRADIENTS = [
@@ -227,7 +277,7 @@ function CommunityFeed() {
   const [filter, setFilter] = useState<NycCategoryId | 'all'>('all')
   // Fixed at mount so "3 hours ago" doesn't change between renders
   const [now] = useState(() => Date.now())
-  if (posts.length === 0) return <div />
+  if (posts.length === 0) return <ExploreBoards />
 
   // Chips only for boards that have posts, in the Ellieo board order
   const boards = ELLIEO_BOARDS.filter((board) => posts.some((post) => post.board === board.id))
