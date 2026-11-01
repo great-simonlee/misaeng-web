@@ -56,6 +56,7 @@ export function EllieoFooter() {
   ]
 
   const support = [
+    { href: href('/about'), label: t('footer.links.about') },
     { href: href('/me'), label: t('footer.links.me') },
     { href: `mailto:${CONTACT_EMAIL}`, label: t('footer.links.contact') },
   ]

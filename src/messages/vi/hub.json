@@ -180,6 +180,87 @@
       "title": "Khám phá Ellieo",
       "subtitle": "Các chuyên mục về nhà ở, visa, việc làm và cuộc sống ở {city}."
     },
+    "about": {
+      "meta": {
+        "title": "Về Ellieo",
+        "description": "Ellieo là đội ngũ xây dựng dịch vụ mà du học sinh và người đi làm ở nước ngoài có thể thật sự tin tưởng."
+      },
+      "hero": {
+        "eyebrow": "Về Ellieo",
+        "title": "Xa nhà không có nghĩa là một mình.",
+        "subline": "Ellieo là đội ngũ xây dựng một dịch vụ mà du học sinh và người đi làm ở nước ngoài có thể thật sự tin tưởng — và chúng tôi muốn đó là dịch vụ tốt nhất."
+      },
+      "why": {
+        "title": "Vì sao chúng tôi bắt đầu",
+        "intro": "Chuyển đến một đất nước mới cần rất nhiều can đảm. Và cũng có những khó khăn không ai báo trước.",
+        "scam": {
+          "title": "Lừa đảo nhà ở",
+          "body": "Tin đăng giả và lời nhắn “chuyển cọc trước” nhắm vào người mới đến nhiều nhất."
+        },
+        "visa": {
+          "title": "Thủ tục visa rối rắm",
+          "body": "Mốc thời gian OPT, CPT và thẻ xanh nằm rải rác khắp diễn đàn, nhóm chat và tin đồn."
+        },
+        "jobs": {
+          "title": "Thiếu thông tin việc làm đáng tin",
+          "body": "Rất khó tìm kinh nghiệm phỏng vấn và chuyện nơi làm việc thật lòng từ những người giống bạn."
+        },
+        "lonely": {
+          "title": "Những ngày đầu cô đơn",
+          "body": "Mùa đông đầu tiên, kỳ nghỉ lễ đầu tiên xa gia đình — biết có người hiểu mình là đỡ hơn rất nhiều."
+        }
+      },
+      "promise": {
+        "title": "Điều chúng tôi cam kết",
+        "verified": {
+          "title": "Chỉ thành viên đã xác minh",
+          "body": "Ai cũng tham gia bằng email trường hoặc công ty, nên bạn luôn biết mình đang trò chuyện với ai."
+        },
+        "real": {
+          "title": "Trải nghiệm thật",
+          "body": "Đánh giá và câu chuyện đến từ chính những thành viên đã trải qua — không phải quảng cáo."
+        },
+        "safety": {
+          "title": "An toàn là trên hết",
+          "body": "Báo cáo bất cứ điều gì đáng ngờ, đội ngũ của chúng tôi sẽ kiểm tra và phản hồi."
+        },
+        "free": {
+          "title": "Tham gia miễn phí",
+          "body": "Tạo tài khoản và tham gia cộng đồng hoàn toàn miễn phí."
+        }
+      },
+      "does": {
+        "title": "Ellieo làm gì",
+        "housing": {
+          "title": "Nhà ở",
+          "body": "Thuê nhà, tìm bạn cùng phòng và sublet — và chúng tôi không bao giờ yêu cầu bạn trả tiền trước khi ký hợp đồng."
+        },
+        "visa": {
+          "title": "Visa",
+          "body": "Mốc thời gian OPT, CPT và thẻ xanh, được chia sẻ từng bước bởi những người đã trải qua."
+        },
+        "jobs": {
+          "title": "Việc làm",
+          "body": "Trang công ty, tin tuyển thực tập và sinh viên mới ra trường, cùng đánh giá phỏng vấn thật lòng."
+        },
+        "community": {
+          "title": "Cộng đồng",
+          "body": "Ăn uống, sự kiện và hỏi đáp ẩn danh cho cuộc sống hằng ngày ở {city}."
+        }
+      },
+      "team": {
+        "title": "Đội ngũ của chúng tôi",
+        "body": "Chúng tôi xây dựng Ellieo cho người đang đọc hợp đồng thuê nhà bằng ngôn ngữ thứ hai, lướt diễn đàn visa lúc 2 giờ sáng, chỉ mong một câu trả lời thật lòng. Mỗi tính năng đều bắt đầu từ cùng một câu hỏi: chính chúng tôi có tin tưởng điều này không?",
+        "closing": "Giúp du học sinh và người đi làm xa nhà thấy an toàn và bớt cô đơn — đó là lý do chúng tôi ở đây.",
+        "operator": "Ellieo được vận hành bởi {company}, {city}."
+      },
+      "cta": {
+        "title": "Bạn không phải tự mình xoay xở.",
+        "body": "Tham gia cộng đồng nơi mọi thành viên đều đã xác minh và ai cũng sẵn lòng giúp đỡ.",
+        "join": "Tham gia Ellieo",
+        "explore": "Khám phá cộng đồng"
+      }
+    },
     "stories": {
       "title": "Đối tác & nhà sáng tạo",
       "partner": "VSA đối tác"

@@ -180,6 +180,87 @@
       "title": "Explore Ellieo",
       "subtitle": "Boards for housing, visas, jobs and everyday life in {city}."
     },
+    "about": {
+      "meta": {
+        "title": "About Ellieo",
+        "description": "Ellieo is a team building the service international students and working professionals abroad can truly trust."
+      },
+      "hero": {
+        "eyebrow": "About Ellieo",
+        "title": "Far from home shouldn't mean on your own.",
+        "subline": "Ellieo is a team building one service that international students and working professionals abroad can truly trust — and we want it to be the best one there is."
+      },
+      "why": {
+        "title": "Why we started",
+        "intro": "Moving to a new country takes courage. It is also hard in ways nobody warns you about.",
+        "scam": {
+          "title": "Housing scams",
+          "body": "Fake listings and “send the deposit first” messages hit newcomers the hardest."
+        },
+        "visa": {
+          "title": "Confusing visa steps",
+          "body": "OPT, CPT and green card timelines are scattered across forums, group chats and rumors."
+        },
+        "jobs": {
+          "title": "No trusted job info",
+          "body": "Honest interview tips and workplace stories from people like you are hard to find."
+        },
+        "lonely": {
+          "title": "Lonely beginnings",
+          "body": "The first winter, the first holiday away from family — it helps to know someone gets it."
+        }
+      },
+      "promise": {
+        "title": "What we promise",
+        "verified": {
+          "title": "Verified members only",
+          "body": "Everyone joins with a school or work email, so you always know who you're talking to."
+        },
+        "real": {
+          "title": "Real experiences",
+          "body": "Reviews and stories come from members who lived them — not from ads."
+        },
+        "safety": {
+          "title": "Safety first",
+          "body": "Report anything suspicious and our team will review it and follow up."
+        },
+        "free": {
+          "title": "Free to join",
+          "body": "Creating an account and joining the community costs nothing."
+        }
+      },
+      "does": {
+        "title": "What Ellieo does",
+        "housing": {
+          "title": "Housing",
+          "body": "Rentals, roommates and sublets — and we never ask you to pay before you sign a lease."
+        },
+        "visa": {
+          "title": "Visa",
+          "body": "OPT, CPT and green card timelines, shared step by step by people who went through them."
+        },
+        "jobs": {
+          "title": "Jobs",
+          "body": "Company pages, internship and new grad postings, and honest interview reviews."
+        },
+        "community": {
+          "title": "Community",
+          "body": "Food, events and anonymous Q&A for everyday life in {city}."
+        }
+      },
+      "team": {
+        "title": "Our team",
+        "body": "We build Ellieo for the person reading a lease in a second language, refreshing visa forums at 2 a.m., wishing for one honest answer. Every feature starts with the same question: would we trust this ourselves?",
+        "closing": "Helping students and workers far from home feel safe and less alone — that is the whole reason we are here.",
+        "operator": "Ellieo is operated by {company}, {city}."
+      },
+      "cta": {
+        "title": "You don't have to figure it out alone.",
+        "body": "Join a community where every member is verified and everyone is here to help.",
+        "join": "Join Ellieo",
+        "explore": "Explore the community"
+      }
+    },
     "stories": {
       "title": "Partners & Creators",
       "partner": "Partner VSA"

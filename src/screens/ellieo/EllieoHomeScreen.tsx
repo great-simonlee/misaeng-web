@@ -4,9 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { MarqueeRow } from '@components'
-import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
-import { useEllieoViewer } from '@hooks/useEllieoViewer'
-import { cityLoginPath } from '@lib/constants/cities'
+import { useCityInfo, useCityPath } from '@hooks/useCity'
 import { captureReferralFromLocation } from '@lib/community/referral'
 import type { NycCategoryId } from '@lib/constants/nyc'
 import { useFormat, useLocale, useT } from '@lib/i18n/client'
@@ -64,34 +62,26 @@ const BANNER_EXT = 'svg'
 const bannerSrc = (locale: string, size: 'desktop' | 'mobile') =>
   `/brand/banner/ellieo-banner-${locale === 'vi' ? 'vi' : 'en'}-${size}.${BANNER_EXT}`
 
-/** Links to sign-up while signed out; a plain image once signed in */
+/** The whole banner opens the Ellieo intro page (/<city>/about) */
 function TopBanner() {
   const t = useT('hub')
   const locale = useLocale()
-  const city = useCity()
-  const { user, loading } = useEllieoViewer()
-  const picture = (
-    <picture>
-      <source media='(max-width: 639px)' srcSet={bannerSrc(locale, 'mobile')} />
-      <img
-        src={bannerSrc(locale, 'desktop')}
-        alt={t('ellieo.banner.alt')}
-        width={1280}
-        height={132}
-        className='block h-auto w-full rounded-2xl'
-      />
-    </picture>
-  )
+  const href = useCityPath()
 
   return (
     <div className='mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 sm:pt-4 lg:px-8'>
-      {!loading && !user ? (
-        <Link href={`${cityLoginPath(city)}?mode=signup`} className='block rounded-2xl transition hover:opacity-95'>
-          {picture}
-        </Link>
-      ) : (
-        picture
-      )}
+      <Link href={href('/about')} className='block rounded-2xl transition hover:opacity-95'>
+        <picture>
+          <source media='(max-width: 639px)' srcSet={bannerSrc(locale, 'mobile')} />
+          <img
+            src={bannerSrc(locale, 'desktop')}
+            alt={t('ellieo.banner.alt')}
+            width={1280}
+            height={132}
+            className='block h-auto w-full rounded-2xl'
+          />
+        </picture>
+      </Link>
     </div>
   )
 }
