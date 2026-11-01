@@ -70,7 +70,10 @@ function TopBanner() {
 
   return (
     <div className='mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 sm:pt-4 lg:px-8'>
-      <Link href={href('/about')} className='block rounded-2xl transition hover:opacity-95'>
+      <Link
+        href={href('/about')}
+        className='block rounded-2xl transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-12px_rgba(31,94,255,0.55)] hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand)]'
+      >
         <picture>
           <source media='(max-width: 639px)' srcSet={bannerSrc(locale, 'mobile')} />
           <img
@@ -88,7 +91,15 @@ function TopBanner() {
 
 /* ---------- Stories: partner VSAs + creators ---------- */
 
-type Story = { id: string; mark: string; color: string; name: string; caption: string; url: string | null; ring: string }
+type Story = {
+  id: string
+  mark: string
+  color: string
+  name: string
+  caption: string
+  url: string | null
+  ring: string
+}
 
 const PLATFORM_URL: Record<EllieoCreator['platform'], (handle: string) => string> = {
   instagram: (handle) => `https://instagram.com/${handle}`,
@@ -122,10 +133,13 @@ function StoriesStrip() {
       mark: creator.name.charAt(0),
       color: creator.color,
       name: creator.name,
-      caption: `${t(`ellieo.creators.platforms.${creator.platform}`)} ${format.number(creator.followers, {
-        notation: 'compact',
-        maximumFractionDigits: 1,
-      })}`,
+      caption: `${t(`ellieo.creators.platforms.${creator.platform}`)} ${format.number(
+        creator.followers,
+        {
+          notation: 'compact',
+          maximumFractionDigits: 1,
+        }
+      )}`,
       url: creator.handle ? PLATFORM_URL[creator.platform](creator.handle) : null,
       ring: CREATOR_RING,
     })),
@@ -136,10 +150,15 @@ function StoriesStrip() {
   return (
     <section className='mx-auto w-full max-w-7xl pt-3 sm:pt-4'>
       <div className='flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-8'>
-        <h2 className='text-[13px] font-semibold text-[var(--muted)]'>{t('ellieo.stories.title')}</h2>
+        <h2 className='text-[13px] font-semibold text-[var(--muted)]'>
+          {t('ellieo.stories.title')}
+        </h2>
         <div className='flex shrink-0 items-center gap-2'>
           {sample ? <SampleTag /> : null}
-          <Link href={href('/partners')} className='text-[13px] font-semibold text-[var(--foreground)] hover:text-[var(--brand)]'>
+          <Link
+            href={href('/partners')}
+            className='text-[13px] font-semibold text-[var(--foreground)] hover:text-[var(--brand)]'
+          >
             {t('ellieo.seeAll')}
           </Link>
         </div>
@@ -163,12 +182,20 @@ function StoriesStrip() {
               <span className='mt-0.5 block w-full truncate text-center text-[11.5px] font-semibold leading-tight text-[var(--foreground)]'>
                 {story.name}
               </span>
-              <span className='block w-full truncate text-center text-[10px] leading-tight text-[var(--muted)]'>{story.caption}</span>
+              <span className='block w-full truncate text-center text-[10px] leading-tight text-[var(--muted)]'>
+                {story.caption}
+              </span>
             </>
           )
           const itemClass = 'flex w-[5rem] shrink-0 flex-col items-center px-0.5 py-0.5'
           return story.url ? (
-            <a key={story.id} href={story.url} target='_blank' rel='noopener noreferrer' className={itemClass}>
+            <a
+              key={story.id}
+              href={story.url}
+              target='_blank'
+              rel='noopener noreferrer'
+              className={itemClass}
+            >
               {inner}
             </a>
           ) : (
@@ -263,7 +290,9 @@ function CommunityFeed() {
   const locale = useLocale()
   const format = useFormat()
   const href = useCityPath()
-  const posts = getCommunityHighlights().filter((post) => !FEED_EXCLUDED_BOARDS.includes(post.board))
+  const posts = getCommunityHighlights().filter(
+    (post) => !FEED_EXCLUDED_BOARDS.includes(post.board)
+  )
   const [filter, setFilter] = useState<NycCategoryId | 'all'>('all')
   // Fixed at mount so "3 hours ago" doesn't change between renders
   const [now] = useState(() => Date.now())
@@ -280,27 +309,28 @@ function CommunityFeed() {
       {/* Board filter chips */}
       <div className='-mx-4 mt-3 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden'>
         <div role='tablist' aria-label={t('ellieo.community.title')} className='flex w-max gap-1.5'>
-          {[{ id: 'all' as const, label: t('ellieo.community.all') }, ...boards.map((board) => ({ id: board.id, label: tc(`categories.${board.id}.title`) }))].map(
-            (chip) => {
-              const active = filter === chip.id
-              return (
-                <button
-                  key={chip.id}
-                  type='button'
-                  role='tab'
-                  aria-selected={active}
-                  onClick={() => setFilter(chip.id)}
-                  className={
-                    active
-                      ? 'h-8 rounded-full bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white'
-                      : 'h-8 rounded-full bg-white px-3.5 text-[13px] font-semibold text-[var(--muted-foreground)] ring-1 ring-inset ring-[var(--border)] transition hover:ring-[var(--border-muted)]'
-                  }
-                >
-                  {chip.label}
-                </button>
-              )
-            },
-          )}
+          {[
+            { id: 'all' as const, label: t('ellieo.community.all') },
+            ...boards.map((board) => ({ id: board.id, label: tc(`categories.${board.id}.title`) })),
+          ].map((chip) => {
+            const active = filter === chip.id
+            return (
+              <button
+                key={chip.id}
+                type='button'
+                role='tab'
+                aria-selected={active}
+                onClick={() => setFilter(chip.id)}
+                className={
+                  active
+                    ? 'h-8 rounded-full bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white'
+                    : 'h-8 rounded-full bg-white px-3.5 text-[13px] font-semibold text-[var(--muted-foreground)] ring-1 ring-inset ring-[var(--border)] transition hover:ring-[var(--border-muted)]'
+                }
+              >
+                {chip.label}
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -312,7 +342,11 @@ function CommunityFeed() {
           const anonymous = post.board === 'anonymous'
           return (
             <li key={post.id} className='border-b border-[var(--border)] last:border-b-0'>
-              <Link href={href(board?.path ?? '/')} data-ui='hover-row' className='group block py-3.5'>
+              <Link
+                href={href(board?.path ?? '/')}
+                data-ui='hover-row'
+                className='group block py-3.5'
+              >
                 {/* Author line: one row. Anonymous Q&A hides nickname and school, like the board itself (lib/community/anonymous) */}
                 <span className='flex items-center gap-2'>
                   <span
@@ -328,7 +362,8 @@ function CommunityFeed() {
                     </span>
                     <BadgeCheckIcon className='size-3.5 shrink-0 text-[var(--ellieo-jade)]' />
                     <span className='truncate text-[var(--muted)]'>
-                      {anonymous ? '' : ` · ${shortSchool(post.school)}`} · {format.relative(now - post.hoursAgo * 3_600_000)}
+                      {anonymous ? '' : ` · ${shortSchool(post.school)}`} ·{' '}
+                      {format.relative(now - post.hoursAgo * 3_600_000)}
                     </span>
                   </span>
                   <span
@@ -337,7 +372,9 @@ function CommunityFeed() {
                   >
                     {BoardIcon ? <BoardIcon className='size-3' /> : null}
                     {/* Phones: icon only, so the nickname has room */}
-                    <span className='sr-only sm:not-sr-only'>{tc(`categories.${post.board}.title`)}</span>
+                    <span className='sr-only sm:not-sr-only'>
+                      {tc(`categories.${post.board}.title`)}
+                    </span>
                   </span>
                 </span>
 
@@ -373,4 +410,3 @@ function CommunityFeed() {
     </section>
   )
 }
-
