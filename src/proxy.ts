@@ -59,6 +59,10 @@ export function proxy(request: NextRequest) {
 
   if (!BRAND_CONFIG.hasCorporateSite) {
     if (!first) return redirectTo(request, servicePathFor(request, '/nyc'), 307)
+    // partners and the Ellieo intro page live under the city on ellieo (/nyc/partners, /nyc/about)
+    if ((first === 'partners' || first === 'about') && segments.length === 1) {
+      return redirectTo(request, servicePathFor(request, `/nyc/${first}`), 307)
+    }
     if (CORPORATE_PATHS.has(first)) {
       const misaeng = brandConfig('misaeng')
       return NextResponse.redirect(`${misaeng.siteUrl}${pathname}${search}`, 308)
