@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 
+import { MemberGate } from '@components/MemberGate'
 import { isCityId } from '@lib/constants/cities'
 import { isLocale } from '@lib/i18n/locales'
 import { getT } from '@lib/i18n/server'
@@ -9,6 +10,7 @@ import {
   getNycCategory,
   isCommunityBoardId,
   isCommunityBoardWip,
+  isMemberOnlyBoard,
 } from '@lib/constants/nyc'
 import { CommunityBoardWipScreen } from '@screens/nyc/CommunityBoardWipScreen'
 import { CommunityDetailScreen } from '@screens/nyc/CommunityDetailScreen'
@@ -36,11 +38,6 @@ export default async function CommunityDetailPage({
     return <CommunityBoardWipScreen boardId={board} title={title} />
   }
 
-  return (
-    <CommunityDetailScreen
-      boardId={board}
-      title={title}
-      postId={id}
-    />
-  )
+  const detail = <CommunityDetailScreen boardId={board} title={title} postId={id} />
+  return isMemberOnlyBoard(board) ? <MemberGate>{detail}</MemberGate> : detail
 }

@@ -227,6 +227,11 @@ export function isStatusCommunityBoard(id: string): boolean {
   return resolveMergedCommunityBoardId(id) === 'status'
 }
 
+/** 회원 전용 게시판 (비자·OPT 통합 게시판, 직장 후기). 화면은 MemberGate로 감싼다. */
+export function isMemberOnlyBoard(id: string): boolean {
+  return isStatusCommunityBoard(id) || id === 'job-review'
+}
+
 export function isAnonymousBoard(id: string): boolean {
   return id === 'anonymous'
 }
