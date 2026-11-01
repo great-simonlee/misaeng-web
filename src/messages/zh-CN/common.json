@@ -199,5 +199,15 @@
       "description": "每次添加进度或进入下一项时，内容都会保存在这台设备上。关闭窗口后也可以从上次的地方继续写。",
       "savedAt": "已保存 · {time}"
     }
+  },
+  "share": {
+    "housing": "来自 Misaeng 的房源分享！🏠",
+    "visa": "来自 Misaeng 的签证帖子分享！🛂",
+    "review": "来自 Misaeng 的面试·求职评价分享！💼",
+    "company": "来自 Misaeng 的公司分享！🏢",
+    "postings": "来自 Misaeng 的招聘信息分享！📋",
+    "memberOnly": "仅限 Misaeng 会员查看，请在应用中打开。",
+    "openInApp": "在应用中查看",
+    "perMonth": "/月"
   }
 }

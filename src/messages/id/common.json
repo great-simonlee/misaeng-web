@@ -199,5 +199,15 @@
       "description": "Tulisan disimpan di perangkat ini setiap kali kamu menambah update progres atau pindah ke item berikutnya. Kamu bisa menutup jendela dan melanjutkan dari bagian terakhir.",
       "savedAt": "Tersimpan · {time}"
     }
+  },
+  "share": {
+    "housing": "Kamar yang dibagikan dari Misaeng! 🏠",
+    "visa": "Postingan visa yang dibagikan dari Misaeng! 🛂",
+    "review": "Ulasan wawancara & kerja dari Misaeng! 💼",
+    "company": "Perusahaan yang dibagikan dari Misaeng! 🏢",
+    "postings": "Lowongan kerja yang dibagikan dari Misaeng! 📋",
+    "memberOnly": "Khusus anggota Misaeng. Buka di aplikasi.",
+    "openInApp": "Buka di aplikasi",
+    "perMonth": "/bln"
   }
 }
