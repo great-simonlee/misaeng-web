@@ -130,8 +130,9 @@ const ELLIEO: BrandConfig = {
     // 확인 필요: NY real estate license no. / brokerage name. Hidden while empty.
     realEstateLicense: '',
     brokerage: '',
-    registeredMark: true,
-    trademarkRegNo: '8509979',
+    // Not shown on the site (user decision 2026-11-01); Ellieo® USPTO Reg. No. 8509979
+    registeredMark: false,
+    trademarkRegNo: '',
     reportSlaHours: 48,
   },
   colors: { brand: '#1f5eff', brandHover: '#1748c7' },
