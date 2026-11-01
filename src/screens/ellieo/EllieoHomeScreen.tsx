@@ -4,7 +4,9 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { MarqueeRow } from '@components'
-import { useCityInfo, useCityPath } from '@hooks/useCity'
+import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
+import { useEllieoViewer } from '@hooks/useEllieoViewer'
+import { cityLoginPath } from '@lib/constants/cities'
 import { captureReferralFromLocation } from '@lib/community/referral'
 import type { NycCategoryId } from '@lib/constants/nyc'
 import { useFormat, useLocale, useT } from '@lib/i18n/client'
@@ -40,13 +42,40 @@ export function EllieoHomeScreen() {
     <div className='min-w-0 flex-1 bg-white'>
       <h1 className='sr-only'>{t('ellieo.intro.title', { city: cityInfo.shortLabel })}</h1>
 
+      <TopBanner />
       <StoriesStrip />
 
       {/* Feed on the left; new listings and roommates/sublets as two separate blocks in the side rail */}
-      <div className='mx-auto grid w-full max-w-7xl gap-10 px-4 pb-2 pt-7 sm:px-6 sm:pt-9 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 lg:px-8'>
+      <div className='mx-auto grid w-full max-w-7xl gap-10 px-4 pb-2 pt-5 sm:px-6 sm:pt-7 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 lg:px-8'>
         <CommunityFeed />
         <EllieoSideRail />
       </div>
+    </div>
+  )
+}
+
+/* ---------- Top banner: one short line above the stories ---------- */
+
+/** Text lives in hub.json `ellieo.banner`; the Join link hides once signed in. */
+function TopBanner() {
+  const t = useT('hub')
+  const city = useCity()
+  const { user, loading } = useEllieoViewer()
+  const showJoin = !loading && !user
+
+  return (
+    <div className='mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 lg:px-8'>
+      <p className='flex items-center justify-center gap-x-2 rounded-full bg-[var(--brand-soft,#eef3ff)] px-4 py-1.5 text-center text-[12px] leading-snug text-[var(--foreground)] sm:text-[12.5px]'>
+        <span className='min-w-0'>{t('ellieo.banner.text')}</span>
+        {showJoin ? (
+          <Link
+            href={`${cityLoginPath(city)}?mode=signup`}
+            className='shrink-0 font-semibold text-[var(--brand)] hover:underline'
+          >
+            {t('ellieo.banner.cta')} →
+          </Link>
+        ) : null}
+      </p>
     </div>
   )
 }
@@ -99,7 +128,7 @@ function StoriesStrip() {
   const sample = isMockList(orgs, ELLIEO_PARTNER_ORGS) || isMockList(creators, ELLIEO_CREATORS)
 
   return (
-    <section className='mx-auto w-full max-w-7xl pt-4 sm:pt-6'>
+    <section className='mx-auto w-full max-w-7xl pt-3 sm:pt-4'>
       <div className='flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-8'>
         <h2 className='text-[13px] font-semibold text-[var(--muted)]'>{t('ellieo.stories.title')}</h2>
         <div className='flex shrink-0 items-center gap-2'>
@@ -110,7 +139,7 @@ function StoriesStrip() {
         </div>
       </div>
       {/* Slides by itself; pauses on hover, stops for reduced motion (partner-marquee in globals.css) */}
-      <MarqueeRow className='mt-2 lg:mx-8'>
+      <MarqueeRow className='mt-1 lg:mx-8'>
         {stories.map((story) => {
           const inner = (
             <>
@@ -118,20 +147,20 @@ function StoriesStrip() {
                 <span className='block rounded-full bg-white p-[2px]'>
                   <span
                     aria-hidden
-                    className='flex size-[3.25rem] items-center justify-center rounded-full text-[13px] font-bold tracking-tight text-white'
+                    className='flex size-11 items-center justify-center rounded-full text-[12px] font-bold tracking-tight text-white'
                     style={{ background: story.color }}
                   >
                     {story.mark}
                   </span>
                 </span>
               </span>
-              <span className='mt-1 block w-full truncate text-center text-[12px] font-semibold text-[var(--foreground)]'>
+              <span className='mt-0.5 block w-full truncate text-center text-[11.5px] font-semibold leading-tight text-[var(--foreground)]'>
                 {story.name}
               </span>
-              <span className='block w-full truncate text-center text-[10.5px] text-[var(--muted)]'>{story.caption}</span>
+              <span className='block w-full truncate text-center text-[10px] leading-tight text-[var(--muted)]'>{story.caption}</span>
             </>
           )
-          const itemClass = 'flex w-[5.5rem] shrink-0 flex-col items-center px-0.5 py-1'
+          const itemClass = 'flex w-[5rem] shrink-0 flex-col items-center px-0.5 py-0.5'
           return story.url ? (
             <a key={story.id} href={story.url} target='_blank' rel='noopener noreferrer' className={itemClass}>
               {inner}

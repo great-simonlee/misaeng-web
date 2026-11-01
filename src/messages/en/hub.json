@@ -173,6 +173,10 @@
       "anonymous": "Anonymous"
     },
     "perMonth": "/mo",
+    "banner": {
+      "text": "Welcome to Ellieo — the community for Vietnamese students and professionals in NYC.",
+      "cta": "Join free"
+    },
     "stories": {
       "title": "Partners & Creators",
       "partner": "Partner VSA"
