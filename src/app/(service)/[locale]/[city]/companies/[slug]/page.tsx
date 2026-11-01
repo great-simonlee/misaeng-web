@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { MemberGate } from '@components/MemberGate'
 import { BRAND_CONFIG } from '@lib/brand'
 import { isLocale } from '@lib/i18n/locales'
 import { getT } from '@lib/i18n/server'
@@ -24,5 +25,9 @@ export async function generateMetadata({ params }: CompanyPageProps): Promise<Me
 
 export default async function CompanyPage({ params }: CompanyPageProps) {
   const { slug } = await params
-  return <CompanyDetailScreen slug={slug} />
+  return (
+    <MemberGate>
+      <CompanyDetailScreen slug={slug} />
+    </MemberGate>
+  )
 }
