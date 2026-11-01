@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
+import { BRAND_CONFIG } from '@lib/brand'
 import { buildReferralShareUrl } from '@lib/community/referral'
 import { COMMUNITY_CREDIT_REFERRAL_MAX } from '@lib/constants/communityCredit'
 import { apiErrorMessage } from '@lib/i18n/apiError'
@@ -35,7 +36,8 @@ export async function GET(request: Request) {
       getSupabaseProfile(user.uid),
       getReferralUseCount(user.uid),
     ])
-    const origin = new URL(request.url).origin
+    // behind the AWS proxy request.url is the internal address, so shared links use the public site URL
+    const origin = process.env.NODE_ENV === 'production' ? BRAND_CONFIG.siteUrl : new URL(request.url).origin
     return NextResponse.json({
       code,
       shareUrl: buildReferralShareUrl(origin, code),
