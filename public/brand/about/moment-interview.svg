@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200"><rect width="320" height="200" fill="#eef3ff"/><circle cx="70" cy="40" r="60" fill="#bfd3ff" fill-opacity="0.55"/><circle cx="270" cy="170" r="60" fill="#bfd3ff" fill-opacity="0.55"/>
+<rect x="60" y="120" width="200" height="12" rx="6" fill="#0a2f8f"/><rect x="80" y="132" width="8" height="46" fill="#0a2f8f"/><rect x="232" y="132" width="8" height="46" fill="#0a2f8f"/>
+<g transform="translate(110 92)"><circle r="16" fill="#0b4fe0"/><path d="M-26 28 a26 26 0 0 1 52 0 Z" fill="#0b4fe0"/></g>
+<g transform="translate(212 92)"><circle r="16" fill="#1f6bff"/><path d="M-26 28 a26 26 0 0 1 52 0 Z" fill="#1f6bff"/></g>
+<rect x="138" y="108" width="44" height="12" rx="3" fill="#ffffff"/>
+<g transform="translate(150 22)"><rect width="78" height="42" rx="14" fill="#ffffff" stroke="#bfd3ff" stroke-width="2"/><path d="M18 42 L14 54 L30 42 Z" fill="#ffffff"/><text x="39" y="30" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="24" font-weight="700" fill="#1f6bff">?</text></g>
+<g transform="translate(66 30)"><rect width="56" height="34" rx="12" fill="#ffb547"/><rect x="10" y="10" width="36" height="4" rx="2" fill="#ffffff"/><rect x="10" y="19" width="24" height="4" rx="2" fill="#ffffff"/></g></svg>
