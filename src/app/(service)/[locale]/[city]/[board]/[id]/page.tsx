@@ -1,6 +1,8 @@
+import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 
 import { MemberGate } from '@components/MemberGate'
+import { OpenInApp } from '@components/OpenInApp'
 import { isCityId } from '@lib/constants/cities'
 import { isLocale } from '@lib/i18n/locales'
 import { getT } from '@lib/i18n/server'
@@ -12,11 +14,22 @@ import {
   isCommunityBoardWip,
   isMemberOnlyBoard,
 } from '@lib/constants/nyc'
+import { shareMetadata } from '@lib/share/shareMetadata'
 import { CommunityBoardWipScreen } from '@screens/nyc/CommunityBoardWipScreen'
 import { CommunityDetailScreen } from '@screens/nyc/CommunityDetailScreen'
 
 interface CommunityDetailPageProps {
   params: Promise<{ locale: string; city: string; board: string; id: string }>
+}
+
+// 회원 전용 게시판(비자·면접/취업 후기)을 공유한 링크: "미생에서 … 공유했어요" 제목 + 통일 이미지, 본문은 넣지 않는다.
+export async function generateMetadata({ params }: CommunityDetailPageProps): Promise<Metadata> {
+  const { locale, city, board, id } = await params
+  if (!isCommunityBoardId(board) || !isMemberOnlyBoard(board)) return {}
+  return shareMetadata(board === 'job-review' ? 'review' : 'visa', locale, {
+    path: `/${city}/${board}/${id}`,
+    memberOnly: true,
+  })
 }
 
 export default async function CommunityDetailPage({
@@ -39,5 +52,11 @@ export default async function CommunityDetailPage({
   }
 
   const detail = <CommunityDetailScreen boardId={board} title={title} postId={id} />
-  return isMemberOnlyBoard(board) ? <MemberGate>{detail}</MemberGate> : detail
+  if (!isMemberOnlyBoard(board)) return detail
+  return (
+    <>
+      <OpenInApp appPath={`${board === 'job-review' ? 'review' : 'status'}/${id}`} />
+      <MemberGate>{detail}</MemberGate>
+    </>
+  )
 }

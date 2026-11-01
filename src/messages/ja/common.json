@@ -199,5 +199,15 @@
       "description": "進捗を追加したり次の項目に進んだりするたびに、この端末に保存されます。ウィンドウを閉じても、続きから再開できます。",
       "savedAt": "保存済み · {time}"
     }
+  },
+  "share": {
+    "housing": "Misaengで部屋がシェアされました！🏠",
+    "visa": "Misaengでビザの投稿がシェアされました！🛂",
+    "review": "Misaengで面接・就職レビューがシェアされました！💼",
+    "company": "Misaengで企業がシェアされました！🏢",
+    "postings": "Misaengで求人がシェアされました！📋",
+    "memberOnly": "Misaeng会員限定です。アプリで確認してください。",
+    "openInApp": "アプリで見る",
+    "perMonth": "/月"
   }
 }

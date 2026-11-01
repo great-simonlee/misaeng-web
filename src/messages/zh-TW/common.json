@@ -199,5 +199,15 @@
       "description": "每次新增進度或進到下一個項目時，都會儲存在這台裝置上。關閉視窗後也能從上次的地方繼續。",
       "savedAt": "已儲存 · {time}"
     }
+  },
+  "share": {
+    "housing": "來自 Misaeng 的房源分享！🏠",
+    "visa": "來自 Misaeng 的簽證文章分享！🛂",
+    "review": "來自 Misaeng 的面試·求職評價分享！💼",
+    "company": "來自 Misaeng 的公司分享！🏢",
+    "postings": "來自 Misaeng 的徵才資訊分享！📋",
+    "memberOnly": "僅限 Misaeng 會員查看，請在 App 中開啟。",
+    "openInApp": "在 App 中查看",
+    "perMonth": "/月"
   }
 }
