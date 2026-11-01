@@ -54,28 +54,44 @@ export function EllieoHomeScreen() {
   )
 }
 
-/* ---------- Top banner: one short line above the stories ---------- */
+/* ---------- Top banner: what Ellieo is, as an image above the stories ---------- */
 
-/** Text lives in hub.json `ellieo.banner`; the Join link hides once signed in. */
+/**
+ * Banner images live in public/brand/banner/ellieo-banner-{en|vi}-{desktop|mobile}.<ext>.
+ * To swap in designer artwork, drop files with the same base names and change BANNER_EXT.
+ */
+const BANNER_EXT = 'svg'
+const bannerSrc = (locale: string, size: 'desktop' | 'mobile') =>
+  `/brand/banner/ellieo-banner-${locale === 'vi' ? 'vi' : 'en'}-${size}.${BANNER_EXT}`
+
+/** Links to sign-up while signed out; a plain image once signed in */
 function TopBanner() {
   const t = useT('hub')
+  const locale = useLocale()
   const city = useCity()
   const { user, loading } = useEllieoViewer()
-  const showJoin = !loading && !user
+  const picture = (
+    <picture>
+      <source media='(max-width: 639px)' srcSet={bannerSrc(locale, 'mobile')} />
+      <img
+        src={bannerSrc(locale, 'desktop')}
+        alt={t('ellieo.banner.alt')}
+        width={1280}
+        height={132}
+        className='block h-auto w-full rounded-2xl'
+      />
+    </picture>
+  )
 
   return (
-    <div className='mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 lg:px-8'>
-      <p className='flex items-center justify-center gap-x-2 rounded-full bg-[var(--brand-soft,#eef3ff)] px-4 py-1.5 text-center text-[12px] leading-snug text-[var(--foreground)] sm:text-[12.5px]'>
-        <span className='min-w-0'>{t('ellieo.banner.text')}</span>
-        {showJoin ? (
-          <Link
-            href={`${cityLoginPath(city)}?mode=signup`}
-            className='shrink-0 font-semibold text-[var(--brand)] hover:underline'
-          >
-            {t('ellieo.banner.cta')} →
-          </Link>
-        ) : null}
-      </p>
+    <div className='mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 sm:pt-4 lg:px-8'>
+      {!loading && !user ? (
+        <Link href={`${cityLoginPath(city)}?mode=signup`} className='block rounded-2xl transition hover:opacity-95'>
+          {picture}
+        </Link>
+      ) : (
+        picture
+      )}
     </div>
   )
 }

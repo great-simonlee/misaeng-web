@@ -174,8 +174,11 @@
     },
     "perMonth": "/mo",
     "banner": {
-      "text": "Welcome to Ellieo — the community for Vietnamese students and professionals in NYC.",
-      "cta": "Join free"
+      "alt": "Ellieo — the community for international students in the US. Every member is verified with a school or work email. Housing, visa and jobs."
+    },
+    "explore": {
+      "title": "Explore Ellieo",
+      "subtitle": "Boards for housing, visas, jobs and everyday life in {city}."
     },
     "stories": {
       "title": "Partners & Creators",

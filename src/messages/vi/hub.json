@@ -174,8 +174,11 @@
     },
     "perMonth": "/tháng",
     "banner": {
-      "text": "Chào mừng đến với Ellieo — cộng đồng của du học sinh và người đi làm Việt Nam tại NYC.",
-      "cta": "Tham gia miễn phí"
+      "alt": "Ellieo — cộng đồng du học sinh tại Mỹ. Mọi thành viên đều xác minh bằng email trường hoặc công ty. Nhà ở, visa và việc làm."
+    },
+    "explore": {
+      "title": "Khám phá Ellieo",
+      "subtitle": "Các chuyên mục về nhà ở, visa, việc làm và cuộc sống ở {city}."
     },
     "stories": {
       "title": "Đối tác & nhà sáng tạo",
