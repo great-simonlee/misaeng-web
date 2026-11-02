@@ -19,6 +19,11 @@ export type AuthUser = {
   /** google | apple | email … */
   providers: string[]
   metadata: Record<string, unknown>
+  /**
+   * Sign-in methods linked to the user. Supabase answers sign-up for an email that is already registered with a fake
+   * user whose `identities` is empty (and sends nothing), so 0 here means "already a member".
+   */
+  identityCount?: number | null
 }
 
 export class AuthApiError extends Error {
@@ -91,6 +96,7 @@ function toUser(raw: Record<string, unknown> | null | undefined): AuthUser {
     emailConfirmed: Boolean(r.email_confirmed_at || r.confirmed_at),
     providers: appMeta.providers ?? (appMeta.provider ? [appMeta.provider] : []),
     metadata: (r.user_metadata ?? {}) as Record<string, unknown>,
+    identityCount: Array.isArray(r.identities) ? r.identities.length : null,
   }
 }
 
@@ -166,6 +172,11 @@ export async function adminCreateUser(email: string, options: { password?: strin
       },
     }),
   )
+}
+
+/** A user by id with its sign-in methods (`providers`: email, google, apple …). */
+export async function adminGetUser(userId: string) {
+  return toUser(await call(`admin/users/${encodeURIComponent(userId)}`, { method: 'GET', admin: true }))
 }
 
 export async function adminSetPassword(userId: string, password: string) {

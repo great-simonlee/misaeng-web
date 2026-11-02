@@ -9,6 +9,7 @@ import {
   isPlaceholderEmail,
   resolveUid,
   sessionFromEllieoMember,
+  socialOnlyProvidersForEmail,
   UidConflictError,
 } from './accounts.server'
 import { authRest, enc } from './store.server'
@@ -132,7 +133,18 @@ export async function emailLogin(t: Translate, rawEmail: string, password: strin
   // Switch-over (A): an existing member's first sign-in — the password is checked with Ellieo once, then kept here.
   const member = await checkEllieoPassword(email, password, deviceId)
   if (member === 'unavailable') return fail(503, t('auth.ellieoUnavailable'))
-  if (!member) return fail(401, t('auth.invalidCredentials'), 'auth.invalidCredentials')
+  if (!member) {
+    // Signed up with Google / Apple only: there is no password to get right, so point to the right button.
+    const social = await socialOnlyProvidersForEmail(email).catch((error) => {
+      console.error('Social-only lookup failed:', error)
+      return []
+    })
+    if (social.length) {
+      const provider = social.map((id) => (id === 'google' ? 'Google' : 'Apple')).join(' · ')
+      return fail(401, t('auth.useSocialLogin', { provider }), 'auth.useSocialLogin', { providers: social })
+    }
+    return fail(401, t('auth.invalidCredentials'), 'auth.invalidCredentials')
+  }
   try {
     const user = await ensureAuthUserForEllieoMember({ uid: member.uid, email: member.email, name: member.name }, 'ellieo_password', password)
     await adminSetPassword(user.id, password)
@@ -154,8 +166,11 @@ export async function emailSignup(t: Translate, rawEmail: string, password: stri
       ...(name ? { name } : {}),
       consent: { termsVersion: consent.termsVersion ?? null, privacyVersion: consent.privacyVersion ?? null, uiLanguage: consent.uiLanguage ?? null },
     })
-    // Supabase answers an already-confirmed email with a fake user and sends nothing (no account enumeration)
-    if (result.user.id && result.user.emailConfirmed && !result.session) return fail(409, t('auth.emailInUse'), 'auth.emailInUse')
+    // Supabase answers an already-registered email with a fake user (no identities, often not marked confirmed) and
+    // sends nothing (no account enumeration), so the app would wait for a code that never comes: say "log in" instead.
+    if (!result.session && result.user.id && (result.user.emailConfirmed || result.user.identityCount === 0)) {
+      return fail(409, t('auth.emailInUse'), 'auth.emailInUse')
+    }
     return { ok: true, verificationRequired: true }
   } catch (error) {
     return authFailure(t, error, 'auth.signupFailed')
@@ -213,11 +228,14 @@ export async function passwordResetStart(t: Translate, rawEmail: string): Promis
     await sendEmailCode('recovery', email)
     return { ok: true }
   } catch (error) {
+    // Supabase answers an unknown email with 200 itself, so anything that lands here means no email went out:
+    // say so instead of sending the writer to a code step that never gets a code.
+    console.error('Password reset start:', error)
     if (error instanceof AuthApiError && error.status >= 500) return fail(503, t('auth.emailUnavailable'))
     if (error instanceof AuthApiError && error.code === 'over_email_send_rate_limit') return fail(429, t('auth.codeCooldown'), 'auth.codeCooldown')
     if (error instanceof AuthApiError && error.code?.startsWith('over_')) return fail(429, t('auth.tooManyAttempts'), 'auth.tooManyAttempts')
-    console.error('Password reset start:', error)
-    return { ok: true }
+    if (error instanceof AuthApiError) return authFailure(t, error, 'auth.passwordResetFailed')
+    return fail(503, t('auth.emailUnavailable'))
   }
 }
 

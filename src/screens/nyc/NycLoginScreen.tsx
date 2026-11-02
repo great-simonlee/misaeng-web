@@ -72,6 +72,8 @@ export function NycLoginScreen() {
   const [password, setPassword] = useState('')
   const [code, setCode] = useState('')
   const [resending, setResending] = useState(false)
+  // Supabase takes a new code only once a minute, so "다시 받기" waits too (seconds left).
+  const [cooldown, setCooldown] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [showTermsError, setShowTermsError] = useState(false)
@@ -100,11 +102,18 @@ export function NycLoginScreen() {
   const changeMode = useCallback((nextMode: 'signin' | 'signup' | 'reset' | 'verify' | 'resetCode') => {
     setMode(nextMode)
     setCode('')
+    if (nextMode === 'verify' || nextMode === 'resetCode') setCooldown(60)
     if (nextMode !== 'signup') {
       setAcceptedTerms(false)
       setShowTermsError(false)
     }
   }, [])
+
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const timer = window.setTimeout(() => setCooldown((left) => left - 1), 1000)
+    return () => window.clearTimeout(timer)
+  }, [cooldown])
 
   useEffect(() => {
     captureReferralFromLocation()
@@ -145,6 +154,7 @@ export function NycLoginScreen() {
           success(t('login.toasts.codeSent'))
           setPassword('')
           setMode('resetCode')
+          setCooldown(60)
           return
         }
         success(t('login.toasts.resetEmailSent'))
@@ -183,10 +193,23 @@ export function NycLoginScreen() {
       router.replace(mode === 'signup' ? afterSignup : next)
     } catch (err) {
       signedUpRef.current = false
-      // signed up earlier but never entered the code: send a fresh one and ask for it
+      // signed up earlier but never entered the code: send a fresh one and ask for it.
+      // If sending fails (e.g. asked again within a minute), say so instead of waiting for a mail that won't come.
       if (mode === 'signin' && (err as { code?: string | null })?.code === 'auth.emailNotConfirmed') {
-        await resendCode(email.trim()).catch(() => null)
+        const resendError = await resendCode(email.trim()).then(() => null, (error: unknown) => error)
         changeMode('verify')
+        if (resendError) {
+          // Only "a code went out less than a minute ago" keeps the wait; any other failure can be retried now.
+          if ((resendError as { code?: string | null }).code !== 'auth.codeCooldown') setCooldown(0)
+          toastError(getErrorMessage(resendError, t('login.errors.authFailed')))
+          return
+        }
+      }
+      // Signed up again within a minute: the code from the first try is still on its way, so ask for it.
+      if (mode === 'signup' && (err as { code?: string | null })?.code === 'auth.codeCooldown') {
+        changeMode('verify')
+        success(t('login.toasts.codeSent'))
+        return
       }
       toastError(
         getErrorMessage(
@@ -261,6 +284,7 @@ export function NycLoginScreen() {
       if (mode === 'resetCode') await resetPassword(email.trim())
       else await resendCode(email.trim())
       success(t('login.toasts.codeResent'))
+      setCooldown(60)
     } catch (err) {
       toastError(getErrorMessage(err, t('login.errors.authFailed')))
     } finally {
@@ -526,11 +550,11 @@ export function NycLoginScreen() {
             {isCodeMode && (
               <button
                 type='button'
-                disabled={resending || submitting}
+                disabled={resending || submitting || cooldown > 0}
                 onClick={() => void handleResend()}
-                className='w-full text-center text-[13px] font-medium text-[#667085] transition hover:text-brand disabled:opacity-50'
+                className='w-full text-center text-[13px] font-medium text-[#667085] tabular-nums transition hover:text-brand disabled:cursor-not-allowed disabled:opacity-60'
               >
-                {t('login.resendCode')}
+                {cooldown > 0 ? t('login.resendIn', { seconds: cooldown }) : t('login.resendCode')}
               </button>
             )}
           </form>
