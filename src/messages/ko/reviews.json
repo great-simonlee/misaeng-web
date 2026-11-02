@@ -389,7 +389,11 @@
     "sources": {
       "misaeng": {
         "label": "{brand|을/를} 통해",
-        "description": "{brand} 사이트·SNS를 보고 왔어요"
+        "description": "{brand}에서 연락을 받고 후기를 쓰게 됐어요"
+      },
+      "givo": {
+        "label": "Givo를 통해",
+        "description": "Givo에서 연락을 받고 후기를 쓰게 됐어요"
       },
       "student-org": {
         "label": "학생회를 통해",

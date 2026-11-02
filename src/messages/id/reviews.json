@@ -389,7 +389,11 @@
     "sources": {
       "misaeng": {
         "label": "Lewat {brand}",
-        "description": "Aku melihat situs atau media sosial {brand}"
+        "description": "{brand} menghubungi saya dan meminta saya menulis ini"
+      },
+      "givo": {
+        "label": "Lewat Givo",
+        "description": "Givo menghubungi saya dan meminta saya menulis ini"
       },
       "student-org": {
         "label": "Lewat organisasi mahasiswa",

@@ -389,7 +389,11 @@
     "sources": {
       "misaeng": {
         "label": "通过 {brand}",
-        "description": "我看到了 {brand} 网站或社交媒体"
+        "description": "{brand} 联系我并邀请我写下这篇评价"
+      },
+      "givo": {
+        "label": "通过 Givo",
+        "description": "Givo 联系我并邀请我写下这篇评价"
       },
       "student-org": {
         "label": "通过学生组织",

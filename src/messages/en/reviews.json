@@ -390,7 +390,11 @@
     "sources": {
       "misaeng": {
         "label": "Through {brand}",
-        "description": "I saw the {brand} site or social media"
+        "description": "{brand} reached out and asked me to write this"
+      },
+      "givo": {
+        "label": "Through Givo",
+        "description": "Givo reached out and asked me to write this"
       },
       "student-org": {
         "label": "Through a student group",

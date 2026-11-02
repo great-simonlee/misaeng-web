@@ -21,7 +21,7 @@ export type ContentModeration = {
 }
 
 /** 면접/취업 후기: 연락 경로 (JOB_REVIEW_SOURCES). 예전 값 'kiso'는 student-org + nyu-kiso로 읽음 */
-export type JobReviewSourceId = 'misaeng' | 'student-org' | 'referral' | 'other'
+export type JobReviewSourceId = 'misaeng' | 'givo' | 'student-org' | 'referral' | 'other'
 
 /** 면접/취업 후기: 최종 결과 (JOB_REVIEW_OUTCOMES) */
 export type JobReviewOutcomeId = 'offer' | 'rejected' | 'in-progress' | 'withdrew'

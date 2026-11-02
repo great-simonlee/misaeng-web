@@ -389,7 +389,11 @@
     "sources": {
       "misaeng": {
         "label": "{brand}を通じて",
-        "description": "{brand}のサイトやSNSを見た"
+        "description": "{brand}から連絡を受けて書くことになりました"
+      },
+      "givo": {
+        "label": "Givo経由",
+        "description": "Givoから連絡を受けて書くことになりました"
       },
       "student-org": {
         "label": "学生団体を通じて",
