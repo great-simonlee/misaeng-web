@@ -9,13 +9,18 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const TOKEN_PATTERN = /^[0-9a-f]{64,200}$/i
+/** FCM registration tokens: base64url-ish with ':' (about 150–200 chars). */
+const FCM_TOKEN_PATTERN = /^[A-Za-z0-9_:\-]{100,400}$/
 
 function storeError(error: unknown) {
   const setup = error instanceof PushStoreError && error.setupRequired
   return NextResponse.json({ error: setup ? error.message : 'Push registration failed.' }, { status: setup ? 503 : 500 })
 }
 
-/** POST { token, environment: 'sandbox' | 'production', locale } — the app's APNs device token for the signed-in user. */
+/**
+ * POST { token, environment: 'sandbox' | 'production', locale, platform?: 'ios' | 'android' } — the signed-in user's
+ * device token: an APNs token (iOS, default) or an FCM registration token (Android).
+ */
 export async function POST(request: Request) {
   const t = await getRequestT(request, 'api')
   const user = await resolveAuthenticatedUser()
@@ -23,12 +28,14 @@ export async function POST(request: Request) {
 
   const body = ((await request.json().catch(() => null)) || {}) as Record<string, unknown>
   const token = String(body.token || '').trim()
-  if (!TOKEN_PATTERN.test(token)) return NextResponse.json({ error: 'Invalid device token.' }, { status: 400 })
+  const platform = body.platform === 'android' ? 'android' : 'ios'
+  const valid = platform === 'android' ? FCM_TOKEN_PATTERN.test(token) : TOKEN_PATTERN.test(token)
+  if (!valid) return NextResponse.json({ error: 'Invalid device token.' }, { status: 400 })
   try {
     await savePushDevice({
       token,
       userId: user.uid,
-      platform: 'ios',
+      platform,
       environment: body.environment === 'sandbox' ? 'sandbox' : 'production',
       locale: parseLocale(String(body.locale || '')) ?? 'ko',
     })
@@ -42,7 +49,7 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   const body = ((await request.json().catch(() => null)) || {}) as Record<string, unknown>
   const token = String(body.token || '').trim()
-  if (!TOKEN_PATTERN.test(token)) return NextResponse.json({ ok: true })
+  if (!TOKEN_PATTERN.test(token) && !FCM_TOKEN_PATTERN.test(token)) return NextResponse.json({ ok: true })
   const user = await resolveAuthenticatedUser()
   try {
     // Signed out already (token expired): the device token alone is enough to remove it.
