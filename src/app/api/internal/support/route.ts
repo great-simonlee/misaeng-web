@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { isInternalAuthorized, UNAUTHORIZED_INTERNAL } from '@lib/points/http.server'
-import { handleAssigned, handleStaffMessage } from '@lib/support/service.server'
+import { getConversation, handleAssigned, handleStaffMessage, signalConversation } from '@lib/support/service.server'
 import { notifyReporterOfOutcome } from '@lib/support/reports.server'
 
 export const runtime = 'nodejs'
@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic'
 type Body =
   | { event: 'staff_message'; conversationId: string }
   | { event: 'assigned'; conversationId: string; by?: string }
+  | { event: 'status'; conversationId: string }
   | { event: 'report_outcome'; reporterUids: string[]; outcome: 'resolved' | 'dismissed' }
 
 /**
@@ -22,7 +23,10 @@ export async function POST(request: Request) {
   try {
     if (body?.event === 'staff_message' && body.conversationId) await handleStaffMessage(body.conversationId)
     else if (body?.event === 'assigned' && body.conversationId) await handleAssigned(body.conversationId, body.by || '')
-    else if (body?.event === 'report_outcome' && Array.isArray(body.reporterUids))
+    else if (body?.event === 'status' && body.conversationId) {
+      const row = await getConversation(body.conversationId)
+      if (row) await signalConversation(row, 'status')
+    } else if (body?.event === 'report_outcome' && Array.isArray(body.reporterUids))
       notifyReporterOfOutcome(body.reporterUids, body.outcome === 'dismissed' ? 'dismissed' : 'resolved')
     else return NextResponse.json({ error: 'Unknown event' }, { status: 400 })
     return NextResponse.json({ ok: true })
