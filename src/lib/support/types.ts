@@ -77,6 +77,8 @@ export type HousingProfile = {
   phone?: string
   moveIn?: string // YYYY-MM-DD
   budget?: string
+  /** Exact monthly budget typed by the user (USD); `budget` is its range key */
+  budgetAmount?: number
   roomType?: string
   occupants?: number
   occupation?: 'worker' | 'student'

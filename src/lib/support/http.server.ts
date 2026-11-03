@@ -65,17 +65,31 @@ const str = (value: unknown, max = 200) => String(value ?? '').replace(/\s+/g, '
 const oneOf = <T extends readonly string[]>(value: unknown, options: T) =>
   (options as readonly string[]).includes(String(value)) ? (String(value) as T[number]) : undefined
 
+/** Range key for a typed amount (same ranges as the options). */
+function budgetKey(amount: number): HousingProfile['budget'] {
+  if (amount < 1500) return 'under_1500'
+  if (amount < 2000) return '1500_2000'
+  if (amount < 2500) return '2000_2500'
+  if (amount < 3000) return '2500_3000'
+  if (amount < 3500) return '3000_3500'
+  if (amount < 4500) return '3500_4500'
+  return 'over_4500'
+}
+
 /** Cleans the housing form (spec §4.1, §15). Returns null when a required field is missing. */
 export function parseHousingProfile(input: unknown): HousingProfile | null {
   const raw = (input && typeof input === 'object' ? input : {}) as Record<string, unknown>
   const occupation = raw.occupation === 'worker' || raw.occupation === 'student' ? raw.occupation : undefined
   const occupants = Math.round(Number(raw.occupants))
+  const amount = Math.round(Number(raw.budgetAmount))
+  const budgetAmount = Number.isFinite(amount) && amount >= 100 && amount <= 100000 ? amount : undefined
   const profile: HousingProfile = {
     name: str(raw.name, 80),
     email: str(raw.email, 200),
     phone: str(raw.phone, 40),
     moveIn: /^\d{4}-\d{2}-\d{2}$/.test(String(raw.moveIn)) ? String(raw.moveIn) : undefined,
-    budget: oneOf(raw.budget, BUDGET_OPTIONS),
+    budget: oneOf(raw.budget, BUDGET_OPTIONS) ?? (budgetAmount ? budgetKey(budgetAmount) : undefined),
+    budgetAmount,
     roomType: oneOf(raw.roomType, ROOM_OPTIONS),
     occupants: Number.isFinite(occupants) && occupants >= 1 && occupants <= 10 ? occupants : undefined,
     occupation,
