@@ -430,6 +430,12 @@ export async function listStoredCommunityPosts(
   )
 }
 
+/** 공개 글(open, 숨김 아님) 전체 — 모든 도시, 작성자 보강 없이 (홈 배너 통계용) */
+export async function listAllOpenCommunityPosts(): Promise<CommunityPost[]> {
+  const posts = await listAllStoredCommunityPosts()
+  return posts.filter((post) => post.status === 'open' && !isModerationHidden(post))
+}
+
 /** 한 게시판의 공개 글 — 작성자 프로필 보강 없이 (회사별 후기 수·목록용) */
 export async function listStoredOpenBoardPosts(
   boardId: string,
