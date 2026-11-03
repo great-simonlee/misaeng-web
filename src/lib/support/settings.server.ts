@@ -10,6 +10,8 @@ export type SupportSettings = {
   'housing.hours': { start: number; end: number; days: number[] }
   'housing.escalate_minutes': number[]
   'email.delay_minutes': number
+  /** Beta testers (account emails): they get both features while the switches are still off (TestFlight checks on prod). */
+  testers: string[]
 }
 
 export const SUPPORT_DEFAULTS: SupportSettings = {
@@ -22,6 +24,7 @@ export const SUPPORT_DEFAULTS: SupportSettings = {
   'housing.hours': { start: 9, end: 21, days: [0, 1, 2, 3, 4, 5, 6] },
   'housing.escalate_minutes': [60, 120],
   'email.delay_minutes': 5,
+  testers: [],
 }
 
 let cache: { at: number; value: SupportSettings } | null = null
@@ -48,3 +51,10 @@ export function invalidateSupportSettings() {
 }
 
 export const normalizeEmail = (email: string | null | undefined) => String(email || '').trim().toLowerCase()
+
+/** Whether a feature is on for this user: the switch, or the user is on the tester list. */
+export function supportFeatureOn(settings: SupportSettings, feature: 'support.enabled' | 'inquiry.enabled', email?: string | null) {
+  if (settings[feature]) return true
+  const e = normalizeEmail(email)
+  return Boolean(e) && (settings.testers ?? []).map(normalizeEmail).includes(e)
+}

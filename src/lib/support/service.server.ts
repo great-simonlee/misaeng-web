@@ -6,7 +6,7 @@ import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import { broadcastSignals, staffTopic, userTopic, type SupportSignal } from './realtime.server'
 import { redactSensitive } from './redact'
 import { eq, inList, supportRest } from './rest.server'
-import { getSupportSettings, normalizeEmail } from './settings.server'
+import { getSupportSettings, normalizeEmail, supportFeatureOn } from './settings.server'
 import { sendStaffPush } from './staffPush.server'
 import { notifyTeamOfNewConversation, notifyUserOfStaffReply } from './userNotify.server'
 import type {
@@ -246,7 +246,7 @@ export async function startHousingConversation(input: {
   city?: string | null
 }) {
   const settings = await getSupportSettings()
-  if (!settings['support.enabled']) throw new SupportError('support.disabled', 403, 'SUPPORT_DISABLED')
+  if (!supportFeatureOn(settings, 'support.enabled', input.user.email)) throw new SupportError('support.disabled', 403, 'SUPPORT_DISABLED')
   const { text, redactions } = cleanBody(input.message)
   await assertRateLimit(input.user.uid)
 
@@ -308,7 +308,7 @@ export async function startHousingConversation(input: {
 /** 문의/건의 thread (web + app). */
 export async function startInquiry(input: { user: StartUser; kind: 'question' | 'suggestion'; title: string; message: string }) {
   const settings = await getSupportSettings()
-  if (!settings['inquiry.enabled']) throw new SupportError('support.disabled', 403, 'SUPPORT_DISABLED')
+  if (!supportFeatureOn(settings, 'inquiry.enabled', input.user.email)) throw new SupportError('support.disabled', 403, 'SUPPORT_DISABLED')
   const title = String(input.title || '').replace(/\s+/g, ' ').trim().slice(0, 120)
   if (!title) throw new SupportError('support.titleRequired', 400, 'TITLE_REQUIRED')
   const { text, redactions } = cleanBody(input.message)

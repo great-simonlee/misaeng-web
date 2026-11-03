@@ -126,7 +126,8 @@ insert into public.support_settings (key, value) values
   ('housing.hours', '{"start": 9, "end": 21, "days": [0,1,2,3,4,5,6]}'::jsonb),   -- New York time
   ('housing.escalate_minutes', '[60, 120]'::jsonb),
   ('email.delay_minutes', '5'::jsonb),
-  ('rotation.cursor', '{"email": null}'::jsonb)
+  ('rotation.cursor', '{"email": null}'::jsonb),
+  ('testers', '[]'::jsonb)                                      -- account emails that see both features while they're off
 on conflict (key) do nothing;
 
 -- Next housing lead: the first eligible staff after the last one who got a lead, in rotation order (wraps around).
