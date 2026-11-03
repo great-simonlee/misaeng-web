@@ -80,6 +80,8 @@ export type HousingProfile = {
   /** Exact monthly budget typed by the user (USD); `budget` is its range key */
   budgetAmount?: number
   roomType?: string
+  /** roommate_room only: master | regular | flex | any */
+  roomKind?: string
   occupants?: number
   occupation?: 'worker' | 'student'
   income?: string
@@ -93,4 +95,5 @@ export type HousingProfile = {
 export const BUDGET_OPTIONS = ['under_1500', '1500_2000', '2000_2500', '2500_3000', '3000_3500', '3500_4500', 'over_4500'] as const
 export const INCOME_OPTIONS = ['under_50k', '50_75k', '75_100k', '100_150k', 'over_150k'] as const
 export const ROOM_OPTIONS = ['roommate_room', 'studio', 'one_bed', 'two_bed_plus', 'any'] as const
+export const ROOM_KIND_OPTIONS = ['master', 'regular', 'flex', 'any'] as const
 export const APPROVAL_OPTIONS = ['own_income', 'guarantor', 'guarantor_company', 'other'] as const
