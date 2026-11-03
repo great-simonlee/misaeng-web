@@ -21,12 +21,14 @@ export function notifyUsers(input: {
   build: (t: Translate, locale: Locale) => ApnsMessage
   /** false = inbox only, no push (throttled notifications). Default true. */
   push?: boolean
+  /** false = push only, no in-app inbox entry (support chat messages have their own unread badge). Default true. */
+  inbox?: boolean
 }) {
   const userIds = [...new Set(input.userIds.map((id) => String(id || '').trim()).filter(Boolean))]
   if (userIds.length === 0) return
 
   const run = async () => {
-    await recordNotifications({ type: input.type, userIds, build: input.build })
+    if (input.inbox !== false) await recordNotifications({ type: input.type, userIds, build: input.build })
     const apns = isApnsConfigured()
     const fcm = isFcmConfigured()
     if (input.push === false || (!apns && !fcm)) return

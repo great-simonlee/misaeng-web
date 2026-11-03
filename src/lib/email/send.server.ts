@@ -61,3 +61,23 @@ ${input.lines.map((line) => `<tr><td style="font-size:15px;line-height:1.6;color
   const text = [input.title, '', ...input.lines, '', input.code, '', input.footer].join('\n')
   return { html, text }
 }
+
+/** A short notice mail with an optional quoted message and one button (support replies, new inquiries). */
+export function noticeEmail(input: { title: string; lines: string[]; quote?: string; button?: { label: string; url: string }; footer: string }) {
+  const quote = input.quote
+    ? `<tr><td style="padding:12px 0"><div style="font-size:15px;line-height:1.6;color:#0f172a;background:#f1f5f9;border-radius:14px;padding:14px 16px;white-space:pre-wrap">${escape(input.quote)}</div></td></tr>`
+    : ''
+  const button = input.button
+    ? `<tr><td style="padding:16px 0"><a href="${escape(input.button.url)}" style="display:inline-block;background:#f64310;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;border-radius:999px;padding:12px 22px">${escape(input.button.label)}</a></td></tr>`
+    : ''
+  const html = `<!doctype html><html><body style="margin:0;background:#f6f7f9;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Pretendard',sans-serif;color:#0f172a">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:20px;padding:32px 28px">
+<tr><td style="font-size:20px;font-weight:700;padding-bottom:12px">${escape(input.title)}</td></tr>
+${input.lines.map((line) => `<tr><td style="font-size:15px;line-height:1.6;color:#475569;padding-bottom:6px">${escape(line)}</td></tr>`).join('')}
+${quote}${button}
+<tr><td style="font-size:12px;line-height:1.6;color:#94a3b8">${escape(input.footer)}</td></tr>
+</table></td></tr></table></body></html>`
+  const text = [input.title, '', ...input.lines, ...(input.quote ? ['', input.quote] : []), ...(input.button ? ['', input.button.url] : []), '', input.footer].join('\n')
+  return { html, text }
+}

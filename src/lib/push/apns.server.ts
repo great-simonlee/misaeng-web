@@ -85,7 +85,7 @@ function session(environment: ApnsEnvironment): ClientHttp2Session {
   return created
 }
 
-function sendOne(environment: ApnsEnvironment, token: string, payload: string, threadId?: string): Promise<ApnsResult> {
+function sendOne(environment: ApnsEnvironment, token: string, payload: string, threadId?: string, topic?: string): Promise<ApnsResult> {
   return new Promise((resolve) => {
     let request
     try {
@@ -93,7 +93,7 @@ function sendOne(environment: ApnsEnvironment, token: string, payload: string, t
         ':method': 'POST',
         ':path': `/3/device/${token}`,
         authorization: `bearer ${providerToken(environment)}`,
-        'apns-topic': bundleId(),
+        'apns-topic': topic || bundleId(),
         'apns-push-type': 'alert',
         'apns-priority': '10',
         ...(threadId ? { 'apns-collapse-id': threadId.slice(0, 64) } : {}),
@@ -136,6 +136,8 @@ function sendOne(environment: ApnsEnvironment, token: string, payload: string, t
 export async function sendApns(
   devices: { token: string; environment: ApnsEnvironment }[],
   message: ApnsMessage,
+  /** Another app of the same team (e.g. the staff app "Misaeng ERP"); default APNS_BUNDLE_ID. */
+  options: { topic?: string } = {},
 ): Promise<ApnsResult[]> {
   // Devices whose environment has no key yet are skipped (not removed).
   devices = devices.filter((d) => isApnsConfigured(d.environment))
@@ -148,5 +150,5 @@ export async function sendApns(
     },
     ...(message.data ?? {}),
   })
-  return Promise.all(devices.map((d) => sendOne(d.environment, d.token, payload, message.threadId)))
+  return Promise.all(devices.map((d) => sendOne(d.environment, d.token, payload, message.threadId, options.topic)))
 }

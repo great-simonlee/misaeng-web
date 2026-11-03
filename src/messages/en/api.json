@@ -524,5 +524,35 @@
     "loadFailed": "Couldn’t load your saved posts. Please try again shortly.",
     "saveFailed": "Couldn’t save. Please try again shortly.",
     "tooMany": "You can move up to {max} saves at once."
+  },
+  "support": {
+    "disabled": "We can't take inquiries right now. Please try again later.",
+    "emptyMessage": "Please enter a message.",
+    "tooLong": "Messages can be up to 2,000 characters.",
+    "tooMany": "You're sending messages too quickly. Please wait a moment.",
+    "titleRequired": "Please enter a subject.",
+    "notFound": "We couldn't find this conversation.",
+    "verifyRequired": "Housing inquiries are available after school or work email verification.",
+    "profileInvalid": "Please check the required housing details.",
+    "failed": "We couldn't process your inquiry. Please try again later.",
+    "notConfigured": "Inquiries are not set up yet.",
+    "push": {
+      "housingTitle": "Reply from {name}",
+      "inquiryTitle": "Your inquiry got a reply",
+      "reportResolvedTitle": "We handled your report",
+      "reportResolvedBody": "We reviewed it and took action. Thanks for keeping Misaeng safe.",
+      "reportDismissedBody": "We reviewed it and it doesn't break our rules. Thanks for letting us know."
+    },
+    "email": {
+      "housingSubject": "[Misaeng] New reply to your housing inquiry",
+      "housingTitle": "New reply to your housing inquiry",
+      "housingLine": "Open the Misaeng app to read and reply.",
+      "inquirySubject": "[Misaeng] Your inquiry got a reply",
+      "inquiryTitle": "Your inquiry got a reply",
+      "inquiryLine": "The Misaeng team replied to \"{title}\".",
+      "openApp": "Open in the Misaeng app",
+      "openWeb": "View reply",
+      "footer": "This is a send-only address. Please reply in the Misaeng app or website."
+    }
   }
 }

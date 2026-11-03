@@ -8,6 +8,8 @@
  * Never throws: a failed alert must never fail the report itself. The mail goes to the team, so it stays Korean + English.
  */
 
+import { pushReportToHandler } from '@lib/support/reports.server'
+
 const EMAILJS_SEND_URL = 'https://api.emailjs.com/api/v1.0/email/send'
 
 /** Reply-to of the team alert mail (never the reporter's address). */
@@ -111,7 +113,16 @@ async function mailTeam(alert: CommunityReportAlert) {
 }
 
 export async function notifyTeamOfCommunityReport(alert: CommunityReportAlert): Promise<void> {
-  const results = await Promise.allSettled([notifyErp(alert), mailTeam(alert)])
+  const what = alert.targetType === 'comment' ? 'comment' : 'post'
+  const results = await Promise.allSettled([
+    notifyErp(alert),
+    mailTeam(alert),
+    // Report handler's "Misaeng ERP" app (support settings reports.assignee)
+    pushReportToHandler({
+      title: alert.autoHidden ? `Report: ${what} auto-hidden` : `New report: ${what}`,
+      body: `${alert.reason}${alert.postTitle ? ` · ${alert.postTitle.slice(0, 60)}` : ''}`,
+    }),
+  ])
   for (const result of results) {
     if (result.status === 'rejected') console.error('[community report] alert error:', result.reason)
   }
