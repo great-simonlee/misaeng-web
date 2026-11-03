@@ -92,6 +92,9 @@ export type HousingProfile = {
   approval?: string
   approvalOther?: string
   pets?: 'yes' | 'no' | null
+  /** pets === 'yes': dog | cat | other */
+  petType?: 'dog' | 'cat' | 'other'
+  petOther?: string
 }
 
 export const BUDGET_OPTIONS = ['under_1500', '1500_2000', '2000_2500', '2500_3000', '3000_3500', '3500_4500', 'over_4500'] as const

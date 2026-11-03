@@ -112,6 +112,8 @@ export function parseHousingProfile(input: unknown): HousingProfile | null {
     approval: oneOf(raw.approval, APPROVAL_OPTIONS),
     approvalOther: raw.approval === 'other' ? str(raw.approvalOther, 200) : undefined,
     pets: raw.pets === 'yes' || raw.pets === 'no' ? raw.pets : null,
+    petType: raw.pets === 'yes' && (raw.petType === 'dog' || raw.petType === 'cat' || raw.petType === 'other') ? raw.petType : undefined,
+    petOther: raw.pets === 'yes' && raw.petType === 'other' ? str(raw.petOther, 60) : undefined,
   }
   const required = [profile.name, profile.email, profile.phone, profile.moveIn, profile.budget, profile.roomType, profile.occupants, profile.occupation, profile.approval]
   if (required.some((v) => v === undefined || v === '')) return null
