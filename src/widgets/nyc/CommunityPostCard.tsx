@@ -254,11 +254,6 @@ function CptOptListingCard({
   const postCity = parseCityId(post.city)
   const stepCount = post.cptOptTimeline?.length ?? 0
   const dateRange = getCptOptTimelineDateRange(post.cptOptTimeline, locale)
-  const contextTag = getListingContextTag(
-    [post.location],
-    post.authorSchoolId,
-    post.authorSchoolName,
-  )
 
   return (
     <BoardSurface
@@ -278,11 +273,6 @@ function CptOptListingCard({
               </span>
             ) : null}
             <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} size='md' />
-            {contextTag ? (
-              <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#eef4ff] px-2.5 py-1 text-[11px] font-semibold text-[#3b5bdb] ring-1 ring-[#3b5bdb]/15'>
-                {contextTag}
-              </span>
-            ) : null}
           </div>
           <PostLikeButton
             kind='community'

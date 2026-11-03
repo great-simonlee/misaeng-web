@@ -52,7 +52,6 @@ import {
 } from '@widgets/nyc/CptOptWriteOrientationModal'
 import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
-import { StatusEmployerSelect } from '@widgets/nyc/StatusEmployerSelect'
 import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
 
 type CptOptWriteDraft = {
@@ -309,7 +308,6 @@ export function CptOptWriteScreen({
         {isEdit ? (
           <UpdateHero
             title={postTitle}
-            location={location}
             cptOptType={cptOptType}
             recordCount={existingTimelineIds.length}
           />
@@ -359,11 +357,6 @@ export function CptOptWriteScreen({
                         placeholder={tCommunity(communityBoardKey(boardId, 'titlePlaceholder'))}
                       />
                     </Field>
-                    <StatusEmployerSelect
-                      value={location}
-                      onChange={setLocation}
-                      label={tCommunity(communityBoardKey(boardId, 'locationLabel'))}
-                    />
                     <div>
                       <p className='text-[13px] font-medium text-[var(--foreground)]'>
                         {t('cptOpt.write.tipsTitle')}
@@ -407,11 +400,7 @@ export function CptOptWriteScreen({
                 />
               </CreateSection>
 
-              <CreateSection
-                step={2}
-                title={t('cptOpt.write.basicSection')}
-                description={t('cptOpt.write.basicSectionDescription')}
-              >
+              <CreateSection step={2} title={t('cptOpt.write.basicSection')}>
                 <Field label={t('write.titleLabel')} required>
                   <input
                     required
@@ -421,12 +410,6 @@ export function CptOptWriteScreen({
                     placeholder={tCommunity(communityBoardKey(boardId, 'titlePlaceholder'))}
                   />
                 </Field>
-                <StatusEmployerSelect
-                  className='mt-4'
-                  value={location}
-                  onChange={setLocation}
-                  label={tCommunity(communityBoardKey(boardId, 'locationLabel'))}
-                />
               </CreateSection>
 
               <CreateSection
@@ -524,12 +507,10 @@ function CreateHero({ writeLabel }: { writeLabel: string }) {
 
 function UpdateHero({
   title,
-  location,
   cptOptType,
   recordCount,
 }: {
   title: string
-  location: string
   cptOptType: CptOptTypeId | null
   recordCount: number
 }) {
@@ -559,11 +540,6 @@ function UpdateHero({
         <span className='min-w-0 truncate text-[13px] font-medium text-[var(--foreground)]'>
           {title || t('write.untitled')}
         </span>
-        {location.trim() ? (
-          <span className='text-[12px] text-[var(--muted)]'>
-            · {location.trim()}
-          </span>
-        ) : null}
         <span className='ml-auto text-[11px] font-medium text-[var(--muted)]'>
           {t('write.existingCount', { count: recordCount })}
         </span>

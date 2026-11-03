@@ -149,16 +149,6 @@ export function CptOptDetailContent({
 
       <div className='mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-1.5 px-1 text-[12px] text-[var(--muted)] sm:px-0'>
         <CptOptTypeBadge type={post.cptOptType} />
-        {post.location?.trim() ? (
-          <>
-            <span className='text-black/20' aria-hidden>
-              ·
-            </span>
-            <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#eef4ff] px-2.5 py-1 text-[11px] font-semibold text-[#3b5bdb] ring-1 ring-[#3b5bdb]/15'>
-              {post.location.trim()}
-            </span>
-          </>
-        ) : null}
         <span className='text-black/20' aria-hidden>
           ·
         </span>
