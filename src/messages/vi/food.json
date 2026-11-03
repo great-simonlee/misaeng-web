@@ -3,13 +3,15 @@
     "restaurant": "Phải thử",
     "value": "Đáng tiền",
     "vibe": "Không gian đẹp",
-    "study": "Chỗ học bài"
+    "study": "Chỗ học bài",
+    "honest": "Review thật lòng"
   },
   "categoryDescriptions": {
     "restaurant": "Những quán nhất định phải thử",
     "value": "Đáng từng đồng đô",
     "vibe": "Những nơi có không gian tuyệt vời",
-    "study": "Quán cà phê hợp để học bài hay làm việc"
+    "study": "Quán cà phê hợp để học bài hay làm việc",
+    "honest": "Khen chê thẳng thắn, không tô vẽ"
   },
   "cuisines": {
     "brunch": "Brunch",

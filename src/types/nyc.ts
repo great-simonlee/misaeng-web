@@ -478,7 +478,7 @@ export interface JobReviewTimelineEntry {
 }
 
 /** 맛집 보드 카테고리 */
-export type FoodCategoryId = 'restaurant' | 'value' | 'vibe' | 'study'
+export type FoodCategoryId = 'restaurant' | 'value' | 'vibe' | 'study' | 'honest'
 
 /** 맛집 메뉴 (사진 + 메뉴명 + 한 줄 평) */
 export interface FoodMenuItem {

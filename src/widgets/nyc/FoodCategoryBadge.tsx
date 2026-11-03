@@ -63,6 +63,8 @@ export function FoodCategoryIcon({
       return <SparkleIcon className={className} />
     case 'study':
       return <LaptopIcon className={className} />
+    case 'honest':
+      return <QuoteIcon className={className} />
   }
 }
 
@@ -135,6 +137,25 @@ function LaptopIcon({ className }: { className?: string }) {
       aria-hidden
     >
       <path d='M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55A1 1 0 0 1 20.28 20H3.72a1 1 0 0 1-.9-1.45L4 16' />
+    </svg>
+  )
+}
+
+function QuoteIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      className={className}
+      aria-hidden
+    >
+      <path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' />
+      <path d='M8 12a2 2 0 0 0 2-2V8H8' />
+      <path d='M14 12a2 2 0 0 0 2-2V8h-2' />
     </svg>
   )
 }

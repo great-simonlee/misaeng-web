@@ -3,13 +3,15 @@
     "restaurant": "必食",
     "value": "コスパ最強",
     "vibe": "雰囲気◎",
-    "study": "勉強スポット"
+    "study": "勉強スポット",
+    "honest": "正直レビュー"
   },
   "categoryDescriptions": {
     "restaurant": "絶対に行くべきお店",
     "value": "払った分以上の満足感",
     "vibe": "雰囲気がいいお店",
-    "study": "勉強や作業にぴったりのカフェ"
+    "study": "勉強や作業にぴったりのカフェ",
+    "honest": "良い点も気になる点も正直に"
   },
   "cuisines": {
     "brunch": "ブランチ",

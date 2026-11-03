@@ -3,13 +3,15 @@
     "restaurant": "Wajib coba",
     "value": "Hemat",
     "vibe": "Suasana asyik",
-    "study": "Tempat belajar"
+    "study": "Tempat belajar",
+    "honest": "Ulasan jujur"
   },
   "categoryDescriptions": {
     "restaurant": "Tempat yang wajib kamu coba",
     "value": "Sepadan dengan harganya",
     "vibe": "Tempat dengan suasana yang asyik",
-    "study": "Kafe yang enak buat belajar atau kerja"
+    "study": "Kafe yang enak buat belajar atau kerja",
+    "honest": "Kelebihan dan kekurangannya, apa adanya"
   },
   "cuisines": {
     "brunch": "Brunch",

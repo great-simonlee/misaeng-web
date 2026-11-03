@@ -59,14 +59,44 @@ export const FOOD_CATEGORIES: FoodCategoryMeta[] = [
     selectClass: 'border-[#bfdbfe] bg-[#f8fafc]',
     selectActiveClass: 'border-[#2563eb] bg-[#eff6ff] ring-1 ring-[#2563eb]/25',
   },
+  {
+    // 솔직후기: 칭찬·아쉬움을 그대로 — 차분한 무채색
+    id: 'honest',
+    softClass: 'bg-[#f1f5f9] text-[#334155] ring-1 ring-[#cbd5e1]/60',
+    solidClass: 'bg-[#475569] text-white shadow-sm shadow-slate-500/25',
+    badgeClass:
+      'bg-[#475569]/95 text-white shadow-sm backdrop-blur-sm',
+    selectClass: 'border-[#e2e8f0] bg-[#f8fafc]',
+    selectActiveClass: 'border-[#475569] bg-[#f1f5f9] ring-1 ring-[#475569]/25',
+  },
 ]
+
+/**
+ * 웹 글쓰기에서 '솔직후기'를 고를 수 있는지.
+ * 서버는 이미 'honest'를 받고 저장하며, 목록·필터·뱃지에도 항상 보인다.
+ * 앱 1.0.2가 App Store + Play에 모두 출시된 뒤 true로 바꾼다.
+ */
+export const FOOD_HONEST_COMPOSE_ENABLED = false
+
+/**
+ * 웹 글쓰기 카테고리 선택지. 솔직후기는 위 플래그로 막아 두되,
+ * 이미 솔직후기로 쓴 글(앱에서 작성)을 고칠 때는 지금 값이 사라지지 않게 보여 준다.
+ */
+export function getFoodComposeCategories(
+  selected: FoodCategoryId | null | undefined,
+): FoodCategoryMeta[] {
+  return FOOD_CATEGORIES.filter(
+    (item) => item.id !== 'honest' || FOOD_HONEST_COMPOSE_ENABLED || selected === 'honest',
+  )
+}
 
 export function isFoodCategoryId(value: unknown): value is FoodCategoryId {
   return (
     value === 'restaurant' ||
     value === 'value' ||
     value === 'vibe' ||
-    value === 'study'
+    value === 'study' ||
+    value === 'honest'
   )
 }
 

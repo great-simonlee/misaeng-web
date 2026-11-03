@@ -3,13 +3,15 @@
     "restaurant": "Must-try",
     "value": "Great value",
     "vibe": "Good vibes",
-    "study": "Study spot"
+    "study": "Study spot",
+    "honest": "Honest review"
   },
   "categoryDescriptions": {
     "restaurant": "Places you have to try",
     "value": "Worth every dollar",
     "vibe": "Places with a great atmosphere",
-    "study": "Cafés good for studying or working"
+    "study": "Cafés good for studying or working",
+    "honest": "The good and the not-so-good"
   },
   "cuisines": {
     "brunch": "Brunch",

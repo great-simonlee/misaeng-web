@@ -3,13 +3,15 @@
     "restaurant": "必吃",
     "value": "性价比高",
     "vibe": "氛围好",
-    "study": "适合学习"
+    "study": "适合学习",
+    "honest": "真实测评"
   },
   "categoryDescriptions": {
     "restaurant": "一定要去试试的店",
     "value": "物超所值",
     "vibe": "氛围超棒的地方",
-    "study": "适合学习或办公的咖啡馆"
+    "study": "适合学习或办公的咖啡馆",
+    "honest": "优缺点都说实话"
   },
   "cuisines": {
     "brunch": "早午餐",

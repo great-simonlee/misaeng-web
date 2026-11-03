@@ -414,6 +414,9 @@ export async function listStoredCommunityPosts(
       return communityPostMatchesCity(post, city)
     })
 
+  // 맛집은 등록일 순으로만 — 글을 고쳐도(updatedAt) 위로 올라오지 않는다
+  if (boardId === 'food') filtered.sort((a, b) => b.createdAt - a.createdAt)
+
   const withCounts =
     boardId === 'food'
       ? await Promise.all(filtered.map(enrichStoredCommunityPostCounts))
