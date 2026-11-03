@@ -212,7 +212,15 @@
       "outdoorPatio": "Patio",
       "flexWallAllowed": "Allowed",
       "flexWallNotAllowed": "Not allowed"
-    }
+    },
+    "appInquiry": "Inquire in the app",
+    "appInquiryTitle": "Chat with us in the Misaeng app",
+    "appInquiryBody": "Live chat with our housing team is in the Misaeng app. Install it and tap Inquire on this listing.",
+    "appStore": "Download on the App Store",
+    "googlePlay": "Get it on Google Play",
+    "orKakao": "Can't install the app? Ask us on KakaoTalk or by email.",
+    "emailInquiryShort": "Email us",
+    "close": "Close"
   },
   "listingKinds": {
     "unit": {

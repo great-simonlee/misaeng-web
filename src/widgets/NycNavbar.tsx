@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { useAuth } from '@hooks/useAuth'
+import { useSupportConfig } from '@lib/support/client'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
 import { BRAND_CONFIG } from '@lib/brand'
@@ -36,6 +37,9 @@ const ACCOUNT_LINKS = [
     match: 'prefix' as const,
   },
 ] as const
+
+/** Shown when the 문의/건의 switch is on (support settings inquiry.enabled). */
+const INQUIRY_LINK = { path: '/me/inquiries', key: 'inquiries', match: 'prefix' as const }
 
 const TEAM_ACCOUNT_LINKS = [
   {
@@ -69,10 +73,12 @@ export function NycNavbar() {
     label: t(`links.${item.key}`),
     href: href(item.path),
   }))
+  const supportConfig = useSupportConfig()
+  const baseAccountLinks = supportConfig?.inquiries ? [...ACCOUNT_LINKS, INQUIRY_LINK] : [...ACCOUNT_LINKS]
   const accountMenuLinks = (
     isMisaengUser
-      ? [...ACCOUNT_LINKS, ...TEAM_ACCOUNT_LINKS]
-      : [...ACCOUNT_LINKS]
+      ? [...baseAccountLinks, ...TEAM_ACCOUNT_LINKS]
+      : baseAccountLinks
   ).map((item) => ({
     ...item,
     label: t(`account.${item.key}`),

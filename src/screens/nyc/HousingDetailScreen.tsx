@@ -10,6 +10,8 @@ import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { housingListingMatchesCity } from '@lib/constants/cities'
 import { useToast } from '@hooks/useToast'
+import { useSupportConfig } from '@lib/support/client'
+import { AppInquiryModal } from '@widgets/nyc/AppInquiryModal'
 import {
   formatHousingAvailableDate,
   formatListingBedBath,
@@ -76,6 +78,9 @@ interface HousingDetailScreenProps {
 }
 
 export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
+  // 문의하기 → app download modal when the housing chat is on (it lives in the app)
+  const supportConfig = useSupportConfig()
+  const [appInquiryOpen, setAppInquiryOpen] = useState(false)
   const t = useT('housing')
   const city = useCity()
   const href = useCityPath()
@@ -615,12 +620,22 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             <HousingDescriptionSection listing={listing} className='mt-5' />
 
             <div className='mt-6 flex flex-col gap-2.5 border-t border-black/[0.04] pt-5 sm:flex-row sm:items-stretch'>
-              <a
-                href={mailHref}
-                className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full bg-[var(--brand)] px-5 text-sm font-semibold text-white shadow-[0_8px_20px_rgb(var(--brand-rgb)/0.22)] touch-manipulation transition hover:bg-[var(--brand-hover)]'
-              >
-                {t('detail.emailInquiry')}
-              </a>
+              {supportConfig?.housingChat ? (
+                <button
+                  type='button'
+                  onClick={() => setAppInquiryOpen(true)}
+                  className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full bg-[var(--brand)] px-5 text-sm font-semibold text-white shadow-[0_8px_20px_rgb(var(--brand-rgb)/0.22)] touch-manipulation transition hover:bg-[var(--brand-hover)]'
+                >
+                  {t('detail.appInquiry')}
+                </button>
+              ) : (
+                <a
+                  href={mailHref}
+                  className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full bg-[var(--brand)] px-5 text-sm font-semibold text-white shadow-[0_8px_20px_rgb(var(--brand-rgb)/0.22)] touch-manipulation transition hover:bg-[var(--brand-hover)]'
+                >
+                  {t('detail.emailInquiry')}
+                </a>
+              )}
               <button
                 type='button'
                 onClick={handleKakaoInquiry}
@@ -637,6 +652,12 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               </button>
             </div>
 
+            <AppInquiryModal
+              open={appInquiryOpen}
+              onClose={() => setAppInquiryOpen(false)}
+              mailHref={listing.contactEmail ? mailHref : null}
+              onKakao={handleKakaoInquiry}
+            />
             {isAuthor && (
               <button
                 type='button'
