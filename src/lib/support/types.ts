@@ -85,8 +85,10 @@ export type HousingProfile = {
   occupants?: number
   occupation?: 'worker' | 'student'
   income?: string
+  /** Annual income typed by the user, thousands of USD; `income` is its range key */
+  incomeK?: number
   school?: string
-  graduation?: string // YYYY-MM
+  graduation?: string // YYYY (app) or YYYY-MM (older)
   approval?: string
   approvalOther?: string
   pets?: 'yes' | 'no' | null

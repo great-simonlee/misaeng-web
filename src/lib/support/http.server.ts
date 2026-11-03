@@ -77,11 +77,21 @@ function budgetKey(amount: number): HousingProfile['budget'] {
   return 'over_4500'
 }
 
+function incomeKey(thousands: number): HousingProfile['income'] {
+  if (thousands < 50) return 'under_50k'
+  if (thousands < 75) return '50_75k'
+  if (thousands < 100) return '75_100k'
+  if (thousands < 150) return '100_150k'
+  return 'over_150k'
+}
+
 /** Cleans the housing form (spec §4.1, §15). Returns null when a required field is missing. */
 export function parseHousingProfile(input: unknown): HousingProfile | null {
   const raw = (input && typeof input === 'object' ? input : {}) as Record<string, unknown>
   const occupation = raw.occupation === 'worker' || raw.occupation === 'student' ? raw.occupation : undefined
   const occupants = Math.round(Number(raw.occupants))
+  const incomeRaw = Math.round(Number(raw.incomeK))
+  const incomeK = Number.isFinite(incomeRaw) && incomeRaw > 0 && incomeRaw <= 10000 ? incomeRaw : undefined
   const amount = Math.round(Number(raw.budgetAmount))
   const budgetAmount = Number.isFinite(amount) && amount >= 100 && amount <= 100000 ? amount : undefined
   const profile: HousingProfile = {
@@ -95,9 +105,10 @@ export function parseHousingProfile(input: unknown): HousingProfile | null {
     roomKind: raw.roomType === 'roommate_room' ? oneOf(raw.roomKind, ROOM_KIND_OPTIONS) : undefined,
     occupants: Number.isFinite(occupants) && occupants >= 1 && occupants <= 10 ? occupants : undefined,
     occupation,
-    income: occupation === 'worker' ? oneOf(raw.income, INCOME_OPTIONS) : undefined,
+    income: occupation === 'worker' ? (oneOf(raw.income, INCOME_OPTIONS) ?? (incomeK ? incomeKey(incomeK) : undefined)) : undefined,
+    incomeK: occupation === 'worker' ? incomeK : undefined,
     school: occupation === 'student' ? str(raw.school, 120) : undefined,
-    graduation: occupation === 'student' && /^\d{4}-\d{2}$/.test(String(raw.graduation)) ? String(raw.graduation) : undefined,
+    graduation: occupation === 'student' && /^\d{4}(-\d{2})?$/.test(String(raw.graduation)) ? String(raw.graduation) : undefined,
     approval: oneOf(raw.approval, APPROVAL_OPTIONS),
     approvalOther: raw.approval === 'other' ? str(raw.approvalOther, 200) : undefined,
     pets: raw.pets === 'yes' || raw.pets === 'no' ? raw.pets : null,
