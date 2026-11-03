@@ -62,7 +62,10 @@ export async function POST(request: Request) {
         return supportJson({ error: t('support.verifyRequired'), code: 'VERIFICATION_REQUIRED' }, 403)
       }
       const profile = parseHousingProfile(body.profile)
-      if (!profile) return supportJson({ error: t('support.profileInvalid'), code: 'PROFILE_INVALID' }, 400)
+      if (!profile) {
+        if (process.env.NODE_ENV === 'development') console.warn('[support] invalid housing profile', JSON.stringify(body.profile))
+        return supportJson({ error: t('support.profileInvalid'), code: 'PROFILE_INVALID' }, 400)
+      }
       const listingId = typeof body.listingId === 'string' && body.listingId.trim() ? body.listingId.trim().slice(0, 200) : null
       const result = await startHousingConversation({
         user: { ...startUser, email: email ?? profile.email ?? null },
