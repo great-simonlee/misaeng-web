@@ -33,6 +33,10 @@
       }
     },
     "fields": {
+      "stageLabel": {
+        "label": "Step",
+        "shortLabel": "Step"
+      },
       "prepared": {
         "label": "What you prepared",
         "shortLabel": "Prepared",

@@ -33,6 +33,10 @@
       }
     },
     "fields": {
+      "stageLabel": {
+        "label": "단계",
+        "shortLabel": "단계"
+      },
       "prepared": {
         "label": "뭘 준비했는지",
         "shortLabel": "준비",

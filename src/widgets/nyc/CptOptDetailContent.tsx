@@ -86,6 +86,11 @@ export function CptOptDetailContent({
       hasReview,
       body: (
         <>
+          {entry.stageLabel?.trim() ? (
+            <p className='mb-2.5 text-[15px] font-bold text-[var(--foreground)]'>
+              {entry.stageLabel.trim()}
+            </p>
+          ) : null}
           <TimelineFieldGrid items={fieldItems} />
           {hasReview ? (
             <div className='mt-3 rounded-xl bg-[#fafbfc] px-3.5 py-3 ring-1 ring-black/[0.05] sm:px-4 sm:py-3.5'>

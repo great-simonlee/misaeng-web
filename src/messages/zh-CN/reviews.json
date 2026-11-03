@@ -33,6 +33,10 @@
       }
     },
     "fields": {
+      "stageLabel": {
+        "label": "阶段",
+        "shortLabel": "阶段"
+      },
       "prepared": {
         "label": "准备了什么",
         "shortLabel": "准备",

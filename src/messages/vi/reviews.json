@@ -33,6 +33,10 @@
       }
     },
     "fields": {
+      "stageLabel": {
+        "label": "Bước",
+        "shortLabel": "Bước"
+      },
       "prepared": {
         "label": "Bạn đã chuẩn bị gì",
         "shortLabel": "Chuẩn bị",

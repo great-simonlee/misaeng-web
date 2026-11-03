@@ -387,6 +387,7 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
                 post.authorSchoolName,
                 post.cptOptTips,
                 ...(post.cptOptTimeline ?? []).flatMap((entry) => [
+                  entry.stageLabel ?? '',
                   entry.prepared,
                   entry.submitted,
                   entry.resultReceived,

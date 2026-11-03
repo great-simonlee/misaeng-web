@@ -32,7 +32,7 @@ export const DEFAULT_SOURCE_LOCALE: Locale = 'ko'
 
 const text = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
 
-const CPT_OPT_ENTRY_FIELDS = ['prepared', 'submitted', 'resultReceived', 'nextStep', 'stageReviewHtml']
+const CPT_OPT_ENTRY_FIELDS = ['stageLabel', 'prepared', 'submitted', 'resultReceived', 'nextStep', 'stageReviewHtml']
 const JOB_REVIEW_ENTRY_FIELDS = [
   'stageLabel',
   'platform',

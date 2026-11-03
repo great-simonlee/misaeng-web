@@ -33,6 +33,10 @@
       }
     },
     "fields": {
+      "stageLabel": {
+        "label": "Tahap",
+        "shortLabel": "Tahap"
+      },
       "prepared": {
         "label": "Yang kamu siapkan",
         "shortLabel": "Persiapan",

@@ -436,6 +436,8 @@ export interface CptOptTimelineEntry {
   id: string
   /** YYYY-MM-DD 또는 자유 입력 */
   date: string
+  /** 단계 이름 (앱 단계형 입력). 없으면 예전 글 */
+  stageLabel?: string
   /** 뭘 준비했는지 */
   prepared: string
   /** 어떻게 제출했는지 */
