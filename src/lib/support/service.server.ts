@@ -7,7 +7,7 @@ import { broadcastSignals, staffTopic, userTopic, type SupportSignal } from './r
 import { redactSensitive } from './redact'
 import { eq, inList, supportRest } from './rest.server'
 import { getSupportSettings, normalizeEmail, supportFeatureOn } from './settings.server'
-import { sendStaffPush } from './staffPush.server'
+import { housingLeadPush, pushPreview, sendStaffPush } from './staffPush.server'
 import { notifyTeamOfNewConversation, notifyUserOfStaffReply } from './userNotify.server'
 import type {
   ConversationRow,
@@ -294,10 +294,10 @@ export async function startHousingConversation(input: {
     await Promise.all([
       signalConversation(conversation, 'message'),
       sendStaffPush([assignee.email], {
-        title: 'New housing lead',
-        body: `${userName || 'A user'}${conversation.listing_snapshot?.title ? ` · ${conversation.listing_snapshot.title}` : ''}`,
+        ...housingLeadPush({ userName, listingTitle: conversation.listing_snapshot?.title, profile: input.profile, message: text }),
         data: { type: 'support', conversationId: conversation.id },
         threadId: `support-${conversation.id}`,
+        sound: 'lead',
       }),
       notifyTeamOfNewConversation(conversation, text),
     ])
@@ -334,10 +334,11 @@ export async function startInquiry(input: { user: StartUser; kind: 'question' | 
   runAfter(async () => {
     await Promise.all([
       sendStaffPush([assignee], {
-        title: input.kind === 'suggestion' ? 'New suggestion' : 'New inquiry',
-        body: `${userName || 'A user'}: ${title}`,
+        title: `${input.kind === 'suggestion' ? '💡 New suggestion' : '💬 New inquiry'} · ${title}`,
+        body: `${userName || 'A user'}: ${pushPreview(text, 140)}`,
         data: { type: 'inquiry', conversationId: conversation.id },
         threadId: `support-${conversation.id}`,
+        sound: 'lead',
       }),
       notifyTeamOfNewConversation(conversation, text),
     ])
@@ -366,11 +367,14 @@ export async function addUserMessage(user: StartUser, row: ConversationRow, body
   runAfter(async () => {
     await Promise.all([
       signalConversation(row, 'message'),
+      // A message in an open conversation: just who and what (KakaoTalk style, no listing)
       sendStaffPush([row.assignee_email], {
-        title: row.kind === 'housing' ? `${row.user_name || 'User'}` : `${row.user_name || 'User'} · ${row.title || 'Inquiry'}`,
-        body: row.kind === 'housing' ? 'New message' : 'New reply',
+        title: row.user_name || 'User',
+        body: pushPreview(text),
         data: { type: row.kind === 'housing' ? 'support' : 'inquiry', conversationId: row.id },
         threadId: `support-${row.id}`,
+        sound: 'message',
+        sender: { id: row.user_uid, name: row.user_name || 'User' },
       }),
     ])
   })
@@ -399,6 +403,7 @@ export async function handleAssigned(conversationId: string, by: string) {
     signalConversation(row, 'assign'),
     sendStaffPush([row.assignee_email], {
       title: row.kind === 'housing' ? 'Housing lead assigned to you' : 'Inquiry assigned to you',
+      sound: 'lead',
       body: `${row.user_name || 'A user'}${row.listing_snapshot?.title ? ` · ${row.listing_snapshot.title}` : row.title ? ` · ${row.title}` : ''}${by ? ` (by ${by})` : ''}`,
       data: { type: row.kind === 'housing' ? 'support' : 'inquiry', conversationId: row.id },
       threadId: `support-${row.id}`,

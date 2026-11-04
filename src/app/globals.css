@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+/* Noto Sans JP/SC/TC + Geist Mono, self-hosted (the build must not depend on Google Fonts) */
+@import './fonts-self-hosted.css';
 
 /* 기본: 밝은 테마 */
 :root {
@@ -66,7 +68,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* 일본어·중국어는 그 언어 한자 모양 글꼴을 Pretendard보다 앞에 둔다 (src/lib/fonts/cjk.ts) */
+/* 일본어·중국어는 그 언어 한자 모양 글꼴을 Pretendard보다 앞에 둔다 (src/app/fonts-self-hosted.css) */
 :lang(ja) {
   font-family: var(--font-noto-jp), var(--font-pretendard), system-ui, sans-serif;
 }

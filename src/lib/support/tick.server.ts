@@ -40,6 +40,7 @@ async function reassign(row: ConversationRow, to: string, level: number, reason:
       title: level >= 2 ? 'Unanswered housing lead (2h)' : 'Housing lead passed to you (1h no reply)',
       body: `${row.user_name || 'A user'}${row.listing_snapshot?.title ? ` · ${row.listing_snapshot.title}` : ''}`,
       data: { type: 'support', conversationId: row.id },
+      sound: 'lead',
       threadId: `support-${row.id}`,
     }),
   ])
@@ -69,6 +70,7 @@ async function runEscalations(now: Date) {
           title: 'Unanswered housing lead (2h)',
           body: `${row.user_name || 'A user'} is still waiting for a reply.`,
           data: { type: 'support', conversationId: row.id },
+          sound: 'lead',
           threadId: `support-${row.id}`,
         })
       }

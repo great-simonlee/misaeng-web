@@ -13,7 +13,13 @@ export type ApnsEnvironment = 'sandbox' | 'production'
 
 export type ApnsMessage = {
   title: string
+  /** Second bold line under the title (iOS). */
+  subtitle?: string
   body: string
+  /** A sound file in the app bundle (e.g. "lead.caf"); default "default". Focus / silent mode still mute it. */
+  sound?: string
+  /** Lets the app's Notification Service Extension rewrite the alert (e.g. a messaging-style notification with the sender). */
+  mutableContent?: boolean
   /** Custom data the app reads when the notification is tapped (e.g. { type, postId }). */
   data?: Record<string, string>
   /** Notifications with the same thread are grouped on the lock screen. */
@@ -144,8 +150,9 @@ export async function sendApns(
   if (devices.length === 0) return []
   const payload = JSON.stringify({
     aps: {
-      alert: { title: message.title, body: message.body },
-      sound: 'default',
+      alert: { title: message.title, ...(message.subtitle ? { subtitle: message.subtitle } : {}), body: message.body },
+      sound: message.sound || 'default',
+      ...(message.mutableContent ? { 'mutable-content': 1 } : {}),
       ...(message.threadId ? { 'thread-id': message.threadId } : {}),
     },
     ...(message.data ?? {}),
