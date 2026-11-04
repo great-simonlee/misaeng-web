@@ -541,7 +541,9 @@
       "inquiryTitle": "Your inquiry got a reply",
       "reportResolvedTitle": "We handled your report",
       "reportResolvedBody": "We reviewed it and took action. Thanks for keeping Misaeng safe.",
-      "reportDismissedBody": "We reviewed it and it doesn't break our rules. Thanks for letting us know."
+      "reportDismissedBody": "We reviewed it and it doesn't break our rules. Thanks for letting us know.",
+      "feedbackShippedTitle": "Your feedback made it into Misaeng 🎉",
+      "feedbackShippedBody": "\"{title}\" — see it in Talking with Misaeng members."
     },
     "email": {
       "housingSubject": "[Misaeng] New reply to your housing inquiry",

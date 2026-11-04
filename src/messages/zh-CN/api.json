@@ -499,5 +499,11 @@
     "loadFailed": "无法加载收藏的帖子，请稍后再试。",
     "saveFailed": "收藏失败，请稍后再试。",
     "tooMany": "一次最多可转移 {max} 条收藏。"
+  },
+  "support": {
+    "push": {
+      "feedbackShippedTitle": "你的建议已上线 🎉",
+      "feedbackShippedBody": "“{title}” — 在“与Misaeng成员的对话”中查看。"
+    }
   }
 }

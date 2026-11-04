@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { isInternalAuthorized, UNAUTHORIZED_INTERNAL } from '@lib/points/http.server'
 import { getConversation, handleAssigned, handleStaffMessage, signalConversation } from '@lib/support/service.server'
-import { notifyReporterOfOutcome } from '@lib/support/reports.server'
+import { notifyFeedbackShipped, notifyReporterOfOutcome } from '@lib/support/reports.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -12,6 +12,7 @@ type Body =
   | { event: 'assigned'; conversationId: string; by?: string }
   | { event: 'status'; conversationId: string }
   | { event: 'report_outcome'; reporterUids: string[]; outcome: 'resolved' | 'dismissed' }
+  | { event: 'dev_note_done'; noteId: string }
 
 /**
  * ellieo-erp → misaeng-web (x-internal-secret = INTERNAL_PUSH_SECRET). The ERP stores staff actions itself; this sends
@@ -28,6 +29,7 @@ export async function POST(request: Request) {
       if (row) await signalConversation(row, 'status')
     } else if (body?.event === 'report_outcome' && Array.isArray(body.reporterUids))
       notifyReporterOfOutcome(body.reporterUids, body.outcome === 'dismissed' ? 'dismissed' : 'resolved')
+    else if (body?.event === 'dev_note_done' && body.noteId) await notifyFeedbackShipped(body.noteId).catch((error) => console.error('Feedback shipped notify failed:', error?.message || error))
     else return NextResponse.json({ error: 'Unknown event' }, { status: 400 })
     return NextResponse.json({ ok: true })
   } catch (error) {

@@ -541,7 +541,9 @@
       "inquiryTitle": "문의/건의에 답변이 왔어요",
       "reportResolvedTitle": "신고하신 내용을 처리했어요",
       "reportResolvedBody": "검토 후 조치했어요. 미생을 깨끗하게 지켜 주셔서 고마워요.",
-      "reportDismissedBody": "검토했지만 운영 정책 위반은 아니었어요. 알려 주셔서 고마워요."
+      "reportDismissedBody": "검토했지만 운영 정책 위반은 아니었어요. 알려 주셔서 고마워요.",
+      "feedbackShippedTitle": "보내 주신 의견이 반영됐어요 🎉",
+      "feedbackShippedBody": "\"{title}\" — 미생 멤버들과의 대화에서 확인해 보세요."
     },
     "email": {
       "housingSubject": "[미생] 하우징 문의에 답장이 왔어요",

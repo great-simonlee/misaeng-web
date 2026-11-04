@@ -14,6 +14,7 @@ type DevNoteRow = {
   detail: string | null
   detail_en: string | null
   updated_at: string
+  shipped_at?: string | null
 }
 
 /**
@@ -22,9 +23,12 @@ type DevNoteRow = {
  */
 export async function GET() {
   try {
-    const rows = await supportRest<DevNoteRow[]>(
-      'dev_notes?published=is.true&select=id,section,status,title,title_en,detail,detail_en,updated_at&order=section.asc,sort.asc,updated_at.desc&limit=100',
-    )
+    const query = (extra: string) =>
+      supportRest<DevNoteRow[]>(
+        `dev_notes?published=is.true&select=id,section,status,title,title_en,detail,detail_en,updated_at${extra}&order=section.asc,sort.asc,updated_at.desc&limit=100`,
+      )
+    // shipped_at comes with dev_notes_feedback.sql; before it runs, read without it
+    const rows = await query(',shipped_at').catch(() => query(''))
     const notes = (rows ?? []).map((r) => ({
       id: r.id,
       section: r.section,
@@ -34,6 +38,7 @@ export async function GET() {
       detail: r.detail || null,
       detailEn: r.detail_en || null,
       updatedAt: r.updated_at,
+      shippedAt: r.shipped_at ?? null,
     }))
     const updatedAt = notes.reduce<string | null>((max, n) => (!max || n.updatedAt > max ? n.updatedAt : max), null)
     return NextResponse.json({ notes, updatedAt }, { headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' } })

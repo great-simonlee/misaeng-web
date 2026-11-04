@@ -499,5 +499,11 @@
     "loadFailed": "保存した投稿を読み込めませんでした。しばらくしてから再度お試しください。",
     "saveFailed": "保存できませんでした。しばらくしてから再度お試しください。",
     "tooMany": "一度に移せるのは最大{max}件です。"
+  },
+  "support": {
+    "push": {
+      "feedbackShippedTitle": "いただいたご意見を反映しました 🎉",
+      "feedbackShippedBody": "「{title}」— Misaengメンバーとの対話でご覧ください。"
+    }
   }
 }

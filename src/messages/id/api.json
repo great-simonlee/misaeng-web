@@ -499,5 +499,11 @@
     "loadFailed": "Tidak dapat memuat postingan tersimpan. Coba lagi nanti.",
     "saveFailed": "Tidak dapat menyimpan. Coba lagi nanti.",
     "tooMany": "Anda dapat memindahkan maksimal {max} simpanan sekaligus."
+  },
+  "support": {
+    "push": {
+      "feedbackShippedTitle": "Masukan Anda sudah kami terapkan 🎉",
+      "feedbackShippedBody": "\"{title}\" — lihat di Obrolan dengan anggota Misaeng."
+    }
   }
 }
