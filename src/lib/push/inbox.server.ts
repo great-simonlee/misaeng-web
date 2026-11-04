@@ -129,11 +129,14 @@ function toItem(row: Row, locale: Locale): InboxItem {
   }
 }
 
+/** Support chat rows (written before 2026-11-04 PM) stay out of 알림: messages have their own tab. */
+const NOT_SUPPORT = `&or=${encodeURIComponent('(thread_id.is.null,thread_id.not.like.support-*)')}`
+
 /** Newest first, `limit` per page; `cursor` = createdAt of the last item of the previous page. */
 export async function listNotifications(uid: string, locale: Locale, cursor: string | null, limit = 30) {
   const since = new Date(Date.now() - KEEP_DAYS * 86_400_000).toISOString()
   let query = `${TABLE}?user_id=eq.${encodeURIComponent(uid)}&created_at=gte.${encodeURIComponent(since)}` +
-    `&select=id,user_id,type,content,data,thread_id,created_at,read_at&order=created_at.desc&limit=${limit + 1}`
+    `${NOT_SUPPORT}&select=id,user_id,type,content,data,thread_id,created_at,read_at&order=created_at.desc&limit=${limit + 1}`
   if (cursor && Number.isFinite(Date.parse(cursor))) query += `&created_at=lt.${encodeURIComponent(cursor)}`
   try {
     const rows = (await rest<Row[]>(query)) ?? []
@@ -153,7 +156,7 @@ export async function unreadCount(uid: string): Promise<number> {
   if (!c) return 0
   try {
     const res = await fetch(
-      `${c.url}/rest/v1/${TABLE}?user_id=eq.${encodeURIComponent(uid)}&read_at=is.null&select=id`,
+      `${c.url}/rest/v1/${TABLE}?user_id=eq.${encodeURIComponent(uid)}&read_at=is.null${NOT_SUPPORT}&select=id`,
       {
         method: 'HEAD',
         headers: { apikey: c.key, Authorization: `Bearer ${c.key}`, Prefer: 'count=exact', Range: '0-0' },

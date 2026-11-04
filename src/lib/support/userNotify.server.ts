@@ -26,14 +26,13 @@ async function lastStaffMessage(conversationId: string) {
   return rows?.[0] ?? null
 }
 
-/** App push + one bell entry per conversation for a staff reply. */
+/** App push for a staff reply. No 알림 entry: messages live in the 메시지 tab (its own unread count). */
 export async function notifyUserOfStaffReply(row: ConversationRow) {
   const last = await lastStaffMessage(row.id)
   notifyUsers({
     type: 'account',
     userIds: [row.user_uid],
-    // One bell entry per conversation, replaced by the latest reply (comes back unread at the top).
-    replaceThread: true,
+    inbox: false,
     build: (t) => ({
       title:
         row.kind === 'housing'
