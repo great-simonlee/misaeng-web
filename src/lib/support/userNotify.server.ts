@@ -26,20 +26,21 @@ async function lastStaffMessage(conversationId: string) {
   return rows?.[0] ?? null
 }
 
-/** App push for a staff reply (no inbox entry: the chat has its own unread badge). */
+/** App push + one bell entry per conversation for a staff reply. */
 export async function notifyUserOfStaffReply(row: ConversationRow) {
   const last = await lastStaffMessage(row.id)
   notifyUsers({
     type: 'account',
     userIds: [row.user_uid],
-    inbox: false,
+    // One bell entry per conversation, replaced by the latest reply (comes back unread at the top).
+    replaceThread: true,
     build: (t) => ({
       title:
         row.kind === 'housing'
           ? t('api.support.push.housingTitle', { name: last?.sender_display || 'Misaeng' })
           : t('api.support.push.inquiryTitle'),
       body: previewText(last?.body || row.last_message_preview || ''),
-      data: { type: 'support', conversationId: row.id, kind: row.kind },
+      data: { type: 'support', conversationId: row.id, kind: row.kind, senderName: last?.sender_display || 'Misaeng' },
       threadId: `support-${row.id}`,
     }),
   })

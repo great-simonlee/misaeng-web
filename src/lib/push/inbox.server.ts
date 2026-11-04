@@ -74,11 +74,16 @@ async function rest<T>(path: string, init: RequestInit & { prefer?: string } = {
   return data as T
 }
 
-/** Stores one notification per user, rendered in every language. Never throws. */
+/**
+ * Stores one notification per user, rendered in every language. Never throws.
+ * `replaceThread`: the user's earlier row with the same threadId is replaced, so a thread keeps one entry that comes
+ * back unread at the top (support chat: one row per conversation, latest message).
+ */
 export async function recordNotifications(input: {
   type: string
   userIds: string[]
   build: (t: Translate, locale: Locale) => ApnsMessage
+  replaceThread?: boolean
 }): Promise<void> {
   if (!config() || input.userIds.length === 0) return
   try {
@@ -90,6 +95,12 @@ export async function recordNotifications(input: {
       content[locale] = { title: message.title, body: message.body }
       data = message.data ?? data
       threadId = message.threadId ?? threadId
+    }
+    if (input.replaceThread && threadId) {
+      await rest(
+        `${TABLE}?user_id=in.(${input.userIds.map((id) => `"${id.replace(/"/g, '')}"`).join(',')})&thread_id=eq.${encodeURIComponent(threadId)}`,
+        { method: 'DELETE', prefer: 'return=minimal' },
+      )
     }
     const rows = input.userIds.map((userId) => ({
       user_id: userId,
@@ -169,6 +180,20 @@ export async function markNotificationsRead(uid: string, ids: string[] | 'all'):
     })
   } catch (error) {
     if (!(error instanceof InboxMissing)) throw error
+  }
+}
+
+/** Marks the user's notifications in one thread as read (opening a support chat clears its bell entry). Never throws. */
+export async function markThreadRead(uid: string, threadId: string): Promise<void> {
+  if (!config() || !uid || !threadId) return
+  try {
+    await rest(`${TABLE}?user_id=eq.${encodeURIComponent(uid)}&thread_id=eq.${encodeURIComponent(threadId)}&read_at=is.null`, {
+      method: 'PATCH',
+      prefer: 'return=minimal',
+      body: JSON.stringify({ read_at: new Date().toISOString() }),
+    })
+  } catch (error) {
+    if (!(error instanceof InboxMissing)) console.error('Notification thread read failed:', error)
   }
 }
 

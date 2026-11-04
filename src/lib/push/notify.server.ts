@@ -23,12 +23,14 @@ export function notifyUsers(input: {
   push?: boolean
   /** false = push only, no in-app inbox entry (support chat messages have their own unread badge). Default true. */
   inbox?: boolean
+  /** Inbox keeps one row per threadId (replaced on each send) instead of one per notification. */
+  replaceThread?: boolean
 }) {
   const userIds = [...new Set(input.userIds.map((id) => String(id || '').trim()).filter(Boolean))]
   if (userIds.length === 0) return
 
   const run = async () => {
-    if (input.inbox !== false) await recordNotifications({ type: input.type, userIds, build: input.build })
+    if (input.inbox !== false) await recordNotifications({ type: input.type, userIds, build: input.build, replaceThread: input.replaceThread })
     const apns = isApnsConfigured()
     const fcm = isFcmConfigured()
     if (input.push === false || (!apns && !fcm)) return

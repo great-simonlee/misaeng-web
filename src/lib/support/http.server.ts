@@ -41,6 +41,8 @@ export function toUserConversation(row: ConversationRow) {
     title: row.title,
     listingId: row.listing_id,
     listing: row.listing_snapshot,
+    /** The user's own first-inquiry details (shown in the app's listing info sheet). */
+    housing: row.housing_snapshot,
     lastMessageAt: row.last_message_at,
     lastMessagePreview: row.last_message_preview,
     lastSender: row.last_sender,

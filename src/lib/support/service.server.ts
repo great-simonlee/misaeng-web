@@ -1,5 +1,6 @@
 import { after } from 'next/server'
 
+import { markThreadRead } from '@lib/push/inbox.server'
 import { getStoredHousingListing } from '@lib/supabase/housing.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 
@@ -118,6 +119,7 @@ export async function listMessages(conversationId: string, after?: string | null
 }
 
 export async function markUserRead(row: ConversationRow) {
+  runAfter(() => markThreadRead(row.user_uid, `support-${row.id}`))
   if (row.user_unread === 0 && row.user_email_due_at === null) return
   await supportRest(`support_conversations?id=${eq(row.id)}`, {
     method: 'PATCH',
@@ -365,6 +367,7 @@ export async function addUserMessage(user: StartUser, row: ConversationRow, body
   })
   if (row.status === 'closed') await logEvent(row.id, 'reopen', `user:${user.uid}`)
   runAfter(async () => {
+    const photo = (await getSupabaseProfile(row.user_uid).catch(() => null))?.photoURL?.trim()
     await Promise.all([
       signalConversation(row, 'message'),
       // A message in an open conversation: just who and what (KakaoTalk style, no listing)
@@ -374,7 +377,7 @@ export async function addUserMessage(user: StartUser, row: ConversationRow, body
         data: { type: row.kind === 'housing' ? 'support' : 'inquiry', conversationId: row.id },
         threadId: `support-${row.id}`,
         sound: 'message',
-        sender: { id: row.user_uid, name: row.user_name || 'User' },
+        sender: { id: row.user_uid, name: row.user_name || 'User', avatarUrl: photo && /^https?:\/\//i.test(photo) ? photo : null },
       }),
     ])
   })

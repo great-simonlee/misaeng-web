@@ -23,9 +23,9 @@ export type StaffPush = {
   sound?: StaffSound
   /**
    * A chat message: the staff app shows it like a messenger (sender initials + name as the title, the text below),
-   * built by its Notification Service Extension from these fields.
+   * built by its Notification Service Extension from these fields. `avatarUrl` = the user's profile photo, if any.
    */
-  sender?: { id: string; name: string }
+  sender?: { id: string; name: string; avatarUrl?: string | null }
 }
 
 export type StaffSound = 'lead' | 'message'
@@ -51,6 +51,7 @@ export async function sendStaffPush(emails: (string | null | undefined)[], messa
         data: {
           ...(message.data ?? {}),
           ...(message.sender ? { senderId: message.sender.id, senderName: message.sender.name } : {}),
+          ...(message.sender?.avatarUrl ? { senderAvatarUrl: message.sender.avatarUrl } : {}),
         },
       },
       { topic: staffBundleId() },
