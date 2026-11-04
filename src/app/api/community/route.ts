@@ -69,6 +69,7 @@ import {
   isCommunityStorageConfigured,
   listStoredCommunityPosts,
   listStoredCommunityPostsByAuthor,
+  withLiveAuthors,
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
@@ -133,7 +134,8 @@ export async function GET(request: Request) {
         }
       }
       const locale = await getRequestLocale(request)
-      const posts = localizePosts(await listStoredCommunityPostsByAuthor(user.uid), locale, {
+      // 내 글 목록도 지금 프로필 사진으로 (사진을 바꾼 뒤 예전 글에 옛 사진이 남지 않게)
+      const posts = localizePosts(await withLiveAuthors(await listStoredCommunityPostsByAuthor(user.uid)), locale, {
         hidePending: false,
       })
       return NextResponse.json({

@@ -474,6 +474,14 @@ export async function listStoredCommunityPostsByAuthor(
   return posts.filter((post) => post.authorUid === uid)
 }
 
+/**
+ * 응답 직전에 작성자의 지금 프로필(사진·닉네임·배지)을 붙인다 — 프로필 사진을 바꾸면 예전 글에도 바로 보인다.
+ * 익명 게시판은 그대로. 프로필은 5분 캐시라 작성자당 한 번만 읽는다.
+ */
+export function withLiveAuthors(posts: CommunityPost[]): Promise<CommunityPost[]> {
+  return Promise.all(posts.map((post) => enrichCommunityPostAuthor(post, { persist: false, cachedProfile: true })))
+}
+
 /** 탈퇴한 작성자의 글·댓글에 덮어쓰는 표시 필드 */
 export const DELETED_AUTHOR_FIELDS = {
   authorDeleted: true,
