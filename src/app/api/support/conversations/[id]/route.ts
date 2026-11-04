@@ -1,4 +1,5 @@
 import { getRequestT } from '@lib/i18n/server'
+import { staffAvatars } from '@lib/support/staffAvatars.server'
 import { supportErrorResponse, supportJson, toUserConversation, toUserMessage } from '@lib/support/http.server'
 import { getConversation, listMessages, markUserRead } from '@lib/support/service.server'
 
@@ -16,9 +17,9 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     const { id } = await context.params
     const row = await getConversation(id)
     if (!row || row.user_uid !== user.uid) return supportJson({ error: t('support.notFound') }, 404)
-    const messages = await listMessages(row.id)
+    const [messages, avatars] = await Promise.all([listMessages(row.id), staffAvatars()])
     await markUserRead(row)
-    return supportJson({ conversation: { ...toUserConversation(row), unread: 0 }, messages: messages.map(toUserMessage) })
+    return supportJson({ conversation: { ...toUserConversation(row), unread: 0 }, messages: messages.map((m) => toUserMessage(m, avatars)) })
   } catch (error) {
     return supportErrorResponse(t, error)
   }

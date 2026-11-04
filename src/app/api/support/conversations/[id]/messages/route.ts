@@ -1,5 +1,6 @@
 import { getRequestT } from '@lib/i18n/server'
 import { accountSuspendedResponse } from '@lib/supabase/profile.server'
+import { staffAvatars } from '@lib/support/staffAvatars.server'
 import { supportErrorResponse, supportJson, toUserConversation, toUserMessage } from '@lib/support/http.server'
 import { addUserMessage, getConversation, listMessages, markUserRead } from '@lib/support/service.server'
 import { getSupportSettings, supportFeatureOn } from '@lib/support/settings.server'
@@ -20,9 +21,9 @@ export async function GET(request: Request, context: Context) {
     const { id } = await context.params
     const row = await getConversation(id)
     if (!row || row.user_uid !== user.uid) return supportJson({ error: t('support.notFound') }, 404)
-    const messages = await listMessages(row.id, new URL(request.url).searchParams.get('after'))
+    const [messages, avatars] = await Promise.all([listMessages(row.id, new URL(request.url).searchParams.get('after')), staffAvatars()])
     await markUserRead(row)
-    return supportJson({ conversation: { ...toUserConversation(row), unread: 0 }, messages: messages.map(toUserMessage) })
+    return supportJson({ conversation: { ...toUserConversation(row), unread: 0 }, messages: messages.map((m) => toUserMessage(m, avatars)) })
   } catch (error) {
     return supportErrorResponse(t, error)
   }

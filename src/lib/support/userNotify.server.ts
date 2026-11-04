@@ -5,6 +5,7 @@ import { notifyUsers, previewText } from '@lib/push/notify.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 
 import { eq, supportRest } from './rest.server'
+import { staffAvatars } from './staffAvatars.server'
 import type { ConversationRow } from './types'
 
 const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://misaeng.com').replace(/\/+$/, '')
@@ -20,15 +21,16 @@ export function conversationWebPath(row: Pick<ConversationRow, 'id' | 'kind' | '
 }
 
 async function lastStaffMessage(conversationId: string) {
-  const rows = await supportRest<{ body: string; sender_display: string | null }[]>(
-    `support_messages?conversation_id=${eq(conversationId)}&sender_type=eq.staff&select=body,sender_display&order=created_at.desc&limit=1`,
+  const rows = await supportRest<{ body: string; sender_display: string | null; sender_email: string | null }[]>(
+    `support_messages?conversation_id=${eq(conversationId)}&sender_type=eq.staff&select=body,sender_display,sender_email&order=created_at.desc&limit=1`,
   ).catch(() => [])
   return rows?.[0] ?? null
 }
 
 /** App push for a staff reply. No 알림 entry: messages live in the 메시지 tab (its own unread count). */
 export async function notifyUserOfStaffReply(row: ConversationRow) {
-  const last = await lastStaffMessage(row.id)
+  const [last, avatars] = await Promise.all([lastStaffMessage(row.id), staffAvatars()])
+  const senderAvatarUrl = last?.sender_email ? avatars.get(last.sender_email.toLowerCase()) : undefined
   notifyUsers({
     type: 'account',
     userIds: [row.user_uid],
@@ -39,7 +41,12 @@ export async function notifyUserOfStaffReply(row: ConversationRow) {
           ? t('api.support.push.housingTitle', { name: last?.sender_display || 'Misaeng' })
           : t('api.support.push.inquiryTitle'),
       body: previewText(last?.body || row.last_message_preview || ''),
-      data: { type: 'support', conversationId: row.id, kind: row.kind, senderName: last?.sender_display || 'Misaeng' },
+      data: {
+        type: 'support', conversationId: row.id, kind: row.kind, senderName: last?.sender_display || 'Misaeng',
+        // Sender photo for the iOS Notification Service Extension / Android large icon
+        ...(senderAvatarUrl ? { senderAvatarUrl } : {}),
+      },
+      mutableContent: true,
       threadId: `support-${row.id}`,
     }),
   })

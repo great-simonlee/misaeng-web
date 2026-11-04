@@ -53,11 +53,13 @@ export function toUserConversation(row: ConversationRow) {
   }
 }
 
-export function toUserMessage(m: MessageRow) {
+export function toUserMessage(m: MessageRow, avatars?: Map<string, string>) {
   return {
     id: m.id,
     sender: m.sender_type,
     senderName: m.sender_type === 'user' ? null : m.sender_display,
+    /** Staff member's photo (ERP agent photo); null for the user's own messages or when they have none. */
+    senderAvatar: m.sender_type === 'staff' && m.sender_email ? (avatars?.get(m.sender_email.toLowerCase()) ?? null) : null,
     body: m.body,
     redactions: m.redactions,
     createdAt: m.created_at,
