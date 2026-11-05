@@ -61,7 +61,8 @@ const ELLIEO: BrandConfig = {
   id: 'ellieo',
   name: 'Ellieo',
   siteUrl: siteUrlFromEnv('https://ellieo.com'),
-  serviceLocales: ['en', 'ko', 'vi'],
+  // English default (no prefix) + Vietnamese (/vi/...). Korean lives on misaeng.com (/ko/... → misaeng.com)
+  serviceLocales: ['en', 'vi'],
   serviceDefaultLocale: 'en',
   indexedLocales: ['en', 'vi'],
   fallbackLocale: 'en',

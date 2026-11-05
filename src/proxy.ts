@@ -82,6 +82,11 @@ export function proxy(request: NextRequest) {
       return NextResponse.next()
     }
     if (!isServiceLocale(first)) {
+      // Korean lives on misaeng.com (Ellieo = English + Vietnamese): the same page there, in Korean (no prefix)
+      if (first === 'ko' && BRAND_CONFIG.id === 'ellieo') {
+        const misaeng = brandConfig('misaeng')
+        return NextResponse.redirect(`${misaeng.siteUrl}${rest}${search}`, 308)
+      }
       return redirectTo(request, brandLocalePath(BRAND_CONFIG, resolveServiceLocale(first), rest), 308)
     }
     if (first === BRAND_CONFIG.serviceDefaultLocale) {
