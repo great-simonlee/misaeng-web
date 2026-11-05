@@ -82,8 +82,8 @@ misaeng_temp_web/
 |---|---|---|
 | `NEXT_PUBLIC_BRAND` | `misaeng` (기본) | `ellieo` |
 | 회사 페이지 (`/about` 등) | 영어 | 없음 → misaeng.com으로 이동 |
-| 도시 서비스 (`/nyc/...`) | 한국어 기본 + 영어 | 영어 기본 + ko, vi, ja, zh-CN, zh-TW, id |
-| 검색 노출 언어 | ko | ko 제외 6개 |
+| 도시 서비스 (`/nyc/...`) | 한국어 기본 + 영어 | 영어 기본 + ko, vi (ja·zh-CN·zh-TW·id는 2026-11-05 삭제, 옛 주소는 301) |
+| 검색 노출 언어 | ko | en, vi |
 | 기타 | | 파란 테마, `/mobile-app` |
 
 - **URL**: 기본 언어는 접두사 없이 `/nyc/...`, 다른 언어는 `/vi/nyc/...`. `src/proxy.ts`가 rewrite·redirect하고,

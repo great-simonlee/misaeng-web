@@ -68,17 +68,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* 일본어·중국어는 그 언어 한자 모양 글꼴을 Pretendard보다 앞에 둔다 (src/app/fonts-self-hosted.css) */
-:lang(ja) {
-  font-family: var(--font-noto-jp), var(--font-pretendard), system-ui, sans-serif;
-}
-:lang(zh-CN) {
-  font-family: var(--font-noto-sc), var(--font-pretendard), system-ui, sans-serif;
-}
-:lang(zh-TW) {
-  font-family: var(--font-noto-tc), var(--font-pretendard), system-ui, sans-serif;
-}
-
 body {
   background: var(--background);
   color: var(--foreground);

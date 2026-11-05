@@ -3,7 +3,7 @@ import type { Locale } from '@lib/i18n/locales'
 /**
  * 한 코드베이스로 두 서비스를 배포한다. Vercel 프로젝트마다 NEXT_PUBLIC_BRAND를 다르게 둔다.
  * - misaeng: misaeng.com. 회사 페이지(영어) + 도시 서비스(한국어 기본, 영어)
- * - ellieo: 도시 서비스(영어 기본 + 6개 언어) + 모바일 앱 페이지
+ * - ellieo: 도시 서비스(영어 기본, 한국어, 베트남어) + 모바일 앱 페이지
  * 브랜드별 차이는 이 파일에만 둔다. 화면 코드는 `BRAND_CONFIG` 값만 읽는다.
  */
 export const BRAND_IDS = ['misaeng', 'ellieo'] as const
@@ -61,9 +61,9 @@ const ELLIEO: BrandConfig = {
   id: 'ellieo',
   name: 'Ellieo',
   siteUrl: siteUrlFromEnv('https://ellieo.com'),
-  serviceLocales: ['en', 'ko', 'vi', 'ja', 'zh-CN', 'zh-TW', 'id'],
+  serviceLocales: ['en', 'ko', 'vi'],
   serviceDefaultLocale: 'en',
-  indexedLocales: ['en', 'vi', 'ja', 'zh-CN', 'zh-TW', 'id'],
+  indexedLocales: ['en', 'vi'],
   fallbackLocale: 'en',
   hasCorporateSite: false,
   hasMobileAppPage: true,

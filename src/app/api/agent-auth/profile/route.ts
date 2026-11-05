@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { resolveAuthenticatedUser } from '../lib/authHelpers'
 import { apiErrorMessage } from '@lib/i18n/apiError'
-import { parseLocale } from '@lib/i18n/locales'
+import { isRemovedLocale, parseLocale } from '@lib/i18n/locales'
 import { getRequestT } from '@lib/i18n/server'
 import {
   getNicknameValidationIssue,
@@ -120,8 +120,10 @@ export async function PATCH(request: Request) {
   }
 
   if (body.preferredLocale !== undefined) {
-    const preferredLocale = parseLocale(asTrimmedString(body.preferredLocale))
-    if (body.preferredLocale && !preferredLocale) {
+    const raw = asTrimmedString(body.preferredLocale)
+    const preferredLocale = parseLocale(raw)
+    // 삭제한 언어(ja·zh·id)를 보낸 옛 앱은 오류 대신 선호 언어를 비운다 → 브랜드 기본 언어로 보인다
+    if (body.preferredLocale && !preferredLocale && !isRemovedLocale(raw)) {
       return NextResponse.json(
         { error: 'Unsupported language.' },
         { status: 400 },

@@ -35,11 +35,7 @@ function pruneOriginal<T extends object>(item: WithI18n<T>): WithI18n<T> {
 const DELETED_USER_LABEL: Record<Locale, string> = {
   ko: '탈퇴한 회원',
   en: 'Deleted user',
-  ja: '退会したユーザー',
-  'zh-CN': '已注销用户',
-  'zh-TW': '已註銷使用者',
   vi: 'Người dùng đã xóa tài khoản',
-  id: 'Pengguna yang dihapus',
 }
 
 export function deletedUserLabel(locale: Locale) {
