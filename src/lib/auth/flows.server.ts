@@ -1,4 +1,5 @@
 import { ellieoUpstreamFetch, extractEllieoTokens, getEllieoBaseUrl } from '@/app/api/agent-auth/lib/ellieoServer'
+import { notifyNewSignup } from '@lib/erp/notifySignup'
 import { normalizeUserFromAccessToken } from '@/app/api/agent-auth/lib/authHelpers'
 import { persistConsentRecord } from '@lib/consent/recordConsent'
 import type { Translate } from '@lib/i18n/translate'
@@ -187,6 +188,7 @@ export async function emailVerifySignup(t: Translate, request: Request, rawEmail
       const stored = (session.user.metadata.consent ?? {}) as Consent
       const recorded = await recordConsent(request, t, linked.uid, email, { acceptedTerms: true, ...stored, ...strip(consent) }, 'signup_checkbox')
       if (!recorded.ok) console.error('Sign-up consent not recorded:', recorded)
+      notifyNewSignup(email, 'email')
     }
     const name = typeof session.user.metadata.name === 'string' ? session.user.metadata.name : null
     return { ok: true, session, uid: linked.uid, registered: linked.isNew, displayName: name }
@@ -289,6 +291,7 @@ export async function idTokenSignIn(
       const method = provider === 'google' ? 'google_signup_checkbox' : 'apple_signup_checkbox'
       const recorded = await recordConsent(request, t, linked.uid, session.user.email, options.consent, method)
       if (!recorded.ok) console.error('Sign-up consent not recorded:', recorded)
+      notifyNewSignup(session.user.email, provider)
     }
     const meta = session.user.metadata
     const displayName = options.name?.trim() || (typeof meta.full_name === 'string' ? meta.full_name : null) || (typeof meta.name === 'string' ? meta.name : null)
