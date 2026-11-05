@@ -17,11 +17,16 @@ export const dynamic = 'force-dynamic'
  * { type: 'job_review_test', email, source, orgId, target, post: { id, title, createdAt } } — admin test of the
  *   new-job-review push in the Misaeng ERP app, to that admin's own devices only (answers { devices, sent })
  */
+/**
+ * The ERP sends INTERNAL_POINTS_SECRET when it is set (same as the points routes), otherwise INTERNAL_PUSH_SECRET —
+ * accept either, so posting / credit / verification / test pushes are not refused when the two differ.
+ */
 function authorized(request: Request) {
-  const secret = process.env.INTERNAL_PUSH_SECRET?.trim()
   const given = request.headers.get('x-internal-secret')?.trim() || ''
-  if (!secret || given.length !== secret.length) return false
-  return timingSafeEqual(Buffer.from(given), Buffer.from(secret))
+  if (!given) return false
+  return [process.env.INTERNAL_PUSH_SECRET, process.env.INTERNAL_POINTS_SECRET]
+    .map((value) => value?.trim() || '')
+    .some((secret) => secret.length === given.length && timingSafeEqual(Buffer.from(given), Buffer.from(secret)))
 }
 
 export async function POST(request: Request) {
