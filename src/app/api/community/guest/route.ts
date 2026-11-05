@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server'
+import { after, NextResponse } from 'next/server'
+import { notifyJobReviewCreated } from '@lib/erp/notifyJobReview'
 
 import { apiErrorMessage } from '@lib/i18n/apiError'
 import { formatNumber } from '@lib/i18n/format'
@@ -293,6 +294,7 @@ export async function POST(request: Request) {
       jobReviewSource: jobReviewSource.source,
       jobReviewSourceOrgId: jobReviewSource.orgId,
     })
+    after(() => notifyJobReviewCreated(saved, jobReviewSource))
 
     // 포인트 전환(cutover) 후에는 즉시 적립이 없고 운영팀 검수 뒤 지급된다 (src/lib/points/WIRING.md)
     const { isPointsLedgerActive, onPostCreated } = await import('@lib/points/facade.server')
@@ -308,8 +310,8 @@ export async function POST(request: Request) {
           ? null
           : await getStoredCommunityCreditAccount(user!.uid).catch(() => null)
         const result = await onPostCreated({ uid: user!.uid, post: saved })
-        const after = result.ok && result.engine === 'legacy' ? result.result : null
-        if (after && before) awarded = Math.max(0, after.balance - before.balance)
+        const afterCredit = result.ok && result.engine === 'legacy' ? result.result : null
+        if (afterCredit && before) awarded = Math.max(0, afterCredit.balance - before.balance)
       } catch (creditError) {
         console.error('Guest job-review credit award error:', creditError)
       }

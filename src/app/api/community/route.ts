@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { after, NextResponse } from 'next/server'
 import { finalizePost, localizePosts } from '@lib/translations/localize.server'
 
 import { apiErrorMessage } from '@lib/i18n/apiError'
@@ -73,6 +73,7 @@ import {
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
+import { notifyJobReviewCreated } from '@lib/erp/notifyJobReview'
 import type {
   CommunityPost,
   CptOptTimelineEntry,
@@ -670,6 +671,7 @@ export async function POST(request: Request) {
     } catch (creditError) {
       console.error('Community credit award (post) error:', creditError)
     }
+    if (jobReviewSource) after(() => notifyJobReviewCreated(saved, jobReviewSource))
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),
     })

@@ -28,17 +28,23 @@ export type StaffPush = {
   sender?: { id: string; name: string; avatarUrl?: string | null }
 }
 
-export type StaffSound = 'lead' | 'message'
-const SOUND_FILES: Record<StaffSound, string> = { lead: 'lead.caf', message: 'message.caf' }
+/** `review`: a new job review through a partner (soft rising chime). */
+export type StaffSound = 'lead' | 'message' | 'review'
+const SOUND_FILES: Record<StaffSound, string> = { lead: 'lead.caf', message: 'message.caf', review: 'review.caf' }
 
-export async function sendStaffPush(emails: (string | null | undefined)[], message: StaffPush) {
+/** Returns how many registered devices the push went to (for the admin test push); 0 when nothing was sent. */
+export async function sendStaffPush(
+  emails: (string | null | undefined)[],
+  message: StaffPush,
+): Promise<{ devices: number; sent: number }> {
+  const none = { devices: 0, sent: 0 }
   const targets = [...new Set(emails.map((e) => String(e || '').trim().toLowerCase()).filter(Boolean))]
-  if (targets.length === 0 || !isApnsConfigured()) return
+  if (targets.length === 0 || !isApnsConfigured()) return none
   try {
     const devices = await supportRest<StaffDevice[]>(
       `staff_push_devices?email=in.${encodeURIComponent(inList(targets))}&select=token,email,environment`,
     )
-    if (!devices?.length) return
+    if (!devices?.length) return none
     const results = await sendApns(
       devices,
       {
@@ -65,8 +71,10 @@ export async function sendStaffPush(emails: (string | null | undefined)[], messa
     }
     const failed = results.filter((r) => !r.ok && !r.unregistered)
     if (failed.length) console.error('Staff push failed:', failed.map((r) => `${r.status} ${r.reason}`).join(', '))
+    return { devices: devices.length, sent: results.filter((r) => r.ok).length }
   } catch (error) {
     console.error('Staff push error:', error)
+    return none
   }
 }
 
