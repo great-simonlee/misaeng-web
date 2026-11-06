@@ -8,6 +8,7 @@ import { getViewerBlockedUids, withoutBlockedAuthors } from '@lib/community/bloc
 import { withoutModeratedPosts } from '@lib/community/moderation'
 import { getViewerReportedKeys } from '@lib/community/reports.server'
 import { splitReviewForViewer } from '@lib/community/reviewAccess'
+import { withLiveAuthors } from '@lib/supabase/community.server'
 import {
   getActiveCompanyBySlug,
   isCompanyStorageConfigured,
@@ -56,9 +57,11 @@ export async function GET(request: Request, context: RouteContext) {
     ])
     const locale = await getRequestLocale(request)
     // 신고로 숨겨진 후기·내가 신고한 후기는 뺀다
-    const reviews = localizePosts(withoutModeratedPosts(withoutBlockedAuthors(posts, blocked), reported), locale)
+    const matching = withoutModeratedPosts(withoutBlockedAuthors(posts, blocked), reported)
       .filter((post) => post.companyId && ids.has(post.companyId))
       .filter((post) => !type || post.jobReviewType === type)
+    // 작성자의 지금 닉네임·사진 (바꾸면 예전 후기에도 바로 보인다). 이 회사 후기만 보강한다
+    const reviews = localizePosts(await withLiveAuthors(matching), locale)
       .sort((a, b) => b.createdAt - a.createdAt)
       .map((post) =>
         splitReviewForViewer(sanitizeAnonymousCommunityPost(post, viewer?.uid), viewer),

@@ -3,7 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
-import { BottomSheet, BottomSheetSelect } from '@components'
+import { BottomSheet, BottomSheetSelect, UserAvatar } from '@components'
 import { MbtiPicker } from '@components/MbtiPicker'
 import { NicknameAvailabilityHint } from '@components/NicknameAvailabilityHint'
 import { useAuth } from '@hooks/useAuth'
@@ -98,6 +98,7 @@ export function MyPageScreen() {
     isMisaengUser,
     avatarURL,
     displayName,
+    avatarName,
     nickname,
     profile,
     uploadAvatar,
@@ -424,7 +425,7 @@ export function MyPageScreen() {
                     className='group relative -mt-10 inline-flex touch-manipulation disabled:opacity-60 lg:-mt-12'
                     aria-label={t('profile.changePhotoAria')}
                   >
-                    <ProfileImage photoURL={avatarURL} displayName={displayName} />
+                    <ProfileImage photoURL={avatarURL} displayName={displayName} avatarName={avatarName} />
                     <span className='absolute -bottom-0.5 -right-0.5 flex size-8 items-center justify-center rounded-full border-[3px] border-white bg-[var(--foreground)] text-white shadow-sm transition group-active:scale-95'>
                       {uploading ? (
                         <span className='size-3.5 animate-pulse rounded-full bg-white/70' />
@@ -998,38 +999,21 @@ function ProfileOptionChips<T extends string>({
 function ProfileImage({
   photoURL,
   displayName,
+  avatarName,
 }: {
   photoURL: string | null
   displayName: string
+  avatarName: string | null
 }) {
   const t = useT('me')
-  const [failedSrc, setFailedSrc] = useState<string | null>(null)
-  const show = Boolean(photoURL) && failedSrc !== photoURL
-
   return (
-    <span className='relative inline-flex size-[5.5rem] shrink-0 overflow-hidden rounded-full bg-[#e8eaee] ring-4 ring-white shadow-[0_8px_24px_rgba(15,23,42,0.08)] lg:size-[6.25rem]'>
-      {show ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={photoURL!}
-          alt={t('profile.photoAlt', { name: displayName })}
-          className='size-full object-cover'
-          onError={() => setFailedSrc(photoURL)}
-          referrerPolicy='no-referrer'
-        />
-      ) : (
-        <span className='flex size-full items-center justify-center text-[#9aa3af]'>
-          <svg
-            viewBox='0 0 24 24'
-            fill='currentColor'
-            className='size-9'
-            aria-hidden
-          >
-            <path d='M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z' />
-          </svg>
-        </span>
-      )}
-    </span>
+    <UserAvatar
+      photoURL={photoURL}
+      name={avatarName}
+      size='xl'
+      alt={photoURL ? t('profile.photoAlt', { name: displayName }) : undefined}
+      className='ring-4 ring-white shadow-[0_8px_24px_rgba(15,23,42,0.08)]'
+    />
   )
 }
 

@@ -41,6 +41,7 @@ import {
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile, type SupabaseProfileRecord } from '@lib/supabase/profile.server'
 import { isModerationHidden, normalizeModeration } from '@lib/community/moderation'
+import { sanitizeCommunityNickname } from '@lib/community/author'
 import type { CommunityPost, JobReviewSourceId } from '@/types/nyc'
 import { listStoredCommunityComments } from '@lib/supabase/communityComments.server'
 import { listStoredRecommends } from '@lib/supabase/communityEngagement.server'
@@ -475,7 +476,7 @@ export async function listStoredCommunityPostsByAuthor(
 }
 
 /**
- * 응답 직전에 작성자의 지금 프로필(사진·닉네임·배지)을 붙인다 — 프로필 사진을 바꾸면 예전 글에도 바로 보인다.
+ * 응답 직전에 작성자의 지금 프로필(사진·닉네임·배지)을 붙인다 — 사진·닉네임을 바꾸면 예전 글에도 바로 보인다.
  * 익명 게시판은 그대로. 프로필은 5분 캐시라 작성자당 한 번만 읽는다.
  */
 export function withLiveAuthors(posts: CommunityPost[]): Promise<CommunityPost[]> {
@@ -511,7 +512,11 @@ async function enrichCommunityPostAuthor(
   if (post.authorDeleted || profile?.status === 'deleted') {
     return { ...post, ...DELETED_AUTHOR_FIELDS }
   }
-  const profileNickname = profile?.nickname?.trim() || null
+  // 지금 프로필 닉네임 (이메일형·이메일 아이디는 제외 — 표시하지 않는다)
+  const profileNickname = sanitizeCommunityNickname(
+    profile?.nickname,
+    typeof profile?.email === 'string' ? profile.email : post.authorEmail,
+  )
   const profilePhoto =
     typeof profile?.photoURL === 'string' && profile.photoURL.trim()
       ? profile.photoURL.trim()
@@ -522,8 +527,8 @@ async function enrichCommunityPostAuthor(
   const safeStoredPhoto =
     storedPhoto && !storedPhoto.startsWith('blob:') ? storedPhoto : null
 
-  const authorNickname = storedNickname || profileNickname
-  // 목록·상세 모두 최신 프로필 사진을 우선 사용
+  // 목록·상세 모두 지금 프로필 닉네임·사진을 우선 사용 (바꾸면 예전 글에도 바로 보인다). 없으면 글에 저장된 값
+  const authorNickname = profileNickname || storedNickname
   const authorPhotoURL = profilePhoto || safeStoredPhoto
 
   if (

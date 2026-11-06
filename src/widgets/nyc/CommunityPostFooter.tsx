@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import { useCity } from '@hooks/useCity'
 import { hrefForCommunityPost } from '@lib/constants/cities'
-import { getCommunityAuthorDisplayName } from '@lib/community/author'
+import { getCommunityAuthorDisplayName, sanitizeCommunityNickname } from '@lib/community/author'
 import { maskAnonymousDisplayName } from '@lib/community/anonymous'
 import { useT } from '@lib/i18n/client'
 import { UserAvatar, AuthorBadges } from '@components'
@@ -39,7 +39,8 @@ export function CommunityPostFooter({
   const authorName = anonymous
     ? maskAnonymousDisplayName(t('author.anonymous'))
     : getCommunityAuthorDisplayName(post, null, t)
-  const authorInitial = authorName.charAt(0).toUpperCase()
+  // 아바타 이니셜은 실제 닉네임으로만 (없거나 탈퇴한 회원이면 기본 프로필 아이콘)
+  const avatarName = anonymous || post.authorDeleted ? null : sanitizeCommunityNickname(post.authorNickname, post.authorEmail)
   const photoURL = anonymous ? null : post.authorPhotoURL?.trim() || null
 
   return (
@@ -49,7 +50,7 @@ export function CommunityPostFooter({
           {!anonymous ? (
             <UserAvatar
               photoURL={photoURL}
-              initial={authorInitial}
+              name={avatarName}
               size='lg'
               className='ring-2 ring-white shadow-sm shadow-black/[0.04]'
             />

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
+import { UserAvatar } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { useSupportConfig } from '@lib/support/client'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
@@ -66,7 +67,7 @@ export function NycNavbar() {
   const city = useCity()
   const cityInfo = useCityInfo()
   const href = useCityPath()
-  const { user, loading, avatarURL, displayName, isMisaengUser } = useAuth()
+  const { user, loading, avatarURL, displayName, avatarName, isMisaengUser } = useAuth()
   const t = useT('nav')
   const navLinks = NAV_LINKS.map((item) => ({
     ...item,
@@ -406,6 +407,7 @@ export function NycNavbar() {
                   <ProfileAvatar
                     photoURL={avatarURL}
                     displayName={displayName}
+                    avatarName={avatarName}
                   />
                   <span className='inline-flex size-7 items-center justify-center text-[var(--muted-foreground)]'>
                     {mobileOpen ? <CloseIcon /> : <MenuIcon />}
@@ -428,6 +430,7 @@ export function NycNavbar() {
                     <ProfileAvatar
                       photoURL={avatarURL}
                       displayName={displayName}
+                      avatarName={avatarName}
                     />
                     <span className='inline-flex size-7 items-center justify-center text-[var(--muted-foreground)]'>
                       {accountOpen ? <CloseIcon /> : <MenuIcon />}
@@ -515,43 +518,25 @@ function CloseIcon() {
 function ProfileAvatar({
   photoURL,
   displayName,
+  avatarName,
 }: {
   photoURL?: string | null
   displayName?: string | null
+  avatarName?: string | null
 }) {
   const t = useT('nav')
-  const [failedSrc, setFailedSrc] = useState<string | null>(null)
-  const showPhoto = Boolean(photoURL) && failedSrc !== photoURL
-
   return (
-    <span className='relative inline-flex size-7 shrink-0 overflow-hidden rounded-full bg-[#f1f5f9]'>
-      {showPhoto ? (
-        // eslint-disable-next-line @next/next/no-img-element -- 외부 프로필 URL (Google 등)
-        <img
-          src={photoURL!}
-          alt={
-            displayName
-              ? t('profileAlt', { name: displayName })
-              : t('profileAltFallback')
-          }
-          width={28}
-          height={28}
-          className='size-full object-cover'
-          onError={() => setFailedSrc(photoURL ?? null)}
-          referrerPolicy='no-referrer'
-        />
-      ) : (
-        <span className='flex size-full items-center justify-center text-[var(--slate-muted)]'>
-          <svg
-            viewBox='0 0 24 24'
-            fill='currentColor'
-            className='size-3.5'
-            aria-hidden
-          >
-            <path d='M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z' />
-          </svg>
-        </span>
-      )}
-    </span>
+    <UserAvatar
+      photoURL={photoURL}
+      name={avatarName}
+      size='xs'
+      alt={
+        photoURL
+          ? displayName
+            ? t('profileAlt', { name: displayName })
+            : t('profileAltFallback')
+          : undefined
+      }
+    />
   )
 }

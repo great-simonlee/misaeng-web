@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 
 import { SchoolBadge, UserAvatar } from '@components'
-import { getCommunityAuthorDisplayName } from '@lib/community/author'
+import { getCommunityAuthorDisplayName, sanitizeCommunityNickname } from '@lib/community/author'
 import { useT } from '@lib/i18n/client'
 import type { CommunityPost } from '@/types/nyc'
 
@@ -23,14 +23,14 @@ export function ListingAuthorMeta({
 }: ListingAuthorMetaProps) {
   const t = useT('community')
   const authorName = getCommunityAuthorDisplayName(post, null, t)
-  const authorInitial = authorName.charAt(0).toUpperCase()
+  const avatarName = post.authorDeleted ? null : sanitizeCommunityNickname(post.authorNickname, post.authorEmail)
   const authorPhoto = post.authorPhotoURL?.trim() || null
 
   return (
     <span className='inline-flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5'>
       <UserAvatar
         photoURL={authorPhoto}
-        initial={authorInitial}
+        name={avatarName}
         size='sm'
         className='!h-5 !w-5 text-[9px]'
       />

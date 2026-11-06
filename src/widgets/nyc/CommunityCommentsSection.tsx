@@ -12,6 +12,7 @@ import { maskAnonymousDisplayName } from '@lib/community/anonymous'
 import {
   getCommentAuthorDisplayName,
   resolveCommunityNickname,
+  sanitizeCommunityNickname,
 } from '@lib/community/author'
 import {
   buildCommentThreads,
@@ -611,7 +612,10 @@ function CommentItem({
         isAuthor ? viewerNickname : null,
         t,
       )
-  const initial = displayName.charAt(0).toUpperCase()
+  const avatarName = anonymousBoard || comment.authorDeleted
+    ? null
+    : sanitizeCommunityNickname(comment.authorNickname, comment.authorEmail) ||
+      (isAuthor ? sanitizeCommunityNickname(viewerNickname) : null)
   const photoURL = anonymousBoard
     ? null
     : comment.authorPhotoURL?.trim() || null
@@ -621,7 +625,7 @@ function CommentItem({
       {!anonymousBoard ? (
         <UserAvatar
           photoURL={photoURL}
-          initial={initial}
+          name={avatarName}
           size={isReply ? 'sm' : 'md'}
         />
       ) : null}
