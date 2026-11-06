@@ -4,7 +4,10 @@
  * 요청 JSON 형식은 ellieo-erp src/app/api/misaeng-admin/instagram 과 맞춘다.
  */
 
-export const MISAENG_INSTAGRAM_HANDLE = 'misaeng.ny'
+import { BRAND_CONFIG } from '@lib/brand'
+
+/** The brand's official account the code is DMed to (@misaeng.ny on Misaeng, @ellieo.nyc on Ellieo) */
+export const MISAENG_INSTAGRAM_HANDLE = BRAND_CONFIG.social.instagram
 /** DM 대화창을 바로 여는 링크 (앱은 인스타그램 앱, 데스크톱은 웹 DM) */
 export const MISAENG_INSTAGRAM_DM_URL = `https://ig.me/m/${MISAENG_INSTAGRAM_HANDLE}`
 

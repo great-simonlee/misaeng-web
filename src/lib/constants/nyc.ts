@@ -1,8 +1,10 @@
+import { BRAND_CONFIG } from '@lib/brand'
 import { cityPath, type CityId } from '@lib/constants/cities'
 
 export const MISAENG_EMAIL_DOMAIN = '@misaeng.com'
 
-export const MISAENG_NY_INSTAGRAM_HANDLE = 'misaeng.ny'
+/** This brand's Instagram (misaeng.ny / ellieo.nyc — BRAND_CONFIG.social) */
+export const MISAENG_NY_INSTAGRAM_HANDLE = BRAND_CONFIG.social.instagram
 export const MISAENG_NY_INSTAGRAM_URL = `https://instagram.com/${MISAENG_NY_INSTAGRAM_HANDLE}`
 
 /** NYC 네비·푸터·본문 가로 정렬용 컨테이너 */
