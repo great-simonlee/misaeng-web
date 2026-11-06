@@ -52,6 +52,16 @@ const CORPORATE_PATHS = new Set([
   'terms',
 ])
 
+/**
+ * Brands without the corporate site (Ellieo): corporate paths that have an Ellieo equivalent. The rest of
+ * CORPORATE_PATHS still goes to misaeng.com. Contact has no page yet: it opens an email to info@ellieo.com.
+ */
+const ELLIEO_OWN_PATHS: Record<string, string> = {
+  terms: '/nyc/terms-of-use',
+  privacy: '/nyc/privacy-policy',
+  contact: 'mailto:info@ellieo.com',
+}
+
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
   const segments = pathname.split('/').filter(Boolean)
@@ -62,6 +72,13 @@ export function proxy(request: NextRequest) {
     // partners and the Ellieo intro page live under the city on ellieo (/nyc/partners, /nyc/about)
     if ((first === 'partners' || first === 'about') && segments.length === 1) {
       return redirectTo(request, servicePathFor(request, `/nyc/${first}`), 307)
+    }
+    // Ellieo's own legal pages and contact (temporary: these may become Ellieo pages later)
+    const own = segments.length === 1 ? ELLIEO_OWN_PATHS[first] : undefined
+    if (own) {
+      return own.startsWith('mailto:')
+        ? NextResponse.redirect(own, 307)
+        : redirectTo(request, servicePathFor(request, own), 307)
     }
     if (CORPORATE_PATHS.has(first)) {
       const misaeng = brandConfig('misaeng')
@@ -176,7 +193,17 @@ function withSearchHeaders(response: NextResponse, locale: Locale, path: string)
   )
 
   response.headers.set('Link', links.join(', '))
+  // Ellieo: sign-in and personal pages are not for search (/nyc/login, /nyc/me/...)
+  if (BRAND_CONFIG.id === 'ellieo' && isPrivateServicePath(path)) {
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow')
+  }
   return response
+}
+
+/** `/nyc/login`, `/nyc/me`, `/nyc/me/posts` … (path without the language prefix) */
+function isPrivateServicePath(path: string) {
+  const section = path.split('/').filter(Boolean)[1]
+  return section === 'login' || section === 'me'
 }
 
 export const config = {
