@@ -47,8 +47,10 @@ export function deletedUserLabel(locale: Locale) {
 }
 
 /**
- * Ellieo shows no Korean user content: only items whose original is in an Ellieo language (en/vi) or that have
- * a saved, up-to-date translation for the page language. Misaeng keeps its own rules (hiddenUntilTranslated).
+ * Ellieo shows only (1) content written on Ellieo (brand 'ellieo') in en/vi and (2) any content with a saved,
+ * up-to-date en/vi translation (ERP Translations). Everything else — Korean, and Misaeng content without a saved
+ * translation even when written in English — is hidden on Ellieo only (shared Storage data is never changed).
+ * Misaeng keeps its own rules (hiddenUntilTranslated).
  */
 export const ELLIEO_ONLY_TRANSLATED = BRAND === 'ellieo'
 
@@ -57,9 +59,24 @@ function ellieoDisplayChain(locale: Locale): Locale[] {
   return locale === 'vi' ? ['vi', 'en'] : ['en']
 }
 
-/** Original written in a language this brand serves (an Ellieo user's own en/vi post or comment) */
+/** Original written in a language this brand serves */
 function isServiceSource(item: object): boolean {
   return BRAND_CONFIG.serviceLocales.includes(sourceLocaleOf(item))
+}
+
+/** Written on Ellieo in en/vi (shown on Ellieo as written) */
+function isEllieoOriginal(item: object): boolean {
+  return contentBrandOf(item as ContentBrandFields) === 'ellieo' && isServiceSource(item)
+}
+
+/** Has a saved, up-to-date translation into an Ellieo language (en/vi) */
+function hasSavedEllieoTranslation(item: object, kind: ContentKind): boolean {
+  const source = sourceLocaleOf(item)
+  return BRAND_CONFIG.serviceLocales.some(
+    (code) =>
+      code !== source &&
+      localizeContent(item as Record<string, unknown>, kind, code).i18n.state === 'translated',
+  )
 }
 
 function localize<T extends object>(
@@ -80,8 +97,12 @@ function localize<T extends object>(
       }
     }
   }
-  if (ELLIEO_ONLY_TRANSLATED && localized.i18n.original && !isServiceSource(item)) {
-    // No "view original" on Ellieo when the original is Korean
+  if (ELLIEO_ONLY_TRANSLATED && !isEllieoOriginal(item) && !hasSavedEllieoTranslation(item, kind)) {
+    // Misaeng content without a saved en/vi translation: hidden on Ellieo (hiddenUntilTranslated)
+    localized = { ...localized, i18n: { ...localized.i18n, state: 'pending' } }
+  }
+  if (ELLIEO_ONLY_TRANSLATED && localized.i18n.original && !isEllieoOriginal(item)) {
+    // No "view original" on Ellieo for Misaeng content (the original belongs to Misaeng)
     const { original: _original, ...i18n } = localized.i18n
     void _original
     localized = { ...localized, i18n }
@@ -111,11 +132,15 @@ function withoutKoreanNames<T extends object>(item: T, locale: Locale): T {
 /**
  * 목록에서 숨길 글인가
  * - misaeng: 한국어 화면에서 아직 한국어 번역이 없는 외국어 글
- * - ellieo: Misaeng content whose page language (or en on vi pages) has no version — no Korean content on Ellieo
+ * - ellieo: anything but Ellieo en/vi originals and content with a saved en/vi translation for this page
  */
 export function hiddenUntilTranslated(item: { i18n: ContentI18n } & ContentBrandFields): boolean {
-  // Ellieo: posts/comments written on Ellieo (en/vi originals) always show; Misaeng ones need an en/vi version
-  if (ELLIEO_ONLY_TRANSLATED) return item.i18n.state === 'pending' && contentBrandOf(item) !== 'ellieo'
+  // Ellieo: posts/comments written on Ellieo in en/vi always show; the rest needs a saved en/vi translation
+  if (ELLIEO_ONLY_TRANSLATED) {
+    const ellieoOriginal =
+      contentBrandOf(item) === 'ellieo' && BRAND_CONFIG.serviceLocales.includes(item.i18n.sourceLocale)
+    return item.i18n.state === 'pending' && !ellieoOriginal
+  }
   return BRAND === 'misaeng' && item.i18n.displayLocale === 'ko' && item.i18n.state === 'pending'
 }
 
@@ -128,7 +153,7 @@ export function localizePosts<T extends CommunityPost>(
   if (ELLIEO_ONLY_TRANSLATED) {
     // "My posts" (hidePending: false) still lists the viewer's own en/vi posts written in the other language
     return out.filter(
-      (post, index) => !hiddenUntilTranslated(post) || (!hidePending && isServiceSource(posts[index])),
+      (post, index) => !hiddenUntilTranslated(post) || (!hidePending && isEllieoOriginal(posts[index])),
     )
   }
   return hidePending ? out.filter((post) => !hiddenUntilTranslated(post)) : out
@@ -145,7 +170,7 @@ export function localizePost<T extends CommunityPost>(
   { viewerUid }: { viewerUid?: string | null } = {},
 ): WithI18n<T> | null {
   const isAuthor = Boolean(viewerUid && post.authorUid === viewerUid)
-  if (isAuthor && (!ELLIEO_ONLY_TRANSLATED || isServiceSource(post))) {
+  if (isAuthor && (!ELLIEO_ONLY_TRANSLATED || isEllieoOriginal(post))) {
     return localize(post, 'post', sourceLocaleOf(post), false)
   }
   const localized = localize(post, 'post', locale, true)
@@ -168,7 +193,7 @@ export function localizeComments<T extends CommunityComment>(
   { viewerUid }: { viewerUid?: string | null } = {},
 ): WithI18n<T>[] {
   const out = comments.map((comment) =>
-    viewerUid && comment.authorUid === viewerUid && (!ELLIEO_ONLY_TRANSLATED || isServiceSource(comment))
+    viewerUid && comment.authorUid === viewerUid && (!ELLIEO_ONLY_TRANSLATED || isEllieoOriginal(comment))
       ? localize(comment, 'comment', sourceLocaleOf(comment), false)
       : localize(comment, 'comment', locale, true),
   )
@@ -216,22 +241,22 @@ export async function withEllieoCommentCounts<T extends CommunityPost>(posts: T[
 const HANGUL = /[\u1100-\u11ff\u3130-\u318f\uac00-\ud7a3]/
 
 /**
- * Ellieo: listings are not translated any more (ERP, 2026-11-05) and are shown as data (price, rooms,
- * photos). Free text without an en/vi version is dropped when it is Korean.
+ * Ellieo: listings are shown as data (price, rooms, photos). Their free text (description, roommate intros)
+ * shows only with a saved en/vi translation; otherwise it is left out on Ellieo (Storage is not changed).
  */
 function withoutKoreanListingText<T extends HousingListing>(listing: WithI18n<T>): WithI18n<T> {
   if (!ELLIEO_ONLY_TRANSLATED || listing.i18n.state !== 'pending') return listing
   const waiting = listing.roommateWaiting
   return {
     ...listing,
-    // Shown as written (no "translation pending" note): what is left is not Korean
+    // No "translation pending" note: the text is simply left out
     i18n: { ...listing.i18n, state: 'original' },
-    description: HANGUL.test(listing.description || '') ? '' : listing.description,
+    description: '',
     roommateWaiting: waiting
       ? {
           ...waiting,
           profiles: (waiting.profiles || []).map((profile) =>
-            HANGUL.test(profile.intro || '') ? { ...profile, intro: '' } : profile,
+            ({ ...profile, intro: '' }),
           ),
         }
       : waiting,
