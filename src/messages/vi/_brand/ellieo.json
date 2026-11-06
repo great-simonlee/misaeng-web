@@ -196,5 +196,22 @@
         "viewCredit": "Xem điểm Ellieo của tôi"
       }
     }
+  },
+  "common": {
+    "seo": {
+      "titleTemplate": "{title} | {brand} NYC",
+      "partnersTitle": "Đối tác & nhà sáng tạo",
+      "partnersDescription": "Các hội sinh viên và nhà sáng tạo đồng hành cùng {brand} để hỗ trợ du học sinh tại New York.",
+      "loginTitle": "Đăng nhập",
+      "loginDescription": "Đăng nhập {brand} để viết review, lưu tin nhà và xác minh trường hoặc nơi làm việc.",
+      "termsTitle": "Điều khoản sử dụng",
+      "privacyTitle": "Chính sách quyền riêng tư",
+      "listingTitle": "{rooms} tại {area} · ${price}/tháng",
+      "listingDescription": "{rooms} tại {address}, {area}. ${price}/tháng. Tin nhà đã xác minh trên {brand}.",
+      "studio": "Studio",
+      "bedrooms": "{count} PN",
+      "postFallback": "Bài viết cộng đồng",
+      "jobReviewDescription": "Timeline phỏng vấn và tuyển dụng {type} tại {company} trên {brand}."
+    }
   }
 }

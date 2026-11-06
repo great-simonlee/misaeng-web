@@ -214,5 +214,22 @@
         "viewCredit": "View my Ellieo Points"
       }
     }
+  },
+  "common": {
+    "seo": {
+      "titleTemplate": "{title} | {brand} NYC",
+      "partnersTitle": "Partners & Creators",
+      "partnersDescription": "Student associations and creators who work with {brand} to help international students in New York.",
+      "loginTitle": "Sign in",
+      "loginDescription": "Sign in to {brand} to post reviews, save listings and verify your school or workplace.",
+      "termsTitle": "Terms of Use",
+      "privacyTitle": "Privacy Policy",
+      "listingTitle": "{rooms} in {area} · ${price}/mo",
+      "listingDescription": "{rooms} at {address}, {area}. ${price}/mo. Verified listing on {brand}.",
+      "studio": "Studio",
+      "bedrooms": "{count} BR",
+      "postFallback": "Community post",
+      "jobReviewDescription": "{company} {type} interview and hiring timeline on {brand}."
+    }
   }
 }

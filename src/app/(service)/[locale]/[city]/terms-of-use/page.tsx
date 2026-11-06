@@ -6,6 +6,7 @@ import { toLegalViewDocument } from '@lib/constants/legalDocument'
 import { NYC_TERMS_OF_USE } from '@lib/constants/nycTermsOfUse'
 import { isLocale, type Locale } from '@lib/i18n/locales'
 import { getT } from '@lib/i18n/server'
+import { PER_PAGE_METADATA, pageMetadata, serviceLocale } from '@lib/seo/pageMetadata.server'
 import { loadLegalTranslations } from '@lib/legal/translations.server'
 
 type Props = {
@@ -17,11 +18,15 @@ function resolveLocale(locale: string): Locale {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params
+  const { locale, city } = await params
   const t = await getT(resolveLocale(locale), 'legal')
-  return {
-    description: t('meta.termsDescription', { brand: BRAND_CONFIG.name }),
+  const description = t('meta.termsDescription', { brand: BRAND_CONFIG.name })
+  // Ellieo: full per-page metadata (title, og, canonical, hreflang). Misaeng: description only, as before
+  if (PER_PAGE_METADATA) {
+    const seo = await getT(serviceLocale(locale), 'common.seo')
+    return pageMetadata({ locale, path: `/${city}/terms-of-use`, title: seo('termsTitle'), description })
   }
+  return { description }
 }
 
 export default async function NycTermsOfUsePage({ params }: Props) {

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 
 import { isCityId } from '@lib/constants/cities'
@@ -12,9 +13,23 @@ import {
 } from '@lib/constants/nyc'
 import { CommunityBoardWipScreen } from '@screens/nyc/CommunityBoardWipScreen'
 import { CommunityListScreen } from '@screens/nyc/CommunityListScreen'
+import { pageMetadata, serviceLocale } from '@lib/seo/pageMetadata.server'
 
 interface CommunityBoardPageProps {
   params: Promise<{ locale: string; city: string; board: string }>
+}
+
+export async function generateMetadata({ params }: CommunityBoardPageProps): Promise<Metadata> {
+  const { locale, city, board } = await params
+  const category = isCommunityBoardId(board) ? getNycCategory(board) : null
+  if (!category || !isCityId(city)) return {}
+  const t = await getT(serviceLocale(locale), 'community')
+  return pageMetadata({
+    locale,
+    path: `/${city}${category.href}`,
+    title: t(`categories.${category.id}.title`),
+    description: t(`categories.${category.id}.description`, { city: city.toUpperCase() }),
+  })
 }
 
 export default async function CommunityBoardPage({
