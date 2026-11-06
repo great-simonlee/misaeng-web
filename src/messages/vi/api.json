@@ -122,6 +122,15 @@
       "tooManyRequests": "Hôm nay bạn không thể nhận thêm mã. Vui lòng thử lại vào ngày mai.",
       "requestFailed": "Không thể gửi yêu cầu xác minh Instagram.",
       "saveFailed": "Không thể lưu yêu cầu xác minh Instagram."
+    },
+    "emailCode": {
+      "subjectSchool": "[Ellieo] Mã xác minh email trường",
+      "titleSchool": "Mã xác minh email trường",
+      "lineSchool": "Bạn đã yêu cầu Ellieo xác minh email trường. Hãy nhập mã bên dưới vào ứng dụng hoặc website.",
+      "subjectWork": "[Ellieo] Mã xác minh email công việc",
+      "titleWork": "Mã xác minh email công việc",
+      "lineWork": "Bạn đã yêu cầu Ellieo xác minh email công việc. Hãy nhập mã bên dưới vào ứng dụng hoặc website.",
+      "footer": "Mã có hiệu lực trong 10 phút. Nếu bạn không yêu cầu, hãy bỏ qua email này. — Ellieo"
     }
   },
   "consent": {

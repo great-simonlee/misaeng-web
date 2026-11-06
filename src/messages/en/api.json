@@ -128,6 +128,15 @@
       "tooManyRequests": "You can't get more codes today. Please try again tomorrow.",
       "requestFailed": "Couldn't request Instagram verification.",
       "saveFailed": "Couldn't save the Instagram verification request."
+    },
+    "emailCode": {
+      "subjectSchool": "[Ellieo] Your school email code",
+      "titleSchool": "School email code",
+      "lineSchool": "You asked Ellieo to verify your school email. Enter the code below in the app or on the website.",
+      "subjectWork": "[Ellieo] Your work email code",
+      "titleWork": "Work email code",
+      "lineWork": "You asked Ellieo to verify your work email. Enter the code below in the app or on the website.",
+      "footer": "The code works for 10 minutes. If you didn't ask for it, you can ignore this email. — Ellieo"
     }
   },
   "consent": {

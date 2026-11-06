@@ -3,7 +3,22 @@
  * Supabase Auth through the same Resend account (SMTP, configured in the Supabase dashboard); this module sends the
  * mails Misaeng owns: school / work email verification codes.
  * Env: RESEND_API_KEY, EMAIL_FROM (default "미생 <no-reply@misaeng.com>"), EMAIL_REPLY_TO (optional).
+ * Ellieo: EMAIL_FROM_ELLIEO (e.g. "Ellieo <no-reply@ellieo.com>") and EMAIL_REPLY_TO_ELLIEO. Set them only after the
+ * ellieo.com domain is verified in Resend; until then Ellieo keeps sending from EMAIL_FROM so nothing breaks.
  */
+
+import { BRAND_CONFIG } from '@lib/brand'
+
+/** Sender for this brand (see the header comment) */
+function senderFor() {
+  const fallback = process.env.EMAIL_FROM?.trim() || '미생 <no-reply@misaeng.com>'
+  const replyTo = process.env.EMAIL_REPLY_TO?.trim()
+  if (BRAND_CONFIG.id !== 'ellieo') return { from: fallback, replyTo }
+  return {
+    from: process.env.EMAIL_FROM_ELLIEO?.trim() || fallback,
+    replyTo: process.env.EMAIL_REPLY_TO_ELLIEO?.trim() || replyTo,
+  }
+}
 
 export function isEmailConfigured() {
   return Boolean(process.env.RESEND_API_KEY?.trim())
@@ -19,8 +34,7 @@ export class EmailSendError extends Error {
 export async function sendEmail(input: { to: string; subject: string; html: string; text: string }) {
   const key = process.env.RESEND_API_KEY?.trim()
   if (!key) throw new EmailSendError('RESEND_API_KEY is not set.', 503)
-  const from = process.env.EMAIL_FROM?.trim() || '미생 <no-reply@misaeng.com>'
-  const replyTo = process.env.EMAIL_REPLY_TO?.trim()
+  const { from, replyTo } = senderFor()
   let res: Response
   try {
     res = await fetch('https://api.resend.com/emails', {
@@ -48,6 +62,12 @@ export async function sendEmail(input: { to: string; subject: string; html: stri
 const escape = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
+/** Code box colors: Misaeng orange, Ellieo blue */
+const CODE_BOX =
+  BRAND_CONFIG.id === 'ellieo'
+    ? { background: '#eef3ff', color: BRAND_CONFIG.colors.brand }
+    : { background: '#fff1ed', color: '#ea4a12' }
+
 /** A short mail with one big code (verification codes). `lines` are plain sentences above the code. */
 export function codeEmail(input: { title: string; lines: string[]; code: string; footer: string }) {
   const html = `<!doctype html><html><body style="margin:0;background:#f6f7f9;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Pretendard',sans-serif;color:#0f172a">
@@ -55,7 +75,7 @@ export function codeEmail(input: { title: string; lines: string[]; code: string;
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:20px;padding:32px 28px">
 <tr><td style="font-size:20px;font-weight:700;padding-bottom:12px">${escape(input.title)}</td></tr>
 ${input.lines.map((line) => `<tr><td style="font-size:15px;line-height:1.6;color:#475569;padding-bottom:6px">${escape(line)}</td></tr>`).join('')}
-<tr><td style="padding:20px 0"><div style="font-size:32px;font-weight:700;letter-spacing:8px;text-align:center;background:#fff1ed;color:#ea4a12;border-radius:14px;padding:18px 0">${escape(input.code)}</div></td></tr>
+<tr><td style="padding:20px 0"><div style="font-size:32px;font-weight:700;letter-spacing:8px;text-align:center;background:${CODE_BOX.background};color:${CODE_BOX.color};border-radius:14px;padding:18px 0">${escape(input.code)}</div></td></tr>
 <tr><td style="font-size:12px;line-height:1.6;color:#94a3b8">${escape(input.footer)}</td></tr>
 </table></td></tr></table></body></html>`
   const text = [input.title, '', ...input.lines, '', input.code, '', input.footer].join('\n')

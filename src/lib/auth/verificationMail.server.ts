@@ -1,3 +1,4 @@
+import { BRAND_CONFIG } from '@lib/brand'
 import { codeEmail, EmailSendError, isEmailConfigured, sendEmail } from '@lib/email/send.server'
 import type { Translate } from '@lib/i18n/translate'
 
@@ -23,12 +24,24 @@ const COPY = {
 
 const FOOTER = '인증번호는 10분 동안 쓸 수 있어요. 직접 요청하지 않았다면 이 메일은 무시해 주세요. — 미생 Misaeng'
 
+/** Misaeng: the Korean mail above. Ellieo: en/vi from `api.verification.emailCode` in the request language. */
+function mailCopy(t: Translate, purpose: EmailCodePurpose) {
+  if (BRAND_CONFIG.id !== 'ellieo') return { ...COPY[purpose], footer: FOOTER }
+  const kind = purpose === 'school_email' ? 'School' : 'Work'
+  return {
+    subject: t(`verification.emailCode.subject${kind}`),
+    title: t(`verification.emailCode.title${kind}`),
+    line: t(`verification.emailCode.line${kind}`),
+    footer: t('verification.emailCode.footer'),
+  }
+}
+
 export async function sendVerificationCode(t: Translate, purpose: EmailCodePurpose, uid: string, email: string) {
   if (!isEmailConfigured()) return { ok: false as const, error: t('auth.emailUnavailable') }
   try {
     const code = await issueEmailCode(purpose, uid, email)
-    const copy = COPY[purpose]
-    const { html, text } = codeEmail({ title: copy.title, lines: [copy.line], code, footer: FOOTER })
+    const copy = mailCopy(t, purpose)
+    const { html, text } = codeEmail({ title: copy.title, lines: [copy.line], code, footer: copy.footer })
     await sendEmail({ to: email, subject: copy.subject, html, text })
     return { ok: true as const }
   } catch (error) {
