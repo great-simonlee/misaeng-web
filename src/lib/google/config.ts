@@ -1,7 +1,17 @@
+import { BRAND_CONFIG } from '@lib/brand'
 import { DEFAULT_GOOGLE_CLIENT_ID } from '@lib/constants/googleAuth'
 
+/**
+ * Google Sign-In web client. Ellieo uses its own OAuth client (consent screen named "Ellieo", origin ellieo.com)
+ * from NEXT_PUBLIC_GOOGLE_CLIENT_ID_ELLIEO when set; otherwise the shared one. The Ellieo client id must also be
+ * listed in Supabase → Auth → Providers → Google → Client IDs, or Supabase rejects its id tokens.
+ * (NEXT_PUBLIC_* values are inlined at build time, so they are read with literal names.)
+ */
 export function getGoogleClientId() {
+  const ellieo =
+    BRAND_CONFIG.id === 'ellieo' ? process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID_ELLIEO?.trim() : ''
   return (
+    ellieo ||
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim() ||
     DEFAULT_GOOGLE_CLIENT_ID
   )
