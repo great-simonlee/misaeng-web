@@ -10,6 +10,10 @@
     "boston": {
       "headline": "Making life in Boston together",
       "description": "A place for international students and professionals to share Boston tips."
+    },
+    "dc": {
+      "headline": "Making life in Washington DC together",
+      "description": "A place for international students and professionals to share Washington DC tips."
     }
   },
   "magazine": {
@@ -99,7 +103,7 @@
   },
   "introCarousel": {
     "intro": {
-      "kicker": "{brand} NYC",
+      "kicker": "{brand}",
       "headline": "The place every student in New York should know",
       "body": "We teamed up with Korean student associations at each school to bring visa, job, food, and event info together in one place. Plus expert connections."
     },
@@ -140,7 +144,7 @@
     }
   },
   "carouselTest": {
-    "kicker": "{brand} NYC · Carousel draft",
+    "kicker": "{brand} · Carousel draft",
     "title": "Intro carousel",
     "description": "Full-bleed photo backgrounds · 1080×1080 · swipe left and right. Each slide has its own mood overlay for its topic.",
     "photoNote": "Backgrounds are Unsplash New York and lifestyle photos. We recommend replacing them with high-res brand photos before publishing.",

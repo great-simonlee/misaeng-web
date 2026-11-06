@@ -209,7 +209,15 @@
       "outdoorPatio": "파티오",
       "flexWallAllowed": "가능",
       "flexWallNotAllowed": "불가"
-    }
+    },
+    "appInquiry": "앱으로 문의하기",
+    "appInquiryTitle": "미생 앱에서 바로 상담하세요",
+    "appInquiryBody": "하우징 담당자와의 실시간 채팅은 미생 앱에서 할 수 있어요. 앱을 설치하고 이 매물에서 문의하기를 눌러 주세요.",
+    "appStore": "App Store에서 받기",
+    "googlePlay": "Google Play에서 받기",
+    "orKakao": "앱 설치가 어렵다면 카카오톡이나 이메일로 문의해 주세요.",
+    "emailInquiryShort": "이메일 문의",
+    "close": "닫기"
   },
   "listingKinds": {
     "unit": {
@@ -223,7 +231,7 @@
   },
   "list": {
     "title": "하우징",
-    "subtitle": "{brand|이/가} 엄선한 NYC 매물 · 유닛과 개인 방을 한곳에서 찾아보세요.",
+    "subtitle": "{brand|이/가} 엄선한 {city} 매물 · 유닛과 개인 방을 한곳에서 찾아보세요.",
     "filters": "필터",
     "quickFilters": "빠른 필터",
     "previousFilters": "이전 필터 보기",
@@ -483,10 +491,15 @@
       "bronx": "브롱스",
       "staten-island": "스태튼아일랜드",
       "new-jersey": "뉴저지",
+      "connecticut": "코네티컷",
       "boston": "보스턴",
       "cambridge": "케임브리지",
       "somerville": "서머빌",
-      "brookline": "브루클라인"
+      "brookline": "브루클라인",
+      "rhode-island": "로드아일랜드",
+      "washington-dc": "Washington DC",
+      "virginia": "버지니아",
+      "maryland": "메릴랜드"
     },
     "detail": {
       "type": "유형",

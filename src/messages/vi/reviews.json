@@ -33,6 +33,10 @@
       }
     },
     "fields": {
+      "stageLabel": {
+        "label": "Bước",
+        "shortLabel": "Bước"
+      },
       "prepared": {
         "label": "Bạn đã chuẩn bị gì",
         "shortLabel": "Chuẩn bị",
@@ -389,7 +393,11 @@
     "sources": {
       "misaeng": {
         "label": "Qua {brand}",
-        "description": "Mình thấy trang web hoặc mạng xã hội của {brand}"
+        "description": "{brand} đã liên hệ và mời tôi viết bài này"
+      },
+      "givo": {
+        "label": "Qua Givo",
+        "description": "Givo đã liên hệ và mời tôi viết bài này"
       },
       "student-org": {
         "label": "Qua hội sinh viên",

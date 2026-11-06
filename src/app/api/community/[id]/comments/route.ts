@@ -117,7 +117,7 @@ export async function GET(request: Request, context: RouteContext) {
   }
 }
 
-/** 작성자 인증 배지 (응답에만): 대표 학교·직장인·인스타그램. 인증되면 예전 댓글에도 바로 보인다 */
+/** 작성자 프로필 (응답에만): 지금 닉네임·사진과 인증 배지(대표 학교·직장인·인스타그램). 바뀌면 예전 댓글에도 바로 보인다 */
 async function attachCommentBadges(comments: CommunityComment[]): Promise<CommunityComment[]> {
   const uids = [...new Set(comments.map((item) => item.authorUid).filter(Boolean))]
   const profiles = new Map(
@@ -139,8 +139,17 @@ async function attachCommentBadges(comments: CommunityComment[]): Promise<Commun
       }
     }
     const schoolId = profile.schoolEmailVerified ? profile.verifiedSchoolId?.trim() || null : null
+    // 지금 프로필 사진 우선 (사진을 바꾸면 예전 댓글에도 바로 보인다), 없으면 댓글에 저장된 사진
+    const livePhoto = typeof profile.photoURL === 'string' ? profile.photoURL.trim() : ''
+    // 닉네임도 지금 프로필 우선 (닉네임을 바꾸면 예전 댓글에도 바로 보인다). 이메일형·이메일 아이디는 제외
+    const liveNickname = sanitizeCommunityNickname(
+      typeof profile.nickname === 'string' ? profile.nickname : null,
+      typeof profile.email === 'string' ? profile.email : item.authorEmail,
+    )
     return {
       ...item,
+      authorNickname: liveNickname || item.authorNickname,
+      authorPhotoURL: livePhoto && !livePhoto.startsWith('blob:') ? livePhoto : item.authorPhotoURL,
       authorSchoolId: schoolId ?? item.authorSchoolId,
       authorWorkplaceVerified: profile.workplaceStatus === 'approved',
       authorInstagramVerified: Boolean(profile.instagramVerified),

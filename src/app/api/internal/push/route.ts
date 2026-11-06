@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 
 import { listPublicPostings } from '@lib/supabase/jobPostings.server'
 import { notifyUsers } from '@lib/push/notify.server'
+import { sendJobReviewTestPush } from '@lib/erp/notifyJobReview'
+import { sendStaffPush } from '@lib/support/staffPush.server'
 import { listCompanyFollowers } from '@lib/push/store.server'
 
 export const runtime = 'nodejs'
@@ -13,17 +15,61 @@ export const dynamic = 'force-dynamic'
  * { type: 'posting', postingId }                         — a posting was approved → followers of its company
  * { type: 'credit', uid, amount, balance, reason?, label? } — credits awarded by an admin
  * { type: 'verification', uid, kind: 'instagram', result: 'approved' | 'rejected' } — a verification was reviewed
+ * { type: 'job_review_test', email, source, orgId, target, post: { id, title, createdAt } } — admin test of the
+ *   new-job-review push in the Misaeng ERP app, to that admin's own devices only (answers { devices, sent })
+ * { type: 'staff_alert', emails, title, body, data } — an ERP team alert (tour scheduled, new client, …) to the Misaeng
+ *   ERP app; the ERP picks the recipients (internal staff only, never partners) and also sends it as Web Push
+ */
+/**
+ * The ERP sends INTERNAL_POINTS_SECRET when it is set (same as the points routes), otherwise INTERNAL_PUSH_SECRET —
+ * accept either, so posting / credit / verification / test pushes are not refused when the two differ.
  */
 function authorized(request: Request) {
-  const secret = process.env.INTERNAL_PUSH_SECRET?.trim()
   const given = request.headers.get('x-internal-secret')?.trim() || ''
-  if (!secret || given.length !== secret.length) return false
-  return timingSafeEqual(Buffer.from(given), Buffer.from(secret))
+  if (!given) return false
+  return [process.env.INTERNAL_PUSH_SECRET, process.env.INTERNAL_POINTS_SECRET]
+    .map((value) => value?.trim() || '')
+    .some((secret) => secret.length === given.length && timingSafeEqual(Buffer.from(given), Buffer.from(secret)))
 }
 
 export async function POST(request: Request) {
   if (!authorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = ((await request.json().catch(() => null)) || {}) as Record<string, unknown>
+
+  if (body.type === 'staff_alert') {
+    const emails = Array.isArray(body.emails) ? body.emails.filter((e): e is string => typeof e === 'string') : []
+    const title = String(body.title || '').trim()
+    if (!emails.length || !title) return NextResponse.json({ error: 'emails and title are required.' }, { status: 400 })
+    const data = (body.data && typeof body.data === 'object' ? body.data : {}) as Record<string, unknown>
+    const result = await sendStaffPush(emails.slice(0, 200), {
+      title,
+      body: String(body.body || ''),
+      threadId: 'erp-alerts',
+      data: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v ?? '')])),
+    })
+    return NextResponse.json(result)
+  }
+
+  if (body.type === 'job_review_test') {
+    const email = String(body.email || '').trim().toLowerCase()
+    const source = (body.source || {}) as { source?: unknown; orgId?: unknown }
+    const post = (body.post || {}) as { id?: unknown; title?: unknown; createdAt?: unknown }
+    const target = body.target as { type?: unknown; id?: unknown } | null
+    if (!email || typeof source.source !== 'string') {
+      return NextResponse.json({ error: 'email and source are required.' }, { status: 400 })
+    }
+    const result = await sendJobReviewTestPush({
+      email,
+      source: { source: source.source, orgId: typeof source.orgId === 'string' ? source.orgId : null },
+      target: target && typeof target.type === 'string' ? { type: target.type, id: String(target.id || target.type) } : null,
+      post: {
+        id: typeof post.id === 'string' ? post.id : null,
+        title: String(post.title || 'Sample job review'),
+        createdAt: Number(post.createdAt) || Date.now(),
+      },
+    })
+    return NextResponse.json(result)
+  }
 
   if (body.type === 'posting') {
     const postingId = String(body.postingId || '').trim()

@@ -403,10 +403,13 @@ function mapCommunity(
       : boardId === 'job-review' && post.jobReviewType
         ? t(`reviews.jobReview.types.${post.jobReviewType}.label`)
         : null
+  // CPT/OPT posts don't show the employer any more (still stored on older posts).
   const location =
-    post.location && (boardId === 'status' || boardId === 'job-review')
-      ? translateStatusEmployerLocation(t, post.location)
-      : post.location
+    boardId === 'status'
+      ? null
+      : post.location && boardId === 'job-review'
+        ? translateStatusEmployerLocation(t, post.location)
+        : post.location
   const meta =
     [
       typeLabel,

@@ -43,6 +43,7 @@ import {
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile, type SupabaseProfileRecord } from '@lib/supabase/profile.server'
 import { isModerationHidden, normalizeModeration } from '@lib/community/moderation'
+import { sanitizeCommunityNickname } from '@lib/community/author'
 import type { CommunityPost, JobReviewSourceId } from '@/types/nyc'
 import { listStoredCommunityComments } from '@lib/supabase/communityComments.server'
 import { listStoredRecommends } from '@lib/supabase/communityEngagement.server'
@@ -439,6 +440,9 @@ export async function listStoredCommunityPosts(
       return communityPostMatchesCity(post, city)
     })
 
+  // 맛집은 등록일 순으로만 — 글을 고쳐도(updatedAt) 위로 올라오지 않는다
+  if (boardId === 'food') filtered.sort((a, b) => b.createdAt - a.createdAt)
+
   const withCounts =
     boardId === 'food'
       ? await Promise.all(filtered.map(enrichStoredCommunityPostCounts))
@@ -450,6 +454,12 @@ export async function listStoredCommunityPosts(
       enrichCommunityPostAuthor(item, { persist: false, cachedProfile: true }),
     ),
   )
+}
+
+/** 공개 글(open, 숨김 아님) 전체 — 모든 도시, 작성자 보강 없이 (홈 배너 통계용) */
+export async function listAllOpenCommunityPosts(): Promise<CommunityPost[]> {
+  const posts = await listAllStoredCommunityPosts()
+  return posts.filter((post) => post.status === 'open' && !isModerationHidden(post))
 }
 
 /** 한 게시판의 공개 글 — 작성자 프로필 보강 없이 (회사별 후기 수·목록용) */
@@ -490,6 +500,14 @@ export async function listStoredCommunityPostsByAuthor(
   return posts.filter((post) => post.authorUid === uid)
 }
 
+/**
+ * 응답 직전에 작성자의 지금 프로필(사진·닉네임·배지)을 붙인다 — 사진·닉네임을 바꾸면 예전 글에도 바로 보인다.
+ * 익명 게시판은 그대로. 프로필은 5분 캐시라 작성자당 한 번만 읽는다.
+ */
+export function withLiveAuthors(posts: CommunityPost[]): Promise<CommunityPost[]> {
+  return Promise.all(posts.map((post) => enrichCommunityPostAuthor(post, { persist: false, cachedProfile: true })))
+}
+
 /** 탈퇴한 작성자의 글·댓글에 덮어쓰는 표시 필드 */
 export const DELETED_AUTHOR_FIELDS = {
   authorDeleted: true,
@@ -519,7 +537,11 @@ async function enrichCommunityPostAuthor(
   if (post.authorDeleted || profile?.status === 'deleted') {
     return { ...post, ...DELETED_AUTHOR_FIELDS }
   }
-  const profileNickname = profile?.nickname?.trim() || null
+  // 지금 프로필 닉네임 (이메일형·이메일 아이디는 제외 — 표시하지 않는다)
+  const profileNickname = sanitizeCommunityNickname(
+    profile?.nickname,
+    typeof profile?.email === 'string' ? profile.email : post.authorEmail,
+  )
   const profilePhoto =
     typeof profile?.photoURL === 'string' && profile.photoURL.trim()
       ? profile.photoURL.trim()
@@ -530,8 +552,8 @@ async function enrichCommunityPostAuthor(
   const safeStoredPhoto =
     storedPhoto && !storedPhoto.startsWith('blob:') ? storedPhoto : null
 
-  const authorNickname = storedNickname || profileNickname
-  // 목록·상세 모두 최신 프로필 사진을 우선 사용
+  // 목록·상세 모두 지금 프로필 닉네임·사진을 우선 사용 (바꾸면 예전 글에도 바로 보인다). 없으면 글에 저장된 값
+  const authorNickname = profileNickname || storedNickname
   const authorPhotoURL = profilePhoto || safeStoredPhoto
 
   if (

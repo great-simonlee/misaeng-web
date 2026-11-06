@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "{brand} NYC | Community for International Students & Professionals in New York",
+    "title": "{brand} | Community for International Students & Professionals in New York",
     "description": "Housing, food, CPT/OPT, visa and job interview reviews from people who study and work in New York."
   },
   "language": {
@@ -199,5 +199,15 @@
       "description": "It's saved on this device every time you add a progress update or move to the next item. You can close the window and pick up where you left off.",
       "savedAt": "Saved · {time}"
     }
+  },
+  "share": {
+    "housing": "A room shared from Misaeng! 🏠",
+    "visa": "A visa post shared from Misaeng! 🛂",
+    "review": "An interview & job review shared from Misaeng! 💼",
+    "company": "A company shared from Misaeng! 🏢",
+    "postings": "Job postings shared from Misaeng! 📋",
+    "memberOnly": "For Misaeng members. Open it in the app.",
+    "openInApp": "Open in app",
+    "perMonth": "/mo"
   }
 }

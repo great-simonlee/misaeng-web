@@ -7,7 +7,7 @@
  */
 
 import { authRest as rest, enc } from './store.server'
-import { adminCreateSession, adminCreateUser, adminFindUserByEmail, type AuthUser } from './supabaseAuth.server'
+import { adminCreateSession, adminCreateUser, adminFindUserByEmail, adminGetUser, type AuthUser } from './supabaseAuth.server'
 
 /** `MISAENG_AUTH_PROVIDER=supabase` switches sign-in to Supabase; anything else keeps Ellieo (until set up). */
 export function isSupabaseAuthMode() {
@@ -101,6 +101,21 @@ export async function resolveUid(
   if (!row) throw new Error('Could not link the account.')
   if (row.uid !== uid && proof.ellieoUid) throw new UidConflictError(proof.ellieoUid)
   return { uid: row.uid, isNew: row.linked_via === 'new', created: row.uid === uid, linkedVia: row.linked_via }
+}
+
+/**
+ * Google / Apple when every Misaeng login on this email signs in only with them (no password), else []. Lets a
+ * wrong email login say "you signed up with Google" instead of "wrong password".
+ */
+export async function socialOnlyProvidersForEmail(email: string): Promise<string[]> {
+  const rows = await rest<AccountRow[]>(`auth_accounts?email=ilike.${enc(email.replace(/[%_]/g, '\\$&'))}&select=*&limit=3`)
+  if (!rows.length) return []
+  const providers = new Set<string>()
+  for (const row of rows) {
+    for (const provider of (await adminGetUser(row.auth_user_id)).providers) providers.add(provider)
+  }
+  if (providers.has('email')) return []
+  return ['google', 'apple'].filter((provider) => providers.has(provider))
 }
 
 /** Read-only: the uid for a Supabase user that already signed in once (null before the first link). */

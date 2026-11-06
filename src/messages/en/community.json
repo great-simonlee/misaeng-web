@@ -169,17 +169,17 @@
   },
   "guidelines": {
     "common": {
-      "noPersonalInfo": "Don't post real names, contact info, or anything that could identify someone.",
-      "noAbuse": "No insults, hate, discrimination, threats, or false information.",
-      "noPrivacyViolation": "Please avoid personal disputes, invading privacy, or sharing photos taken without consent.",
-      "violationPenalty": "Posts that break these rules may be removed, and your account may be restricted."
+      "noPersonalInfo": "Don't post anyone's real name or contact.",
+      "noAbuse": "No abuse, hate, discrimination or false claims.",
+      "noPrivacyViolation": "No privacy violations or unauthorized photos.",
+      "violationPenalty": "Violations may lead to removal or a ban."
     },
     "anonymous": {
       "noTargeting": "Even anonymously, posts that name or hint at a specific person, or talk behind their back, aren't allowed.",
       "stillResponsible": "Others can't see your name, school, or photo, but you're still legally responsible for what you post.",
       "loginRequired": "You need to log in so you can edit or delete your posts. Our team can check who posted when handling reports."
     },
-    "commonTitle": "Community guidelines",
+    "commonTitle": "Community rules",
     "anonymousTitle": "Anonymous board guidelines"
   },
   "anonymousTopics": {
@@ -468,6 +468,15 @@
       "coverPhoto": "Cover photo",
       "photo": "Photo",
       "cover": "Cover",
+      "reorderHint": "Drag the handle (⋮⋮) or use the arrows to reorder. The top photo is your cover.",
+      "reorderHandleAria": "Reorder menu {n} (drag, or use the up/down arrow keys)",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "moveUpAria": "Move menu {n} up",
+      "moveDownAria": "Move menu {n} down",
+      "makeCover": "Set as cover",
+      "reorderMoved": "Moved the menu photo to position {n}",
+      "reorderMovedToCover": "Set as the cover photo",
       "menuNamePlaceholder": "Menu name (required)",
       "menuNameAria": "Menu {n} name",
       "menuCaptionPlaceholder": "One-line review (required)",

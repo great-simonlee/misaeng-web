@@ -1,5 +1,5 @@
 import { BRAND_CONFIG } from '@lib/brand'
-import { NextResponse } from 'next/server'
+import { after, NextResponse } from 'next/server'
 import { finalizePost, localizePosts, withEllieoCommentCounts } from '@lib/translations/localize.server'
 
 import { apiErrorMessage } from '@lib/i18n/apiError'
@@ -70,9 +70,11 @@ import {
   isCommunityStorageConfigured,
   listStoredCommunityPosts,
   listStoredCommunityPostsByAuthor,
+  withLiveAuthors,
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
+import { notifyJobReviewCreated } from '@lib/erp/notifyJobReview'
 import type {
   CommunityPost,
   CptOptTimelineEntry,
@@ -134,8 +136,9 @@ export async function GET(request: Request) {
         }
       }
       const locale = await getRequestLocale(request)
+      // 내 글 목록도 지금 프로필 사진으로 (사진을 바꾼 뒤 예전 글에 옛 사진이 남지 않게)
       const posts = await withEllieoCommentCounts(
-        localizePosts(await listStoredCommunityPostsByAuthor(user.uid), locale, { hidePending: false }),
+        localizePosts(await withLiveAuthors(await listStoredCommunityPostsByAuthor(user.uid)), locale, { hidePending: false }),
         locale,
       )
       return NextResponse.json({
@@ -672,6 +675,7 @@ export async function POST(request: Request) {
     } catch (creditError) {
       console.error('Community credit award (post) error:', creditError)
     }
+    if (jobReviewSource) after(() => notifyJobReviewCreated(saved, jobReviewSource))
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),
     })

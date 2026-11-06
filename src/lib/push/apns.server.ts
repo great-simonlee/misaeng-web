@@ -13,7 +13,13 @@ export type ApnsEnvironment = 'sandbox' | 'production'
 
 export type ApnsMessage = {
   title: string
+  /** Second bold line under the title (iOS). */
+  subtitle?: string
   body: string
+  /** A sound file in the app bundle (e.g. "lead.caf"); default "default". Focus / silent mode still mute it. */
+  sound?: string
+  /** Lets the app's Notification Service Extension rewrite the alert (e.g. a messaging-style notification with the sender). */
+  mutableContent?: boolean
   /** Custom data the app reads when the notification is tapped (e.g. { type, postId }). */
   data?: Record<string, string>
   /** Notifications with the same thread are grouped on the lock screen. */
@@ -85,7 +91,7 @@ function session(environment: ApnsEnvironment): ClientHttp2Session {
   return created
 }
 
-function sendOne(environment: ApnsEnvironment, token: string, payload: string, threadId?: string): Promise<ApnsResult> {
+function sendOne(environment: ApnsEnvironment, token: string, payload: string, threadId?: string, topic?: string): Promise<ApnsResult> {
   return new Promise((resolve) => {
     let request
     try {
@@ -93,7 +99,7 @@ function sendOne(environment: ApnsEnvironment, token: string, payload: string, t
         ':method': 'POST',
         ':path': `/3/device/${token}`,
         authorization: `bearer ${providerToken(environment)}`,
-        'apns-topic': bundleId(),
+        'apns-topic': topic || bundleId(),
         'apns-push-type': 'alert',
         'apns-priority': '10',
         ...(threadId ? { 'apns-collapse-id': threadId.slice(0, 64) } : {}),
@@ -136,17 +142,20 @@ function sendOne(environment: ApnsEnvironment, token: string, payload: string, t
 export async function sendApns(
   devices: { token: string; environment: ApnsEnvironment }[],
   message: ApnsMessage,
+  /** Another app of the same team (e.g. the staff app "Misaeng ERP"); default APNS_BUNDLE_ID. */
+  options: { topic?: string } = {},
 ): Promise<ApnsResult[]> {
   // Devices whose environment has no key yet are skipped (not removed).
   devices = devices.filter((d) => isApnsConfigured(d.environment))
   if (devices.length === 0) return []
   const payload = JSON.stringify({
     aps: {
-      alert: { title: message.title, body: message.body },
-      sound: 'default',
+      alert: { title: message.title, ...(message.subtitle ? { subtitle: message.subtitle } : {}), body: message.body },
+      sound: message.sound || 'default',
+      ...(message.mutableContent ? { 'mutable-content': 1 } : {}),
       ...(message.threadId ? { 'thread-id': message.threadId } : {}),
     },
     ...(message.data ?? {}),
   })
-  return Promise.all(devices.map((d) => sendOne(d.environment, d.token, payload, message.threadId)))
+  return Promise.all(devices.map((d) => sendOne(d.environment, d.token, payload, message.threadId, options.topic)))
 }

@@ -84,3 +84,21 @@ export function resolveCommunityNickname(
     )
   )
 }
+
+const HANGUL_OR_CJK = /[ᄀ-ᇿ㄰-㆏가-힣぀-ヿ一-鿿]/
+
+/**
+ * 프로필 사진이 없을 때 아바타에 쓰는 이니셜 (앱과 같은 규칙).
+ * 한글·한자·가나 이름은 첫 글자 하나, 그 밖에는 단어(공백·.·@로 나눔, 직원 앱 InitialsAvatar와 같음) 두 개까지의 첫 글자 (Simon Lee → SL).
+ * 이름이 없으면 빈 문자열 — 화면은 기본 프로필 아이콘을 보여 준다.
+ */
+export function avatarInitials(name: string | null | undefined): string {
+  const trimmed = name?.trim() || ''
+  if (!trimmed) return ''
+  if (HANGUL_OR_CJK.test(trimmed)) return Array.from(trimmed)[0] ?? ''
+  const words = trimmed.split(/[\s.@]+/).filter(Boolean).slice(0, 2)
+  return words
+    .map((word) => Array.from(word)[0] ?? '')
+    .join('')
+    .toUpperCase()
+}

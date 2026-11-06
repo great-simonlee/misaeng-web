@@ -3,13 +3,15 @@
     "restaurant": "맛집",
     "value": "가성비",
     "vibe": "느좋",
-    "study": "카공"
+    "study": "카공",
+    "honest": "솔직후기"
   },
   "categoryDescriptions": {
     "restaurant": "꼭 가볼 만한 맛집",
     "value": "가격 대비 만족",
     "vibe": "분위기 좋은 곳",
-    "study": "공부·작업하기 좋은 카페"
+    "study": "공부·작업하기 좋은 카페",
+    "honest": "장단점까지 솔직하게"
   },
   "cuisines": {
     "brunch": "브런치",

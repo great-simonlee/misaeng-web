@@ -216,6 +216,7 @@ export function sortTimelineByDate(
 
 export function summarizeTimelineEntry(entry: CptOptTimelineEntry) {
   return [
+    entry.stageLabel ?? '',
     entry.prepared,
     entry.submitted,
     entry.resultReceived,
@@ -275,6 +276,7 @@ export function normalizeCptOptTimeline(raw: unknown): CptOptTimelineEntry[] {
       if (!item || typeof item !== 'object') return null
       const data = item as Record<string, unknown>
       const date = String(data.date || '').trim()
+      const stageLabel = String(data.stageLabel || '').trim()
       const prepared = String(data.prepared || '').trim()
       const submitted = String(data.submitted || '').trim()
       const resultReceived = String(data.resultReceived || '').trim()
@@ -284,6 +286,7 @@ export function normalizeCptOptTimeline(raw: unknown): CptOptTimelineEntry[] {
       )
       if (
         !date &&
+        !stageLabel &&
         !prepared &&
         !submitted &&
         !resultReceived &&
@@ -297,6 +300,7 @@ export function normalizeCptOptTimeline(raw: unknown): CptOptTimelineEntry[] {
           String(data.id || '').trim() ||
           `step_${index}_${Math.random().toString(36).slice(2, 7)}`,
         date,
+        ...(stageLabel ? { stageLabel: stageLabel.slice(0, CPT_OPT_FIELD_MAX) } : {}),
         prepared: prepared.slice(0, CPT_OPT_FIELD_MAX),
         submitted: submitted.slice(0, CPT_OPT_FIELD_MAX),
         resultReceived: resultReceived.slice(0, CPT_OPT_FIELD_MAX),
@@ -343,6 +347,7 @@ export function createEmptyTimelineEntry(): CptOptTimelineEntry {
   return {
     id: `step_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
     date: '',
+    stageLabel: '',
     prepared: '',
     submitted: '',
     resultReceived: '',
@@ -358,6 +363,7 @@ function hasStageReviewContent(entry: CptOptTimelineEntry) {
 export function isTimelineEntryFilled(entry: CptOptTimelineEntry) {
   return Boolean(
     entry.date.trim() ||
+      (entry.stageLabel ?? '').trim() ||
       entry.prepared.trim() ||
       entry.submitted.trim() ||
       entry.resultReceived.trim() ||
@@ -369,7 +375,8 @@ export function isTimelineEntryFilled(entry: CptOptTimelineEntry) {
 export function isTimelineEntryComplete(entry: CptOptTimelineEntry) {
   if (!entry.date.trim()) return false
   return Boolean(
-    entry.prepared.trim() ||
+    (entry.stageLabel ?? '').trim() ||
+      entry.prepared.trim() ||
       entry.submitted.trim() ||
       entry.resultReceived.trim() ||
       entry.nextStep.trim() ||

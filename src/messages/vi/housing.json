@@ -223,7 +223,7 @@
   },
   "list": {
     "title": "Nhà ở",
-    "subtitle": "Tin đăng ở NYC do {brand} chọn lọc · Tìm nguyên căn và phòng riêng ở cùng một nơi.",
+    "subtitle": "Tin đăng ở {city} do {brand} chọn lọc · Tìm nguyên căn và phòng riêng ở cùng một nơi.",
     "filters": "Bộ lọc",
     "quickFilters": "Lọc nhanh",
     "previousFilters": "Xem bộ lọc trước",
@@ -483,10 +483,15 @@
       "bronx": "Bronx",
       "staten-island": "Staten Island",
       "new-jersey": "New Jersey",
+      "connecticut": "Connecticut",
       "boston": "Boston",
       "cambridge": "Cambridge",
       "somerville": "Somerville",
-      "brookline": "Brookline"
+      "brookline": "Brookline",
+      "rhode-island": "Rhode Island",
+      "washington-dc": "Washington DC",
+      "virginia": "Virginia",
+      "maryland": "Maryland"
     },
     "detail": {
       "type": "Loại",

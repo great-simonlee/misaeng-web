@@ -11,6 +11,14 @@ export const REMOVED_LOCALE_PREFIXES = ['ja', 'zh-CN', 'zh-TW', 'id'] as const
 
 export type Locale = (typeof LOCALES)[number]
 
+/** 삭제한 언어 값인가 (`ja`, `zh-Hant`, `id-ID`, `in` …). 옛 앱·옛 프로필이 보낸 값을 오류 대신 대체 언어로 넘길 때 쓴다. */
+export function isRemovedLocale(value: string | null | undefined): boolean {
+  const raw = String(value || '').trim().replace('_', '-').toLowerCase()
+  if (!raw) return false
+  const base = raw.split('-')[0]
+  return base === 'ja' || base === 'zh' || base === 'id' || base === 'in'
+}
+
 export function isLocale(value: unknown): value is Locale {
   return typeof value === 'string' && (LOCALES as readonly string[]).includes(value)
 }

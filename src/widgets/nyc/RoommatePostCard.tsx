@@ -6,7 +6,7 @@ import type { ReactNode } from 'react'
 import { SchoolBadge, UserAvatar } from '@components'
 import { useCity } from '@hooks/useCity'
 import { hrefForCommunityPost } from '@lib/constants/cities'
-import { getCommunityAuthorDisplayName } from '@lib/community/author'
+import { getCommunityAuthorDisplayName, sanitizeCommunityNickname } from '@lib/community/author'
 import {
   formatRoommateBudget,
   formatRoommateDateShort,
@@ -43,6 +43,7 @@ export type RoommateCardPost = Pick<
   | 'authorNickname'
   | 'authorPhotoURL'
   | 'authorSchoolId'
+  | 'authorDeleted'
   | 'viewCount'
   | 'createdAt'
   | 'boostedUntil'
@@ -79,7 +80,7 @@ export function RoommatePostCard({ post, preview = false }: RoommatePostCardProp
   const thumbnail = photos[0] ?? null
   const location = post.location?.trim() || null
   const authorName = getCommunityAuthorDisplayName(post, null, tCommunity)
-  const authorInitial = authorName.charAt(0).toUpperCase()
+  const avatarName = post.authorDeleted ? null : sanitizeCommunityNickname(post.authorNickname)
   const authorPhoto = post.authorPhotoURL?.trim() || null
   const pinned = !preview && isRoommateBoostActive(post)
   const { ended, availableNow } = getRoommateTimeline(post)
@@ -184,7 +185,7 @@ export function RoommatePostCard({ post, preview = false }: RoommatePostCardProp
         <div className='flex min-w-0 items-center gap-1.5'>
           <UserAvatar
             photoURL={authorPhoto}
-            initial={authorInitial}
+            name={avatarName}
             size='sm'
             className='!h-5 !w-5 text-[9px]'
           />

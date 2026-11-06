@@ -22,7 +22,7 @@ export type ContentModeration = {
 }
 
 /** 면접/취업 후기: 연락 경로 (JOB_REVIEW_SOURCES). 예전 값 'kiso'는 student-org + nyu-kiso로 읽음 */
-export type JobReviewSourceId = 'misaeng' | 'student-org' | 'referral' | 'other'
+export type JobReviewSourceId = 'misaeng' | 'givo' | 'student-org' | 'referral' | 'other'
 
 /** 면접/취업 후기: 최종 결과 (JOB_REVIEW_OUTCOMES) */
 export type JobReviewOutcomeId = 'offer' | 'rejected' | 'in-progress' | 'withdrew'
@@ -437,6 +437,8 @@ export interface CptOptTimelineEntry {
   id: string
   /** YYYY-MM-DD 또는 자유 입력 */
   date: string
+  /** 단계 이름 (앱 단계형 입력). 없으면 예전 글 */
+  stageLabel?: string
   /** 뭘 준비했는지 */
   prepared: string
   /** 어떻게 제출했는지 */
@@ -477,7 +479,7 @@ export interface JobReviewTimelineEntry {
 }
 
 /** 맛집 보드 카테고리 */
-export type FoodCategoryId = 'restaurant' | 'value' | 'vibe' | 'study'
+export type FoodCategoryId = 'restaurant' | 'value' | 'vibe' | 'study' | 'honest'
 
 /** 맛집 메뉴 (사진 + 메뉴명 + 한 줄 평) */
 export interface FoodMenuItem {

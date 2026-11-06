@@ -424,6 +424,7 @@ export type { JobReviewOutcomeId, JobReviewSourceId }
 /** 화면 문구: `reviews.jobReview.sources.<id>.label` / `.description` */
 export const JOB_REVIEW_SOURCES: readonly { id: JobReviewSourceId }[] = [
   { id: 'misaeng' },
+  { id: 'givo' },
   { id: 'student-org' },
   { id: 'referral' },
   { id: 'other' },

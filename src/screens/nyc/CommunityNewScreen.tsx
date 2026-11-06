@@ -10,6 +10,7 @@ import {
   TipTapEditor,
 } from '@components'
 import { useCity, useCityPath } from '@hooks/useCity'
+import { moveArrayItem, useDragReorder } from '@hooks/useDragReorder'
 import { useRequireAuth } from '@hooks/useRequireAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { cityLoginPath, hrefForCommunityPost } from '@lib/constants/cities'
@@ -27,7 +28,7 @@ import {
 import { isAccountSuspended, isIdentityVerified } from '@lib/community/schoolGate'
 import {
   COMMUNITY_BODY_MAX,
-  FOOD_CATEGORIES,
+  getFoodComposeCategories,
   FOOD_CUISINES,
   FOOD_GALLERY_MAX,
   FOOD_MENU_MAX,
@@ -361,6 +362,20 @@ function CommunityBoardNewScreen({
   function removeMenuRow(key: string) {
     setMenuDrafts((prev) => prev.filter((item) => item.key !== key))
   }
+
+  // 메뉴 카드 순서 바꾸기 — 0번이 대표 사진(thumbnailUrl)이 된다
+  const [menuOrderMessage, setMenuOrderMessage] = useState('')
+  const menuReorder = useDragReorder({
+    keys: menuDrafts.map((item) => item.key),
+    onReorder: (from, to) => {
+      setMenuDrafts((prev) => moveArrayItem(prev, from, to))
+      setMenuOrderMessage(
+        to === 0
+          ? t('write.food.reorderMovedToCover')
+          : t('write.food.reorderMoved', { n: to + 1 }),
+      )
+    },
+  })
 
   function resetMenuFileInput() {
     if (menuFileInputRef.current) menuFileInputRef.current.value = ''
@@ -845,7 +860,7 @@ function CommunityBoardNewScreen({
               {t('write.food.categoryTitle')}
             </h2>
             <div className='mt-2.5 flex flex-wrap gap-2'>
-              {FOOD_CATEGORIES.map((cat) => {
+              {getFoodComposeCategories(foodCategory).map((cat) => {
                 const active = foodCategory === cat.id
                 return (
                   <button
@@ -1165,10 +1180,22 @@ function CommunityBoardNewScreen({
               </button>
             ) : null}
 
+            {menuDrafts.length > 1 ? (
+              <p id='menu-reorder-hint' className='mt-2 text-[11px] text-[var(--muted)]'>
+                {t('write.food.reorderHint')}
+              </p>
+            ) : null}
+            <p className='sr-only' aria-live='polite'>
+              {menuOrderMessage}
+            </p>
+
             {menuDrafts.length > 0 || menuPendingCount > 0 ? (
               <div className='mt-3 space-y-2.5'>
                 {menuDrafts.map((item, index) => {
                   const isCover = index === 0
+                  const canReorder = menuDrafts.length > 1
+                  const isDragging = menuReorder.draggingKey === item.key
+                  const isLast = index === menuDrafts.length - 1
                   const missingName =
                     Boolean(item.imageUrl) && !item.name.trim()
                   const missingCaption =
@@ -1177,14 +1204,34 @@ function CommunityBoardNewScreen({
                     <div
                       key={item.key}
                       id={`menu-card-${item.key}`}
-                      className={
-                        isCover
-                          ? 'rounded-2xl bg-white p-3 ring-1 ring-[var(--brand)]/25'
-                          : 'rounded-2xl bg-white p-3 ring-1 ring-black/[0.06]'
-                      }
+                      ref={menuReorder.itemRef(item.key)}
+                      className={cn(
+                        'relative rounded-2xl bg-white p-3 ring-1',
+                        isCover ? 'ring-[var(--brand)]/25' : 'ring-black/[0.06]',
+                        // 끄는 카드는 떠오르고, 나머지는 부드럽게 비켜난다
+                        isDragging
+                          ? 'z-10 shadow-[0_18px_36px_-12px_rgba(0,0,0,0.22)] ring-[var(--brand)]/40'
+                          : menuReorder.draggingKey
+                            ? 'transition-transform duration-200 ease-[cubic-bezier(0.2,0,0,1)] motion-reduce:transition-none'
+                            : null,
+                      )}
                     >
                       <div className='mb-2.5 flex items-center justify-between gap-2'>
                         <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
+                          {canReorder ? (
+                            <button
+                              type='button'
+                              {...menuReorder.getHandleProps(item.key, index)}
+                              aria-label={t('write.food.reorderHandleAria', { n: index + 1 })}
+                              aria-describedby='menu-reorder-hint'
+                              className={cn(
+                                '-ml-1 inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-[var(--muted)] outline-none transition hover:bg-black/[0.04] hover:text-[var(--foreground)] focus-visible:ring-2 focus-visible:ring-[var(--brand)]/40',
+                                isDragging ? 'cursor-grabbing bg-black/[0.04] text-[var(--foreground)]' : 'cursor-grab',
+                              )}
+                            >
+                              <GripIcon className='size-4' />
+                            </button>
+                          ) : null}
                           <p className='text-[12px] font-semibold text-[var(--muted)]'>
                             {t('write.food.menuNumber', { n: index + 1 })}
                           </p>
@@ -1194,13 +1241,48 @@ function CommunityBoardNewScreen({
                             </span>
                           ) : null}
                         </div>
-                        <button
-                          type='button'
-                          onClick={() => removeMenuRow(item.key)}
-                          className='text-[11px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
-                        >
-                          {t('detail.delete')}
-                        </button>
+                        <div className='flex shrink-0 items-center gap-0.5'>
+                          {canReorder ? (
+                            <>
+                              {!isCover ? (
+                                <button
+                                  type='button'
+                                  onClick={() => menuReorder.move(index, 0)}
+                                  className='mr-1 rounded-full px-2 py-1 text-[11px] font-medium text-[var(--muted)] touch-manipulation transition hover:bg-brand-soft hover:text-[var(--brand)]'
+                                >
+                                  {t('write.food.makeCover')}
+                                </button>
+                              ) : null}
+                              <button
+                                type='button'
+                                disabled={isCover}
+                                onClick={() => menuReorder.move(index, index - 1)}
+                                aria-label={t('write.food.moveUpAria', { n: index + 1 })}
+                                title={t('write.food.moveUp')}
+                                className='inline-flex size-7 items-center justify-center rounded-full text-[var(--muted)] touch-manipulation transition hover:bg-black/[0.04] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30'
+                              >
+                                <ChevronIcon direction='up' className='size-3.5' />
+                              </button>
+                              <button
+                                type='button'
+                                disabled={isLast}
+                                onClick={() => menuReorder.move(index, index + 1)}
+                                aria-label={t('write.food.moveDownAria', { n: index + 1 })}
+                                title={t('write.food.moveDown')}
+                                className='mr-1 inline-flex size-7 items-center justify-center rounded-full text-[var(--muted)] touch-manipulation transition hover:bg-black/[0.04] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30'
+                              >
+                                <ChevronIcon direction='down' className='size-3.5' />
+                              </button>
+                            </>
+                          ) : null}
+                          <button
+                            type='button'
+                            onClick={() => removeMenuRow(item.key)}
+                            className='text-[11px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
+                          >
+                            {t('detail.delete')}
+                          </button>
+                        </div>
                       </div>
 
                       <div className='grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]'>
@@ -1647,6 +1729,43 @@ function PlusIcon({ className }: { className?: string }) {
       aria-hidden
     >
       <path strokeLinecap='round' d='M12 6v12M6 12h12' />
+    </svg>
+  )
+}
+
+/** 드래그 손잡이 (점 6개) */
+function GripIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox='0 0 24 24' fill='currentColor' className={className} aria-hidden>
+      <circle cx='9' cy='6' r='1.6' />
+      <circle cx='15' cy='6' r='1.6' />
+      <circle cx='9' cy='12' r='1.6' />
+      <circle cx='15' cy='12' r='1.6' />
+      <circle cx='9' cy='18' r='1.6' />
+      <circle cx='15' cy='18' r='1.6' />
+    </svg>
+  )
+}
+
+function ChevronIcon({
+  direction,
+  className,
+}: {
+  direction: 'up' | 'down'
+  className?: string
+}) {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='2.4'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      className={className}
+      aria-hidden
+    >
+      <path d={direction === 'up' ? 'm6 15 6-6 6 6' : 'm6 9 6 6 6-6'} />
     </svg>
   )
 }

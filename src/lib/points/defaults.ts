@@ -104,6 +104,8 @@ export type PointSettings = {
   'coffee_chat.enabled': boolean
   /** Private Q&A with interview/job review authors (app only). Off until the team turns it on. */
   'review_qna.enabled': boolean
+  /** Washington DC city site (web /dc and the app city list). Off until the team opens it. */
+  'cities.dc.enabled': boolean
 }
 
 export type PointSettingKey = keyof PointSettings
@@ -115,6 +117,7 @@ export const POINT_SETTING_DEFAULTS: PointSettings = {
   'points.cutover_at': null,
   'coffee_chat.enabled': false,
   'review_qna.enabled': false,
+  'cities.dc.enabled': false,
 }
 
 export const POINT_SETTING_KEYS = Object.keys(POINT_SETTING_DEFAULTS) as PointSettingKey[]

@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+/* Noto Sans JP/SC/TC + Geist Mono, self-hosted (the build must not depend on Google Fonts) */
+@import './fonts-self-hosted.css';
 /* Ellieo 화면 규칙 ([data-brand='ellieo'] 아래에서만 적용, Misaeng 무영향) */
 @import './ellieo-theme.css';
 /* Extra Next dist dirs (second dev server, verify builds) hold compressed caches; never scan them for classes */

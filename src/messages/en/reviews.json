@@ -33,6 +33,10 @@
       }
     },
     "fields": {
+      "stageLabel": {
+        "label": "Step",
+        "shortLabel": "Step"
+      },
       "prepared": {
         "label": "What you prepared",
         "shortLabel": "Prepared",
@@ -390,7 +394,11 @@
     "sources": {
       "misaeng": {
         "label": "Through {brand}",
-        "description": "I saw the {brand} site or social media"
+        "description": "{brand} reached out and asked me to write this"
+      },
+      "givo": {
+        "label": "Through Givo",
+        "description": "Givo reached out and asked me to write this"
       },
       "student-org": {
         "label": "Through a student group",
@@ -490,10 +498,10 @@
   "orientation": {
     "defaultEyebrow": "Write a review",
     "title": "Before you start",
-    "subtitleWithGuide": "Please read the writing guide and community guidelines, then agree.",
-    "subtitle": "Please read the community guidelines, then agree.",
+    "subtitleWithGuide": "Check how to write and the community rules.",
+    "subtitle": "Check the community rules.",
     "guideTitle": "Writing guide",
-    "communityTitle": "Community guidelines",
+    "communityTitle": "Community rules",
     "saving": "Saving…",
     "agree": "Agree and start writing",
     "backToList": "Back to list",
@@ -502,30 +510,30 @@
     "anonymousEyebrow": "Anonymous board",
     "cptOpt": {
       "step1": {
-        "title": "A review you log by date",
-        "body": "Log your CPT, OPT, STEM OPT, visa or green card progress one date at a time, so others can follow it step by step later."
+        "title": "Log it by date",
+        "body": "One entry per date, from preparation to result."
       },
       "step2": {
         "title": "Date → field → details",
-        "body": "In the form below, pick a date, choose only the fields you need (Prepared, Submitted, Result, Next step), then write the details."
+        "body": "Pick a date, choose only the fields you need, then write."
       },
       "step3": {
-        "title": "\"Add this entry\" stacks it above",
-        "body": "When you're done, tap \"Add this entry\" and it moves to the list above the form. Keep going with the next date in the form below."
+        "title": "Stack with \"Add this entry\"",
+        "body": "Added entries stack above; keep going with the next date."
       }
     },
     "jobReview": {
       "step1": {
-        "title": "A review you log by date",
-        "body": "Log your internship, new grad, experienced, job change or contract hiring process one date at a time, so others can follow it from application to offer."
+        "title": "Log it by date",
+        "body": "One entry per date, from application to offer."
       },
       "step2": {
         "title": "Date → field → details",
-        "body": "In the form below, pick a date, choose only the fields you need (Stage, Platform, Documents, Interview, Result), then write the details."
+        "body": "Pick a date, choose only the fields you need, then write."
       },
       "step3": {
-        "title": "\"Add this entry\" stacks it above",
-        "body": "When you're done, tap \"Add this entry\" and it moves to the list above the form. Keep going with the next date in the form below."
+        "title": "Stack with \"Add this entry\"",
+        "body": "Added entries stack above; keep going with the next date."
       }
     }
   },

@@ -212,7 +212,15 @@
       "outdoorPatio": "Patio",
       "flexWallAllowed": "Allowed",
       "flexWallNotAllowed": "Not allowed"
-    }
+    },
+    "appInquiry": "Inquire in the app",
+    "appInquiryTitle": "Chat with us in the Misaeng app",
+    "appInquiryBody": "Live chat with our housing team is in the Misaeng app. Install it and tap Inquire on this listing.",
+    "appStore": "Download on the App Store",
+    "googlePlay": "Get it on Google Play",
+    "orKakao": "Can't install the app? Ask us on KakaoTalk or by email.",
+    "emailInquiryShort": "Email us",
+    "close": "Close"
   },
   "listingKinds": {
     "unit": {
@@ -226,7 +234,7 @@
   },
   "list": {
     "title": "Housing",
-    "subtitle": "NYC listings hand-picked by {brand} · Find whole units and private rooms in one place.",
+    "subtitle": "{city} listings hand-picked by {brand} · Find whole units and private rooms in one place.",
     "filters": "Filters",
     "quickFilters": "Quick filters",
     "previousFilters": "Show previous filters",
@@ -495,10 +503,15 @@
       "bronx": "Bronx",
       "staten-island": "Staten Island",
       "new-jersey": "New Jersey",
+      "connecticut": "Connecticut",
       "boston": "Boston",
       "cambridge": "Cambridge",
       "somerville": "Somerville",
-      "brookline": "Brookline"
+      "brookline": "Brookline",
+      "rhode-island": "Rhode Island",
+      "washington-dc": "Washington DC",
+      "virginia": "Virginia",
+      "maryland": "Maryland"
     },
     "detail": {
       "type": "Type",

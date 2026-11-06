@@ -31,6 +31,8 @@ interface AuthContextValue {
   avatarURL: string | null
   /** 닉네임 우선, 없으면 계정 이름 */
   displayName: string
+  /** 아바타 이니셜용 이름 (닉네임 → 계정 이름). 이메일·'회원'은 쓰지 않고, 없으면 null(기본 프로필 아이콘) */
+  avatarName: string | null
   nickname: string | null
   loading: boolean
   /** 로그인·세션 동기화 중 (마이페이지 스켈레톤용) */
@@ -651,12 +653,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user?.email?.split('@')[0] ||
     t('memberFallbackName')
 
+  const avatarName =
+    profile?.nickname?.trim() ||
+    profile?.displayName?.trim() ||
+    user?.displayName?.trim() ||
+    null
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
       profile,
       avatarURL: profile?.photoURL ?? null,
       displayName,
+      avatarName,
       nickname: profile?.nickname ?? null,
       loading,
       sessionLoading,
@@ -683,6 +692,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       profile,
       displayName,
+      avatarName,
       loading,
       sessionLoading,
       configured,

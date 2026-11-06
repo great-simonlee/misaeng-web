@@ -86,6 +86,11 @@ export function CptOptDetailContent({
       hasReview,
       body: (
         <>
+          {entry.stageLabel?.trim() ? (
+            <p className='mb-2.5 text-[15px] font-bold text-[var(--foreground)]'>
+              {entry.stageLabel.trim()}
+            </p>
+          ) : null}
           <TimelineFieldGrid items={fieldItems} />
           {hasReview ? (
             <div className='mt-3 rounded-xl bg-[#fafbfc] px-3.5 py-3 ring-1 ring-black/[0.05] sm:px-4 sm:py-3.5'>
@@ -144,16 +149,6 @@ export function CptOptDetailContent({
 
       <div className='mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-1.5 px-1 text-[12px] text-[var(--muted)] sm:px-0'>
         <CptOptTypeBadge type={post.cptOptType} />
-        {post.location?.trim() ? (
-          <>
-            <span className='text-black/20' aria-hidden>
-              ·
-            </span>
-            <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#eef4ff] px-2.5 py-1 text-[11px] font-semibold text-[#3b5bdb] ring-1 ring-[#3b5bdb]/15'>
-              {post.location.trim()}
-            </span>
-          </>
-        ) : null}
         <span className='text-black/20' aria-hidden>
           ·
         </span>

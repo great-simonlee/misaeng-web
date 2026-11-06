@@ -74,11 +74,16 @@ async function rest<T>(path: string, init: RequestInit & { prefer?: string } = {
   return data as T
 }
 
-/** Stores one notification per user, rendered in every language. Never throws. */
+/**
+ * Stores one notification per user, rendered in every language. Never throws.
+ * `replaceThread`: the user's earlier row with the same threadId is replaced, so a thread keeps one entry that comes
+ * back unread at the top (support chat: one row per conversation, latest message).
+ */
 export async function recordNotifications(input: {
   type: string
   userIds: string[]
   build: (t: Translate, locale: Locale) => ApnsMessage
+  replaceThread?: boolean
 }): Promise<void> {
   if (!config() || input.userIds.length === 0) return
   try {
@@ -90,6 +95,12 @@ export async function recordNotifications(input: {
       content[locale] = { title: message.title, body: message.body }
       data = message.data ?? data
       threadId = message.threadId ?? threadId
+    }
+    if (input.replaceThread && threadId) {
+      await rest(
+        `${TABLE}?user_id=in.(${input.userIds.map((id) => `"${id.replace(/"/g, '')}"`).join(',')})&thread_id=eq.${encodeURIComponent(threadId)}`,
+        { method: 'DELETE', prefer: 'return=minimal' },
+      )
     }
     const rows = input.userIds.map((userId) => ({
       user_id: userId,
@@ -118,11 +129,14 @@ function toItem(row: Row, locale: Locale): InboxItem {
   }
 }
 
+/** Support chat rows (written before 2026-11-04 PM) stay out of 알림: messages have their own tab. */
+const NOT_SUPPORT = `&or=${encodeURIComponent('(thread_id.is.null,thread_id.not.like.support-*)')}`
+
 /** Newest first, `limit` per page; `cursor` = createdAt of the last item of the previous page. */
 export async function listNotifications(uid: string, locale: Locale, cursor: string | null, limit = 30) {
   const since = new Date(Date.now() - KEEP_DAYS * 86_400_000).toISOString()
   let query = `${TABLE}?user_id=eq.${encodeURIComponent(uid)}&created_at=gte.${encodeURIComponent(since)}` +
-    `&select=id,user_id,type,content,data,thread_id,created_at,read_at&order=created_at.desc&limit=${limit + 1}`
+    `${NOT_SUPPORT}&select=id,user_id,type,content,data,thread_id,created_at,read_at&order=created_at.desc&limit=${limit + 1}`
   if (cursor && Number.isFinite(Date.parse(cursor))) query += `&created_at=lt.${encodeURIComponent(cursor)}`
   try {
     const rows = (await rest<Row[]>(query)) ?? []
@@ -142,7 +156,7 @@ export async function unreadCount(uid: string): Promise<number> {
   if (!c) return 0
   try {
     const res = await fetch(
-      `${c.url}/rest/v1/${TABLE}?user_id=eq.${encodeURIComponent(uid)}&read_at=is.null&select=id`,
+      `${c.url}/rest/v1/${TABLE}?user_id=eq.${encodeURIComponent(uid)}&read_at=is.null${NOT_SUPPORT}&select=id`,
       {
         method: 'HEAD',
         headers: { apikey: c.key, Authorization: `Bearer ${c.key}`, Prefer: 'count=exact', Range: '0-0' },
@@ -169,6 +183,20 @@ export async function markNotificationsRead(uid: string, ids: string[] | 'all'):
     })
   } catch (error) {
     if (!(error instanceof InboxMissing)) throw error
+  }
+}
+
+/** Marks the user's notifications in one thread as read (opening a support chat clears its bell entry). Never throws. */
+export async function markThreadRead(uid: string, threadId: string): Promise<void> {
+  if (!config() || !uid || !threadId) return
+  try {
+    await rest(`${TABLE}?user_id=eq.${encodeURIComponent(uid)}&thread_id=eq.${encodeURIComponent(threadId)}&read_at=is.null`, {
+      method: 'PATCH',
+      prefer: 'return=minimal',
+      body: JSON.stringify({ read_at: new Date().toISOString() }),
+    })
+  } catch (error) {
+    if (!(error instanceof InboxMissing)) console.error('Notification thread read failed:', error)
   }
 }
 

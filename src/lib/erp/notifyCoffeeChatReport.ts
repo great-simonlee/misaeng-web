@@ -7,6 +7,8 @@ import { erpReportsUrl } from './notifyCommunityReport'
  * the user ids the team needs to look the chat up. Never throws. The mail goes to the team, so it stays Korean + English.
  */
 
+import { pushReportToHandler } from '@lib/support/reports.server'
+
 const EMAILJS_SEND_URL = 'https://api.emailjs.com/api/v1.0/email/send'
 const TEAM_EMAIL = process.env.MISAENG_TEAM_EMAIL?.trim() || 'info@misaeng.com'
 
@@ -72,7 +74,11 @@ async function mailTeam(heading: string, lines: string[]) {
 }
 
 async function alertTeam(title: string, heading: string, lines: string[]) {
-  const results = await Promise.allSettled([notifyErp(title, lines), mailTeam(heading, lines)])
+  const results = await Promise.allSettled([
+    notifyErp(title, lines),
+    mailTeam(heading, lines),
+    pushReportToHandler({ title, body: lines[0] || heading }),
+  ])
   for (const result of results) {
     if (result.status === 'rejected') console.error('[report alert] error:', result.reason)
   }

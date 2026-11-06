@@ -361,7 +361,7 @@ function mapCommunity(
       id: post.id,
       title: post.title,
       meta:
-        [post.location, post.detail].filter(Boolean).join(' · ') ||
+        [categoryId === 'status' ? null : post.location, post.detail].filter(Boolean).join(' · ') ||
         t('list.viewDetail'),
       href: hrefForCommunityPost(post, city),
       editHref: isMock ? null : hrefForCommunityPost(post, city, 'edit'),

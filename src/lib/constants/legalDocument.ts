@@ -100,7 +100,7 @@ export function legalTextKey(en: string): string {
 }
 
 /**
- * 서버에서 보는 언어 하나만 골라 브라우저로 보낸다 (7개 언어 전문을 모두 보내지 않게).
+ * 서버에서 보는 언어 하나만 골라 브라우저로 보낸다 (모든 언어 전문을 보내지 않게).
  * ko는 문서 안의 ko, 다른 언어는 translations 파일(또는 문서 안의 같은 언어 키)에서 찾는다.
  */
 export function toLegalViewDocument(

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "{brand} NYC | Cộng đồng du học sinh & người đi làm quốc tế tại New York",
+    "title": "{brand} | Cộng đồng du học sinh & người đi làm quốc tế tại New York",
     "description": "Review về nhà ở, ăn uống, CPT/OPT, visa và phỏng vấn xin việc từ những người đang học tập và làm việc tại New York."
   },
   "language": {
@@ -199,5 +199,15 @@
       "description": "Nội dung được lưu trên thiết bị này mỗi khi bạn thêm cập nhật tiến trình hoặc chuyển sang mục tiếp theo. Bạn có thể đóng cửa sổ và viết tiếp sau.",
       "savedAt": "Đã lưu · {time}"
     }
+  },
+  "share": {
+    "housing": "Một căn phòng được chia sẻ từ Misaeng! 🏠",
+    "visa": "Bài viết về visa được chia sẻ từ Misaeng! 🛂",
+    "review": "Đánh giá phỏng vấn & việc làm từ Misaeng! 💼",
+    "company": "Một công ty được chia sẻ từ Misaeng! 🏢",
+    "postings": "Tin tuyển dụng được chia sẻ từ Misaeng! 📋",
+    "memberOnly": "Dành cho thành viên Misaeng. Mở trong ứng dụng.",
+    "openInApp": "Mở trong ứng dụng",
+    "perMonth": "/tháng"
   }
 }

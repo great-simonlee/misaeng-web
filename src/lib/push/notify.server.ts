@@ -4,11 +4,12 @@ import { parseLocale, type Locale } from '@lib/i18n/locales'
 import type { Translate } from '@lib/i18n/translate'
 import { getT } from '@lib/i18n/server'
 import { isApnsConfigured, sendApns, type ApnsMessage } from './apns.server'
+import { isFcmConfigured, sendFcm } from './fcm.server'
 import { recordNotifications } from './inbox.server'
 import { deletePushDevices, listPushDevices, usersWithTypeOff, type PushType } from './store.server'
 
 /**
- * Sends a push to users' devices (misaeng-app), in each device's language, respecting their preferences, and stores
+ * Sends a push to users' devices (misaeng-app: iOS through APNs, Android through FCM), in each device's language, respecting their preferences, and stores
  * the same notification in the in-app inbox (bell on Home) for every user — even without a device or with that push off.
  * Runs after the response (`after()`), never throws, and never blocks the action that caused it.
  * `build` gets the translator for the device language (all namespaces; push texts are `api.push.*`).
@@ -20,19 +21,27 @@ export function notifyUsers(input: {
   build: (t: Translate, locale: Locale) => ApnsMessage
   /** false = inbox only, no push (throttled notifications). Default true. */
   push?: boolean
+  /** false = push only, no in-app inbox entry (support chat messages have their own unread badge). Default true. */
+  inbox?: boolean
+  /** Inbox keeps one row per threadId (replaced on each send) instead of one per notification. */
+  replaceThread?: boolean
 }) {
   const userIds = [...new Set(input.userIds.map((id) => String(id || '').trim()).filter(Boolean))]
   if (userIds.length === 0) return
 
   const run = async () => {
-    await recordNotifications({ type: input.type, userIds, build: input.build })
-    if (input.push === false || !isApnsConfigured()) return
+    if (input.inbox !== false) await recordNotifications({ type: input.type, userIds, build: input.build, replaceThread: input.replaceThread })
+    const apns = isApnsConfigured()
+    const fcm = isFcmConfigured()
+    if (input.push === false || (!apns && !fcm)) return
     try {
       const [devices, off] = await Promise.all([
         listPushDevices(userIds),
         input.type === 'account' ? Promise.resolve(new Set<string>()) : usersWithTypeOff(userIds, input.type),
       ])
-      const targets = devices.filter((d) => !off.has(d.user_id) && d.platform === 'ios')
+      const targets = devices.filter(
+        (d) => !off.has(d.user_id) && ((d.platform === 'ios' && apns) || (d.platform === 'android' && fcm)),
+      )
       if (targets.length === 0) return
 
       const byLocale = new Map<Locale, typeof targets>()
@@ -45,10 +54,19 @@ export function notifyUsers(input: {
       for (const [locale, group] of byLocale) {
         const t = await getT(locale)
         const message = input.build(t, locale)
-        const results = await sendApns(group, message)
+        const ios = group.filter((d) => d.platform === 'ios')
+        const android = group.filter((d) => d.platform === 'android')
+        const [apnsResults, fcmResults] = await Promise.all([
+          ios.length ? sendApns(ios, message) : Promise.resolve([]),
+          android.length ? sendFcm(android, message).catch((error) => {
+            console.error('FCM send error:', error)
+            return []
+          }) : Promise.resolve([]),
+        ])
+        const results = [...apnsResults, ...fcmResults]
         dead.push(...results.filter((r) => r.unregistered).map((r) => r.token))
         const failed = results.filter((r) => !r.ok && !r.unregistered)
-        if (failed.length) console.error('APNs send failed:', failed.map((r) => `${r.status} ${r.reason}`).join(', '))
+        if (failed.length) console.error('Push send failed:', failed.map((r) => `${r.status} ${r.reason}`).join(', '))
       }
       await deletePushDevices(dead).catch(() => undefined)
     } catch (error) {

@@ -47,8 +47,9 @@
     "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
     "userInfoUnavailable": "Bạn đã đăng nhập nhưng chúng tôi không thể tải thông tin tài khoản.",
     "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+    "useSocialLogin": "Tài khoản này đã đăng ký bằng {provider}. Hãy dùng 'Tiếp tục với {provider}' để đăng nhập.",
     "accountNotFound": "Không có tài khoản nào với email này. Hãy kiểm tra lại email hoặc đăng ký.",
-    "emailInUse": "Email này đã được đăng ký. Hãy đăng nhập hoặc đặt lại mật khẩu.",
+    "emailInUse": "Email này đã được đăng ký. Hãy đăng nhập bằng cách bạn đã đăng ký (Google, Apple hoặc email), hoặc đặt lại mật khẩu.",
     "tooManyAttempts": "Bạn đã thử quá nhiều lần. Vui lòng thử lại sau ít phút.",
     "weakPassword": "Mật khẩu phải có ít nhất 6 ký tự.",
     "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ.",
@@ -507,5 +508,21 @@
     "loadFailed": "Không thể tải các bài viết đã lưu. Vui lòng thử lại sau.",
     "saveFailed": "Không thể lưu. Vui lòng thử lại sau.",
     "tooMany": "Bạn chỉ có thể chuyển tối đa {max} mục đã lưu cùng lúc."
+  },
+  "support": {
+    "push": {
+      "feedbackShippedTitle": "Góp ý của bạn đã được áp dụng 🎉",
+      "feedbackShippedBody": "\"{title}\" — xem trong Trò chuyện với thành viên Misaeng."
+    },
+    "ellieoEmail": {
+      "housingSubject": "[Ellieo] Có phản hồi mới cho yêu cầu nhà ở của bạn",
+      "housingTitle": "Có phản hồi mới cho yêu cầu nhà ở của bạn",
+      "housingLine": "Đội ngũ Ellieo đã trả lời về \"{title}\".",
+      "inquirySubject": "[Ellieo] Câu hỏi của bạn đã có phản hồi",
+      "inquiryTitle": "Câu hỏi của bạn đã có phản hồi",
+      "inquiryLine": "Đội ngũ Ellieo đã trả lời \"{title}\".",
+      "openWeb": "Xem phản hồi",
+      "footer": "Đây là địa chỉ chỉ gửi. Vui lòng trả lời trên ellieo.com."
+    }
   }
 }

@@ -505,5 +505,33 @@
     "confirm": "Delete your account?\n\n• Your profile, verifications and notifications are deleted right away\n• Roommate/sublet posts are deleted; other posts and comments stay as \"Deleted user\"\n• You can’t sign in with this account again\n• Your Ellieo account (same login as Misaeng) is deleted too",
     "done": "Your account has been deleted",
     "failed": "We couldn’t delete your account. Please try again in a moment."
+  },
+  "support": {
+    "title": "Questions & suggestions",
+    "intro": "Leave a question or a suggestion. The Misaeng team will read it and reply.",
+    "new": "New question / suggestion",
+    "question": "Question",
+    "suggestion": "Suggestion",
+    "subject": "Subject",
+    "message": "Write your message",
+    "submit": "Submit",
+    "submitted": "Sent. We'll let you know when we reply.",
+    "empty": "No questions or suggestions yet",
+    "status": {
+      "open": "Waiting",
+      "waiting_user": "Answered",
+      "closed": "Closed"
+    },
+    "reply": "Reply",
+    "replyPlaceholder": "Write a reply",
+    "send": "Send",
+    "staff": "Misaeng team",
+    "closedNotice": "This is closed. Send a reply to open it again.",
+    "redacted": "Sensitive numbers were hidden.",
+    "replyHint": "We'll email you when we reply. In the Misaeng app you get a notification.",
+    "back": "Back to list",
+    "loginRequired": "Please log in first.",
+    "notFound": "We couldn't find this conversation.",
+    "unavailable": "We can't take inquiries right now. Please email info@misaeng.com."
   }
 }

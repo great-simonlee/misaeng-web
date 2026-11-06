@@ -43,6 +43,8 @@ import {
 /** 회사 사이트 경로. ellieo에는 없으므로 misaeng.com으로 보낸다. */
 const CORPORATE_PATHS = new Set([
   'about',
+  'account-deletion',
+  'child-safety',
   'careers',
   'contact',
   'credit',
@@ -65,6 +67,9 @@ const ELLIEO_OWN_PATHS: Record<string, string> = {
   careers: '/nyc/about',
   'our-service': '/nyc/about',
   roadmap: '/nyc/about',
+  // Misaeng app store pages: Ellieo accounts are deleted from My page; safety rules live in the terms
+  'account-deletion': '/nyc/me',
+  'child-safety': '/nyc/terms-of-use',
 }
 
 export function proxy(request: NextRequest) {

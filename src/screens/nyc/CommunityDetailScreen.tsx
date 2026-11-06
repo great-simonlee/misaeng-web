@@ -239,7 +239,8 @@ export function CommunityDetailScreen({
   )
   const tone = boardToneForId(boardId)
   const metaBits = [
-    post.location && {
+    // CPT/OPT posts no longer show the employer; older posts keep it stored.
+    !isCptOpt && post.location && {
       label: t(communityBoardKey(boardId, 'locationLabel')),
       value: post.location,
     },
