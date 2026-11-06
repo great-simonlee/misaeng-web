@@ -12,6 +12,11 @@ type StaffDevice = { token: string; email: string; environment: ApnsEnvironment 
 
 const staffBundleId = () => process.env.STAFF_APNS_BUNDLE_ID?.trim() || 'com.misaeng.erp'
 
+/** The Super Admin: always hears about new sign-ups and new 문의/건의 in the Misaeng ERP app. */
+export const SUPER_ADMIN_EMAIL = 'simon@misaeng.com'
+
+const otherEnvironment = (environment: ApnsEnvironment): ApnsEnvironment => (environment === 'sandbox' ? 'production' : 'sandbox')
+
 export type StaffPush = {
   title: string
   subtitle?: string
@@ -39,31 +44,61 @@ export async function sendStaffPush(
 ): Promise<{ devices: number; sent: number }> {
   const none = { devices: 0, sent: 0 }
   const targets = [...new Set(emails.map((e) => String(e || '').trim().toLowerCase()).filter(Boolean))]
-  if (targets.length === 0 || !isApnsConfigured()) return none
+  if (targets.length === 0) return none
+  // Logged (not silent): a staff alert that never arrives is otherwise impossible to trace on the server
+  if (!isApnsConfigured()) {
+    console.error(`Staff push skipped ("${message.title}"): APNs is not configured (APNS_TEAM_ID + APNS_KEY_ID + APNS_KEY).`)
+    return none
+  }
   try {
     const devices = await supportRest<StaffDevice[]>(
       `staff_push_devices?email=in.${encodeURIComponent(inList(targets))}&select=token,email,environment`,
     )
-    if (!devices?.length) return none
-    const results = await sendApns(
-      devices,
-      {
-        title: message.title,
-        subtitle: message.subtitle,
-        body: message.body,
-        threadId: message.threadId,
-        sound: message.sound ? SOUND_FILES[message.sound] : undefined,
-        mutableContent: Boolean(message.sender),
-        data: {
-          ...(message.data ?? {}),
-          ...(message.sender ? { senderId: message.sender.id, senderName: message.sender.name } : {}),
-          ...(message.sender?.avatarUrl ? { senderAvatarUrl: message.sender.avatarUrl } : {}),
-        },
+    if (!devices?.length) {
+      console.warn(`Staff push skipped ("${message.title}"): no Misaeng ERP app device registered for ${targets.join(', ')}.`)
+      return none
+    }
+    const payload = {
+      title: message.title,
+      subtitle: message.subtitle,
+      body: message.body,
+      threadId: message.threadId,
+      sound: message.sound ? SOUND_FILES[message.sound] : undefined,
+      mutableContent: Boolean(message.sender),
+      data: {
+        ...(message.data ?? {}),
+        ...(message.sender ? { senderId: message.sender.id, senderName: message.sender.name } : {}),
+        ...(message.sender?.avatarUrl ? { senderAvatarUrl: message.sender.avatarUrl } : {}),
       },
-      { topic: staffBundleId() },
-    )
-    const dead = results.filter((r) => r.unregistered).map((r) => r.token)
+    }
+    const options = { topic: staffBundleId() }
+    const results = await sendApns(devices, payload, options)
+
+    // BadDeviceToken usually means the token is from the other APNs environment (a build signed differently from
+    // what the app reported). Try that environment once before dropping the device, and remember it when it works.
+    const wrongEnv = results.filter((r) => r.status === 400 && r.reason === 'BadDeviceToken')
+    const moved = new Set<string>()
+    if (wrongEnv.length) {
+      const retry = wrongEnv
+        .map((r) => devices.find((d) => d.token === r.token)!)
+        .map((d) => ({ ...d, environment: otherEnvironment(d.environment) }))
+      const retried = await sendApns(retry, payload, options)
+      for (const r of retried.filter((x) => x.ok)) {
+        moved.add(r.token)
+        const device = retry.find((d) => d.token === r.token)!
+        const index = results.findIndex((x) => x.token === r.token)
+        if (index >= 0) results[index] = r
+        await supportRest(`staff_push_devices?token=eq.${encodeURIComponent(r.token)}`, {
+          method: 'PATCH',
+          prefer: 'return=minimal',
+          body: JSON.stringify({ environment: device.environment, updated_at: new Date().toISOString() }),
+        }).catch(() => undefined)
+      }
+    }
+
+    const dead = results.filter((r) => r.unregistered && !moved.has(r.token)).map((r) => r.token)
     if (dead.length) {
+      console.warn(`Staff push: removing ${dead.length} unregistered device(s):`, results.filter((r) => dead.includes(r.token)).map((r) => `${r.status} ${r.reason}`).join(', '))
       await supportRest(`staff_push_devices?token=in.${encodeURIComponent(inList(dead))}`, {
         method: 'DELETE',
         prefer: 'return=minimal',

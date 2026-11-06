@@ -188,8 +188,9 @@ export async function emailVerifySignup(t: Translate, request: Request, rawEmail
       const stored = (session.user.metadata.consent ?? {}) as Consent
       const recorded = await recordConsent(request, t, linked.uid, email, { acceptedTerms: true, ...stored, ...strip(consent) }, 'signup_checkbox')
       if (!recorded.ok) console.error('Sign-up consent not recorded:', recorded)
-      notifyNewSignup(email, 'email')
     }
+    // Every new Misaeng login from the sign-up form, also an old Ellieo member linked by email (isNew = false)
+    if (linked.created) notifyNewSignup(email, 'email', !linked.isNew)
     const name = typeof session.user.metadata.name === 'string' ? session.user.metadata.name : null
     return { ok: true, session, uid: linked.uid, registered: linked.isNew, displayName: name }
   } catch (error) {
@@ -291,8 +292,8 @@ export async function idTokenSignIn(
       const method = provider === 'google' ? 'google_signup_checkbox' : 'apple_signup_checkbox'
       const recorded = await recordConsent(request, t, linked.uid, session.user.email, options.consent, method)
       if (!recorded.ok) console.error('Sign-up consent not recorded:', recorded)
-      notifyNewSignup(session.user.email, provider)
     }
+    if (linked.created) notifyNewSignup(session.user.email, provider, !linked.isNew)
     const meta = session.user.metadata
     const displayName = options.name?.trim() || (typeof meta.full_name === 'string' ? meta.full_name : null) || (typeof meta.name === 'string' ? meta.name : null)
     return { ok: true, session, uid: linked.uid, registered: linked.isNew, displayName }

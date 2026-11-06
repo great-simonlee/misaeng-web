@@ -8,7 +8,7 @@ import { broadcastSignals, staffTopic, userTopic, type SupportSignal } from './r
 import { redactSensitive } from './redact'
 import { eq, inList, supportRest } from './rest.server'
 import { getSupportSettings, normalizeEmail, supportFeatureOn } from './settings.server'
-import { housingLeadPush, pushPreview, sendStaffPush } from './staffPush.server'
+import { housingLeadPush, pushPreview, sendStaffPush, SUPER_ADMIN_EMAIL } from './staffPush.server'
 import { notifyTeamOfNewConversation, notifyUserOfStaffReply } from './userNotify.server'
 import type {
   ConversationRow,
@@ -333,9 +333,11 @@ export async function startInquiry(input: { user: StartUser; kind: 'question' | 
   await addMessage({ conversationId: row.id, senderType: 'user', senderUid: input.user.uid, senderDisplay: userName, body: text, redactions })
   await logEvent(row.id, 'assign', 'system', { to: assignee, reason: 'inquiry' })
   const conversation = (await getConversation(row.id))!
+  // New 문의/건의 → the assignee, every support admin and always the Super Admin (inquiry.assignee may point elsewhere)
+  const alertTo = [assignee, ...(settings.admins ?? []), SUPER_ADMIN_EMAIL]
   runAfter(async () => {
     await Promise.all([
-      sendStaffPush([assignee], {
+      sendStaffPush(alertTo, {
         title: `${input.kind === 'suggestion' ? '💡 New suggestion' : '💬 New inquiry'} · ${title}`,
         body: `${userName || 'A user'}: ${pushPreview(text, 140)}`,
         data: { type: 'inquiry', conversationId: conversation.id },
