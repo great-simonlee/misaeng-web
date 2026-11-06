@@ -1,7 +1,8 @@
 import { isApnsConfigured, sendApns, type ApnsEnvironment } from '@lib/push/apns.server'
 
+import { staffBrandPrefix } from './brand'
 import { inList, supportRest } from './rest.server'
-import type { HousingProfile } from './types'
+import type { HousingProfile, SupportBrand } from './types'
 
 /**
  * Push to the "Misaeng ERP" staff app (APNs, same team key as the user app, topic STAFF_APNS_BUNDLE_ID).
@@ -31,6 +32,8 @@ export type StaffPush = {
    * built by its Notification Service Extension from these fields. `avatarUrl` = the user's profile photo, if any.
    */
   sender?: { id: string; name: string; avatarUrl?: string | null }
+  /** Brand of the conversation: Ellieo titles get an "[Ellieo] " prefix (Misaeng unchanged). */
+  brand?: SupportBrand | string | null
 }
 
 /** `review`: a new job review through a partner (soft rising chime). */
@@ -59,7 +62,7 @@ export async function sendStaffPush(
       return none
     }
     const payload = {
-      title: message.title,
+      title: `${staffBrandPrefix(message.brand)}${message.title}`,
       subtitle: message.subtitle,
       body: message.body,
       threadId: message.threadId,

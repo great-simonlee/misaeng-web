@@ -1,4 +1,5 @@
 import { getRequestT } from '@lib/i18n/server'
+import { supportBrand, SERVER_SUPPORT_BRAND } from '@lib/support/brand'
 import { staffAvatars } from '@lib/support/staffAvatars.server'
 import { supportErrorResponse, supportJson, toUserConversation, toUserMessage } from '@lib/support/http.server'
 import { getConversation, listMessages, markUserRead } from '@lib/support/service.server'
@@ -16,7 +17,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     if (!user?.uid) return supportJson({ error: t('common.loginRequired') }, 401)
     const { id } = await context.params
     const row = await getConversation(id)
-    if (!row || row.user_uid !== user.uid) return supportJson({ error: t('support.notFound') }, 404)
+    if (!row || row.user_uid !== user.uid || supportBrand(row.brand) !== SERVER_SUPPORT_BRAND) return supportJson({ error: t('support.notFound') }, 404)
     const [messages, avatars] = await Promise.all([listMessages(row.id), staffAvatars()])
     await markUserRead(row)
     return supportJson({ conversation: { ...toUserConversation(row), unread: 0 }, messages: messages.map((m) => toUserMessage(m, avatars)) })

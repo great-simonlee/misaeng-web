@@ -504,6 +504,16 @@
     "push": {
       "feedbackShippedTitle": "Góp ý của bạn đã được áp dụng 🎉",
       "feedbackShippedBody": "\"{title}\" — xem trong Trò chuyện với thành viên Misaeng."
+    },
+    "ellieoEmail": {
+      "housingSubject": "[Ellieo] Có phản hồi mới cho yêu cầu nhà ở của bạn",
+      "housingTitle": "Có phản hồi mới cho yêu cầu nhà ở của bạn",
+      "housingLine": "Đội ngũ Ellieo đã trả lời về \"{title}\".",
+      "inquirySubject": "[Ellieo] Câu hỏi của bạn đã có phản hồi",
+      "inquiryTitle": "Câu hỏi của bạn đã có phản hồi",
+      "inquiryLine": "Đội ngũ Ellieo đã trả lời \"{title}\".",
+      "openWeb": "Xem phản hồi",
+      "footer": "Đây là địa chỉ chỉ gửi. Vui lòng trả lời trên ellieo.com."
     }
   }
 }

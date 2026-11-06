@@ -3,7 +3,23 @@
  * Supabase Auth through the same Resend account (SMTP, configured in the Supabase dashboard); this module sends the
  * mails Misaeng owns: school / work email verification codes.
  * Env: RESEND_API_KEY, EMAIL_FROM (default "미생 <no-reply@misaeng.com>"), EMAIL_REPLY_TO (optional).
+ * Ellieo: EMAIL_FROM_ELLIEO (e.g. "Ellieo <no-reply@ellieo.com>") and EMAIL_REPLY_TO_ELLIEO. Set them only after the
+ * ellieo.com domain is verified in Resend; until then Ellieo keeps sending from EMAIL_FROM so nothing breaks.
+ * A mail can name its brand (misaeng.com sends Ellieo support mails too); default = this deployment's brand.
  */
+
+import { BRAND_CONFIG, brandConfig, type BrandId } from '@lib/brand'
+
+/** Sender for a brand (see the header comment) */
+function senderFor(brand: BrandId = BRAND_CONFIG.id) {
+  const fallback = process.env.EMAIL_FROM?.trim() || '미생 <no-reply@misaeng.com>'
+  const replyTo = process.env.EMAIL_REPLY_TO?.trim()
+  if (brand !== 'ellieo') return { from: fallback, replyTo }
+  return {
+    from: process.env.EMAIL_FROM_ELLIEO?.trim() || fallback,
+    replyTo: process.env.EMAIL_REPLY_TO_ELLIEO?.trim() || replyTo,
+  }
+}
 
 export function isEmailConfigured() {
   return Boolean(process.env.RESEND_API_KEY?.trim())
@@ -16,11 +32,10 @@ export class EmailSendError extends Error {
   }
 }
 
-export async function sendEmail(input: { to: string; subject: string; html: string; text: string }) {
+export async function sendEmail(input: { to: string; subject: string; html: string; text: string; brand?: BrandId }) {
   const key = process.env.RESEND_API_KEY?.trim()
   if (!key) throw new EmailSendError('RESEND_API_KEY is not set.', 503)
-  const from = process.env.EMAIL_FROM?.trim() || '미생 <no-reply@misaeng.com>'
-  const replyTo = process.env.EMAIL_REPLY_TO?.trim()
+  const { from, replyTo } = senderFor(input.brand)
   let res: Response
   try {
     res = await fetch('https://api.resend.com/emails', {
@@ -63,12 +78,21 @@ ${input.lines.map((line) => `<tr><td style="font-size:15px;line-height:1.6;color
 }
 
 /** A short notice mail with an optional quoted message and one button (support replies, new inquiries). */
-export function noticeEmail(input: { title: string; lines: string[]; quote?: string; button?: { label: string; url: string }; footer: string }) {
+export function noticeEmail(input: {
+  title: string
+  lines: string[]
+  quote?: string
+  button?: { label: string; url: string }
+  footer: string
+  /** Button color: Misaeng orange (default), Ellieo blue */
+  brand?: BrandId
+}) {
+  const buttonColor = input.brand === 'ellieo' ? brandConfig('ellieo').colors.brand : '#f64310'
   const quote = input.quote
     ? `<tr><td style="padding:12px 0"><div style="font-size:15px;line-height:1.6;color:#0f172a;background:#f1f5f9;border-radius:14px;padding:14px 16px;white-space:pre-wrap">${escape(input.quote)}</div></td></tr>`
     : ''
   const button = input.button
-    ? `<tr><td style="padding:16px 0"><a href="${escape(input.button.url)}" style="display:inline-block;background:#f64310;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;border-radius:999px;padding:12px 22px">${escape(input.button.label)}</a></td></tr>`
+    ? `<tr><td style="padding:16px 0"><a href="${escape(input.button.url)}" style="display:inline-block;background:${buttonColor};color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;border-radius:999px;padding:12px 22px">${escape(input.button.label)}</a></td></tr>`
     : ''
   const html = `<!doctype html><html><body style="margin:0;background:#f6f7f9;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Pretendard',sans-serif;color:#0f172a">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px"><tr><td align="center">

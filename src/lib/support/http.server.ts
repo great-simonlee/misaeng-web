@@ -89,8 +89,11 @@ function incomeKey(thousands: number): HousingProfile['income'] {
   return 'over_150k'
 }
 
-/** Cleans the housing form (spec §4.1, §15). Returns null when a required field is missing. */
-export function parseHousingProfile(input: unknown): HousingProfile | null {
+/**
+ * Cleans the housing form (spec §4.1, §15). Returns null when a required field is missing.
+ * `required: false` (Ellieo web board inquiry): keeps whatever valid details were given, nothing is required.
+ */
+export function parseHousingProfile(input: unknown, { required: checkRequired = true }: { required?: boolean } = {}): HousingProfile | null {
   const raw = (input && typeof input === 'object' ? input : {}) as Record<string, unknown>
   const occupation = raw.occupation === 'worker' || raw.occupation === 'student' ? raw.occupation : undefined
   const occupants = Math.round(Number(raw.occupants))
@@ -118,6 +121,10 @@ export function parseHousingProfile(input: unknown): HousingProfile | null {
     pets: raw.pets === 'yes' || raw.pets === 'no' ? raw.pets : null,
     petType: raw.pets === 'yes' && (raw.petType === 'dog' || raw.petType === 'cat' || raw.petType === 'other') ? raw.petType : undefined,
     petOther: raw.pets === 'yes' && raw.petType === 'other' ? str(raw.petOther, 60) : undefined,
+  }
+  if (!checkRequired) {
+    if (profile.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(profile.email)) profile.email = ''
+    return Object.fromEntries(Object.entries(profile).filter(([, v]) => v !== undefined && v !== '' && v !== null)) as HousingProfile
   }
   const required = [profile.name, profile.email, profile.phone, profile.moveIn, profile.budget, profile.roomType, profile.occupants, profile.occupation, profile.approval]
   if (required.some((v) => v === undefined || v === '')) return null

@@ -4,6 +4,7 @@ import { markThreadRead } from '@lib/push/inbox.server'
 import { getStoredHousingListing } from '@lib/supabase/housing.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 
+import { supportBrand } from './brand'
 import { broadcastSignals, staffTopic, userTopic, type SupportSignal } from './realtime.server'
 import { redactSensitive } from './redact'
 import { eq, inList, supportRest, SupportStoreError } from './rest.server'
@@ -71,16 +72,19 @@ export async function staffRows(emails?: string[]): Promise<StaffRow[]> {
   return (await supportRest<StaffRow[]>(`support_staff?select=*${filter}&order=rotation_order.asc,email.asc`)) ?? []
 }
 
-/** Staff channels that should hear about a conversation: its assignee and every admin. */
-async function staffTopicsFor(assignee: string | null) {
-  const settings = await getSupportSettings()
+/** Staff channels that should hear about a conversation: its assignee and every admin (of the conversation's brand). */
+async function staffTopicsFor(assignee: string | null, brand?: string | null) {
+  const settings = await getSupportSettings(supportBrand(brand))
   const emails = [...new Set([normalizeEmail(assignee), ...settings.admins.map(normalizeEmail)].filter(Boolean))]
   const rows = await staffRows(emails).catch(() => [])
   return rows.filter((r) => r.active).map((r) => staffTopic(r.inbox_key))
 }
 
-export async function signalConversation(row: Pick<ConversationRow, 'id' | 'user_uid' | 'assignee_email'>, kind: SupportSignal['k']) {
-  const [userKey, staff] = await Promise.all([userInboxKeyIfAny(row.user_uid), staffTopicsFor(row.assignee_email)])
+export async function signalConversation(
+  row: Pick<ConversationRow, 'id' | 'user_uid' | 'assignee_email'> & { brand?: string | null },
+  kind: SupportSignal['k'],
+) {
+  const [userKey, staff] = await Promise.all([userInboxKeyIfAny(row.user_uid), staffTopicsFor(row.assignee_email, row.brand)])
   await broadcastSignals([...(userKey ? [userTopic(userKey)] : []), ...staff], { c: row.id, k: kind })
 }
 
@@ -102,10 +106,11 @@ export async function getConversation(id: string): Promise<ConversationRow | nul
   return rows?.[0] ?? null
 }
 
-export async function listUserConversations(uid: string, kinds: SupportKind[]) {
+/** A user's conversations on one brand's site/app (Misaeng never lists Ellieo threads and the other way round). */
+export async function listUserConversations(uid: string, kinds: SupportKind[], brand: SupportBrand) {
   return (
     (await supportRest<ConversationRow[]>(
-      `support_conversations?user_uid=${eq(uid)}&kind=in.${encodeURIComponent(inList(kinds))}&select=*&order=last_message_at.desc&limit=100`,
+      `support_conversations?user_uid=${eq(uid)}&brand=${eq(brand)}&kind=in.${encodeURIComponent(inList(kinds))}&select=*&order=last_message_at.desc&limit=100`,
     )) ?? []
   )
 }
@@ -130,9 +135,9 @@ export async function markUserRead(row: ConversationRow) {
   runAfter(() => signalConversation(row, 'read'))
 }
 
-export async function userUnreadTotal(uid: string) {
+export async function userUnreadTotal(uid: string, brand: SupportBrand) {
   const rows = await supportRest<{ user_unread: number }[]>(
-    `support_conversations?user_uid=${eq(uid)}&user_unread=gt.0&select=user_unread`,
+    `support_conversations?user_uid=${eq(uid)}&brand=${eq(brand)}&user_unread=gt.0&select=user_unread`,
   ).catch(() => [])
   return (rows ?? []).reduce((sum, r) => sum + (r.user_unread || 0), 0)
 }
@@ -200,7 +205,7 @@ async function displayNameFor(uid: string, fallback?: string | null) {
   return (name || fallback || '').trim() || null
 }
 
-export const supportBrand = (value: unknown): SupportBrand => (value === 'ellieo' ? 'ellieo' : 'misaeng')
+export { supportBrand }
 
 /** In this brand's housing rotation: in_rotation = Misaeng, in_rotation_ellieo = Ellieo (false before that column exists). */
 export const inBrandRotation = (row: StaffRow, brand: SupportBrand) =>
@@ -232,7 +237,7 @@ async function takeNextAssignee(brand: SupportBrand): Promise<string | null> {
  * escalation contact.
  */
 async function pickHousingAssignee(uid: string, brand: SupportBrand = 'misaeng'): Promise<{ email: string; reason: string }> {
-  const settings = await getSupportSettings()
+  const settings = await getSupportSettings(brand)
   const previous = await supportRest<{ assignee_email: string | null }[]>(
     `support_conversations?user_uid=${eq(uid)}&kind=eq.housing&brand=${eq(brand)}&assignee_email=not.is.null&select=assignee_email&order=created_at.desc&limit=1`,
   )
@@ -274,17 +279,18 @@ export async function startHousingConversation(input: {
   message: string
   profile: HousingProfile
   city?: string | null
-  /** Default Misaeng. Ellieo housing inquiries will pass 'ellieo' once they come through this system. */
+  /** The server's brand (SERVER_SUPPORT_BRAND), never the request body. Default Misaeng. */
   brand?: SupportBrand
 }) {
-  const settings = await getSupportSettings()
+  const brand = supportBrand(input.brand)
+  const settings = await getSupportSettings(brand)
   if (!supportFeatureOn(settings, 'support.enabled', input.user.email)) throw new SupportError('support.disabled', 403, 'SUPPORT_DISABLED')
   const { text, redactions } = cleanBody(input.message)
   await assertRateLimit(input.user.uid)
 
   if (input.listingId) {
     const existing = await supportRest<ConversationRow[]>(
-      `support_conversations?user_uid=${eq(input.user.uid)}&kind=eq.housing&listing_id=${eq(input.listingId)}&status=neq.closed&select=*&order=created_at.desc&limit=1`,
+      `support_conversations?user_uid=${eq(input.user.uid)}&brand=${eq(brand)}&kind=eq.housing&listing_id=${eq(input.listingId)}&status=neq.closed&select=*&order=created_at.desc&limit=1`,
     )
     if (existing?.[0]) {
       await addUserMessage(input.user, existing[0], text, redactions, true)
@@ -293,7 +299,6 @@ export async function startHousingConversation(input: {
   }
 
   const listing = input.listingId ? await getStoredHousingListing(input.listingId).catch(() => null) : null
-  const brand = supportBrand(input.brand)
   const assignee = await pickHousingAssignee(input.user.uid, brand)
   const now = new Date().toISOString()
   const userName = input.profile.name?.trim() || (await displayNameFor(input.user.uid, input.user.displayName))
@@ -332,6 +337,7 @@ export async function startHousingConversation(input: {
         data: { type: 'support', conversationId: conversation.id },
         threadId: `support-${conversation.id}`,
         sound: 'lead',
+        brand,
       }),
       notifyTeamOfNewConversation(conversation, text),
     ])
@@ -340,8 +346,16 @@ export async function startHousingConversation(input: {
 }
 
 /** 문의/건의 thread (web + app). */
-export async function startInquiry(input: { user: StartUser; kind: 'question' | 'suggestion'; title: string; message: string }) {
-  const settings = await getSupportSettings()
+export async function startInquiry(input: {
+  user: StartUser
+  kind: 'question' | 'suggestion'
+  title: string
+  message: string
+  /** The server's brand (SERVER_SUPPORT_BRAND), never the request body. Default Misaeng. */
+  brand?: SupportBrand
+}) {
+  const brand = supportBrand(input.brand)
+  const settings = await getSupportSettings(brand)
   if (!supportFeatureOn(settings, 'inquiry.enabled', input.user.email)) throw new SupportError('support.disabled', 403, 'SUPPORT_DISABLED')
   const title = String(input.title || '').replace(/\s+/g, ' ').trim().slice(0, 120)
   if (!title) throw new SupportError('support.titleRequired', 400, 'TITLE_REQUIRED')
@@ -353,6 +367,7 @@ export async function startInquiry(input: { user: StartUser; kind: 'question' | 
     method: 'POST',
     prefer: 'return=representation',
     body: JSON.stringify({
+      brand,
       kind: input.kind,
       user_uid: input.user.uid,
       user_email: input.user.email,
@@ -375,6 +390,7 @@ export async function startInquiry(input: { user: StartUser; kind: 'question' | 
         data: { type: 'inquiry', conversationId: conversation.id },
         threadId: `support-${conversation.id}`,
         sound: 'lead',
+        brand,
       }),
       notifyTeamOfNewConversation(conversation, text),
     ])
@@ -412,6 +428,7 @@ export async function addUserMessage(user: StartUser, row: ConversationRow, body
         threadId: `support-${row.id}`,
         sound: 'message',
         sender: { id: row.user_uid, name: row.user_name || 'User', avatarUrl: photo && /^https?:\/\//i.test(photo) ? photo : null },
+        brand: row.brand,
       }),
     ])
   })
@@ -423,7 +440,7 @@ export async function addUserMessage(user: StartUser, row: ConversationRow, body
 export async function handleStaffMessage(conversationId: string) {
   const row = await getConversation(conversationId)
   if (!row) return
-  const settings = await getSupportSettings()
+  const settings = await getSupportSettings(supportBrand(row.brand))
   const due = new Date(Date.now() + Math.max(1, settings['email.delay_minutes']) * 60_000).toISOString()
   await supportRest(`support_conversations?id=${eq(row.id)}&user_unread=gt.0`, {
     method: 'PATCH',
@@ -444,6 +461,7 @@ export async function handleAssigned(conversationId: string, by: string) {
       body: `${row.user_name || 'A user'}${row.listing_snapshot?.title ? ` · ${row.listing_snapshot.title}` : row.title ? ` · ${row.title}` : ''}${by ? ` (by ${by})` : ''}`,
       data: { type: row.kind === 'housing' ? 'support' : 'inquiry', conversationId: row.id },
       threadId: `support-${row.id}`,
+      brand: row.brand,
     }),
   ])
 }

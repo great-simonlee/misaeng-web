@@ -45,19 +45,29 @@ async function reassign(row: ConversationRow, to: string, level: number, reason:
       data: { type: 'support', conversationId: row.id },
       sound: 'lead',
       threadId: `support-${row.id}`,
+      brand: row.brand,
     }),
   ])
 }
 
-/** 1h without a staff reply (housing hours only) → next staff in the conversation brand's rotation; 2h → the final contact. */
+/**
+ * 1h without a staff reply (housing hours only) → next staff in the conversation brand's rotation; 2h → the final
+ * contact. Hours, minutes and the final contact come from the conversation brand's settings.
+ */
 async function runEscalations(now: Date) {
-  const settings = await getSupportSettings()
-  const [first, second] = settings['housing.escalate_minutes']
+  const settingsByBrand = new Map<SupportBrand, Awaited<ReturnType<typeof getSupportSettings>>>()
+  const settingsFor = async (brand: SupportBrand) => {
+    if (!settingsByBrand.has(brand)) settingsByBrand.set(brand, await getSupportSettings(brand))
+    return settingsByBrand.get(brand)!
+  }
   const rows = await supportRest<ConversationRow[]>(
     'support_conversations?kind=eq.housing&status=eq.open&last_sender=eq.user&escalation_level=lt.2&sla_started_at=not.is.null&select=*&limit=200',
   )
   let moved = 0
   for (const row of rows ?? []) {
+    const brand = supportBrand(row.brand)
+    const settings = await settingsFor(brand)
+    const [first, second] = settings['housing.escalate_minutes']
     const started = new Date(row.sla_started_at!)
     const final = normalizeEmail(settings['escalation.final'])
     if (second && now >= addBusinessMinutes(started, second, settings['housing.hours'])) {
@@ -75,11 +85,12 @@ async function runEscalations(now: Date) {
           data: { type: 'support', conversationId: row.id },
           sound: 'lead',
           threadId: `support-${row.id}`,
+          brand,
         })
       }
       moved += 1
     } else if (row.escalation_level === 0 && first && now >= addBusinessMinutes(started, first, settings['housing.hours'])) {
-      const next = (await nextInRotationAfter(row.assignee_email, supportBrand(row.brand))) || final
+      const next = (await nextInRotationAfter(row.assignee_email, brand)) || final
       if (normalizeEmail(next) !== normalizeEmail(row.assignee_email)) await reassign(row, next, 1, 'escalation_1h')
       else
         await supportRest(`support_conversations?id=${eq(row.id)}`, {

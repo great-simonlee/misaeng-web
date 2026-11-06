@@ -15,6 +15,8 @@ export type BrandConfig = {
   name: string
   /** 정식 사이트 주소 (끝 슬래시 없음) */
   siteUrl: string
+  /** 항상 그 브랜드의 운영 도메인 (NEXT_PUBLIC_SITE_URL과 무관). 다른 브랜드 사용자에게 보내는 메일 링크 등에 쓴다 */
+  productionUrl: string
   /** 도시 서비스에서 고를 수 있는 언어 */
   serviceLocales: readonly Locale[]
   /** URL 접두사 없이 보여 주는 언어 (`/nyc/...`). 나머지는 `/vi/nyc/...` */
@@ -43,6 +45,7 @@ const MISAENG: BrandConfig = {
   id: 'misaeng',
   name: 'Misaeng',
   siteUrl: siteUrlFromEnv('https://misaeng.com'),
+  productionUrl: 'https://misaeng.com',
   serviceLocales: ['ko', 'en'],
   serviceDefaultLocale: 'ko',
   indexedLocales: ['ko'],
@@ -61,6 +64,7 @@ const ELLIEO: BrandConfig = {
   id: 'ellieo',
   name: 'Ellieo',
   siteUrl: siteUrlFromEnv('https://ellieo.com'),
+  productionUrl: 'https://ellieo.com',
   // English default (no prefix) + Vietnamese (/vi/...). Korean lives on misaeng.com (/ko/... → misaeng.com)
   serviceLocales: ['en', 'vi'],
   serviceDefaultLocale: 'en',

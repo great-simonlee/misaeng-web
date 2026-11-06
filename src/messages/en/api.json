@@ -555,6 +555,16 @@
       "openApp": "Open in the Misaeng app",
       "openWeb": "View reply",
       "footer": "This is a send-only address. Please reply in the Misaeng app or website."
+    },
+    "ellieoEmail": {
+      "housingSubject": "[Ellieo] New reply to your housing inquiry",
+      "housingTitle": "New reply to your housing inquiry",
+      "housingLine": "The Ellieo team replied about \"{title}\".",
+      "inquirySubject": "[Ellieo] Your inquiry got a reply",
+      "inquiryTitle": "Your inquiry got a reply",
+      "inquiryLine": "The Ellieo team replied to \"{title}\".",
+      "openWeb": "View reply",
+      "footer": "This is a send-only address. Please reply on ellieo.com."
     }
   }
 }
