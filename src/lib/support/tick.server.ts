@@ -1,14 +1,17 @@
 import { addBusinessMinutes } from './hours'
 import { eq, supportRest } from './rest.server'
-import { getConversation, logEvent, signalConversation, staffRows } from './service.server'
+import { getConversation, inBrandRotation, logEvent, signalConversation, staffRows, supportBrand } from './service.server'
 import { getSupportSettings, normalizeEmail } from './settings.server'
 import { sendStaffPush } from './staffPush.server'
-import type { ConversationRow } from './types'
+import type { ConversationRow, SupportBrand } from './types'
 import { emailUserOfUnreadReply } from './userNotify.server'
 
-/** The next rotation member after `current` (wraps; skips off / inactive / current). Does not move the cursor. */
-export async function nextInRotationAfter(current: string | null): Promise<string | null> {
-  const rows = (await staffRows()).filter((r) => r.in_rotation)
+/**
+ * The next member of this brand's rotation after `current` (wraps; skips off / inactive / current). Does not move the
+ * cursor. Ellieo before supabase/support_brand_rotation.sql: nobody (→ the final contact).
+ */
+export async function nextInRotationAfter(current: string | null, brand: SupportBrand = 'misaeng'): Promise<string | null> {
+  const rows = (await staffRows()).filter((r) => inBrandRotation(r, brand))
   const eligible = rows.filter((r) => r.active && r.accepting && r.email !== normalizeEmail(current))
   if (eligible.length === 0) return null
   const index = rows.findIndex((r) => r.email === normalizeEmail(current))
@@ -46,7 +49,7 @@ async function reassign(row: ConversationRow, to: string, level: number, reason:
   ])
 }
 
-/** 1h without a staff reply (housing hours only) → next staff in the rotation; 2h → the final contact. */
+/** 1h without a staff reply (housing hours only) → next staff in the conversation brand's rotation; 2h → the final contact. */
 async function runEscalations(now: Date) {
   const settings = await getSupportSettings()
   const [first, second] = settings['housing.escalate_minutes']
@@ -76,7 +79,7 @@ async function runEscalations(now: Date) {
       }
       moved += 1
     } else if (row.escalation_level === 0 && first && now >= addBusinessMinutes(started, first, settings['housing.hours'])) {
-      const next = (await nextInRotationAfter(row.assignee_email)) || final
+      const next = (await nextInRotationAfter(row.assignee_email, supportBrand(row.brand))) || final
       if (normalizeEmail(next) !== normalizeEmail(row.assignee_email)) await reassign(row, next, 1, 'escalation_1h')
       else
         await supportRest(`support_conversations?id=${eq(row.id)}`, {

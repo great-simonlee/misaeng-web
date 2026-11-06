@@ -6,7 +6,7 @@ import { getSupabaseProfile } from '@lib/supabase/profile.server'
 
 import { broadcastSignals, staffTopic, userTopic, type SupportSignal } from './realtime.server'
 import { redactSensitive } from './redact'
-import { eq, inList, supportRest } from './rest.server'
+import { eq, inList, supportRest, SupportStoreError } from './rest.server'
 import { getSupportSettings, normalizeEmail, supportFeatureOn } from './settings.server'
 import { housingLeadPush, pushPreview, sendStaffPush, SUPER_ADMIN_EMAIL } from './staffPush.server'
 import { notifyTeamOfNewConversation, notifyUserOfStaffReply } from './userNotify.server'
@@ -16,6 +16,7 @@ import type {
   ListingSnapshot,
   MessageRow,
   StaffRow,
+  SupportBrand,
   SupportKind,
 } from './types'
 
@@ -199,21 +200,48 @@ async function displayNameFor(uid: string, fallback?: string | null) {
   return (name || fallback || '').trim() || null
 }
 
+export const supportBrand = (value: unknown): SupportBrand => (value === 'ellieo' ? 'ellieo' : 'misaeng')
+
+/** In this brand's housing rotation: in_rotation = Misaeng, in_rotation_ellieo = Ellieo (false before that column exists). */
+export const inBrandRotation = (row: StaffRow, brand: SupportBrand) =>
+  brand === 'ellieo' ? row.in_rotation_ellieo === true : row.in_rotation === true
+
 /**
- * Assignee for a new housing lead: a returning user goes back to their last housing assignee (if still active and
- * accepting); otherwise the rotation's next staff; nobody available → the final escalation contact.
+ * Next staff in this brand's rotation (moves that brand's cursor). Misaeng calls the RPC without arguments, which works
+ * before and after supabase/support_brand_rotation.sql. Ellieo needs that SQL: until it runs → null (final contact).
  */
-async function pickHousingAssignee(uid: string): Promise<{ email: string; reason: string }> {
+async function takeNextAssignee(brand: SupportBrand): Promise<string | null> {
+  if (brand === 'misaeng') return supportRest<string | null>('rpc/support_take_next_assignee', { method: 'POST', body: '{}' })
+  try {
+    return await supportRest<string | null>('rpc/support_take_next_assignee', {
+      method: 'POST',
+      body: JSON.stringify({ p_brand: brand }),
+    })
+  } catch (error) {
+    if (error instanceof SupportStoreError && (error.code === 'PGRST202' || error.code === '42883' || error.code === '42703')) {
+      console.error('Ellieo rotation is not set up: run supabase/support_brand_rotation.sql.')
+      return null
+    }
+    throw error
+  }
+}
+
+/**
+ * Assignee for a new housing lead: a returning user goes back to their last housing assignee of the same brand (if still
+ * active, accepting and in that brand's rotation); otherwise that brand's rotation; nobody available → the final
+ * escalation contact.
+ */
+async function pickHousingAssignee(uid: string, brand: SupportBrand = 'misaeng'): Promise<{ email: string; reason: string }> {
   const settings = await getSupportSettings()
   const previous = await supportRest<{ assignee_email: string | null }[]>(
-    `support_conversations?user_uid=${eq(uid)}&kind=eq.housing&assignee_email=not.is.null&select=assignee_email&order=created_at.desc&limit=1`,
+    `support_conversations?user_uid=${eq(uid)}&kind=eq.housing&brand=${eq(brand)}&assignee_email=not.is.null&select=assignee_email&order=created_at.desc&limit=1`,
   )
   const last = normalizeEmail(previous?.[0]?.assignee_email)
   if (last) {
     const [row] = await staffRows([last])
-    if (row?.active && row.accepting) return { email: last, reason: 'returning_user' }
+    if (row?.active && row.accepting && inBrandRotation(row, brand)) return { email: last, reason: 'returning_user' }
   }
-  const next = await supportRest<string | null>('rpc/support_take_next_assignee', { method: 'POST', body: '{}' })
+  const next = await takeNextAssignee(brand)
   if (next) return { email: normalizeEmail(next), reason: 'round_robin' }
   return { email: normalizeEmail(settings['escalation.final']), reason: 'no_staff' }
 }
@@ -246,6 +274,8 @@ export async function startHousingConversation(input: {
   message: string
   profile: HousingProfile
   city?: string | null
+  /** Default Misaeng. Ellieo housing inquiries will pass 'ellieo' once they come through this system. */
+  brand?: SupportBrand
 }) {
   const settings = await getSupportSettings()
   if (!supportFeatureOn(settings, 'support.enabled', input.user.email)) throw new SupportError('support.disabled', 403, 'SUPPORT_DISABLED')
@@ -263,13 +293,15 @@ export async function startHousingConversation(input: {
   }
 
   const listing = input.listingId ? await getStoredHousingListing(input.listingId).catch(() => null) : null
-  const assignee = await pickHousingAssignee(input.user.uid)
+  const brand = supportBrand(input.brand)
+  const assignee = await pickHousingAssignee(input.user.uid, brand)
   const now = new Date().toISOString()
   const userName = input.profile.name?.trim() || (await displayNameFor(input.user.uid, input.user.displayName))
   const [row] = await supportRest<ConversationRow[]>('support_conversations', {
     method: 'POST',
     prefer: 'return=representation',
     body: JSON.stringify({
+      brand,
       kind: 'housing',
       city: input.city || listing?.city || 'nyc',
       user_uid: input.user.uid,

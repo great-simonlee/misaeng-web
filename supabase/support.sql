@@ -11,7 +11,8 @@ create table if not exists public.support_staff (
   agent_id text,
   display_name text not null default '',
   active boolean not null default true,
-  in_rotation boolean not null default false,   -- housing lead rotation (admin picks)
+  in_rotation boolean not null default false,   -- Misaeng housing lead rotation (Super Admin picks)
+  in_rotation_ellieo boolean not null default false,  -- Ellieo housing lead rotation (support_brand_rotation.sql)
   rotation_order integer not null default 0,
   accepting boolean not null default true,      -- 받기 on/off (vacation, off hours)
   last_assigned_at timestamptz,
@@ -126,27 +127,38 @@ insert into public.support_settings (key, value) values
   ('housing.hours', '{"start": 9, "end": 21, "days": [0,1,2,3,4,5,6]}'::jsonb),   -- New York time
   ('housing.escalate_minutes', '[60, 120]'::jsonb),
   ('email.delay_minutes', '5'::jsonb),
-  ('rotation.cursor', '{"email": null}'::jsonb),
+  ('rotation.cursor', '{"email": null}'::jsonb),                 -- Misaeng
+  ('rotation.cursor.ellieo', '{"email": null}'::jsonb),
   ('testers', '[]'::jsonb)                                      -- account emails that see both features while they're off
 on conflict (key) do nothing;
 
--- Next housing lead: the first eligible staff after the last one who got a lead, in rotation order (wraps around).
+-- Databases created before in_rotation_ellieo existed.
+alter table public.support_staff add column if not exists in_rotation_ellieo boolean not null default false;
+
+-- Next housing lead for a brand: the first eligible staff after the last one who got that brand's lead, in rotation
+-- order (wraps around). Misaeng keeps the old cursor key ('rotation.cursor'); Ellieo has its own.
 -- Only new leads call this. Returning users, transfers, escalations and admin assignment never move the cursor.
-create or replace function public.support_take_next_assignee()
+-- Called without arguments (older servers) = Misaeng, same as before.
+drop function if exists public.support_take_next_assignee();
+
+create or replace function public.support_take_next_assignee(p_brand text default 'misaeng')
 returns text
 language plpgsql
 as $$
 declare
+  ellieo boolean := lower(coalesce(p_brand, 'misaeng')) = 'ellieo';
+  cursor_key text := case when ellieo then 'rotation.cursor.ellieo' else 'rotation.cursor' end;
   cur text;
   cur_order integer;
   nxt text;
 begin
   perform pg_advisory_xact_lock(hashtext('support_rotation'));
-  select value->>'email' into cur from public.support_settings where key = 'rotation.cursor';
+  select value->>'email' into cur from public.support_settings where key = cursor_key;
   select rotation_order into cur_order from public.support_staff where email = cur;
   select s.email into nxt
     from public.support_staff s
-   where s.active and s.in_rotation and s.accepting
+   where s.active and s.accepting
+     and (case when ellieo then s.in_rotation_ellieo else s.in_rotation end)
    order by
      case when cur_order is null
             or s.rotation_order > cur_order
@@ -155,7 +167,7 @@ begin
    limit 1;
   if nxt is not null then
     insert into public.support_settings (key, value, updated_at)
-    values ('rotation.cursor', jsonb_build_object('email', nxt), now())
+    values (cursor_key, jsonb_build_object('email', nxt), now())
     on conflict (key) do update set value = excluded.value, updated_at = now();
     update public.support_staff set last_assigned_at = now() where email = nxt;
   end if;
@@ -225,9 +237,9 @@ grant select, insert, update, delete on
   public.support_settings, public.support_housing_profiles, public.support_user_state, public.staff_push_devices
   to service_role;
 grant usage, select on sequence public.support_events_id_seq to service_role;
-grant execute on function public.support_take_next_assignee() to service_role;
+grant execute on function public.support_take_next_assignee(text) to service_role;
 grant execute on function public.support_add_message(uuid, text, text, text, text, text, integer) to service_role;
-revoke execute on function public.support_take_next_assignee() from anon, authenticated, public;
+revoke execute on function public.support_take_next_assignee(text) from anon, authenticated, public;
 revoke execute on function public.support_add_message(uuid, text, text, text, text, text, integer) from anon, authenticated, public;
 
 notify pgrst, 'reload schema';

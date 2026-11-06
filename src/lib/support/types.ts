@@ -1,4 +1,6 @@
 export type SupportKind = 'housing' | 'question' | 'suggestion'
+/** Which brand's app the conversation came from: picks that brand's housing rotation. */
+export type SupportBrand = 'misaeng' | 'ellieo'
 export type SupportStatus = 'open' | 'waiting_user' | 'closed'
 export type SupportSender = 'user' | 'staff' | 'system'
 
@@ -53,7 +55,10 @@ export type StaffRow = {
   agent_id: string | null
   display_name: string
   active: boolean
+  /** Misaeng housing lead rotation. */
   in_rotation: boolean
+  /** Ellieo housing lead rotation (supabase/support_brand_rotation.sql; missing until that SQL runs). */
+  in_rotation_ellieo?: boolean
   rotation_order: number
   accepting: boolean
   last_assigned_at: string | null
