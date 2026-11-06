@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -12,9 +13,20 @@ import { cityLoginPath } from '@lib/constants/cities'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { useFormat, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
-import { fetchThread, sendReply, type SupportConversation, type SupportMessage } from '@lib/support/client'
+import {
+  fetchThread,
+  sendReply,
+  supportKindKey,
+  supportThreadTitle,
+  useSupportSignals,
+  type SupportConversation,
+  type SupportMessage,
+} from '@lib/support/client'
 
-/** One 문의/건의 thread: the messages and a reply box (not realtime; refreshed on open and every 30 s). */
+/**
+ * One board thread (문의/건의, and on Ellieo listing inquiries): the messages and a reply box. Refreshed on open, on
+ * the conversation's realtime signal while the page is open (signal only, content comes from the API) and every 30 s.
+ */
 export function MyInquiryThreadScreen({ id }: { id: string }) {
   const t = useT('me')
   const format = useFormat()
@@ -43,6 +55,8 @@ export function MyInquiryThreadScreen({ id }: { id: string }) {
       setFailed(true)
     }
   }, [id])
+
+  useSupportSignals(user ? id : null, () => void load())
 
   useEffect(() => {
     if (!user) return
@@ -80,13 +94,20 @@ export function MyInquiryThreadScreen({ id }: { id: string }) {
           <>
             <div className='mt-4 flex flex-wrap items-center gap-2'>
               <span className='rounded-full bg-[#f3f4f6] px-2.5 py-0.5 text-[12px] font-semibold text-[var(--muted-foreground)]'>
-                {t(`support.${conversation.kind === 'suggestion' ? 'suggestion' : 'question'}`)}
+                {t(`support.${supportKindKey(conversation.kind)}`)}
               </span>
               <span className={cn('text-[12px] font-semibold', conversation.status === 'waiting_user' ? 'text-emerald-600' : 'text-[var(--muted)]')}>
                 {t(`support.status.${conversation.status}`)}
               </span>
             </div>
-            <h1 className='mt-2 text-[1.35rem] font-semibold tracking-[-0.02em] text-[var(--foreground)]'>{conversation.title}</h1>
+            <h1 className='mt-2 text-[1.35rem] font-semibold tracking-[-0.02em] text-[var(--foreground)]'>{supportThreadTitle(conversation)}</h1>
+            {conversation.kind === 'housing' && conversation.listing && (
+              <ListingSnapshotCard
+                listing={conversation.listing}
+                href={conversation.listingId ? href(`/housing/${conversation.listingId}`) : null}
+                label={t('support.viewListing')}
+              />
+            )}
 
             <ol className='mt-6 space-y-3'>
               {messages.map((message) => {
@@ -142,5 +163,49 @@ export function MyInquiryThreadScreen({ id }: { id: string }) {
         )}
       </div>
     </div>
+  )
+}
+
+/** The listing a housing thread is about (snapshot saved when the thread started). */
+function ListingSnapshotCard({
+  listing,
+  href,
+  label,
+}: {
+  listing: NonNullable<SupportConversation['listing']>
+  href: string | null
+  label: string
+}) {
+  const body = (
+    <>
+      {listing.photo ? (
+        <Image
+          src={listing.photo}
+          alt=''
+          width={96}
+          height={72}
+          unoptimized
+          className='h-[72px] w-24 shrink-0 rounded-xl object-cover'
+        />
+      ) : null}
+      <span className='min-w-0 flex-1'>
+        <span className='block truncate text-[15px] font-semibold text-[var(--foreground)]'>{listing.title || listing.address}</span>
+        {listing.area ? <span className='mt-0.5 block truncate text-[13px] text-[var(--muted-foreground)]'>{listing.area}</span> : null}
+        <span className='mt-1 flex items-center gap-2 text-[13px]'>
+          {listing.price ? (
+            <span className='font-semibold text-[var(--foreground)]'>${Math.round(listing.price).toLocaleString('en-US')}</span>
+          ) : null}
+          {href ? <span className='font-semibold text-[var(--brand)]'>{label} →</span> : null}
+        </span>
+      </span>
+    </>
+  )
+  const className = 'mt-4 flex items-center gap-3 rounded-2xl bg-white p-3 ring-1 ring-black/[0.06]'
+  return href ? (
+    <Link href={href} className={`${className} transition hover:bg-[#fafbfc]`}>
+      {body}
+    </Link>
+  ) : (
+    <div className={className}>{body}</div>
   )
 }

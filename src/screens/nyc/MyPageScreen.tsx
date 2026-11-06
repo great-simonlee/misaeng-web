@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
@@ -10,6 +11,8 @@ import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { useNicknameAvailability } from '@hooks/useNicknameAvailability'
 import { cityLoginPath } from '@lib/constants/cities'
+import { BRAND_CONFIG } from '@lib/brand'
+import { useSupportConfig } from '@lib/support/client'
 import {
   MAX_NICKNAME_LEN,
   MIN_NICKNAME_LEN,
@@ -1049,6 +1052,7 @@ function LogoutSection({
   const t = useT('me')
   return (
     <section className={cn(className)}>
+      {BRAND_CONFIG.theme === 'ellieo' && <InquiriesEntry />}
       <button
         type='button'
         onClick={onLogout}
@@ -1080,6 +1084,37 @@ function LogoutSection({
         </button>
       </div>
     </section>
+  )
+}
+
+/** Ellieo My page → Inquiries & suggestions board (shown while the inquiry switch is on). */
+function InquiriesEntry() {
+  const t = useT('me')
+  const href = useCityPath()
+  const config = useSupportConfig()
+  if (!config?.inquiries) return null
+  return (
+    <Link
+      href={href('/me/inquiries')}
+      className='group mb-3 flex w-full items-center justify-between gap-3 rounded-[1.25rem] bg-white px-4 py-4 text-left shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04] transition hover:bg-[#fafafa] active:scale-[0.995] sm:px-5 sm:py-3.5'
+    >
+      <span className='flex min-w-0 items-center gap-3'>
+        <span className='flex size-10 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--brand-rgb)/0.08)] text-[var(--brand)] sm:size-9'>
+          <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.8' className='size-[18px]' aria-hidden>
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              d='M7.5 8.25h9m-9 3h6M5.25 4.5h13.5A1.5 1.5 0 0 1 20.25 6v9a1.5 1.5 0 0 1-1.5 1.5H9l-4.5 3v-3H5.25a1.5 1.5 0 0 1-1.5-1.5V6a1.5 1.5 0 0 1 1.5-1.5Z'
+            />
+          </svg>
+        </span>
+        <span className='min-w-0'>
+          <span className='block text-[15px] font-semibold tracking-tight text-[var(--foreground)]'>{t('support.entry')}</span>
+          <span className='mt-0.5 block text-[13px] leading-snug text-[var(--muted-foreground)] lg:text-[12px]'>{t('support.entryHint')}</span>
+        </span>
+      </span>
+      <ChevronIcon />
+    </Link>
   )
 }
 

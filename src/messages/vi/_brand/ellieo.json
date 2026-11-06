@@ -37,8 +37,12 @@
     },
     "footer": {
       "links": {
-        "credit": "Điểm Ellieo"
+        "credit": "Điểm Ellieo",
+        "inquiries": "Hỏi đáp & góp ý"
       }
+    },
+    "account": {
+      "inquiries": "Hỏi đáp & góp ý"
     }
   },
   "hub": {
@@ -93,6 +97,37 @@
       "coffeeChat": {
         "mentorConsent": "Thông báo và đồng ý dành cho mentor\n· Các bài review của bạn trên diễn đàn vẫn được giữ ẩn danh. Tuy nhiên, trong buổi coffee chat, người kia có thể thấy khuôn mặt và tên của bạn.\n· Làm mentor không có bất kỳ phần thưởng nào, kể cả điểm. Thưởng giới thiệu (referral) của công ty tuân theo chính sách riêng của từng công ty.\n· Khi có yêu cầu, bạn gửi 1–3 khung giờ phù hợp; người gửi yêu cầu chọn một và gửi link Zoom hoặc Google Meet. Ellieo chỉ giúp kết nối.\n· Lời khuyên nghề nghiệp là ý kiến cá nhân, và Ellieo không chịu trách nhiệm về nội dung cuộc trò chuyện.\n· LinkedIn của bạn được gửi kèm khi bạn gửi khung giờ và sẽ hiển thị cho người gửi yêu cầu khi họ xác nhận thời gian.\n· Nếu bạn hủy một coffee chat đã xác nhận, điểm của người gửi yêu cầu sẽ được hoàn lại.\n· Nút gửi yêu cầu coffee chat cũng hiển thị trên các bài review phỏng vấn và việc làm bạn đã viết.",
         "requestDisclaimer": "Coffee chat là cuộc trò chuyện tự nguyện với mentor. Ellieo không đảm bảo bất kỳ kết quả giới thiệu, phỏng vấn hay việc làm nào. Mọi sự giới thiệu hoàn toàn do mentor tự quyết định và tuân theo chính sách của công ty mentor. Ellieo không nhận bất kỳ lợi ích tài chính nào từ coffee chat hay việc giới thiệu, và mentor không được Ellieo trả thù lao. Khi gửi yêu cầu, LinkedIn của bạn sẽ được chia sẻ với mentor. Khi gửi yêu cầu, điểm sẽ được giữ chỗ; điểm bị trừ khi bạn chọn một khung giờ mentor gửi và xác nhận bằng link Zoom hoặc Google Meet. Ellieo không kiểm tra cuộc trò chuyện có diễn ra hay không. Sau khi xác nhận, điểm chỉ được hoàn lại nếu mentor hủy hoặc bạn hủy trước giờ bắt đầu ít nhất 24 giờ. Nếu mentor không xuất hiện, hãy báo cáo trong ứng dụng."
+      }
+    },
+    "support": {
+      "disabled": "Hiện chúng tôi chưa thể nhận câu hỏi. Vui lòng thử lại sau.",
+      "emptyMessage": "Vui lòng nhập tin nhắn.",
+      "tooLong": "Tin nhắn tối đa 2.000 ký tự.",
+      "tooMany": "Bạn đang gửi tin nhắn quá nhanh. Vui lòng đợi một chút.",
+      "titleRequired": "Vui lòng nhập tiêu đề.",
+      "notFound": "Không tìm thấy cuộc trò chuyện này.",
+      "verifyRequired": "Cần xác minh email trường học hoặc nơi làm việc trước khi hỏi về nhà ở.",
+      "profileInvalid": "Vui lòng kiểm tra lại các thông tin nhà ở bắt buộc.",
+      "failed": "Không xử lý được yêu cầu của bạn. Vui lòng thử lại sau.",
+      "notConfigured": "Tính năng hỏi đáp chưa sẵn sàng.",
+      "push": {
+        "inquiryTitle": "Câu hỏi của bạn đã có phản hồi",
+        "reportResolvedTitle": "Chúng tôi đã xử lý báo cáo của bạn",
+        "reportResolvedBody": "Chúng tôi đã xem xét và xử lý. Cảm ơn bạn đã giúp Ellieo an toàn.",
+        "reportDismissedBody": "Chúng tôi đã xem xét nhưng nội dung này không vi phạm quy định. Cảm ơn bạn đã báo cho chúng tôi.",
+        "feedbackShippedTitle": "Góp ý của bạn đã được áp dụng vào Ellieo 🎉",
+        "feedbackShippedBody": "\"{title}\" đã có trên Ellieo."
+      },
+      "email": {
+        "housingSubject": "[Ellieo] Có phản hồi mới cho yêu cầu nhà ở của bạn",
+        "housingTitle": "Có phản hồi mới cho yêu cầu nhà ở của bạn",
+        "housingLine": "Mở ellieo.com để đọc và trả lời.",
+        "inquirySubject": "[Ellieo] Câu hỏi của bạn đã có phản hồi",
+        "inquiryTitle": "Câu hỏi của bạn đã có phản hồi",
+        "inquiryLine": "Đội ngũ Ellieo đã trả lời \"{title}\".",
+        "openApp": "Mở trên ellieo.com",
+        "openWeb": "Xem phản hồi",
+        "footer": "Đây là địa chỉ chỉ gửi. Vui lòng trả lời trên ellieo.com."
       }
     }
   },
@@ -196,6 +231,38 @@
     },
     "deleteAccount": {
       "confirm": "Bạn chắc chắn muốn xóa tài khoản?\n\n• Hồ sơ, thông tin xác minh và thông báo sẽ bị xóa ngay\n• Bài đăng tìm bạn cùng phòng/sublet sẽ bị xóa; các bài viết và bình luận khác vẫn còn dưới tên \"Người dùng đã xóa tài khoản\"\n• Bạn không thể đăng nhập lại bằng tài khoản này"
+    },
+    "support": {
+      "title": "Hỏi đáp & góp ý",
+      "intro": "Đặt câu hỏi, hỏi về một tin nhà hoặc gửi góp ý cho chúng tôi. Đội ngũ Ellieo đọc mọi tin nhắn và trả lời tại đây.",
+      "new": "Câu hỏi / góp ý mới",
+      "question": "Câu hỏi",
+      "suggestion": "Góp ý",
+      "housing": "Tin nhà",
+      "subject": "Tiêu đề",
+      "message": "Viết tin nhắn của bạn",
+      "submit": "Gửi",
+      "submitted": "Đã gửi. Chúng tôi sẽ trả lời tại đây và báo cho bạn qua email.",
+      "empty": "Chưa có câu hỏi hay góp ý nào",
+      "status": {
+        "open": "Đang chờ trả lời",
+        "waiting_user": "Đã trả lời",
+        "closed": "Đã đóng"
+      },
+      "reply": "Trả lời",
+      "replyPlaceholder": "Viết câu trả lời",
+      "send": "Gửi",
+      "staff": "Đội ngũ Ellieo",
+      "closedNotice": "Cuộc trò chuyện này đã đóng. Gửi tin nhắn để mở lại.",
+      "redacted": "Các số nhạy cảm đã được ẩn.",
+      "replyHint": "Chúng tôi sẽ gửi email cho bạn khi đội ngũ Ellieo trả lời.",
+      "back": "Quay lại danh sách",
+      "loginRequired": "Vui lòng đăng nhập trước.",
+      "notFound": "Không tìm thấy cuộc trò chuyện này.",
+      "unavailable": "Hiện chúng tôi chưa thể nhận câu hỏi. Vui lòng gửi email tới info@ellieo.com.",
+      "viewListing": "Xem tin nhà",
+      "entry": "Hỏi đáp & góp ý",
+      "entryHint": "Câu hỏi, hỏi về tin nhà và ý tưởng cho Ellieo"
     }
   },
   "points": {
@@ -233,6 +300,14 @@
       "bedrooms": "{count} PN",
       "postFallback": "Bài viết cộng đồng",
       "jobReviewDescription": "Timeline phỏng vấn và tuyển dụng {type} tại {company} trên {brand}."
+    },
+    "share": {
+      "housing": "Một căn phòng được chia sẻ trên Ellieo 🏠",
+      "visa": "Bài viết về visa được chia sẻ trên Ellieo 🛂",
+      "review": "Đánh giá phỏng vấn & việc làm trên Ellieo 💼",
+      "company": "Một công ty được chia sẻ trên Ellieo 🏢",
+      "postings": "Tin tuyển dụng được chia sẻ trên Ellieo 📋",
+      "memberOnly": "Dành cho thành viên Ellieo."
     }
   },
   "housing": {
@@ -256,6 +331,24 @@
           "bodyPlaceholder": "Mô tả thời gian, có nội thất hay không, phương tiện đi lại, điện nước và tiền cọc. Để lại cách liên hệ (Zalo, Instagram hoặc email)."
         }
       }
+    },
+    "detail": {
+      "askListing": "Hỏi về tin nhà này",
+      "listingInquiry": {
+        "title": "Hỏi về tin nhà này",
+        "body": "Tin nhắn của bạn sẽ được gửi tới đội ngũ nhà ở của Ellieo. Bạn sẽ thấy câu trả lời trong Trang của tôi → Hỏi đáp & góp ý, và chúng tôi cũng sẽ gửi email cho bạn.",
+        "defaultMessage": "Xin chào! Tôi quan tâm đến {address}. Căn này còn trống không?",
+        "message": "Tin nhắn",
+        "phone": "Số điện thoại (không bắt buộc)",
+        "moveIn": "Ngày dọn vào (không bắt buộc)",
+        "send": "Gửi",
+        "sent": "Đã gửi. Đội ngũ Ellieo sẽ sớm trả lời.",
+        "failed": "Không gửi được tin nhắn. Vui lòng thử lại.",
+        "cancel": "Hủy"
+      },
+      "appInquiryTitle": "Hỏi về tin nhà này",
+      "appInquiryBody": "Gửi câu hỏi của bạn tới đội ngũ nhà ở của Ellieo.",
+      "orKakao": "Hoặc gửi email cho chúng tôi."
     }
   }
 }

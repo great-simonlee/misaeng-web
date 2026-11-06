@@ -12,9 +12,21 @@ import { cityLoginPath } from '@lib/constants/cities'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { useFormat, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
-import { listInquiries, startInquiry, useSupportConfig, type SupportConversation } from '@lib/support/client'
+import { BRAND_CONFIG } from '@lib/brand'
+import {
+  listAllConversations,
+  listInquiries,
+  startInquiry,
+  supportKindKey,
+  supportThreadTitle,
+  useSupportConfig,
+  type SupportConversation,
+} from '@lib/support/client'
 
-/** My → 문의/건의하기: board-style threads with the Misaeng team (same data as the app). */
+/** Ellieo's board also lists listing inquiries (housing threads); Misaeng's housing chat lives in the app. */
+const LIST_HOUSING_THREADS = BRAND_CONFIG.theme === 'ellieo'
+
+/** My → 문의/건의하기: board-style threads with the team (same data as the app). */
 export function MyInquiriesScreen() {
   const t = useT('me')
   const format = useFormat()
@@ -37,7 +49,7 @@ export function MyInquiriesScreen() {
 
   const load = useCallback(async () => {
     try {
-      setItems(await listInquiries())
+      setItems(await (LIST_HOUSING_THREADS ? listAllConversations() : listInquiries()))
     } catch {
       setItems((current) => current ?? [])
     }
@@ -154,9 +166,9 @@ export function MyInquiriesScreen() {
                         <div className='min-w-0 flex-1'>
                           <div className='flex items-center gap-2'>
                             <span className='shrink-0 rounded-full bg-[#f3f4f6] px-2 py-0.5 text-[11px] font-semibold text-[var(--muted-foreground)]'>
-                              {t(`support.${item.kind === 'suggestion' ? 'suggestion' : 'question'}`)}
+                              {t(`support.${supportKindKey(item.kind)}`)}
                             </span>
-                            <span className='truncate text-[15px] font-semibold text-[var(--foreground)]'>{item.title}</span>
+                            <span className='truncate text-[15px] font-semibold text-[var(--foreground)]'>{supportThreadTitle(item)}</span>
                           </div>
                           <p className='mt-1 line-clamp-2 text-[14px] text-[var(--muted-foreground)]'>{item.lastMessagePreview}</p>
                           <p className={cn('mt-1.5 text-[12px] font-semibold', item.status === 'waiting_user' ? 'text-emerald-600' : 'text-[var(--muted)]')}>

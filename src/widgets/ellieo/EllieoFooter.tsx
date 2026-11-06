@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 import { useCityInfo, useCityPath } from '@hooks/useCity'
 import { BRAND_CONFIG } from '@lib/brand'
 import { useT } from '@lib/i18n/client'
+import { useSupportConfig } from '@lib/support/client'
 import {
   BadgeCheckIcon,
   FlagIcon,
@@ -32,6 +33,7 @@ export function EllieoFooter() {
   const pathname = usePathname()
   const isHome = pathname === href()
   const sla = trust.reportSlaHours
+  const supportConfig = useSupportConfig()
 
   const trustItems = [
     {
@@ -58,6 +60,8 @@ export function EllieoFooter() {
   const support = [
     { href: href('/about'), label: t('footer.links.about') },
     { href: href('/me'), label: t('footer.links.me') },
+    // Help: the inquiry board (login required; the page sends guests to log in first)
+    ...(supportConfig?.inquiries ? [{ href: href('/me/inquiries'), label: t('footer.links.inquiries') }] : []),
     { href: `mailto:${CONTACT_EMAIL}`, label: t('footer.links.contact') },
   ]
   const legal = [

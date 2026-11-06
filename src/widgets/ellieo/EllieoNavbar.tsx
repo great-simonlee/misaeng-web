@@ -11,6 +11,7 @@ import { cn } from '@lib'
 import { BRAND_CONFIG } from '@lib/brand'
 import { cityLoginPath } from '@lib/constants/cities'
 import { useT } from '@lib/i18n/client'
+import { useSupportConfig } from '@lib/support/client'
 import { LanguageMenu } from '@widgets/LanguageMenu'
 import { CitySelectModal } from '@widgets/nyc/CitySelectModal'
 import { ChevronDownIcon, CloseIcon, HomeIcon, MenuIcon, PinIcon, UserIcon } from '@widgets/ellieo/icons'
@@ -38,6 +39,7 @@ export function EllieoNavbar() {
   const t = useT('nav')
   const tc = useT('community')
   const { user, loading, avatarURL, displayName, isMisaengUser } = useEllieoViewer()
+  const supportConfig = useSupportConfig()
   const [cityOpen, setCityOpen] = useState(false)
   /** Phone drop-down under the header */
   const [panel, setPanel] = useState<'menu' | 'account' | null>(null)
@@ -74,6 +76,7 @@ export function EllieoNavbar() {
   const joinHref = `${cityLoginPath(city)}?mode=signup`
   const accountLinks = [
     ...ACCOUNT_LINKS,
+    ...(supportConfig?.inquiries ? [{ path: '/me/inquiries', key: 'inquiries', exact: false } as const] : []),
     ...(isMisaengUser ? [{ path: '/team/credit-reviews', key: 'creditReviews', exact: false } as const] : []),
   ].map((item) => ({ ...item, href: href(item.path), label: t(`account.${item.key}`) }))
   const primaryBoards = ELLIEO_BOARDS.filter((board) => board.primary)

@@ -36,11 +36,13 @@
       "anonymous": "Anonymous Q&A"
     },
     "account": {
-      "creditReviews": "Ellieo Points reviews"
+      "creditReviews": "Ellieo Points reviews",
+      "inquiries": "Inquiries & suggestions"
     },
     "footer": {
       "links": {
-        "credit": "Ellieo Points"
+        "credit": "Ellieo Points",
+        "inquiries": "Inquiries & suggestions"
       }
     }
   },
@@ -106,6 +108,21 @@
       "coffeeChat": {
         "mentorConsent": "Mentor notice and consent\n· Your reviews on the boards stay anonymous. In a coffee chat, however, the other person may see your face and name.\n· Mentoring comes with no reward of any kind, including points. Company referral bonuses follow each company's own program.\n· When a request comes in, you send 1 to 3 times that work for you; the requester picks one and sends a Zoom or Google Meet link. Ellieo only helps you connect.\n· Career advice is your personal opinion, and Ellieo is not responsible for what is said in the conversation.\n· Your LinkedIn goes along with the times you send and is shown to the requester once they confirm a time.\n· If you cancel a confirmed coffee chat, the requester's points are refunded.\n· A coffee chat request button also appears on the interview and job reviews you wrote.",
         "requestDisclaimer": "Coffee chats are voluntary conversations with mentors. Ellieo does not guarantee any referral, interview, or employment outcome. Any referral is made solely at the mentor's personal discretion and is subject to the policies of the mentor's employer. Ellieo does not receive any monetary benefit from coffee chats or referrals, and mentors are not compensated by Ellieo. When you send a request, your LinkedIn is shared with the mentor. When you send a request, points are put on hold; they are spent when you pick one of the mentor's times and confirm it with a Zoom or Google Meet link. Ellieo does not check whether the call took place. After confirming, points are refunded only if the mentor cancels or you cancel at least 24 hours before the start. If the mentor doesn't show up, please report it in the app."
+      }
+    },
+    "support": {
+      "push": {
+        "reportResolvedBody": "We reviewed it and took action. Thanks for keeping Ellieo safe.",
+        "feedbackShippedTitle": "Your feedback made it into Ellieo 🎉",
+        "feedbackShippedBody": "\"{title}\" is now live on Ellieo."
+      },
+      "email": {
+        "housingSubject": "[Ellieo] New reply to your housing inquiry",
+        "housingLine": "Open ellieo.com to read and reply.",
+        "inquirySubject": "[Ellieo] Your inquiry got a reply",
+        "inquiryLine": "The Ellieo team replied to \"{title}\".",
+        "openApp": "Open on ellieo.com",
+        "footer": "This is a send-only address. Please reply on ellieo.com."
       }
     }
   },
@@ -214,6 +231,38 @@
     },
     "deleteAccount": {
       "confirm": "Delete your account?\n\n• Your profile, verifications and notifications are deleted right away\n• Roommate/sublet posts are deleted; other posts and comments stay as \"Deleted user\"\n• You can’t sign in with this account again"
+    },
+    "support": {
+      "title": "Inquiries & suggestions",
+      "intro": "Ask a question, ask about a listing, or send us a suggestion. The Ellieo team reads every message and replies here.",
+      "new": "New inquiry / suggestion",
+      "question": "Inquiry",
+      "suggestion": "Suggestion",
+      "housing": "Listing",
+      "subject": "Subject",
+      "message": "Write your message",
+      "submit": "Send",
+      "submitted": "Sent. We'll reply here and let you know by email.",
+      "empty": "No inquiries or suggestions yet",
+      "status": {
+        "open": "Waiting for reply",
+        "waiting_user": "Answered",
+        "closed": "Closed"
+      },
+      "reply": "Reply",
+      "replyPlaceholder": "Write a reply",
+      "send": "Send",
+      "staff": "Ellieo team",
+      "closedNotice": "This thread is closed. Send a reply to open it again.",
+      "redacted": "Sensitive numbers were hidden.",
+      "replyHint": "We'll email you when the Ellieo team replies.",
+      "back": "Back to list",
+      "loginRequired": "Please log in first.",
+      "notFound": "We couldn't find this conversation.",
+      "unavailable": "We can't take inquiries right now. Please email info@ellieo.com.",
+      "viewListing": "View listing",
+      "entry": "Inquiries & suggestions",
+      "entryHint": "Questions, listing inquiries and ideas for Ellieo"
     }
   },
   "points": {
@@ -251,6 +300,14 @@
       "bedrooms": "{count} BR",
       "postFallback": "Community post",
       "jobReviewDescription": "{company} {type} interview and hiring timeline on {brand}."
+    },
+    "share": {
+      "housing": "A room shared on Ellieo 🏠",
+      "visa": "A visa post shared on Ellieo 🛂",
+      "review": "An interview & job review shared on Ellieo 💼",
+      "company": "A company shared on Ellieo 🏢",
+      "postings": "Job postings shared on Ellieo 📋",
+      "memberOnly": "For Ellieo members."
     }
   },
   "housing": {
@@ -274,6 +331,24 @@
           "bodyPlaceholder": "Describe the dates, whether it's furnished, transit, utilities and deposit. Leave a way to reach you (Instagram, WhatsApp or email)."
         }
       }
+    },
+    "detail": {
+      "askListing": "Ask about this listing",
+      "listingInquiry": {
+        "title": "Ask about this listing",
+        "body": "Your message goes to the Ellieo housing team. You'll find the reply under My page → Inquiries & suggestions, and we'll email you too.",
+        "defaultMessage": "Hi! I'm interested in {address}. Is it still available?",
+        "message": "Message",
+        "phone": "Phone (optional)",
+        "moveIn": "Move-in date (optional)",
+        "send": "Send",
+        "sent": "Sent. The Ellieo team will reply soon.",
+        "failed": "We couldn't send your message. Please try again.",
+        "cancel": "Cancel"
+      },
+      "appInquiryTitle": "Ask about this listing",
+      "appInquiryBody": "Send your question to the Ellieo housing team.",
+      "orKakao": "Or email us."
     }
   }
 }
