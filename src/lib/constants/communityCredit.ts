@@ -1,5 +1,6 @@
 /** Misaeng NYC 커뮤니티 크레딧 — 적립·사용·한도·정책 (정수만 사용) */
 
+import { BRAND } from '@lib/brand'
 import type { Translate } from '@lib/i18n/translate'
 
 export type CommunityCreditLedgerKind = 'earn' | 'revoke' | 'spend' | 'restore'
@@ -202,8 +203,15 @@ export const COMMUNITY_CREDIT_NO_EARN = [
   'adminPosts',
 ] as const
 
+/**
+ * Coffee chats and immigration-lawyer consultations are run by the Misaeng team (Korean mentors and lawyers).
+ * Ellieo has no equivalent yet, so they are not offered there (user decision pending).
+ */
+export const OFFERS_MISAENG_EXPERT_PROGRAMS = BRAND !== 'ellieo'
+const MISAENG_ONLY_REDEEM_IDS = ['coffee-chat', 'lawyer-consult']
+
 /** 문구 키 `redeemOptions.<id>.*` */
-export const COMMUNITY_CREDIT_REDEEM_OPTIONS: readonly CommunityCreditRedeemOption[] =
+const ALL_REDEEM_OPTIONS: readonly CommunityCreditRedeemOption[] =
   [
     {
       id: 'coffee-chat',
@@ -233,6 +241,11 @@ export const COMMUNITY_CREDIT_REDEEM_OPTIONS: readonly CommunityCreditRedeemOpti
       comingSoon: true,
     },
   ] as const
+
+export const COMMUNITY_CREDIT_REDEEM_OPTIONS: readonly CommunityCreditRedeemOption[] =
+  OFFERS_MISAENG_EXPERT_PROGRAMS
+    ? ALL_REDEEM_OPTIONS
+    : ALL_REDEEM_OPTIONS.filter((option) => !MISAENG_ONLY_REDEEM_IDS.includes(option.id))
 
 export const COMMUNITY_CREDIT_LIMITS = {
   commentDailyCap: 10,

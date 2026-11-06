@@ -53,6 +53,7 @@ import { hrefForCommunityPost } from '@lib/constants/cities'
 import {
   COMMUNITY_CREDIT_BONUS_RULES,
   COMMUNITY_CREDIT_REDEEM_OPTIONS,
+  OFFERS_MISAENG_EXPERT_PROGRAMS,
   COMMUNITY_CREDIT_TIMELINE_ENTRY,
   COMMUNITY_CREDIT_TIMELINE_POST_MAX,
 } from '@lib/constants/communityCredit'
@@ -551,6 +552,7 @@ export function JobReviewGuestWriteScreen() {
                       autoComplete='url'
                     />
                   </Field>
+                  {OFFERS_MISAENG_EXPERT_PROGRAMS ? (
                   <label className='flex cursor-pointer items-start gap-3 rounded-xl bg-[#f4f5f7] px-3.5 py-3 ring-1 ring-black/[0.05]'>
                     <input
                       type='checkbox'
@@ -570,6 +572,7 @@ export function JobReviewGuestWriteScreen() {
                       </span>
                     </span>
                   </label>
+                  ) : null}
                 </div>
                 {/* 허니팟 — 스크린리더·사람에게는 보이지 않음 */}
                 <div className='hidden' aria-hidden>
@@ -884,9 +887,11 @@ function CreditPitch() {
         <PitchItem accent>
           {t('guest.creditPitch.review')}
         </PitchItem>
-        <PitchItem accent>
-          {t('guest.creditPitch.coffeeChat', { cost: COFFEE_CHAT_COST })}
-        </PitchItem>
+        {OFFERS_MISAENG_EXPERT_PROGRAMS ? (
+          <PitchItem accent>
+            {t('guest.creditPitch.coffeeChat', { cost: COFFEE_CHAT_COST })}
+          </PitchItem>
+        ) : null}
         <PitchItem accent>
           {t('guest.creditPitch.optionalSignup')}
         </PitchItem>
@@ -1033,9 +1038,11 @@ function DonePhase({
                     ? t('guest.done.linkedReviewPending')
                     : t('guest.done.linked')}
               </p>
-              <p className='mt-1 text-[12px] leading-relaxed text-[var(--muted-foreground)]'>
-                {t('guest.done.coffeeChat', { cost: COFFEE_CHAT_COST })}
-              </p>
+              {OFFERS_MISAENG_EXPERT_PROGRAMS ? (
+                <p className='mt-1 text-[12px] leading-relaxed text-[var(--muted-foreground)]'>
+                  {t('guest.done.coffeeChat', { cost: COFFEE_CHAT_COST })}
+                </p>
+              ) : null}
             </>
           ) : (
             <>

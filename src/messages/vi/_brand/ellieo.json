@@ -8,11 +8,20 @@
         "title": "Hỏi đáp ẩn danh",
         "description": "Hỏi những điều bạn không muốn ghi tên"
       }
+    },
+    "detail": {
+      "deletePointsClawback": "{points}P điểm Ellieo bạn nhận từ bài viết này sẽ bị thu hồi.",
+      "deletePointsPending": "{points}P điểm Ellieo sắp được trả cho bài viết này sẽ bị hủy."
     }
   },
   "nav": {
     "links": {
       "anonymous": "Hỏi đáp ẩn danh"
+    },
+    "footer": {
+      "links": {
+        "credit": "Điểm Ellieo"
+      }
     }
   },
   "hub": {
@@ -41,6 +50,150 @@
           "title": "Làm quen với Astoria",
           "excerpt": "Giá thuê, đi lại và ăn uống cho sinh viên đang tính chuyển đến."
         }
+      }
+    },
+    "introCarousel": {
+      "expert": {
+        "headline": "Dùng điểm Ellieo để gặp chuyên gia"
+      }
+    }
+  },
+  "api": {
+    "auth": {
+      "accountDisabled": "Tài khoản này đã bị hạn chế. Vui lòng liên hệ đội ngũ Ellieo."
+    },
+    "verification": {
+      "schoolDomainUnsupported": "Chúng tôi chưa hỗ trợ tên miền email của trường này. Hãy liên hệ đội ngũ Ellieo để thêm trường của bạn.",
+      "workplacePending": "Đội ngũ Ellieo đang xem xét yêu cầu xác minh nơi làm việc của bạn.",
+      "instagram": {
+        "handleTaken": "Tài khoản Instagram này đã được xác minh hoặc đang được xác minh bởi một tài khoản Ellieo khác."
+      }
+    },
+    "points": {
+      "coffeeChat": {
+        "mentorConsent": "Thông báo và đồng ý dành cho mentor\n· Các bài review của bạn trên diễn đàn vẫn được giữ ẩn danh. Tuy nhiên, trong buổi coffee chat, người kia có thể thấy khuôn mặt và tên của bạn.\n· Làm mentor không có bất kỳ phần thưởng nào, kể cả điểm. Thưởng giới thiệu (referral) của công ty tuân theo chính sách riêng của từng công ty.\n· Khi có yêu cầu, bạn gửi 1–3 khung giờ phù hợp; người gửi yêu cầu chọn một và gửi link Zoom hoặc Google Meet. Ellieo chỉ giúp kết nối.\n· Lời khuyên nghề nghiệp là ý kiến cá nhân, và Ellieo không chịu trách nhiệm về nội dung cuộc trò chuyện.\n· LinkedIn của bạn được gửi kèm khi bạn gửi khung giờ và sẽ hiển thị cho người gửi yêu cầu khi họ xác nhận thời gian.\n· Nếu bạn hủy một coffee chat đã xác nhận, điểm của người gửi yêu cầu sẽ được hoàn lại.\n· Nút gửi yêu cầu coffee chat cũng hiển thị trên các bài review phỏng vấn và việc làm bạn đã viết.",
+        "requestDisclaimer": "Coffee chat là cuộc trò chuyện tự nguyện với mentor. Ellieo không đảm bảo bất kỳ kết quả giới thiệu, phỏng vấn hay việc làm nào. Mọi sự giới thiệu hoàn toàn do mentor tự quyết định và tuân theo chính sách của công ty mentor. Ellieo không nhận bất kỳ lợi ích tài chính nào từ coffee chat hay việc giới thiệu, và mentor không được Ellieo trả thù lao. Khi gửi yêu cầu, LinkedIn của bạn sẽ được chia sẻ với mentor. Khi gửi yêu cầu, điểm sẽ được giữ chỗ; điểm bị trừ khi bạn chọn một khung giờ mentor gửi và xác nhận bằng link Zoom hoặc Google Meet. Ellieo không kiểm tra cuộc trò chuyện có diễn ra hay không. Sau khi xác nhận, điểm chỉ được hoàn lại nếu mentor hủy hoặc bạn hủy trước giờ bắt đầu ít nhất 24 giờ. Nếu mentor không xuất hiện, hãy báo cáo trong ứng dụng."
+      }
+    }
+  },
+  "credit": {
+    "meta": {
+      "description": "Cách hoạt động của điểm Ellieo tại {brand} NYC: cách kiếm, cách dùng, giới hạn và câu hỏi thường gặp. Tích điểm qua review ăn uống, OPT, việc làm và bình luận, rồi dùng cho coffee chat, tư vấn luật sư, cố vấn nghề nghiệp và nhiều hơn nữa."
+    },
+    "header": {
+      "title": "Hướng dẫn điểm Ellieo"
+    },
+    "redeem": {
+      "title": "Phần thưởng bạn có thể nhận bằng điểm Ellieo"
+    },
+    "earn": {
+      "title": "Kiếm điểm Ellieo"
+    },
+    "principles": {
+      "cost": {
+        "body": "Ellieo chi trả thời gian của chuyên gia và chi phí kết nối cho coffee chat và tư vấn luật sư di trú, nên số điểm cần dùng sẽ nhiều hơn số điểm kiếm được."
+      }
+    },
+    "redeemProcess": {
+      "match": {
+        "description": "Ellieo kết nối bạn với người phù hợp từ mạng lưới đối tác, mentor và chuyên gia. Nếu không kết nối được, điểm sẽ được hoàn lại."
+      }
+    },
+    "earnRules": {
+      "status": {
+        "description": "{entry} điểm cho mỗi bước timeline (tối đa {postMax} mỗi bài viết). Review có kết quả cuối cùng có thể nhận thêm tối đa {reviewBonus} sau khi đội ngũ Ellieo xét duyệt (tổng cộng tối đa {totalMax})."
+      },
+      "job-review": {
+        "description": "{entry} điểm cho mỗi bước tuyển dụng (timeline), tối đa {postMax} mỗi bài viết. Thêm offer hoặc kết quả cuối cùng để nhận thêm tối đa {reviewBonus} sau khi đội ngũ Ellieo xét duyệt (tổng cộng tối đa {totalMax})."
+      }
+    },
+    "redeemOptions": {
+      "coffee-chat": {
+        "includes": {
+          "scheduling": "Đội ngũ Ellieo lên lịch và kết nối"
+        },
+        "note": "Mentor tham gia với tư cách tình nguyện viên hoặc đối tác, Ellieo chi trả chi phí kết nối và vận hành."
+      }
+    },
+    "faq": {
+      "cash": {
+        "a": "Không. Điểm Ellieo không thể quy đổi thành tiền mặt, hoàn tiền, chuyển nhượng, bán hay chuyển sang tài khoản khác. Bạn chỉ có thể dùng cho các chương trình phần thưởng do {brand} NYC quy định."
+      },
+      "timeline": {
+        "a": "Không. Bạn tự động nhận {entry} điểm cho mỗi bước timeline, tối đa {postMax} mỗi bài viết. Nếu bạn thêm kết quả cuối cùng và nhấn \"Yêu cầu thêm điểm\", đội ngũ Ellieo sẽ xét duyệt và cộng {reviewBonus} nếu được duyệt, tổng cộng tối đa {totalMax}."
+      },
+      "policyChange": {
+        "q": "Chính sách điểm Ellieo có thể thay đổi không?"
+      }
+    },
+    "glossary": {
+      "credit": {
+        "term": "Điểm Ellieo"
+      },
+      "reward": {
+        "definition": "Các chương trình phi tiền tệ do Ellieo cung cấp hoặc sắp xếp, như coffee chat và tư vấn luật sư di trú."
+      }
+    },
+    "reviewCard": {
+      "description": "Nếu review của bạn có kết quả cuối cùng, đội ngũ Ellieo có thể kiểm tra và tặng thêm {bonus} điểm. (Tối đa {totalMax} mỗi bài viết, bao gồm điểm tự động)",
+      "pending": "Đang chờ xét duyệt · Chúng tôi sẽ cộng điểm sau khi đội ngũ Ellieo kiểm tra bài viết của bạn."
+    }
+  },
+  "me": {
+    "verification": {
+      "workplace": {
+        "pendingDetail": "Đã xác minh email · Đang chờ đội ngũ Ellieo xem xét",
+        "submittedToast": "Email của bạn đã được xác minh. Việc xác minh nơi làm việc sẽ hoàn tất sau khi đội ngũ Ellieo xem xét.",
+        "approvedDescription": "Đội ngũ Ellieo đã xác nhận nơi làm việc của bạn.",
+        "pendingDescription": "Email công việc của bạn đã được xác minh. Đội ngũ Ellieo đang xem xét thông tin công ty của bạn.",
+        "formDescription": "Email công việc sẽ được liên kết với tài khoản bạn đang đăng nhập, kể cả khi khác với email đăng ký. Sau khi bạn nhập mã, đội ngũ Ellieo sẽ kiểm tra lại thông tin công ty.",
+        "companyPlaceholder": "VD: Amazon"
+      },
+      "school": {
+        "registerDescription": "Nếu trường của bạn chưa có trong danh sách, bạn có thể đề nghị đội ngũ Ellieo thêm vào. Cho chúng tôi biết tên trường và tên miền email, chúng tôi sẽ thêm vào {brand} và ứng dụng.",
+        "registerSubmit": "Gửi yêu cầu tới đội ngũ Ellieo"
+      },
+      "instagram": {
+        "intro": "Gửi mã qua DM từ tài khoản Instagram của bạn tới tài khoản chính thức của Ellieo @{account}, đội ngũ của chúng tôi sẽ xác minh cho bạn.",
+        "rejectReasons": {
+          "noMessage": "Chúng tôi không nhận được tin nhắn nào tại @ellieo.nyc."
+        },
+        "dmMessage": "Xin chào Ellieo! Đây là yêu cầu xác minh Instagram của tôi.\nMã: {code}"
+      }
+    },
+    "cardAction": {
+      "workplacePending": {
+        "description": "Email của bạn đã được xác minh. Vui lòng chờ đội ngũ Ellieo xem xét",
+        "descriptionDesktop": "Đang chờ đội ngũ Ellieo xem xét"
+      }
+    },
+    "credit": {
+      "redeemComingSoon": "Tính năng đổi thưởng đang được mở dần. Xem hướng dẫn điểm Ellieo để biết chi tiết.",
+      "pillAria_other": "{count} điểm Ellieo, xem lịch sử",
+      "requestTitle": "Dùng điểm Ellieo",
+      "requestDescription": "Chọn phần thưởng bạn muốn dùng. Sau khi bạn gửi yêu cầu, Ellieo sẽ xem xét và kết nối cho bạn.",
+      "historyTitle": "Lịch sử điểm Ellieo"
+    },
+    "deleteAccount": {
+      "confirm": "Bạn chắc chắn muốn xóa tài khoản?\n\n• Hồ sơ, thông tin xác minh và thông báo sẽ bị xóa ngay\n• Bài đăng tìm bạn cùng phòng/sublet sẽ bị xóa; các bài viết và bình luận khác vẫn còn dưới tên \"Người dùng đã xóa tài khoản\"\n• Bạn không thể đăng nhập lại bằng tài khoản này\n• Tài khoản Ellieo (dùng chung đăng nhập với Ellieo) cũng sẽ bị xóa"
+    }
+  },
+  "points": {
+    "name": "điểm Ellieo",
+    "reasons": {
+      "review": {
+        "pick": "Được chọn là Ellieo Pick"
+      }
+    }
+  },
+  "reviews": {
+    "guest": {
+      "creditPitch": {
+        "title": "Nhận điểm Ellieo cho review của bạn",
+        "review": "Review chi tiết sẽ nhận thêm điểm sau khi đội ngũ Ellieo xét duyệt"
+      },
+      "done": {
+        "viewCredit": "Xem điểm Ellieo của tôi"
       }
     }
   }

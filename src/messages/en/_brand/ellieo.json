@@ -8,11 +8,23 @@
         "title": "Anonymous Q&A",
         "description": "Ask what you'd rather not put your name on"
       }
+    },
+    "detail": {
+      "deletePointsClawback": "The {points}P Ellieo points you earned from this post will be taken back.",
+      "deletePointsPending": "The {points}P Ellieo points waiting to be paid for this post will be cancelled."
     }
   },
   "nav": {
     "links": {
       "anonymous": "Anonymous Q&A"
+    },
+    "account": {
+      "creditReviews": "Ellieo Points reviews"
+    },
+    "footer": {
+      "links": {
+        "credit": "Ellieo Points"
+      }
     }
   },
   "hub": {
@@ -41,6 +53,165 @@
           "title": "A first look at Astoria",
           "excerpt": "Rent, commute, and food for students thinking of moving there."
         }
+      }
+    },
+    "introCarousel": {
+      "expert": {
+        "headline": "Use your Ellieo Points to meet experts"
+      }
+    }
+  },
+  "api": {
+    "auth": {
+      "accountDisabled": "This account has been restricted. Please contact the Ellieo team."
+    },
+    "verification": {
+      "schoolDomainUnsupported": "We don't support this school email domain yet. Ask the Ellieo team to add your school.",
+      "workplacePending": "The Ellieo team is reviewing your workplace verification.",
+      "instagram": {
+        "handleTaken": "This Instagram account is already verified, or being verified, by another Ellieo account."
+      }
+    },
+    "credit": {
+      "loadFailed": "Couldn't load your Ellieo Points.",
+      "saveFailed": "Couldn't save Ellieo Points (HTTP {status})",
+      "awardFailed": "Couldn't award Ellieo Points. Please check the storage settings."
+    },
+    "push": {
+      "credit": {
+        "title": "+{amount} Ellieo Points"
+      }
+    },
+    "points": {
+      "coffeeChat": {
+        "mentorConsent": "Mentor notice and consent\n· Your reviews on the boards stay anonymous. In a coffee chat, however, the other person may see your face and name.\n· Mentoring comes with no reward of any kind, including points. Company referral bonuses follow each company's own program.\n· When a request comes in, you send 1 to 3 times that work for you; the requester picks one and sends a Zoom or Google Meet link. Ellieo only helps you connect.\n· Career advice is your personal opinion, and Ellieo is not responsible for what is said in the conversation.\n· Your LinkedIn goes along with the times you send and is shown to the requester once they confirm a time.\n· If you cancel a confirmed coffee chat, the requester's points are refunded.\n· A coffee chat request button also appears on the interview and job reviews you wrote.",
+        "requestDisclaimer": "Coffee chats are voluntary conversations with mentors. Ellieo does not guarantee any referral, interview, or employment outcome. Any referral is made solely at the mentor's personal discretion and is subject to the policies of the mentor's employer. Ellieo does not receive any monetary benefit from coffee chats or referrals, and mentors are not compensated by Ellieo. When you send a request, your LinkedIn is shared with the mentor. When you send a request, points are put on hold; they are spent when you pick one of the mentor's times and confirm it with a Zoom or Google Meet link. Ellieo does not check whether the call took place. After confirming, points are refunded only if the mentor cancels or you cancel at least 24 hours before the start. If the mentor doesn't show up, please report it in the app."
+      }
+    }
+  },
+  "credit": {
+    "meta": {
+      "description": "How Ellieo Points work at {brand} NYC: earning, using, limits and FAQ. Collect points with food, OPT and job reviews and comments, then use them for coffee chats, lawyer consultations, career mentoring and more."
+    },
+    "header": {
+      "title": "Ellieo Points Guide"
+    },
+    "redeem": {
+      "title": "Rewards you can get with Ellieo Points"
+    },
+    "earn": {
+      "title": "Earning Ellieo Points"
+    },
+    "principles": {
+      "cost": {
+        "body": "Ellieo covers expert time and matching costs for coffee chats and immigration lawyer consultations, so using points takes more than earning them."
+      }
+    },
+    "redeemProcess": {
+      "match": {
+        "description": "Ellieo connects you with the right person from our partners, mentors and experts. If matching fails, your points are refunded."
+      }
+    },
+    "earnRules": {
+      "status": {
+        "description": "{entry} points per timeline step (up to {postMax} per post). Reviews with a final result can earn up to {reviewBonus} more after an Ellieo team review (up to {totalMax} total)."
+      },
+      "job-review": {
+        "description": "{entry} points per hiring step (timeline), up to {postMax} per post. Add your offer or final result to earn up to {reviewBonus} more after an Ellieo team review (up to {totalMax} total)."
+      }
+    },
+    "redeemOptions": {
+      "coffee-chat": {
+        "includes": {
+          "scheduling": "Scheduling and matching by the Ellieo team"
+        },
+        "note": "Mentors join as volunteers or partners, and Ellieo covers matching and operating costs."
+      }
+    },
+    "faq": {
+      "cash": {
+        "a": "No. Ellieo Points can't be cashed out, refunded, transferred, sold or moved to another account. You can only use them for reward programs set by {brand} NYC."
+      },
+      "timeline": {
+        "a": "No. You get {entry} points automatically for each timeline step, up to {postMax} per post. If you add your final result and tap \"Request extra points,\" the Ellieo team reviews it and adds {reviewBonus} if approved, for up to {totalMax} total."
+      },
+      "policyChange": {
+        "q": "Can the Ellieo Points policy change?"
+      }
+    },
+    "glossary": {
+      "credit": {
+        "term": "Ellieo Points"
+      },
+      "reward": {
+        "definition": "Non-monetary programs Ellieo offers or arranges, like coffee chats and immigration lawyer consultations."
+      }
+    },
+    "reviewCard": {
+      "description": "If your review includes a final result, the Ellieo team can check it and give you {bonus} extra points. (Up to {totalMax} per post, including automatic points)",
+      "pending": "Waiting for review · We'll add the points after the Ellieo team checks your post."
+    },
+    "reviews": {
+      "title": "Ellieo Points reviews"
+    }
+  },
+  "me": {
+    "verification": {
+      "workplace": {
+        "pendingDetail": "Email verified · Waiting for Ellieo team review",
+        "submittedToast": "Your email is verified. Work verification will be complete once the Ellieo team reviews it.",
+        "approvedDescription": "The Ellieo team has confirmed your work verification.",
+        "pendingDescription": "Your work email is verified. The Ellieo team is now reviewing your company info.",
+        "formDescription": "Your work email will be linked to the account you're signed in with, even if it's different from your sign-up email. After you enter the code, the Ellieo team double-checks your company info.",
+        "companyPlaceholder": "e.g. Amazon"
+      },
+      "school": {
+        "registerDescription": "If your school isn't listed, you can ask the Ellieo team to add it. Tell us the school name and email domain and we'll add it to {brand} and the app.",
+        "registerSubmit": "Send request to the Ellieo team"
+      },
+      "instagram": {
+        "intro": "Send a code by DM from your Instagram account to Ellieo's official account @{account}, and our team will verify you.",
+        "rejectReasons": {
+          "noMessage": "We didn't receive a message at @ellieo.nyc."
+        },
+        "dmMessage": "Hi Ellieo! This is my Instagram verification request.\nCode: {code}"
+      }
+    },
+    "cardAction": {
+      "workplacePending": {
+        "description": "Your email is verified. Please wait for the Ellieo team to review it",
+        "descriptionDesktop": "Waiting for Ellieo team review"
+      }
+    },
+    "credit": {
+      "redeemComingSoon": "Reward requests are opening in stages. Check the Ellieo Points guide for details.",
+      "pillAria_other": "{count} Ellieo Points, view history",
+      "requestTitle": "Use Ellieo Points",
+      "balanceLabel": "Your Ellieo Points",
+      "requestDescription": "Pick a reward to use. After you request it, Ellieo will review and match you.",
+      "historyTitle": "Ellieo Points history",
+      "pillAria_one": "{count} Ellieo Point, view history"
+    },
+    "deleteAccount": {
+      "confirm": "Delete your account?\n\n• Your profile, verifications and notifications are deleted right away\n• Roommate/sublet posts are deleted; other posts and comments stay as \"Deleted user\"\n• You can’t sign in with this account again\n• Your Ellieo account (same login as Ellieo) is deleted too"
+    }
+  },
+  "points": {
+    "name": "Ellieo Points",
+    "reasons": {
+      "review": {
+        "pick": "Selected as an Ellieo Pick"
+      }
+    }
+  },
+  "reviews": {
+    "guest": {
+      "creditPitch": {
+        "title": "Earn Ellieo Points for your review",
+        "review": "Detailed reviews get extra points after the Ellieo team reviews them"
+      },
+      "done": {
+        "viewCredit": "View my Ellieo Points"
       }
     }
   }
