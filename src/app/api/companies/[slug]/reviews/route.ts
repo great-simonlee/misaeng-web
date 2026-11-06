@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getRequestLocale, getRequestT } from '@lib/i18n/server'
-import { localizePosts } from '@lib/translations/localize.server'
+import { localizePosts, withEllieoCommentCounts } from '@lib/translations/localize.server'
 import { resolveAuthenticatedUser } from '@/app/api/agent-auth/lib/authHelpers'
 import { resolveCityId } from '@lib/constants/cities'
 import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
@@ -56,7 +56,11 @@ export async function GET(request: Request, context: RouteContext) {
     ])
     const locale = await getRequestLocale(request)
     // 신고로 숨겨진 후기·내가 신고한 후기는 뺀다
-    const reviews = localizePosts(withoutModeratedPosts(withoutBlockedAuthors(posts, blocked), reported), locale)
+    const localized = await withEllieoCommentCounts(
+      localizePosts(withoutModeratedPosts(withoutBlockedAuthors(posts, blocked), reported), locale),
+      locale,
+    )
+    const reviews = localized
       .filter((post) => post.companyId && ids.has(post.companyId))
       .filter((post) => !type || post.jobReviewType === type)
       .sort((a, b) => b.createdAt - a.createdAt)

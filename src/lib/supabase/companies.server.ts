@@ -1,8 +1,12 @@
+import { BRAND } from '@lib/brand'
 import type { CityId } from '@lib/constants/cities'
+import type { Locale } from '@lib/i18n/locales'
+import { ELLIEO_ONLY_TRANSLATED, localizePosts } from '@lib/translations/localize.server'
 import {
   COMPANY_INDUSTRIES,
   COMPANY_REVIEW_BOARD,
   industryLabel,
+  isCompanyIndustry,
   toVisaStatus,
   type CompanyClickKind,
   type VisaStatus,
@@ -181,6 +185,21 @@ export async function listIndustries(): Promise<CompanyIndustryItem[]> {
   return industriesCache.value
 }
 
+/**
+ * Ellieo: industry names in the page language (the table only has Korean names). Misaeng keeps label_ko.
+ * `t` is the `companies` namespace translator.
+ */
+export function localizeIndustries(
+  industries: CompanyIndustryItem[],
+  t: (key: string) => string,
+): CompanyIndustryItem[] {
+  if (BRAND !== 'ellieo') return industries
+  return industries.map((item) => ({
+    ...item,
+    label: isCompanyIndustry(item.code) ? t(`industries.${item.code}`) : item.code,
+  }))
+}
+
 /** 코드 → 한국어 이름. 목록에 없는 코드는 기본 라벨(없으면 코드)로. */
 export function industryLabelFrom(industries: CompanyIndustryItem[], code: string): string {
   return industries.find((i) => i.code === code)?.label ?? industryLabel(code)
@@ -235,9 +254,15 @@ export async function listCompanyReviewPosts(city?: CityId) {
   return listStoredOpenBoardPosts(COMPANY_REVIEW_BOARD, city)
 }
 
-export async function countReviewsByCompany(city?: CityId): Promise<Record<string, number>> {
+export async function countReviewsByCompany(
+  city?: CityId,
+  /** Ellieo: count only reviews shown in this page language (no Korean-only reviews) */
+  locale?: Locale,
+): Promise<Record<string, number>> {
   const counts: Record<string, number> = {}
-  for (const post of await listCompanyReviewPosts(city)) {
+  const posts = await listCompanyReviewPosts(city)
+  const shown = locale && ELLIEO_ONLY_TRANSLATED ? localizePosts(posts, locale) : posts
+  for (const post of shown) {
     if (post.companyId) counts[post.companyId] = (counts[post.companyId] || 0) + 1
   }
   return counts

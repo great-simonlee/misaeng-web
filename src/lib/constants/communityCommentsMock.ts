@@ -1,3 +1,4 @@
+import { BRAND } from '@lib/brand'
 import type {
   CommunityComment,
   CommunityCommentThread,
@@ -83,6 +84,8 @@ export const COMMUNITY_MOCK_COMMENTS: CommunityComment[] = [
 export function listMockCommunityComments(
   postId: string,
 ): CommunityComment[] {
+  // Korean sample comments: never on Ellieo
+  if (BRAND === 'ellieo') return []
   return COMMUNITY_MOCK_COMMENTS.filter(
     (item) => item.postId === postId && item.status === 'open',
   ).sort((a, b) => a.createdAt - b.createdAt)

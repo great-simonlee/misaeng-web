@@ -1,3 +1,4 @@
+import { BRAND_CONFIG } from '@lib/brand'
 import { NextResponse } from 'next/server'
 
 import { apiErrorMessage } from '@lib/i18n/apiError'
@@ -219,6 +220,8 @@ export async function POST(request: Request) {
   const post: CommunityPost = {
     id,
     // 작성 화면 언어 = 원문 언어 (번역이 다르면 ERP 번역 단계에서 바로잡는다)
+    // Site it was written on (contentBrand.ts): from the server config, never from the request
+    brand: BRAND_CONFIG.id,
     sourceLocale: locale,
     categoryId: 'job-review',
     city: null,

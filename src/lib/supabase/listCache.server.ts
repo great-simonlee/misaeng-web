@@ -1,4 +1,5 @@
 import type { SupabaseProfileRecord } from '@lib/supabase/profile.server'
+import type { CommunityComment } from '@/types/nyc'
 
 /**
  * 서버 인스턴스 메모리 캐시 — Storage JSON을 매 요청마다 수십 개씩 내려받지 않도록 한다.
@@ -61,8 +62,13 @@ export const postCountsCache = new TtlCache<{ recommendCount: number; commentCou
   POST_COUNTS_TTL_MS,
 )
 
+/** Ellieo: comments of a post, to count only the ones with an en/vi version (src/lib/translations) */
+export const postCommentsCache = new TtlCache<CommunityComment[]>(POST_COUNTS_TTL_MS)
+
 export function invalidatePostCounts(postId: string) {
-  postCountsCache.delete(String(postId || '').trim())
+  const id = String(postId || '').trim()
+  postCountsCache.delete(id)
+  postCommentsCache.delete(id)
 }
 
 export const listProfileCache = new TtlCache<SupabaseProfileRecord | null>(LIST_PROFILE_TTL_MS, 2000)

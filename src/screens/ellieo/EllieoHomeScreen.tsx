@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { MarqueeRow } from '@components'
-import { useCityInfo, useCityPath } from '@hooks/useCity'
+import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { captureReferralFromLocation } from '@lib/community/referral'
-import type { NycCategoryId } from '@lib/constants/nyc'
+import { resolveMergedCommunityBoardId, type NycCategoryId } from '@lib/constants/nyc'
+import type { CommunityPost } from '@/types/nyc'
 import { useFormat, useLocale, useT } from '@lib/i18n/client'
 import { BadgeCheckIcon, ChatIcon, HeartIcon } from '@widgets/ellieo/icons'
 import {
@@ -290,12 +291,12 @@ function CommunityFeed() {
   const locale = useLocale()
   const format = useFormat()
   const href = useCityPath()
-  const posts = getCommunityHighlights().filter(
-    (post) => !FEED_EXCLUDED_BOARDS.includes(post.board)
-  )
-  const [filter, setFilter] = useState<NycCategoryId | 'all'>('all')
   // Fixed at mount so "3 hours ago" doesn't change between renders
   const [now] = useState(() => Date.now())
+  const feed = useHomeFeed(locale, now)
+  const posts = feed.items.filter((post) => !FEED_EXCLUDED_BOARDS.includes(post.board))
+  const [filter, setFilter] = useState<NycCategoryId | 'all'>('all')
+  if (feed.loading) return null
   if (posts.length === 0) return <ExploreBoards />
 
   // Chips only for boards that have posts, in the Ellieo board order
@@ -304,7 +305,7 @@ function CommunityFeed() {
 
   return (
     <section className='min-w-0'>
-      <FeedHeading title={t('ellieo.community.title')} aside={<SampleTag />} />
+      <FeedHeading title={t('ellieo.community.title')} aside={feed.sample ? <SampleTag /> : null} />
 
       {/* Board filter chips */}
       <div className='-mx-4 mt-3 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden'>
@@ -343,7 +344,7 @@ function CommunityFeed() {
           return (
             <li key={post.id} className='border-b border-[var(--border)] last:border-b-0'>
               <Link
-                href={href(board?.path ?? '/')}
+                href={href(post.path ?? board?.path ?? '/')}
                 data-ui='hover-row'
                 className='group block py-3.5'
               >
@@ -352,9 +353,9 @@ function CommunityFeed() {
                   <span
                     aria-hidden
                     className='flex size-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold uppercase text-white'
-                    style={{ background: anonymous ? '#9aa4b2' : gradientFor(post.nickname) }}
+                    style={{ background: anonymous ? '#9aa4b2' : gradientFor(post.nickname || '?') }}
                   >
-                    {anonymous ? '?' : post.nickname.charAt(0)}
+                    {anonymous ? '?' : (post.nickname || '?').charAt(0)}
                   </span>
                   <span className='flex min-w-0 flex-1 items-center gap-1 text-[12.5px]'>
                     <span className='truncate font-semibold text-[var(--foreground)]'>
@@ -362,8 +363,8 @@ function CommunityFeed() {
                     </span>
                     <BadgeCheckIcon className='size-3.5 shrink-0 text-[var(--ellieo-jade)]' />
                     <span className='truncate text-[var(--muted)]'>
-                      {anonymous ? '' : ` · ${shortSchool(post.school)}`} ·{' '}
-                      {format.relative(now - post.hoursAgo * 3_600_000)}
+                      {anonymous || !post.school ? '' : ` · ${shortSchool(post.school)}`} ·{' '}
+                      {format.relative(post.at)}
                     </span>
                   </span>
                   <span
@@ -385,10 +386,10 @@ function CommunityFeed() {
                       {t('ellieo.community.trending')}
                     </span>
                   ) : null}
-                  {locale === 'vi' ? post.title.vi : post.title.en}
+                  {post.title}
                 </span>
                 <span className='mt-0.5 line-clamp-1 text-[13.5px] leading-relaxed text-[var(--muted)]'>
-                  {locale === 'vi' ? post.excerpt.vi : post.excerpt.en}
+                  {post.excerpt}
                 </span>
 
                 {/* Reactions */}
@@ -409,4 +410,80 @@ function CommunityFeed() {
       </ul>
     </section>
   )
+}
+
+/* ---------- Home feed data: real posts first, design samples only on a dev server ---------- */
+
+type HomeFeedItem = {
+  id: string
+  board: NycCategoryId
+  /** Post detail path; samples link to their board */
+  path: string | null
+  title: string
+  excerpt: string
+  nickname: string
+  school: string
+  at: number
+  likes: number
+  comments: number
+}
+
+const HOME_FEED_LIMIT = 8
+
+/**
+ * Newest community posts of this city from /api/community (Ellieo only gets posts with an en/vi version,
+ * src/lib/translations/localize.server.ts). Sample posts (mockContent) only when there are no real ones.
+ */
+function useHomeFeed(locale: string, now: number): { items: HomeFeedItem[]; sample: boolean; loading: boolean } {
+  const city = useCity()
+  const [real, setReal] = useState<HomeFeedItem[] | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch(`/api/community?${new URLSearchParams({ city }).toString()}`, { cache: 'no-store' })
+      .then((res) => (res.ok ? (res.json() as Promise<{ posts?: CommunityPost[] }>) : { posts: [] }))
+      .catch(() => ({ posts: [] as CommunityPost[] }))
+      .then((data) => {
+        if (cancelled) return
+        const items: HomeFeedItem[] = []
+        for (const post of data.posts ?? []) {
+          const boardId = (resolveMergedCommunityBoardId(post.categoryId) ?? post.categoryId) as NycCategoryId
+          const board = ELLIEO_BOARDS.find((item) => item.id === boardId)
+          if (!board) continue
+          items.push({
+            id: post.id,
+            board: boardId,
+            path: `${board.path}/${encodeURIComponent(post.id)}`,
+            title: post.title,
+            excerpt: post.description,
+            nickname: post.authorNickname || '',
+            school: post.authorSchoolName || '',
+            at: post.createdAt,
+            likes: post.recommendCount,
+            comments: post.commentCount,
+          })
+        }
+        items.sort((a, b) => b.at - a.at)
+        setReal(items.slice(0, HOME_FEED_LIMIT))
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [city, locale])
+
+  if (real === null) return { items: [], sample: false, loading: true }
+  if (real.length > 0) return { items: real, sample: false, loading: false }
+  const samples = getCommunityHighlights().map((post) => ({
+    id: post.id,
+    board: post.board,
+    path: null,
+    title: locale === 'vi' ? post.title.vi : post.title.en,
+    excerpt: locale === 'vi' ? post.excerpt.vi : post.excerpt.en,
+    nickname: post.nickname,
+    school: post.school,
+    at: now - post.hoursAgo * 3_600_000,
+    likes: post.likes,
+    comments: post.comments,
+  }))
+  return { items: samples, sample: samples.length > 0, loading: false }
 }

@@ -1,3 +1,4 @@
+import { BRAND_CONFIG } from '@lib/brand'
 import { NextResponse } from 'next/server'
 
 import { apiErrorMessage } from '@lib/i18n/apiError'
@@ -339,6 +340,8 @@ export async function POST(request: Request, context: RouteContext) {
     postId,
     parentId,
     body,
+    // Site it was written on (contentBrand.ts): from the server config, never from the request
+    brand: BRAND_CONFIG.id,
     sourceLocale: locale,
     authorUid: user.uid,
     authorEmail: user.email,

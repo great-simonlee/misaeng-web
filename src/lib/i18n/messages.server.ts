@@ -64,13 +64,15 @@ async function loadBrandOverlay(locale: Locale): Promise<MessageTree> {
 const cache = new Map<Locale, Promise<MessageTree>>()
 
 /**
- * 빠진 문구는 en → ko 순으로 채운다. 번역이 늦어도 화면에 키가 그대로 보이지 않게 한다.
+ * 빠진 문구는 en → ko 순으로 채운다 (Ellieo: en only). 번역이 늦어도 화면에 키가 그대로 보이지 않게 한다.
  * (ko 화면은 ko → en 순)
  */
 export function getMessages(locale: Locale): Promise<MessageTree> {
   const cached = cache.get(locale)
   if (cached) return cached
-  const chain: Locale[] = locale === 'ko' ? ['en', 'ko'] : ['ko', 'en', locale]
+  // Ellieo never shows Korean UI text: missing vi strings fall back to en only
+  const chain: Locale[] =
+    BRAND === 'ellieo' ? (locale === 'en' ? ['en'] : ['en', locale]) : locale === 'ko' ? ['en', 'ko'] : ['ko', 'en', locale]
   const unique = [...new Set(chain)]
   const promise = Promise.all([
     ...unique.map(loadLocale),

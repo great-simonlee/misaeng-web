@@ -1,5 +1,6 @@
+import { BRAND_CONFIG } from '@lib/brand'
 import { NextResponse } from 'next/server'
-import { finalizePost, localizePosts } from '@lib/translations/localize.server'
+import { finalizePost, localizePosts, withEllieoCommentCounts } from '@lib/translations/localize.server'
 
 import { apiErrorMessage } from '@lib/i18n/apiError'
 import { formatNumber } from '@lib/i18n/format'
@@ -133,9 +134,10 @@ export async function GET(request: Request) {
         }
       }
       const locale = await getRequestLocale(request)
-      const posts = localizePosts(await listStoredCommunityPostsByAuthor(user.uid), locale, {
-        hidePending: false,
-      })
+      const posts = await withEllieoCommentCounts(
+        localizePosts(await listStoredCommunityPostsByAuthor(user.uid), locale, { hidePending: false }),
+        locale,
+      )
       return NextResponse.json({
         posts: posts.map((item) =>
           finalizePost(
@@ -170,7 +172,7 @@ export async function GET(request: Request) {
     // 면접·취업 후기: 작성자가 그 글로 합격 인증을 받았는지 (authorUid는 익명 정리 전 원본으로 확인)
     const offerVerified =
       board === 'job-review' ? await getOfferVerifiedPostIds(ordered) : null
-    const posts = localizePosts(ordered, locale)
+    const posts = await withEllieoCommentCounts(localizePosts(ordered, locale), locale)
     return NextResponse.json({
       posts: posts.map((item) => {
         const finalized = finalizePost(
@@ -596,6 +598,8 @@ export async function POST(request: Request) {
   const post: CommunityPost = {
     id,
     // 작성 화면 언어 = 원문 언어 (번역이 다르면 ERP 번역 단계에서 바로잡는다)
+    // Site it was written on (contentBrand.ts): from the server config, never from the request
+    brand: BRAND_CONFIG.id,
     sourceLocale: locale,
     categoryId,
     city,

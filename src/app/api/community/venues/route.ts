@@ -8,7 +8,8 @@ import {
 import { resolveCityId } from '@lib/constants/cities'
 import { listMockCommunityPosts } from '@lib/constants/communityMock'
 import { apiErrorMessage } from '@lib/i18n/apiError'
-import { getRequestT } from '@lib/i18n/server'
+import { getRequestLocale, getRequestT } from '@lib/i18n/server'
+import { ELLIEO_ONLY_TRANSLATED, localizePosts } from '@lib/translations/localize.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -38,7 +39,10 @@ export async function GET(request: Request) {
     let posts = isCommunityStorageConfigured()
       ? await listStoredCommunityPosts('food', city)
       : []
-    if (posts.length === 0) {
+    if (ELLIEO_ONLY_TRANSLATED) {
+      // Ellieo: only places from reviews with an en/vi version (and no Korean sample posts)
+      posts = localizePosts(posts, await getRequestLocale(request))
+    } else if (posts.length === 0) {
       posts = listMockCommunityPosts('food', city)
     }
 

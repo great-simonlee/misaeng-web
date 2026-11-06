@@ -1,4 +1,5 @@
 import { pickTranslationFields } from '@lib/translations/content'
+import { pickContentBrand } from '@lib/community/contentBrand'
 import type { CommunityComment } from '@/types/nyc'
 import { ApiMessageError } from '@lib/i18n/apiError'
 import { invalidatePostCounts } from '@lib/supabase/listCache.server'
@@ -103,6 +104,7 @@ function normalizeComment(raw: unknown): CommunityComment | null {
     // 신고 자동 숨김·ERP 숨김 (src/lib/community/moderation.ts)
     moderation: normalizeModeration(data.moderation),
     ...pickTranslationFields(data),
+    ...pickContentBrand(data),
   }
 }
 

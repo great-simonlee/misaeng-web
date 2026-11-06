@@ -3,6 +3,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
 
 import { cn } from '@lib'
+import { BRAND } from '@lib/brand'
 import { useLocale, useT } from '@lib/i18n/client'
 import { localeDisplayName } from '@lib/i18n/locales'
 import { restoreOriginal, type ContentI18n, type ContentKind } from '@lib/translations/content'
@@ -94,6 +95,18 @@ export function TranslationNotice({
       {showingOriginal ? t('showTranslation') : t('showOriginal')}
     </button>
   )
+
+  // Ellieo sends no Korean original: "Translated from Korean" without the toggle
+  if (BRAND === 'ellieo' && !i18n.original) {
+    return variant === 'comment'
+      ? null
+      : wrap(
+          <>
+            {icon}
+            <span>{t('translatedFrom', { language })}</span>
+          </>,
+        )
+  }
 
   if (variant === 'comment') {
     return wrap(

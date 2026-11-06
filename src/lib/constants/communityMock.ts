@@ -1,3 +1,4 @@
+import { BRAND } from '@lib/brand'
 import type { CommunityPost } from '@/types/nyc'
 import {
   communityPostMatchesCity,
@@ -786,10 +787,14 @@ export const COMMUNITY_MOCK_POSTS: CommunityPost[] = [
   }),
 ]
 
+/** The sample posts are Korean: never on Ellieo (an empty board stays empty there) */
+const SAMPLE_CONTENT = BRAND !== 'ellieo'
+
 export function listMockCommunityPosts(
   boardId?: NycCommunityBoardId,
   city?: CityId,
 ): CommunityPost[] {
+  if (!SAMPLE_CONTENT) return []
   const items = COMMUNITY_MOCK_POSTS.filter((item) => {
     if (boardId && item.categoryId !== boardId) return false
     if (!city) return true
@@ -805,6 +810,7 @@ export function listMockCommunityPosts(
 }
 
 export function getMockCommunityPost(id: string): CommunityPost | null {
+  if (!SAMPLE_CONTENT) return null
   return COMMUNITY_MOCK_POSTS.find((item) => item.id === id) ?? null
 }
 

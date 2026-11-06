@@ -1,4 +1,5 @@
 import type { Locale } from '@lib/i18n/locales'
+import type { ContentBrandFields } from '@lib/community/contentBrand'
 import type { ContentI18n, TranslationFields } from '@lib/translations/content'
 import type { CityId } from '@lib/constants/cities'
 import type { InstagramVerificationState } from '@lib/verification/instagram'
@@ -294,7 +295,7 @@ export type CommunityBoardId =
   | 'anonymous'
   | 'roommate'
 
-export interface CommunityPost extends TranslationFields {
+export interface CommunityPost extends TranslationFields, ContentBrandFields {
   id: string
   categoryId: CommunityBoardId
   /** 도시 전용 글은 필수. status는 필터용 도시, job-review는 null */
@@ -507,7 +508,7 @@ export interface PlaceSearchResult {
 /** 댓글/대댓글 — parentId가 있으면 대댓글(1단만 허용) */
 export type CommunityCommentStatus = 'open' | 'deleted'
 
-export interface CommunityComment extends TranslationFields {
+export interface CommunityComment extends TranslationFields, ContentBrandFields {
   id: string
   postId: string
   /** null = 댓글, string = 해당 댓글에 대한 대댓글 */

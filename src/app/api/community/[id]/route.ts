@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { finalizePost, localizePost } from '@lib/translations/localize.server'
+import { finalizePost, localizePost, withEllieoCommentCounts } from '@lib/translations/localize.server'
 
 import { apiErrorMessage } from '@lib/i18n/apiError'
 import { formatNumber } from '@lib/i18n/format'
@@ -157,11 +157,12 @@ export async function GET(request: Request, context: RouteContext) {
         )
       }
     }
+    const found = localizePost(post, locale, { viewerUid: user?.uid })
+    // Ellieo: a post with no en/vi version does not exist there
+    if (!found) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    const [localized] = await withEllieoCommentCounts([found], locale)
     const visible = finalizePost(
-      applyReviewBodyAccess(
-        sanitizeAnonymousCommunityPost(localizePost(post, locale, { viewerUid: user?.uid }), user?.uid),
-        user,
-      ),
+      applyReviewBodyAccess(sanitizeAnonymousCommunityPost(localized, user?.uid), user),
     )
     // 연락 경로는 비공개 — 수정 화면을 위해 작성자 본인에게만 내려준다.
     const isAuthor = Boolean(user?.uid && user.uid === post.authorUid)

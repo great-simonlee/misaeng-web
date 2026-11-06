@@ -1,5 +1,6 @@
+import { BRAND } from '@lib/brand'
 import { NextResponse } from 'next/server'
-import { getRequestT } from '@lib/i18n/server'
+import { getRequestLocale, getRequestT, getT } from '@lib/i18n/server'
 import { resolveCityId } from '@lib/constants/cities'
 import {
   countReviewsByCompany,
@@ -8,6 +9,7 @@ import {
   isCompanyStorageConfigured,
   listActiveCompanies,
   listIndustries,
+  localizeIndustries,
   type CompanyIndustryItem,
   type PublicCompany,
 } from '@lib/supabase/companies.server'
@@ -45,10 +47,11 @@ export async function GET(request: Request, context: RouteContext) {
 
     const { searchParams } = new URL(request.url)
     const city = searchParams.get('city') ? resolveCityId(searchParams.get('city')) : undefined
+    const locale = await getRequestLocale(request)
     const [companies, counts, industries] = await Promise.all([
       listActiveCompanies(),
-      countReviewsByCompany(city),
-      listIndustries(),
+      countReviewsByCompany(city, locale),
+      listIndustries().then(async (rows) => localizeIndustries(rows, await getT(locale, 'companies'))),
     ])
     const parent = companies.find((c) => c.id === company.parentCompanyId) ?? null
     const children = companies.filter((c) => c.parentCompanyId === company.id)
@@ -56,7 +59,7 @@ export async function GET(request: Request, context: RouteContext) {
     return NextResponse.json({
       company: {
         ...summary(company, counts, industries),
-        aliases: company.aliases,
+        aliases: BRAND === 'ellieo' ? company.aliases.filter((a) => !/[\uac00-\ud7a3]/.test(a)) : company.aliases,
         careersUrl: company.careersUrl,
         studentsUrl: company.studentsUrl,
         isFeatured: company.isFeatured,

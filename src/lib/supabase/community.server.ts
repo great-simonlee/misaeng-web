@@ -1,4 +1,6 @@
+import { BRAND } from '@lib/brand'
 import { pickTranslationFields } from '@lib/translations/content'
+import { pickContentBrand } from '@lib/community/contentBrand'
 import { ApiMessageError } from '@lib/i18n/apiError'
 import {
   normalizeFoodCategory,
@@ -250,6 +252,8 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
         : resolveCityId(typeof data.city === 'string' ? data.city : null),
     // 번역(ERP Translations 탭이 저장) — 다시 저장할 때 잃지 않도록 같이 읽는다
     ...pickTranslationFields(data),
+    // Site the post was written on (src/lib/community/contentBrand.ts) — kept on re-save
+    ...pickContentBrand(data),
   }
 }
 
@@ -310,7 +314,18 @@ async function writeRawPostJson(
   return Boolean(res?.ok)
 }
 
-const allPostsCache = new TtlCache<CommunityPost[]>(COMMUNITY_POSTS_TTL_MS, 1)
+/**
+ * Ellieo shows a post only once its en/vi translation is saved in the ERP (another server, which cannot clear
+ * this cache). So on Ellieo the list is re-checked every few seconds — one Storage list call — and only posts
+ * whose object changed (`updated_at`) are downloaded again. Misaeng keeps the 60-second cache.
+ */
+const RECHECK_CHANGED_POSTS = BRAND === 'ellieo'
+const allPostsCache = new TtlCache<CommunityPost[]>(
+  RECHECK_CHANGED_POSTS ? 5_000 : COMMUNITY_POSTS_TTL_MS,
+  1,
+)
+/** Ellieo: last downloaded post per object name, reused while its `updated_at` is the same */
+const postObjectCache = new Map<string, { updatedAt: string; post: CommunityPost | null }>()
 const ALL_POSTS_KEY = 'all'
 
 /** 이 서버에서 글을 쓰거나 지웠을 때 — 다음 목록 요청이 Storage에서 다시 읽는다 */
@@ -358,22 +373,32 @@ async function loadAllStoredCommunityPosts(): Promise<CommunityPost[]> {
   if (!res?.ok) throw new Error('Community post list failed')
 
   const items = (await res.json().catch(() => null)) as
-    | Array<{ name?: string }>
+    | Array<{ name?: string; updated_at?: string | null }>
     | null
-  const names = (items || [])
-    .map((item) => String(item?.name || '').trim())
-    .filter((name) => name.endsWith('.json'))
+  const objects = (items || [])
+    .map((item) => ({ name: String(item?.name || '').trim(), updatedAt: String(item?.updated_at || '') }))
+    .filter((item) => item.name.endsWith('.json'))
 
   const posts = (
     await Promise.all(
-      names.map((name) => {
+      objects.map(async ({ name, updatedAt }) => {
         const path = name.startsWith('community/')
           ? name
           : `community/${name}`
-        return fetchPostJson(bucket, path)
+        if (!RECHECK_CHANGED_POSTS) return fetchPostJson(bucket, path)
+        const hit = postObjectCache.get(path)
+        if (hit && updatedAt && hit.updatedAt === updatedAt) return hit.post
+        const post = await fetchPostJson(bucket, path)
+        if (updatedAt) postObjectCache.set(path, { updatedAt, post })
+        return post
       }),
     )
   ).filter((post): post is CommunityPost => Boolean(post))
+
+  if (RECHECK_CHANGED_POSTS) {
+    const listed = new Set(objects.map(({ name }) => (name.startsWith('community/') ? name : `community/${name}`)))
+    for (const path of postObjectCache.keys()) if (!listed.has(path)) postObjectCache.delete(path)
+  }
 
   return posts.sort((a, b) => b.updatedAt - a.updatedAt || b.createdAt - a.createdAt)
 }

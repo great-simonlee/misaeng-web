@@ -1,3 +1,4 @@
+import { BRAND_CONFIG } from '@lib/brand'
 import {
   isCommunityEngagementStorageConfigured,
   listStoredReports,
@@ -43,6 +44,9 @@ type ReportRow = {
 }
 
 class ReportsTableMissing extends Error {}
+
+const SEND_REPORT_BRAND = BRAND_CONFIG.id === 'ellieo'
+let brandColumnMissing = false
 class ReportDuplicate extends Error {}
 
 let warnedMissing = false
@@ -148,10 +152,16 @@ export async function createCommunityReport(input: CreateReportInput): Promise<C
   if (inJson) return { ok: false, duplicate: true }
 
   try {
-    const rows = await rest<ReportRow[]>(TABLE, {
-      method: 'POST',
-      prefer: 'return=representation',
-      body: JSON.stringify({
+    const insert = (withBrand: boolean) =>
+      rest<ReportRow[]>(TABLE, {
+        method: 'POST',
+        prefer: 'return=representation',
+        body: JSON.stringify({
+          ...(withBrand ? { brand: BRAND_CONFIG.id } : {}),
+          ...reportRow,
+        }),
+      })
+    const reportRow = {
         target_type: input.targetType,
         target_id: input.targetId,
         post_id: input.postId,
@@ -162,8 +172,22 @@ export async function createCommunityReport(input: CreateReportInput): Promise<C
         reason: input.reason,
         detail: input.detail,
         status: 'open',
-      }),
-    })
+      }
+    // Site the report was made on (contentBrand.ts). Only Ellieo sends it: the column defaults to 'misaeng'.
+    // Until supabase/community_reports_brand.sql runs the column is missing (PGRST204): save without it.
+    let rows: ReportRow[]
+    if (SEND_REPORT_BRAND && !brandColumnMissing) {
+      try {
+        rows = await insert(true)
+      } catch (error) {
+        if (!(error instanceof ReportsTableMissing) || error.message !== 'PGRST204') throw error
+        brandColumnMissing = true
+        console.warn('Community reports: run supabase/community_reports_brand.sql (saving without brand).')
+        rows = await insert(false)
+      }
+    } else {
+      rows = await insert(false)
+    }
     viewerReportsCache.delete(input.reporterUid)
     const row = Array.isArray(rows) ? rows[0] : null
     if (!row) throw new Error('Report insert returned no row')
