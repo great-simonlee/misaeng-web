@@ -1,3 +1,4 @@
+import { BRAND_CONFIG } from '@lib/brand'
 import type { HousingListing } from '@/types/nyc'
 
 function isFiniteNumber(value: unknown): value is number {
@@ -15,10 +16,21 @@ export function getHousingMapCoordinates(listing: HousingListing): {
   return { latitude, longitude }
 }
 
-/** Public JSON: keep displayed address only — no exact address or coordinates. */
+/**
+ * Public JSON: keep displayed address only — no exact address or coordinates.
+ * Ellieo: the Misaeng team's addresses (housing@misaeng.com …) are replaced by Ellieo's contact address.
+ */
 export function toPublicHousingListing(listing: HousingListing): HousingListing {
+  const ellieoContact =
+    BRAND_CONFIG.id === 'ellieo'
+      ? {
+          contactEmail: BRAND_CONFIG.contactEmail,
+          authorEmail: /@misaeng\.com$/i.test(listing.authorEmail) ? BRAND_CONFIG.contactEmail : listing.authorEmail,
+        }
+      : {}
   return {
     ...listing,
+    ...ellieoContact,
     property: {
       ...listing.property,
       address: '',

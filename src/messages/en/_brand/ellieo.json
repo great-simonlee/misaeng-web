@@ -12,6 +12,23 @@
     "detail": {
       "deletePointsClawback": "The {points}P Ellieo points you earned from this post will be taken back.",
       "deletePointsPending": "The {points}P Ellieo points waiting to be paid for this post will be cancelled."
+    },
+    "boards": {
+      "events": {
+        "titlePlaceholder": "International student networking night"
+      },
+      "food": {
+        "locationPlaceholder": "East Village / Midtown"
+      },
+      "status": {
+        "locationPlaceholder": "e.g. IT and software company"
+      },
+      "cpt-opt": {
+        "locationPlaceholder": "e.g. IT and software company"
+      },
+      "roommate": {
+        "descriptionPlaceholder": "Tell us about your lifestyle, budget, and move-in date. Leave a way to reach you (Instagram, WhatsApp or email)."
+      }
     }
   },
   "nav": {
@@ -58,6 +75,9 @@
     "introCarousel": {
       "expert": {
         "headline": "Use your Ellieo Points to meet experts"
+      },
+      "intro": {
+        "body": "Visa, job, food, and event info from students and professionals in New York, all in one place."
       }
     }
   },
@@ -193,7 +213,7 @@
       "pillAria_one": "{count} Ellieo Point, view history"
     },
     "deleteAccount": {
-      "confirm": "Delete your account?\n\n• Your profile, verifications and notifications are deleted right away\n• Roommate/sublet posts are deleted; other posts and comments stay as \"Deleted user\"\n• You can’t sign in with this account again\n• Your Ellieo account (same login as Ellieo) is deleted too"
+      "confirm": "Delete your account?\n\n• Your profile, verifications and notifications are deleted right away\n• Roommate/sublet posts are deleted; other posts and comments stay as \"Deleted user\"\n• You can’t sign in with this account again"
     }
   },
   "points": {
@@ -202,7 +222,8 @@
       "review": {
         "pick": "Selected as an Ellieo Pick"
       }
-    }
+    },
+    "sharedNotice": "Your points are saved to your account."
   },
   "reviews": {
     "guest": {
@@ -230,6 +251,29 @@
       "bedrooms": "{count} BR",
       "postFallback": "Community post",
       "jobReviewDescription": "{company} {type} interview and hiring timeline on {brand}."
+    }
+  },
+  "housing": {
+    "roommate": {
+      "write": {
+        "steps": {
+          "detailsDescription": "Share your lifestyle and terms, and leave a way to reach you (Instagram, WhatsApp or email)."
+        }
+      },
+      "form": {
+        "has-room": {
+          "bodyPlaceholder": "Describe the layout, your lifestyle, utilities and deposit. Leave a way to reach you (Instagram, WhatsApp or email)."
+        },
+        "together": {
+          "bodyPlaceholder": "Share your budget, preferred neighborhood and lifestyle. Leave a way to reach you (Instagram, WhatsApp or email)."
+        },
+        "room": {
+          "bodyPlaceholder": "Share your budget, preferred location and move-in timing. Leave a way to reach you (Instagram, WhatsApp or email)."
+        },
+        "sublet": {
+          "bodyPlaceholder": "Describe the dates, whether it's furnished, transit, utilities and deposit. Leave a way to reach you (Instagram, WhatsApp or email)."
+        }
+      }
     }
   }
 }

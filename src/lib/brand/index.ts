@@ -42,6 +42,8 @@ export type BrandConfig = {
    * 색·글꼴·모서리·그림자 토큰은 globals.css `[data-brand]`에 있다.
    */
   theme: BrandId
+  /** Public contact address (inquiries, housing questions) */
+  contactEmail: string
   /** Official social accounts (handles without @). Instagram: partner/creator DMs and the DM verification */
   social: { instagram: string }
   /** 홈·파트너 영역 노출 (Ellieo VSA 영역은 구조만 두고 기본 숨김, 브리프 3장) */
@@ -94,6 +96,7 @@ const MISAENG: BrandConfig = {
   hasCorporateSite: true,
   hasMobileAppPage: true,
   theme: 'misaeng',
+  contactEmail: 'info@misaeng.com',
   social: { instagram: 'misaeng.ny' },
   sections: { koreanPartnerSchools: true, partnerInfluencers: true },
   trust: {
@@ -127,6 +130,7 @@ const ELLIEO: BrandConfig = {
   hasCorporateSite: false,
   hasMobileAppPage: true,
   theme: 'ellieo',
+  contactEmail: 'info@ellieo.com',
   social: { instagram: 'ellieo.nyc' },
   sections: { koreanPartnerSchools: false, partnerInfluencers: false },
   trust: {

@@ -53,13 +53,18 @@ const CORPORATE_PATHS = new Set([
 ])
 
 /**
- * Brands without the corporate site (Ellieo): corporate paths that have an Ellieo equivalent. The rest of
- * CORPORATE_PATHS still goes to misaeng.com. Contact has no page yet: it opens an email to info@ellieo.com.
+ * Brands without the corporate site (Ellieo): every corporate path goes to an Ellieo page — Ellieo never links
+ * to misaeng.com (separate services; the relationship shows only in the legal pages). Contact has no page yet:
+ * it opens an email to info@ellieo.com. Misaeng-only pages (careers, our service, roadmap) go to the About page.
  */
 const ELLIEO_OWN_PATHS: Record<string, string> = {
   terms: '/nyc/terms-of-use',
   privacy: '/nyc/privacy-policy',
   contact: 'mailto:info@ellieo.com',
+  credit: '/nyc/credit',
+  careers: '/nyc/about',
+  'our-service': '/nyc/about',
+  roadmap: '/nyc/about',
 }
 
 export function proxy(request: NextRequest) {
@@ -74,15 +79,11 @@ export function proxy(request: NextRequest) {
       return redirectTo(request, servicePathFor(request, `/nyc/${first}`), 307)
     }
     // Ellieo's own legal pages and contact (temporary: these may become Ellieo pages later)
-    const own = segments.length === 1 ? ELLIEO_OWN_PATHS[first] : undefined
-    if (own) {
+    if (CORPORATE_PATHS.has(first)) {
+      const own = (segments.length === 1 && ELLIEO_OWN_PATHS[first]) || '/nyc/about'
       return own.startsWith('mailto:')
         ? NextResponse.redirect(own, 307)
         : redirectTo(request, servicePathFor(request, own), 307)
-    }
-    if (CORPORATE_PATHS.has(first)) {
-      const misaeng = brandConfig('misaeng')
-      return NextResponse.redirect(`${misaeng.siteUrl}${pathname}${search}`, 308)
     }
   }
 
@@ -99,6 +100,10 @@ export function proxy(request: NextRequest) {
 
   if (isLocale(first) && BRAND_CONFIG.otherBrandLocales.includes(first)) {
     const rest = `/${segments.slice(1).join('/')}`
+    // Ellieo does not send visitors to misaeng.com: `/ko/nyc/...` opens the same page in English here
+    if (BRAND_CONFIG.id === 'ellieo') {
+      return redirectTo(request, brandLocalePath(BRAND_CONFIG, BRAND_CONFIG.fallbackLocale, rest === '/' ? '/nyc' : rest), 301)
+    }
     const other = OTHER_BRAND_CONFIG
     const target = brandLocalePath(other, first, rest === '/' ? '/nyc' : rest)
     return NextResponse.redirect(`${other.productionUrl}${target}${search}`, 301)
@@ -183,6 +188,8 @@ function withSearchHeaders(response: NextResponse, locale: Locale, path: string)
   for (const alt of LOCALES) {
     const brand = indexedBrandFor(alt)
     if (!brand) continue
+    // Ellieo lists only its own languages (no hreflang to misaeng.com)
+    if (BRAND_CONFIG.id === 'ellieo' && brand.id !== 'ellieo') continue
     links.push(
       `<${brand.siteUrl}${brandLocalePath(brand, alt, path)}>; rel="alternate"; hreflang="${alt}"`,
     )

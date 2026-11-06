@@ -12,6 +12,23 @@
     "detail": {
       "deletePointsClawback": "{points}P điểm Ellieo bạn nhận từ bài viết này sẽ bị thu hồi.",
       "deletePointsPending": "{points}P điểm Ellieo sắp được trả cho bài viết này sẽ bị hủy."
+    },
+    "boards": {
+      "events": {
+        "titlePlaceholder": "Đêm networking du học sinh quốc tế"
+      },
+      "food": {
+        "locationPlaceholder": "East Village / Midtown"
+      },
+      "status": {
+        "locationPlaceholder": "VD: Công ty IT & phần mềm"
+      },
+      "cpt-opt": {
+        "locationPlaceholder": "VD: Công ty IT & phần mềm"
+      },
+      "roommate": {
+        "descriptionPlaceholder": "Chia sẻ về lối sống, ngân sách và ngày dọn vào. Để lại cách liên hệ (Zalo, Instagram hoặc email)."
+      }
     }
   },
   "nav": {
@@ -55,6 +72,9 @@
     "introCarousel": {
       "expert": {
         "headline": "Dùng điểm Ellieo để gặp chuyên gia"
+      },
+      "intro": {
+        "body": "Thông tin visa, việc làm, ăn uống và sự kiện từ du học sinh và người đi làm ở New York, tất cả ở một nơi."
       }
     }
   },
@@ -175,7 +195,7 @@
       "historyTitle": "Lịch sử điểm Ellieo"
     },
     "deleteAccount": {
-      "confirm": "Bạn chắc chắn muốn xóa tài khoản?\n\n• Hồ sơ, thông tin xác minh và thông báo sẽ bị xóa ngay\n• Bài đăng tìm bạn cùng phòng/sublet sẽ bị xóa; các bài viết và bình luận khác vẫn còn dưới tên \"Người dùng đã xóa tài khoản\"\n• Bạn không thể đăng nhập lại bằng tài khoản này\n• Tài khoản Ellieo (dùng chung đăng nhập với Ellieo) cũng sẽ bị xóa"
+      "confirm": "Bạn chắc chắn muốn xóa tài khoản?\n\n• Hồ sơ, thông tin xác minh và thông báo sẽ bị xóa ngay\n• Bài đăng tìm bạn cùng phòng/sublet sẽ bị xóa; các bài viết và bình luận khác vẫn còn dưới tên \"Người dùng đã xóa tài khoản\"\n• Bạn không thể đăng nhập lại bằng tài khoản này"
     }
   },
   "points": {
@@ -184,7 +204,8 @@
       "review": {
         "pick": "Được chọn là Ellieo Pick"
       }
-    }
+    },
+    "sharedNotice": "Điểm được lưu vào tài khoản của bạn."
   },
   "reviews": {
     "guest": {
@@ -212,6 +233,29 @@
       "bedrooms": "{count} PN",
       "postFallback": "Bài viết cộng đồng",
       "jobReviewDescription": "Timeline phỏng vấn và tuyển dụng {type} tại {company} trên {brand}."
+    }
+  },
+  "housing": {
+    "roommate": {
+      "write": {
+        "steps": {
+          "detailsDescription": "Chia sẻ lối sống và điều kiện của bạn, và để lại cách liên hệ (Zalo, Instagram hoặc email)."
+        }
+      },
+      "form": {
+        "has-room": {
+          "bodyPlaceholder": "Mô tả bố cục căn hộ, lối sống của bạn, điện nước và tiền cọc. Để lại cách liên hệ (Zalo, Instagram hoặc email)."
+        },
+        "together": {
+          "bodyPlaceholder": "Chia sẻ ngân sách, khu vực mong muốn và lối sống của bạn. Để lại cách liên hệ (Zalo, Instagram hoặc email)."
+        },
+        "room": {
+          "bodyPlaceholder": "Chia sẻ ngân sách, vị trí mong muốn và thời gian dọn vào. Để lại cách liên hệ (Zalo, Instagram hoặc email)."
+        },
+        "sublet": {
+          "bodyPlaceholder": "Mô tả thời gian, có nội thất hay không, phương tiện đi lại, điện nước và tiền cọc. Để lại cách liên hệ (Zalo, Instagram hoặc email)."
+        }
+      }
     }
   }
 }
