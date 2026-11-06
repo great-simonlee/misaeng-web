@@ -1,4 +1,5 @@
 import { supportRest } from './rest.server'
+import type { SupportBrand } from './types'
 
 export type SupportSettings = {
   'support.enabled': boolean
@@ -27,23 +28,61 @@ export const SUPPORT_DEFAULTS: SupportSettings = {
   testers: [],
 }
 
-let cache: { at: number; value: SupportSettings } | null = null
+/**
+ * Keys a brand can override with `<key>.<brand>` in support_settings (e.g. `inquiry.assignee.ellieo`).
+ * Not here: reports.assignee (community reports are not tied to a conversation brand) and the rotation cursors.
+ */
+export const BRAND_OVERRIDABLE_KEYS = [
+  'support.enabled',
+  'inquiry.enabled',
+  'inquiry.assignee',
+  'admins',
+  'escalation.final',
+  'housing.hours',
+  'housing.escalate_minutes',
+  'email.delay_minutes',
+  'testers',
+] as const satisfies readonly (keyof SupportSettings)[]
+
+type RawSettings = Map<string, unknown>
+
+let cache: { at: number; value: RawSettings } | null = null
 const TTL_MS = 15_000
 
-/** Settings with defaults for missing keys. Missing table → defaults (features stay off). */
-export async function getSupportSettings(): Promise<SupportSettings> {
+async function rawSettings(): Promise<RawSettings | null> {
   if (cache && Date.now() - cache.at < TTL_MS) return cache.value
-  const value: SupportSettings = { ...SUPPORT_DEFAULTS }
   try {
     const rows = await supportRest<{ key: string; value: unknown }[]>('support_settings?select=key,value')
-    for (const row of rows ?? []) {
-      if (row.key in value) (value as Record<string, unknown>)[row.key] = row.value
-    }
-  } catch {
+    const value: RawSettings = new Map((rows ?? []).map((row) => [row.key, row.value]))
+    cache = { at: Date.now(), value }
     return value
+  } catch {
+    return null
   }
-  cache = { at: Date.now(), value }
+}
+
+/**
+ * The one place brand settings are resolved: Misaeng always reads the base key; Ellieo reads `<key>.ellieo` when that
+ * row exists, else the base key; missing → defaults.
+ */
+export function resolveSupportSettings(raw: RawSettings, brand: SupportBrand = 'misaeng'): SupportSettings {
+  const value: SupportSettings = { ...SUPPORT_DEFAULTS }
+  for (const key of Object.keys(value) as (keyof SupportSettings)[]) {
+    if (raw.has(key)) (value as Record<string, unknown>)[key] = raw.get(key)
+  }
+  if (brand !== 'misaeng') {
+    for (const key of BRAND_OVERRIDABLE_KEYS) {
+      const brandKey = `${key}.${brand}`
+      if (raw.has(brandKey)) (value as Record<string, unknown>)[key] = raw.get(brandKey)
+    }
+  }
   return value
+}
+
+/** Settings for a brand (default Misaeng) with defaults for missing keys. Missing table → defaults (features stay off). */
+export async function getSupportSettings(brand: SupportBrand = 'misaeng'): Promise<SupportSettings> {
+  const raw = await rawSettings()
+  return resolveSupportSettings(raw ?? new Map(), brand)
 }
 
 export function invalidateSupportSettings() {
