@@ -45,6 +45,44 @@
     },
     "parsons-ksa": {
       "name": "Parsons Korean Student Association"
+    },
+    "rutgers-kisa": {
+      "name": "Rutgers Korean Student Association"
+    },
+    "yale-hanppuri": {
+      "name": "Yale Hanppuri"
+    },
+    "neu-kisa": {
+      "name": "Northeastern Korean Student Association"
+    },
+    "bu-kisa": {
+      "name": "BU Korean Student Association"
+    },
+    "bc-kisa": {
+      "name": "Boston College Korean Student Association"
+    },
+    "hc-kisa": {
+      "name": "Harvard Korean Student Association"
+    },
+    "berklee-kcsa": {
+      "name": "Berklee Korean Student Association"
+    },
+    "tufts-kiso": {
+      "name": "Tufts Korean Student Association"
+    },
+    "risd-ksa": {
+      "name": "RISD Korean Student Association"
+    },
+    "brown-kisa": {
+      "name": "Brown Korean Student Association"
+    },
+    "uw-ksu": {
+      "name": "UW Korean Student Union"
     }
+  },
+  "orgGroups": {
+    "nyc": "New York",
+    "boston": "Boston",
+    "other": "Other areas"
   }
 }

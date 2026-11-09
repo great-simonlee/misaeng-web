@@ -107,6 +107,11 @@
       "headline": "Nơi mọi sinh viên ở New York nên biết",
       "body": "Chúng tôi hợp tác với hội sinh viên Hàn Quốc ở từng trường để tập hợp thông tin visa, việc làm, ăn uống và sự kiện vào một nơi. Kèm theo kết nối với chuyên gia."
     },
+    "introBoston": {
+      "kicker": "{brand}",
+      "headline": "Nơi mọi sinh viên ở Boston nên biết",
+      "body": "Chúng tôi hợp tác với hội sinh viên Hàn Quốc ở từng trường để tập hợp thông tin visa, việc làm, ăn uống và sự kiện vào một nơi. Kèm theo kết nối với chuyên gia."
+    },
     "status": {
       "kicker": "Visa · Tình trạng",
       "headline": "Mình làm vậy có đúng không?",

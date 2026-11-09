@@ -1,4 +1,4 @@
-import { PARTNER_ORGS } from '@lib/constants/partners'
+import { STUDENT_ORG_IDS } from '@lib/constants/partners'
 import type {
   JobReviewOutcomeId,
   JobReviewSourceId,
@@ -435,7 +435,7 @@ export function isJobReviewSourceId(value: unknown): value is JobReviewSourceId 
 }
 
 export function isPartnerOrgId(value: unknown): value is string {
-  return PARTNER_ORGS.some((org) => org.id === value)
+  return typeof value === 'string' && STUDENT_ORG_IDS.includes(value)
 }
 
 /** storage 값 → {source, orgId}. 예전 'kiso'는 NYU 한인학생회(nyu-kiso)로 읽는다. */

@@ -1,7 +1,8 @@
 'use client'
 
 import { cn } from '@lib'
-import { PARTNER_ORGS } from '@lib/constants/partners'
+import { studentOrgGroupsFor } from '@lib/constants/partners'
+import { useCity } from '@hooks/useCity'
 import {
   JOB_REVIEW_OUTCOMES,
   JOB_REVIEW_SOURCES,
@@ -68,6 +69,7 @@ type JobReviewSourcePickerProps = {
 export function JobReviewSourcePicker({ value, orgId, onChange }: JobReviewSourcePickerProps) {
   const t = useT('reviews')
   const tPartners = useT('partners')
+  const city = useCity()
   const brand = BRAND_CONFIG.name
   const options = JOB_REVIEW_SOURCES.map((item) => ({
     id: item.id,
@@ -86,14 +88,23 @@ export function JobReviewSourcePicker({ value, orgId, onChange }: JobReviewSourc
           <p className='mb-2 text-[13px] font-medium text-[var(--foreground)]'>
             {t('jobReview.sourcePicker.orgQuestion')}<span className='text-[var(--brand)]'> *</span>
           </p>
-          <ChoiceCards
-            options={PARTNER_ORGS.map((org) => ({
-              id: org.id as string,
-              label: tPartners(`orgs.${org.id}.name`),
-            }))}
-            value={orgId}
-            onChange={(nextOrg) => onChange('student-org', nextOrg)}
-          />
+          <div className='space-y-3'>
+            {studentOrgGroupsFor(city).map((group) => (
+              <div key={group.group}>
+                <p className='mb-1.5 text-[12px] font-semibold text-[var(--muted-foreground)]'>
+                  {tPartners(`orgGroups.${group.group}`)}
+                </p>
+                <ChoiceCards
+                  options={group.orgs.map((id) => ({
+                    id: id as string,
+                    label: tPartners(`orgs.${id}.name`),
+                  }))}
+                  value={orgId}
+                  onChange={(nextOrg) => onChange('student-org', nextOrg)}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       ) : null}
     </div>

@@ -21,6 +21,17 @@ const STUDENT_ORG_NAMES: Record<string, string> = {
   'fit-ksof': 'FIT KSOF',
   'baruch-ksa': 'Baruch KSA',
   'parsons-ksa': 'Parsons KISP',
+  'rutgers-kisa': 'RUTGERS KISA',
+  'yale-hanppuri': 'Yale Hanppuri',
+  'neu-kisa': 'NEU KISA',
+  'bu-kisa': 'BU KISA',
+  'bc-kisa': 'BC KISA',
+  'hc-kisa': 'HC KISA',
+  'berklee-kcsa': 'Berklee KCSA',
+  'tufts-kiso': 'Tufts KISO',
+  'risd-ksa': 'RISD KSA',
+  'brown-kisa': 'Brown KISA',
+  'uw-ksu': 'UW KSU',
 }
 
 const TITLE_MAX = 24

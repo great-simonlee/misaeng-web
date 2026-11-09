@@ -107,6 +107,11 @@
       "headline": "The place every student in New York should know",
       "body": "We teamed up with Korean student associations at each school to bring visa, job, food, and event info together in one place. Plus expert connections."
     },
+    "introBoston": {
+      "kicker": "{brand}",
+      "headline": "The place every student in Boston should know",
+      "body": "We teamed up with Korean student associations at each school to bring visa, job, food, and event info together in one place. Plus expert connections."
+    },
     "status": {
       "kicker": "Visa · Status",
       "headline": "Am I doing this right?",
