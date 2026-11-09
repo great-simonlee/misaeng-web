@@ -25,7 +25,7 @@ export type StaffPush = {
   /** read by the staff app on tap: { type: 'support' | 'inquiry' | 'report', conversationId?, reportId? } */
   data?: Record<string, string>
   threadId?: string
-  /** Sound in the staff app bundle: new leads / inquiries ring louder than a reply in an open chat. */
+  /** Kind of alert (lead / message / review). Every alert currently plays STAFF_SOUND_FILE. */
   sound?: StaffSound
   /**
    * A chat message: the staff app shows it like a messenger (sender initials + name as the title, the text below),
@@ -36,9 +36,13 @@ export type StaffPush = {
   brand?: SupportBrand | string | null
 }
 
-/** `review`: a new job review through a partner (soft rising chime). */
+/** `review`: a new job review through a partner. */
 export type StaffSound = 'lead' | 'message' | 'review'
-const SOUND_FILES: Record<StaffSound, string> = { lead: 'lead.caf', message: 'message.caf', review: 'review.caf' }
+/**
+ * Every Misaeng ERP alert plays the app's own sound, duo.caf (two soft marimba notes; owner pick 2026-11-08) — leads,
+ * chat replies, sign-ups, posts and Sales alerts alike. App builds without duo.caf fall back to the iOS default sound.
+ */
+const STAFF_SOUND_FILE = 'duo.caf'
 
 /** Returns how many registered devices the push went to (for the admin test push); 0 when nothing was sent. */
 export async function sendStaffPush(
@@ -66,7 +70,7 @@ export async function sendStaffPush(
       subtitle: message.subtitle,
       body: message.body,
       threadId: message.threadId,
-      sound: message.sound ? SOUND_FILES[message.sound] : undefined,
+      sound: STAFF_SOUND_FILE,
       mutableContent: Boolean(message.sender),
       data: {
         ...(message.data ?? {}),
