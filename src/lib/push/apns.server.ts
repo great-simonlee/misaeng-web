@@ -77,25 +77,55 @@ function providerToken(environment: ApnsEnvironment): string {
   return value
 }
 
-const sessions = new Map<ApnsEnvironment, ClientHttp2Session>()
+/**
+ * One HTTP/2 connection per environment, reused between pushes. misaeng.com sits behind an AWS NAT gateway, which
+ * silently drops a connection after 350 s without traffic: the next push on it then failed with ECONNRESET and was
+ * lost (most alerts, since they come minutes apart). So a connection idle for MAX_IDLE_MS is replaced before use, and
+ * a push that got no answer from Apple at all is sent once more on a fresh connection.
+ */
+const MAX_IDLE_MS = 4 * 60_000
+const REQUEST_TIMEOUT_MS = 10_000
+
+const sessions = new Map<ApnsEnvironment, { session: ClientHttp2Session; usedAt: number }>()
+
+function forgetSession(environment: ApnsEnvironment, target: ClientHttp2Session) {
+  if (sessions.get(environment)?.session !== target) return
+  sessions.delete(environment)
+  if (!target.closed && !target.destroyed) target.close()
+}
 
 function session(environment: ApnsEnvironment): ClientHttp2Session {
+  const now = Date.now()
   const existing = sessions.get(environment)
-  if (existing && !existing.closed && !existing.destroyed) return existing
+  if (existing) {
+    const { session: open, usedAt } = existing
+    if (!open.closed && !open.destroyed && now - usedAt < MAX_IDLE_MS) {
+      existing.usedAt = now
+      return open
+    }
+    forgetSession(environment, open)
+  }
   const created = connect(HOSTS[environment])
-  created.on('error', () => sessions.delete(environment))
-  created.on('close', () => sessions.delete(environment))
+  const forget = () => forgetSession(environment, created)
+  created.on('error', forget)
+  created.on('goaway', forget)
+  created.on('close', forget)
   // Do not keep a serverless instance alive just for this connection.
   created.unref()
-  sessions.set(environment, created)
+  sessions.set(environment, { session: created, usedAt: now })
   return created
 }
 
-function sendOne(environment: ApnsEnvironment, token: string, payload: string, threadId?: string, topic?: string): Promise<ApnsResult> {
+/** `retryable`: Apple never answered (connection reset / refused), so the push was not delivered and can be resent. */
+type Attempt = ApnsResult & { retryable: boolean }
+
+function attempt(environment: ApnsEnvironment, token: string, payload: string, threadId?: string, topic?: string): Promise<Attempt> {
   return new Promise((resolve) => {
+    let connection: ClientHttp2Session
     let request
     try {
-      request = session(environment).request({
+      connection = session(environment)
+      request = connection.request({
         ':method': 'POST',
         ':path': `/3/device/${token}`,
         authorization: `bearer ${providerToken(environment)}`,
@@ -106,12 +136,25 @@ function sendOne(environment: ApnsEnvironment, token: string, payload: string, t
         'content-type': 'application/json',
       })
     } catch (error) {
-      resolve({ token, ok: false, status: 0, reason: String(error), unregistered: false })
+      resolve({ token, ok: false, status: 0, reason: String(error), unregistered: false, retryable: true })
       return
     }
     let status = 0
     let body = ''
-    const timer = setTimeout(() => request.close(), 10_000)
+    let settled = false
+    const finish = (result: Attempt) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
+      // No HTTP answer: this connection is dead, the next push (or the retry) opens a new one
+      if (result.status === 0) forgetSession(environment, connection)
+      resolve(result)
+    }
+    // Timed out: Apple may still have delivered it, so it is not resent (no duplicate notification)
+    const timer = setTimeout(() => {
+      finish({ token, ok: false, status, reason: 'Timeout', unregistered: false, retryable: false })
+      request.close()
+    }, REQUEST_TIMEOUT_MS)
     request.on('response', (headers) => {
       status = Number(headers[':status']) || 0
     })
@@ -120,7 +163,6 @@ function sendOne(environment: ApnsEnvironment, token: string, payload: string, t
       body += chunk
     })
     request.on('end', () => {
-      clearTimeout(timer)
       let reason: string | undefined
       try {
         reason = body ? (JSON.parse(body) as { reason?: string }).reason : undefined
@@ -129,14 +171,26 @@ function sendOne(environment: ApnsEnvironment, token: string, payload: string, t
       }
       // 410 Unregistered / 400 BadDeviceToken: the app was deleted or the token belongs to the other environment.
       const unregistered = status === 410 || reason === 'BadDeviceToken' || reason === 'Unregistered'
-      resolve({ token, ok: status === 200, status, reason, unregistered })
+      finish({ token, ok: status === 200, status, reason, unregistered, retryable: status === 0 })
     })
     request.on('error', (error) => {
-      clearTimeout(timer)
-      resolve({ token, ok: false, status, reason: String(error), unregistered: false })
+      finish({ token, ok: false, status, reason: String(error), unregistered: false, retryable: status === 0 })
+    })
+    // Stream closed without 'end' / 'error' (e.g. the session went away): never leave the push hanging
+    request.on('close', () => {
+      finish({ token, ok: false, status, reason: status ? undefined : 'Stream closed', unregistered: false, retryable: status === 0 })
     })
     request.end(payload)
   })
+}
+
+async function sendOne(environment: ApnsEnvironment, token: string, payload: string, threadId?: string, topic?: string): Promise<ApnsResult> {
+  let result = await attempt(environment, token, payload, threadId, topic)
+  if (!result.ok && result.retryable) {
+    console.warn(`APNs: no answer (${result.reason}), retrying once on a new connection`)
+    result = await attempt(environment, token, payload, threadId, topic)
+  }
+  return { token, ok: result.ok, status: result.status, reason: result.reason, unregistered: result.unregistered }
 }
 
 export async function sendApns(

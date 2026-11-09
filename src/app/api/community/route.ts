@@ -74,6 +74,7 @@ import {
 } from '@lib/supabase/community.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import { notifyJobReviewCreated } from '@lib/erp/notifyJobReview'
+import { notifyBoardPostCreated } from '@lib/erp/notifyBoardPost'
 import type {
   CommunityPost,
   CptOptTimelineEntry,
@@ -672,6 +673,7 @@ export async function POST(request: Request) {
       console.error('Community credit award (post) error:', creditError)
     }
     if (jobReviewSource) after(() => notifyJobReviewCreated(saved, jobReviewSource))
+    after(() => notifyBoardPostCreated(saved))
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),
     })
