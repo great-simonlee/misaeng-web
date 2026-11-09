@@ -79,7 +79,6 @@ function jobReviewPush(
     subtitle: oneLineTitle(post.title),
     body: postedAtLabel(post.createdAt || Date.now()),
     threadId: 'job-review',
-    sound: 'review',
     data: {
       type: 'job_review',
       ...(post.id ? { postId: post.id } : {}),
