@@ -1,5 +1,8 @@
 import { after, NextResponse } from 'next/server'
 import { notifyJobReviewCreated } from '@lib/erp/notifyJobReview'
+import { BRAND_CONFIG } from '@lib/brand'
+import { parseContactSourceInput } from '@lib/community/contactSources'
+import { getContactSourceConfig } from '@lib/supabase/contactSources.server'
 
 import { apiErrorMessage } from '@lib/i18n/apiError'
 import { formatNumber } from '@lib/i18n/format'
@@ -26,7 +29,6 @@ import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/content
 import {
   getJobReviewTypeLabel,
   isJobReviewOutcomeId,
-  parseJobReviewSourceInput,
   isJobReviewTypeId,
   normalizeJobReviewTimeline,
   normalizeJobReviewTips,
@@ -191,7 +193,9 @@ export async function POST(request: Request) {
     )
   }
   const jobReviewIndustry = String(body.jobReviewIndustry || '').trim() || null
-  const jobReviewSource = parseJobReviewSourceInput(
+  const jobReviewSource = parseContactSourceInput(
+    await getContactSourceConfig(),
+    BRAND_CONFIG.id,
     body.jobReviewSource,
     body.jobReviewSourceOrgId,
   )

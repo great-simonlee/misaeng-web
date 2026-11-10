@@ -28,34 +28,6 @@ export const PARTNER_ORGS = [
   },
 ] as const
 
-/**
- * 면접/취업 후기 "학생회를 통해"에서 고르는 학생회. 지역별로 묶어 보여 준다 (현재 도시 묶음이 먼저).
- * 문구 키 `orgs.<id>.name`, 묶음 이름 `orgGroups.<group>` (partners 네임스페이스).
- * `other` = 아직 미생 도시가 아닌 지역. ERP `STUDENT_ORGS` (misaengJobReviewSource.js)와 같은 id.
- */
-export const STUDENT_ORG_GROUPS = [
-  {
-    group: 'nyc',
-    orgs: ['nyu-kiso', 'fit-ksof', 'baruch-ksa', 'parsons-ksa', 'rutgers-kisa', 'yale-hanppuri'],
-  },
-  {
-    group: 'boston',
-    orgs: ['neu-kisa', 'bu-kisa', 'bc-kisa', 'hc-kisa', 'berklee-kcsa', 'tufts-kiso', 'risd-ksa', 'brown-kisa'],
-  },
-  { group: 'other', orgs: ['uw-ksu'] },
-] as const
-
-export type StudentOrgGroupId = (typeof STUDENT_ORG_GROUPS)[number]['group']
-
-export const STUDENT_ORG_IDS: readonly string[] = STUDENT_ORG_GROUPS.flatMap((g) => g.orgs)
-
-/** 현재 도시 묶음을 맨 앞으로 */
-export function studentOrgGroupsFor(city: string) {
-  return [...STUDENT_ORG_GROUPS].sort(
-    (a, b) => Number(b.group === city) - Number(a.group === city),
-  )
-}
-
 /** 문구 키 `influencerPlatforms.<id>.title` / `.description` (partners 네임스페이스) */
 export const INFLUENCER_PLATFORMS = [
   { id: 'instagram' },

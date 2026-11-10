@@ -221,7 +221,7 @@
       "cptOptTimelineRequired": "Vui lòng thêm ít nhất một bước vào timeline.",
       "jobReviewTypeRequired": "Vui lòng chọn loại: thực tập, mới đi làm, có kinh nghiệm hoặc hợp đồng.",
       "jobReviewTimelineRequired": "Vui lòng thêm ít nhất một bước tuyển dụng.",
-      "jobReviewSourceRequired": "Vui lòng chọn cách bạn được kết nối. Nếu chọn hội sinh viên, hãy chọn cả hội nào.",
+      "jobReviewSourceRequired": "Vui lòng chọn bạn được liên hệ qua đâu.",
       "jobReviewOutcomeRequired": "Vui lòng chọn kết quả cuối cùng.",
       "cityRequired": "Vui lòng kiểm tra thành phố."
     },

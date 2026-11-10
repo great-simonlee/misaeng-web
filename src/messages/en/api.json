@@ -227,7 +227,7 @@
       "cptOptTimelineRequired": "Please add at least one timeline step.",
       "jobReviewTypeRequired": "Please choose a type: internship, entry-level, experienced, or contract.",
       "jobReviewTimelineRequired": "Please add at least one hiring step.",
-      "jobReviewSourceRequired": "Please choose how you got connected. If you picked a student association, choose which one too.",
+      "jobReviewSourceRequired": "Please choose how we reached you.",
       "jobReviewOutcomeRequired": "Please choose the final result.",
       "cityRequired": "Please check the city."
     },

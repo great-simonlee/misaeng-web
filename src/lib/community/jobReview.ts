@@ -1,4 +1,3 @@
-import { STUDENT_ORG_IDS } from '@lib/constants/partners'
 import type {
   JobReviewOutcomeId,
   JobReviewSourceId,
@@ -418,46 +417,8 @@ export function isJobReviewTimelineEntryComplete(entry: JobReviewTimelineEntry) 
   )
 }
 
-/** 후기를 남기게 된 경로. 작성 시 필수, 공개되지 않음 (ellieo-erp에서 관리) */
+/** 연락 경로 선택지는 ERP에서 관리한다 (`@lib/community/contactSources`) */
 export type { JobReviewOutcomeId, JobReviewSourceId }
-
-/** 화면 문구: `reviews.jobReview.sources.<id>.label` / `.description` */
-export const JOB_REVIEW_SOURCES: readonly { id: JobReviewSourceId }[] = [
-  { id: 'misaeng' },
-  { id: 'givo' },
-  { id: 'student-org' },
-  { id: 'referral' },
-  { id: 'other' },
-]
-
-export function isJobReviewSourceId(value: unknown): value is JobReviewSourceId {
-  return JOB_REVIEW_SOURCES.some((item) => item.id === value)
-}
-
-export function isPartnerOrgId(value: unknown): value is string {
-  return typeof value === 'string' && STUDENT_ORG_IDS.includes(value)
-}
-
-/** storage 값 → {source, orgId}. 예전 'kiso'는 NYU 한인학생회(nyu-kiso)로 읽는다. */
-export function normalizeJobReviewSource(
-  source: unknown,
-  orgId: unknown,
-): { source: JobReviewSourceId | null; orgId: string | null } {
-  if (source === 'kiso') return { source: 'student-org', orgId: 'nyu-kiso' }
-  if (!isJobReviewSourceId(source)) return { source: null, orgId: null }
-  if (source !== 'student-org') return { source, orgId: null }
-  return { source, orgId: isPartnerOrgId(orgId) ? orgId : null }
-}
-
-/** 작성 요청 검증: student-org면 학생회 선택까지 필수 */
-export function parseJobReviewSourceInput(
-  source: unknown,
-  orgId: unknown,
-): { source: JobReviewSourceId; orgId: string | null } | null {
-  if (!isJobReviewSourceId(source)) return null
-  if (source !== 'student-org') return { source, orgId: null }
-  return isPartnerOrgId(orgId) ? { source, orgId } : null
-}
 
 /** 화면 문구: `reviews.jobReview.outcomes.<id>.label` / `.description` */
 export const JOB_REVIEW_OUTCOMES: readonly { id: JobReviewOutcomeId }[] = [

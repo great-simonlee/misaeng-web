@@ -1,5 +1,7 @@
 import { sendStaffPush, SUPER_ADMIN_EMAIL, type StaffPush } from '@lib/support/staffPush.server'
 import type { CommunityPost } from '@/types/nyc'
+import { contactSourceShortName } from '@lib/community/contactSources'
+import { getContactSourceConfig } from '@lib/supabase/contactSources.server'
 
 /**
  * A new job review (면접 · 취업 후기) → a push in the Misaeng ERP app to the External Partners it came through
@@ -9,36 +11,11 @@ import type { CommunityPost } from '@/types/nyc'
  * Never throws: a failed alert must never fail the post.
  */
 
-/** Short names for the push title ("New Job/Interview Post · NYU KISO"), by jobReviewSource / student org id. */
-const SOURCE_NAMES: Record<string, string> = {
-  misaeng: 'Misaeng',
-  givo: 'GivO',
-  referral: 'Personal Network',
-  other: 'Other Channels',
-}
-const STUDENT_ORG_NAMES: Record<string, string> = {
-  'nyu-kiso': 'NYU KISO',
-  'fit-ksof': 'FIT KSOF',
-  'baruch-ksa': 'Baruch KSA',
-  'parsons-ksa': 'Parsons KISP',
-  'rutgers-kisa': 'RUTGERS KISA',
-  'yale-hanppuri': 'Yale Hanppuri',
-  'neu-kisa': 'NEU KISA',
-  'bu-kisa': 'BU KISA',
-  'bc-kisa': 'BC KISA',
-  'hc-kisa': 'HC KISA',
-  'berklee-kcsa': 'Berklee KCSA',
-  'tufts-kiso': 'Tufts KISO',
-  'risd-ksa': 'RISD KSA',
-  'brown-kisa': 'Brown KISA',
-  'uw-ksu': 'UW KSU',
-}
-
 const TITLE_MAX = 24
 
-export function jobReviewSourceName(source: string, orgId: string | null): string {
-  if (source === 'student-org') return (orgId && STUDENT_ORG_NAMES[orgId]) || 'Student Organization'
-  return SOURCE_NAMES[source] || 'Other Channels'
+/** Short name for the push title ("NYU KISO"), from the ERP's contact sources (shortName). */
+export async function jobReviewSourceName(source: string, orgId: string | null): Promise<string> {
+  return contactSourceShortName(await getContactSourceConfig(), source, orgId)
 }
 
 /** One line: whitespace collapsed, cut at TITLE_MAX characters with "…". */
@@ -80,13 +57,13 @@ async function fetchRecipients(source: string, orgId: string | null): Promise<Re
 type JobReviewSource = { source: string; orgId: string | null }
 
 /** The push itself — the same for real reviews and the admin test push. */
-function jobReviewPush(
+async function jobReviewPush(
   post: { id: string | null; title: string; createdAt: number },
   source: JobReviewSource,
   target: Recipients['target'],
-): StaffPush {
+): Promise<StaffPush> {
   return {
-    title: `New Job/Interview Post · ${jobReviewSourceName(source.source, source.orgId)}`,
+    title: `New Job/Interview Post · ${await jobReviewSourceName(source.source, source.orgId)}`,
     subtitle: oneLineTitle(post.title),
     body: postedAtLabel(post.createdAt || Date.now()),
     threadId: 'job-review',
@@ -108,7 +85,7 @@ export async function notifyJobReviewCreated(
     // ERP unreachable: the Super Admin still hears about it (the partner is picked by the ERP)
     const recipients = (await fetchRecipients(source.source, source.orgId)) ?? { emails: [SUPER_ADMIN_EMAIL], target: null }
     if (!recipients.emails?.length) return
-    await sendStaffPush(recipients.emails, jobReviewPush(post, source, recipients.target))
+    await sendStaffPush(recipients.emails, await jobReviewPush(post, source, recipients.target))
   } catch (error) {
     console.error('[job review push] error:', error)
   }
@@ -118,11 +95,11 @@ export async function notifyJobReviewCreated(
  * Admin test (Misaeng ERP app › Partner Views › Test notifications, through the ERP): the exact push a partner gets,
  * sent only to the admin's own devices. `post` is the partner's latest review (or a sample when it has none).
  */
-export function sendJobReviewTestPush(input: {
+export async function sendJobReviewTestPush(input: {
   email: string
   source: JobReviewSource
   target: Recipients['target']
   post: { id: string | null; title: string; createdAt: number }
 }) {
-  return sendStaffPush([input.email], jobReviewPush(input.post, input.source, input.target))
+  return sendStaffPush([input.email], await jobReviewPush(input.post, input.source, input.target))
 }

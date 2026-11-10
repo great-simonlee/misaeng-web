@@ -391,31 +391,6 @@
         }
       }
     },
-    "sources": {
-      "misaeng": {
-        "label": "Through {brand}",
-        "description": "{brand} reached out and asked me to write this"
-      },
-      "givo": {
-        "label": "Through Givo",
-        "description": "Givo reached out and asked me to write this"
-      },
-      "student-org": {
-        "label": "Through a student group",
-        "description": "A student group at my school reached out"
-      },
-      "referral": {
-        "label": "Through someone I know",
-        "description": "Someone I know introduced me"
-      },
-      "other": {
-        "label": "Other",
-        "description": "Some other way"
-      }
-    },
-    "sourcePicker": {
-      "orgQuestion": "Which student group?"
-    },
     "outcomes": {
       "offer": {
         "label": "Got an offer",
@@ -461,8 +436,7 @@
         "timelineRequiredEdit": "Please keep at least 1 progress entry. Add a date and details, then tap \"Add this entry\"",
         "timelineRequired": "Add at least 1 progress entry (date + details), then tap \"Add this entry\"",
         "outcomeRequired": "Please choose the final result",
-        "orgRequired": "Please choose which student group connected you",
-        "sourceRequired": "Please choose how you got connected"
+        "sourceRequired": "Please choose how we reached you"
       },
       "updated": "Your progress is updated. It's now at the top of the list",
       "created": "Your review is posted. You can keep adding progress later",
@@ -474,9 +448,9 @@
       "outcomeSection": "What was the final result?",
       "outcomeEditHint": "If things change, update it here too",
       "outcomeSectionDescription": "If it's still going, choose \"In progress\". You can change it later",
-      "sourceSection": "How did you get connected?",
-      "sourceSectionDescription": "Tell us how you came to write this review. Other people won't see this",
-      "selectSourceFirst": "Please choose how you got connected",
+      "sourceSection": "How did we reach you?",
+      "sourceSectionDescription": "Only our team can see this",
+      "selectSourceFirst": "Please choose how we reached you",
       "updateSubmit": "Update progress",
       "typeSection": "What type is it?",
       "basicSection": "Basic info",
@@ -703,5 +677,13 @@
       "pendingReviewNote": "Review points are added after our team reviews the post. Sign up with the Google account that matches the email in your review, and it links automatically.",
       "signupPitch1Review": "The review you just wrote links to your account right away, and points are added after review"
     }
+  },
+  "contactSource": {
+    "groups": {
+      "studentOrg": "Student organizations",
+      "partner": "Partners"
+    },
+    "loadFailed": "Couldn't load the options",
+    "retry": "Retry"
   }
 }

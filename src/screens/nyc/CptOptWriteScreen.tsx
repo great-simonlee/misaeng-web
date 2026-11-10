@@ -53,6 +53,7 @@ import {
 import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
+import { ContactSourcePicker } from '@widgets/nyc/ContactSourcePicker'
 
 type CptOptWriteDraft = {
   postTitle: string
@@ -60,6 +61,8 @@ type CptOptWriteDraft = {
   location: string
   cptOptType: CptOptTypeId | null
   timeline: CptOptTimelineEntry[]
+  jobReviewSource?: string | null
+  jobReviewSourceOrgId?: string | null
 }
 
 interface CptOptWriteScreenProps {
@@ -92,6 +95,9 @@ export function CptOptWriteScreen({
   const [contentHtml, setContentHtml] = useState('')
   const [location, setLocation] = useState('')
   const [cptOptType, setCptOptType] = useState<CptOptTypeId | null>(null)
+  // 연락 경로 (필수, 비공개 — 면접/취업과 같은 키로 저장)
+  const [jobReviewSource, setJobReviewSource] = useState<string | null>(null)
+  const [jobReviewSourceOrgId, setJobReviewSourceOrgId] = useState<string | null>(null)
   const [timeline, setTimeline] = useState<CptOptTimelineEntry[]>([])
   const [existingTimelineIds, setExistingTimelineIds] = useState<string[]>([])
   const [showMoreSettings, setShowMoreSettings] = useState(false)
@@ -108,6 +114,8 @@ export function CptOptWriteScreen({
       setLocation(stored.data.location ?? '')
       setCptOptType(stored.data.cptOptType ?? null)
       setTimeline(Array.isArray(stored.data.timeline) ? stored.data.timeline : [])
+      setJobReviewSource(stored.data.jobReviewSource ?? null)
+      setJobReviewSourceOrgId(stored.data.jobReviewSourceOrgId ?? null)
       setDraftSavedAt(stored.savedAt)
     }
     setDraftHydrated(true)
@@ -141,6 +149,8 @@ export function CptOptWriteScreen({
         )
         setLocation(post.location)
         setCptOptType(post.cptOptType)
+        setJobReviewSource(post.jobReviewSource ?? null)
+        setJobReviewSourceOrgId(post.jobReviewSourceOrgId ?? null)
         const loadedTimeline = post.cptOptTimeline?.length
           ? post.cptOptTimeline
           : []
@@ -209,6 +219,10 @@ export function CptOptWriteScreen({
       toastError(t('write.errors.timelineIncomplete'))
       return
     }
+    if (!jobReviewSource) {
+      toastError(t('jobReview.write.errors.sourceRequired'))
+      return
+    }
 
     setSubmitting(true)
     try {
@@ -220,6 +234,8 @@ export function CptOptWriteScreen({
         cptOptType,
         cptOptTimeline: normalizedTimeline,
         cptOptTips: plain.slice(0, CPT_OPT_TIPS_MAX) || null,
+        jobReviewSource,
+        jobReviewSourceOrgId,
       }
 
       const post =
@@ -260,6 +276,8 @@ export function CptOptWriteScreen({
         location,
         cptOptType,
         timeline,
+        jobReviewSource,
+        jobReviewSourceOrgId,
       })
       setDraftSavedAt(savedAt)
       success(t('write.draftSaved'))
@@ -328,6 +346,24 @@ export function CptOptWriteScreen({
                 />
               </section>
 
+              <section className='rounded-2xl p-4 ring-1 ring-black/[0.06] sm:p-5'>
+                <p className='text-[14px] font-semibold text-[var(--foreground)]'>
+                  {t('jobReview.write.sourceSection')}
+                  <span className='text-[var(--brand)]'> *</span>
+                </p>
+                <p className='mb-3 mt-0.5 text-[11px] text-[var(--muted)]'>
+                  {t('jobReview.write.sourceSectionDescription')}
+                </p>
+                <ContactSourcePicker
+                  source={jobReviewSource}
+                  orgId={jobReviewSourceOrgId}
+                  onChange={({ source, orgId }) => {
+                    setJobReviewSource(source)
+                    setJobReviewSourceOrgId(orgId)
+                  }}
+                />
+              </section>
+
               <section className='overflow-hidden rounded-2xl ring-1 ring-black/[0.06]'>
                 <button
                   type='button'
@@ -382,7 +418,7 @@ export function CptOptWriteScreen({
 
               <button
                 type='submit'
-                disabled={submitting || !postTitle.trim() || !cptOptType}
+                disabled={submitting || !postTitle.trim() || !cptOptType || !jobReviewSource}
                 className='inline-flex h-12 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[15px] font-semibold text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-50'
               >
                 {submitting ? t('write.updating') : t('cptOpt.write.updateSubmit')}
@@ -441,6 +477,21 @@ export function CptOptWriteScreen({
                 />
               </CreateSection>
 
+              <CreateSection
+                step={5}
+                title={t('jobReview.write.sourceSection')}
+                description={t('jobReview.write.sourceSectionDescription')}
+              >
+                <ContactSourcePicker
+                  source={jobReviewSource}
+                  orgId={jobReviewSourceOrgId}
+                  onChange={({ source, orgId }) => {
+                    setJobReviewSource(source)
+                    setJobReviewSourceOrgId(orgId)
+                  }}
+                />
+              </CreateSection>
+
               <WriteDraftActions
                 onSave={handleSaveDraft}
                 savedAt={draftSavedAt}
@@ -448,14 +499,16 @@ export function CptOptWriteScreen({
               >
                 <button
                   type='submit'
-                  disabled={submitting || !postTitle.trim() || !cptOptType}
+                  disabled={submitting || !postTitle.trim() || !cptOptType || !jobReviewSource}
                   className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
                 >
                   {submitting
                     ? t('write.submitting')
                     : !cptOptType
                       ? t('write.selectTypeFirst')
-                      : t('write.submit')}
+                      : !jobReviewSource
+                        ? t('jobReview.write.selectSourceFirst')
+                        : t('write.submit')}
                 </button>
               </WriteDraftActions>
               <p className='text-center text-[12px] text-[var(--muted)]'>

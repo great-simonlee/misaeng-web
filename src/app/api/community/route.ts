@@ -5,6 +5,9 @@ import { apiErrorMessage } from '@lib/i18n/apiError'
 import { formatNumber } from '@lib/i18n/format'
 import { getRequestLocale, getRequestT, getT } from '@lib/i18n/server'
 
+import { BRAND_CONFIG } from '@lib/brand'
+import { parseContactSourceInput } from '@lib/community/contactSources'
+import { getContactSourceConfig } from '@lib/supabase/contactSources.server'
 import { resolveAuthenticatedUser } from '../agent-auth/lib/authHelpers'
 import { applyReviewBodyAccess } from '@lib/community/reviewAccess'
 import { resolveReviewCompanyId } from '@lib/supabase/companies.server'
@@ -19,7 +22,6 @@ import {
 import {
   getJobReviewTypeLabel,
   isJobReviewOutcomeId,
-  parseJobReviewSourceInput,
   isJobReviewTypeId,
   normalizeJobReviewTimeline,
   normalizeJobReviewTips,
@@ -380,8 +382,16 @@ export async function POST(request: Request) {
   const jobReviewIndustry = isJobReview
     ? String(body?.jobReviewIndustry || '').trim() || null
     : null
-  const jobReviewSource = isJobReview
-    ? parseJobReviewSourceInput(body?.jobReviewSource, body?.jobReviewSourceOrgId)
+  // 연락 경로 (비공개): 면접/취업은 필수. 비자는 이 키를 보내는 클라이언트(웹·새 앱)에만 필수 —
+  // 앱 1.0.2의 비자 글쓰기에는 이 질문이 없다
+  const asksContactSource = isJobReview || (isCptOpt && Boolean(body && 'jobReviewSource' in body))
+  const jobReviewSource = asksContactSource
+    ? parseContactSourceInput(
+        await getContactSourceConfig(),
+        BRAND_CONFIG.id,
+        body?.jobReviewSource,
+        body?.jobReviewSourceOrgId,
+      )
     : null
   const jobReviewOutcome =
     isJobReview && isJobReviewOutcomeId(body?.jobReviewOutcome)
@@ -540,15 +550,16 @@ export async function POST(request: Request) {
         { status: 400 },
       )
     }
-    if (!jobReviewSource) {
-      return NextResponse.json(
-        { error: t('community.write.jobReviewSourceRequired') },
-        { status: 400 },
-      )
-    }
     if (!jobReviewOutcome) {
       return NextResponse.json({ error: t('community.write.jobReviewOutcomeRequired') }, { status: 400 })
     }
+  }
+
+  if (asksContactSource && !jobReviewSource) {
+    return NextResponse.json(
+      { error: t('community.write.jobReviewSourceRequired') },
+      { status: 400 },
+    )
   }
 
   const authorNickname = isAnonymous
@@ -672,7 +683,7 @@ export async function POST(request: Request) {
     } catch (creditError) {
       console.error('Community credit award (post) error:', creditError)
     }
-    if (jobReviewSource) after(() => notifyJobReviewCreated(saved, jobReviewSource))
+    if (isJobReview && jobReviewSource) after(() => notifyJobReviewCreated(saved, jobReviewSource))
     after(() => notifyBoardPostCreated(saved))
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),
