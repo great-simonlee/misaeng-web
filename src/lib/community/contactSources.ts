@@ -392,3 +392,8 @@ export function findContactSourceOptionId(
     null
   )
 }
+
+/** 연락 경로를 다 골랐는지 (학생회면 어느 학생회인지까지) */
+export function isContactSourceComplete(source: string | null | undefined, orgId: string | null | undefined) {
+  return Boolean(source) && (source !== STUDENT_ORG_SOURCE || Boolean(orgId))
+}

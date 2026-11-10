@@ -679,11 +679,20 @@
     }
   },
   "contactSource": {
-    "groups": {
-      "studentOrg": "Student organizations",
-      "partner": "Partners"
-    },
     "loadFailed": "Couldn't load the options",
-    "retry": "Retry"
+    "retry": "Retry",
+    "via": "Through {name}",
+    "descriptions": {
+      "direct": "{name} reached out to me",
+      "partner": "{name} reached out to me",
+      "referral": "Someone I know introduced me",
+      "other": "Some other way"
+    },
+    "studentOrg": {
+      "label": "Through a student organization",
+      "description": "My school's student organization reached out",
+      "question": "Which student organization?",
+      "required": "Choose the student organization"
+    }
   }
 }

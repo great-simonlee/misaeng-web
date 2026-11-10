@@ -670,11 +670,20 @@
     }
   },
   "contactSource": {
-    "groups": {
-      "studentOrg": "학생회",
-      "partner": "파트너"
-    },
     "loadFailed": "선택지를 불러오지 못했어요",
-    "retry": "다시 시도"
+    "retry": "다시 시도",
+    "via": "{name|을/를} 통해",
+    "descriptions": {
+      "direct": "{name}에서 연락을 받았어요",
+      "partner": "{name}에서 연락을 받았어요",
+      "referral": "아는 사람에게 소개받았어요",
+      "other": "그 외 다른 경로"
+    },
+    "studentOrg": {
+      "label": "학생회를 통해",
+      "description": "학교 학생회에서 연락을 받았어요",
+      "question": "어느 학생회인가요?",
+      "required": "어느 학생회인지 골라 주세요"
+    }
   }
 }

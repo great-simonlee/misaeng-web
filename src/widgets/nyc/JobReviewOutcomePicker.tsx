@@ -10,7 +10,7 @@ type ChoiceCardsProps<T extends string> = {
   onChange: (value: T) => void
 }
 
-function ChoiceCards<T extends string>({ options, value, onChange }: ChoiceCardsProps<T>) {
+export function ChoiceCards<T extends string>({ options, value, onChange }: ChoiceCardsProps<T>) {
   return (
     <div className='grid grid-cols-2 gap-2'>
       {options.map((item) => {

@@ -50,6 +50,7 @@ import { JobReviewTimelineEditor } from '@widgets/nyc/JobReviewTimelineEditor'
 import { JobReviewTypeBadge, JobReviewTypePicker } from '@widgets/nyc/JobReviewTypeBadge'
 import { JobReviewOutcomePicker } from '@widgets/nyc/JobReviewOutcomePicker'
 import { ContactSourcePicker } from '@widgets/nyc/ContactSourcePicker'
+import { isContactSourceComplete } from '@lib/community/contactSources'
 import type { JobReviewOutcomeId } from '@lib/community/jobReview'
 import {
   JobReviewWriteOrientationModal,
@@ -104,7 +105,7 @@ export function JobReviewWriteScreen({
   const [jobReviewSource, setJobReviewSource] = useState<string | null>(null)
   const [jobReviewSourceOrgId, setJobReviewSourceOrgId] = useState<string | null>(null)
   const [jobReviewOutcome, setJobReviewOutcome] = useState<JobReviewOutcomeId | null>(null)
-  const sourceComplete = Boolean(jobReviewSource)
+  const sourceComplete = isContactSourceComplete(jobReviewSource, jobReviewSourceOrgId)
   const [timeline, setTimeline] = useState<JobReviewTimelineEntry[]>([])
   const [existingTimelineIds, setExistingTimelineIds] = useState<string[]>([])
   const [showMoreSettings, setShowMoreSettings] = useState(false)
@@ -328,8 +329,12 @@ export function JobReviewWriteScreen({
       toastError(t('jobReview.write.errors.outcomeRequired'))
       return
     }
-    if (!jobReviewSource) {
-      toastError(t('jobReview.write.errors.sourceRequired'))
+    if (!jobReviewSource || !sourceComplete) {
+      toastError(
+        jobReviewSource === 'student-org'
+          ? t('contactSource.studentOrg.required')
+          : t('jobReview.write.errors.sourceRequired'),
+      )
       return
     }
 
