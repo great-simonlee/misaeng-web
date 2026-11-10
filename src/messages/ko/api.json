@@ -227,7 +227,7 @@
       "cptOptTimelineRequired": "타임라인을 최소 1단계 이상 입력해 주세요.",
       "jobReviewTypeRequired": "인턴 / 신입 / 경력 / 계약 유형을 선택해 주세요.",
       "jobReviewTimelineRequired": "채용 단계를 최소 1건 이상 입력해 주세요.",
-      "jobReviewSourceRequired": "어떻게 연락이 닿았는지 선택해 주세요. 학생회를 골랐다면 어느 학생회인지도 선택해 주세요.",
+      "jobReviewSourceRequired": "어떤 경로로 연락받으셨는지 선택해 주세요.",
       "jobReviewOutcomeRequired": "최종 결과를 선택해 주세요.",
       "cityRequired": "도시를 확인해 주세요."
     },

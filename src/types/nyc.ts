@@ -21,8 +21,8 @@ export type ContentModeration = {
   restoredBy?: string | null
 }
 
-/** 면접/취업 후기: 연락 경로 (JOB_REVIEW_SOURCES). 예전 값 'kiso'는 student-org + nyu-kiso로 읽음 */
-export type JobReviewSourceId = 'misaeng' | 'givo' | 'student-org' | 'referral' | 'other'
+/** 면접/취업 · 비자 글: 연락 경로. ERP에서 관리하는 옵션 id 또는 'student-org' (@lib/community/contactSources) */
+export type JobReviewSourceId = string
 
 /** 면접/취업 후기: 최종 결과 (JOB_REVIEW_OUTCOMES) */
 export type JobReviewOutcomeId = 'offer' | 'rejected' | 'in-progress' | 'withdrew'
@@ -375,11 +375,11 @@ export interface CommunityPost extends TranslationFields, ContentBrandFields {
   /** 면접/취업 후기 → companies/index.json 회사 id. 없으면 location 텍스트만 있음 */
   companyId?: string | null
   /**
-   * 면접/취업 후기: 어떻게 연락이 닿았는지 (비공개). 작성자 본인이 단건 조회할 때만 채워지고
+   * 면접/취업 · 비자 글: 어떻게 연락이 닿았는지 (비공개). 작성자 본인이 단건 조회할 때만 채워지고
    * 목록·다른 사람 조회에는 없음. storage에는 항상 저장됨 (ellieo-erp에서 관리)
    */
   jobReviewSource?: JobReviewSourceId | null
-  /** 면접/취업 후기: 연락 경로가 student-org일 때 학생회 id (PARTNER_ORGS). jobReviewSource와 같은 규칙으로 비공개 */
+  /** 연락 경로가 student-org일 때 학생회 옵션 id. jobReviewSource와 같은 규칙으로 비공개 */
   jobReviewSourceOrgId?: string | null
   /** 면접/취업 후기: 최종 결과 (공개) */
   jobReviewOutcome?: JobReviewOutcomeId | null

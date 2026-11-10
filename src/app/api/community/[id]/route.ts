@@ -5,6 +5,9 @@ import { apiErrorMessage } from '@lib/i18n/apiError'
 import { formatNumber } from '@lib/i18n/format'
 import { getRequestLocale, getRequestT, getT } from '@lib/i18n/server'
 
+import { BRAND_CONFIG } from '@lib/brand'
+import { parseContactSourceInput } from '@lib/community/contactSources'
+import { getContactSourceConfig } from '@lib/supabase/contactSources.server'
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import { applyReviewBodyAccess } from '@lib/community/reviewAccess'
 import { getOfferVerifiedPostIds } from '@lib/supabase/reviewVerification.server'
@@ -20,7 +23,6 @@ import {
 import {
   getJobReviewTypeLabel,
   isJobReviewOutcomeId,
-  parseJobReviewSourceInput,
   isJobReviewTypeId,
   normalizeJobReviewTimeline,
   normalizeJobReviewTips,
@@ -53,7 +55,7 @@ import { BLOCKED_USER_CODE, getViewerBlockedUids } from '@lib/community/blocks.s
 import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/contentFilter'
 import { CONTENT_HIDDEN_CODE, isModerationHidden, reportKey } from '@lib/community/moderation'
 import { getViewerReportedKeys } from '@lib/community/reports.server'
-import { isMisaengEmail } from '@lib/constants/nyc'
+import { isMisaengEmail, isStatusCommunityBoard } from '@lib/constants/nyc'
 import {
   deleteStoredCommunityPost,
   getStoredCommunityPost,
@@ -166,6 +168,11 @@ export async function GET(request: Request, context: RouteContext) {
     )
     // 연락 경로는 비공개 — 수정 화면을 위해 작성자 본인에게만 내려준다.
     const isAuthor = Boolean(user?.uid && user.uid === post.authorUid)
+    if (isStatusCommunityBoard(post.categoryId)) {
+      return NextResponse.json({
+        post: isAuthor ? await withPrivateJobReviewSource(visible, id) : visible,
+      })
+    }
     if (post.categoryId !== 'job-review') return NextResponse.json({ post: visible })
     // "합격 인증": the author's approved offer verification for this post (checked on the stored authorUid)
     const [withSource, offerVerified] = await Promise.all([
@@ -355,8 +362,15 @@ export async function PATCH(request: Request, context: RouteContext) {
     ? String(body.jobReviewIndustry ?? existing.jobReviewIndustry ?? '').trim() ||
       null
     : null
-  const jobReviewSource = isJobReview
-    ? parseJobReviewSourceInput(body.jobReviewSource, body.jobReviewSourceOrgId)
+  // 연락 경로 (비공개): 면접/취업은 필수. 비자는 이 키를 보낸 경우만 (앱 1.0.2는 안 보낸다 → 저장된 값 유지)
+  const asksContactSource = isJobReview || (isCptOpt && 'jobReviewSource' in body)
+  const jobReviewSource = asksContactSource
+    ? parseContactSourceInput(
+        await getContactSourceConfig(),
+        BRAND_CONFIG.id,
+        body.jobReviewSource,
+        body.jobReviewSourceOrgId,
+      )
     : null
   const jobReviewOutcome =
     isJobReview && isJobReviewOutcomeId(body.jobReviewOutcome)
@@ -516,15 +530,16 @@ export async function PATCH(request: Request, context: RouteContext) {
         { status: 400 },
       )
     }
-    if (!jobReviewSource) {
-      return NextResponse.json(
-        { error: t('community.write.jobReviewSourceRequired') },
-        { status: 400 },
-      )
-    }
     if (!jobReviewOutcome) {
       return NextResponse.json({ error: t('community.write.jobReviewOutcomeRequired') }, { status: 400 })
     }
+  }
+
+  if (asksContactSource && !jobReviewSource) {
+    return NextResponse.json(
+      { error: t('community.write.jobReviewSourceRequired') },
+      { status: 400 },
+    )
   }
 
   const companyResult = isJobReview

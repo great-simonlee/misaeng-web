@@ -390,31 +390,6 @@
         }
       }
     },
-    "sources": {
-      "misaeng": {
-        "label": "Qua {brand}",
-        "description": "{brand} đã liên hệ và mời tôi viết bài này"
-      },
-      "givo": {
-        "label": "Qua Givo",
-        "description": "Givo đã liên hệ và mời tôi viết bài này"
-      },
-      "student-org": {
-        "label": "Qua hội sinh viên",
-        "description": "Một hội sinh viên ở trường đã liên hệ mình"
-      },
-      "referral": {
-        "label": "Qua người quen",
-        "description": "Người quen đã giới thiệu mình"
-      },
-      "other": {
-        "label": "Khác",
-        "description": "Cách khác"
-      }
-    },
-    "sourcePicker": {
-      "orgQuestion": "Hội sinh viên nào?"
-    },
     "outcomes": {
       "offer": {
         "label": "Nhận được offer",
@@ -459,8 +434,7 @@
         "timelineRequiredEdit": "Vui lòng giữ ít nhất 1 mục tiến trình. Thêm ngày và chi tiết, rồi nhấn \"Thêm mục này\"",
         "timelineRequired": "Thêm ít nhất 1 mục tiến trình (ngày + chi tiết), rồi nhấn \"Thêm mục này\"",
         "outcomeRequired": "Vui lòng chọn kết quả cuối cùng",
-        "orgRequired": "Vui lòng chọn hội sinh viên đã kết nối bạn",
-        "sourceRequired": "Vui lòng chọn cách bạn được kết nối"
+        "sourceRequired": "Vui lòng chọn bạn được liên hệ qua đâu"
       },
       "updated": "Đã cập nhật tiến trình. Bài viết của bạn đang ở đầu danh sách",
       "created": "Đã đăng review. Bạn có thể tiếp tục thêm tiến trình sau",
@@ -472,9 +446,9 @@
       "outcomeSection": "Kết quả cuối cùng là gì?",
       "outcomeEditHint": "Nếu có thay đổi, hãy cập nhật cả ở đây",
       "outcomeSectionDescription": "Nếu vẫn đang diễn ra, hãy chọn \"Đang diễn ra\". Bạn có thể đổi sau",
-      "sourceSection": "Bạn được kết nối bằng cách nào?",
-      "sourceSectionDescription": "Cho chúng tôi biết lý do bạn viết review này. Người khác sẽ không thấy thông tin này",
-      "selectSourceFirst": "Vui lòng chọn cách bạn được kết nối",
+      "sourceSection": "Bạn được liên hệ qua đâu?",
+      "sourceSectionDescription": "Chỉ đội ngũ của chúng tôi thấy thông tin này",
+      "selectSourceFirst": "Vui lòng chọn bạn được liên hệ qua đâu",
       "updateSubmit": "Cập nhật tiến trình",
       "typeSection": "Đây là loại nào?",
       "basicSection": "Thông tin cơ bản",
@@ -694,5 +668,13 @@
       "pendingReviewNote": "Điểm cho review được cộng sau khi đội ngũ xét duyệt bài viết. Đăng ký bằng tài khoản Google trùng với email trong review để tự động liên kết.",
       "signupPitch1Review": "Review bạn vừa viết sẽ được liên kết với tài khoản ngay, và điểm được cộng sau khi xét duyệt"
     }
+  },
+  "contactSource": {
+    "groups": {
+      "studentOrg": "Hội sinh viên",
+      "partner": "Đối tác"
+    },
+    "loadFailed": "Không tải được các lựa chọn",
+    "retry": "Thử lại"
   }
 }

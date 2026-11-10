@@ -22,7 +22,6 @@ import {
 import {
   coalesceJobReviewTimelineRaw,
   isJobReviewOutcomeId,
-  normalizeJobReviewSource,
   normalizeJobReviewTimeline,
   normalizeJobReviewTips,
   normalizeJobReviewType,
@@ -40,6 +39,7 @@ import {
   resolveCityId,
   type CityId,
 } from '@lib/constants/cities'
+import { normalizeStoredContactSource } from '@lib/community/contactSources'
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile, type SupabaseProfileRecord } from '@lib/supabase/profile.server'
 import { isModerationHidden, normalizeModeration } from '@lib/community/moderation'
@@ -612,7 +612,7 @@ export async function getStoredCommunityPost(
   return enrichCommunityPostAuthor(post, { persist: false })
 }
 
-/** 면접/취업 후기 연락 경로 (비공개 필드). 작성자 본인 조회에만 붙여서 내보낼 것 */
+/** 면접/취업 · 비자 글 연락 경로 (비공개 필드). 작성자 본인 조회에만 붙여서 내보낼 것 */
 export async function getStoredJobReviewSource(
   id: string,
 ): Promise<{ source: JobReviewSourceId | null; orgId: string | null }> {
@@ -623,7 +623,7 @@ export async function getStoredJobReviewSource(
   const bucket = await resolveBucket()
   const raw = await fetchRawPostJson(bucket, objectPath(postId))
   if (!raw) return empty
-  return normalizeJobReviewSource(raw.jobReviewSource, raw.jobReviewSourceOrgId)
+  return normalizeStoredContactSource(raw.jobReviewSource, raw.jobReviewSourceOrgId)
 }
 
 export async function saveStoredCommunityPost(
