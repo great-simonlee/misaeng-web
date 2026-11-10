@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic'
 /**
  * What the signed-in user should look at (launch modal, My page dots, app icon badge):
  * - coffeeChats: received requests waiting for my times + sent chats waiting for me to pick a time
+ *   (coffeeChatsReceived = the received part, so the app opens the 받은 tab first)
  * - careerQuestions: questions on my reviews waiting for my answer
  * - badge: unread notifications + unread messages (the app icon number)
  */
@@ -24,23 +25,28 @@ export async function GET(request: Request) {
     try {
       await assertCoffeeChatEnabled()
     } catch {
-      return 0
+      return { received: 0, sent: 0 }
     }
     const [received, sent] = await Promise.all([listChats(uid, 'received', t), listChats(uid, 'sent', t)])
-    return (
-      received.filter((chat) => chat.stage === 'awaiting_mentor').length +
-      sent.filter((chat) => chat.stage === 'awaiting_requester').length
-    )
+    return {
+      received: received.filter((chat) => chat.stage === 'awaiting_mentor').length,
+      sent: sent.filter((chat) => chat.stage === 'awaiting_requester').length,
+    }
   }
   const careerQuestions = async () =>
     (await listQuestions(uid, 'received')).filter((question) => question.status === 'pending').length
   const [chats, questions, badge] = await Promise.all([
-    coffeeChats().catch(() => 0),
+    coffeeChats().catch(() => ({ received: 0, sent: 0 })),
     careerQuestions().catch(() => 0),
     appBadgeCount(uid),
   ])
   return NextResponse.json(
-    { coffeeChats: chats, careerQuestions: questions, badge },
+    {
+      coffeeChats: chats.received + chats.sent,
+      coffeeChatsReceived: chats.received,
+      careerQuestions: questions,
+      badge,
+    },
     { headers: { 'Cache-Control': 'no-store' } },
   )
 }
