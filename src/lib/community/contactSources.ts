@@ -107,7 +107,7 @@ const DEFAULT_STUDENT_ORGS: SeedOrg[] = [
     'rutgers-kisa',
     'nyc',
     'rutgers',
-    'RUTGERS KISA',
+    'Rutgers KISA',
     'Rutgers Korean Student Association',
     '럿거스 한인학생회',
     'Hội sinh viên Hàn Quốc Rutgers',
@@ -328,7 +328,11 @@ export function listContactSourceOptions(
     .map(({ option }) => ({
       id: option.id,
       kind: option.kind,
-      label: contactSourceLabel(option, locale),
+      // 학생회는 짧은 영어 이름(ERP Short name)으로 — 한글 정식 이름은 칩에 너무 길다
+      label:
+        option.kind === 'student-org' && option.shortName
+          ? option.shortName
+          : contactSourceLabel(option, locale),
       ...contactSourceValue(option),
       area: option.area,
       areaLabel: option.area ? areaLabel(option.area) : null,
