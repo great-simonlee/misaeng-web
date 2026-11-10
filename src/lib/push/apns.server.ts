@@ -24,6 +24,8 @@ export type ApnsMessage = {
   data?: Record<string, string>
   /** Notifications with the same thread are grouped on the lock screen. */
   threadId?: string
+  /** App icon number (iOS aps.badge; Android reads `badge` from the data). Omitted = leave the icon as is. */
+  badge?: number
 }
 
 export type ApnsResult = { token: string; ok: boolean; status: number; reason?: string; unregistered: boolean }
@@ -208,6 +210,7 @@ export async function sendApns(
       sound: message.sound || 'default',
       ...(message.mutableContent ? { 'mutable-content': 1 } : {}),
       ...(message.threadId ? { 'thread-id': message.threadId } : {}),
+      ...(typeof message.badge === 'number' ? { badge: message.badge } : {}),
     },
     ...(message.data ?? {}),
   })

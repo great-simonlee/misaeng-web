@@ -5,6 +5,7 @@ import type { Translate } from '@lib/i18n/translate'
 import { getT } from '@lib/i18n/server'
 import { isApnsConfigured, sendApns, type ApnsMessage } from './apns.server'
 import { isFcmConfigured, sendFcm } from './fcm.server'
+import { appBadgeCount } from './badge.server'
 import { recordNotifications } from './inbox.server'
 import { deletePushDevices, listPushDevices, usersWithTypeOff, type PushType } from './store.server'
 
@@ -50,23 +51,33 @@ export function notifyUsers(input: {
         byLocale.set(locale, [...(byLocale.get(locale) ?? []), device])
       }
 
+      // App icon number per user, counted after the inbox row above was written
+      const badges = new Map<string, number>()
+      await Promise.all(
+        [...new Set(targets.map((d) => d.user_id))].map(async (uid) => badges.set(uid, await appBadgeCount(uid))),
+      )
+
       const dead: string[] = []
       for (const [locale, group] of byLocale) {
         const t = await getT(locale)
-        const message = input.build(t, locale)
-        const ios = group.filter((d) => d.platform === 'ios')
-        const android = group.filter((d) => d.platform === 'android')
-        const [apnsResults, fcmResults] = await Promise.all([
-          ios.length ? sendApns(ios, message) : Promise.resolve([]),
-          android.length ? sendFcm(android, message).catch((error) => {
-            console.error('FCM send error:', error)
-            return []
-          }) : Promise.resolve([]),
-        ])
-        const results = [...apnsResults, ...fcmResults]
-        dead.push(...results.filter((r) => r.unregistered).map((r) => r.token))
-        const failed = results.filter((r) => !r.ok && !r.unregistered)
-        if (failed.length) console.error('Push send failed:', failed.map((r) => `${r.status} ${r.reason}`).join(', '))
+        const base = input.build(t, locale)
+        for (const uid of new Set(group.map((d) => d.user_id))) {
+          const mine = group.filter((d) => d.user_id === uid)
+          const message = { ...base, badge: badges.get(uid) }
+          const ios = mine.filter((d) => d.platform === 'ios')
+          const android = mine.filter((d) => d.platform === 'android')
+          const [apnsResults, fcmResults] = await Promise.all([
+            ios.length ? sendApns(ios, message) : Promise.resolve([]),
+            android.length ? sendFcm(android, message).catch((error) => {
+              console.error('FCM send error:', error)
+              return []
+            }) : Promise.resolve([]),
+          ])
+          const results = [...apnsResults, ...fcmResults]
+          dead.push(...results.filter((r) => r.unregistered).map((r) => r.token))
+          const failed = results.filter((r) => !r.ok && !r.unregistered)
+          if (failed.length) console.error('Push send failed:', failed.map((r) => `${r.status} ${r.reason}`).join(', '))
+        }
       }
       await deletePushDevices(dead).catch(() => undefined)
     } catch (error) {
