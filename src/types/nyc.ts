@@ -1,3 +1,4 @@
+import type { ProxyAuthor } from '@lib/community/proxyAuthor'
 import type { Locale } from '@lib/i18n/locales'
 import type { ContentI18n, TranslationFields } from '@lib/translations/content'
 import type { CityId } from '@lib/constants/cities'
@@ -398,6 +399,8 @@ export interface CommunityPost extends TranslationFields {
    * 계정에 연결되면 authorUid가 채워지고 linkedUid/linkedAt이 기록된다.
    */
   guestAuthor: CommunityGuestAuthor | null
+  /** 팀이 대신 올린 후기 (ERP). 계정 없는 작성자 — 커피챗·커리어 질문 불가 (@lib/community/proxyAuthor) */
+  proxyAuthor?: ProxyAuthor | null
   /** 보는 언어로 바꾼 결과 (API 응답에만 있음, src/lib/translations) */
   i18n?: ContentI18n
 }

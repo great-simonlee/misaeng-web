@@ -38,6 +38,7 @@ import {
   type CityId,
 } from '@lib/constants/cities'
 import { normalizeStoredContactSource } from '@lib/community/contactSources'
+import { normalizeProxyAuthor } from '@lib/community/proxyAuthor'
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile, type SupabaseProfileRecord } from '@lib/supabase/profile.server'
 import { isModerationHidden, normalizeModeration } from '@lib/community/moderation'
@@ -244,6 +245,7 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       normalizeRoommateMoveInDate(data.roommateMoveInDate),
     ),
     guestAuthor: normalizeCommunityGuestAuthor(data.guestAuthor),
+    proxyAuthor: normalizeProxyAuthor(data.proxyAuthor),
     city: isStatusCommunityBoard(categoryId)
       ? parseCityId(typeof data.city === 'string' ? data.city : null)
       : isSharedCommunityBoard(categoryId)

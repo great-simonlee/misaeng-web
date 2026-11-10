@@ -15,12 +15,13 @@ export type NicknameIndexRecord = {
 
 const INDEX_PREFIX = 'community-nicknames'
 /** 기존 프로필 닉네임을 색인에 한 번 채웠는지 표시 */
-const BACKFILL_MARKER_PATH = `${INDEX_PREFIX}/_backfill-v1.json`
+// v2: 한글 닉네임도 색인 (v1은 영문·점만 채웠다)
+const BACKFILL_MARKER_PATH = `${INDEX_PREFIX}/_backfill-v2.json`
 const LIST_PAGE_SIZE = 1000
 const BACKFILL_CONCURRENCY = 8
 
-/** 멤버 닉네임 규칙(영문·점)을 통과한 소문자 키만 색인 대상 */
-const INDEX_KEY_PATTERN = /^[a-z.]+$/
+/** 멤버 닉네임 규칙(한글·영문·점)을 통과한 소문자 키만 색인 대상 */
+const INDEX_KEY_PATTERN = /^[a-z.가-힣]+$/
 
 export class NicknameTakenError extends ApiMessageError {
   constructor() {
@@ -42,8 +43,10 @@ export function toNicknameKey(value: string | null | undefined): string | null {
   return INDEX_KEY_PATTERN.test(key) ? key : null
 }
 
+/** Storage 파일 이름은 ASCII만 되므로 한글 키는 16진수로 (`u_<hex>.json`). 영문 키는 예전 그대로 */
 function indexObjectPath(key: string) {
-  return `${INDEX_PREFIX}/${key}.json`
+  const name = /^[a-z.]+$/.test(key) ? key : `u_${Buffer.from(key, 'utf8').toString('hex')}`
+  return `${INDEX_PREFIX}/${name}.json`
 }
 
 async function storageFetch(path: string, init: RequestInit & { timeoutMs?: number }) {

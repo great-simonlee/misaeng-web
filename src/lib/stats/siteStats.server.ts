@@ -42,7 +42,10 @@ async function loadSiteStats(): Promise<SiteStats> {
   ])
 
   const posts = { housing: housing.length, food: 0, roommate: 0, visa: 0, jobReview: 0, anonymous: 0 }
+  // 팀이 대신 올린 후기의 작성자 (계정 없음, 글마다 다른 사람) — 회원 수에 한 명씩 더한다
+  let proxyAuthors = 0
   for (const post of communityPosts) {
+    if (post.proxyAuthor) proxyAuthors += 1
     const board = post.categoryId
     if (board === 'food') posts.food += 1
     else if (board === 'roommate') posts.roommate += 1
@@ -52,7 +55,7 @@ async function loadSiteStats(): Promise<SiteStats> {
     else if (isStatusCommunityBoard(board)) posts.visa += 1
   }
 
-  return { members, posts, updatedAt: Date.now() }
+  return { members: members + proxyAuthors, posts, updatedAt: Date.now() }
 }
 
 /**
