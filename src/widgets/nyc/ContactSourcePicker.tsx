@@ -2,22 +2,15 @@
 
 import { useEffect, useState } from 'react'
 
-import { cn } from '@lib'
 import { LoadingSpinner } from '@components/LoadingSpinner'
 import {
   findContactSourceOptionId,
-  type ContactSourceKind,
   type ContactSourceOption,
   type ContactSourceValue,
 } from '@lib/community/contactSources'
 import { useT } from '@lib/i18n/client'
 import { useCity } from '@hooks/useCity'
-
-/** 제목을 붙여 따로 묶는 종류 (나머지는 제목 없이 위·아래에) */
-const GROUP_HEADINGS: Partial<Record<ContactSourceKind, string>> = {
-  'student-org': 'contactSource.groups.studentOrg',
-  partner: 'contactSource.groups.partner',
-}
+import { ChoiceCards } from '@widgets/nyc/JobReviewOutcomePicker'
 
 async function fetchContactSourceOptions(city: string): Promise<ContactSourceOption[]> {
   const res = await fetch(`/api/community/contact-sources?city=${encodeURIComponent(city)}`, {
@@ -28,19 +21,37 @@ async function fetchContactSourceOptions(city: string): Promise<ContactSourceOpt
   return Array.isArray(data.options) ? data.options : []
 }
 
-/** 옵션을 화면 순서대로 묶는다. 같은 종류가 이어지면 한 묶음 */
-function groupOptions(options: ContactSourceOption[]) {
-  const groups: { kind: ContactSourceKind; options: ContactSourceOption[] }[] = []
+const STUDENT_ORG = 'student-org'
+
+type Row = { id: string; label: string; description: string }
+
+/** 큰 선택 카드: 직접·파트너는 하나씩, 학생회는 한 장으로 묶고 (고르면 아래에 학생회 목록), 지인·기타 */
+function buildRows(options: ContactSourceOption[], t: ReturnType<typeof useT>): Row[] {
+  const rows: Row[] = []
   for (const option of options) {
-    const last = groups[groups.length - 1]
-    const heading = GROUP_HEADINGS[option.kind]
-    if (last && (last.kind === option.kind || (!heading && !GROUP_HEADINGS[last.kind]))) {
-      last.options.push(option)
+    if (option.kind === 'student-org') {
+      if (!rows.some((row) => row.id === STUDENT_ORG)) {
+        rows.push({
+          id: STUDENT_ORG,
+          label: t('contactSource.studentOrg.label'),
+          description: t('contactSource.studentOrg.description'),
+        })
+      }
+    } else if (option.kind === 'direct' || option.kind === 'partner') {
+      rows.push({
+        id: option.id,
+        label: t('contactSource.via', { name: option.label }),
+        description: t(`contactSource.descriptions.${option.kind}`, { name: option.label }),
+      })
     } else {
-      groups.push({ kind: option.kind, options: [option] })
+      rows.push({
+        id: option.id,
+        label: option.label,
+        description: t(`contactSource.descriptions.${option.kind}`),
+      })
     }
   }
-  return groups
+  return rows
 }
 
 /** 학생회 안에서 지역별로 (API 순서 그대로) */
@@ -117,52 +128,49 @@ export function ContactSourcePicker({ source, orgId, onChange }: ContactSourcePi
     )
   }
 
-  const selectedId = findContactSourceOptionId(options, source, orgId)
+  const rows = buildRows(options, t)
+  const selectedRow =
+    source === STUDENT_ORG ? STUDENT_ORG : findContactSourceOptionId(options, source, orgId)
+  const studentOrgs = options.filter((option) => option.kind === 'student-org')
 
   return (
     <div className='space-y-3'>
-      {groupOptions(options).map((group, index) => {
-        const heading = GROUP_HEADINGS[group.kind]
-        return (
-          <div key={`${group.kind}-${index}`}>
-            {heading ? (
-              <p className='mb-1.5 text-[12px] font-medium text-[var(--muted-foreground)]'>
-                {t(heading)}
-              </p>
-            ) : null}
-            <div className='space-y-2'>
-              {groupByArea(group.options).map((row) => (
-                <div key={row.area ?? 'all'}>
-                  {row.areaLabel ? (
-                    <p className='mb-1 text-[11px] text-[var(--muted)]'>{row.areaLabel}</p>
-                  ) : null}
-                  <div className='flex flex-wrap gap-2'>
-                    {row.options.map((option) => {
-                      const active = option.id === selectedId
-                      return (
-                        <button
-                          key={option.id}
-                          type='button'
-                          aria-pressed={active}
-                          onClick={() => onChange({ source: option.source, orgId: option.orgId })}
-                          className={cn(
-                            'rounded-full px-3.5 py-2 text-[14px] font-medium ring-1 touch-manipulation transition',
-                            active
-                              ? 'bg-[var(--brand)]/5 text-[var(--brand)] ring-2 ring-[var(--brand)]'
-                              : 'bg-white text-[var(--foreground)] ring-[var(--border)] hover:ring-[var(--muted)]'
-                          )}
-                        >
-                          {option.label}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
+      <ChoiceCards
+        options={rows}
+        value={selectedRow}
+        onChange={(id) => {
+          if (id === STUDENT_ORG) {
+            onChange({ source: STUDENT_ORG, orgId: source === STUDENT_ORG ? orgId : null })
+            return
+          }
+          const option = options.find((item) => item.id === id)
+          if (option) onChange({ source: option.source, orgId: option.orgId })
+        }}
+      />
+      {source === STUDENT_ORG ? (
+        <div>
+          <p className='mb-2 text-[13px] font-medium text-[var(--foreground)]'>
+            {t('contactSource.studentOrg.question')}
+            <span className='text-[var(--brand)]'> *</span>
+          </p>
+          <div className='space-y-3'>
+            {groupByArea(studentOrgs).map((group) => (
+              <div key={group.area ?? 'all'}>
+                {group.areaLabel ? (
+                  <p className='mb-1.5 text-[12px] font-semibold text-[var(--muted-foreground)]'>
+                    {group.areaLabel}
+                  </p>
+                ) : null}
+                <ChoiceCards
+                  options={group.options.map((option) => ({ id: option.id, label: option.label }))}
+                  value={orgId}
+                  onChange={(nextOrg) => onChange({ source: STUDENT_ORG, orgId: nextOrg })}
+                />
+              </div>
+            ))}
           </div>
-        )
-      })}
+        </div>
+      ) : null}
     </div>
   )
 }

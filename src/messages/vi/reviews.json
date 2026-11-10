@@ -670,11 +670,20 @@
     }
   },
   "contactSource": {
-    "groups": {
-      "studentOrg": "Hội sinh viên",
-      "partner": "Đối tác"
-    },
     "loadFailed": "Không tải được các lựa chọn",
-    "retry": "Thử lại"
+    "retry": "Thử lại",
+    "via": "Qua {name}",
+    "descriptions": {
+      "direct": "{name} đã liên hệ với tôi",
+      "partner": "{name} đã liên hệ với tôi",
+      "referral": "Người quen giới thiệu",
+      "other": "Cách khác"
+    },
+    "studentOrg": {
+      "label": "Qua hội sinh viên",
+      "description": "Hội sinh viên của trường đã liên hệ với tôi",
+      "question": "Hội sinh viên nào?",
+      "required": "Hãy chọn hội sinh viên"
+    }
   }
 }

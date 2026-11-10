@@ -68,6 +68,7 @@ import { JobReviewTimelineEditor } from '@widgets/nyc/JobReviewTimelineEditor'
 import { JobReviewTypePicker } from '@widgets/nyc/JobReviewTypeBadge'
 import { JobReviewOutcomePicker } from '@widgets/nyc/JobReviewOutcomePicker'
 import { ContactSourcePicker } from '@widgets/nyc/ContactSourcePicker'
+import { isContactSourceComplete } from '@lib/community/contactSources'
 import type { JobReviewOutcomeId } from '@lib/community/jobReview'
 import { StatusEmployerSelect } from '@widgets/nyc/StatusEmployerSelect'
 import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
@@ -135,7 +136,7 @@ export function JobReviewGuestWriteScreen() {
   const [jobReviewSource, setJobReviewSource] = useState<string | null>(null)
   const [jobReviewSourceOrgId, setJobReviewSourceOrgId] = useState<string | null>(null)
   const [jobReviewOutcome, setJobReviewOutcome] = useState<JobReviewOutcomeId | null>(null)
-  const sourceComplete = Boolean(jobReviewSource)
+  const sourceComplete = isContactSourceComplete(jobReviewSource, jobReviewSourceOrgId)
   const [timeline, setTimeline] = useState<JobReviewTimelineEntry[]>([])
   const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null)
   const [draftHydrated, setDraftHydrated] = useState(false)
@@ -378,8 +379,12 @@ export function JobReviewGuestWriteScreen() {
       toastError(t('jobReview.write.errors.outcomeRequired'))
       return
     }
-    if (!jobReviewSource) {
-      toastError(t('jobReview.write.errors.sourceRequired'))
+    if (!jobReviewSource || !sourceComplete) {
+      toastError(
+        jobReviewSource === 'student-org'
+          ? t('contactSource.studentOrg.required')
+          : t('jobReview.write.errors.sourceRequired'),
+      )
       return
     }
     if (!guidelinesAccepted) {

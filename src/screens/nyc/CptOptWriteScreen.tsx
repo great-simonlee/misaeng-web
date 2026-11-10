@@ -54,6 +54,7 @@ import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
 import { ContactSourcePicker } from '@widgets/nyc/ContactSourcePicker'
+import { isContactSourceComplete } from '@lib/community/contactSources'
 
 type CptOptWriteDraft = {
   postTitle: string
@@ -98,6 +99,7 @@ export function CptOptWriteScreen({
   // 연락 경로 (필수, 비공개 — 면접/취업과 같은 키로 저장)
   const [jobReviewSource, setJobReviewSource] = useState<string | null>(null)
   const [jobReviewSourceOrgId, setJobReviewSourceOrgId] = useState<string | null>(null)
+  const sourceComplete = isContactSourceComplete(jobReviewSource, jobReviewSourceOrgId)
   const [timeline, setTimeline] = useState<CptOptTimelineEntry[]>([])
   const [existingTimelineIds, setExistingTimelineIds] = useState<string[]>([])
   const [showMoreSettings, setShowMoreSettings] = useState(false)
@@ -219,8 +221,12 @@ export function CptOptWriteScreen({
       toastError(t('write.errors.timelineIncomplete'))
       return
     }
-    if (!jobReviewSource) {
-      toastError(t('jobReview.write.errors.sourceRequired'))
+    if (!jobReviewSource || !sourceComplete) {
+      toastError(
+        jobReviewSource === 'student-org'
+          ? t('contactSource.studentOrg.required')
+          : t('jobReview.write.errors.sourceRequired'),
+      )
       return
     }
 
@@ -418,7 +424,7 @@ export function CptOptWriteScreen({
 
               <button
                 type='submit'
-                disabled={submitting || !postTitle.trim() || !cptOptType || !jobReviewSource}
+                disabled={submitting || !postTitle.trim() || !cptOptType || !sourceComplete}
                 className='inline-flex h-12 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[15px] font-semibold text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-50'
               >
                 {submitting ? t('write.updating') : t('cptOpt.write.updateSubmit')}
@@ -499,14 +505,14 @@ export function CptOptWriteScreen({
               >
                 <button
                   type='submit'
-                  disabled={submitting || !postTitle.trim() || !cptOptType || !jobReviewSource}
+                  disabled={submitting || !postTitle.trim() || !cptOptType || !sourceComplete}
                   className='inline-flex h-11 w-full items-center justify-center rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white touch-manipulation transition hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-[15px]'
                 >
                   {submitting
                     ? t('write.submitting')
                     : !cptOptType
                       ? t('write.selectTypeFirst')
-                      : !jobReviewSource
+                      : !sourceComplete
                         ? t('jobReview.write.selectSourceFirst')
                         : t('write.submit')}
                 </button>
