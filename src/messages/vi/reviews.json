@@ -507,7 +507,8 @@
         "title": "\"Thêm mục này\" sẽ xếp mục lên trên",
         "body": "Khi xong, nhấn \"Thêm mục này\" và mục đó sẽ chuyển vào danh sách phía trên form. Tiếp tục với ngày tiếp theo trong form bên dưới."
       }
-    }
+    },
+    "guideButton": "Hướng dẫn"
   },
   "write": {
     "notFound": "Không tìm thấy bài viết này",
@@ -679,6 +680,7 @@
       "referral": "Người quen giới thiệu",
       "other": "Cách khác"
     },
+    "organizationRequired": "Hãy chọn một",
     "studentOrg": {
       "label": "Qua hội sinh viên",
       "description": "Hội sinh viên của trường đã liên hệ với tôi",

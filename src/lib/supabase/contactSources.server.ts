@@ -1,7 +1,7 @@
 import {
   DEFAULT_CONTACT_SOURCES,
   normalizeContactSourceConfig,
-  type ContactSourceConfigOption,
+  type ContactSourceConfig,
 } from '@lib/community/contactSources'
 import { TtlCache } from '@lib/supabase/listCache.server'
 
@@ -42,22 +42,22 @@ async function storageFetch(path: string) {
   }
 }
 
-async function fetchConfig(): Promise<ContactSourceConfigOption[]> {
-  if (!getSupabaseUrl() || !getSupabaseSecretKey()) return [...DEFAULT_CONTACT_SOURCES]
+async function fetchConfig(): Promise<ContactSourceConfig> {
+  if (!getSupabaseUrl() || !getSupabaseSecretKey()) return DEFAULT_CONTACT_SOURCES
   const preferred = getPreferredBucket()
   const buckets = preferred === FALLBACK_BUCKET ? [preferred] : [preferred, FALLBACK_BUCKET]
   for (const bucket of buckets) {
     const res = await storageFetch(`/storage/v1/object/${bucket}/${CONFIG_PATH}`)
     if (!res?.ok) continue
-    const options = normalizeContactSourceConfig(await res.json().catch(() => null))
-    if (options) return options
+    const config = normalizeContactSourceConfig(await res.json().catch(() => null))
+    if (config) return config
   }
-  return [...DEFAULT_CONTACT_SOURCES]
+  return DEFAULT_CONTACT_SOURCES
 }
 
-const cache = new TtlCache<ContactSourceConfigOption[]>(CONFIG_TTL_MS, 1)
+const cache = new TtlCache<ContactSourceConfig>(CONFIG_TTL_MS, 1)
 
-/** ERP에서 바꾼 목록은 최대 1분 뒤 반영된다 */
-export function getContactSourceConfig(): Promise<ContactSourceConfigOption[]> {
+/** ERP에서 바꾼 설정은 최대 1분 뒤 반영된다 */
+export function getContactSourceConfig(): Promise<ContactSourceConfig> {
   return cache.get('config', fetchConfig)
 }

@@ -509,7 +509,8 @@
         "title": "Stack with \"Add this entry\"",
         "body": "Added entries stack above; keep going with the next date."
       }
-    }
+    },
+    "guideButton": "Guidelines"
   },
   "write": {
     "notFound": "We couldn't find this post",
@@ -688,6 +689,7 @@
       "referral": "Someone I know introduced me",
       "other": "Some other way"
     },
+    "organizationRequired": "Choose one",
     "studentOrg": {
       "label": "Through a student organization",
       "description": "My school's student organization reached out",

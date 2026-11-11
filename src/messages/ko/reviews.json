@@ -507,7 +507,8 @@
         "title": "「이 기록 추가」로 쌓기",
         "body": "추가한 기록은 위 목록에 쌓이고, 다음 날짜를 이어서 적어요."
       }
-    }
+    },
+    "guideButton": "가이드라인"
   },
   "write": {
     "notFound": "글을 찾을 수 없어요",
@@ -679,6 +680,7 @@
       "referral": "아는 사람에게 소개받았어요",
       "other": "그 외 다른 경로"
     },
+    "organizationRequired": "하나를 골라 주세요",
     "studentOrg": {
       "label": "학생회를 통해",
       "description": "학교 학생회에서 연락을 받았어요",
