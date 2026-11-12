@@ -12,6 +12,8 @@ import { MISAENG_APP_STORE_URL, MISAENG_PLAY_STORE_URL } from '@widgets/nyc/Misa
  * - "모바일 웹으로 볼게요" hides it for a few days on this browser.
  * Misaeng only.
  */
+/** Same artwork as the app's home-screen icon (misaeng-app AppIcon). */
+const APP_ICON = '/img/app_icon.png'
 const DISMISSED_KEY = 'misaeng.appPrompt.dismissedAt'
 const HIDE_DAYS = 3
 const SHOW_DELAY_MS = 600
@@ -84,7 +86,7 @@ export function AppDownloadPrompt() {
         <div className='mx-auto mb-5 h-1 w-10 rounded-full bg-black/10' />
         <div className='flex items-center gap-3.5'>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={BRAND_CONFIG.assets.square} alt='' className='h-14 w-14 rounded-2xl border border-black/[0.06] shadow-sm' />
+          <img src={APP_ICON} alt='' className='h-14 w-14 rounded-[14px] shadow-md shadow-[var(--brand)]/25' />
           <div className='min-w-0'>
             <h2 className='text-[1.2rem] font-bold tracking-[-0.02em] text-[var(--foreground)]'>{t('appPrompt.title')}</h2>
             <p className='mt-0.5 text-[13px] text-[var(--muted-foreground)]'>{t('appPrompt.subtitle')}</p>
