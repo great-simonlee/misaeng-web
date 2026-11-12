@@ -84,11 +84,12 @@
     "IN": "인도"
   },
   "postings": {
-    "sectionTitle": "인턴 · 신입 공고",
+    "sectionTitle": "채용 공고",
+    "overviewTitle": "어떤 일을 하나요",
     "sectionDescription": "{brand}에서 공고를 읽고 핵심만 정리했어요.",
-    "listTitle": "인턴 · 신입 채용 공고",
-    "listIntro": "미국 회사들의 인턴·신입 공고를 {brand}에서 핵심만 정리했어요.",
-    "listLink": "인턴 · 신입 공고 보기",
+    "listTitle": "채용 공고",
+    "listIntro": "미국 회사들의 인턴·신입·경력 공고를 {brand}에서 핵심만 정리했어요.",
+    "listLink": "채용 공고 보기",
     "backToCompanies": "회사별 채용 페이지",
     "allLevels": "전체",
     "allRegions": "전체 지역",
@@ -119,7 +120,7 @@
     "searchPlaceholder": "회사·직무 검색 (예: Analyst)",
     "loadError": "공고를 불러오지 못했어요",
     "emptyTitle": "아직 등록된 공고가 없어요",
-    "emptyDescription": "새 인턴·신입 공고가 올라오면 여기에 보여 드릴게요.",
+    "emptyDescription": "새 채용 공고가 올라오면 여기에 보여 드릴게요.",
     "noMatchTitle": "조건에 맞는 공고가 없어요",
     "noMatchDescription": "다른 지역이나 검색어로 찾아보세요.",
     "level": {

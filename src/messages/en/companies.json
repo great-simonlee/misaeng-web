@@ -86,11 +86,12 @@
     "IN": "India"
   },
   "postings": {
-    "sectionTitle": "Internship & New Grad Jobs",
+    "sectionTitle": "Job Postings",
+    "overviewTitle": "About the role",
     "sectionDescription": "{brand} read the postings and pulled out the key points.",
-    "listTitle": "Internship & New Grad Jobs",
-    "listIntro": "{brand} sums up the key points of internship and new grad postings from US companies.",
-    "listLink": "See internship & new grad jobs",
+    "listTitle": "Job Postings",
+    "listIntro": "{brand} sums up the key points of internship, new grad and experienced postings from US companies.",
+    "listLink": "See job postings",
     "backToCompanies": "Company careers pages",
     "allLevels": "All",
     "allRegions": "All locations",
@@ -126,7 +127,7 @@
     "searchPlaceholder": "Search companies or roles (e.g. Analyst)",
     "loadError": "We couldn't load the jobs",
     "emptyTitle": "No jobs posted yet",
-    "emptyDescription": "New internship and new grad jobs will show up here.",
+    "emptyDescription": "New job postings will show up here.",
     "noMatchTitle": "No jobs match your filters",
     "noMatchDescription": "Try a different location or search term.",
     "level": {

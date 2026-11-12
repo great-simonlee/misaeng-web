@@ -84,11 +84,12 @@
     "IN": "Ấn Độ"
   },
   "postings": {
-    "sectionTitle": "Việc làm thực tập & new grad",
+    "sectionTitle": "Tin tuyển dụng",
+    "overviewTitle": "Về vị trí",
     "sectionDescription": "{brand} đã đọc các tin tuyển dụng và tóm tắt những điểm chính.",
-    "listTitle": "Việc làm thực tập & new grad",
-    "listIntro": "{brand} tóm tắt điểm chính của các tin tuyển thực tập và new grad từ công ty Mỹ.",
-    "listLink": "Xem việc làm thực tập & new grad",
+    "listTitle": "Tin tuyển dụng",
+    "listIntro": "{brand} tóm tắt điểm chính của các tin tuyển thực tập, new grad và có kinh nghiệm từ công ty Mỹ.",
+    "listLink": "Xem tin tuyển dụng",
     "backToCompanies": "Trang tuyển dụng công ty",
     "allLevels": "Tất cả",
     "allRegions": "Tất cả địa điểm",
@@ -119,7 +120,7 @@
     "searchPlaceholder": "Tìm công ty hoặc vị trí (VD: Analyst)",
     "loadError": "Không thể tải danh sách việc làm",
     "emptyTitle": "Chưa có việc làm nào",
-    "emptyDescription": "Việc làm thực tập và new grad mới sẽ hiển thị tại đây.",
+    "emptyDescription": "Tin tuyển dụng mới sẽ hiển thị tại đây.",
     "noMatchTitle": "Không có việc làm nào phù hợp với bộ lọc",
     "noMatchDescription": "Hãy thử địa điểm hoặc từ khóa khác.",
     "level": {
