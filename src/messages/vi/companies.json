@@ -124,7 +124,8 @@
     "noMatchDescription": "Hãy thử địa điểm hoặc từ khóa khác.",
     "level": {
       "intern": "Thực tập",
-      "new_grad": "New grad"
+      "new_grad": "New grad",
+      "experienced": "Có kinh nghiệm"
     },
     "tag": {
       "korean_preferred": "Ưu tiên biết tiếng Hàn",

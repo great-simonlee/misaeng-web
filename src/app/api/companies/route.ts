@@ -9,7 +9,7 @@ import {
   listActiveCompanies,
   listIndustries,
 } from '@lib/supabase/companies.server'
-import { listPublicPostings } from '@lib/supabase/jobPostings.server'
+import { forClientLevels, listPublicPostings } from '@lib/supabase/jobPostings.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -33,7 +33,8 @@ export async function GET(request: Request) {
       listPublicPostings().catch(() => []),
     ])
     const postingCounts: Record<string, number> = {}
-    for (const p of postings) postingCounts[p.company.id] = (postingCounts[p.company.id] || 0) + 1
+    // 공고 수: 이 클라이언트가 보는 공고만 (?levels=all)
+    for (const p of forClientLevels(postings, request)) postingCounts[p.company.id] = (postingCounts[p.company.id] || 0) + 1
     const knownIndustry = industries.some((i) => i.code === industry)
     const filtered = companies.filter(
       (c) => (!knownIndustry || c.industry === industry) && companyMatchesQuery(c, q),

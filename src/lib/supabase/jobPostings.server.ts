@@ -1,5 +1,11 @@
 import { listActiveCompanies } from '@lib/supabase/companies.server'
-import { todayInNewYork, type PostingLevel, type PublicPosting, type WorkArrangement } from '@lib/company/postings'
+import {
+  STUDENT_POSTING_LEVELS,
+  todayInNewYork,
+  type PostingLevel,
+  type PublicPosting,
+  type WorkArrangement,
+} from '@lib/company/postings'
 import { freshSummaryTranslations, type PostingSummaryTranslation } from '@lib/translations/postings'
 import type { Locale } from '@lib/i18n/locales'
 import { DEGREE_LABELS, JOB_FUNCTIONS, type DegreeLevel, type JobFunction } from '@lib/constants/postingCopy'
@@ -8,7 +14,7 @@ import { DEGREE_LABELS, JOB_FUNCTIONS, type DegreeLevel, type JobFunction } from
  * 채용 공고는 ellieo-erp 관리자 화면(Jobs → Postings)에서 검토하고 Supabase Postgres에 있다
  * (ellieo-erp/supabase/job_postings.sql). 사용자에게는 아래 조건을 모두 만족하는 공고만 보인다.
  *   - 승인됨 (status = approved), 마감 안 됨 (closed_at is null)
- *   - 학생용 (is_student: 인턴·신입), 요약이 공고 내용과 맞음 (summary_status = ok)
+ *   - 레벨이 인턴·신입·경력 (경력은 예전 앱에 보내지 않는다: forClientLevels), 요약이 공고 내용과 맞음 (summary_status = ok)
  *   - 회사가 사이트에 노출 중 (companies.is_active, 삭제 안 됨)
  * visa_statements(공고 원문 인용)는 관리자 전용이라 읽지 않는다. 이 파일은 읽기만 한다.
  */
@@ -71,7 +77,7 @@ function getSupabaseSecretKey() {
 /** ellieo-erp/supabase/job_posting_function.sql, job_posting_deadline.sql 로 추가되는 컬럼 */
 const OPTIONAL_COLUMNS = ['job_function', 'apply_by', 'tags', 'summary_translations']
 
-const LEVELS: PostingLevel[] = ['intern', 'new_grad']
+const LEVELS: PostingLevel[] = ['intern', 'new_grad', 'experienced']
 
 // ellieo-erp guessDegree() 와 같은 규칙: summary.degree 가 없던 예전 요약은 자격요건 문장으로 추정한다.
 const GRAD_WORDS = /\b(mba|master'?s?|phd|ph\.d|doctoral|jd|graduate (degree|student|program))\b|석사|대학원|박사/i
@@ -121,7 +127,8 @@ export async function listPublicPostings(): Promise<StoredPosting[]> {
   const key = getSupabaseSecretKey()
   if (!url || !key) return []
 
-  const filters = '&status=eq.approved&closed_at=is.null&is_student=eq.true&summary_status=eq.ok&order=created_at.desc&limit=500'
+  // 인턴·신입·경력 (ellieo-erp postingListRules.mjs isLivePosting 과 같은 기준). 레벨 unknown 은 보이지 않는다.
+  const filters = `&status=eq.approved&closed_at=is.null&level=in.(${LEVELS.join(',')})&summary_status=eq.ok&order=created_at.desc&limit=1000`
   const request = (columns: string) =>
     fetch(`${url}/rest/v1/job_postings?select=${columns}${filters}`, {
       headers: { apikey: key, Authorization: `Bearer ${key}` },
@@ -248,4 +255,10 @@ export async function getCompanyMoreUrl(companyId: string): Promise<string | nul
 export async function listPublicPostingsForCompany(slug: string): Promise<StoredPosting[]> {
   const key = String(slug || '').trim().toLowerCase()
   return (await listPublicPostings()).filter((p) => p.company.slug === key)
+}
+
+/** ?levels=all 을 보내지 않는 예전 앱(경력 칩·문구가 없음)에는 인턴·신입 공고만 보낸다. */
+export function forClientLevels<T extends { level: PostingLevel }>(postings: T[], request: Request): T[] {
+  if (new URL(request.url).searchParams.get('levels') === 'all') return postings
+  return postings.filter((p) => STUDENT_POSTING_LEVELS.includes(p.level))
 }

@@ -2,8 +2,11 @@ import type { ContentI18n } from '@lib/translations/content'
 import type { CityId } from '@lib/constants/cities'
 import type { DegreeLevel, JobFunction } from '@lib/constants/postingCopy'
 
-/** 사용자에게 보이는 채용 공고 (승인된 인턴·신입 공고) */
-export type PostingLevel = 'intern' | 'new_grad'
+/** 사용자에게 보이는 채용 공고 (승인된 인턴·신입·경력 공고) */
+export type PostingLevel = 'intern' | 'new_grad' | 'experienced'
+
+/** 학생 대상 레벨. 경력(experienced) 공고를 모르는 예전 앱에는 이 레벨만 보낸다 (/api/postings ?levels=all 이 없을 때). */
+export const STUDENT_POSTING_LEVELS: PostingLevel[] = ['intern', 'new_grad']
 export type WorkArrangement = 'onsite' | 'hybrid' | 'remote' | 'unknown'
 
 export type PublicPosting = {
@@ -98,7 +101,8 @@ export async function fetchPostingsWithMore(
   city: CityId,
   company?: string,
 ): Promise<{ postings: PublicPosting[]; moreUrl: string | null }> {
-  const params = new URLSearchParams({ city })
+  // levels=all: 경력 공고 포함 (이 웹은 경력 칩을 안다)
+  const params = new URLSearchParams({ city, levels: 'all' })
   if (company) params.set('company', company)
   const res = await fetch(`/api/postings?${params}`, { cache: 'no-store' })
   const data = (await res.json().catch(() => ({}))) as {
@@ -111,11 +115,11 @@ export async function fetchPostingsWithMore(
   return { postings: data.postings ?? [], moreUrl: data.moreUrl ?? null }
 }
 
-/** 공고 목록 구분 필터: 레벨(인턴·신입)과 태그(한국어 우대·한국 근무) 중 하나 */
-export type PostingKind = 'all' | 'intern' | 'new_grad' | 'korean_preferred' | 'korea_based'
+/** 공고 목록 구분 필터: 레벨(인턴·신입·경력)과 태그(한국어 우대·한국 근무) 중 하나 */
+export type PostingKind = 'all' | 'intern' | 'new_grad' | 'experienced' | 'korean_preferred' | 'korea_based'
 
 export function matchesKind(posting: PublicPosting, kind: PostingKind) {
   if (kind === 'all') return true
-  if (kind === 'intern' || kind === 'new_grad') return posting.level === kind
+  if (kind === 'intern' || kind === 'new_grad' || kind === 'experienced') return posting.level === kind
   return posting.tags.includes(kind)
 }

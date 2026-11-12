@@ -124,7 +124,8 @@
     "noMatchDescription": "다른 지역이나 검색어로 찾아보세요.",
     "level": {
       "intern": "인턴",
-      "new_grad": "신입"
+      "new_grad": "신입",
+      "experienced": "경력"
     },
     "tag": {
       "korean_preferred": "한국어 우대",

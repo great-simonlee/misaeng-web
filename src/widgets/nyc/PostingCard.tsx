@@ -34,10 +34,12 @@ import { CompanyMark } from '@widgets/nyc/CompanyBrand'
 const LEVEL_LABEL: Record<PostingLevel, string> = {
   intern: 'postings.level.intern',
   new_grad: 'postings.level.new_grad',
+  experienced: 'postings.level.experienced',
 }
 const LEVEL_TONE: Record<PostingLevel, string> = {
   intern: 'bg-[#fff1eb] text-[var(--brand)] ring-[#ffd2c2]',
   new_grad: 'bg-[#eef2ff] text-[#4338ca] ring-[#c7d2fe]',
+  experienced: 'bg-[#f0fdf4] text-[#15803d] ring-[#bbf7d0]',
 }
 const WORK_LABEL: Partial<Record<PublicPosting['workArrangement'], string>> = {
   remote: 'postings.work.remote',
@@ -52,10 +54,11 @@ const DEGREE_TAG: Record<DegreeLevel, string> = {
   both: 'bg-[#f5f3ff] text-[#6d28d9] ring-[#ddd6fe]',
   unspecified: 'bg-[#f4f5f7] text-[var(--muted)] ring-black/[0.05]',
 }
-/** 구분 필터 칩: 레벨(인턴·신입)과 자동 태그(한국어 우대·한국 근무). labelKey: companies 문구 키 */
+/** 구분 필터 칩: 레벨(인턴·신입·경력)과 자동 태그(한국어 우대·한국 근무). labelKey: companies 문구 키 */
 export const KIND_OPTIONS: { id: Exclude<PostingKind, 'all'>; labelKey: string }[] = [
   { id: 'intern', labelKey: 'postings.level.intern' },
   { id: 'new_grad', labelKey: 'postings.level.new_grad' },
+  { id: 'experienced', labelKey: 'postings.level.experienced' },
   { id: 'korean_preferred', labelKey: 'postings.tag.korean_preferred' },
   { id: 'korea_based', labelKey: 'postings.tag.korea_based' },
 ]

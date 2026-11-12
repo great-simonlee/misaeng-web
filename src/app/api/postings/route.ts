@@ -5,22 +5,24 @@ import { getActiveCompanyBySlug } from '@lib/supabase/companies.server'
 import {
   getCompanyMoreUrl,
   listPublicPostings,
+  forClientLevels,
   listPublicPostingsForCompany,
 } from '@lib/supabase/jobPostings.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-/** GET /api/postings?company=goldman-sachs — 승인된 인턴·신입 공고 (company 없으면 전체) */
+/** GET /api/postings?company=goldman-sachs&levels=all — 승인된 공고 (company 없으면 전체). levels=all 이 없으면 인턴·신입만 (예전 앱) */
 export async function GET(request: Request) {
   try {
     const company = new URL(request.url).searchParams.get('company')?.trim() || ''
     const locale = await getRequestLocale(request)
     if (!company) {
-      const postings = await listPublicPostings()
+      const postings = forClientLevels(await listPublicPostings(), request)
       return NextResponse.json({ postings: postings.map((p) => localizePosting(p, locale)) })
     }
-    const [postings, found] = await Promise.all([listPublicPostingsForCompany(company), getActiveCompanyBySlug(company)])
+    const [all, found] = await Promise.all([listPublicPostingsForCompany(company), getActiveCompanyBySlug(company)])
+    const postings = forClientLevels(all, request)
     const moreUrl = found ? await getCompanyMoreUrl(found.id) : null
     return NextResponse.json({ postings: postings.map((p) => localizePosting(p, locale)), moreUrl })
   } catch (error) {

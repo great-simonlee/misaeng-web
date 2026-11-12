@@ -131,7 +131,8 @@
     "noMatchDescription": "Try a different location or search term.",
     "level": {
       "intern": "Intern",
-      "new_grad": "New grad"
+      "new_grad": "New grad",
+      "experienced": "Experienced"
     },
     "tag": {
       "korean_preferred": "Korean preferred",
