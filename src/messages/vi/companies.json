@@ -81,7 +81,13 @@
     "DE": "Đức",
     "FR": "Pháp",
     "AU": "Úc",
-    "IN": "Ấn Độ"
+    "IN": "Ấn Độ",
+    "NL": "Hà Lan",
+    "SE": "Thụy Điển",
+    "CH": "Thụy Sĩ",
+    "IE": "Ireland",
+    "IL": "Israel",
+    "TW": "Đài Loan"
   },
   "postings": {
     "sectionTitle": "Tin tuyển dụng",

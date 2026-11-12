@@ -83,7 +83,13 @@
     "DE": "Germany",
     "FR": "France",
     "AU": "Australia",
-    "IN": "India"
+    "IN": "India",
+    "NL": "the Netherlands",
+    "SE": "Sweden",
+    "CH": "Switzerland",
+    "IE": "Ireland",
+    "IL": "Israel",
+    "TW": "Taiwan"
   },
   "postings": {
     "sectionTitle": "Job Postings",
