@@ -41,6 +41,10 @@ type WriteConsentModalProps = {
   eyebrow?: string
   titleId: string
   listHref?: string
+  /** 글쓰기 화면의 "가이드라인" 버튼으로 다시 연 경우: 동의 대신 "확인" */
+  readOnly?: boolean
+  /** 실제 글 캡처로 보는 예시 (면접·취업 후기) */
+  example?: boolean
 }
 
 function WriteConsentModal({
@@ -53,9 +57,12 @@ function WriteConsentModal({
   eyebrow,
   titleId,
   listHref,
+  readOnly = false,
+  example = false,
 }: WriteConsentModalProps) {
   const t = useT('reviews')
   const tCommunity = useT('community')
+  const [showExample, setShowExample] = useState(false)
   useBodyScrollLock(open)
 
   if (!open || typeof document === 'undefined') return null
@@ -159,15 +166,24 @@ function WriteConsentModal({
               {error}
             </p>
           ) : null}
+          {example ? (
+            <button
+              type='button'
+              onClick={() => setShowExample(true)}
+              className='mb-2.5 min-h-[44px] w-full rounded-full bg-[#f4f5f7] text-[14px] font-semibold text-[var(--foreground)] transition hover:bg-[#eceef1]'
+            >
+              {t('orientation.example.button')}
+            </button>
+          ) : null}
           <button
             type='button'
             onClick={onAgree}
             disabled={agreeing}
             className='min-h-[48px] w-full rounded-full bg-[linear-gradient(135deg,var(--brand-bright)_0%,var(--brand)_50%,var(--brand-deep)_100%)] text-[15px] font-semibold text-white shadow-[0_10px_20px_rgb(var(--brand-rgb)/0.24)] transition hover:brightness-[1.03] disabled:cursor-not-allowed disabled:opacity-50'
           >
-            {agreeing ? t('orientation.saving') : t('orientation.agree')}
+            {agreeing ? t('orientation.saving') : readOnly ? t('orientation.close') : t('orientation.agree')}
           </button>
-          {listHref ? (
+          {listHref && !readOnly ? (
             <Link
               href={listHref}
               className='mt-3 flex min-h-11 items-center justify-center text-[13px] font-medium text-[var(--muted)] underline-offset-2 hover:underline'
@@ -177,8 +193,71 @@ function WriteConsentModal({
           ) : null}
         </div>
       </div>
+      {showExample ? <WriteExampleModal onClose={() => setShowExample(false)} /> : null}
     </div>,
     document.body,
+  )
+}
+
+const EXAMPLE_SECTIONS = ['s1', 's2', 's3'] as const
+
+/**
+ * "예시와 함께 보기": a real member's job review (작성자 정보는 캡처에서 뺐다) in three captures, each with what makes
+ * it a good example. Images: public/guides/job-review-example-{1,2,3}.jpg (the Misaeng apps load the same files).
+ */
+function WriteExampleModal({ onClose }: { onClose: () => void }) {
+  const t = useT('reviews')
+  return (
+    <div className='fixed inset-0 z-[10060] flex items-end justify-center sm:items-center sm:p-4' role='dialog' aria-modal='true'>
+      <div className='absolute inset-0 bg-black/45' aria-hidden onClick={onClose} />
+      <div className='relative z-10 flex max-h-[92dvh] w-full max-w-[480px] flex-col overflow-hidden rounded-t-[1.5rem] bg-white sm:rounded-[1.5rem]'>
+        <div className='flex shrink-0 items-start justify-between gap-3 border-b border-black/[0.05] px-5 py-4'>
+          <div>
+            <h2 className='text-[1.15rem] font-semibold tracking-[-0.03em] text-[var(--foreground)]'>{t('orientation.example.title')}</h2>
+            <p className='mt-1 text-[12px] leading-relaxed text-[var(--muted)]'>{t('orientation.example.intro')}</p>
+          </div>
+          <button
+            type='button'
+            onClick={onClose}
+            aria-label={t('orientation.example.close')}
+            className='flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f4f5f7] text-[var(--foreground)]'
+          >
+            ✕
+          </button>
+        </div>
+        <div className='min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-5 py-5'>
+          {EXAMPLE_SECTIONS.map((id, i) => (
+            <section key={id}>
+              <p className='text-[15px] font-semibold text-[var(--foreground)]'>{t(`orientation.example.${id}.title`)}</p>
+              <ul className='mt-2 space-y-1.5'>
+                {(['p1', 'p2', 'p3'] as const).map((p) => (
+                  <li key={p} className='flex gap-2 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
+                    <span className='mt-[7px] size-1.5 shrink-0 rounded-full bg-[var(--brand)]' aria-hidden />
+                    <span>{t(`orientation.example.${id}.${p}`)}</span>
+                  </li>
+                ))}
+              </ul>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/guides/job-review-example-${i + 1}.jpg`}
+                alt=''
+                loading='lazy'
+                className='mt-3 w-full rounded-2xl ring-1 ring-black/[0.06]'
+              />
+            </section>
+          ))}
+        </div>
+        <div className='shrink-0 border-t border-black/[0.05] px-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]'>
+          <button
+            type='button'
+            onClick={onClose}
+            className='min-h-[46px] w-full rounded-full bg-[var(--foreground)] text-[14px] font-semibold text-white'
+          >
+            {t('orientation.example.close')}
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -188,6 +267,8 @@ function useWriteConsent(enabled: boolean, source: WriteConsentSource) {
   const [ready, setReady] = useState(!enabled)
   const [agreeing, setAgreeing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Opened again from the write screen's "가이드라인" button (read only once agreed)
+  const [reviewing, setReviewing] = useState(false)
 
   useEffect(() => {
     if (!enabled) {
@@ -220,6 +301,10 @@ function useWriteConsent(enabled: boolean, source: WriteConsentSource) {
 
   async function agree() {
     if (agreeing) return
+    if (!(enabled && required)) {
+      setReviewing(false)
+      return
+    }
     setAgreeing(true)
     setError(null)
     try {
@@ -232,6 +317,7 @@ function useWriteConsent(enabled: boolean, source: WriteConsentSource) {
         throw new Error('write consent save failed')
       }
       setRequired(false)
+      setReviewing(false)
     } catch {
       setError(t('orientation.saveFailed'))
     } finally {
@@ -239,8 +325,12 @@ function useWriteConsent(enabled: boolean, source: WriteConsentSource) {
     }
   }
 
+  const mustAgree = enabled && ready && required
   return {
-    open: enabled && ready && required,
+    open: mustAgree || reviewing,
+    /** Already agreed (or editing): the guide is shown again with "확인" */
+    readOnly: !mustAgree,
+    show: () => setReviewing(true),
     agree,
     agreeing,
     error,
@@ -253,6 +343,7 @@ type WriteConsentModalExportProps = {
   error?: string | null
   onClose: () => void
   listHref?: string
+  readOnly?: boolean
 }
 
 /** Status 글쓰기: 미동의 시 가이드·안내 */
@@ -262,6 +353,7 @@ export function CptOptWriteOrientationModal({
   error,
   onClose,
   listHref,
+  readOnly = false,
 }: WriteConsentModalExportProps) {
   const steps = useOrientationSteps('cptOpt')
   return (
@@ -273,6 +365,7 @@ export function CptOptWriteOrientationModal({
       steps={steps}
       titleId='status-write-consent-title'
       listHref={listHref}
+      readOnly={readOnly}
     />
   )
 }
@@ -287,6 +380,7 @@ export function JobReviewWriteOrientationModal({
   error,
   onClose,
   listHref,
+  readOnly = false,
 }: WriteConsentModalExportProps) {
   const steps = useOrientationSteps('jobReview')
   return (
@@ -297,7 +391,9 @@ export function JobReviewWriteOrientationModal({
       onAgree={onClose}
       steps={steps}
       titleId='job-review-write-consent-title'
+      example
       listHref={listHref}
+      readOnly={readOnly}
     />
   )
 }
@@ -312,6 +408,7 @@ export function RoommateWriteOrientationModal({
   error,
   onClose,
   listHref,
+  readOnly = false,
 }: WriteConsentModalExportProps) {
   const t = useT('reviews')
   return (
@@ -323,6 +420,7 @@ export function RoommateWriteOrientationModal({
       eyebrow={t('orientation.roommateEyebrow')}
       titleId='roommate-write-consent-title'
       listHref={listHref}
+      readOnly={readOnly}
     />
   )
 }
@@ -337,6 +435,7 @@ export function AnonymousWriteOrientationModal({
   error,
   onClose,
   listHref,
+  readOnly = false,
 }: WriteConsentModalExportProps) {
   const t = useT('reviews')
   return (
@@ -351,6 +450,7 @@ export function AnonymousWriteOrientationModal({
       eyebrow={t('orientation.anonymousEyebrow')}
       titleId='anonymous-write-consent-title'
       listHref={listHref}
+      readOnly={readOnly}
     />
   )
 }

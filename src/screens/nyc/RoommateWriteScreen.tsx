@@ -47,6 +47,7 @@ import {
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { useT } from '@lib/i18n/client'
+import { WriteGuideButton } from '@widgets/nyc/WriteGuideButton'
 import { cn } from '@lib'
 import {
   BoardBackLink,
@@ -554,6 +555,8 @@ export function RoommateWriteScreen({
           <CreateHero />
         )}
 
+        <WriteGuideButton onClick={orientation.show} />
+
         {!isEdit ? (
           <div className='mt-4 rounded-xl bg-brand-soft px-4 py-3 text-[13px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--brand)]/15'>
             {onePostBefore}
@@ -926,16 +929,14 @@ export function RoommateWriteScreen({
           </p>
         </form>
       </div>
-
-      {!isEdit ? (
-        <RoommateWriteOrientationModal
-          open={orientation.open}
-          agreeing={orientation.agreeing}
-          error={orientation.error}
-          onClose={() => void orientation.agree()}
-          listHref={href(`/${boardId}`)}
-        />
-      ) : null}
+      <RoommateWriteOrientationModal
+        open={orientation.open}
+        agreeing={orientation.agreeing}
+        error={orientation.error}
+        onClose={() => void orientation.agree()}
+        readOnly={orientation.readOnly}
+        listHref={href(`/${boardId}`)}
+      />
     </BoardPageShell>
   )
 }

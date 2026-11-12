@@ -510,7 +510,32 @@
         "body": "Added entries stack above; keep going with the next date."
       }
     },
-    "guideButton": "Guidelines"
+    "guideButton": "Guidelines",
+    "close": "Got it",
+    "example": {
+      "button": "See an example",
+      "title": "A great review, step by step",
+      "intro": "A real member's post, \"Amazon Non-Tech Intern timeline + review\". The author is hidden.",
+      "close": "Close",
+      "s1": {
+        "title": "① Title and hiring steps",
+        "p1": "Put the company, role and type in the title, e.g. Amazon Non-Tech Intern.",
+        "p2": "Record each step in date order, from applying to the result.",
+        "p3": "Keep step names short and clear: Online Assessment, Interview, Internship start."
+      },
+      "s2": {
+        "title": "② Result and notes for each step",
+        "p1": "Add the result of each step (Pass, Offer, Inclined …).",
+        "p2": "Say what you did and what you were told, with details.",
+        "p3": "Explain unfamiliar terms, e.g. headcount = an open spot on the team."
+      },
+      "s3": {
+        "title": "③ For the next applicant",
+        "p1": "List the tips you learned first-hand, numbered.",
+        "p2": "Numbers and examples help a lot, e.g. about 80% of emails went to spam.",
+        "p3": "Be specific about how to prepare, e.g. 6–7 stories per Leadership Principle, STAR format."
+      }
+    }
   },
   "write": {
     "notFound": "We couldn't find this post",

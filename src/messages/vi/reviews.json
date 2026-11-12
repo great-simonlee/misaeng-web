@@ -508,7 +508,32 @@
         "body": "Khi xong, nhấn \"Thêm mục này\" và mục đó sẽ chuyển vào danh sách phía trên form. Tiếp tục với ngày tiếp theo trong form bên dưới."
       }
     },
-    "guideButton": "Hướng dẫn"
+    "guideButton": "Hướng dẫn",
+    "close": "Đã hiểu",
+    "example": {
+      "button": "Xem ví dụ",
+      "title": "Một bài review tốt, từng bước",
+      "intro": "Bài viết thật của một thành viên: \"Amazon Non-Tech Intern – timeline + review\". Thông tin tác giả đã được ẩn.",
+      "close": "Đóng",
+      "s1": {
+        "title": "① Tiêu đề và các bước tuyển dụng",
+        "p1": "Ghi công ty, vị trí và loại hình trong tiêu đề, ví dụ: Amazon Non-Tech Intern.",
+        "p2": "Ghi lại từng bước theo thứ tự ngày, từ lúc nộp đơn đến kết quả.",
+        "p3": "Tên bước ngắn gọn, rõ ràng: Online Assessment, Interview, Bắt đầu thực tập."
+      },
+      "s2": {
+        "title": "② Kết quả và chia sẻ từng bước",
+        "p1": "Ghi kết quả của từng bước (Pass, Offer, Inclined …).",
+        "p2": "Kể cụ thể bạn đã làm gì và được nói gì.",
+        "p3": "Giải thích thuật ngữ lạ, ví dụ: headcount = vị trí còn trống."
+      },
+      "s3": {
+        "title": "③ Gửi ứng viên sau",
+        "p1": "Liệt kê các mẹo bạn tự trải nghiệm, có đánh số.",
+        "p2": "Số liệu và ví dụ rất hữu ích, ví dụ: khoảng 80% email vào thư rác.",
+        "p3": "Cách chuẩn bị cụ thể, ví dụ: 6–7 câu chuyện cho mỗi Leadership Principle, theo STAR."
+      }
+    }
   },
   "write": {
     "notFound": "Không tìm thấy bài viết này",

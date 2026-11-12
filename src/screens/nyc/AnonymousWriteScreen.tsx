@@ -35,6 +35,7 @@ import {
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { useFormat, useT } from '@lib/i18n/client'
+import { WriteGuideButton } from '@widgets/nyc/WriteGuideButton'
 import { BoardBackLink, BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
 import {
@@ -270,6 +271,8 @@ export function AnonymousWriteScreen({
           <CreateHero />
         )}
 
+        <WriteGuideButton onClick={orientation.show} />
+
         <form onSubmit={(e) => void handleSubmit(e)} className='mt-5 space-y-6'>
           <CreateSection
             step={1}
@@ -368,16 +371,14 @@ export function AnonymousWriteScreen({
           </p>
         </form>
       </div>
-
-      {!isEdit ? (
-        <AnonymousWriteOrientationModal
-          open={orientation.open}
-          agreeing={orientation.agreeing}
-          error={orientation.error}
-          onClose={() => void orientation.agree()}
-          listHref={href(`/${boardId}`)}
-        />
-      ) : null}
+      <AnonymousWriteOrientationModal
+        open={orientation.open}
+        agreeing={orientation.agreeing}
+        error={orientation.error}
+        onClose={() => void orientation.agree()}
+        readOnly={orientation.readOnly}
+        listHref={href(`/${boardId}`)}
+      />
     </BoardPageShell>
   )
 }
