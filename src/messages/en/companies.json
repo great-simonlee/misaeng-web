@@ -167,6 +167,15 @@
       "graduate": "Graduate",
       "both": "Undergrad & Grad",
       "unspecified": "Degree not specified"
+    },
+    "shared": {
+      "openInAppFull": "See the full posting in the Misaeng app",
+      "teaserNote": "Qualifications, preferred skills, apply tips and the original posting link are in the Misaeng app.",
+      "noApp": "Don't have the app yet?",
+      "appStore": "Download on the App Store",
+      "googlePlay": "Get it on Google Play",
+      "notFoundTitle": "This posting isn't available",
+      "notFoundDescription": "It may have closed or been taken down. Browse other postings instead."
     }
   },
   "industries": {

@@ -164,7 +164,8 @@
     "reviewBonusReplaced": "Sau khi cập nhật hệ thống điểm, điểm cho review được cộng sau khi đội ngũ xét duyệt từng bài thay cho khoản thưởng này. Vui lòng dùng hàng chờ xét duyệt điểm trong ERP."
   },
   "postings": {
-    "loadFailed": "Không thể tải tin tuyển dụng."
+    "loadFailed": "Không thể tải tin tuyển dụng.",
+    "notFound": "Không tìm thấy tin tuyển dụng. Tin có thể đã hết hạn hoặc bị gỡ."
   },
   "comments": {
     "bodyRequired": "Vui lòng viết bình luận.",

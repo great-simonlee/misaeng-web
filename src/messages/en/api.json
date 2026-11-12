@@ -170,7 +170,8 @@
     "reviewBonusReplaced": "Since the points update, review points are paid after the team reviews each post instead of this bonus. Please use the points review queue in the ERP."
   },
   "postings": {
-    "loadFailed": "Couldn't load job postings."
+    "loadFailed": "Couldn't load job postings.",
+    "notFound": "This posting isn't available. It may have closed or been taken down."
   },
   "comments": {
     "bodyRequired": "Please write a comment.",

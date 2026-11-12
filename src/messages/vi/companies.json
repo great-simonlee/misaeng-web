@@ -160,6 +160,15 @@
       "graduate": "Sau đại học",
       "both": "Đại học & Sau đại học",
       "unspecified": "Không yêu cầu bằng cấp cụ thể"
+    },
+    "shared": {
+      "openInAppFull": "Xem toàn bộ tin trong ứng dụng Misaeng",
+      "teaserNote": "Yêu cầu, điểm cộng, mẹo ứng tuyển và link tin gốc có trong ứng dụng Misaeng.",
+      "noApp": "Chưa có ứng dụng?",
+      "appStore": "Tải trên App Store",
+      "googlePlay": "Tải trên Google Play",
+      "notFoundTitle": "Không tìm thấy tin tuyển dụng",
+      "notFoundDescription": "Tin có thể đã hết hạn hoặc bị gỡ. Hãy xem các tin khác."
     }
   },
   "industries": {

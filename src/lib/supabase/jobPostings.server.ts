@@ -224,7 +224,7 @@ export async function recordPostingClick(input: { postingId: string; userId: str
   const url = getSupabaseUrl()
   const key = getSupabaseSecretKey()
   if (!url || !key) return false
-  const posting = (await listPublicPostings()).find((p) => p.id === input.postingId)
+  const posting = await getPublicPosting(input.postingId)
   if (!posting) return false
   const res = await fetch(`${url}/rest/v1/company_clicks`, {
     method: 'POST',
@@ -256,6 +256,13 @@ export async function getCompanyMoreUrl(companyId: string): Promise<string | nul
   if (!res?.ok) return null
   const rows = ((await res.json().catch(() => null)) as { url?: string }[] | null) ?? []
   return isHttpsUrl(rows[0]?.url) ? rows[0]!.url! : null
+}
+
+/** 사용자에게 보이는 공고 하나 (공유 링크 /[city]/companies/postings/[id]). 숨겨진·마감된 공고는 null. */
+export async function getPublicPosting(id: string): Promise<StoredPosting | null> {
+  const key = String(id || '').trim()
+  if (!key) return null
+  return (await listPublicPostings()).find((p) => p.id === key) ?? null
 }
 
 export async function listPublicPostingsForCompany(slug: string): Promise<StoredPosting[]> {

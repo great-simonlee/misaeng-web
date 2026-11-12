@@ -160,6 +160,15 @@
       "graduate": "대학원생",
       "both": "학부·대학원",
       "unspecified": "학력 미명시"
+    },
+    "shared": {
+      "openInAppFull": "미생 앱에서 전체 보기",
+      "teaserNote": "자격요건 · 우대사항 · 지원 팁과 공고 원문 링크는 미생 앱에서 볼 수 있어요.",
+      "noApp": "아직 앱이 없다면",
+      "appStore": "App Store에서 받기",
+      "googlePlay": "Google Play에서 받기",
+      "notFoundTitle": "공고를 찾을 수 없어요",
+      "notFoundDescription": "마감됐거나 내려간 공고예요. 다른 공고를 둘러보세요."
     }
   },
   "industries": {

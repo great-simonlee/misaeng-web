@@ -159,6 +159,28 @@ function ApplyGuide({ posting }: { posting: PublicPosting }) {
   )
 }
 
+/** 레벨 · 직무 · 지원 대상 · 자동 태그(한국어 우대·한국 근무) 칩 줄 (공고 줄과 공유 링크 페이지) */
+export function PostingChips({ posting, className }: { posting: PublicPosting; className?: string }) {
+  const t = useT('companies')
+  const { degree } = posting.summary
+  return (
+    <span className={cn('flex flex-wrap items-center gap-1.5', className)}>
+      <span className={cn(TAG, LEVEL_TONE[posting.level])}>{t(LEVEL_LABEL[posting.level])}</span>
+      {posting.jobFunction && posting.jobFunction !== 'other' ? (
+        <span className={cn(TAG, FUNCTION_TAG)}>{t(JOB_FUNCTION_LABELS[posting.jobFunction])}</span>
+      ) : null}
+      <span className={cn(TAG, DEGREE_TAG[degree])}>{t(DEGREE_LABELS[degree])}</span>
+      {posting.tags
+        .filter((tag) => TAG_LABEL[tag])
+        .map((tag) => (
+          <span key={tag} className={cn(TAG, 'bg-[#fff1f2] text-[#be123c] ring-[#fecdd3]')}>
+            {t(TAG_LABEL[tag])}
+          </span>
+        ))}
+    </span>
+  )
+}
+
 /** "Charlotte, NC · Dallas, TX 외 1곳" */
 function regionSummary(regions: string[], t: Translate) {
   if (regions.length <= 2) return regions.join(' · ')
@@ -228,20 +250,7 @@ export function PostingRow({
                 {posting.company.name}
               </span>
             ) : null}
-            <span className='flex flex-wrap items-center gap-1.5'>
-              <span className={cn(TAG, LEVEL_TONE[posting.level])}>{t(LEVEL_LABEL[posting.level])}</span>
-              {posting.jobFunction && posting.jobFunction !== 'other' ? (
-                <span className={cn(TAG, FUNCTION_TAG)}>{t(JOB_FUNCTION_LABELS[posting.jobFunction])}</span>
-              ) : null}
-              <span className={cn(TAG, DEGREE_TAG[summary.degree])}>{t(DEGREE_LABELS[summary.degree])}</span>
-              {posting.tags
-                .filter((tag) => TAG_LABEL[tag])
-                .map((tag) => (
-                  <span key={tag} className={cn(TAG, 'bg-[#fff1f2] text-[#be123c] ring-[#fecdd3]')}>
-                    {t(TAG_LABEL[tag])}
-                  </span>
-                ))}
-            </span>
+            <PostingChips posting={posting} />
             <span className='mt-1.5 block text-[15px] font-semibold leading-snug tracking-tight text-[var(--foreground)]'>
               {posting.title}
             </span>
