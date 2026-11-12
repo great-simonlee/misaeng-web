@@ -11,9 +11,9 @@ const UPLOAD_KEY_SHA256 = '35:D1:36:DF:B8:8E:A5:E9:AE:8C:87:51:C6:5F:70:4A:44:6F
 /**
  * Google Play app signing key: Play re-signs every install from the store with a Google-held key, so store installs
  * only verify against this one. Copy it from Play Console → Misaeng → Test and release → App integrity →
- * App signing → "App signing key certificate" SHA-256. Empty until then (store installs open the browser).
+ * App signing → "App signing key certificate" SHA-256 (Protected with Play → Manage Play app signing).
  */
-const PLAY_APP_SIGNING_KEY_SHA256 = ''
+const PLAY_APP_SIGNING_KEY_SHA256 = 'DF:2D:69:C3:13:A8:E5:44:F3:63:FA:78:5A:48:EB:21:99:06:8C:15:8F:01:FE:DC:34:72:B2:FB:60:4E:DA:F6'
 
 const body = [
   {
