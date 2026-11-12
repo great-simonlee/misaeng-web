@@ -21,6 +21,12 @@ export type PublicPosting = {
   summary: {
     overview: string[]
     qualifications: string[]
+    /** 우대 사항 (상세 요약, 2026-11~). 예전 요약은 빈 배열 */
+    preferred: string[]
+    /** 급여 (공고에 있을 때만), 예: "연봉 $120,000–$150,000 (뉴욕 기준)" */
+    compensation: string | null
+    /** 복지·혜택 (공고에 있을 때만) */
+    benefits: string[]
     workType: string
     location: string
     /** 지원 팁 (수시 심사, 지원 횟수 제한, 제출 서류 등) */
@@ -122,4 +128,13 @@ export function matchesKind(posting: PublicPosting, kind: PostingKind) {
   if (kind === 'all') return true
   if (kind === 'intern' || kind === 'new_grad' || kind === 'experienced') return posting.level === kind
   return posting.tags.includes(kind)
+}
+
+/**
+ * 공고 원문을 Google 번역으로 여는 주소 (원문은 저장·재게시하지 않고, 읽는 사람의 브라우저가 번역해서 본다).
+ * 영어 화면에서는 null (원문이 대부분 영어).
+ */
+export function translatedPostingUrl(url: string, locale: string): string | null {
+  if (!url || locale === 'en') return null
+  return `https://translate.google.com/translate?sl=auto&tl=${encodeURIComponent(locale)}&u=${encodeURIComponent(url)}`
 }

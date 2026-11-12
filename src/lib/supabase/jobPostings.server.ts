@@ -53,6 +53,9 @@ type PostingRow = {
   summary: {
     overview?: unknown
     qualifications?: unknown
+    preferred?: unknown
+    compensation?: unknown
+    benefits?: unknown
     workType?: unknown
     location?: unknown
     applyNotes?: unknown
@@ -188,6 +191,9 @@ export async function listPublicPostings(): Promise<StoredPosting[]> {
       summary: {
         overview,
         qualifications,
+        preferred: lines(row.summary?.preferred),
+        compensation: text(row.summary?.compensation) || null,
+        benefits: lines(row.summary?.benefits),
         workType: text(row.summary?.workType),
         location: text(row.summary?.location),
         applyNotes: lines(row.summary?.applyNotes),

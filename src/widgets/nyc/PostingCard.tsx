@@ -17,6 +17,7 @@ import {
   type PostingKind,
   type PostingLevel,
   type PublicPosting,
+  translatedPostingUrl,
 } from '@lib/company/postings'
 import {
   DEGREE_LABELS,
@@ -25,7 +26,7 @@ import {
   type DegreeLevel,
   type JobFunction,
 } from '@lib/constants/postingCopy'
-import { useFormat, useT } from '@lib/i18n/client'
+import { useFormat, useLocale, useT } from '@lib/i18n/client'
 import type { Translate } from '@lib/i18n/translate'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CompanyMark } from '@widgets/nyc/CompanyBrand'
@@ -185,6 +186,8 @@ export function PostingRow({
   const format = useFormat()
   const brand = BRAND_CONFIG.name
   const { summary } = posting
+  // 원문 전문은 Google 번역으로 (저장하지 않음). 영어 화면에서는 버튼 없음
+  const translatedUrl = translatedPostingUrl(posting.applyUrl, useLocale())
   const workKey = WORK_LABEL[posting.workArrangement]
   const work = workKey ? t(workKey) : undefined
   const postedDate =
@@ -306,7 +309,33 @@ export function PostingRow({
               </ul>
             </div>
           ) : null}
+          {summary.preferred?.length ? (
+            <div>
+              <p className='font-semibold text-[var(--foreground)]'>{t('postings.preferredTitle')}</p>
+              <ul className='mt-1 list-disc space-y-0.5 pl-5 text-[var(--muted-foreground)]'>
+                {summary.preferred.map((line, i) => (
+                  <li key={i}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {summary.benefits?.length ? (
+            <div>
+              <p className='font-semibold text-[var(--foreground)]'>{t('postings.benefitsTitle')}</p>
+              <ul className='mt-1 list-disc space-y-0.5 pl-5 text-[var(--muted-foreground)]'>
+                {summary.benefits.map((line, i) => (
+                  <li key={i}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <dl className='grid gap-1.5 sm:grid-cols-[80px_1fr]'>
+            {summary.compensation ? (
+              <>
+                <dt className='font-semibold text-[var(--foreground)]'>{t('postings.compensationLabel')}</dt>
+                <dd className='text-[var(--muted-foreground)]'>{summary.compensation}</dd>
+              </>
+            ) : null}
             {summary.workType ? (
               <>
                 <dt className='font-semibold text-[var(--foreground)]'>{t('postings.workTypeLabel')}</dt>
@@ -331,6 +360,18 @@ export function PostingRow({
               {t('postings.applyButton')}
               <ExternalIcon className='size-3.5' />
             </a>
+            {translatedUrl ? (
+              <a
+                href={translatedUrl}
+                target='_blank'
+                rel='noopener noreferrer'
+                onClick={() => trackPostingClick(posting.id)}
+                className='inline-flex h-9 items-center gap-1 rounded-full border border-black/10 bg-white px-4 text-[13px] font-semibold text-[var(--foreground)] transition hover:bg-black/[0.03] active:scale-[0.98]'
+              >
+                {t('postings.translateButton')}
+                <ExternalIcon className='size-3.5' />
+              </a>
+            ) : null}
             <p className='min-w-0 flex-1 text-[11px] text-[var(--muted)]'>{t('postings.summaryNotice', { brand })}</p>
           </div>
         </div>

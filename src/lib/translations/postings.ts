@@ -24,6 +24,10 @@ export type PostingSummaryTranslation = {
   workType: string
   location: string
   applyNotes: string[]
+  /** 상세 요약 항목: 번역이 없으면 이 언어에서는 보이지 않는다 (한국어 문장이 섞이지 않게) */
+  preferred?: string[]
+  compensation?: string | null
+  benefits?: string[]
   sourceHash: string
 }
 
@@ -83,6 +87,9 @@ export function localizePosting(
       workType: translation.workType,
       location: translation.location,
       applyNotes: translation.applyNotes,
+      preferred: translation.preferred ?? [],
+      compensation: translation.compensation ?? null,
+      benefits: translation.benefits ?? [],
     },
     i18n: { ...base, state: 'translated' },
   }
