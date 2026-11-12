@@ -515,25 +515,25 @@
     "example": {
       "button": "See an example",
       "title": "A great review, step by step",
-      "intro": "A real member's post, \"Amazon Non-Tech Intern timeline + review\". The author is hidden.",
+      "intro": "A real member's post, \"Amazon Non-Tech Intern timeline + review\", as it looks in the app. The author is hidden.",
       "close": "Close",
       "s1": {
-        "title": "① Title and hiring steps",
-        "p1": "Put the company, role and type in the title, e.g. Amazon Non-Tech Intern.",
-        "p2": "Record each step in date order, from applying to the result.",
-        "p3": "Keep step names short and clear: Online Assessment, Interview, Internship start."
+        "title": "① A timeline with dates",
+        "p1": "Look back through your inbox, LinkedIn and the application site for the dates you applied, heard back, took the OA, interviewed and got the result or offer.",
+        "p2": "Exact dates show the next applicants when to expect each email.",
+        "p3": "Keep step names short and clear: Online Assessment, Interview, Offer, Internship start."
       },
       "s2": {
-        "title": "② Result and notes for each step",
-        "p1": "Add the result of each step (Pass, Offer, Inclined …).",
-        "p2": "Say what you did and what you were told, with details.",
-        "p3": "Explain unfamiliar terms, e.g. headcount = an open spot on the team."
+        "title": "② What to note for each step",
+        "p1": "Where they reached you (email, LinkedIn, the application site) and what you submitted.",
+        "p2": "How many interviews, in what format (phone, video, in person), how long they took and the result.",
+        "p3": "How long you waited for the next email helps a lot, e.g. offer email two weeks after the interview."
       },
       "s3": {
-        "title": "③ For the next applicant",
-        "p1": "List the tips you learned first-hand, numbered.",
-        "p2": "Numbers and examples help a lot, e.g. about 80% of emails went to spam.",
-        "p3": "Be specific about how to prepare, e.g. 6–7 stories per Leadership Principle, STAR format."
+        "title": "③ The final result and after",
+        "p1": "Add the final result (offer, rejection, waitlist) and the date you got it.",
+        "p2": "Explain what the result means and what happens next, as you were told, e.g. Inclined = hired when a spot opens.",
+        "p3": "Write as much detail as you remember. Small facts help the next applicant a lot."
       }
     }
   },

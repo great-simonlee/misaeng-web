@@ -513,25 +513,25 @@
     "example": {
       "button": "Xem ví dụ",
       "title": "Một bài review tốt, từng bước",
-      "intro": "Bài viết thật của một thành viên: \"Amazon Non-Tech Intern – timeline + review\". Thông tin tác giả đã được ẩn.",
+      "intro": "Bài viết thật của một thành viên, \"Timeline + review thực tập Non-Tech tại Amazon\", như hiển thị trong ứng dụng. Thông tin người viết đã được ẩn.",
       "close": "Đóng",
       "s1": {
-        "title": "① Tiêu đề và các bước tuyển dụng",
-        "p1": "Ghi công ty, vị trí và loại hình trong tiêu đề, ví dụ: Amazon Non-Tech Intern.",
-        "p2": "Ghi lại từng bước theo thứ tự ngày, từ lúc nộp đơn đến kết quả.",
-        "p3": "Tên bước ngắn gọn, rõ ràng: Online Assessment, Interview, Bắt đầu thực tập."
+        "title": "① Timeline theo ngày",
+        "p1": "Xem lại hộp thư, LinkedIn và trang ứng tuyển để ghi ngày nộp đơn, ngày được liên hệ, ngày làm OA, ngày phỏng vấn và ngày nhận kết quả hoặc offer.",
+        "p2": "Ngày càng chính xác, người ứng tuyển sau càng biết khi nào sẽ nhận được email.",
+        "p3": "Đặt tên bước ngắn gọn, rõ ràng: Online Assessment, Interview, Offer, Bắt đầu thực tập."
       },
       "s2": {
-        "title": "② Kết quả và chia sẻ từng bước",
-        "p1": "Ghi kết quả của từng bước (Pass, Offer, Inclined …).",
-        "p2": "Kể cụ thể bạn đã làm gì và được nói gì.",
-        "p3": "Giải thích thuật ngữ lạ, ví dụ: headcount = vị trí còn trống."
+        "title": "② Nên ghi gì ở mỗi bước",
+        "p1": "Bạn được liên hệ qua đâu (email, LinkedIn, trang ứng tuyển) và đã nộp hồ sơ gì.",
+        "p2": "Số vòng phỏng vấn, hình thức (điện thoại, video, trực tiếp), thời lượng và kết quả.",
+        "p3": "Thời gian chờ đến email tiếp theo cũng rất hữu ích, ví dụ: email offer 2 tuần sau phỏng vấn."
       },
       "s3": {
-        "title": "③ Gửi ứng viên sau",
-        "p1": "Liệt kê các mẹo bạn tự trải nghiệm, có đánh số.",
-        "p2": "Số liệu và ví dụ rất hữu ích, ví dụ: khoảng 80% email vào thư rác.",
-        "p3": "Cách chuẩn bị cụ thể, ví dụ: 6–7 câu chuyện cho mỗi Leadership Principle, theo STAR."
+        "title": "③ Kết quả cuối cùng và sau đó",
+        "p1": "Ghi kết quả cuối cùng (offer, bị từ chối, chờ) và ngày nhận được.",
+        "p2": "Giải thích kết quả có nghĩa là gì và bước tiếp theo như bạn được cho biết, ví dụ: Inclined = sẽ tuyển khi có vị trí.",
+        "p3": "Hãy viết càng chi tiết càng tốt. Thông tin nhỏ cũng giúp ích rất nhiều cho người ứng tuyển sau."
       }
     }
   },
