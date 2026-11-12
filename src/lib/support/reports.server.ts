@@ -3,15 +3,19 @@ import { notifyUsers } from '@lib/push/notify.server'
 import { eq, supportRest } from './rest.server'
 import { getSupportSettings } from './settings.server'
 import { sendStaffPush } from './staffPush.server'
+import { BRAND, type BrandId } from '@lib/brand'
 
-/** New report → push to the report handler (staff app). Never throws. */
-export async function pushReportToHandler(input: { title: string; body: string; reportId?: string | null }) {
+/**
+ * New report → push to the report handler (staff app). `brand` (default: this site's brand) makes the app open the
+ * Misaeng or the Ellieo reports list. Never throws.
+ */
+export async function pushReportToHandler(input: { title: string; body: string; reportId?: string | null; brand?: BrandId }) {
   try {
     const settings = await getSupportSettings()
     await sendStaffPush([settings['reports.assignee']], {
       title: input.title,
       body: input.body,
-      data: { type: 'report', ...(input.reportId ? { reportId: input.reportId } : {}) },
+      data: { type: 'report', brand: input.brand || BRAND, ...(input.reportId ? { reportId: input.reportId } : {}) },
       threadId: 'reports',
     })
   } catch (error) {
