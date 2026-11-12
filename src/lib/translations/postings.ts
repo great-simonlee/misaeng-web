@@ -5,14 +5,18 @@ import type { ContentI18n } from './content'
 
 /**
  * 채용 공고 요약 번역. 한국어 summary가 원문이고, ellieo-erp(Jobs → Postings)가
- * job_postings.summary_translations 에 { en: { overview, qualifications, workType, location, applyNotes, sourceHash } }
+ * job_postings.summary_translations 에 { en: { overview, qualifications, preferred, compensation, benefits, workType,
+ * location, applyNotes, sourceHash } }
  * 형태로 저장한다. sourceHash 규칙은 ellieo-erp src/app/util/postingTranslations.mjs summarySourceHash 와 같다.
  */
 
 export const POSTING_SOURCE_LOCALE: Locale = 'ko'
 
-const TRANSLATED_FIELDS = ['overview', 'qualifications', 'workType', 'location', 'applyNotes'] as const
-const LIST_FIELDS: readonly string[] = ['overview', 'qualifications', 'applyNotes']
+// 첫 (짧은) 요약 항목. 상세 항목(preferred·compensation·benefits)은 요약에 하나라도 있을 때만 해시에 들어간다
+// (예전 해시가 그대로 맞도록). ellieo-erp postingTranslations.mjs 와 같은 규칙.
+const CORE_FIELDS = ['overview', 'qualifications', 'workType', 'location', 'applyNotes'] as const
+const DETAIL_FIELDS = ['preferred', 'compensation', 'benefits'] as const
+const LIST_FIELDS: readonly string[] = ['overview', 'qualifications', 'preferred', 'benefits', 'applyNotes']
 
 const cleanLine = (value: unknown) => String(value ?? '').replace(/\s+/g, ' ').trim()
 const cleanLines = (value: unknown) =>
@@ -33,9 +37,10 @@ export type PostingSummaryTranslation = {
 
 export function summarySourceHash(summary: Record<string, unknown> | null | undefined): string | null {
   if (!summary) return null
-  const source = JSON.stringify(
-    TRANSLATED_FIELDS.map((key) => (LIST_FIELDS.includes(key) ? cleanLines(summary[key]) : cleanLine(summary[key]))),
-  )
+  const value = (key: string) => (LIST_FIELDS.includes(key) ? cleanLines(summary[key]) : cleanLine(summary[key]))
+  const detail = DETAIL_FIELDS.map(value)
+  const hasDetail = detail.some((v) => v.length > 0)
+  const source = JSON.stringify([...CORE_FIELDS.map(value), ...(hasDetail ? detail : [])])
   let hash = 0x811c9dc5
   for (let i = 0; i < source.length; i += 1) {
     hash ^= source.charCodeAt(i)
@@ -62,6 +67,9 @@ export function freshSummaryTranslations(
       workType: cleanLine(value.workType),
       location: cleanLine(value.location),
       applyNotes: cleanLines(value.applyNotes),
+      preferred: cleanLines(value.preferred),
+      compensation: cleanLine(value.compensation) || null,
+      benefits: cleanLines(value.benefits),
       sourceHash: hash,
     }
   }
