@@ -158,5 +158,17 @@
   "instagramDm": {
     "body": "{message}: nhắn DM cho chúng tôi tại {handle}.",
     "button": "Gửi DM Instagram"
+  },
+  "appPrompt": {
+    "title": "Misaeng tiện hơn trên ứng dụng",
+    "subtitle": "Cộng đồng du học sinh và người đi làm tại Mỹ",
+    "perks": {
+      "alerts": "Nhận thông báo tin tuyển dụng mới từ công ty bạn theo dõi, bình luận và tin nhắn",
+      "chat": "Nhắn tin hỏi về nhà ở ngay trong ứng dụng",
+      "full": "Xem đánh giá phỏng vấn và tin tuyển dụng nhanh hơn"
+    },
+    "downloadIos": "Tải miễn phí trên App Store",
+    "downloadAndroid": "Tải miễn phí trên Google Play",
+    "continueWeb": "Không, tiếp tục trên web"
   }
 }

@@ -7,6 +7,7 @@ import { useCityInfo } from '@hooks/useCity'
 import { BRAND_CONFIG } from '@lib/brand'
 import { captureReferralFromLocation } from '@lib/community/referral'
 import { useT } from '@lib/i18n/client'
+import { AppDownloadPrompt } from '@widgets/nyc/AppDownloadPrompt'
 import { BoardHighlightCards } from '@widgets/nyc/BoardHighlightCards'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
 import { MagazinePreviewSection } from '@widgets/nyc/MagazinePreviewSection'
@@ -35,6 +36,8 @@ export function NycHubScreen() {
 
   return (
     <div className='min-h-screen min-w-0 overflow-x-hidden bg-[var(--background)]'>
+      {/* phones: point to the app (Misaeng only, hidden for a few days once dismissed) */}
+      <AppDownloadPrompt />
       <header className='border-b border-[var(--border)]'>
         <div className='mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8'>
           <div className='min-w-0'>

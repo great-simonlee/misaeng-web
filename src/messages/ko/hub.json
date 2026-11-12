@@ -158,5 +158,17 @@
   "instagramDm": {
     "body": "{message} {handle}로 DM 보내주세요.",
     "button": "인스타그램 DM 보내기"
+  },
+  "appPrompt": {
+    "title": "미생은 앱에서 더 편해요",
+    "subtitle": "미국 유학생·직장인 커뮤니티 미생",
+    "perks": {
+      "alerts": "관심 회사 새 공고, 댓글·메시지 알림을 바로 받아요",
+      "chat": "하우징 매물 문의를 앱에서 바로 채팅으로 해요",
+      "full": "면접 후기·채용 공고를 더 빠르고 편하게 봐요"
+    },
+    "downloadIos": "App Store에서 무료로 받기",
+    "downloadAndroid": "Google Play에서 무료로 받기",
+    "continueWeb": "괜찮아요, 모바일 웹으로 볼게요"
   }
 }

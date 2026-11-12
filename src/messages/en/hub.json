@@ -158,5 +158,17 @@
   "instagramDm": {
     "body": "{message}: DM us at {handle}.",
     "button": "Send an Instagram DM"
+  },
+  "appPrompt": {
+    "title": "Misaeng works better in the app",
+    "subtitle": "The community for students and young professionals in the US",
+    "perks": {
+      "alerts": "Get alerts for new postings from companies you follow, comments and messages",
+      "chat": "Chat about housing listings right in the app",
+      "full": "Browse interview reviews and job postings faster"
+    },
+    "downloadIos": "Get it free on the App Store",
+    "downloadAndroid": "Get it free on Google Play",
+    "continueWeb": "No thanks, continue on the web"
   }
 }
