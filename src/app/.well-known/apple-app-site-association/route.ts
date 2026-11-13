@@ -3,7 +3,7 @@
  * open the Misaeng app when it is installed, and the web page otherwise.
  * Paths match `/<city>/<board>/<id>` and `/<locale>/<city>/<board>/<id>`; the app maps them in AppRouter.appURL(forWebLink:).
  */
-const BOARDS = ['housing', 'roommate', 'sublet', 'food', 'anonymous', 'status', 'job-review', 'companies']
+const BOARDS = ['housing', 'roommate', 'food', 'anonymous', 'status', 'job-review', 'companies']
 
 const body = {
   applinks: {

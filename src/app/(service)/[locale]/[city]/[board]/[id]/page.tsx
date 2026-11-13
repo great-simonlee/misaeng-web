@@ -32,6 +32,9 @@ export async function generateMetadata({ params }: CommunityDetailPageProps): Pr
   })
 }
 
+/** Boards the app opens by id */
+const APP_BOARDS = new Set(['review', 'status', 'food', 'anonymous', 'roommate'])
+
 export default async function CommunityDetailPage({
   params,
 }: CommunityDetailPageProps) {
@@ -52,10 +55,20 @@ export default async function CommunityDetailPage({
   }
 
   const detail = <CommunityDetailScreen boardId={board} title={title} postId={id} />
-  if (!isMemberOnlyBoard(board)) return detail
+  // Same screen in the app (misaeng-app AppRouter: review/, status/, food/, anonymous/, roommate/)
+  const appBoard = board === 'job-review' ? 'review' : isMemberOnlyBoard(board) ? 'status' : board
+  const openInApp = APP_BOARDS.has(appBoard) ? <OpenInApp appPath={`${appBoard}/${id}`} /> : null
+  if (!isMemberOnlyBoard(board)) {
+    return (
+      <>
+        {openInApp}
+        {detail}
+      </>
+    )
+  }
   return (
     <>
-      <OpenInApp appPath={`${board === 'job-review' ? 'review' : 'status'}/${id}`} />
+      {openInApp}
       <MemberGate>{detail}</MemberGate>
     </>
   )

@@ -210,5 +210,45 @@
     "memberOnly": "For Misaeng members. Open it in the app.",
     "openInApp": "Open in app",
     "perMonth": "/mo"
+  },
+  "appHandoff": {
+    "openApp": "Open in the Misaeng app",
+    "notInstalled": "Don't have the app? Install it first and you'll land right back here.",
+    "appStore": "Download on the App Store",
+    "googlePlay": "Get it on Google Play",
+    "qrTitle": "Scan with your phone camera",
+    "qrBody": "If you have the app, this page opens there. If not, you'll see how to install it.",
+    "qrAlt": "QR code to open this page on your phone",
+    "close": "Close",
+    "open": {
+      "title": "Misaeng works better in the app",
+      "body": "Notifications, saves and messages all in one place."
+    },
+    "coffeeChat": {
+      "title": "Request coffee chats in the Misaeng app",
+      "body": "Pick a time with the person who wrote this review and get notified when it is confirmed."
+    },
+    "ask": {
+      "title": "Ask questions in the Misaeng app",
+      "body": "Ask the person who wrote this review directly. We will notify you when they answer."
+    },
+    "follow": {
+      "title": "Get new posting alerts in the Misaeng app",
+      "body": "We send a push notification as soon as this company posts a new job."
+    },
+    "inquiry": {
+      "title": "Ask about this listing in the Misaeng app",
+      "body": "Message our team in real time and get notified when they reply."
+    },
+    "message": {
+      "title": "Send messages in the Misaeng app",
+      "body": "Talk to the author right in the app."
+    },
+    "buttons": {
+      "coffeeChat": "Request a coffee chat",
+      "ask": "Ask the author",
+      "follow": "Get new posting alerts",
+      "openInApp": "Open in app"
+    }
   }
 }

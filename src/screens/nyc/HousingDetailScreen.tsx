@@ -636,13 +636,16 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                   {t('detail.emailInquiry')}
                 </a>
               )}
-              <button
-                type='button'
-                onClick={handleKakaoInquiry}
-                className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-[#E8D84A] bg-[#FEE500] px-5 text-sm font-semibold text-[#191919] touch-manipulation transition hover:brightness-95'
-              >
-                {t('detail.kakaoInquiry')}
-              </button>
+              {/* With app chat on, KakaoTalk is a small fallback inside the app inquiry sheet */}
+              {!supportConfig?.housingChat ? (
+                <button
+                  type='button'
+                  onClick={handleKakaoInquiry}
+                  className='inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-[#E8D84A] bg-[#FEE500] px-5 text-sm font-semibold text-[#191919] touch-manipulation transition hover:brightness-95'
+                >
+                  {t('detail.kakaoInquiry')}
+                </button>
+              ) : null}
               <button
                 type='button'
                 onClick={() => void handleShare()}
@@ -655,6 +658,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             <AppInquiryModal
               open={appInquiryOpen}
               onClose={() => setAppInquiryOpen(false)}
+              listingId={listing.id}
               mailHref={listing.contactEmail ? mailHref : null}
               onKakao={handleKakaoInquiry}
             />

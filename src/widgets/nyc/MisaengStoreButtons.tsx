@@ -1,6 +1,7 @@
 import { cn } from '@lib'
 
-export const MISAENG_APP_STORE_URL = 'https://apps.apple.com/us/app/id6826454902'
+export const MISAENG_APP_STORE_ID = '6826454902'
+export const MISAENG_APP_STORE_URL = `https://apps.apple.com/us/app/id${MISAENG_APP_STORE_ID}`
 export const MISAENG_PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.misaeng.nyc'
 
 /** App Store · Google Play 버튼 (미생 앱 설치). 문구는 화면마다 자기 네임스페이스에서 넘긴다. */

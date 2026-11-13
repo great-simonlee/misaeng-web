@@ -210,5 +210,45 @@
     "memberOnly": "Dành cho thành viên Misaeng. Mở trong ứng dụng.",
     "openInApp": "Mở trong ứng dụng",
     "perMonth": "/tháng"
+  },
+  "appHandoff": {
+    "openApp": "Mở trong ứng dụng Misaeng",
+    "notInstalled": "Chưa có ứng dụng? Hãy cài đặt trước, sau đó bạn sẽ quay lại đúng trang này.",
+    "appStore": "Tải trên App Store",
+    "googlePlay": "Tải trên Google Play",
+    "qrTitle": "Quét bằng camera điện thoại",
+    "qrBody": "Nếu đã có ứng dụng, trang này sẽ mở trong ứng dụng. Nếu chưa, bạn sẽ thấy hướng dẫn cài đặt.",
+    "qrAlt": "Mã QR để mở trang này trên điện thoại",
+    "close": "Đóng",
+    "open": {
+      "title": "Dùng Misaeng tiện hơn trên ứng dụng",
+      "body": "Thông báo, lưu và tin nhắn đều ở một nơi."
+    },
+    "coffeeChat": {
+      "title": "Đăng ký coffee chat trên ứng dụng Misaeng",
+      "body": "Hẹn giờ với người viết bài đánh giá này và nhận thông báo khi được xác nhận."
+    },
+    "ask": {
+      "title": "Đặt câu hỏi trên ứng dụng Misaeng",
+      "body": "Hỏi trực tiếp người viết bài đánh giá này. Chúng tôi sẽ báo khi có câu trả lời."
+    },
+    "follow": {
+      "title": "Nhận thông báo tin tuyển dụng mới trên ứng dụng Misaeng",
+      "body": "Chúng tôi gửi thông báo ngay khi công ty này đăng tin tuyển dụng mới."
+    },
+    "inquiry": {
+      "title": "Hỏi về căn hộ này trên ứng dụng Misaeng",
+      "body": "Nhắn tin trực tiếp với đội ngũ và nhận thông báo khi có phản hồi."
+    },
+    "message": {
+      "title": "Gửi tin nhắn trên ứng dụng Misaeng",
+      "body": "Trò chuyện với người viết ngay trong ứng dụng."
+    },
+    "buttons": {
+      "coffeeChat": "Đăng ký coffee chat",
+      "ask": "Hỏi người viết",
+      "follow": "Nhận thông báo tin mới",
+      "openInApp": "Mở trong ứng dụng"
+    }
   }
 }
