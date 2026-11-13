@@ -291,7 +291,8 @@
     "perMonth": "/tháng",
     "stepNumber": "Bước {n}",
     "noStepInfo": "Chưa có chi tiết các bước",
-    "views": "Lượt xem"
+    "views": "Lượt xem",
+    "offerVerified": "Đã xác minh trúng tuyển"
   },
   "anonymous": {
     "topicPlaceholder": "Chọn chủ đề",

@@ -291,7 +291,8 @@
     "perMonth": "/월",
     "stepNumber": "{n}단계",
     "noStepInfo": "단계 정보 없음",
-    "views": "조회수"
+    "views": "조회수",
+    "offerVerified": "합격 인증"
   },
   "anonymous": {
     "topicPlaceholder": "주제를 선택해 주세요",

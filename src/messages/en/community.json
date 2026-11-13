@@ -295,7 +295,8 @@
     "perMonth": "/mo",
     "stepNumber": "Step {n}",
     "noStepInfo": "No step details",
-    "views": "Views"
+    "views": "Views",
+    "offerVerified": "Offer verified"
   },
   "anonymous": {
     "topicPlaceholder": "Choose a topic",
