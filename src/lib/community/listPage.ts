@@ -53,6 +53,20 @@ export function roommateTypeOf(post: Pick<CommunityPost, 'roommateLookingFor' | 
   return null
 }
 
+const STATUS_TYPES_BY_DETAIL: Record<string, string> = {
+  cpt: 'cpt',
+  opt: 'opt',
+  'stem opt': 'stem-opt',
+  비자: 'visa',
+  영주권: 'green-card',
+}
+
+/** 비자 글 종류 (예전 글은 detail 로, 앱과 같은 규칙) */
+export function statusTypeOf(post: Pick<CommunityPost, 'cptOptType' | 'detail'>): string {
+  if (post.cptOptType) return post.cptOptType
+  return STATUS_TYPES_BY_DETAIL[String(post.detail || '').toLowerCase()] ?? ''
+}
+
 /** 앱이 보내는 목록 필터 (게시판마다 쓰는 것만) */
 export type ListFilters = {
   /** 익명: 주제 (post.location) */
@@ -77,7 +91,7 @@ export function matchesListFilters(post: CommunityPost, board: string | undefine
   if (filters.category && post.foodCategory !== filters.category) return false
   if (filters.cuisine && cuisineIdOf(post) !== filters.cuisine) return false
   if (filters.type) {
-    const type = board === 'roommate' ? roommateTypeOf(post) : post.cptOptType
+    const type = board === 'roommate' ? roommateTypeOf(post) : statusTypeOf(post)
     if (type !== filters.type) return false
   }
   if (filters.school && post.authorSchoolId !== filters.school) return false
