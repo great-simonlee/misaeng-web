@@ -248,7 +248,8 @@
       "coffeeChat": "Request a coffee chat",
       "ask": "Ask the author",
       "follow": "Get new posting alerts",
-      "openInApp": "Open in app"
+      "openInApp": "Open in app",
+      "getApp": "Get the app"
     }
   }
 }

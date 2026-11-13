@@ -170,5 +170,8 @@
     "downloadIos": "Get it free on the App Store",
     "downloadAndroid": "Get it free on Google Play",
     "continueWeb": "No thanks, continue on the web"
-  }
+  },
+  "heroCta": "Explore the boards",
+  "boardsTitle": "What are you looking for?",
+  "boardsSubtitle": "Everything here comes straight from students and young professionals."
 }

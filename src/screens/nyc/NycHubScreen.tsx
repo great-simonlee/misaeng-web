@@ -1,78 +1,116 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
-import { LoadingState } from '@components'
+import { AppHandoffButton } from '@components/AppHandoff'
 import { useCityInfo } from '@hooks/useCity'
 import { BRAND_CONFIG } from '@lib/brand'
 import { captureReferralFromLocation } from '@lib/community/referral'
 import { useT } from '@lib/i18n/client'
 import { AppDownloadPrompt } from '@widgets/nyc/AppDownloadPrompt'
 import { BoardHighlightCards } from '@widgets/nyc/BoardHighlightCards'
+import { HeroAppCard } from '@widgets/nyc/HeroAppCard'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
 import { MagazinePreviewSection } from '@widgets/nyc/MagazinePreviewSection'
 import { PartnerSchoolsMarquee } from '@widgets/nyc/PartnerSchoolsMarquee'
 import { PartnerInfluencersSection } from '@widgets/nyc/PartnerInfluencersSection'
 import { ProfessionalsSection } from '@widgets/nyc/ProfessionalsSection'
 
-/** 임시: 허브 진입 시 스피너 노출 시간 (ms) */
-const TEMP_SPLASH_MS = 1200
-
 export function NycHubScreen() {
-  // const { configured } = useAuth()
   const cityInfo = useCityInfo()
   const t = useT('hub')
-  const [showSplash, setShowSplash] = useState(true)
+  const tCommon = useT('common')
 
   useEffect(() => {
     captureReferralFromLocation()
-    const id = window.setTimeout(() => setShowSplash(false), TEMP_SPLASH_MS)
-    return () => window.clearTimeout(id)
   }, [])
 
-  if (showSplash) {
-    return <LoadingState fullPage label={t('loading')} />
-  }
-
   return (
-    <div className='min-h-screen min-w-0 overflow-x-hidden bg-[var(--background)]'>
+    <div className='min-h-screen min-w-0 overflow-x-hidden bg-[var(--canvas)]'>
       {/* phones: point to the app (Misaeng only, hidden for a few days once dismissed) */}
       <AppDownloadPrompt />
-      <header className='border-b border-[var(--border)]'>
-        <div className='mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8'>
+
+      {/* Hero: one strong line, what it is, two ways in */}
+      <section className='relative overflow-hidden bg-white'>
+        <div
+          className='pointer-events-none absolute -right-40 -top-40 size-[34rem] rounded-full opacity-70 blur-3xl'
+          style={{
+            background: 'radial-gradient(circle, rgb(var(--brand-rgb) / 0.16), transparent 65%)',
+          }}
+          aria-hidden
+        />
+        <div
+          className='pointer-events-none absolute -bottom-48 -left-32 size-[28rem] rounded-full opacity-60 blur-3xl'
+          style={{ background: 'radial-gradient(circle, rgb(59 130 246 / 0.10), transparent 65%)' }}
+          aria-hidden
+        />
+        <div className='relative mx-auto grid max-w-7xl items-center gap-10 px-5 pb-12 pt-12 sm:px-6 sm:pb-16 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_auto] lg:px-8'>
           <div className='min-w-0'>
-            <p className='text-[11px] font-medium tracking-[0.2em] text-[var(--muted)]'>
-              {t('brandCity', {
-                brand: BRAND_CONFIG.name.toUpperCase(),
-                city: cityInfo.shortLabel.toUpperCase(),
-              })}
-            </p>
-            <h1 className='mt-1.5 text-[1.375rem] font-bold tracking-tight text-[var(--foreground)] sm:text-2xl'>
+            <span className='inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-[12px] font-semibold tracking-wide text-[var(--muted-foreground)] ring-1 ring-[var(--card-ring)]'>
+              <span className='size-1.5 rounded-full bg-[var(--brand)]' aria-hidden />
+              {t('brandCity', { brand: BRAND_CONFIG.name, city: cityInfo.shortLabel })}
+            </span>
+            <h1 className='mt-5 max-w-3xl text-[2.15rem] font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] sm:text-5xl lg:text-[3.5rem]'>
               {t(`cities.${cityInfo.id}.headline`)}
             </h1>
-            <p className='mt-1.5 max-w-lg text-sm leading-relaxed text-[var(--muted-foreground)]'>
+            <p className='mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--muted-foreground)] sm:text-lg'>
               {t(`cities.${cityInfo.id}.description`)}
             </p>
-          </div>
-
-          <div className='mt-5'>
-            <BoardHighlightCards />
-          </div>
-
-          <PartnerSchoolsMarquee />
-          <PartnerInfluencersSection />
-
-          {/* 임시: 파이어베이스 배너 비활성화
-          {!configured && (
-            <div className='mt-5'>
-              <FirebaseConfigBanner />
+            <div className='mt-8 flex flex-wrap items-center gap-2.5'>
+              <a
+                href='#boards'
+                className='inline-flex h-12 items-center gap-2 rounded-full bg-[var(--foreground)] px-6 text-[15px] font-semibold text-white transition hover:bg-black'
+              >
+                {t('heroCta')}
+                <svg
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeWidth='2'
+                  className='size-4'
+                  aria-hidden
+                >
+                  <path strokeLinecap='round' strokeLinejoin='round' d='M12 5v14M5 12l7 7 7-7' />
+                </svg>
+              </a>
+              <AppHandoffButton
+                appPath='home'
+                action='open'
+                variant='plain'
+                className='inline-flex h-12 items-center rounded-full bg-white px-6 text-[15px] font-semibold text-[var(--foreground)] ring-1 ring-black/10 transition hover:bg-[#fafbfc]'
+                label={tCommon('appHandoff.buttons.getApp')}
+              />
             </div>
-          )}
-          */}
+          </div>
+          <div className='hidden lg:block'>
+            <HeroAppCard />
+          </div>
         </div>
-      </header>
+      </section>
 
-      <main className='mx-auto max-w-7xl space-y-10 px-4 py-8 sm:px-6 sm:py-10 lg:px-8'>
+      {/* Boards */}
+      <section
+        id='boards'
+        className='mx-auto max-w-7xl scroll-mt-24 px-5 pt-10 sm:px-6 sm:pt-14 lg:px-8'
+      >
+        <h2 className='text-[1.4rem] font-bold tracking-[-0.025em] text-[var(--foreground)] sm:text-[1.75rem]'>
+          {t('boardsTitle')}
+        </h2>
+        <p className='mt-1.5 text-[14px] text-[var(--muted)] sm:text-[15px]'>
+          {t('boardsSubtitle')}
+        </p>
+        <div className='mt-6'>
+          <BoardHighlightCards />
+        </div>
+      </section>
+
+      {/* Partners */}
+      <section className='mx-auto max-w-7xl px-5 pt-8 sm:px-6 sm:pt-10 lg:px-8'>
+        <PartnerSchoolsMarquee />
+        <PartnerInfluencersSection />
+      </section>
+
+      <main className='mx-auto max-w-7xl space-y-10 px-5 pb-16 pt-6 sm:px-6 sm:pt-10 lg:px-8'>
         {/* 매거진·전문가 예시는 뉴욕 내용이라 뉴욕에서만 보여 준다 */}
         {cityInfo.id === 'nyc' ? (
           <>

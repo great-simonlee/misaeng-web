@@ -17,7 +17,7 @@ export function BoardPageShell({
   className,
 }: BoardPageShellProps) {
   return (
-    <div className={cn('relative min-h-screen bg-white', className)}>
+    <div className={cn('relative min-h-screen bg-[var(--canvas)]', className)}>
       <div
         className={cn(
           'relative mx-auto w-full',
@@ -47,7 +47,8 @@ export function BoardSurface({
   return (
     <Tag
       className={cn(
-        'rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.05),0_12px_32px_rgba(15,23,42,0.07)] ring-1 ring-black/[0.05]',
+        // Flat white card on the gray canvas: hairline ring, barely-there shadow (the app's cards)
+        'rounded-[1.375rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] ring-1 ring-[var(--card-ring)]',
         className,
       )}
     >
@@ -71,7 +72,7 @@ export function BoardMetaChip({
     <span
       className={cn(
         'inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-tight',
-        tone === 'neutral' && 'bg-[#f1f2f4] text-[var(--muted-foreground)]',
+        tone === 'neutral' && 'bg-[#f1f3f6] text-[var(--muted-foreground)]',
         tone === 'brand' && 'bg-[var(--brand-light)] text-[var(--brand)]',
         tone === 'food' && 'bg-[#fff4eb] text-[#b45309]',
         tone === 'market' && 'bg-[#eef4ff] text-[#3b5bdb]',

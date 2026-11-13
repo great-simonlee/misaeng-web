@@ -16,6 +16,9 @@
 # next.js
 /.next/
 /.next-ellieo/
+/.next-verify/
+/.next-pagetest/
+/.next-build/
 /out/
 
 # production

@@ -170,5 +170,8 @@
     "downloadIos": "App Store에서 무료로 받기",
     "downloadAndroid": "Google Play에서 무료로 받기",
     "continueWeb": "괜찮아요, 모바일 웹으로 볼게요"
-  }
+  },
+  "heroCta": "게시판 둘러보기",
+  "boardsTitle": "무엇을 찾고 있나요?",
+  "boardsSubtitle": "유학생·직장인이 직접 남긴 정보만 모았어요."
 }
