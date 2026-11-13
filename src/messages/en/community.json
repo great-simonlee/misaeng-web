@@ -176,7 +176,7 @@
     },
     "anonymous": {
       "noTargeting": "Even anonymously, posts that name or hint at a specific person, or talk behind their back, aren't allowed.",
-      "stillResponsible": "Others can't see your name, school, or photo, but you're still legally responsible for what you post.",
+      "stillResponsible": "Posting anonymously hides your name, school, and photo, but you're still legally responsible for what you post.",
       "loginRequired": "You need to log in so you can edit or delete your posts. Our team can check who posted when handling reports."
     },
     "commonTitle": "Community rules",
@@ -244,7 +244,7 @@
     "close": "Close",
     "eyebrow": "Before you start",
     "board": "Ask & Talk",
-    "title": "An anonymous space we keep safe together",
+    "title": "A space for questions and open talk we keep safe together",
     "body": "To keep {brand} a healthy, helpful community, please follow the rules and treat each other with respect, even on the anonymous board!",
     "confirm": "Got it",
     "snooze24h": "Don't show for 24 hours"
@@ -501,7 +501,7 @@
     "titleDescription": "Write a short title people can read at a glance.",
     "bodyDescription": "Write whatever's on your mind. You'll be shown as anonymous.",
     "createTitle": "Post on the anonymous board",
-    "createDescription": "Your name, school, and photo stay hidden. Share freely.",
+    "createDescription": "Post anonymously or with your nickname. Ask anything, share freely.",
     "editTitle": "Edit anonymous post",
     "authorLabel": "Post as",
     "authorAnonymous": "Anonymous",
