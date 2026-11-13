@@ -9,8 +9,8 @@ import { useT } from '@lib/i18n/client'
 import { MISAENG_APP_STORE_URL, MISAENG_PLAY_STORE_URL } from '@widgets/nyc/MisaengStoreButtons'
 
 /**
- * City home hero, right side on wide screens: what the app adds and a QR to open this site on a phone
- * (the app opens it when installed, the stores otherwise). Misaeng only.
+ * City home hero, right side on wide screens: what the app adds and a QR of misaeng.com/app, which sends an
+ * iPhone to the App Store and an Android phone to Google Play. Misaeng only.
  */
 export function HeroAppCard() {
   const t = useT('hub')
@@ -19,7 +19,7 @@ export function HeroAppCard() {
 
   useEffect(() => {
     let alive = true
-    QRCode.toDataURL(window.location.href, { margin: 1, width: 280, color: { dark: '#0f172a', light: '#ffffff' } })
+    QRCode.toDataURL(`${window.location.origin}/app`, { margin: 1, width: 280, color: { dark: '#0f172a', light: '#ffffff' } })
       .then((url) => alive && setQr(url))
       .catch(() => null)
     return () => {
