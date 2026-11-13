@@ -11,7 +11,10 @@ const PHD = /ph\.?\s?d|doctora|박사/i
  * 제목과 자격 요건에서 읽은 가장 낮은 지원 가능 학력. 학사 언급이 있으면 학사 이상("학사 또는 대학원 재학"),
  * 없으면 석사·박사 순. 앱(iOS JobPosting.minDegree, Android JobPosting.minDegree)과 같은 규칙.
  */
-export function minDegreeOf(title: string, qualifications: string[]): MinDegree {
+export function minDegreeOf(title: string, qualifications: string[], stored?: unknown): MinDegree {
+  // 요약할 때 Claude 가 정한 값 (ellieo-erp MIN_DEGREES). none(학력 무관)·unspecified 는 앱의 '무관'
+  if (stored === 'bachelor' || stored === 'master' || stored === 'master_phd' || stored === 'phd') return stored
+  if (stored === 'none') return 'any'
   const text = [title, ...qualifications].join(' \n ')
   if (BACHELOR.test(text)) return 'bachelor'
   const master = MASTER.test(text)
@@ -22,7 +25,6 @@ export function minDegreeOf(title: string, qualifications: string[]): MinDegree 
 /** 목록용 공고 (?view=list): 카드와 필터에 쓰는 값만. 긴 요약(소개·자격·우대·복지·지원 팁)은 상세(/api/postings/{id})에서. */
 export type ListPosting = Omit<PublicPosting, 'summary'> & {
   summary: Pick<PublicPosting['summary'], 'compensation' | 'earlyApply' | 'alwaysOpen' | 'degree'>
-  minDegree: MinDegree
   /** 요약이 빠진 목록용 공고 (앱이 상세에서 전체를 다시 받는다) */
   light: true
 }
@@ -37,7 +39,6 @@ export function toListPosting(posting: PublicPosting): ListPosting {
       alwaysOpen: summary.alwaysOpen,
       degree: summary.degree,
     },
-    minDegree: minDegreeOf(posting.title, summary.qualifications),
     light: true,
   }
 }

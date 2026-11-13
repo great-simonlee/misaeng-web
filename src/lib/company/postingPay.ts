@@ -103,3 +103,19 @@ export function previousPayFor(
   }
   return [...bySeason.values()].sort((a, b) => b.season - a.season).slice(0, 3)
 }
+
+const PAY_UNITS: PayUnit[] = ['year', 'month', 'biweek', 'week', 'hour', 'total']
+
+/**
+ * 공고의 급여: 요약에 저장된 숫자(summary.pay, ellieo-erp normalizePay)가 있으면 그것, 없으면 급여 문장에서 추정.
+ * 숫자는 Claude 가 공고에서 바로 읽은 값이라 문장 추정보다 정확하다.
+ */
+export function storedPay(value: unknown, compensation: string | null | undefined): PostingPay | null {
+  const v = value as Partial<PostingPay> | null | undefined
+  if (v && PAY_UNITS.includes(v.unit as PayUnit)) {
+    const min = Number(v.min)
+    const max = Number(v.max ?? v.min)
+    if (Number.isFinite(min) && Number.isFinite(max) && min > 0 && max >= min) return { unit: v.unit as PayUnit, min, max }
+  }
+  return parsePay(compensation || '')
+}

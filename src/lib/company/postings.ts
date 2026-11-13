@@ -1,4 +1,5 @@
 import type { PostingPay, PreviousPay } from '@lib/company/postingPay'
+import type { MinDegree } from '@lib/company/postingList'
 import type { ContentI18n } from '@lib/translations/content'
 import type { CityId } from '@lib/constants/cities'
 import type { DegreeLevel, JobFunction } from '@lib/constants/postingCopy'
@@ -49,8 +50,10 @@ export type PublicPosting = {
   applyBy: string | null
   applyUrl: string
   postedAt: number
-  /** 급여 단위·범위 (요약의 급여 문장에서, 없으면 null). src/lib/company/postingPay.ts */
+  /** 급여 단위·범위 (요약에 저장된 숫자, 없으면 급여 문장에서 추정, 없으면 null). src/lib/company/postingPay.ts */
   pay?: PostingPay | null
+  /** 지원 가능 학력 (앱 필터): 요약에 저장된 값, 없으면 제목·자격요건에서 추정. src/lib/company/postingList.ts */
+  minDegree?: MinDegree
   /** 같은 포지션의 지난 시즌 공고 급여 (연도만 다른 제목, 최근 시즌부터) */
   previousPay?: PreviousPay[]
   /** 마감된 공고 목록(?closed=1)에서만: 마감된 때 (ms) */

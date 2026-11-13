@@ -9,7 +9,8 @@ import {
 import { freshSummaryTranslations, type PostingSummaryTranslation } from '@lib/translations/postings'
 import type { Locale } from '@lib/i18n/locales'
 import { DEGREE_LABELS, JOB_FUNCTIONS, type DegreeLevel, type JobFunction } from '@lib/constants/postingCopy'
-import { parsePay, previousPayFor, type PayHistoryRow } from '@lib/company/postingPay'
+import { previousPayFor, storedPay, type PayHistoryRow } from '@lib/company/postingPay'
+import { minDegreeOf } from '@lib/company/postingList'
 
 /*
  * 채용 공고는 ellieo-erp 관리자 화면(Jobs → Postings)에서 검토하고 Supabase Postgres에 있다
@@ -64,6 +65,10 @@ type PostingRow = {
     earlyApply?: unknown
     alwaysOpen?: unknown
     degree?: unknown
+    /** ellieo-erp MIN_DEGREES (요약할 때 Claude 가 정함) */
+    minDegree?: unknown
+    /** { unit, min, max } (ellieo-erp normalizePay) */
+    pay?: unknown
   } | null
   visa_sponsorship: string | null
   created_at: string
@@ -208,7 +213,8 @@ function toStoredPosting(row: PostingRow, company: ListedCompany | undefined, hi
     applyUrl: row.source_url,
     postedAt: new Date(row.created_at).getTime(),
     // 급여는 한국어 원문 요약에서 뽑는다 (번역문은 앱이 보여 주기만)
-    pay: parsePay(text(row.summary?.compensation)),
+    pay: storedPay(row.summary?.pay, text(row.summary?.compensation)),
+    minDegree: minDegreeOf(row.title, qualifications, row.summary?.minDegree),
     previousPay: previousPayFor(
       { id: row.id, companyId: row.company_id, title: row.title, level: row.level, createdAt: new Date(row.created_at).getTime() },
       history,
@@ -276,6 +282,7 @@ type HistoryRow = {
   closed_at: string | null
   apply_by?: string | null
   compensation: string | null
+  pay?: unknown
 }
 
 /**
@@ -289,7 +296,7 @@ export async function listPayHistory(): Promise<PayHistoryRow[]> {
   if (!url || !key) return []
   const request = (deadline: boolean) =>
     fetch(
-      `${url}/rest/v1/job_postings?select=id,company_id,title,level,created_at,closed_at${deadline ? ',apply_by' : ''},compensation:summary->>compensation` +
+      `${url}/rest/v1/job_postings?select=id,company_id,title,level,created_at,closed_at${deadline ? ',apply_by' : ''},compensation:summary->>compensation,pay:summary->pay` +
         `&status=eq.approved&level=in.(${LEVELS.join(',')})&order=created_at.desc&limit=5000`,
       { headers: { apikey: key, Authorization: `Bearer ${key}` }, cache: 'no-store', signal: AbortSignal.timeout(15000) },
     ).catch(() => null)
@@ -303,7 +310,7 @@ export async function listPayHistory(): Promise<PayHistoryRow[]> {
     companyId: row.company_id,
     title: row.title,
     level: row.level,
-    pay: parsePay(row.compensation),
+    pay: storedPay(row.pay, row.compensation),
     createdAt: new Date(row.created_at).getTime(),
     open: !row.closed_at && !(row.apply_by && row.apply_by < today),
   }))
