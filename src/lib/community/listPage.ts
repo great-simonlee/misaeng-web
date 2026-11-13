@@ -86,7 +86,7 @@ export function matchesListFilters(post: CommunityPost, board: string | undefine
 
 /**
  * 다음 페이지 위치: "{지금까지 보낸 개수}.{마지막 글 id}". 그 사이 새 글이 생겨 순서가 밀려도
- * 마지막 글 id 다음부터 이어서 준다 (그 글이 지워졌으면 개수로).
+ * 마지막 글 id 다음부터 이어서 준다. 그 글이 지워졌으면 한 칸 앞부터 (건너뛰는 글이 없게, 앱은 같은 id 를 한 번만 보여 준다).
  */
 export function pageAfter<T extends { id: string }>(items: T[], cursor: string | null, limit: number) {
   let start = 0
@@ -95,7 +95,7 @@ export function pageAfter<T extends { id: string }>(items: T[], cursor: string |
     const offset = Math.max(0, Math.floor(Number(cursor.slice(0, dot))) || 0)
     const lastId = cursor.slice(dot + 1)
     const at = lastId ? items.findIndex((item) => item.id === lastId) : -1
-    start = at >= 0 ? at + 1 : offset
+    start = at >= 0 ? at + 1 : Math.max(0, offset - 1)
   }
   const page = items.slice(start, start + limit)
   const end = start + page.length
