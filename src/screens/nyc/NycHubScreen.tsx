@@ -3,12 +3,12 @@
 import { useEffect } from 'react'
 
 import { AppHandoffButton } from '@components/AppHandoff'
-import { useCityInfo } from '@hooks/useCity'
+import { useCityInfo, useCityPath } from '@hooks/useCity'
 import { BRAND_CONFIG } from '@lib/brand'
 import { captureReferralFromLocation } from '@lib/community/referral'
 import { useT } from '@lib/i18n/client'
 import { AppDownloadPrompt } from '@widgets/nyc/AppDownloadPrompt'
-import { BoardHighlightCards } from '@widgets/nyc/BoardHighlightCards'
+import Link from 'next/link'
 import { HeroAppCard } from '@widgets/nyc/HeroAppCard'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
 import { MagazinePreviewSection } from '@widgets/nyc/MagazinePreviewSection'
@@ -18,6 +18,7 @@ import { ProfessionalsSection } from '@widgets/nyc/ProfessionalsSection'
 
 export function NycHubScreen() {
   const cityInfo = useCityInfo()
+  const href = useCityPath()
   const t = useT('hub')
   const tCommon = useT('common')
 
@@ -57,8 +58,9 @@ export function NycHubScreen() {
               {t(`cities.${cityInfo.id}.description`)}
             </p>
             <div className='mt-8 flex flex-wrap items-center gap-2.5'>
-              <a
-                href='#boards'
+              {/* The boards are in the header; the hero points to the one most people come for */}
+              <Link
+                href={href('/housing')}
                 className='inline-flex h-12 items-center gap-2 rounded-full bg-[var(--foreground)] px-6 text-[15px] font-semibold text-white transition hover:bg-black'
               >
                 {t('heroCta')}
@@ -70,9 +72,9 @@ export function NycHubScreen() {
                   className='size-4'
                   aria-hidden
                 >
-                  <path strokeLinecap='round' strokeLinejoin='round' d='M12 5v14M5 12l7 7 7-7' />
+                  <path strokeLinecap='round' strokeLinejoin='round' d='M5 12h14M13 6l6 6-6 6' />
                 </svg>
-              </a>
+              </Link>
               <AppHandoffButton
                 appPath='home'
                 action='open'
@@ -85,22 +87,6 @@ export function NycHubScreen() {
           <div className='hidden lg:block'>
             <HeroAppCard />
           </div>
-        </div>
-      </section>
-
-      {/* Boards */}
-      <section
-        id='boards'
-        className='mx-auto max-w-7xl scroll-mt-24 px-5 pt-10 sm:px-6 sm:pt-14 lg:px-8'
-      >
-        <h2 className='text-[1.4rem] font-bold tracking-[-0.025em] text-[var(--foreground)] sm:text-[1.75rem]'>
-          {t('boardsTitle')}
-        </h2>
-        <p className='mt-1.5 text-[14px] text-[var(--muted)] sm:text-[15px]'>
-          {t('boardsSubtitle')}
-        </p>
-        <div className='mt-6'>
-          <BoardHighlightCards />
         </div>
       </section>
 
