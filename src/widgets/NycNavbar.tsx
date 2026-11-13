@@ -345,7 +345,7 @@ export function NycNavbar() {
           </div>
 
           <nav
-            className='hidden min-w-0 items-center justify-center gap-0.5 overflow-hidden xl:flex'
+            className='hidden min-w-0 items-center justify-center gap-0.5 self-stretch overflow-hidden xl:flex'
             aria-label={t('menuAria', { city: cityInfo.shortLabel })}
           >
             {navLinks.map(({ href: itemHref, label }) => (
@@ -353,11 +353,11 @@ export function NycNavbar() {
                 key={itemHref}
                 href={itemHref}
                 className={cn(
-                  // Pill tabs: the current board fills dark, the rest tint on hover
-                  'inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full px-2.5 text-[13px] font-medium transition-colors 2xl:px-3.5 2xl:text-sm',
+                  // Tabs: the current board is bold with a brand underline on the header's bottom edge; others tint on hover
+                  'relative inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full px-2.5 text-[13px] transition-colors 2xl:px-3.5 2xl:text-sm',
                   isActive(itemHref)
-                    ? 'bg-[var(--foreground)] font-semibold text-white'
-                    : 'text-[var(--muted-foreground)] hover:bg-black/[0.04] hover:text-[var(--foreground)]',
+                    ? 'font-semibold text-[var(--foreground)] after:absolute after:inset-x-2.5 after:-bottom-[14px] after:h-[2px] after:rounded-full after:bg-[var(--brand)] 2xl:after:inset-x-3.5'
+                    : 'font-medium text-[var(--muted-foreground)] hover:bg-black/[0.04] hover:text-[var(--foreground)]',
                 )}
               >
                 {label}
