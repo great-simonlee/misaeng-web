@@ -19,7 +19,12 @@ import {
   resolveCommunityThumbnail,
 } from '@lib/community/food'
 import { getCptOptTimelineDateRange } from '@lib/community/cptOpt'
+import { htmlToPlainText } from '@lib/community/html'
+import { getListingContextTag } from '@lib/community/listingMeta'
+import { BRAND_CONFIG } from '@lib/brand'
+import { JobReviewActivityMeta } from '@widgets/nyc/JobReviewActivityMeta'
 import {
+  formatJobReviewDate,
   getJobReviewTimelineDateRange,
   getJobReviewTypeStyle,
   sortJobReviewTimelineByDate,
@@ -31,7 +36,7 @@ import {
 } from '@lib/constants/nyc'
 import { useFormat, useLocale, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
-import type { CommunityPost } from '@/types/nyc'
+import type { CommunityPost, JobReviewTimelineEntry } from '@/types/nyc'
 import { BoardSurface } from '@widgets/nyc/BoardPageShell'
 import { CptOptActivityMeta } from '@widgets/nyc/CptOptActivityMeta'
 import { CptOptTypeBadge } from '@widgets/nyc/CptOptTypeBadge'
@@ -312,6 +317,18 @@ function CptOptListingCard({
 
 /** 취업 후기: 타임라인 요약 카드 */
 function JobReviewListingCard({
+  post,
+  boardId,
+}: {
+  post: CommunityPost
+  boardId: NycCommunityBoardId
+}) {
+  // Ellieo keeps the classic card; this layout is Misaeng only
+  if (BRAND_CONFIG.id !== 'misaeng') return <JobReviewListingCardClassic post={post} boardId={boardId} />
+  return <JobReviewListingCardMisaeng post={post} boardId={boardId} />
+}
+
+function JobReviewListingCardMisaeng({
   post,
   boardId,
 }: {
@@ -689,5 +706,165 @@ function LocationIcon({ className }: { className?: string }) {
       <path d='M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z' />
       <circle cx='12' cy='10' r='2.5' />
     </svg>
+  )
+}
+
+/** Ellieo's job review card (classic design, with the hiring steps) */
+const JOB_REVIEW_LISTING_STEP_LIMIT = 3
+
+function JobReviewListingCardClassic({
+  post,
+  boardId,
+}: {
+  post: CommunityPost
+  boardId: NycCommunityBoardId
+}) {
+  const t = useT('community')
+  const locale = useLocale()
+  const postHref = usePostHref(post)
+  const timeline = sortJobReviewTimelineByDate(post.jobReviewTimeline ?? [])
+  const stepCount = timeline.length
+  const dateRange = getJobReviewTimelineDateRange(timeline, locale)
+  const typeStyle = getJobReviewTypeStyle(post.jobReviewType)
+  const visibleSteps = timeline.slice(0, JOB_REVIEW_LISTING_STEP_LIMIT)
+  const hiddenStepCount = stepCount - visibleSteps.length
+  const contextTag = getListingContextTag(
+    [post.location, post.jobReviewIndustry],
+    post.authorSchoolId,
+    post.authorSchoolName,
+  )
+
+  return (
+    <BoardSurface
+      as='article'
+      className='group overflow-hidden transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(15,23,42,0.04),0_20px_40px_rgba(15,23,42,0.08)]'
+    >
+      <Link
+        href={postHref}
+        className='block touch-manipulation px-4 py-4 sm:px-5 sm:py-5'
+      >
+        <div className='flex items-start justify-between gap-3'>
+          <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
+            <JobReviewTypeBadge type={post.jobReviewType} />
+            <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} size='md' />
+            {contextTag ? (
+              <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#eef4ff] px-2.5 py-1 text-[11px] font-semibold text-[#3b5bdb] ring-1 ring-[#3b5bdb]/15'>
+                {contextTag}
+              </span>
+            ) : null}
+          </div>
+          <PostLikeButton
+            kind='community'
+            id={post.id}
+            boardId={boardId}
+            variant='icon'
+          />
+        </div>
+
+        <h3 className='mt-2.5 text-[16px] font-semibold leading-snug tracking-[-0.025em] text-[var(--foreground)] sm:text-[17px]'>
+          <span className='line-clamp-2'>{post.title}</span>
+        </h3>
+
+        {visibleSteps.length > 0 ? (
+          <ol className='mt-3 space-y-2'>
+            {visibleSteps.map((entry, index) => (
+              <JobReviewListingStep
+                key={entry.id}
+                entry={entry}
+                stepNumber={index + 1}
+                accentColor={typeStyle.accent}
+                softColor={typeStyle.soft}
+              />
+            ))}
+          </ol>
+        ) : (
+          <p className='mt-2 line-clamp-2 text-[13px] leading-relaxed text-[var(--muted)] sm:text-[14px]'>
+            {post.description}
+          </p>
+        )}
+
+        <TimelineSummaryRow
+          label={
+            stepCount > 0
+              ? hiddenStepCount > 0
+                ? t('card.hiringStepsWithMore', {
+                    count: stepCount,
+                    hidden: hiddenStepCount,
+                  })
+                : t('card.hiringSteps', { count: stepCount })
+              : null
+          }
+          dateRange={dateRange}
+        />
+
+        <TimelineListingFooter
+          post={post}
+          activity={
+            <JobReviewActivityMeta
+              createdAt={post.createdAt}
+              updatedAt={post.updatedAt}
+              compact
+            />
+          }
+        />
+      </Link>
+    </BoardSurface>
+  )
+}
+
+function JobReviewListingStep({
+  entry,
+  stepNumber,
+  accentColor,
+  softColor,
+}: {
+  entry: JobReviewTimelineEntry
+  stepNumber: number
+  accentColor: string
+  softColor: string
+}) {
+  const t = useT('community')
+  const locale = useLocale()
+  const fieldSummary = [
+    entry.stageLabel,
+    entry.platform,
+    entry.interviewRound,
+    entry.outcome,
+  ]
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .join(' · ')
+  const review = htmlToPlainText(entry.stageReviewHtml || '')
+  const description = review || entry.documentsSubmitted.trim()
+  const dateLabel = entry.date
+    ? formatJobReviewDate(entry.date, { compactYear: true, locale })
+    : ''
+
+  return (
+    <li className='flex items-start gap-2.5'>
+      <span
+        className='mt-px inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[9px] font-bold tabular-nums'
+        style={{ backgroundColor: softColor, color: accentColor }}
+      >
+        {t('card.stepNumber', { n: stepNumber })}
+      </span>
+      <div className='min-w-0 flex-1'>
+        <p className='flex min-w-0 items-baseline gap-1.5 text-[13px] leading-snug'>
+          {dateLabel ? (
+            <span className='shrink-0 text-[11px] font-medium tabular-nums text-[var(--muted)]'>
+              {dateLabel}
+            </span>
+          ) : null}
+          <span className='truncate font-semibold text-[var(--foreground)]'>
+            {fieldSummary || (dateLabel ? '' : t('card.noStepInfo'))}
+          </span>
+        </p>
+        {description ? (
+          <p className='mt-0.5 truncate text-[12.5px] leading-relaxed text-[var(--muted)] sm:text-[13px]'>
+            {description}
+          </p>
+        ) : null}
+      </div>
+    </li>
   )
 }

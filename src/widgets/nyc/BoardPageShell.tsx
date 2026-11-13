@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { cn } from '@lib'
+import { byBrand } from '@lib/brand/design'
 
 type BoardPageShellProps = {
   children: ReactNode
@@ -17,7 +18,7 @@ export function BoardPageShell({
   className,
 }: BoardPageShellProps) {
   return (
-    <div className={cn('relative min-h-screen bg-[var(--canvas)]', className)}>
+    <div className={cn(byBrand('relative min-h-screen bg-[var(--canvas)]', 'relative min-h-screen bg-white'), className)}>
       <div
         className={cn(
           'relative mx-auto w-full',
@@ -48,7 +49,7 @@ export function BoardSurface({
     <Tag
       className={cn(
         // Flat white card on the gray canvas: hairline ring, barely-there shadow (the app's cards)
-        'rounded-[1.375rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] ring-1 ring-[var(--card-ring)]',
+        byBrand('rounded-[1.375rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] ring-1 ring-[var(--card-ring)]', 'rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.05),0_12px_32px_rgba(15,23,42,0.07)] ring-1 ring-black/[0.05]'),
         className,
       )}
     >

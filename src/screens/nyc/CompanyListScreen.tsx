@@ -33,6 +33,7 @@ import {
   type Tint,
 } from '@widgets/nyc/CompanyBrand'
 import { EmptyState } from '@widgets/nyc/EmptyState'
+import { byBrand } from '@lib/brand/design'
 
 export function CompanyListScreen() {
   const city = useCity()
@@ -163,7 +164,7 @@ export function CompanyListScreen() {
           <div className='relative'>
             <div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
               <div className='min-w-0'>
-                <h1 className='font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]'>
+                <h1 className={byBrand('font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'text-[1.4rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.6rem]')}>
                   {t('list.title')}
                 </h1>
                 <p className='mt-1.5 text-[13px] leading-relaxed text-white/55 sm:text-[14px]'>

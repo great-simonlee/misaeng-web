@@ -17,6 +17,7 @@ import { useT } from '@lib/i18n/client'
 import { LanguageMenu } from '@widgets/LanguageMenu'
 import { CitySelectModal } from '@widgets/nyc/CitySelectModal'
 import { AppHandoffButton } from '@components/AppHandoff'
+import { byBrand } from '@lib/brand/design'
 
 /** 문구: nav.links.<key> */
 const NAV_LINKS = [
@@ -301,10 +302,10 @@ export function NycNavbar() {
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-[10000] overflow-visible border-b border-black/[0.06]',
+          byBrand('fixed top-0 left-0 right-0 z-[10000] overflow-visible border-b border-black/[0.06]', 'fixed top-0 left-0 right-0 z-[10000] overflow-visible border-b border-[var(--border)]'),
           mobileOpen
             ? 'bg-[var(--background)]'
-            : 'bg-white/85 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-white/70',
+            : byBrand('bg-white/85 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-white/70', 'bg-[var(--background)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--background)]/80'),
         )}
       >
         <div className='relative mx-auto grid h-14 w-full max-w-7xl min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-4 sm:h-16 sm:gap-3 sm:px-6 lg:px-8'>
@@ -345,7 +346,7 @@ export function NycNavbar() {
           </div>
 
           <nav
-            className='hidden min-w-0 items-center justify-center gap-0.5 self-stretch overflow-hidden xl:flex'
+            className={byBrand('hidden min-w-0 items-center justify-center gap-0.5 self-stretch overflow-hidden xl:flex', 'hidden min-w-0 items-center justify-center gap-4 overflow-hidden xl:flex 2xl:gap-6')}
             aria-label={t('menuAria', { city: cityInfo.shortLabel })}
           >
             {navLinks.map(({ href: itemHref, label }) => (
@@ -354,10 +355,10 @@ export function NycNavbar() {
                 href={itemHref}
                 className={cn(
                   // Tabs: the current board is bold with a brand underline on the header's bottom edge; others tint on hover
-                  'relative inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full px-2.5 text-[13px] transition-colors 2xl:px-3.5 2xl:text-sm',
+                  byBrand('relative inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full px-2.5 text-[13px] transition-colors 2xl:px-3.5 2xl:text-sm', 'shrink-0 whitespace-nowrap text-[13px] transition-colors 2xl:text-sm'),
                   isActive(itemHref)
-                    ? 'font-semibold text-[var(--foreground)] after:absolute after:inset-x-2.5 after:-bottom-[14px] after:h-[2px] after:rounded-full after:bg-[var(--brand)] 2xl:after:inset-x-3.5'
-                    : 'font-medium text-[var(--muted-foreground)] hover:bg-black/[0.04] hover:text-[var(--foreground)]',
+                    ? byBrand('font-semibold text-[var(--foreground)] after:absolute after:inset-x-2.5 after:-bottom-[14px] after:h-[2px] after:rounded-full after:bg-[var(--brand)] 2xl:after:inset-x-3.5', 'font-semibold text-[var(--foreground)]')
+                    : byBrand('font-medium text-[var(--muted-foreground)] hover:bg-black/[0.04] hover:text-[var(--foreground)]', 'font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)]'),
                 )}
               >
                 {label}
@@ -384,7 +385,7 @@ export function NycNavbar() {
                 {!mobileOpen && (
                   <Link
                     href={cityLoginPath(city, pathname)}
-                    className='inline-flex h-9 items-center rounded-full bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white transition hover:bg-black'
+                    className={byBrand('inline-flex h-9 items-center rounded-full bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white transition hover:bg-black', 'inline-flex h-9 items-center rounded-full border border-[var(--border)] px-3.5 text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--surface)]')}
                   >
                     {t('login')}
                   </Link>

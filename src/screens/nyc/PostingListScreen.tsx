@@ -15,6 +15,7 @@ import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CompanyHeroPanel } from '@widgets/nyc/CompanyBrand'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { kindCounts, PostingRows } from '@widgets/nyc/PostingCard'
+import { byBrand } from '@lib/brand/design'
 
 /** 한 번에 보여 주는 공고 수 ("더 보기"로 늘린다) */
 const PAGE_SIZE = 20
@@ -98,7 +99,7 @@ export function PostingListScreen() {
           <span aria-hidden>‹</span> {t('postings.backToCompanies')}
         </Link>
         <CompanyHeroPanel className='mt-3'>
-          <h1 className='font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]'>
+          <h1 className={byBrand('font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'text-[1.4rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.6rem]')}>
             {t('postings.listTitle')}
           </h1>
           <p className='mt-1.5 text-[13px] leading-relaxed text-white/55 sm:text-[14px]'>{t('postings.listIntro', { brand: BRAND_CONFIG.name })}</p>

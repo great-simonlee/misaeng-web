@@ -33,6 +33,7 @@ import type {
   HousingRoommateComposition,
 } from '@/types/nyc'
 import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
+import { byBrand } from '@lib/brand/design'
 
 interface HousingPostCardProps {
   listing: HousingListing
@@ -66,7 +67,7 @@ export function HousingPostCard({
   } = usePagedGallery(images.length, listing.id)
 
   return (
-    <article className='group flex flex-col overflow-hidden rounded-[1.375rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] ring-1 ring-[var(--card-ring)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(15,23,42,0.08)]'>
+    <article className={byBrand('group flex flex-col overflow-hidden rounded-[1.375rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] ring-1 ring-[var(--card-ring)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(15,23,42,0.08)]', 'group flex flex-col overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_28px_rgba(15,23,42,0.045)] ring-1 ring-black/[0.03] transition hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgba(15,23,42,0.05),0_16px_36px_rgba(15,23,42,0.07)]')}>
       <div className='relative aspect-[4/3] overflow-hidden bg-[#e8eaee] sm:aspect-[3/2]'>
         {images.length > 0 ? (
           <div

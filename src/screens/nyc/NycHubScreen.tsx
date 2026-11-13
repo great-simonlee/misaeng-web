@@ -10,6 +10,7 @@ import { useT } from '@lib/i18n/client'
 import { AppDownloadPrompt } from '@widgets/nyc/AppDownloadPrompt'
 import Link from 'next/link'
 import { HeroAppCard } from '@widgets/nyc/HeroAppCard'
+import { NycHubScreenClassic } from '@screens/nyc/NycHubScreenClassic'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
 import { MagazinePreviewSection } from '@widgets/nyc/MagazinePreviewSection'
 import { PartnerSchoolsMarquee } from '@widgets/nyc/PartnerSchoolsMarquee'
@@ -17,6 +18,12 @@ import { PartnerInfluencersSection } from '@widgets/nyc/PartnerInfluencersSectio
 import { ProfessionalsSection } from '@widgets/nyc/ProfessionalsSection'
 
 export function NycHubScreen() {
+  // Ellieo keeps its own design; this redesign is Misaeng only
+  if (BRAND_CONFIG.id !== 'misaeng') return <NycHubScreenClassic />
+  return <MisaengHubScreen />
+}
+
+function MisaengHubScreen() {
   const cityInfo = useCityInfo()
   const href = useCityPath()
   const t = useT('hub')
