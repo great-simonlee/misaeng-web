@@ -41,7 +41,16 @@ import {
   isSharedCommunityBoard,
   parseCityId,
   resolveCityId,
+  type CityId,
 } from '@lib/constants/cities'
+import {
+  matchesListFilters,
+  pageAfter,
+  pageLimit,
+  readListFilters,
+  toListPost,
+  type ListFilters,
+} from '@lib/community/listPage'
 import {
   isAnonymousBoard,
   isCommunityBoardId,
@@ -69,8 +78,10 @@ import {
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
 import {
   isCommunityStorageConfigured,
+  enrichCommunityListPosts,
   listStoredCommunityPosts,
   listStoredCommunityPostsByAuthor,
+  listStoredCommunityPostsRaw,
   withLiveAuthors,
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
@@ -154,6 +165,22 @@ export async function GET(request: Request) {
     const user = await resolveAuthenticatedUser()
     const city = resolveCityId(searchParams.get('city'))
     const locale = await getRequestLocale(request)
+    // 앱이 ?limit= 을 보내면 페이지 단위로 (예전 앱은 지금처럼 전체 목록)
+    const limit = pageLimit(searchParams.get('limit'))
+    if (limit != null) {
+      return NextResponse.json(
+        await communityListPage({
+          board,
+          city,
+          locale,
+          user,
+          limit,
+          cursor: searchParams.get('cursor'),
+          filters: readListFilters(searchParams),
+          light: searchParams.get('view') === 'list',
+        }),
+      )
+    }
     // 차단한 작성자는 캐시된 목록을 꺼낸 뒤 보는 사람마다 거른다 (익명 정리 전에)
     const [stored, blocked, reported] = await Promise.all([
       listStoredCommunityPosts(board, city),
@@ -697,4 +724,60 @@ export async function POST(request: Request) {
       { status: 500 },
     )
   }
+}
+
+/**
+ * 한 페이지 (?limit=&cursor=&view=list + 게시판 필터). 필터·차단·정렬은 전체 글로, 작성자 보강·합격 인증·번역은
+ * 보낼 글만. total = 필터 뒤 전체 개수. 비자 게시판은 학교별 글 수(facets.schools)도 준다 (학교 칩).
+ */
+async function communityListPage(input: {
+  board: string | undefined
+  city: CityId | undefined
+  locale: Awaited<ReturnType<typeof getRequestLocale>>
+  user: Awaited<ReturnType<typeof resolveAuthenticatedUser>>
+  limit: number
+  cursor: string | null
+  filters: ListFilters
+  light: boolean
+}) {
+  const { board, city, locale, user, limit, cursor, filters, light } = input
+  const status = board != null && isStatusCommunityBoard(board)
+  const [raw, blocked, reported] = await Promise.all([
+    listStoredCommunityPostsRaw(board, city),
+    getViewerBlockedUids(user?.uid),
+    getViewerReportedKeys(user?.uid),
+  ])
+  // 학교 필터·학교별 개수는 작성자 프로필(authorSchoolId)이 있어야 해서 비자 게시판만 먼저 보강한다
+  const stored = status ? await enrichCommunityListPosts(raw, board) : raw
+  const visible = withoutModeratedPosts(withoutBlockedAuthors(stored, blocked), reported)
+  const boosts = board === 'roommate' ? await loadRoommateBoosts() : null
+  const ordered =
+    boosts && boosts.size > 0
+      ? [...visible].sort((a, b) => {
+          const ua = boosts.get(a.id) ?? ''
+          const ub = boosts.get(b.id) ?? ''
+          if (ua === ub) return 0
+          return ua < ub ? 1 : -1
+        })
+      : visible
+  const matching = ordered.filter((post) => matchesListFilters(post, board, filters))
+  const { page, nextCursor } = pageAfter(matching, cursor, limit)
+  const enriched = status ? page : await enrichCommunityListPosts(page, board)
+  const offerVerified = board === 'job-review' ? await getOfferVerifiedPostIds(enriched) : null
+  const posts = localizePosts(enriched, locale).map((item) => {
+    const finalized = finalizePost(applyReviewBodyAccess(sanitizeAnonymousCommunityPost(item, user?.uid), user))
+    const shaped = light ? toListPost(finalized) : finalized
+    const boostedUntil = boosts?.get(item.id)
+    const withBoost = boostedUntil ? { ...shaped, boostedUntil } : shaped
+    return offerVerified ? { ...withBoost, offerVerified: offerVerified.has(item.id) } : withBoost
+  })
+  const facets = status
+    ? {
+        schools: ordered.reduce<Record<string, number>>((counts, post) => {
+          if (post.authorSchoolId) counts[post.authorSchoolId] = (counts[post.authorSchoolId] || 0) + 1
+          return counts
+        }, {}),
+      }
+    : undefined
+  return { posts, nextCursor, total: matching.length, ...(facets ? { facets } : {}) }
 }

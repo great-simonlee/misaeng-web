@@ -314,6 +314,8 @@ async function writeRawPostJson(
 }
 
 const allPostsCache = new TtlCache<CommunityPost[]>(COMMUNITY_POSTS_TTL_MS, 1)
+/** Storage object list page size (its maximum) */
+const STORAGE_LIST_PAGE = 1000
 const ALL_POSTS_KEY = 'all'
 
 /** 이 서버에서 글을 쓰거나 지웠을 때 — 다음 목록 요청이 Storage에서 다시 읽는다 */
@@ -347,25 +349,25 @@ async function listAllStoredCommunityPosts(
 async function loadAllStoredCommunityPosts(): Promise<CommunityPost[]> {
 
   const bucket = await resolveBucket()
-  const res = await storageFetch(`/storage/v1/object/list/${bucket}`, {
-    method: 'POST',
-    headers: storageHeaders('application/json'),
-    body: JSON.stringify({
-      prefix: 'community/',
-      limit: 1000,
-      offset: 0,
-      sortBy: { column: 'updated_at', order: 'desc' },
-    }),
-  })
-  // 목록 실패는 캐시하지 않는다 (빈 목록이 60초 동안 보이지 않도록)
-  if (!res?.ok) throw new Error('Community post list failed')
-
-  const items = (await res.json().catch(() => null)) as
-    | Array<{ name?: string }>
-    | null
-  const names = (items || [])
-    .map((item) => String(item?.name || '').trim())
-    .filter((name) => name.endsWith('.json'))
+  // Storage 목록은 한 번에 1000개까지라 1000개씩 끝까지 넘겨 읽는다 (예전엔 1000개 넘는 글이 목록에서 빠졌다)
+  const names: string[] = []
+  for (let offset = 0; ; offset += STORAGE_LIST_PAGE) {
+    const res = await storageFetch(`/storage/v1/object/list/${bucket}`, {
+      method: 'POST',
+      headers: storageHeaders('application/json'),
+      body: JSON.stringify({
+        prefix: 'community/',
+        limit: STORAGE_LIST_PAGE,
+        offset,
+        sortBy: { column: 'updated_at', order: 'desc' },
+      }),
+    })
+    // 목록 실패는 캐시하지 않는다 (빈 목록이 60초 동안 보이지 않도록)
+    if (!res?.ok) throw new Error('Community post list failed')
+    const items = ((await res.json().catch(() => null)) as Array<{ name?: string }> | null) || []
+    names.push(...items.map((item) => String(item?.name || '').trim()).filter((name) => name.endsWith('.json')))
+    if (items.length < STORAGE_LIST_PAGE) break
+  }
 
   const posts = (
     await Promise.all(
@@ -400,7 +402,8 @@ export async function enrichStoredCommunityPostCounts(
   return { ...post, ...counts }
 }
 
-export async function listStoredCommunityPosts(
+/** 한 게시판의 공개 글, 목록 순서대로 — 작성자 보강·추천/댓글 수 없이 (페이지를 자른 뒤 enrichCommunityListPosts) */
+export async function listStoredCommunityPostsRaw(
   boardId?: string,
   city?: CityId,
 ): Promise<CommunityPost[]> {
@@ -419,18 +422,25 @@ export async function listStoredCommunityPosts(
 
   // 맛집은 등록일 순으로만 — 글을 고쳐도(updatedAt) 위로 올라오지 않는다
   if (boardId === 'food') filtered.sort((a, b) => b.createdAt - a.createdAt)
+  return filtered
+}
 
-  const withCounts =
-    boardId === 'food'
-      ? await Promise.all(filtered.map(enrichStoredCommunityPostCounts))
-      : filtered
-
-  // 목록에서도 최신 프로필 사진·닉네임 반영 (프로필은 5분 캐시, 작성자당 한 번만 읽음)
+/** 목록에 보낼 글만: 맛집 추천·댓글 수, 최신 프로필 사진·닉네임 (프로필은 5분 캐시, 작성자당 한 번만 읽음) */
+export async function enrichCommunityListPosts(
+  posts: CommunityPost[],
+  boardId?: string,
+): Promise<CommunityPost[]> {
+  const withCounts = boardId === 'food' ? await Promise.all(posts.map(enrichStoredCommunityPostCounts)) : posts
   return Promise.all(
-    withCounts.map((item) =>
-      enrichCommunityPostAuthor(item, { persist: false, cachedProfile: true }),
-    ),
+    withCounts.map((item) => enrichCommunityPostAuthor(item, { persist: false, cachedProfile: true })),
   )
+}
+
+export async function listStoredCommunityPosts(
+  boardId?: string,
+  city?: CityId,
+): Promise<CommunityPost[]> {
+  return enrichCommunityListPosts(await listStoredCommunityPostsRaw(boardId, city), boardId)
 }
 
 /** 공개 글(open, 숨김 아님) 전체 — 모든 도시, 작성자 보강 없이 (홈 배너 통계용) */
