@@ -122,7 +122,7 @@
     },
     "anonymous": {
       "writeLabel": "익명으로 글 남기기",
-      "listIntro": "이름 없이 편하게 나누는 {city} 질문·자유 게시판이에요.",
+      "listIntro": "궁금한 건 묻고 편하게 이야기 나누는 {city} 질문·자유 게시판이에요.",
       "locationLabel": "주제 (선택)",
       "locationPlaceholder": "주제를 선택해 주세요",
       "titlePlaceholder": "오늘 하루 한 줄",

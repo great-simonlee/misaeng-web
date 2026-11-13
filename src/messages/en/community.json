@@ -122,7 +122,7 @@
     },
     "anonymous": {
       "writeLabel": "Post anonymously",
-      "listIntro": "The {city} anonymous board, where you can talk freely without your name.",
+      "listIntro": "Ask anything and talk freely on the {city} Ask & Talk board.",
       "locationLabel": "Topic (optional)",
       "locationPlaceholder": "Choose a topic",
       "titlePlaceholder": "One line about your day",

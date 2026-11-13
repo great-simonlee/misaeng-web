@@ -82,15 +82,15 @@ export function AnonymousBoardNoticeModal({
         className='absolute inset-0 touch-none bg-black/45 backdrop-blur-[2px]'
         onClick={onClose}
       />
-      <div className='relative z-10 flex max-h-[min(88dvh,560px)] w-full max-w-[420px] flex-col overflow-hidden rounded-t-[1.5rem] bg-white shadow-[0_-8px_40px_rgba(15,23,42,0.14)] sm:rounded-[1.5rem]'>
+      <div className='relative z-10 flex max-h-[92dvh] w-full max-w-[440px] flex-col overflow-hidden rounded-t-[1.5rem] bg-white shadow-[0_-8px_40px_rgba(15,23,42,0.14)] sm:rounded-[1.5rem]'>
         <div className='flex shrink-0 flex-col items-center pt-3 sm:pt-4'>
           <span
             className='h-1 w-10 rounded-full bg-[#e2e5ea] sm:hidden'
             aria-hidden
           />
           <div className='mt-3 flex w-full items-center justify-between gap-3 px-5'>
-            <p className='text-[11px] font-semibold tracking-[0.14em] text-[var(--muted)]'>
-              {t('anonymousNotice.eyebrow')}
+            <p className='text-[12px] font-semibold text-[var(--brand)]'>
+              {t('anonymousNotice.board')}
             </p>
             <button
               type='button'
@@ -102,27 +102,24 @@ export function AnonymousBoardNoticeModal({
           </div>
         </div>
 
-        <div className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-2 pt-4'>
-          <p className='text-[11px] font-semibold tracking-[0.12em] text-[var(--brand)]'>
-            {t('anonymousNotice.board')}
-          </p>
+        <div className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-2 pt-2'>
           <h2
             id='anonymous-board-notice-title'
-            className='mt-1.5 text-[1.35rem] font-semibold tracking-[-0.03em] text-[var(--foreground)]'
+            className='text-[1.3rem] font-bold tracking-[-0.03em] text-[var(--foreground)]'
           >
             {t('anonymousNotice.title')}
           </h2>
-          <p className='mt-3 text-[14px] leading-relaxed text-[var(--muted)]'>
+          <p className='mt-2 text-[13.5px] leading-relaxed text-[var(--muted)]'>
             {t('anonymousNotice.body', { brand: BRAND_CONFIG.name })}
           </p>
-          <ul className='mt-4 space-y-2'>
+          <ul className='mt-4 space-y-2.5 rounded-2xl bg-[#f7f8fa] px-4 py-3.5 ring-1 ring-black/[0.04]'>
             {NOTICE_BULLET_KEYS.map((item) => (
               <li
                 key={item}
-                className='flex gap-2.5 rounded-xl bg-[#f7f8fa] px-3.5 py-3 text-[13px] leading-relaxed text-[var(--foreground)] ring-1 ring-black/[0.04]'
+                className='flex gap-2.5 text-[13px] leading-snug text-[var(--foreground)]'
               >
                 <span
-                  className='mt-1.5 size-1.5 shrink-0 rounded-full bg-[var(--brand)]'
+                  className='mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-[var(--brand)]'
                   aria-hidden
                 />
                 <span>{t(item)}</span>
@@ -131,11 +128,11 @@ export function AnonymousBoardNoticeModal({
           </ul>
         </div>
 
-        <div className='flex shrink-0 flex-col gap-2 border-t border-black/[0.05] px-5 py-4'>
+        <div className='flex shrink-0 gap-2 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3'>
           <button
             type='button'
             onClick={onClose}
-            className='h-11 w-full rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white touch-manipulation hover:bg-[var(--brand-hover)]'
+            className='order-2 h-11 flex-1 rounded-full bg-[var(--brand)] text-[14px] font-semibold text-white touch-manipulation hover:bg-[var(--brand-hover)]'
           >
             {t('anonymousNotice.confirm')}
           </button>
@@ -143,7 +140,7 @@ export function AnonymousBoardNoticeModal({
             type='button'
             onClick={onSnooze24h}
             className={cn(
-              'h-11 w-full rounded-full bg-[#f4f5f7] text-[13px] font-semibold text-[var(--foreground)] touch-manipulation',
+              'order-1 h-11 flex-1 rounded-full bg-[#f4f5f7] text-[13px] font-semibold text-[var(--foreground)] touch-manipulation',
               'hover:bg-[#eceef1]',
             )}
           >

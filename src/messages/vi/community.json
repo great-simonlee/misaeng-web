@@ -122,7 +122,7 @@
     },
     "anonymous": {
       "writeLabel": "Đăng ẩn danh",
-      "listIntro": "Hỏi đáp & Tự do {city}, nơi bạn thoải mái trò chuyện mà không cần ghi tên.",
+      "listIntro": "Bảng Hỏi đáp & Tự do {city}: hỏi bất cứ điều gì và trò chuyện thoải mái.",
       "locationLabel": "Chủ đề (không bắt buộc)",
       "locationPlaceholder": "Chọn chủ đề",
       "titlePlaceholder": "Một dòng về ngày hôm nay của bạn",
