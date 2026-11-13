@@ -9,6 +9,7 @@ import {
 import { freshSummaryTranslations, type PostingSummaryTranslation } from '@lib/translations/postings'
 import type { Locale } from '@lib/i18n/locales'
 import { DEGREE_LABELS, JOB_FUNCTIONS, type DegreeLevel, type JobFunction } from '@lib/constants/postingCopy'
+import { parsePay, previousPayFor, type PayHistoryRow } from '@lib/company/postingPay'
 
 /*
  * 채용 공고는 ellieo-erp 관리자 화면(Jobs → Postings)에서 검토하고 Supabase Postgres에 있다
@@ -36,6 +37,7 @@ const PUBLIC_COLUMNS = [
   'summary',
   'visa_sponsorship',
   'created_at',
+  'closed_at',
   'summary_translations',
 ].join(',')
 
@@ -65,6 +67,7 @@ type PostingRow = {
   } | null
   visa_sponsorship: string | null
   created_at: string
+  closed_at?: string | null
   /** 다른 언어 요약 (ellieo-erp/supabase/job_posting_translations.sql) */
   summary_translations?: unknown
 }
@@ -123,23 +126,20 @@ export type StoredPosting = PublicPosting & {
 
 let cache: { at: number; value: StoredPosting[] } | null = null
 
-/** 사용자에게 보이는 공고 전체 (최근 등록순). 60초 캐시. */
-export async function listPublicPostings(): Promise<StoredPosting[]> {
-  if (cache && Date.now() - cache.at < CACHE_TTL_MS) return cache.value
+/**
+ * 공고 행 읽기 (나중에 추가된 컬럼 중 아직 없는 것은 오류 메시지를 보고 하나씩 빼고 다시 읽는다).
+ * null: 읽지 못함 (표가 아직 없으면 조용히, 그 밖의 오류는 로그).
+ */
+async function fetchPostingRows(filters: string): Promise<PostingRow[] | null> {
   const url = getSupabaseUrl()
   const key = getSupabaseSecretKey()
-  if (!url || !key) return []
-
-  // 인턴·신입·경력 (ellieo-erp postingListRules.mjs isLivePosting 과 같은 기준). 레벨 unknown 은 보이지 않는다.
-  const filters = `&status=eq.approved&closed_at=is.null&level=in.(${LEVELS.join(',')})&summary_status=eq.ok&order=created_at.desc&limit=1000`
+  if (!url || !key) return null
   const request = (columns: string) =>
     fetch(`${url}/rest/v1/job_postings?select=${columns}${filters}`, {
       headers: { apikey: key, Authorization: `Bearer ${key}` },
       cache: 'no-store',
       signal: AbortSignal.timeout(15000),
     }).catch(() => null)
-  const companiesPromise = listActiveCompanies()
-  // 나중에 추가된 컬럼(job_function, apply_by) 중 아직 없는 것은 오류 메시지를 보고 하나씩 빼고 다시 읽는다.
   let columns = PUBLIC_COLUMNS.split(',')
   let res = await request(columns.join(','))
   for (let i = 0; i < OPTIONAL_COLUMNS.length && res?.status === 400; i += 1) {
@@ -149,70 +149,165 @@ export async function listPublicPostings(): Promise<StoredPosting[]> {
     columns = columns.filter((c) => c !== missing)
     res = await request(columns.join(','))
   }
-  const companies = await companiesPromise
   if (!res?.ok) {
     // 표가 아직 없으면(job_postings.sql 실행 전) 조용히 빈 목록.
     if (res && res.status !== 404) {
       console.error('Job postings DB error:', res.status, await res.text().catch(() => ''))
     }
-    return cache?.value ?? []
+    return null
   }
+  return ((await res.json().catch(() => null)) as PostingRow[] | null) ?? []
+}
 
+type ListedCompany = Awaited<ReturnType<typeof listActiveCompanies>>[number]
+
+/** 공고 행 → 사용자에게 보이는 공고. 요약이 없거나 링크가 이상하거나 레벨이 다르면 null. */
+function toStoredPosting(row: PostingRow, company: ListedCompany | undefined, history: PayHistoryRow[]): StoredPosting | null {
+  const overview = lines(row.summary?.overview)
+  if (!company || !overview.length || !isHttpsUrl(row.source_url)) return null
+  if (!LEVELS.includes(row.level as PostingLevel)) return null
+  const qualifications = lines(row.summary?.qualifications)
+  return {
+    id: row.id,
+    company: {
+      id: company.id,
+      slug: company.slug,
+      name: company.name,
+      logoUrl: company.logoUrl,
+      industry: company.industry,
+    },
+    title: row.title,
+    level: row.level as PostingLevel,
+    jobFunction: JOB_FUNCTIONS.includes(row.job_function as JobFunction)
+      ? (row.job_function as JobFunction)
+      : null,
+    workArrangement: ARRANGEMENTS.includes(row.work_arrangement as WorkArrangement)
+      ? (row.work_arrangement as WorkArrangement)
+      : 'unknown',
+    regions: Array.isArray(row.regions) ? row.regions : [],
+    summary: {
+      overview,
+      qualifications,
+      preferred: lines(row.summary?.preferred),
+      compensation: text(row.summary?.compensation) || null,
+      benefits: lines(row.summary?.benefits),
+      workType: text(row.summary?.workType),
+      location: text(row.summary?.location),
+      applyNotes: lines(row.summary?.applyNotes),
+      earlyApply: row.summary?.earlyApply === true,
+      // 마감일이 있으면 마감일이 우선
+      alwaysOpen: row.summary?.alwaysOpen === true && !row.apply_by,
+      degree: postingDegree(row.summary?.degree, qualifications),
+      // 한국어 지원 팁에 "빨리 지원" 내용이 이미 있는지 (번역문으로는 판단할 수 없어 원문에서 미리 본다)
+      earlyApplyMentioned: lines(row.summary?.applyNotes).some((n) => /빨리|일찍|수시/.test(n)),
+    },
+    summaryTranslations: freshSummaryTranslations(row.summary, row.summary_translations),
+    noSponsorship: row.visa_sponsorship === 'no',
+    applyBy: row.apply_by || null,
+    tags: Array.isArray(row.tags) ? row.tags.filter((t) => typeof t === 'string') : [],
+    applyUrl: row.source_url,
+    postedAt: new Date(row.created_at).getTime(),
+    // 급여는 한국어 원문 요약에서 뽑는다 (번역문은 앱이 보여 주기만)
+    pay: parsePay(text(row.summary?.compensation)),
+    previousPay: previousPayFor(
+      { id: row.id, companyId: row.company_id, title: row.title, level: row.level, createdAt: new Date(row.created_at).getTime() },
+      history,
+    ),
+  }
+}
+
+/** 사용자에게 보이는 공고 전체 (최근 등록순). 60초 캐시. */
+export async function listPublicPostings(): Promise<StoredPosting[]> {
+  if (cache && Date.now() - cache.at < CACHE_TTL_MS) return cache.value
+  // 인턴·신입·경력 (ellieo-erp postingListRules.mjs isLivePosting 과 같은 기준). 레벨 unknown 은 보이지 않는다.
+  const filters = `&status=eq.approved&closed_at=is.null&level=in.(${LEVELS.join(',')})&summary_status=eq.ok&order=created_at.desc&limit=1000`
+  const [rows, companies, history] = await Promise.all([fetchPostingRows(filters), listActiveCompanies(), listPayHistory()])
+  if (!rows) return cache?.value ?? []
   const companyById = new Map(companies.map((c) => [c.id, c]))
-  const rows = ((await res.json().catch(() => null)) as PostingRow[] | null) ?? []
   const value: StoredPosting[] = []
   const today = todayInNewYork()
   for (const row of rows) {
     // 지원 마감일이 지난 공고는 숨긴다 (마감일 당일까지는 보인다).
     if (row.apply_by && row.apply_by < today) continue
-    const company = companyById.get(row.company_id)
-    const overview = lines(row.summary?.overview)
-    if (!company || !overview.length || !isHttpsUrl(row.source_url)) continue
-    if (!LEVELS.includes(row.level as PostingLevel)) continue
-    const qualifications = lines(row.summary?.qualifications)
-    value.push({
-      id: row.id,
-      company: {
-        id: company.id,
-        slug: company.slug,
-        name: company.name,
-        logoUrl: company.logoUrl,
-        industry: company.industry,
-      },
-      title: row.title,
-      level: row.level as PostingLevel,
-      jobFunction: JOB_FUNCTIONS.includes(row.job_function as JobFunction)
-        ? (row.job_function as JobFunction)
-        : null,
-      workArrangement: ARRANGEMENTS.includes(row.work_arrangement as WorkArrangement)
-        ? (row.work_arrangement as WorkArrangement)
-        : 'unknown',
-      regions: Array.isArray(row.regions) ? row.regions : [],
-      summary: {
-        overview,
-        qualifications,
-        preferred: lines(row.summary?.preferred),
-        compensation: text(row.summary?.compensation) || null,
-        benefits: lines(row.summary?.benefits),
-        workType: text(row.summary?.workType),
-        location: text(row.summary?.location),
-        applyNotes: lines(row.summary?.applyNotes),
-        earlyApply: row.summary?.earlyApply === true,
-        // 마감일이 있으면 마감일이 우선
-        alwaysOpen: row.summary?.alwaysOpen === true && !row.apply_by,
-        degree: postingDegree(row.summary?.degree, qualifications),
-        // 한국어 지원 팁에 "빨리 지원" 내용이 이미 있는지 (번역문으로는 판단할 수 없어 원문에서 미리 본다)
-        earlyApplyMentioned: lines(row.summary?.applyNotes).some((n) => /빨리|일찍|수시/.test(n)),
-      },
-      summaryTranslations: freshSummaryTranslations(row.summary, row.summary_translations),
-      noSponsorship: row.visa_sponsorship === 'no',
-      applyBy: row.apply_by || null,
-      tags: Array.isArray(row.tags) ? row.tags.filter((t) => typeof t === 'string') : [],
-      applyUrl: row.source_url,
-      postedAt: new Date(row.created_at).getTime(),
-    })
+    const posting = toStoredPosting(row, companyById.get(row.company_id), history)
+    if (posting) value.push(posting)
   }
   cache = { at: Date.now(), value }
+  return value
+}
+
+/**
+ * 회사의 마감된 공고 (회사 페이지 "마감된 공고"): 승인·요약됐던 공고 중 채용이 끝났거나 지원 마감일이 지난 것,
+ * 최근 등록순 200개까지. closedAt = 마감된 때 (마감일만 지난 공고는 마감일).
+ */
+export async function listClosedPostingsForCompany(slug: string): Promise<StoredPosting[]> {
+  const company = (await listActiveCompanies()).find((c) => c.slug === String(slug || '').trim().toLowerCase())
+  if (!company) return []
+  const today = todayInNewYork()
+  const base = `&company_id=eq.${encodeURIComponent(company.id)}&status=eq.approved&level=in.(${LEVELS.join(',')})&summary_status=eq.ok&order=created_at.desc&limit=200`
+  // apply_by 컬럼이 없던 시절과 같이 쓰도록 둘로 나눠 읽는다: 종료된 공고 + 마감일이 지난 공고
+  const [closedRows, pastRows, history] = await Promise.all([
+    fetchPostingRows(`${base}&closed_at=not.is.null`),
+    fetchPostingRows(`${base}&closed_at=is.null&apply_by=lt.${today}`),
+    listPayHistory(),
+  ])
+  const seen = new Set<string>()
+  const value: StoredPosting[] = []
+  for (const row of [...(closedRows ?? []), ...(pastRows ?? [])]) {
+    if (seen.has(row.id)) continue
+    seen.add(row.id)
+    const posting = toStoredPosting(row, company, history)
+    if (!posting) continue
+    const closedAt = row.closed_at ? new Date(row.closed_at).getTime() : new Date(`${row.apply_by}T23:59:59-05:00`).getTime()
+    value.push({ ...posting, closedAt })
+  }
+  return value.sort((a, b) => b.postedAt - a.postedAt)
+}
+
+let historyCache: { at: number; value: PayHistoryRow[] } | null = null
+const HISTORY_TTL_MS = 10 * 60_000
+
+type HistoryRow = {
+  id: string
+  company_id: string
+  title: string
+  level: string
+  created_at: string
+  closed_at: string | null
+  apply_by?: string | null
+  compensation: string | null
+}
+
+/**
+ * 급여 비교용 공고 기록: 승인된 공고 전부 (마감·종료된 지난 공고 포함), 급여 문장만.
+ * 해마다 다시 열리는 같은 포지션의 급여를 비교한다. 10분 캐시.
+ */
+export async function listPayHistory(): Promise<PayHistoryRow[]> {
+  if (historyCache && Date.now() - historyCache.at < HISTORY_TTL_MS) return historyCache.value
+  const url = getSupabaseUrl()
+  const key = getSupabaseSecretKey()
+  if (!url || !key) return []
+  const request = (deadline: boolean) =>
+    fetch(
+      `${url}/rest/v1/job_postings?select=id,company_id,title,level,created_at,closed_at${deadline ? ',apply_by' : ''},compensation:summary->>compensation` +
+        `&status=eq.approved&level=in.(${LEVELS.join(',')})&order=created_at.desc&limit=5000`,
+      { headers: { apikey: key, Authorization: `Bearer ${key}` }, cache: 'no-store', signal: AbortSignal.timeout(15000) },
+    ).catch(() => null)
+  let res = await request(true)
+  if (res?.status === 400) res = await request(false)
+  if (!res?.ok) return historyCache?.value ?? []
+  const rows = ((await res.json().catch(() => null)) as HistoryRow[] | null) ?? []
+  const today = todayInNewYork()
+  const value = rows.map((row) => ({
+    id: row.id,
+    companyId: row.company_id,
+    title: row.title,
+    level: row.level,
+    pay: parsePay(row.compensation),
+    createdAt: new Date(row.created_at).getTime(),
+    open: !row.closed_at && !(row.apply_by && row.apply_by < today),
+  }))
+  historyCache = { at: Date.now(), value }
   return value
 }
 
