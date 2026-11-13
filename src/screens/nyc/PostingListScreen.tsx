@@ -98,7 +98,7 @@ export function PostingListScreen() {
           <span aria-hidden>‹</span> {t('postings.backToCompanies')}
         </Link>
         <CompanyHeroPanel className='mt-3'>
-          <h1 className='text-[1.4rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.6rem]'>
+          <h1 className='font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]'>
             {t('postings.listTitle')}
           </h1>
           <p className='mt-1.5 text-[13px] leading-relaxed text-white/55 sm:text-[14px]'>{t('postings.listIntro', { brand: BRAND_CONFIG.name })}</p>

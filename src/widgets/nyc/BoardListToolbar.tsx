@@ -37,7 +37,7 @@ export function BoardListToolbar({
   return (
     <header className={cn('pt-4 sm:pt-5 lg:pt-6', className)}>
       <div className='flex items-center justify-between gap-3'>
-        <h1 className='min-w-0 flex-1 truncate text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]'>
+        <h1 className='min-w-0 flex-1 truncate font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]'>
           {breadcrumbLabel}
         </h1>
 

@@ -226,10 +226,11 @@ function FoodCategoryStickyBar({
       <div
         ref={barRef}
         className={cn(
-          'z-[90] border-b border-black/[0.04] bg-white/95 backdrop-blur-md supports-[backdrop-filter]:bg-white/85',
+          'z-[90]',
+          // In place it sits on the page canvas; once pinned under the header it turns to frosted canvas
           stuck
-            ? 'fixed inset-x-0 top-14 py-2.5 sm:top-16'
-            : 'relative -mx-4 mt-2 px-4 py-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8'
+            ? 'fixed inset-x-0 top-14 border-b border-black/[0.05] bg-[var(--canvas)]/90 py-2.5 backdrop-blur-md sm:top-16'
+            : 'relative -mx-4 mt-2 bg-transparent px-4 py-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8'
         )}
       >
         {stuck ? <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>{chips}</div> : chips}
