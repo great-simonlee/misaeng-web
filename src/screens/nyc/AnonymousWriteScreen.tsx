@@ -83,6 +83,8 @@ export function AnonymousWriteScreen({
   const [postTitle, setPostTitle] = useState('')
   const [contentHtml, setContentHtml] = useState('')
   const [topic, setTopic] = useState('')
+  /** 질문·자유: 기본 익명, 고르면 닉네임·프로필·인증 배지를 보인다 */
+  const [showNickname, setShowNickname] = useState(false)
   const [draftHydrated, setDraftHydrated] = useState(isEdit)
   const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null)
   const orientation = useAnonymousWriteOrientation(!isEdit)
@@ -123,6 +125,7 @@ export function AnonymousWriteScreen({
         setPostTitle(post.title.slice(0, ANONYMOUS_TITLE_MAX))
         setContentHtml(post.contentHtml)
         setTopic(post.location)
+        setShowNickname(post.showNickname === true)
       } catch (err) {
         if (!cancelled) {
           toastError(
@@ -179,6 +182,7 @@ export function AnonymousWriteScreen({
         contentHtml,
         location: topic.trim(),
         detail: '',
+        showNickname,
       }
       const post =
         isEdit && editPostId
@@ -296,6 +300,26 @@ export function AnonymousWriteScreen({
                   onClick={() => setTopic(item)}
                 />
               ))}
+            </div>
+            {/* Who the post shows as: anonymous (default) or the writer's nickname with their verification marks */}
+            <div className='mt-4 flex items-center gap-3'>
+              <span className='text-[13px] font-medium text-[var(--muted-foreground)]'>{t('anonymousWrite.authorLabel')}</span>
+              <div className='inline-flex rounded-full bg-black/[0.05] p-0.5' role='radiogroup' aria-label={t('anonymousWrite.authorLabel')}>
+                {([false, true] as const).map((value) => (
+                  <button
+                    key={String(value)}
+                    type='button'
+                    role='radio'
+                    aria-checked={showNickname === value}
+                    onClick={() => setShowNickname(value)}
+                    className={`h-8 rounded-full px-3.5 text-[13px] font-semibold transition ${
+                      showNickname === value ? 'bg-white text-[var(--foreground)] shadow-sm' : 'text-[var(--muted-foreground)]'
+                    }`}
+                  >
+                    {t(value ? 'anonymousWrite.authorNickname' : 'anonymousWrite.authorAnonymous')}
+                  </button>
+                ))}
+              </div>
             </div>
           </CreateSection>
 

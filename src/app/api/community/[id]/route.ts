@@ -55,7 +55,7 @@ import { BLOCKED_USER_CODE, getViewerBlockedUids } from '@lib/community/blocks.s
 import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/contentFilter'
 import { CONTENT_HIDDEN_CODE, isModerationHidden, reportKey } from '@lib/community/moderation'
 import { getViewerReportedKeys } from '@lib/community/reports.server'
-import { isMisaengEmail, isStatusCommunityBoard } from '@lib/constants/nyc'
+import { isAnonymousBoard, isMisaengEmail, isStatusCommunityBoard } from '@lib/constants/nyc'
 import {
   deleteStoredCommunityPost,
   getStoredCommunityPost,
@@ -82,6 +82,8 @@ interface RouteContext {
 }
 
 type UpdateBody = {
+  /** 질문·자유: 닉네임 공개 */
+  showNickname?: boolean
   title?: string
   contentHtml?: string
   location?: string
@@ -550,6 +552,10 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const next = {
     ...existing,
+    // 질문·자유: 수정할 때 익명 / 닉네임 공개를 바꿀 수 있다 (안 보내면 그대로)
+    ...(isAnonymousBoard(existing.categoryId) && typeof body.showNickname === 'boolean'
+      ? { showNickname: body.showNickname }
+      : {}),
     ...(isCptOpt ? { categoryId: 'status' as const } : {}),
     title,
     contentHtml,

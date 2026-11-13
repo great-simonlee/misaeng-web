@@ -108,7 +108,7 @@ function FoodListingCard({
   const tFood = useT('food')
   const format = useCommunityFormat()
   const postHref = usePostHref(post)
-  const anonymous = isAnonymousBoard(boardId)
+  const anonymous = isAnonymousBoard(boardId) && post.showNickname !== true
   const thumbnail = resolveCommunityThumbnail(post)
   const foodCategory = getFoodCategory(post.foodCategory)
   const cuisineLabel = getFoodCuisineLabel(
@@ -423,7 +423,7 @@ function TextListingCard({
   const tHousing = useT('housing')
   const format = useCommunityFormat()
   const postHref = usePostHref(post)
-  const anonymous = isAnonymousBoard(boardId)
+  const anonymous = isAnonymousBoard(boardId) && post.showNickname !== true
   const boardMeta = NYC_COMMUNITY_BOARD_META[boardId]
   const isMarket = boardId === 'marketplace'
   const isRoommate = boardId === 'roommate'

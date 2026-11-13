@@ -224,6 +224,8 @@ export async function GET(request: Request) {
 }
 
 type CreateBody = {
+  /** 질문·자유: 닉네임 공개 (기본 익명) */
+  showNickname?: boolean
   categoryId?: string
   city?: string | null
   title?: string
@@ -352,7 +354,9 @@ export async function POST(request: Request) {
   const isCptOpt = categoryId === 'status' || categoryId === 'cpt-opt'
   const isJobReview = categoryId === 'job-review'
   const isRoommate = categoryId === 'roommate'
-  const isAnonymous = isAnonymousBoard(categoryId)
+  // 질문·자유 보드: 기본은 익명, 글쓴이가 고르면 닉네임·프로필·인증 배지를 보인다
+  const showNickname = isAnonymousBoard(categoryId) && body?.showNickname === true
+  const isAnonymous = isAnonymousBoard(categoryId) && !showNickname
   const menuItems = isFood ? normalizeFoodMenuItems(body?.menuItems) : []
   const galleryPhotos =
     isFood || isRoommate
@@ -637,6 +641,7 @@ export async function POST(request: Request) {
 
   const post: CommunityPost = {
     id,
+    ...(isAnonymousBoard(categoryId) ? { showNickname } : {}),
     // 작성 화면 언어 = 원문 언어 (번역이 다르면 ERP 번역 단계에서 바로잡는다)
     sourceLocale: locale,
     categoryId,

@@ -220,7 +220,9 @@ export function CommunityDetailScreen({
   }
 
   const isAuthor = user?.uid === post.authorUid && !post.id.startsWith('mock-')
-  const anonymous = isAnonymousBoard(boardId)
+  const anonymousBoard = isAnonymousBoard(boardId)
+  // 질문·자유: the writer may show their nickname (comments there stay anonymous)
+  const anonymous = anonymousBoard && post.showNickname !== true
   const isFood = boardId === 'food'
   const isCptOpt = boardId === 'status'
   const isJobReview = boardId === 'job-review'
@@ -389,7 +391,7 @@ export function CommunityDetailScreen({
           <CommunityCommentsSection
             postId={post.id}
             boardId={boardId}
-            anonymousBoard={anonymous}
+            anonymousBoard={anonymousBoard}
             loginNext={hrefForCommunityPost(post, city)}
           />
         </div>

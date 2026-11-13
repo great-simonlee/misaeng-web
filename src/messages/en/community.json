@@ -29,8 +29,8 @@
       "description": "Find roommates, rooms, and sublets"
     },
     "anonymous": {
-      "title": "Anonymous Board",
-      "description": "Talk freely without your name"
+      "title": "Ask & Talk",
+      "description": "Ask anything, talk freely"
     },
     "comingSoon": "Coming Soon"
   },
@@ -159,7 +159,7 @@
   },
   "author": {
     "member": "Member",
-    "anonymous": "Anonymous"
+    "anonymous": "Ask & Talk"
   },
   "verify": {
     "required": "You need to verify as a student or professional to post and comment.",
@@ -180,7 +180,7 @@
       "loginRequired": "You need to log in so you can edit or delete your posts. Our team can check who posted when handling reports."
     },
     "commonTitle": "Community rules",
-    "anonymousTitle": "Anonymous board guidelines"
+    "anonymousTitle": "Ask & Talk guidelines"
   },
   "anonymousTopics": {
     "opt": "OPT·CPT·STEM OPT",
@@ -243,7 +243,7 @@
   "anonymousNotice": {
     "close": "Close",
     "eyebrow": "Before you start",
-    "board": "Anonymous Board",
+    "board": "Ask & Talk",
     "title": "An anonymous space we keep safe together",
     "body": "To keep {brand} a healthy, helpful community, please follow the rules and treat each other with respect, even on the anonymous board!",
     "confirm": "Got it",
@@ -497,12 +497,15 @@
   "anonymousWrite": {
     "topicTitle": "What's it about?",
     "topicDescription": "You can skip this.",
-    "topicAria": "Anonymous board topic",
+    "topicAria": "Ask & Talk topic",
     "titleDescription": "Write a short title people can read at a glance.",
     "bodyDescription": "Write whatever's on your mind. You'll be shown as anonymous.",
     "createTitle": "Post on the anonymous board",
     "createDescription": "Your name, school, and photo stay hidden. Share freely.",
-    "editTitle": "Edit anonymous post"
+    "editTitle": "Edit anonymous post",
+    "authorLabel": "Post as",
+    "authorAnonymous": "Anonymous",
+    "authorNickname": "Nickname"
   },
   "badges": {
     "workplace": "Workplace verified",

@@ -29,8 +29,8 @@
       "description": "룸메이트·방·서블렛 구하기"
     },
     "anonymous": {
-      "title": "익명게시판",
-      "description": "익명으로 이야기 나누기"
+      "title": "질문·자유",
+      "description": "궁금한 건 묻고, 편하게 이야기 나누기"
     },
     "comingSoon": "Coming Soon"
   },
@@ -122,7 +122,7 @@
     },
     "anonymous": {
       "writeLabel": "익명으로 글 남기기",
-      "listIntro": "이름 없이 편하게 나누는 {city} 익명 게시판이에요.",
+      "listIntro": "이름 없이 편하게 나누는 {city} 질문·자유 게시판이에요.",
       "locationLabel": "주제 (선택)",
       "locationPlaceholder": "주제를 선택해 주세요",
       "titlePlaceholder": "오늘 하루 한 줄",
@@ -180,7 +180,7 @@
       "loginRequired": "로그인은 글 관리(수정·삭제)를 위해 필요하며, 운영팀이 신고 대응을 위해 확인할 수 있어요."
     },
     "commonTitle": "커뮤니티 규칙",
-    "anonymousTitle": "익명게시판 작성 안내"
+    "anonymousTitle": "질문·자유 작성 안내"
   },
   "anonymousTopics": {
     "opt": "OPT·CPT·STEM OPT",
@@ -243,9 +243,9 @@
   "anonymousNotice": {
     "close": "닫기",
     "eyebrow": "이용 주의사항",
-    "board": "익명게시판",
+    "board": "질문·자유",
     "title": "함께 지키는 익명 공간",
-    "body": "{brand}의 건강하고 생산적인 커뮤니티의 발전을 위해, 익명게시판에서도 서로를 존중하는 이용 규칙을 지켜 주세요!",
+    "body": "{brand}의 건강하고 생산적인 커뮤니티의 발전을 위해, 질문·자유에서도 서로를 존중하는 이용 규칙을 지켜 주세요!",
     "confirm": "확인했어요",
     "snooze24h": "24시간 동안 보지 않기"
   },
@@ -487,12 +487,15 @@
   "anonymousWrite": {
     "topicTitle": "어떤 주제인가요?",
     "topicDescription": "선택하지 않아도 괜찮아요",
-    "topicAria": "익명게시판 주제",
+    "topicAria": "질문·자유 주제",
     "titleDescription": "한눈에 보이는 짧은 제목을 적어 주세요",
     "bodyDescription": "부담 없이 남겨 보세요. 작성자는 익명으로 표시돼요.",
-    "createTitle": "익명게시판 글 올리기",
+    "createTitle": "질문·자유 글 올리기",
     "createDescription": "이름·학교·사진은 보이지 않아요. 부담 없이 남겨 주세요.",
-    "editTitle": "익명 글 수정하기"
+    "editTitle": "익명 글 수정하기",
+    "authorLabel": "글쓴이 표시",
+    "authorAnonymous": "익명",
+    "authorNickname": "닉네임"
   },
   "badges": {
     "workplace": "직장 인증",
