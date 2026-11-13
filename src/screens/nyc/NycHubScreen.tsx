@@ -45,19 +45,19 @@ export function NycHubScreen() {
           style={{ background: 'radial-gradient(circle, rgb(59 130 246 / 0.10), transparent 65%)' }}
           aria-hidden
         />
-        <div className='relative mx-auto grid max-w-7xl items-center gap-10 px-5 pb-12 pt-12 sm:px-6 sm:pb-16 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_auto] lg:px-8'>
+        <div className='relative mx-auto grid max-w-7xl items-center gap-8 px-5 pb-8 pt-8 sm:px-6 sm:pb-10 sm:pt-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:px-8'>
           <div className='min-w-0'>
             <span className='inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-[12px] font-semibold tracking-wide text-[var(--muted-foreground)] ring-1 ring-[var(--card-ring)]'>
               <span className='size-1.5 rounded-full bg-[var(--brand)]' aria-hidden />
               {t('brandCity', { brand: BRAND_CONFIG.name, city: cityInfo.shortLabel })}
             </span>
-            <h1 className='mt-5 max-w-3xl text-[2.15rem] font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] sm:text-5xl lg:text-[3.5rem]'>
+            <h1 className='mt-4 max-w-3xl text-[2rem] font-bold leading-[1.12] tracking-[-0.035em] text-[var(--foreground)] sm:text-[2.6rem] lg:text-[3rem]'>
               {t(`cities.${cityInfo.id}.headline`)}
             </h1>
-            <p className='mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--muted-foreground)] sm:text-lg'>
+            <p className='mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--muted-foreground)] sm:text-[17px]'>
               {t(`cities.${cityInfo.id}.description`)}
             </p>
-            <div className='mt-8 flex flex-wrap items-center gap-2.5'>
+            <div className='mt-6 flex flex-wrap items-center gap-2.5'>
               {/* The boards are in the header; the hero points to the one most people come for */}
               <Link
                 href={href('/housing')}
