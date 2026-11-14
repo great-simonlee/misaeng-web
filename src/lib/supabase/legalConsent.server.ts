@@ -377,6 +377,7 @@ export type WriteConsentSource =
   | 'job-review'
   | 'roommate'
   | 'anonymous'
+  | 'marketplace'
 
 export function normalizeWriteConsentSource(
   value: unknown,
@@ -384,7 +385,8 @@ export function normalizeWriteConsentSource(
   if (
     value === 'job-review' ||
     value === 'roommate' ||
-    value === 'anonymous'
+    value === 'anonymous' ||
+    value === 'marketplace'
   ) {
     return value
   }
