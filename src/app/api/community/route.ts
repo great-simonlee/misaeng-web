@@ -76,6 +76,7 @@ import {
   normalizeWaitMinutes,
 } from '@lib/community/food'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
+import { normalizeMarketCategory, normalizeMarketPrice } from '@lib/community/marketplace'
 import {
   isCommunityStorageConfigured,
   enrichCommunityListPosts,
@@ -224,6 +225,8 @@ export async function GET(request: Request) {
 }
 
 type CreateBody = {
+  price?: number | string | null
+  marketCategory?: string
   /** 질문·자유: 닉네임 공개 (기본 익명) */
   showNickname?: boolean
   categoryId?: string
@@ -354,12 +357,13 @@ export async function POST(request: Request) {
   const isCptOpt = categoryId === 'status' || categoryId === 'cpt-opt'
   const isJobReview = categoryId === 'job-review'
   const isRoommate = categoryId === 'roommate'
+  const isMarket = categoryId === 'marketplace'
   // 질문·자유 보드: 기본은 익명, 글쓴이가 고르면 닉네임·프로필·인증 배지를 보인다
   const showNickname = isAnonymousBoard(categoryId) && body?.showNickname === true
   const isAnonymous = isAnonymousBoard(categoryId) && !showNickname
   const menuItems = isFood ? normalizeFoodMenuItems(body?.menuItems) : []
   const galleryPhotos =
-    isFood || isRoommate
+    isFood || isRoommate || isMarket
       ? normalizeFoodGalleryPhotos(body?.galleryPhotos)
       : []
   const partySize = isFood ? normalizePartySize(body?.partySize) : null
@@ -670,7 +674,7 @@ export async function POST(request: Request) {
     recommendCount: 0,
     commentCount: 0,
     beenThereCount: 0,
-    thumbnailUrl: isFood || isRoommate ? thumbnailUrl : null,
+    thumbnailUrl: isFood || isRoommate || isMarket ? thumbnailUrl : null,
     partySize: isFood ? partySize : null,
     totalSpend: isFood ? totalSpend : null,
     tipIncluded: isFood ? tipIncluded : null,
@@ -695,6 +699,13 @@ export async function POST(request: Request) {
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
     roommateMoveInDate: isRoommate ? roommateMoveInDate : null,
     roommateMoveOutDate: isRoommate ? roommateMoveOutDate : null,
+    ...(isMarket
+      ? {
+          price: normalizeMarketPrice(body?.price),
+          marketCategory: normalizeMarketCategory(body?.marketCategory),
+          marketStatus: 'selling' as const,
+        }
+      : {}),
     guestAuthor: null,
   }
 

@@ -375,6 +375,14 @@
         "body": "There was no answer within 7 days."
       },
       "refunded": "{amount}P refunded."
+    },
+    "marketplace": {
+      "newInquiry": {
+        "title": "Câu hỏi mới · {listing}"
+      },
+      "message": {
+        "title": "Tin nhắn mới · {listing}"
+      }
     }
   },
   "reviewDocs": {

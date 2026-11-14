@@ -71,7 +71,7 @@ export function statusTypeOf(post: Pick<CommunityPost, 'cptOptType' | 'detail'>)
 export type ListFilters = {
   /** 익명: 주제 (post.location) */
   topic?: string
-  /** 맛집: foodCategory */
+  /** 맛집: foodCategory · 중고거래: marketCategory */
   category?: string
   /** 맛집: 요리 종류 */
   cuisine?: string
@@ -79,16 +79,27 @@ export type ListFilters = {
   type?: string
   /** 비자: 작성자 학교 id */
   school?: string
+  /** 중고거래: 판매완료 숨기기 */
+  active?: boolean
 }
 
 export function readListFilters(params: URLSearchParams): ListFilters {
   const get = (key: string) => params.get(key)?.trim() || undefined
-  return { topic: get('topic'), category: get('category'), cuisine: get('cuisine'), type: get('type'), school: get('school') }
+  return {
+    topic: get('topic'),
+    category: get('category'),
+    cuisine: get('cuisine'),
+    type: get('type'),
+    school: get('school'),
+    active: params.get('active') === '1',
+  }
 }
 
 export function matchesListFilters(post: CommunityPost, board: string | undefined, filters: ListFilters): boolean {
   if (filters.topic && post.location !== filters.topic) return false
-  if (filters.category && post.foodCategory !== filters.category) return false
+  // 맛집 분위기 / 중고거래 카테고리
+  if (filters.category && (board === 'marketplace' ? post.marketCategory : post.foodCategory) !== filters.category) return false
+  if (filters.active && post.marketStatus === 'sold') return false
   if (filters.cuisine && cuisineIdOf(post) !== filters.cuisine) return false
   if (filters.type) {
     const type = board === 'roommate' ? roommateTypeOf(post) : statusTypeOf(post)

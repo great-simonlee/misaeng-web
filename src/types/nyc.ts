@@ -311,6 +311,10 @@ export interface CommunityPost extends TranslationFields {
   authorEmail: string
   /** 질문·자유(anonymous 보드): 글쓴이가 닉네임을 보이기로 했을 때 true. 없거나 false = 익명 (예전 글 전부) */
   showNickname?: boolean
+  /** 중고거래: 가격 (달러, 0 = 나눔), 카테고리, 거래 상태 (src/lib/community/marketplace.ts) */
+  price?: number | null
+  marketCategory?: string | null
+  marketStatus?: 'selling' | 'reserved' | 'sold' | null
   /** 프로필 닉네임 (작성 시점 스냅샷) */
   authorNickname: string | null
   /** 프로필 사진 URL (작성 시점 스냅샷) */

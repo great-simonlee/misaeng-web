@@ -56,6 +56,8 @@ import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/content
 import { CONTENT_HIDDEN_CODE, isModerationHidden, reportKey } from '@lib/community/moderation'
 import { getViewerReportedKeys } from '@lib/community/reports.server'
 import { isAnonymousBoard, isMisaengEmail, isStatusCommunityBoard } from '@lib/constants/nyc'
+import { normalizeMarketCategory, normalizeMarketPrice, normalizeMarketStatus } from '@lib/community/marketplace'
+import { closeThreadsForPost } from '@lib/marketplace/inquiries.server'
 import {
   deleteStoredCommunityPost,
   getStoredCommunityPost,
@@ -82,6 +84,9 @@ interface RouteContext {
 }
 
 type UpdateBody = {
+  price?: number | string | null
+  marketCategory?: string
+  marketStatus?: string
   /** 질문·자유: 닉네임 공개 */
   showNickname?: boolean
   title?: string
@@ -267,11 +272,12 @@ export async function PATCH(request: Request, context: RouteContext) {
     existing.categoryId === 'status' || existing.categoryId === 'cpt-opt'
   const isJobReview = existing.categoryId === 'job-review'
   const isRoommate = existing.categoryId === 'roommate'
+  const isMarket = existing.categoryId === 'marketplace'
   const menuItems = isFood
     ? normalizeFoodMenuItems(body.menuItems ?? existing.menuItems)
     : []
   const galleryPhotos =
-    isFood || isRoommate
+    isFood || isRoommate || isMarket
       ? normalizeFoodGalleryPhotos(body.galleryPhotos ?? existing.galleryPhotos)
       : []
   const partySize = isFood
@@ -569,7 +575,7 @@ export async function PATCH(request: Request, context: RouteContext) {
           ? getRoommateLookingForLabel(roommateLookingFor)
           : String(body.detail ?? existing.detail).trim(),
     updatedAt: Date.now(),
-    thumbnailUrl: isFood || isRoommate ? thumbnailUrl : null,
+    thumbnailUrl: isFood || isRoommate || isMarket ? thumbnailUrl : null,
     partySize: isFood ? partySize : null,
     totalSpend: isFood ? totalSpend : null,
     tipIncluded: isFood ? tipIncluded : null,
@@ -598,6 +604,15 @@ export async function PATCH(request: Request, context: RouteContext) {
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
     roommateMoveInDate: isRoommate ? roommateMoveInDate : null,
     roommateMoveOutDate: isRoommate ? roommateMoveOutDate : null,
+    // 중고거래: price, category and trade status (판매중 / 예약중 / 판매완료) — each kept unless sent
+    ...(isMarket
+      ? {
+          price: body.price === undefined ? (existing.price ?? null) : normalizeMarketPrice(body.price),
+          marketCategory:
+            body.marketCategory === undefined ? (existing.marketCategory ?? 'other') : normalizeMarketCategory(body.marketCategory),
+          marketStatus: normalizeMarketStatus(body.marketStatus) ?? existing.marketStatus ?? 'selling',
+        }
+      : {}),
     city: isCptOpt
       ? parseCityId(body.city) ?? existing.city
       : existing.city,
@@ -620,6 +635,8 @@ export async function PATCH(request: Request, context: RouteContext) {
     } catch (creditError) {
       console.error('Community credit award (post update) error:', creditError)
     }
+    // 판매완료: the listing's inquiry threads become read only
+    if (saved.categoryId === 'marketplace' && saved.marketStatus === 'sold') await closeThreadsForPost(saved.id)
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),
     })

@@ -400,6 +400,14 @@
         "body": "There was no answer within 7 days."
       },
       "refunded": "{amount}P refunded."
+    },
+    "marketplace": {
+      "newInquiry": {
+        "title": "New inquiry · {listing}"
+      },
+      "message": {
+        "title": "New message · {listing}"
+      }
     }
   },
   "reviewDocs": {

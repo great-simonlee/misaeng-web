@@ -400,6 +400,14 @@
         "body": "7일 동안 답변이 없었어요."
       },
       "refunded": "{amount}P를 돌려드렸어요."
+    },
+    "marketplace": {
+      "newInquiry": {
+        "title": "새 중고거래 문의 · {listing}"
+      },
+      "message": {
+        "title": "중고거래 메시지 · {listing}"
+      }
     }
   },
   "reviewDocs": {
