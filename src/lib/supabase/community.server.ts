@@ -38,6 +38,12 @@ import {
   type CityId,
 } from '@lib/constants/cities'
 import { normalizeStoredContactSource } from '@lib/community/contactSources'
+import {
+  normalizeMarketCategory,
+  normalizeMarketPayments,
+  normalizeMarketPrice,
+  normalizeMarketStatus,
+} from '@lib/community/marketplace'
 import { normalizeProxyAuthor } from '@lib/community/proxyAuthor'
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile, type SupabaseProfileRecord } from '@lib/supabase/profile.server'
@@ -251,6 +257,17 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       : isSharedCommunityBoard(categoryId)
         ? null
         : resolveCityId(typeof data.city === 'string' ? data.city : null),
+    // 질문·자유: 닉네임 공개 여부 — 다시 저장할 때 익명으로 돌아가지 않도록 읽는다
+    ...(isAnonymousBoard(categoryId) ? { showNickname: data.showNickname === true } : {}),
+    // 중고거래: 가격·카테고리·거래 상태·결제 방법 (목록 필터, 문의, 부분 수정이 이 값을 쓴다)
+    ...(categoryId === 'marketplace'
+      ? {
+          price: normalizeMarketPrice(data.price),
+          marketCategory: normalizeMarketCategory(data.marketCategory),
+          marketStatus: normalizeMarketStatus(data.marketStatus) ?? 'selling',
+          marketPayments: normalizeMarketPayments(data.marketPayments),
+        }
+      : {}),
     // 번역(ERP Translations 탭이 저장) — 다시 저장할 때 잃지 않도록 같이 읽는다
     ...pickTranslationFields(data),
   }
@@ -441,6 +458,26 @@ export async function listStoredCommunityPosts(
   city?: CityId,
 ): Promise<CommunityPost[]> {
   return enrichCommunityListPosts(await listStoredCommunityPostsRaw(boardId, city), boardId)
+}
+
+/**
+ * 여러 글을 한 번에 — 서버 캐시(60초)의 전체 목록에서 찾고, 캐시에 없는 글(방금 쓴 글, 지워진 글)만 Storage 에서 하나씩
+ * (최대 20개). 작성자 보강 없이. 중고거래 대화 목록처럼 글 id 가 많은 곳에서 글마다 Storage 를 읽지 않으려고.
+ */
+export async function getCommunityPostsByIds(ids: string[]): Promise<Map<string, CommunityPost>> {
+  const found = new Map<string, CommunityPost>()
+  const wanted = new Set(ids.map((id) => String(id || '').trim()).filter(Boolean))
+  if (!wanted.size || !isCommunityStorageConfigured()) return found
+  for (const post of await listAllStoredCommunityPosts()) {
+    if (wanted.has(post.id)) found.set(post.id, post)
+  }
+  const missing = [...wanted].filter((id) => !found.has(id)).slice(0, 20)
+  if (missing.length) {
+    const bucket = await resolveBucket()
+    const posts = await Promise.all(missing.map((id) => fetchPostJson(bucket, objectPath(id)).catch(() => null)))
+    for (const post of posts) if (post) found.set(post.id, post)
+  }
+  return found
 }
 
 /** 공개 글(open, 숨김 아님) 전체 — 모든 도시, 작성자 보강 없이 (홈 배너 통계용) */

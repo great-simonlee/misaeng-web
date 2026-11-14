@@ -195,7 +195,11 @@ export async function GET(request: Request) {
       getViewerReportedKeys(user?.uid),
     ])
     // 숨김 글은 목록 캐시에서 이미 빠진다. 내가 신고한 글은 보는 사람마다 뺀다 (차단과 같은 방식)
-    const visible = withoutModeratedPosts(withoutBlockedAuthors(stored, blocked), reported)
+    const unfiltered = withoutModeratedPosts(withoutBlockedAuthors(stored, blocked), reported)
+    // 중고거래: 페이지 목록과 같은 규칙 (판매완료 빼기, category / category=free 탭)
+    const listFilters = readListFilters(searchParams)
+    const visible =
+      board === 'marketplace' ? unfiltered.filter((post) => matchesListFilters(post, board, listFilters)) : unfiltered
     // 룸메이트 게시판: 포인트로 부스트한 글을 위로 (부스트는 전환 후에만 생긴다, WIRING.md 5)
     const boosts = board === 'roommate' ? await loadRoommateBoosts() : null
     const ordered =
@@ -319,7 +323,9 @@ export async function POST(request: Request) {
   const contentHtml = sanitizeCommunityHtml(
     String(body?.contentHtml || '').trim(),
   )
-  if (!title || !contentHtml || contentHtml === '<p></p>') {
+  // 중고거래는 본문 없이 제목·사진·가격만으로 올릴 수 있다 (제목은 필수)
+  const emptyBody = !contentHtml || contentHtml === '<p></p>'
+  if (!title || (emptyBody && categoryId !== 'marketplace')) {
     return NextResponse.json(
       { error: t('community.write.titleBodyRequired') },
       { status: 400 },

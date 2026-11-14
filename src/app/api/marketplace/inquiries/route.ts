@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 
 import { InquiryError, listThreads, sendBuyerMessage, unreadCount } from '@lib/marketplace/inquiries.server'
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
+import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/contentFilter'
+import { getRequestT } from '@lib/i18n/server'
+import { accountSuspendedResponse } from '@lib/supabase/profile.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -30,6 +33,13 @@ export async function POST(request: Request) {
   const user = await resolveAuthenticatedUser()
   if (!user?.uid) return NextResponse.json({ error: 'Login required.' }, { status: 401 })
   const body = ((await request.json().catch(() => null)) || {}) as { postId?: unknown; body?: unknown }
+  // Same rules as comments: suspended accounts can't write, objectionable words are refused
+  const t = await getRequestT(request, 'api')
+  const suspended = await accountSuspendedResponse(user.uid, t)
+  if (suspended) return suspended
+  if (findBlockedContent(body.body)) {
+    return NextResponse.json({ error: t('community.contentBlocked'), code: CONTENT_BLOCKED_CODE }, { status: 400 })
+  }
   try {
     return NextResponse.json(
       await sendBuyerMessage({ uid: user.uid, postId: String(body.postId || '').trim(), body: String(body.body || '') }),

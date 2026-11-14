@@ -64,7 +64,7 @@ import {
   normalizeMarketStatus,
   normalizeMarketZip,
 } from '@lib/community/marketplace'
-import { closeThreadsForPost } from '@lib/marketplace/inquiries.server'
+import { closeThreadsForPost, reopenThreadsForPost } from '@lib/marketplace/inquiries.server'
 import {
   deleteStoredCommunityPost,
   getStoredCommunityPost,
@@ -236,7 +236,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   const contentHtml = sanitizeCommunityHtml(
     String(body.contentHtml ?? existing.contentHtml).trim(),
   )
-  if (!title || !contentHtml || contentHtml === '<p></p>') {
+  // 중고거래는 본문이 비어 있어도 된다 (상태만 바꾸는 PATCH { marketStatus } 도 제목·본문을 그대로 둔다)
+  const emptyBody = !contentHtml || contentHtml === '<p></p>'
+  if (!title || (emptyBody && existing.categoryId !== 'marketplace')) {
     return NextResponse.json(
       { error: t('community.write.titleBodyRequired') },
       { status: 400 },
@@ -650,8 +652,11 @@ export async function PATCH(request: Request, context: RouteContext) {
     } catch (creditError) {
       console.error('Community credit award (post update) error:', creditError)
     }
-    // 판매완료: the listing's inquiry threads become read only
-    if (saved.categoryId === 'marketplace' && saved.marketStatus === 'sold') await closeThreadsForPost(saved.id)
+    // 판매완료: the listing's inquiry threads become read only; back on sale: they open again
+    if (saved.categoryId === 'marketplace') {
+      if (saved.marketStatus === 'sold') await closeThreadsForPost(saved.id)
+      else if (existing.marketStatus === 'sold') await reopenThreadsForPost(saved.id)
+    }
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),
     })
@@ -696,6 +701,8 @@ export async function DELETE(request: Request, context: RouteContext) {
     if (!ok) {
       return NextResponse.json({ error: t('community.deleteFailed') }, { status: 500 })
     }
+    // 중고거래: the deleted listing's inquiry threads become read only
+    if (existing.categoryId === 'marketplace') await closeThreadsForPost(id)
     try {
       const { onPostDeleted } = await import('@lib/points/facade.server')
       await onPostDeleted({ uid: user.uid, postId: id })

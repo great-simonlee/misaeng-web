@@ -4,7 +4,12 @@ import { COMMUNITY_REPORT_REASONS } from '@lib/constants/communityEngagement'
 import type { CommunityReportReason } from '@/types/nyc'
 import { createCommunityReport } from '@lib/community/reports.server'
 import { notifyTeamOfCommunityReport } from '@lib/erp/notifyCommunityReport'
-import { InquiryError, inquiryCounterpart, recentInquiryMessages } from '@lib/marketplace/inquiries.server'
+import {
+  InquiryError,
+  inquiryCounterpart,
+  markInquiryReported,
+  recentInquiryMessages,
+} from '@lib/marketplace/inquiries.server'
 import { getStoredCommunityPost } from '@lib/supabase/community.server'
 import { resolveAuthenticatedUser } from '../../../../agent-auth/lib/authHelpers'
 
@@ -35,7 +40,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       .map((m) => `${m.sender_id === user.uid ? 'Reporter' : other.nickname || 'Other'}: ${m.body.slice(0, 160)}`)
       .join('\n')
     const note = String(body.detail || '').trim().slice(0, 500)
-    const detail = [`[중고거래 대화] ${other.nickname || other.uid}`, note, transcript].filter(Boolean).join('\n').slice(0, 2000)
+    // Says plainly that this is a 중고거래 conversation (not a comment), with whom and about which listing
+    const header = `[중고거래 대화 신고 / Marketplace conversation] ${other.nickname || other.uid} · ${post?.title ?? other.thread.post_id} · inquiry ${id}`
+    const detail = [header, note, transcript].filter(Boolean).join('\n').slice(0, 2000)
     const result = await createCommunityReport({
       targetType: 'comment',
       targetId: id,
@@ -48,12 +55,13 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       authorUid: other.uid,
     })
     if (!result.ok) return NextResponse.json({ error: 'Already reported.', code: 'duplicate' }, { status: 409 })
+    await markInquiryReported(id, reason)
     await notifyTeamOfCommunityReport({
       targetType: 'comment',
       targetId: id,
       postId: other.thread.post_id,
-      postTitle: post?.title ?? null,
-      commentPreview: `[중고거래 대화] ${messages.at(-1)?.body ?? ''}`,
+      postTitle: `[중고거래 대화] ${post?.title ?? other.thread.post_id}`,
+      commentPreview: `[중고거래 대화 신고 / Marketplace conversation] ${messages.at(-1)?.body ?? ''}`,
       board: 'marketplace',
       reason,
       detail,
