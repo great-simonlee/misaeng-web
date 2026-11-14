@@ -38,3 +38,6 @@ alter table public.marketplace_inquiries enable row level security;
 alter table public.marketplace_inquiry_messages enable row level security;
 grant select, insert, update, delete on public.marketplace_inquiries to service_role;
 grant select, insert, update, delete on public.marketplace_inquiry_messages to service_role;
+
+-- 2026-11-14: per-sender daily message limit
+create index if not exists marketplace_inquiry_messages_sender_idx on public.marketplace_inquiry_messages (sender_id, created_at desc);
