@@ -139,8 +139,8 @@ export async function replyInThread(input: { uid: string; inquiryId: string; bod
   const thread = await threadFor(input.uid, input.inquiryId)
   if (thread.status === 'closed') throw new InquiryError('closed')
   const other = thread.seller_id === input.uid ? thread.buyer_id : thread.seller_id
-  const blocked = await getViewerBlockedUids(other)
-  if (blocked.has(input.uid)) throw new InquiryError('blocked', 403)
+  const [blockedByOther, blockedByMe] = await Promise.all([getViewerBlockedUids(other), getViewerBlockedUids(input.uid)])
+  if (blockedByOther.has(input.uid) || blockedByMe.has(other)) throw new InquiryError('blocked', 403)
   await addMessage(thread, input.uid, body)
   const post = await getStoredCommunityPost(thread.post_id).catch(() => null)
   pushMessage({ to: other, inquiryId: thread.id, postId: thread.post_id, title: post?.title ?? '', body, first: false })
@@ -227,4 +227,19 @@ export async function closeThreadsForPost(postId: string) {
     prefer: 'return=minimal',
     body: JSON.stringify({ status: 'closed' }),
   }).catch(() => null)
+}
+
+/** The other person in one of the viewer's threads (block / report from the conversation). */
+export async function inquiryCounterpart(uid: string, inquiryId: string) {
+  const thread = await threadFor(uid, inquiryId)
+  const other = thread.seller_id === uid ? thread.buyer_id : thread.seller_id
+  return { thread, uid: other, nickname: await nickname(other) }
+}
+
+/** Last few messages of a thread, oldest first (what the team sees with a report). */
+export async function recentInquiryMessages(inquiryId: string, limit = 6) {
+  const rows = await pointsRest<MessageRow[]>(
+    `marketplace_inquiry_messages?inquiry_id=eq.${enc(inquiryId)}&select=*&order=created_at.desc&limit=${limit}`,
+  )
+  return (rows ?? []).reverse()
 }

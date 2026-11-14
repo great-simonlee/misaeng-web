@@ -18,6 +18,7 @@ import {
 import { listStoredCommunityComments } from '@lib/supabase/communityComments.server'
 import { chatCounterpartUid } from '@lib/points/coffeeChatMentors.server'
 import { questionCounterpartUid } from '@lib/points/reviewQuestions.server'
+import { inquiryCounterpart } from '@lib/marketplace/inquiries.server'
 import {
   getSupabaseProfile,
   upsertSupabaseProfile,
@@ -68,6 +69,8 @@ type CreateBody = {
   commentId?: string | null
   reviewQuestionId?: string
   coffeeChatId?: string
+  /** 중고거래 conversation: blocks the other person in it */
+  marketInquiryId?: string
 }
 
 export async function POST(request: Request) {
@@ -87,7 +90,8 @@ export async function POST(request: Request) {
   const commentId = String(payload?.commentId || '').trim()
   const questionId = String(payload?.reviewQuestionId || '').trim()
   const chatId = String(payload?.coffeeChatId || '').trim()
-  if ((!postId || postId.startsWith('mock-')) && !questionId && !chatId) {
+  const inquiryId = String(payload?.marketInquiryId || '').trim()
+  if ((!postId || postId.startsWith('mock-')) && !questionId && !chatId && !inquiryId) {
     return NextResponse.json({ error: t('community.blocks.targetNotFound') }, { status: 404 })
   }
 
@@ -95,7 +99,12 @@ export async function POST(request: Request) {
     let targetUid = ''
     let label: string | null = null
     let anonymous = false
-    if (questionId || chatId) {
+    if (inquiryId) {
+      // 중고거래 대화: 참여자만, 상대방은 서버에서만 찾는다
+      const other = await inquiryCounterpart(user.uid, inquiryId).catch(() => null)
+      targetUid = other?.uid || ''
+      label = other?.nickname || null
+    } else if (questionId || chatId) {
       // 후기 질문·커피챗: 참여자만, 상대방 uid는 서버에서만 찾는다
       targetUid =
         (questionId
