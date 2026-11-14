@@ -208,7 +208,10 @@ export async function listThreads(uid: string, box: 'buying' | 'selling' | 'all'
     `marketplace_inquiries?${who}${postId ? `&post_id=eq.${enc(postId)}` : ''}` +
       '&select=*&order=last_message_at.desc&limit=100',
   )
-  return Promise.all((rows ?? []).map((row) => toThread(row, uid)))
+  // Conversations with someone the viewer blocked leave the list
+  const blocked = await getViewerBlockedUids(uid)
+  const visible = (rows ?? []).filter((row) => !blocked.has(row.seller_id === uid ? row.buyer_id : row.seller_id))
+  return Promise.all(visible.map((row) => toThread(row, uid)))
 }
 
 /** Unread messages across all the viewer's threads (the tab badge). */
