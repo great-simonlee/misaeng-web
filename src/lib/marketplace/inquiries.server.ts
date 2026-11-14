@@ -91,6 +91,8 @@ function pushMessage(input: { to: string; inquiryId: string; postId: string; tit
       data: { type: 'marketplace_inquiry', inquiryId: input.inquiryId, postId: input.postId },
       threadId: `marketplace-${input.inquiryId}`,
     }),
+    // Bell on Home: one row per conversation (latest message), not one per message
+    replaceThread: true,
   })
 }
 

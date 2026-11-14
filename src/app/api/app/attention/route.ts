@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { getRequestT } from '@lib/i18n/server'
 import { assertCoffeeChatEnabled, listChats } from '@lib/points/coffeeChatMentors.server'
 import { listQuestions } from '@lib/points/reviewQuestions.server'
+import { unreadCount as marketUnreadCount } from '@lib/marketplace/inquiries.server'
 import { appBadgeCount } from '@lib/push/badge.server'
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic'
  * - coffeeChats: received requests waiting for my times + sent chats waiting for me to pick a time
  *   (coffeeChatsReceived = the received part, so the app opens the 받은 tab first)
  * - careerQuestions: questions on my reviews waiting for my answer
+ * - marketInquiries: unread 중고거래 messages (sent + received threads; the 문의함 button and My page)
  * - badge: unread notifications + unread messages (the app icon number)
  */
 export async function GET(request: Request) {
@@ -35,9 +37,10 @@ export async function GET(request: Request) {
   }
   const careerQuestions = async () =>
     (await listQuestions(uid, 'received')).filter((question) => question.status === 'pending').length
-  const [chats, questions, badge] = await Promise.all([
+  const [chats, questions, market, badge] = await Promise.all([
     coffeeChats().catch(() => ({ received: 0, sent: 0 })),
     careerQuestions().catch(() => 0),
+    marketUnreadCount(uid).catch(() => 0),
     appBadgeCount(uid),
   ])
   return NextResponse.json(
@@ -45,6 +48,7 @@ export async function GET(request: Request) {
       coffeeChats: chats.received + chats.sent,
       coffeeChatsReceived: chats.received,
       careerQuestions: questions,
+      marketInquiries: market,
       badge,
     },
     { headers: { 'Cache-Control': 'no-store' } },
