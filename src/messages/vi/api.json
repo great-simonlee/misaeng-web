@@ -267,6 +267,9 @@
     "contentBlocked": "Nội dung có từ ngữ không được phép (chửi thề, phát ngôn thù ghét hoặc quấy rối tình dục). Vui lòng sửa lại rồi thử lại.",
     "moderation": {
       "hidden": "Nội dung này đã bị ẩn do bị báo cáo hoặc không còn khả dụng."
+    },
+    "marketplace": {
+      "zipRequired": "Vui lòng nhập mã ZIP 5 chữ số cho khu vực giao dịch."
     }
   },
   "guest": {

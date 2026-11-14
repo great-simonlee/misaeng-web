@@ -76,7 +76,7 @@ import {
   normalizeWaitMinutes,
 } from '@lib/community/food'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
-import { normalizeMarketCategory, normalizeMarketPrice } from '@lib/community/marketplace'
+import { MARKET_PHOTO_MAX, normalizeMarketCategory, normalizeMarketPrice, normalizeMarketZip } from '@lib/community/marketplace'
 import {
   isCommunityStorageConfigured,
   enrichCommunityListPosts,
@@ -364,8 +364,13 @@ export async function POST(request: Request) {
   const menuItems = isFood ? normalizeFoodMenuItems(body?.menuItems) : []
   const galleryPhotos =
     isFood || isRoommate || isMarket
-      ? normalizeFoodGalleryPhotos(body?.galleryPhotos)
+      ? normalizeFoodGalleryPhotos(body?.galleryPhotos).slice(0, isMarket ? MARKET_PHOTO_MAX : undefined)
       : []
+  // 중고거래: 위치는 ZIP 코드만 (정확한 주소는 받지 않는다)
+  const marketZip = isMarket ? normalizeMarketZip(body?.location) : null
+  if (isMarket && !marketZip) {
+    return NextResponse.json({ error: t('community.marketplace.zipRequired') }, { status: 400 })
+  }
   const partySize = isFood ? normalizePartySize(body?.partySize) : null
   const totalSpend = isFood ? normalizeTotalSpend(body?.totalSpend) : null
   const tipIncluded = isFood ? normalizeTipIncluded(body?.tipIncluded) : null
@@ -653,7 +658,7 @@ export async function POST(request: Request) {
     title,
     contentHtml,
     description: htmlToPlainText(contentHtml).slice(0, 240),
-    location: String(body?.location || '').trim() || (placeName ?? ''),
+    location: marketZip ?? (String(body?.location || '').trim() || (placeName ?? '')),
     detail: isCptOpt
       ? getCptOptTypeLabel(cptOptType)
       : isJobReview

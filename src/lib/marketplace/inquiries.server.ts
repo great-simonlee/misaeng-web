@@ -198,10 +198,12 @@ export async function openThread(uid: string, inquiryId: string) {
 }
 
 /** The viewer's threads: as a buyer (보낸 문의) or as a seller (받은 문의), newest message first. */
-export async function listThreads(uid: string, box: 'buying' | 'selling', postId?: string) {
-  const column = box === 'selling' ? 'seller_id' : 'buyer_id'
+export async function listThreads(uid: string, box: 'buying' | 'selling' | 'all', postId?: string) {
+  // all: 보낸 문의와 받은 문의를 한 목록으로 (카톡 대화 목록처럼 최근 메시지 순)
+  const who =
+    box === 'all' ? `or=(seller_id.eq.${enc(uid)},buyer_id.eq.${enc(uid)})` : `${box === 'selling' ? 'seller_id' : 'buyer_id'}=eq.${enc(uid)}`
   const rows = await pointsRest<InquiryRow[]>(
-    `marketplace_inquiries?${column}=eq.${enc(uid)}${postId ? `&post_id=eq.${enc(postId)}` : ''}` +
+    `marketplace_inquiries?${who}${postId ? `&post_id=eq.${enc(postId)}` : ''}` +
       '&select=*&order=last_message_at.desc&limit=100',
   )
   return Promise.all((rows ?? []).map((row) => toThread(row, uid)))

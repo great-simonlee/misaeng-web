@@ -56,7 +56,13 @@ import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/content
 import { CONTENT_HIDDEN_CODE, isModerationHidden, reportKey } from '@lib/community/moderation'
 import { getViewerReportedKeys } from '@lib/community/reports.server'
 import { isAnonymousBoard, isMisaengEmail, isStatusCommunityBoard } from '@lib/constants/nyc'
-import { normalizeMarketCategory, normalizeMarketPrice, normalizeMarketStatus } from '@lib/community/marketplace'
+import {
+  MARKET_PHOTO_MAX,
+  normalizeMarketCategory,
+  normalizeMarketPrice,
+  normalizeMarketStatus,
+  normalizeMarketZip,
+} from '@lib/community/marketplace'
 import { closeThreadsForPost } from '@lib/marketplace/inquiries.server'
 import {
   deleteStoredCommunityPost,
@@ -278,8 +284,13 @@ export async function PATCH(request: Request, context: RouteContext) {
     : []
   const galleryPhotos =
     isFood || isRoommate || isMarket
-      ? normalizeFoodGalleryPhotos(body.galleryPhotos ?? existing.galleryPhotos)
+      ? normalizeFoodGalleryPhotos(body.galleryPhotos ?? existing.galleryPhotos).slice(0, isMarket ? MARKET_PHOTO_MAX : undefined)
       : []
+  // 중고거래: 위치는 ZIP 코드만. 예전 글의 동네 이름은 위치를 바꾸지 않으면 그대로 둔다
+  const marketZip = isMarket && body.location !== undefined ? normalizeMarketZip(body.location) : null
+  if (isMarket && body.location !== undefined && !marketZip) {
+    return NextResponse.json({ error: t('community.marketplace.zipRequired') }, { status: 400 })
+  }
   const partySize = isFood
     ? normalizePartySize(body.partySize ?? existing.partySize)
     : null
@@ -566,7 +577,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     title,
     contentHtml,
     description: htmlToPlainText(contentHtml).slice(0, 240),
-    location: String(body.location ?? existing.location).trim() || (placeName ?? ''),
+    location: marketZip ?? (String(body.location ?? existing.location).trim() || (placeName ?? '')),
     detail: isCptOpt
       ? getCptOptTypeLabel(cptOptType)
       : isJobReview

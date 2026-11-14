@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * 중고거래 문의 (app; supabase/marketplace_inquiries.sql)
- *   GET  ?box=buying|selling[&postId=]  → { threads }   the viewer's threads (보낸 / 받은 문의)
+ *   GET  ?box=all|buying|selling[&postId=] → { threads } the viewer's threads (all = 보낸 + 받은, newest first)
  *   GET  ?unread=1                       → { unread }    unread messages in all threads
  *   POST { postId, body }                → { inquiryId } buyer → seller (opens the thread on first contact)
  */
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   const params = new URL(request.url).searchParams
   try {
     if (params.get('unread') === '1') return NextResponse.json({ unread: await unreadCount(user.uid) })
-    const box = params.get('box') === 'selling' ? 'selling' : 'buying'
+    const box = params.get('box') === 'selling' ? 'selling' : params.get('box') === 'all' ? 'all' : 'buying'
     const postId = params.get('postId')?.trim() || undefined
     return NextResponse.json({ threads: await listThreads(user.uid, box, postId) })
   } catch (error) {

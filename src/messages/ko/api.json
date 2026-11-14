@@ -273,6 +273,9 @@
     "contentBlocked": "욕설·혐오·성적 괴롭힘 등 허용되지 않는 표현이 있어요. 내용을 고친 뒤 다시 시도해 주세요.",
     "moderation": {
       "hidden": "신고로 숨겨졌거나 볼 수 없는 글이에요."
+    },
+    "marketplace": {
+      "zipRequired": "거래 지역 ZIP 코드 5자리를 입력해 주세요."
     }
   },
   "guest": {

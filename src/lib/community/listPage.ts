@@ -71,7 +71,7 @@ export function statusTypeOf(post: Pick<CommunityPost, 'cptOptType' | 'detail'>)
 export type ListFilters = {
   /** 익명: 주제 (post.location) */
   topic?: string
-  /** 맛집: foodCategory · 중고거래: marketCategory */
+  /** 맛집: foodCategory · 중고거래: marketCategory (free = 나눔) */
   category?: string
   /** 맛집: 요리 종류 */
   cuisine?: string
@@ -79,7 +79,7 @@ export type ListFilters = {
   type?: string
   /** 비자: 작성자 학교 id */
   school?: string
-  /** 중고거래: 판매완료 숨기기 */
+  /** 예전 앱의 판매완료 숨기기 (이제 중고거래 목록은 늘 판매완료를 뺀다) */
   active?: boolean
 }
 
@@ -97,8 +97,13 @@ export function readListFilters(params: URLSearchParams): ListFilters {
 
 export function matchesListFilters(post: CommunityPost, board: string | undefined, filters: ListFilters): boolean {
   if (filters.topic && post.location !== filters.topic) return false
-  // 맛집 분위기 / 중고거래 카테고리
-  if (filters.category && (board === 'marketplace' ? post.marketCategory : post.foodCategory) !== filters.category) return false
+  if (board === 'marketplace') {
+    // 판매완료는 목록에 안 나온다 (상세·문의는 그대로). "free" 탭 = 가격 0 (나눔), 카테고리와 상관없이
+    if (post.marketStatus === 'sold') return false
+    if (filters.category === 'free') {
+      if ((post as { price?: number | null }).price !== 0) return false
+    } else if (filters.category && post.marketCategory !== filters.category) return false
+  } else if (filters.category && post.foodCategory !== filters.category) return false
   if (filters.active && post.marketStatus === 'sold') return false
   if (filters.cuisine && cuisineIdOf(post) !== filters.cuisine) return false
   if (filters.type) {

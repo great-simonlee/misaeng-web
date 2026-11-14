@@ -273,6 +273,9 @@
     "contentBlocked": "Your text contains language that isn’t allowed (profanity, hate speech or sexual harassment). Please edit it and try again.",
     "moderation": {
       "hidden": "This content was hidden after reports or is no longer available."
+    },
+    "marketplace": {
+      "zipRequired": "Enter a 5-digit ZIP code for the pickup area."
     }
   },
   "guest": {
