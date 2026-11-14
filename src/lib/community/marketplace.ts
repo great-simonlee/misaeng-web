@@ -8,6 +8,15 @@ export type MarketStatus = (typeof MARKET_STATUSES)[number]
 
 export const MARKET_PRICE_MAX = 100_000
 
+/** 받는 결제 방법 (여러 개). 순서는 이 목록 순서로 저장한다 */
+export const MARKET_PAYMENTS = ['cash', 'zelle', 'venmo', 'other'] as const
+export type MarketPayment = (typeof MARKET_PAYMENTS)[number]
+
+export function normalizeMarketPayments(value: unknown): MarketPayment[] {
+  const picked = new Set(Array.isArray(value) ? value.map(String) : [])
+  return MARKET_PAYMENTS.filter((id) => picked.has(id))
+}
+
 /** 사진은 최대 6장 (앱도 6장까지만 고르게 한다) */
 export const MARKET_PHOTO_MAX = 6
 

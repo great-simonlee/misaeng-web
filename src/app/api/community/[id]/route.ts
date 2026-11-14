@@ -59,6 +59,7 @@ import { isAnonymousBoard, isMisaengEmail, isStatusCommunityBoard } from '@lib/c
 import {
   MARKET_PHOTO_MAX,
   normalizeMarketCategory,
+  normalizeMarketPayments,
   normalizeMarketPrice,
   normalizeMarketStatus,
   normalizeMarketZip,
@@ -92,6 +93,7 @@ interface RouteContext {
 type UpdateBody = {
   price?: number | string | null
   marketCategory?: string
+  marketPayments?: unknown
   marketStatus?: string
   /** 질문·자유: 닉네임 공개 */
   showNickname?: boolean
@@ -621,6 +623,8 @@ export async function PATCH(request: Request, context: RouteContext) {
           price: body.price === undefined ? (existing.price ?? null) : normalizeMarketPrice(body.price),
           marketCategory:
             body.marketCategory === undefined ? (existing.marketCategory ?? 'other') : normalizeMarketCategory(body.marketCategory),
+          marketPayments:
+            body.marketPayments === undefined ? (existing.marketPayments ?? []) : normalizeMarketPayments(body.marketPayments),
           marketStatus: normalizeMarketStatus(body.marketStatus) ?? existing.marketStatus ?? 'selling',
         }
       : {}),

@@ -315,6 +315,8 @@ export interface CommunityPost extends TranslationFields {
   price?: number | null
   marketCategory?: string | null
   marketStatus?: 'selling' | 'reserved' | 'sold' | null
+  /** 중고거래: 받는 결제 방법 (cash, zelle, venmo, other) */
+  marketPayments?: string[] | null
   /** 프로필 닉네임 (작성 시점 스냅샷) */
   authorNickname: string | null
   /** 프로필 사진 URL (작성 시점 스냅샷) */

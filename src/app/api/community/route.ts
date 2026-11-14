@@ -76,7 +76,13 @@ import {
   normalizeWaitMinutes,
 } from '@lib/community/food'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
-import { MARKET_PHOTO_MAX, normalizeMarketCategory, normalizeMarketPrice, normalizeMarketZip } from '@lib/community/marketplace'
+import {
+  MARKET_PHOTO_MAX,
+  normalizeMarketCategory,
+  normalizeMarketPayments,
+  normalizeMarketPrice,
+  normalizeMarketZip,
+} from '@lib/community/marketplace'
 import {
   isCommunityStorageConfigured,
   enrichCommunityListPosts,
@@ -227,6 +233,7 @@ export async function GET(request: Request) {
 type CreateBody = {
   price?: number | string | null
   marketCategory?: string
+  marketPayments?: unknown
   /** 질문·자유: 닉네임 공개 (기본 익명) */
   showNickname?: boolean
   categoryId?: string
@@ -708,6 +715,7 @@ export async function POST(request: Request) {
       ? {
           price: normalizeMarketPrice(body?.price),
           marketCategory: normalizeMarketCategory(body?.marketCategory),
+          marketPayments: normalizeMarketPayments(body?.marketPayments),
           marketStatus: 'selling' as const,
         }
       : {}),
