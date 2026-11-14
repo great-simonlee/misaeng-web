@@ -53,17 +53,28 @@ async function nickname(uid: string) {
   return (typeof profile?.nickname === 'string' && profile.nickname.trim()) || ''
 }
 
+/** Nickname + profile photo of the other person (conversation list and header). */
+async function person(uid: string) {
+  const profile = await getSupabaseProfile(uid).catch(() => null)
+  return {
+    nickname: (typeof profile?.nickname === 'string' && profile.nickname.trim()) || '',
+    photo: (typeof profile?.photoURL === 'string' && profile.photoURL.trim()) || null,
+  }
+}
+
 /** What one side sees of a thread: the listing, the other person and the unread count. */
 async function toThread(row: InquiryRow, viewer: string) {
   const seller = row.seller_id === viewer
   const post = await getStoredCommunityPost(row.post_id).catch(() => null)
   const other = seller ? row.buyer_id : row.seller_id
+  const them = await person(other)
   return {
     id: row.id,
     postId: row.post_id,
     role: seller ? 'seller' : 'buyer',
     status: row.status,
-    otherNickname: await nickname(other),
+    otherNickname: them.nickname,
+    otherPhoto: them.photo,
     listing: post
       ? {
           title: post.title,
