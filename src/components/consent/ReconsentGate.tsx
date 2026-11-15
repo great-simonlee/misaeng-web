@@ -26,7 +26,7 @@ function isPassthroughPath(pathname: string) {
 
 export function ReconsentGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const { user, loading, sessionLoading } = useAuth()
+  const { user, loading, sessionLoading, logout } = useAuth()
   const { locale } = useConsentLocale()
   const [status, setStatus] = useState<ConsentStatus | null>(null)
   const skip = isPassthroughPath(pathname)
@@ -118,7 +118,15 @@ export function ReconsentGate({ children }: { children: React.ReactNode }) {
         {children}
       </div>
       {blocking && status ? (
-        <ReconsentModal status={status} onAgreed={handleAgreed} />
+        <ReconsentModal
+          status={status}
+          onAgreed={handleAgreed}
+          onDeclined={async () => {
+            // Not agreeing = not using it signed in: sign out; browsing stays open, the modal returns on the next sign-in
+            await logout()
+            setStatus(null)
+          }}
+        />
       ) : null}
     </>
   )

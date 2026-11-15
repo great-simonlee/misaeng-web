@@ -15,5 +15,14 @@
   "reconsentVersions": "이용약관 {terms} · 개인정보처리방침 {privacy}",
   "optOutHint": "중재 옵트아웃: 동의 후 30일 이내 info@misaeng.com 으로 제목 “Arbitration Opt-Out” 이메일을 보내 주세요.",
   "saving": "저장 중…",
-  "defaultSummary": "이용약관 및 개인정보처리방침을 확인해 주세요. 본 약관에는 구속력 있는 개별 중재 합의 및 집단소송 포기 조항이 포함되어 있습니다."
+  "defaultSummary": "이용약관 및 개인정보처리방침을 확인해 주세요. 본 약관에는 구속력 있는 개별 중재 합의 및 집단소송 포기 조항이 포함되어 있습니다.",
+  "reconsentEyebrow": "약관 업데이트",
+  "reconsentVersion": "{version} 버전",
+  "reconsentViewTerms": "이용약관 보기",
+  "reconsentViewPrivacy": "개인정보처리방침 보기",
+  "reconsentDecline": "동의하지 않아요",
+  "reconsentDeclineTitle": "동의하지 않으면 로그아웃돼요",
+  "reconsentDeclineBody": "새 약관에 동의해야 로그인한 상태로 {brand|을/를} 이용할 수 있어요. 로그아웃해도 글은 둘러볼 수 있고, 다시 로그인하면 그때 동의할 수 있어요. 계정 삭제는 misaeng.com/account-deletion 에서 요청할 수 있어요.",
+  "reconsentDeclineConfirm": "로그아웃",
+  "reconsentDeclineCancel": "취소"
 }

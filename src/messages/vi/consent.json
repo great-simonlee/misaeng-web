@@ -15,5 +15,14 @@
   "reconsentVersions": "Điều khoản {terms} · Quyền riêng tư {privacy}",
   "optOutHint": "Từ chối trọng tài: gửi email tới info@misaeng.com trong vòng 30 ngày kể từ khi đồng ý, với tiêu đề “Arbitration Opt-Out”.",
   "saving": "Đang lưu…",
-  "defaultSummary": "Vui lòng xem lại Điều khoản sử dụng và Chính sách quyền riêng tư. Điều khoản này bao gồm thỏa thuận trọng tài cá nhân có tính ràng buộc và điều khoản từ bỏ quyền khởi kiện tập thể."
+  "defaultSummary": "Vui lòng xem lại Điều khoản sử dụng và Chính sách quyền riêng tư. Điều khoản này bao gồm thỏa thuận trọng tài cá nhân có tính ràng buộc và điều khoản từ bỏ quyền khởi kiện tập thể.",
+  "reconsentEyebrow": "Cập nhật điều khoản",
+  "reconsentVersion": "Phiên bản {version}",
+  "reconsentViewTerms": "Xem Điều khoản Sử dụng",
+  "reconsentViewPrivacy": "Xem Chính sách Quyền riêng tư",
+  "reconsentDecline": "Tôi không đồng ý",
+  "reconsentDeclineTitle": "Bạn sẽ bị đăng xuất",
+  "reconsentDeclineBody": "Bạn cần đồng ý với điều khoản mới để sử dụng {brand} khi đã đăng nhập. Bạn vẫn có thể xem bài viết khi đã đăng xuất và đồng ý khi đăng nhập lại. Để xóa tài khoản, hãy truy cập misaeng.com/account-deletion.",
+  "reconsentDeclineConfirm": "Đăng xuất",
+  "reconsentDeclineCancel": "Hủy"
 }
