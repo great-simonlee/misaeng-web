@@ -26,7 +26,7 @@ export const BRAND_APPS = [
   {
     id: 'ellieo',
     name: 'Ellieo',
-    icon: '/img/ellieo_logo.png',
+    icon: '/img/ellieo_app_icon.png',
     languages: 'Vietnamese · English',
     tagline: 'The everyday-life platform for Vietnamese in the U.S.',
     description:

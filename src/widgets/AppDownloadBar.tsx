@@ -13,9 +13,7 @@ export function AppDownloadBar() {
           {/* 두 앱 아이콘을 겹쳐서 (28px) */}
           <span className='flex shrink-0 -space-x-1.5'>
             <Image src='/img/app_icon.png' alt='' width={28} height={28} className='size-7 rounded-lg ring-2 ring-[#0f172a]' aria-hidden />
-            <span className='inline-flex size-7 items-center justify-center overflow-hidden rounded-lg bg-white/95 ring-2 ring-[#0f172a]'>
-              <Image src='/img/ellieo_logo.png' alt='' width={28} height={28} className='size-5 object-contain' aria-hidden />
-            </span>
+            <Image src='/img/ellieo_app_icon.png' alt='' width={28} height={28} className='size-7 rounded-lg ring-2 ring-[#0f172a]' aria-hidden />
           </span>
           <div className='min-w-0'>
             <p className='truncate text-sm font-semibold text-white sm:text-[15px]'>Get the Misaeng &amp; Ellieo apps</p>
