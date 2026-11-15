@@ -409,7 +409,7 @@
         "title": "새 중고거래 문의 · {listing}"
       },
       "message": {
-        "title": "중고거래 메시지 · {listing}"
+        "title": "중고거래 · {listing}"
       }
     }
   },
