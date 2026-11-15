@@ -578,5 +578,9 @@
       "openWeb": "View reply",
       "footer": "This is a send-only address. Please reply on ellieo.com."
     }
+  },
+  "companies": {
+    "nameInvalid": "Check the company name (up to 80 characters, no links).",
+    "tooMany": "You can’t add more companies today. Please try again tomorrow."
   }
 }

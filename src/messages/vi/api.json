@@ -527,5 +527,9 @@
       "openWeb": "Xem phản hồi",
       "footer": "Đây là địa chỉ chỉ gửi. Vui lòng trả lời trên ellieo.com."
     }
+  },
+  "companies": {
+    "nameInvalid": "Vui lòng kiểm tra lại tên công ty (tối đa 80 ký tự, không chứa liên kết).",
+    "tooMany": "Hôm nay bạn không thể thêm công ty nữa. Vui lòng thử lại vào ngày mai."
   }
 }
