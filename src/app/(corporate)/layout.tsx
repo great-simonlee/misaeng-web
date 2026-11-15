@@ -11,11 +11,11 @@ export const metadata: Metadata = {
   icons: { icon: BRAND_CONFIG.assets.favicon },
   title: 'Misaeng & Ellieo | Everyday-Life Platforms for Housing, Roommates, Jobs & Community',
   description:
-    'Misaeng LLC runs Misaeng (Korean · English) and Ellieo (Vietnamese · English), everyday-life platforms for students and professionals in the U.S.: rentals and real estate brokerage, roommate matching, jobs, visa info, a used-goods marketplace and community.',
+    'Misaeng LLC runs Misaeng (Korean · English) and Ellieo (Vietnamese · English), everyday-life platforms for students and professionals in the U.S.: rentals and New York City real estate brokerage, roommate matching, jobs, visa info, a used-goods marketplace and community.',
   openGraph: {
     title: 'Misaeng & Ellieo | Everyday-Life Platforms for Housing, Roommates, Jobs & Community',
     description:
-      'Misaeng LLC runs Misaeng (Korean · English) and Ellieo (Vietnamese · English), everyday-life platforms for students and professionals in the U.S.: rentals and real estate brokerage, roommate matching, jobs, visa info, a used-goods marketplace and community.',
+      'Misaeng LLC runs Misaeng (Korean · English) and Ellieo (Vietnamese · English), everyday-life platforms for students and professionals in the U.S.: rentals and New York City real estate brokerage, roommate matching, jobs, visa info, a used-goods marketplace and community.',
     url: 'https://misaeng.com',
     siteName: 'Misaeng',
     locale: 'en_US',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Misaeng & Ellieo | Everyday-Life Platforms for Housing, Roommates, Jobs & Community',
     description:
-      'Misaeng LLC runs Misaeng (Korean · English) and Ellieo (Vietnamese · English), everyday-life platforms for students and professionals in the U.S.: rentals and real estate brokerage, roommate matching, jobs, visa info, a used-goods marketplace and community.',
+      'Misaeng LLC runs Misaeng (Korean · English) and Ellieo (Vietnamese · English), everyday-life platforms for students and professionals in the U.S.: rentals and New York City real estate brokerage, roommate matching, jobs, visa info, a used-goods marketplace and community.',
     images: ['/twitter-image.png'],
   },
 }

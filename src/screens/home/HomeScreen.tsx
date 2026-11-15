@@ -102,7 +102,7 @@ function IconChat() {
 const SERVICES = [
   {
     title: 'Real Estate Brokerage',
-    body: 'Licensed agents help you find, tour and lease apartments, with verified listings and no surprise fees.',
+    body: 'New York–licensed agents help you find, tour and lease apartments in New York City.',
     Icon: IconHome,
   },
   {
@@ -112,12 +112,12 @@ const SERVICES = [
   },
   {
     title: 'Jobs & Visa',
-    body: 'Open positions, interview reviews, coffee chats with people already working here, and OPT and visa know-how.',
+    body: 'In Misaeng: open positions, interview reviews, coffee chats with people already working here, and OPT and visa know-how.',
     Icon: IconBriefcase,
   },
   {
     title: 'Community & Marketplace',
-    body: 'Boards for every part of life, plus a used-goods marketplace for buying and selling with neighbors.',
+    body: 'Boards for every part of life, plus a used-goods marketplace in the Misaeng app for buying and selling with neighbors.',
     Icon: IconChat,
   },
   {
@@ -196,8 +196,7 @@ export function HomeScreen() {
             <p className='mt-3 text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-4 sm:text-lg'>
               Misaeng LLC runs <strong className='font-semibold text-[var(--foreground)]'>Misaeng</strong> for
               Korean speakers and <strong className='font-semibold text-[var(--foreground)]'>Ellieo</strong> for
-              Vietnamese speakers—both in English too. Housing, roommates, jobs and community in one app, on one
-              account.
+              Vietnamese speakers—both in English too. Housing, roommates and community in one app.
             </p>
           </div>
           <BrandAppCards className='mt-8 sm:mt-12' />
@@ -282,10 +281,9 @@ export function HomeScreen() {
                 New York City first—then we scale
               </h2>
               <p className='mt-2 text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-3 sm:text-base'>
-                Misaeng and Ellieo started in New York City,{' '}
-                <br className='sm:hidden' /> and Misaeng is now live in Boston too.
-                We&apos;re building density and trust one city at a time, with
-                Chicago and LA next.
+                Misaeng&apos;s community is live in New York City and Boston.{' '}
+                <br className='sm:hidden' /> Our housing and brokerage service starts in
+                New York City and grows one city at a time—Boston, Chicago, and LA next.
               </p>
               <div className='mt-4 flex flex-wrap items-center gap-2 sm:mt-5'>
                 <span className='inline-flex items-center gap-1.5 rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)] sm:px-3.5 sm:py-2 sm:text-sm'>

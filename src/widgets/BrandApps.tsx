@@ -15,8 +15,10 @@ export const BRAND_APPS = [
     languages: 'Korean · English',
     tagline: 'The everyday-life platform for Koreans in the U.S.',
     description:
-      'Rentals and real estate brokerage, roommate matching, jobs and visa info, a used-goods marketplace, and a community for students and professionals in New York City and Boston.',
+      'A community for students and professionals in New York City and Boston, with rentals and real estate brokerage through New York–licensed agents in NYC, roommate matching, jobs and visa info, and a used-goods marketplace.',
     accent: '#F64310',
+    /** Small text on white: darker than the brand colour for 4.5:1 contrast */
+    textAccent: '#C2380C',
     appStore: MISAENG_APP_STORE_URL,
     playStore: MISAENG_PLAY_STORE_URL,
     site: { href: '/nyc', label: 'misaeng.com/nyc' },
@@ -28,8 +30,9 @@ export const BRAND_APPS = [
     languages: 'Vietnamese · English',
     tagline: 'The everyday-life platform for Vietnamese in the U.S.',
     description:
-      'Verified rentals and real estate brokerage, roommate matching, jobs and visa info, and a community for Vietnamese students and professionals in New York City.',
+      'Rentals and real estate brokerage through New York–licensed agents, roommate matching, and a community for Vietnamese students and professionals in New York City.',
     accent: '#2f6df6',
+    textAccent: '#2455c4',
     appStore: APP_STORE_URL,
     playStore: PLAY_STORE_URL,
     site: { href: brandConfig('ellieo').productionUrl, label: 'ellieo.com' },
@@ -39,7 +42,8 @@ export const BRAND_APPS = [
 export type BrandApp = (typeof BRAND_APPS)[number]
 
 /** 앱 아이콘 + 이름 + 언어 + 소개 + 스토어 배지 카드 */
-export function BrandAppCard({ app, className }: { app: BrandApp; className?: string }) {
+export function BrandAppCard({ app, className, headingLevel = 3 }: { app: BrandApp; className?: string; headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 2 ? 'h2' : 'h3'
   return (
     <article
       id={app.id}
@@ -58,8 +62,8 @@ export function BrandAppCard({ app, className }: { app: BrandApp; className?: st
           aria-hidden
         />
         <div className='min-w-0'>
-          <h3 className='text-lg font-bold tracking-tight text-[var(--foreground)] sm:text-xl'>{app.name}</h3>
-          <p className='text-xs font-semibold sm:text-sm' style={{ color: app.accent }}>
+          <Heading className='text-lg font-bold tracking-tight text-[var(--foreground)] sm:text-xl'>{app.name}</Heading>
+          <p className='text-xs font-semibold sm:text-sm' style={{ color: app.textAccent }}>
             {app.languages}
           </p>
         </div>
@@ -69,13 +73,13 @@ export function BrandAppCard({ app, className }: { app: BrandApp; className?: st
         {app.description}
       </p>
       <div className='mt-5 flex flex-wrap items-center gap-2.5'>
-        <AppStoreBadge href={app.appStore} />
-        <GooglePlayBadge href={app.playStore} />
+        <AppStoreBadge href={app.appStore} label={`Download ${app.name} on the App Store`} />
+        <GooglePlayBadge href={app.playStore} label={`Get ${app.name} on Google Play`} />
       </div>
       <a
         href={app.site.href}
         className='mt-4 inline-flex items-center gap-1 text-sm font-semibold transition hover:opacity-80'
-        style={{ color: app.accent }}
+        style={{ color: app.textAccent }}
       >
         Visit {app.site.label}
         <span aria-hidden>→</span>
@@ -84,11 +88,11 @@ export function BrandAppCard({ app, className }: { app: BrandApp; className?: st
   )
 }
 
-export function BrandAppCards({ className }: { className?: string }) {
+export function BrandAppCards({ className, headingLevel }: { className?: string; headingLevel?: 2 | 3 }) {
   return (
     <div className={cn('grid gap-4 sm:gap-6 md:grid-cols-2', className)}>
       {BRAND_APPS.map((app) => (
-        <BrandAppCard key={app.id} app={app} />
+        <BrandAppCard key={app.id} app={app} headingLevel={headingLevel} />
       ))}
     </div>
   )

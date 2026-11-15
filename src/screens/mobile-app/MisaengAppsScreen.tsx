@@ -21,7 +21,7 @@ export function MisaengAppsScreen() {
               Rentals and real estate brokerage, roommate matching, jobs and community—on iOS and Android.
             </p>
           </div>
-          <BrandAppCards className='mt-8 sm:mt-12' />
+          <BrandAppCards className='mt-8 sm:mt-12' headingLevel={2} />
         </div>
       </section>
     </div>

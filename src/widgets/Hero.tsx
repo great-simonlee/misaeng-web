@@ -51,7 +51,7 @@ export function Hero() {
           Korean &amp; English, <br className='sm:hidden' />
           <strong className='font-semibold text-white'>Ellieo</strong>{' '}in
           Vietnamese &amp; English. <br />
-          Rentals, real estate brokerage, roommate matching, <br className='sm:hidden' />
+          Rentals, NYC real estate brokerage, roommate matching, <br className='sm:hidden' />
           jobs and community for students and professionals.
         </p>
 
@@ -87,7 +87,7 @@ export function Hero() {
         <div className='mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2.5 text-xs leading-relaxed text-white/85 sm:mt-6 sm:gap-x-6 sm:leading-normal'>
           <span className='flex items-center gap-1.5'>
             <span className='h-1 w-1 rounded-full bg-brand' />
-            Real estate brokerage
+            NYC real estate brokerage
           </span>
           <span className='flex items-center gap-1.5'>
             <span className='h-1 w-1 rounded-full bg-brand' />
