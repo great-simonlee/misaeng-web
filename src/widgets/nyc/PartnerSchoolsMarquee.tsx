@@ -3,8 +3,8 @@
 import Link from 'next/link'
 
 import { MarqueeRow } from '@components'
-import { useCityPath } from '@hooks/useCity'
-import { PARTNER_ORGS } from '@lib/constants/partners'
+import { useCityInfo, useCityPath } from '@hooks/useCity'
+import { PARTNER_ORGS, partnerClubsFor } from '@lib/constants/partners'
 import { useT } from '@lib/i18n/client'
 import { PartnerSchoolLogo } from '@widgets/nyc/PartnerSchoolLogo'
 
@@ -56,11 +56,15 @@ function PartnerItem({
 export function PartnerSchoolsMarquee() {
   const href = useCityPath()
   const t = useT('partners')
+  const city = useCityInfo().id
+  // The city's own club first, then the school associations
+  const partners = [...partnerClubsFor(city).filter((club) => club.city === city), ...PARTNER_ORGS,
+    ...partnerClubsFor(city).filter((club) => club.city !== city)]
   return (
-    <section aria-label={t('schoolsLabel')} className='mt-6'>
+    <section aria-label={t('partnersRowLabel')} className='mt-6'>
       <div className='mb-2.5 flex items-center justify-between gap-3'>
         <p className='text-[11px] font-medium tracking-[0.2em] text-[var(--muted)]'>
-          {t('schoolsLabel')}
+          {t('partnersRowLabel')}
         </p>
         <Link
           href={href('/partners')}
@@ -70,7 +74,7 @@ export function PartnerSchoolsMarquee() {
         </Link>
       </div>
       <MarqueeRow>
-        {PARTNER_ORGS.map((org) => (
+        {partners.map((org) => (
           <PartnerItem
             key={org.id}
             name={t(`orgs.${org.id}.name`)}

@@ -28,6 +28,29 @@ export const PARTNER_ORGS = [
   },
 ] as const
 
+/** 협력 동아리. 도시별로 그 도시 동아리를 먼저 보여 준다 (`partnerClubsFor`). 문구 키 `orgs.<id>.name` */
+export const PARTNER_CLUBS = [
+  {
+    id: 'givo-newyork',
+    shortName: 'GV',
+    handle: 'givo.newyork',
+    logoSrc: '/img/school/givo-newyork.png',
+    city: 'nyc',
+  },
+  {
+    id: 'givo-boston',
+    shortName: 'GV',
+    handle: 'givo.boston',
+    logoSrc: '/img/school/givo-boston.png',
+    city: 'boston',
+  },
+] as const
+
+/** 지금 도시의 동아리가 앞에 오는 협력 동아리 목록 */
+export function partnerClubsFor(city: string) {
+  return [...PARTNER_CLUBS].sort((a, b) => Number(b.city === city) - Number(a.city === city))
+}
+
 /** 문구 키 `influencerPlatforms.<id>.title` / `.description` (partners 네임스페이스) */
 export const INFLUENCER_PLATFORMS = [
   { id: 'instagram' },

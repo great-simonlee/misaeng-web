@@ -78,11 +78,19 @@
     },
     "uw-ksu": {
       "name": "UW Korean Student Union"
+    },
+    "givo-newyork": {
+      "name": "Givo New York"
+    },
+    "givo-boston": {
+      "name": "Givo Boston"
     }
   },
   "orgGroups": {
     "nyc": "New York",
     "boston": "Boston",
     "other": "Other areas"
-  }
+  },
+  "partnersRowLabel": "Partner student groups & clubs",
+  "clubsLabel": "Partner clubs"
 }

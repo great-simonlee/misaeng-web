@@ -78,11 +78,19 @@
     },
     "uw-ksu": {
       "name": "Hội sinh viên Hàn Quốc UW"
+    },
+    "givo-newyork": {
+      "name": "Givo New York"
+    },
+    "givo-boston": {
+      "name": "Givo Boston"
     }
   },
   "orgGroups": {
     "nyc": "New York",
     "boston": "Boston",
     "other": "Khu vực khác"
-  }
+  },
+  "partnersRowLabel": "Hội sinh viên & câu lạc bộ đối tác",
+  "clubsLabel": "Câu lạc bộ đối tác"
 }

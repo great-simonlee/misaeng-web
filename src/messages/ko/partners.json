@@ -78,11 +78,19 @@
     },
     "uw-ksu": {
       "name": "워싱턴대 한인학생회"
+    },
+    "givo-newyork": {
+      "name": "Givo New York"
+    },
+    "givo-boston": {
+      "name": "Givo Boston"
     }
   },
   "orgGroups": {
     "nyc": "New York",
     "boston": "Boston",
     "other": "그 외 지역"
-  }
+  },
+  "partnersRowLabel": "협력 학생회 · 동아리",
+  "clubsLabel": "협력 동아리"
 }
