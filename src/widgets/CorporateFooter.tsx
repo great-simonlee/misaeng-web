@@ -13,7 +13,8 @@ const COMPANY_LINKS = [
 ]
 
 const PRODUCT_LINKS = [
-  { href: '/mobile-app', label: 'Ellieo app' },
+  { href: '/mobile-app#misaeng', label: 'Misaeng app' },
+  { href: '/mobile-app#ellieo', label: 'Ellieo app' },
   { href: '/nyc', label: 'Misaeng NYC community' },
   { href: '/boston', label: 'Misaeng Boston community' },
   { href: brandConfig('ellieo').siteUrl, label: 'Ellieo website', external: true },
@@ -44,8 +45,8 @@ export function CorporateFooter() {
               <span className='text-[15px] font-semibold tracking-tight text-white'>Misaeng</span>
             </Link>
             <p className='mt-2 max-w-sm text-[13px] leading-snug text-white/45'>
-              Misaeng LLC operates Ellieo, the verified housing &amp; roommate app for students and professionals in New
-              York City.
+              Misaeng LLC runs Misaeng (Korean · English) and Ellieo (Vietnamese · English), everyday-life platforms for
+              housing, roommates, jobs and community in the U.S.
             </p>
           </div>
 
@@ -60,7 +61,7 @@ export function CorporateFooter() {
               href='/mobile-app'
               className='inline-flex h-9 items-center justify-center rounded-xl border border-white/15 bg-white/[0.04] px-3.5 text-[13px] font-semibold text-white/85 touch-manipulation transition hover:border-white/30 hover:bg-white/[0.08]'
             >
-              Download Ellieo
+              Download the apps
             </Link>
           </div>
         </div>

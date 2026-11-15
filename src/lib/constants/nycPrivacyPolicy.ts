@@ -6,8 +6,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
   title: 'Privacy Policy',
   titleKo: '개인정보처리방침',
   version: '2026-11-23',
-  lastUpdated: 'October 23, 2026',
-  lastUpdatedKo: '2026년 10월 23일',
+  lastUpdated: 'November 15, 2026',
+  lastUpdatedKo: '2026년 11월 15일',
   effectiveDate: 'November 23, 2026',
   effectiveDateKo: '2026년 11월 23일',
   contactEmail: 'info@misaeng.com',
@@ -126,6 +126,10 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '거래·모집 관련 기재 정보: 룸메이트/서블렛 조건, 연락 방법(이용자가 자발적으로 공개한 경우), 희망 지역·예산 등',
             },
             {
+              en: 'Marketplace listings and inquiry messages: item details, photos, price, accepted payment methods, the ZIP code of the trade area, and messages between buyers and sellers (see Section 5)',
+              ko: '중고거래 등록 글 및 문의 메시지: 물품 정보, 사진, 가격, 받는 결제 방법, 거래 지역 ZIP 코드, 구매자·판매자 간 메시지(제5조 참고)',
+            },
+            {
               en: 'Credit and reward applications: application details, contact information, and scheduling information as needed',
               ko: '크레딧·보상 신청: 신청 내용, 연락용 정보, 일정 조율에 필요한 정보',
             },
@@ -225,9 +229,96 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
       ],
     },
     {
+      id: 'marketplace-privacy',
+      title: '5. Marketplace Information',
+      titleKo: '5. 중고거래 관련 정보',
+      blocks: [
+        {
+          type: 'p',
+          en: 'When you use the Marketplace (the used-goods board described in Section 10 of the Terms of Use), we process the following information in addition to the information described in Section 3:',
+          ko: '이용자가 중고거래(이용약관 제10조에 기재된 중고거래 게시판)를 이용하면, 회사는 제3조에 기재된 정보에 더하여 다음 정보를 처리합니다.',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Listing content: title, description, photos (up to six), category, asking price or “free,” the payment methods you accept (cash, Zelle, Venmo, or other), the ZIP code of the trade area, the listing’s status (selling, reserved, or sold) and its changes, and view counts',
+              ko: '등록 글 내용: 제목, 설명, 사진(최대 6장), 카테고리, 희망 가격 또는 “나눔”, 받는 결제 방법(현금, Zelle, Venmo, 그 외), 거래 지역 ZIP 코드, 거래 상태(판매중·예약중·판매완료)와 그 변경, 조회수',
+            },
+            {
+              en: 'Inquiry conversations: messages between a buyer and a seller about a listing, who sent each message and when, unread counts, and whether the conversation is open or closed',
+              ko: '문의 대화: 등록 글에 관한 구매자·판매자 간 메시지, 각 메시지의 발신자와 시각, 읽지 않은 메시지 수, 대화의 열림·닫힘 상태',
+            },
+            {
+              en: 'Reports and blocks: the reason and details of a report, the most recent messages of a reported conversation, and the Users you block',
+              ko: '신고 및 차단: 신고 사유와 내용, 신고된 대화의 최근 메시지, 이용자가 차단한 사용자',
+            },
+            {
+              en: 'Agreements: when you agree to the community posting guidelines before listing an item, we keep a record of the guidelines version, the time, your account ID and email, IP address, and browser or device information. Your agreement to the safe-trading rules is stored only on your device, for 24 hours, so that you are not asked again, and is not sent to us',
+              ko: '동의 기록: 물품 등록 전 커뮤니티 작성 가이드라인에 동의하면 가이드라인 버전, 동의 시각, 계정 ID와 이메일, IP 주소, 브라우저·기기 정보를 기록합니다. 안전 거래 수칙 동의는 다시 묻지 않도록 이용자 기기에만 24시간 동안 저장되며, 회사로 전송되지 않습니다',
+            },
+            {
+              en: 'Notifications: your device’s push notification token, used to notify you of new inquiries and messages',
+              ko: '알림: 새 문의와 메시지를 알려 드리기 위한 기기의 푸시 알림 토큰',
+            },
+          ],
+        },
+        {
+          type: 'note',
+          en: 'We do not ask for your exact address, and we do not receive or process payment details (such as bank, Zelle, or Venmo account information) for Marketplace trades. Payment happens directly between Users outside the Services.',
+          ko: '회사는 정확한 주소를 요구하지 않으며, 중고거래 결제 정보(은행·Zelle·Venmo 계정 정보 등)를 받거나 처리하지 않습니다. 결제는 서비스 밖에서 이용자 간에 직접 이루어집니다.',
+        },
+        {
+          type: 'p',
+          en: 'What other Users can see:',
+          ko: '다른 이용자에게 보이는 정보:',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Listings—including photos, price, accepted payment methods, status, view count, ZIP code, and the approximate area on a map—are visible to other Users of Misaeng NYC and Ellieo, and to anyone who opens a shared link to the listing, together with your display name and profile photo. Listings may be shown in translation.',
+              ko: '등록 글(사진, 가격, 받는 결제 방법, 거래 상태, 조회수, ZIP 코드, 지도상의 대략적인 지역 포함)은 이용자의 표시 이름·프로필 사진과 함께 Misaeng NYC와 Ellieo의 다른 이용자, 그리고 공유된 링크를 연 누구에게나 보일 수 있으며, 번역문으로 표시될 수 있습니다.',
+            },
+            {
+              en: 'Inquiry messages are visible only to the buyer and the seller in that conversation (each sees the other’s display name and profile photo), and to the Company where needed to operate the Services, review reports, prevent fraud, or comply with law.',
+              ko: '문의 메시지는 해당 대화의 구매자와 판매자(서로의 표시 이름·프로필 사진이 보임)에게만 보이며, 회사는 서비스 운영, 신고 검토, 사기 방지, 법령 준수에 필요한 경우 이를 확인할 수 있습니다.',
+            },
+            {
+              en: 'Anything you write in a listing or message, including contact details, can be seen by the other side. Do not include phone numbers, email addresses, messenger IDs, or home addresses.',
+              ko: '등록 글이나 메시지에 쓴 내용은 연락처를 포함하여 상대방에게 보입니다. 전화번호, 이메일 주소, 메신저 ID, 집 주소는 적지 마세요.',
+            },
+          ],
+        },
+        {
+          type: 'p',
+          en: 'Map and location providers:',
+          ko: '지도 및 위치 제공자:',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'To show a listing’s area on a map, our server sends only the 5-digit ZIP code—not your account information or an address—to the OpenStreetMap Nominatim geocoding service to look up the approximate center of that ZIP code, and caches the result. If that lookup fails, the iOS app may ask Apple’s geocoding service on your device to look up the same ZIP code.',
+              ko: '등록 글의 지역을 지도에 표시하기 위해, 회사 서버는 5자리 ZIP 코드만(계정 정보나 주소는 제외) OpenStreetMap Nominatim 지오코딩 서비스로 보내 해당 ZIP 코드의 대략적인 중심 좌표를 조회하고 그 결과를 캐시합니다. 조회에 실패하면 iOS 앱이 기기에서 Apple의 지오코딩 서비스로 같은 ZIP 코드를 조회할 수 있습니다.',
+            },
+            {
+              en: 'In the apps, the map is displayed by your device’s map service (for example Apple Maps on iOS). When you tap the map or open the area in a maps app such as Apple Maps or Google Maps, the ZIP code or its approximate coordinates are passed to that app, and its provider’s privacy policy applies.',
+              ko: '앱의 지도는 기기의 지도 서비스(예: iOS의 Apple 지도)로 표시됩니다. 지도를 누르거나 Apple 지도·Google 지도 등 지도 앱에서 지역을 열면 ZIP 코드 또는 그 대략적인 좌표가 해당 앱으로 전달되며, 그 제공자의 개인정보처리방침이 적용됩니다.',
+            },
+          ],
+        },
+        {
+          type: 'p',
+          en: 'We use this information to show listings and their approximate trade area, deliver inquiry messages and notifications, translate listings (see Section 8), limit spam, review reports, prevent fraud, enforce the Terms of Use, and cooperate with law enforcement where required. Listings are kept until you delete them or they are removed. Deleting a listing or marking it sold closes its conversations but does not immediately erase them; inquiry conversations are kept for as long as needed to show them to their participants, handle reports and disputes, and prevent fraud, as described in Section 10.',
+          ko: '회사는 이 정보를 등록 글과 대략적인 거래 지역 표시, 문의 메시지·알림 전달, 등록 글 번역(제8조 참고), 스팸 제한, 신고 검토, 사기 방지, 이용약관 집행, 필요한 경우 수사기관 협조에 이용합니다. 등록 글은 이용자가 삭제하거나 운영상 삭제될 때까지 보관됩니다. 등록 글을 삭제하거나 판매완료로 바꾸면 그 대화는 닫히지만 즉시 지워지지는 않으며, 문의 대화는 제10조에 기재된 대로 참여자에게 보여 주고 신고·분쟁에 대응하며 사기를 방지하는 데 필요한 기간 동안 보관됩니다.',
+        },
+      ],
+    },
+    {
       id: 'purpose',
-      title: '5. How We Use Information',
-      titleKo: '5. 이용 목적',
+      title: '6. How We Use Information',
+      titleKo: '6. 이용 목적',
       blocks: [
         {
           type: 'p',
@@ -256,6 +347,10 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
             {
               en: 'Supporting Housing and roommate browsing/submission features',
               ko: '하우징·룸메이트 등 정보 열람·등록 지원',
+            },
+            {
+              en: 'Operating the Marketplace: showing listings and their approximate trade area, delivering inquiry messages and notifications, and investigating reports of fraud or abuse (see Section 5)',
+              ko: '중고거래 운영: 등록 글과 대략적인 거래 지역 표시, 문의 메시지·알림 전달, 사기·부정이용 신고 조사(제5조 참고)',
             },
             {
               en: 'Calculating Community Credits, preventing fraudulent earning, and processing reward applications',
@@ -287,8 +382,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'legal-basis',
-      title: '6. Legal Bases (Where Applicable)',
-      titleKo: '6. 처리의 근거(해당 시)',
+      title: '7. Legal Bases (Where Applicable)',
+      titleKo: '7. 처리의 근거(해당 시)',
       blocks: [
         {
           type: 'p',
@@ -325,8 +420,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'sharing',
-      title: '7. Sharing and Service Providers',
-      titleKo: '7. 제3자 제공 및 처리위탁',
+      title: '8. Sharing and Service Providers',
+      titleKo: '8. 제3자 제공 및 처리위탁',
       blocks: [
         {
           type: 'p',
@@ -343,6 +438,10 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
             {
               en: 'AI translation provider: to translate posts, comments, and listings, the text of that Content (not your account details such as email address) is processed by an AI service provider, currently Anthropic, PBC (United States). We use settings under which this text is not used to train the provider’s models, and we do not send Content that we identify as containing private contact details for translation',
               ko: 'AI 번역 제공자: 게시물·댓글·매물을 번역하기 위해 해당 콘텐츠의 텍스트(이메일 주소 등 계정 정보는 제외)가 AI 서비스 제공자(현재 미국 Anthropic, PBC)에 의해 처리됩니다. 회사는 해당 텍스트가 제공자의 모델 학습에 사용되지 않는 설정을 사용하며, 개인 연락처가 포함된 것으로 확인된 게시물은 번역에 보내지 않습니다',
+            },
+            {
+              en: 'Map, geocoding, and notification providers for the Marketplace: the 5-digit ZIP code of a listing’s trade area (without your account details) is sent to the OpenStreetMap Nominatim geocoding service, and on iOS may be sent to Apple’s geocoding service, to find the approximate center of that ZIP code; maps in the apps are displayed by your device’s map service; and inquiry notifications, which can include the listing title and a preview of the message, are delivered through Apple Push Notification service or Firebase Cloud Messaging (Google) (see Section 5)',
+              ko: '중고거래의 지도·지오코딩·알림 제공자: ZIP 코드 지역의 대략적인 중심 좌표를 찾기 위해 등록 글의 거래 지역 5자리 ZIP 코드(계정 정보 제외)가 OpenStreetMap Nominatim 지오코딩 서비스로, iOS에서는 Apple의 지오코딩 서비스로 전송될 수 있습니다. 앱의 지도는 기기의 지도 서비스로 표시되며, 등록 글 제목과 메시지 미리보기가 포함될 수 있는 문의 알림은 Apple Push Notification service 또는 Firebase Cloud Messaging(Google)을 통해 전달됩니다(제5조 참고)',
             },
             {
               en: 'Partner brokerages and affiliated licensed real-estate professionals (which may include Fact Real Estate or another New York–licensed brokerage): when you inquire about, tour, apply for, or otherwise pursue a housing opportunity involving licensed brokerage activity, we may share information reasonably needed to provide that service—such as your name, email, phone number, preferred neighborhoods/budget/move-in timing, and related inquiry details—with the applicable brokerage and its licensees under their professional and confidentiality obligations',
@@ -375,8 +474,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'cookies',
-      title: '8. Cookies and Similar Technologies',
-      titleKo: '8. 쿠키 및 유사 기술',
+      title: '9. Cookies and Similar Technologies',
+      titleKo: '9. 쿠키 및 유사 기술',
       blocks: [
         {
           type: 'p',
@@ -409,8 +508,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'retention',
-      title: '9. Retention and Deletion',
-      titleKo: '9. 보유 및 파기',
+      title: '10. Retention and Deletion',
+      titleKo: '10. 보유 및 파기',
       blocks: [
         {
           type: 'p',
@@ -441,6 +540,10 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '크레딧·보상 관련 기록: 프로그램 운영·부정 방지에 필요한 기간',
             },
             {
+              en: 'Marketplace listings and inquiry conversations: listings (with their photos and translations) until you delete them or they are removed; inquiry conversations, including closed ones, for as long as needed to show them to their participants, handle reports and disputes, and prevent fraud (see Section 5)',
+              ko: '중고거래 등록 글 및 문의 대화: 등록 글(사진·번역문 포함)은 이용자가 삭제하거나 운영상 삭제될 때까지, 문의 대화(닫힌 대화 포함)는 참여자에게 보여 주고 신고·분쟁에 대응하며 사기를 방지하는 데 필요한 기간 동안(제5조 참고)',
+            },
+            {
               en: 'Licensed real-estate transaction records: records related to New York–licensed brokerage activity (for example inquiry logs, agency/compensation disclosures, showing or application records retained in connection with a transaction) are generally kept for at least three (3) years, or longer if required by the New York Department of State, brokerage policy, or other applicable law',
               ko: '면허 부동산 거래 기록: 뉴욕주 면허 중개 활동과 관련된 기록(문의 로그, 대리·보수 공시, 쇼잉·신청 기록 등)은 일반적으로 최소 3년간, 또는 뉴욕주 Department of State·브로커리지 정책·기타 적용법이 더 긴 기간을 요구하면 그 기간 동안 보관합니다',
             },
@@ -455,8 +558,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'security',
-      title: '10. Security',
-      titleKo: '10. 안전조치',
+      title: '11. Security',
+      titleKo: '11. 안전조치',
       blocks: [
         {
           type: 'p',
@@ -472,20 +575,20 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'international',
-      title: '11. International Transfers',
-      titleKo: '11. 국외 이전',
+      title: '12. International Transfers',
+      titleKo: '12. 국외 이전',
       blocks: [
         {
           type: 'p',
-          en: 'We operate primarily from the United States. Depending on cloud and vendor infrastructure, your information may be transferred to, stored in, or processed in countries other than your country of residence. Where required by applicable law, we work to implement appropriate safeguards (such as contractual clauses). For example, Content sent for translation is processed by our AI translation provider in the United States (see Section 7).',
-          ko: '회사는 미국을 중심으로 서비스를 운영하며, 클라우드·벤더 인프라의 위치에 따라 이용자 정보가 이용자 거주국 외로 이전·저장·처리될 수 있습니다. 이 경우 회사는 적용 법령이 요구하는 범위에서 적절한 보호장치(계약 조항 등)를 마련하기 위해 노력합니다. 예를 들어 번역을 위해 보내는 게시물 텍스트는 미국에 있는 AI 번역 제공자가 처리합니다(제7조 참고).',
+          en: 'We operate primarily from the United States. Depending on cloud and vendor infrastructure, your information may be transferred to, stored in, or processed in countries other than your country of residence. Where required by applicable law, we work to implement appropriate safeguards (such as contractual clauses). For example, Content sent for translation is processed by our AI translation provider in the United States (see Section 8).',
+          ko: '회사는 미국을 중심으로 서비스를 운영하며, 클라우드·벤더 인프라의 위치에 따라 이용자 정보가 이용자 거주국 외로 이전·저장·처리될 수 있습니다. 이 경우 회사는 적용 법령이 요구하는 범위에서 적절한 보호장치(계약 조항 등)를 마련하기 위해 노력합니다. 예를 들어 번역을 위해 보내는 게시물 텍스트는 미국에 있는 AI 번역 제공자가 처리합니다(제8조 참고).',
         },
       ],
     },
     {
       id: 'children',
-      title: '12. Children’s Privacy',
-      titleKo: '12. 아동의 개인정보',
+      title: '13. Children’s Privacy',
+      titleKo: '13. 아동의 개인정보',
       blocks: [
         {
           type: 'p',
@@ -496,8 +599,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'rights',
-      title: '13. Your Rights and Choices',
-      titleKo: '13. 이용자의 권리와 선택',
+      title: '14. Your Rights and Choices',
+      titleKo: '14. 이용자의 권리와 선택',
       blocks: [
         {
           type: 'p',
@@ -551,8 +654,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'ccpa',
-      title: '14. U.S. State Privacy Notice (Including California)',
-      titleKo: '14. 미국 주(州) 프라이버시 고지(캘리포니아 등)',
+      title: '15. U.S. State Privacy Notice (Including California)',
+      titleKo: '15. 미국 주(州) 프라이버시 고지(캘리포니아 등)',
       blocks: [
         {
           type: 'p',
@@ -563,16 +666,16 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
           type: 'ul',
           items: [
             {
-              en: 'Categories collected: identifiers (email, account ID); customer-record-like information; internet/electronic activity; approximate location; user-provided audiovisual/post content; and limited inferences for Service improvement/security — as further described in Section 3',
-              ko: '수집 범주: 식별자(이메일, 계정 ID), 고객 기록에 준하는 정보, 인터넷/전자 활동, 대략적 위치, 이용자가 제공한 시청각·게시 콘텐츠, 추론(제한적, 서비스 개선·보안 목적) 등 — 상세는 제3조와 같습니다.',
+              en: 'Categories collected: identifiers (email, account ID); customer-record-like information; internet/electronic activity; approximate location; user-provided audiovisual/post content; and limited inferences for Service improvement/security — as further described in Sections 3 and 5',
+              ko: '수집 범주: 식별자(이메일, 계정 ID), 고객 기록에 준하는 정보, 인터넷/전자 활동, 대략적 위치, 이용자가 제공한 시청각·게시 콘텐츠, 추론(제한적, 서비스 개선·보안 목적) 등 — 상세는 제3조 및 제5조와 같습니다.',
             },
             {
-              en: 'Purposes of use: as described in Section 5',
-              ko: '이용 목적: 제5조에 기재된 목적',
+              en: 'Purposes of use: as described in Section 6',
+              ko: '이용 목적: 제6조에 기재된 목적',
             },
             {
-              en: 'Disclosure recipients: service providers and other parties described in Section 7',
-              ko: '공개 대상: 제7조의 서비스 제공 업체·법적 요구 등',
+              en: 'Disclosure recipients: service providers and other parties described in Section 8',
+              ko: '공개 대상: 제8조의 서비스 제공 업체·법적 요구 등',
             },
             {
               en: 'Sale: we do not sell personal information',
@@ -597,8 +700,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'automated',
-      title: '15. Automated Decision-Making',
-      titleKo: '15. 자동화된 의사결정',
+      title: '16. Automated Decision-Making',
+      titleKo: '16. 자동화된 의사결정',
       blocks: [
         {
           type: 'p',
@@ -609,8 +712,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'breach',
-      title: '16. Security Incidents',
-      titleKo: '16. 유출 등 사고 대응',
+      title: '17. Security Incidents',
+      titleKo: '17. 유출 등 사고 대응',
       blocks: [
         {
           type: 'p',
@@ -621,8 +724,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'changes',
-      title: '17. Changes to This Policy',
-      titleKo: '17. 방침의 변경',
+      title: '18. Changes to This Policy',
+      titleKo: '18. 방침의 변경',
       blocks: [
         {
           type: 'p',
@@ -633,8 +736,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
     },
     {
       id: 'contact',
-      title: '18. Contact',
-      titleKo: '18. 문의',
+      title: '19. Contact',
+      titleKo: '19. 문의',
       blocks: [
         {
           type: 'p',

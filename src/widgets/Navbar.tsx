@@ -12,7 +12,7 @@ const NAV_LINKS = [
   { href: '/our-service', label: 'Our Service' },
   { href: '/careers', label: 'Careers' },
   { href: '/roadmap', label: 'Roadmap' },
-  { href: '/mobile-app', label: 'Mobile App' },
+  { href: '/mobile-app', label: 'Mobile Apps' },
   { href: '/contact', label: 'Contact' },
 ] as const
 

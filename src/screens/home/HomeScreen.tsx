@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { BrandAppCards } from '@widgets/BrandApps';
 import { Hero } from '@widgets/Hero';
 
 /** 아이콘: 검증 배지 */
@@ -59,10 +60,77 @@ function IconHome() {
   );
 }
 
+/** 아이콘: 서류가방 (취업·비자) */
+function IconBriefcase() {
+  return (
+    <svg
+      className='h-8 w-8 shrink-0'
+      fill='none'
+      viewBox='0 0 24 24'
+      stroke='currentColor'
+      strokeWidth={1.5}
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0'
+      />
+    </svg>
+  );
+}
+
+/** 아이콘: 말풍선 (커뮤니티·중고거래) */
+function IconChat() {
+  return (
+    <svg
+      className='h-8 w-8 shrink-0'
+      fill='none'
+      viewBox='0 0 24 24'
+      stroke='currentColor'
+      strokeWidth={1.5}
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155'
+      />
+    </svg>
+  );
+}
+
+/** 두 플랫폼이 함께 제공하는 서비스 */
+const SERVICES = [
+  {
+    title: 'Real Estate Brokerage',
+    body: 'Licensed agents help you find, tour and lease apartments, with verified listings and no surprise fees.',
+    Icon: IconHome,
+  },
+  {
+    title: 'Roommate Matching',
+    body: 'Get matched by lifestyle, budget and location. Identity verification keeps everyone accountable.',
+    Icon: IconRoommates,
+  },
+  {
+    title: 'Jobs & Visa',
+    body: 'Open positions, interview reviews, coffee chats with people already working here, and OPT and visa know-how.',
+    Icon: IconBriefcase,
+  },
+  {
+    title: 'Community & Marketplace',
+    body: 'Boards for every part of life, plus a used-goods marketplace for buying and selling with neighbors.',
+    Icon: IconChat,
+  },
+  {
+    title: 'Verified & Safe',
+    body: 'School email and identity checks, reporting and blocking, and safety rules built into every flow.',
+    Icon: IconVerified,
+  },
+] as const;
+
 /**
- * 랜딩 페이지
- * - Hero: 유지
- * - 아래: Ellieo 소개 및 생동감 있는 디자인
+ * 회사 사이트 랜딩 페이지 (misaeng.com/)
+ * - Hero: 두 앱 다운로드
+ * - 아래: 미생(한국어·영어)·엘리오(베트남어·영어) 생활 플랫폼 소개와 서비스
  */
 export function HomeScreen() {
   return (
@@ -106,149 +174,75 @@ export function HomeScreen() {
         </div>
       </section>
 
-      {/* About Ellieo — editorial block */}
+      {/* Two platforms — Misaeng (Korean·English) and Ellieo (Vietnamese·English) */}
       <section
-        id='about-ellieo'
+        id='platforms'
         className='relative overflow-hidden bg-[var(--background)] py-12 sm:py-20 md:py-24'
-        aria-labelledby='about-ellieo-title'
+        aria-labelledby='platforms-heading'
       >
         <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <div className='grid gap-8 text-center sm:gap-12 sm:text-left lg:grid-cols-12 lg:gap-16'>
-            <div className='lg:col-span-5'>
-              <span className='inline-block text-[10px] font-semibold uppercase tracking-[0.28em] text-brand'>
-                What is Ellieo?
-              </span>
-              <h2
-                id='about-ellieo-title'
-                className='mt-3 text-2xl font-bold tracking-tight text-[var(--foreground)] sm:mt-4 sm:text-4xl md:text-[2.75rem] md:leading-[1.15]'
-              >
-                Next-gen housing,
-                <br />
-                <span className='text-brand'>built for trust.</span>
-              </h2>
-            </div>
-            <div className='space-y-4 sm:space-y-5 lg:col-span-7 lg:pt-2'>
-              <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base sm:text-lg'>
-                <strong className='font-semibold text-[var(--foreground)]'>
-                  Ellieo
-                </strong>{' '}
-                is Misaeng’s flagship app for
-                <br className='sm:hidden' /> students and professionals in New
-                York City.
-                <br className='sm:hidden' /> We combine verified listings,
-                identity-checked roommates, and scam-resistant flows
-                <br className='sm:hidden' />
-                so you can find a place and roommates.
-              </p>
-              <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base'>
-                No fake ads. No surprise fees.
-                <br className='sm:hidden' />
-                Just transparent, secure housing search
-                <br className='sm:hidden' /> and matching backed by identity
-                verification
-                <br className='sm:hidden' /> and the focus on safety first.
-              </p>
-              <div className='hidden sm:flex flex-wrap justify-center gap-2 pt-1  sm:justify-start sm:gap-3 sm:pt-2'>
-                <span className='rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)] sm:px-4 sm:py-2 sm:text-sm'>
-                  Verified listings
-                </span>
-                <span className='rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)] sm:px-4 sm:py-2 sm:text-sm'>
-                  Identity-checked roommates
-                </span>
-                <span className='rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)] sm:px-4 sm:py-2 sm:text-sm'>
-                  Scam-resistant
-                </span>
-              </div>
-            </div>
+          <div className='mx-auto max-w-3xl text-center'>
+            <span className='inline-block text-[10px] font-semibold uppercase tracking-[0.28em] text-brand'>
+              Our platforms
+            </span>
+            <h2
+              id='platforms-heading'
+              className='mt-3 text-2xl font-bold tracking-tight text-[var(--foreground)] sm:mt-4 sm:text-4xl md:text-[2.75rem] md:leading-[1.15]'
+            >
+              Two everyday-life platforms,
+              <br />
+              <span className='text-brand'>in your language.</span>
+            </h2>
+            <p className='mt-3 text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-4 sm:text-lg'>
+              Misaeng LLC runs <strong className='font-semibold text-[var(--foreground)]'>Misaeng</strong> for
+              Korean speakers and <strong className='font-semibold text-[var(--foreground)]'>Ellieo</strong> for
+              Vietnamese speakers—both in English too. Housing, roommates, jobs and community in one app, on one
+              account.
+            </p>
           </div>
+          <BrandAppCards className='mt-8 sm:mt-12' />
         </div>
       </section>
 
-      {/* Why Ellieo — logo between Why & Ellieo, darker blue highlight */}
+      {/* What you can do — services shared by both platforms */}
       <section
         id='our-service'
-        className='relative overflow-hidden bg-[var(--background)] py-12 sm:py-20 md:py-24'
-        aria-labelledby='why-ellieo-heading'
+        className='relative overflow-hidden border-t border-[var(--border)] bg-[var(--background)] py-12 sm:py-20 md:py-24'
+        aria-labelledby='services-heading'
       >
         <div className='relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <div className='grid gap-8 text-center sm:gap-12 sm:text-left lg:grid-cols-12 lg:gap-16'>
             <div className='lg:col-span-5'>
-              <span className='inline-block text-[10px] font-semibold uppercase tracking-[0.28em] text-[#3478F6]'>
-                Three pillars
+              <span className='inline-block text-[10px] font-semibold uppercase tracking-[0.28em] text-brand'>
+                What we do
               </span>
               <h2
-                id='why-ellieo-heading'
-                className='mt-3 flex flex-wrap items-center justify-center gap-2 text-2xl font-bold tracking-tight text-[var(--foreground)] sm:mt-4 sm:justify-start sm:gap-3 sm:text-4xl md:text-[2.75rem] md:leading-[1.15]'
+                id='services-heading'
+                className='mt-3 text-2xl font-bold tracking-tight text-[var(--foreground)] sm:mt-4 sm:text-4xl md:text-[2.75rem] md:leading-[1.15]'
               >
-                Why
-                <Image
-                  src='/img/ellieo_logo.png'
-                  alt='Ellieo'
-                  width={48}
-                  height={48}
-                  className='h-9 w-9 object-contain sm:h-11 sm:w-11'
-                  aria-hidden
-                />
-                <span className='bg-gradient-to-b from-[#52B5EE] to-[#3478F6] bg-clip-text text-transparent'>
-                  Ellieo?
-                </span>
+                Everything for
+                <br />
+                <span className='text-brand'>life in a new city.</span>
               </h2>
               <p className='mt-3 text-sm text-[var(--muted-foreground)] sm:mt-4 sm:text-lg'>
-                Three pillars that make finding a home
-                <br className='sm:hidden' /> and roommates safer and simpler.
+                From finding a home and roommates
+                <br className='sm:hidden' /> to your first job and your neighbors.
               </p>
             </div>
-            <div className='space-y-6 sm:space-y-8 lg:col-span-7 lg:pt-2'>
-              <div className='space-y-2'>
-                <div className='flex items-center justify-center gap-3 sm:justify-start'>
-                  <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#3478F6]/18 text-[#3478F6] sm:h-10 sm:w-10'>
-                    <IconVerified />
-                  </span>
-                  <h3 className='text-base font-bold text-[var(--foreground)] sm:text-xl'>
-                    Verified Housing
-                  </h3>
+            <div className='grid gap-6 sm:grid-cols-2 sm:gap-8 lg:col-span-7 lg:pt-2'>
+              {SERVICES.map((service) => (
+                <div key={service.title} className='space-y-2'>
+                  <div className='flex items-center justify-center gap-3 sm:justify-start'>
+                    <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/15 text-brand sm:h-10 sm:w-10'>
+                      <service.Icon />
+                    </span>
+                    <h3 className='text-base font-bold text-[var(--foreground)] sm:text-xl'>{service.title}</h3>
+                  </div>
+                  <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base'>
+                    {service.body}
+                  </p>
                 </div>
-                <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base'>
-                  Every listing is vetted. <br className='sm:hidden' />
-                  We verify properties and landlords
-                  <br className='sm:hidden' /> so you avoid scams and hidden
-                  fees
-                  <br className='sm:hidden' />
-                  from search to lease.
-                </p>
-              </div>
-              <div className='space-y-2'>
-                <div className='flex items-center justify-center gap-3 sm:justify-start'>
-                  <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#3478F6]/18 text-[#3478F6] sm:h-10 sm:w-10'>
-                    <IconRoommates />
-                  </span>
-                  <h3 className='text-base font-bold text-[var(--foreground)] sm:text-xl'>
-                    Roommate Matching
-                  </h3>
-                </div>
-                <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base'>
-                  Get matched with roommates
-                  <br className='sm:hidden' /> based on lifestyle, budget, and
-                  location.
-                  <br className='sm:hidden' /> Identity verification keeps
-                  everyone <br className='sm:hidden' /> accountable and safe.
-                </p>
-              </div>
-              <div className='space-y-2'>
-                <div className='flex items-center justify-center gap-3 sm:justify-start'>
-                  <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#3478F6]/18 text-[#3478F6] sm:h-10 sm:w-10'>
-                    <IconHome />
-                  </span>
-                  <h3 className='text-base font-bold text-[var(--foreground)] sm:text-xl'>
-                    Scam Prevention
-                  </h3>
-                </div>
-                <p className='text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base'>
-                  Identity verification and listing checks are built in.{' '}
-                  <br className='sm:hidden' /> No fake ads, no bait-and-switch
-                  <br className='sm:hidden' /> Just transparent, secure housing.
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -288,10 +282,10 @@ export function HomeScreen() {
                 New York City first—then we scale
               </h2>
               <p className='mt-2 text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-3 sm:text-base'>
-                Ellieo is live in New York City.{' '}
-                <br className='sm:hidden' /> We&apos;re building density and trust in
-                one market first, then expanding to Boston, Chicago, and LA. Our
-                roadmap is built for national scale—one city at a time.
+                Misaeng and Ellieo started in New York City,{' '}
+                <br className='sm:hidden' /> and Misaeng is now live in Boston too.
+                We&apos;re building density and trust one city at a time, with
+                Chicago and LA next.
               </p>
               <div className='mt-4 flex flex-wrap items-center gap-2 sm:mt-5'>
                 <span className='inline-flex items-center gap-1.5 rounded-full bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)] sm:px-3.5 sm:py-2 sm:text-sm'>
@@ -340,7 +334,7 @@ export function HomeScreen() {
             id='partners-heading'
             className='text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl md:text-4xl'
           >
-            Partner with Ellieo
+            Partner with Misaeng &amp; Ellieo
           </h2>
           <p className='mt-3 text-sm leading-relaxed text-[var(--muted-foreground)] sm:mt-4 sm:text-base sm:text-lg'>
             Landlords and strategic partners: <br className='sm:hidden' /> we’re
@@ -356,10 +350,6 @@ export function HomeScreen() {
           >
             Partner Inquiry
           </Link>
-          <p className='mt-3 text-xs text-[var(--muted-foreground)] sm:mt-4'>
-            Partner & partnership inquiries{' '}
-            <br className='sm:hidden' /> are handled on Ellieo.
-          </p>
         </div>
       </section>
     </div>
