@@ -78,7 +78,14 @@ export default async function CommunityDetailPage({
   const title = t(`categories.${category.id}.title`)
 
   if (isCommunityBoardWip(board)) {
-    return <CommunityBoardWipScreen boardId={board} title={title} />
+    // 중고거래 is app-only for now: a shared listing link still offers to open the listing in the app
+    // (misaeng-app AppRouter marketplace/<id>).
+    return (
+      <>
+        {board === 'marketplace' ? <OpenInApp appPath={`marketplace/${id}`} /> : null}
+        <CommunityBoardWipScreen boardId={board} title={title} />
+      </>
+    )
   }
 
   const detail = <CommunityDetailScreen boardId={board} title={title} postId={id} />
