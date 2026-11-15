@@ -530,6 +530,7 @@ export function parseMentorInput(body: Record<string, unknown>): MentorInput {
 /** Creates or updates my mentor card. 403 unless the submission is my approved offer verification. */
 export async function saveMentor(uid: string, input: MentorInput): Promise<MyMentorView> {
   const [offers, profile] = await Promise.all([listApprovedOffers(uid), getSupabaseProfile(uid)])
+  if (profile?.accountType === 'parent') throw pointsErrors.parentNotAllowed()
   const offer = offers.find((item) => item.submissionId === input.submissionId)
   if (!offer) {
     throw new PointsError('No approved offer verification', 'points.coffeeChat.mentorNotEligible', 403, undefined, 'MENTOR_NOT_ELIGIBLE')
@@ -772,6 +773,7 @@ export async function requestMentorChat(input: {
     profileOf(mentorId),
     getMentorRow(mentorId).catch(storeError),
   ])
+  if (myProfile?.accountType === 'parent') throw pointsErrors.parentNotAllowed()
   if (pointsTierOf(myProfile) !== 'identity') throw pointsErrors.identityRequired()
   if (
     !mentorRow?.active ||

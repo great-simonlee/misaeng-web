@@ -1,7 +1,7 @@
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import { getRequestT } from '@lib/i18n/server'
 import { pointsErrorResponse, pointsJson } from '@lib/points/http.server'
-import { askQuestion, listQuestions, questionsForPost } from '@lib/points/reviewQuestions.server'
+import { askQuestion, askQuestions, listQuestions, questionsForPost, type AskInput } from '@lib/points/reviewQuestions.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -10,7 +10,10 @@ export const dynamic = 'force-dynamic'
  * Review Q&A (app).
  *   GET ?postId=        → { enabled, count, cost, reward, canAsk, isAuthor, remaining, mine[] } (signed out: count only)
  *   GET ?box=sent|received → { questions[] }
- *   POST { postId, question, topic?, context?, requestKey? } → { question } (20P held; same requestKey → same question)
+ *   POST { postId, question, topic?, context?, requestKey? } → { question } (30P held; same requestKey → same question)
+ *   POST { postId, questions: [{ question, topic?, context?, requestKey? }] (1–3) } → { questions[], failed, question }
+ *        (each question its own 30P hold; 409 INSUFFICIENT_POINTS / MONTHLY_CAP checked for the whole send first;
+ *         403 PARENT_NOT_ALLOWED for parent accounts)
  */
 export async function GET(request: Request) {
   const t = await getRequestT(request, 'api')
@@ -38,6 +41,16 @@ export async function POST(request: Request) {
       topic?: unknown
       context?: unknown
       requestKey?: unknown
+      questions?: unknown
+    }
+    // 1.0.7: { postId, questions: [{ question, topic?, context?, requestKey? }] } — 최대 3개, 질문마다 30P 홀드
+    if (Array.isArray(body.questions)) {
+      const result = await askQuestions({
+        uid: user.uid,
+        postId: String(body.postId || ''),
+        items: body.questions.filter((item): item is AskInput => Boolean(item) && typeof item === 'object'),
+      })
+      return pointsJson({ ...result, question: result.questions[0] ?? null })
     }
     const question = await askQuestion({
       uid: user.uid,

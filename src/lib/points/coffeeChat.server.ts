@@ -47,7 +47,8 @@ export async function requestCoffeeChat(input: {
   mentorId?: string | null
   requestKey?: string | null
 }) {
-  const { tier } = await getPointsProfile(input.uid)
+  const { tier, profile } = await getPointsProfile(input.uid)
+  if (profile?.accountType === 'parent') throw pointsErrors.parentNotAllowed()
   if (tier !== 'identity') throw pointsErrors.identityRequired()
   const config = await getPointsConfig()
   const amount = ruleAmount(config, 'spend.coffee_chat')

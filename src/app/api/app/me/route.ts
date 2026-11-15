@@ -1,6 +1,20 @@
 import { NextResponse } from 'next/server'
 
+import { BRAND_CONFIG } from '@lib/brand'
+import { countHeldPosts } from '@lib/community/heldPosts.server'
+import {
+  canComment,
+  canWritePosts,
+  HELD_POST_LIMIT,
+  isIdentityVerified,
+  isParentAccount,
+  isWriteHeldForApproval,
+  PARENT_WRITE_BOARD,
+} from '@lib/community/schoolGate'
 import { isMisaengEmail } from '@lib/constants/nyc'
+import { getParentInviteSummary, getParentLink } from '@lib/parents/parentInvites.server'
+import { getPointsConfig, ruleAmount } from '@lib/points/config.server'
+import { quizEligibility } from '@lib/quiz/onboardingQuiz.server'
 import { getVerifiedSchool, resolveSchoolFromEmail } from '@lib/constants/schools'
 import { getSchoolRegistry } from '@lib/supabase/schoolRegistry.server'
 import { isPhoneSmsEnabled } from '@lib/constants/verificationSafety'
@@ -47,6 +61,21 @@ export async function GET(request: Request) {
   const workplaceStatus = profile?.workplaceStatus ?? 'none'
   const company = profile?.workplaceCompanyName?.trim() || null
 
+  // 1.0.7: 학부모 계정, 글쓰기 게이트(보류 글), 학부모 초대, 퀴즈 — 앱이 규칙을 따로 만들지 않게 계산해서 내려준다
+  const isParent = isParentAccount(profile)
+  const heldPosts =
+    workplaceStatus === 'pending' || workplaceStatus === 'rejected'
+      ? await countHeldPosts(user.uid).catch(() => 0)
+      : 0
+  const origin = process.env.NODE_ENV === 'production' ? BRAND_CONFIG.siteUrl : new URL(request.url).origin
+  const [parentLink, parentInvite, pointsConfig] = await Promise.all([
+    isParent ? getParentLink(user.uid).catch(() => null) : Promise.resolve(null),
+    // 테이블이 없거나(SQL 전) 실패하면 null — 앱은 카드를 숨긴다
+    isParent ? Promise.resolve(null) : getParentInviteSummary(user.uid, origin).catch(() => null),
+    getPointsConfig().catch(() => null),
+  ])
+  const quiz = quizEligibility(profile)
+
   const nameParts = (user.displayName ?? '').trim().split(/\s+/).filter(Boolean)
   const firstName = profile?.firstName?.trim() || ''
   const profileComplete = Boolean(
@@ -86,6 +115,43 @@ export async function GET(request: Request) {
         email: profile?.workEmail ?? null,
         companyName: company,
         rejectReason: profile?.workplaceRejectReason ?? null,
+        /** 'current' | 'former' (null on requests before 1.0.7 = current) */
+        kind: profile?.workplaceKind ?? (workplaceStatus === 'none' ? null : 'current'),
+        /** 'email' | 'documents' */
+        method: profile?.workplaceMethod ?? (profile?.workEmail ? 'email' : null),
+        /** posts written while pending, waiting for approval (deleted 30 days after a rejection) */
+        heldPosts,
+      },
+      /** 'member' | 'parent' */
+      accountType: isParent ? 'parent' : 'member',
+      /** parent accounts: the student who invited them */
+      parent: parentLink,
+      // What the account may do now (same rules as the server gates in src/lib/community/schoolGate.ts)
+      writeGate: {
+        canWrite: canWritePosts(profile),
+        /** new posts are held until the workplace approval (only the author sees them) */
+        held: isWriteHeldForApproval(profile),
+        heldLimit: HELD_POST_LIMIT,
+        canComment: canComment(profile),
+        /** parents: only this board (질문·자유) */
+        onlyBoard: isParent ? PARENT_WRITE_BOARD : null,
+        canSell: canWritePosts(profile) && !isParent,
+        canCoffeeChat: !isParent && isIdentityVerified(profile),
+        canAskCareerQuestions: !isParent && isIdentityVerified(profile),
+      },
+      // Badges shown on the user's own posts: school name, 직장인 인증 (no company), 학부모
+      badges: {
+        schoolName: schoolName,
+        workplace: workplaceStatus === 'approved',
+        parent: isParent,
+      },
+      /** null for parents or before supabase/release_1_0_7.sql ran */
+      parentInvite,
+      onboardingQuiz: {
+        eligible: quiz.eligible,
+        reason: quiz.reason,
+        completed: Boolean(profile?.onboardingQuizCompletedAt),
+        rewardPoints: pointsConfig ? ruleAmount(pointsConfig, 'earn.onboarding_quiz') : 10,
       },
       // All verified schools (max 3), the main one (used for badges) first.
       schools: listVerifiedSchools(profile).map((entry, index) => ({

@@ -7,14 +7,14 @@ import { pointsTierOf } from './account.server'
 import { getPointsConfig, ruleAmount, ruleCap } from './config.server'
 import { isPointsLedgerActive } from './engine.server'
 import { pointsErrors, PointsError } from './errors'
-import { captureHold, earnPoints, holdPoints, releaseHold } from './ledger.server'
+import { captureHold, earnPoints, getPointsState, holdPoints, releaseHold } from './ledger.server'
 import { notifyReviewQuestion } from './notify.server'
 import { enc, pointsRest, PointsStoreError } from './rest.server'
 
 /**
  * Private career questions to an interview/job review's author (misaeng-app only; supabase/review_questions.sql).
  *   * A reader asks the review's author, with a topic (QUESTION_TOPICS) and optionally their own situation:
- *     spend.review_question is held (20P).
+ *     spend.review_question is held (30P from 1.0.7), per question; up to cap.review_questions_per_send (3) per send.
  *   * The author answers → the hold is captured and the author earns earn.review_answer (10P);
  *     declines → released. Pending questions past expires_at (7 days) are released lazily on every read.
  *   * Text is private to the asker and the author. Anyone sees how many questions a review received (never how many
@@ -184,16 +184,83 @@ export async function questionsForPost(viewer: string | null, postId: string) {
     const recent = rows.filter((r) => Date.parse(r.created_at) >= since).length
     remaining = Math.max(0, (ruleCap(config, 'cap.review_question_monthly') ?? 99) - recent)
   }
+  // 학부모 계정은 커리어 질문을 보낼 수 없다 (1.0.7)
+  const viewerIsParent = viewer ? (await profileOf(viewer))?.accountType === 'parent' : false
   return {
     enabled: true as const,
     count: all.length,
     cost: ruleAmount(config, 'spend.review_question'),
     reward: ruleAmount(config, 'earn.review_answer'),
-    canAsk: Boolean(viewer && post && post.categoryId === 'job-review' && post.authorUid && !isAuthor),
+    canAsk: Boolean(viewer && post && post.categoryId === 'job-review' && post.authorUid && !isAuthor && !viewerIsParent),
     isAuthor,
     remaining,
+    /** 한 번에 보낼 수 있는 질문 수 (각각 cost씩 홀드) */
+    maxPerSend: Math.max(1, Math.min(remaining || 1, ruleCap(config, 'cap.review_questions_per_send') ?? 3)),
+    parentBlocked: viewerIsParent,
     mine,
   }
+}
+
+export type AskInput = { question: string; topic?: unknown; context?: unknown; requestKey?: unknown }
+
+/**
+ * 1.0.7: 같은 후기에 질문 여러 개를 한 번에 (최대 cap.review_questions_per_send = 3). 질문마다 따로 홀드(30P씩)되고,
+ * 답변되면 그 질문만 차감, 거절·만료되면 그 질문만 돌려준다. 월 한도(cap.review_question_monthly)와 잔액을 먼저 확인해
+ * 중간에 실패하지 않게 한다. 그래도 중간에 실패하면 보낸 질문까지만 돌려준다 (failed = 못 보낸 수).
+ */
+export async function askQuestions(input: { uid: string; postId: string; items: AskInput[] }) {
+  const config = await assertReviewQnaEnabled()
+  const items = input.items.slice(0, 10)
+  const perSend = ruleCap(config, 'cap.review_questions_per_send') ?? 3
+  if (items.length === 0) throw err('tooShort', 400, 'QUESTION_TOO_SHORT')
+  if (items.length > perSend) throw err('tooMany', 400, 'TOO_MANY_QUESTIONS')
+  for (const item of items) {
+    if (String(item.question || '').trim().length < 5) throw err('tooShort', 400, 'QUESTION_TOO_SHORT')
+  }
+  const me = await getSupabaseProfile(input.uid)
+  if (me?.accountType === 'parent') throw pointsErrors.parentNotAllowed()
+
+  // 이미 보낸 requestKey(재시도)는 한도·잔액 계산에서 뺀다
+  const fresh: AskInput[] = []
+  for (const item of items) {
+    const key = typeof item.requestKey === 'string' && /^[0-9a-f-]{36}$/i.test(item.requestKey) ? item.requestKey.toLowerCase() : null
+    if (!key || !(await getRow(key))) fresh.push(item)
+  }
+  if (fresh.length > 0) {
+    const since = new Date(Date.now() - 30 * 86_400_000).toISOString()
+    const recent = await rest<{ id: string }[]>(
+      `review_questions?post_id=eq.${enc(input.postId)}&asker_id=eq.${enc(input.uid)}&created_at=gte.${enc(since)}&select=id`,
+    )
+    const cap = ruleCap(config, 'cap.review_question_monthly')
+    if (cap !== null && recent.length + fresh.length > cap) throw pointsErrors.monthlyCap()
+    const amount = ruleAmount(config, 'spend.review_question')
+    if (amount > 0) {
+      if (!(await isPointsLedgerActive())) throw pointsErrors.notActive()
+      const state = await getPointsState(input.uid)
+      if (state.available < amount * fresh.length) throw pointsErrors.insufficient(amount * fresh.length, state.available)
+    }
+  }
+
+  const questions: ReviewQuestionView[] = []
+  for (const item of items) {
+    try {
+      questions.push(
+        await askQuestion({
+          uid: input.uid,
+          postId: input.postId,
+          question: String(item.question || ''),
+          topic: item.topic,
+          context: item.context,
+          requestKey: item.requestKey,
+        }),
+      )
+    } catch (error) {
+      if (questions.length === 0) throw error
+      console.error('Review question (batch) error:', error)
+      break
+    }
+  }
+  return { questions, failed: items.length - questions.length }
 }
 
 export async function askQuestion(input: {
@@ -227,6 +294,7 @@ export async function askQuestion(input: {
   if (authorId === input.uid) throw err('ownReview', 400, 'OWN_REVIEW')
 
   const [me, author] = await Promise.all([getSupabaseProfile(input.uid), profileOf(authorId)])
+  if (me?.accountType === 'parent') throw pointsErrors.parentNotAllowed()
   if (pointsTierOf(me) !== 'identity') throw pointsErrors.identityRequired()
   if (!author || isGone(author) || blocks(author, input.uid) || blocks(me, authorId)) {
     throw err('authorUnavailable', 409, 'AUTHOR_UNAVAILABLE')
