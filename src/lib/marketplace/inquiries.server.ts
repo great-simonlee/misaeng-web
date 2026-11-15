@@ -303,6 +303,15 @@ export async function unreadCount(uid: string) {
   )
 }
 
+/** Account deletion: every thread the person is in (as seller or buyer) goes, messages with it (on delete cascade). */
+export async function deleteThreadsForUser(uid: string) {
+  const id = enc(uid)
+  await pointsRest(`marketplace_inquiries?or=(seller_id.eq.${id},buyer_id.eq.${id})`, {
+    method: 'DELETE',
+    prefer: 'return=minimal',
+  })
+}
+
 /** A listing marked sold (or deleted): its threads become read only. */
 export async function closeThreadsForPost(postId: string) {
   await pointsRest(`marketplace_inquiries?post_id=eq.${enc(postId)}&status=eq.open`, {

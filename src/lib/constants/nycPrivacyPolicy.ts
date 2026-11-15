@@ -5,11 +5,11 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
   eyebrow: 'LEGAL',
   title: 'Privacy Policy',
   titleKo: '개인정보처리방침',
-  version: '2026-11-23',
+  version: '2026-12-15',
   lastUpdated: 'November 15, 2026',
   lastUpdatedKo: '2026년 11월 15일',
-  effectiveDate: 'November 23, 2026',
-  effectiveDateKo: '2026년 11월 23일',
+  effectiveDate: 'December 15, 2026',
+  effectiveDateKo: '2026년 12월 15일',
   contactEmail: 'info@misaeng.com',
   companyName: 'Misaeng LLC',
   companyAddress:
@@ -310,8 +310,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
         },
         {
           type: 'p',
-          en: 'We use this information to show listings and their approximate trade area, deliver inquiry messages and notifications, translate listings (see Section 8), limit spam, review reports, prevent fraud, enforce the Terms of Use, and cooperate with law enforcement where required. Listings are kept until you delete them or they are removed. Deleting a listing or marking it sold closes its conversations but does not immediately erase them; inquiry conversations are kept for as long as needed to show them to their participants, handle reports and disputes, and prevent fraud, as described in Section 10.',
-          ko: '회사는 이 정보를 등록 글과 대략적인 거래 지역 표시, 문의 메시지·알림 전달, 등록 글 번역(제8조 참고), 스팸 제한, 신고 검토, 사기 방지, 이용약관 집행, 필요한 경우 수사기관 협조에 이용합니다. 등록 글은 이용자가 삭제하거나 운영상 삭제될 때까지 보관됩니다. 등록 글을 삭제하거나 판매완료로 바꾸면 그 대화는 닫히지만 즉시 지워지지는 않으며, 문의 대화는 제10조에 기재된 대로 참여자에게 보여 주고 신고·분쟁에 대응하며 사기를 방지하는 데 필요한 기간 동안 보관됩니다.',
+          en: 'We use this information to show listings and their approximate trade area, deliver inquiry messages and notifications, translate listings (see Section 8), limit spam, review reports, prevent fraud, enforce the Terms of Use, and cooperate with law enforcement where required. Listings are kept until you delete them or they are removed. Deleting a listing or marking it sold closes its conversations but does not immediately erase them; inquiry conversations are kept for as long as needed to show them to their participants, handle reports and disputes, and prevent fraud, as described in Section 10. When you delete your account, your listings (with their photos) and every inquiry conversation you took part in, as buyer or seller, are deleted, including the other participant’s copy; a report already sent to us keeps the messages it included.',
+          ko: '회사는 이 정보를 등록 글과 대략적인 거래 지역 표시, 문의 메시지·알림 전달, 등록 글 번역(제8조 참고), 스팸 제한, 신고 검토, 사기 방지, 이용약관 집행, 필요한 경우 수사기관 협조에 이용합니다. 등록 글은 이용자가 삭제하거나 운영상 삭제될 때까지 보관됩니다. 등록 글을 삭제하거나 판매완료로 바꾸면 그 대화는 닫히지만 즉시 지워지지는 않으며, 문의 대화는 제10조에 기재된 대로 참여자에게 보여 주고 신고·분쟁에 대응하며 사기를 방지하는 데 필요한 기간 동안 보관됩니다. 계정을 삭제하면 이용자의 등록 글(사진 포함)과 이용자가 구매자 또는 판매자로 참여한 모든 문의 대화가 상대방에게 보이는 대화까지 함께 삭제됩니다. 다만 이미 접수된 신고에 포함된 메시지는 신고 기록에 남습니다.',
         },
       ],
     },
@@ -540,8 +540,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '크레딧·보상 관련 기록: 프로그램 운영·부정 방지에 필요한 기간',
             },
             {
-              en: 'Marketplace listings and inquiry conversations: listings (with their photos and translations) until you delete them or they are removed; inquiry conversations, including closed ones, for as long as needed to show them to their participants, handle reports and disputes, and prevent fraud (see Section 5)',
-              ko: '중고거래 등록 글 및 문의 대화: 등록 글(사진·번역문 포함)은 이용자가 삭제하거나 운영상 삭제될 때까지, 문의 대화(닫힌 대화 포함)는 참여자에게 보여 주고 신고·분쟁에 대응하며 사기를 방지하는 데 필요한 기간 동안(제5조 참고)',
+              en: 'Marketplace listings and inquiry conversations: listings (with their photos and translations) until you delete them or they are removed; inquiry conversations, including closed ones, for as long as needed to show them to their participants, handle reports and disputes, and prevent fraud (see Section 5); when you delete your account, both are deleted as described in Section 5',
+              ko: '중고거래 등록 글 및 문의 대화: 등록 글(사진·번역문 포함)은 이용자가 삭제하거나 운영상 삭제될 때까지, 문의 대화(닫힌 대화 포함)는 참여자에게 보여 주고 신고·분쟁에 대응하며 사기를 방지하는 데 필요한 기간 동안(제5조 참고). 계정을 삭제하면 둘 다 제5조에 따라 삭제됩니다',
             },
             {
               en: 'Licensed real-estate transaction records: records related to New York–licensed brokerage activity (for example inquiry logs, agency/compensation disclosures, showing or application records retained in connection with a transaction) are generally kept for at least three (3) years, or longer if required by the New York Department of State, brokerage policy, or other applicable law',
