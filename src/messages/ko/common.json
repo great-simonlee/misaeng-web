@@ -209,7 +209,12 @@
     "posting": "미생에서 채용 공고를 공유했어요! 📋",
     "memberOnly": "미생 회원만 볼 수 있어요. 앱에서 확인해보세요.",
     "openInApp": "앱에서 보기",
-    "perMonth": "/월"
+    "perMonth": "/월",
+    "marketplace": "미생 중고거래에 올라온 물건이에요! 🛍️",
+    "marketFree": "나눔",
+    "marketNear": "{zip} 근처",
+    "marketReserved": "예약중",
+    "marketSold": "판매완료"
   },
   "appHandoff": {
     "openApp": "미생 앱에서 열기",

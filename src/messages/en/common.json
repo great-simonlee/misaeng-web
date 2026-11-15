@@ -209,7 +209,12 @@
     "posting": "A job posting shared from Misaeng! 📋",
     "memberOnly": "For Misaeng members. Open it in the app.",
     "openInApp": "Open in app",
-    "perMonth": "/mo"
+    "perMonth": "/mo",
+    "marketplace": "A Misaeng marketplace listing! 🛍️",
+    "marketFree": "Free",
+    "marketNear": "Near {zip}",
+    "marketReserved": "Reserved",
+    "marketSold": "Sold"
   },
   "appHandoff": {
     "openApp": "Open in the Misaeng app",

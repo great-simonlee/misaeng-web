@@ -8,7 +8,7 @@ import { getT } from '@lib/i18n/server'
 /** Misaeng iOS app (com.misaeng.nyc) on the App Store. */
 export const MISAENG_APP_STORE_ID = '6826454902'
 
-export type ShareKind = 'housing' | 'visa' | 'review' | 'company' | 'postings' | 'posting'
+export type ShareKind = 'housing' | 'visa' | 'review' | 'company' | 'postings' | 'posting' | 'marketplace'
 
 const SHARE_IMAGE: Record<ShareKind, string> = {
   housing: '/og/share-housing.png',
@@ -17,6 +17,7 @@ const SHARE_IMAGE: Record<ShareKind, string> = {
   company: '/og/share-default.png',
   postings: '/og/share-default.png',
   posting: '/og/share-default.png',
+  marketplace: '/og/share-default.png',
 }
 
 /**

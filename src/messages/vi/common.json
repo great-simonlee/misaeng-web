@@ -209,7 +209,12 @@
     "posting": "Một tin tuyển dụng được chia sẻ từ Misaeng! 📋",
     "memberOnly": "Dành cho thành viên Misaeng. Mở trong ứng dụng.",
     "openInApp": "Mở trong ứng dụng",
-    "perMonth": "/tháng"
+    "perMonth": "/tháng",
+    "marketplace": "Một món đồ trên chợ Misaeng! 🛍️",
+    "marketFree": "Miễn phí",
+    "marketNear": "Gần {zip}",
+    "marketReserved": "Đã đặt trước",
+    "marketSold": "Đã bán"
   },
   "appHandoff": {
     "openApp": "Mở trong ứng dụng Misaeng",
