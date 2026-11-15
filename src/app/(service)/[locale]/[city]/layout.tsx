@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { connection } from 'next/server'
 
-import { isCityEnabled } from '@lib/cities/availability.server'
+import { isCityEnabled, seesClosedCities } from '@lib/cities/availability.server'
 import { BRAND_CONFIG } from '@lib/brand'
 import { MISAENG_APP_STORE_ID } from '@widgets/nyc/MisaengStoreButtons'
 import { CITY_IDS, isCityId } from '@lib/constants/cities'
@@ -38,7 +38,12 @@ export default async function CityLayout({
   if (city === 'dc') {
     // 설정 조회 실패를 기본값(닫힘)으로 바꾸는 getPointsConfig가 빌드 중 동적 신호까지 삼키지 않도록 먼저 요청 시점으로 넘긴다
     await connection()
-    if (!(await isCityEnabled(city))) notFound()
+    if (!(await isCityEnabled(city))) {
+      // Closed for everyone but the Super Admin (preview before opening)
+      const { resolveAuthenticatedUser } = await import('@/app/api/agent-auth/lib/authHelpers')
+      const user = await resolveAuthenticatedUser().catch(() => null)
+      if (!seesClosedCities(user?.email)) notFound()
+    }
   }
   return children
 }
