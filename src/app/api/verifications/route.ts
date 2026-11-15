@@ -86,9 +86,13 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: t('common.supabaseNotConfigured') }, { status: 503 })
   }
 
-  const postId = new URL(request.url).searchParams.get('postId')?.trim() || ''
+  const params = new URL(request.url).searchParams
+  const postId = params.get('postId')?.trim() || ''
+  // Workplace documents (1.0.7) only for callers that know them (?include=workplace): the 1.0.6 apps have no label for
+  // those kinds (they'd show a raw key) and deleting one there would leave the workplace request pending without files.
+  const withWorkplace = params.get('include') === 'workplace'
   try {
-    const submissions = await listSubmissionsForUser(user.uid)
+    const submissions = (await listSubmissionsForUser(user.uid)).filter((s) => withWorkplace || s.board !== 'workplace')
     const body: ReviewDocListResponse = { submissions: submissions.map(toOwnerSubmission), limits: LIMITS }
     if (postId) {
       const [post, recent] = await Promise.all([

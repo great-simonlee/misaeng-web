@@ -12,6 +12,7 @@ import { cityLoginPath } from '@lib/constants/cities'
 import { useT } from '@lib/i18n/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { MisaengStoreButtons } from '@widgets/nyc/MisaengStoreButtons'
+import { PARENT_APP_READY } from '@lib/parents/constants'
 
 type PublicInvite = {
   code: string
@@ -161,13 +162,16 @@ export function ParentInviteScreen({ code }: { code: string }) {
                 </Link>
               </>
             )}
-            <div className='pt-4'>
-              <p className='mb-2 text-[12px] font-medium text-[var(--muted)]'>{t('orApp')}</p>
-              <MisaengStoreButtons
-                appStoreLabel={tCommon('appHandoff.appStore')}
-                googlePlayLabel={tCommon('appHandoff.googlePlay')}
-              />
-            </div>
+            {/* Store buttons only once the parent-aware app (1.0.7) is live: 1.0.6 blocks parent accounts */}
+            {PARENT_APP_READY ? (
+              <div className='pt-4'>
+                <p className='mb-2 text-[12px] font-medium text-[var(--muted)]'>{t('orApp')}</p>
+                <MisaengStoreButtons
+                  appStoreLabel={tCommon('appHandoff.appStore')}
+                  googlePlayLabel={tCommon('appHandoff.googlePlay')}
+                />
+              </div>
+            ) : null}
           </div>
         ) : (
           <Link

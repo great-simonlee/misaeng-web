@@ -429,7 +429,8 @@
     "alreadyPending": "Chúng tôi đang xét duyệt giấy tờ của bài viết này.",
     "dailyLimit": "Hôm nay bạn không thể tải thêm giấy tờ xác minh. Vui lòng thử lại vào ngày mai.",
     "notFound": "Không tìm thấy lịch sử xác minh.",
-    "deleteFailed": "Không thể xóa tệp ngay. Hệ thống sẽ tự động thử lại."
+    "deleteFailed": "Không thể xóa tệp ngay. Hệ thống sẽ tự động thử lại.",
+    "workplaceNotDeletable": "Không thể xóa giấy tờ xác minh nơi làm việc khi đang được xem xét."
   },
   "points": {
     "notConfigured": "Tính năng điểm chưa sẵn sàng. Vui lòng thử lại sau.",

@@ -16,7 +16,7 @@ async function readJson<T>(res: Response, fallback: string): Promise<T> {
 }
 
 export async function fetchReviewDocs(postId?: string, fallbackError = 'Failed'): Promise<ReviewDocListResponse> {
-  const query = postId ? `?postId=${encodeURIComponent(postId)}` : ''
+  const query = postId ? `?postId=${encodeURIComponent(postId)}` : '?include=workplace'
   const res = await fetch(`/api/verifications${query}`, { credentials: 'include', cache: 'no-store' })
   return readJson<ReviewDocListResponse>(res, fallbackError)
 }

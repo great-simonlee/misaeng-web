@@ -38,6 +38,10 @@ export async function DELETE(request: Request, context: RouteContext) {
     if (!submission || submission.user_id !== user.uid) {
       return NextResponse.json({ error: t('reviewDocs.notFound') }, { status: 404 })
     }
+    // Workplace documents belong to the workplace request (decided in the ERP): not deletable one by one here
+    if (submission.board === 'workplace' && submission.status === 'pending') {
+      return NextResponse.json({ error: t('reviewDocs.workplaceNotDeletable') }, { status: 409 })
+    }
 
     let current = submission
     if (submission.status === 'pending') {

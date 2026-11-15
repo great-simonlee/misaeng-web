@@ -454,7 +454,8 @@
     "alreadyPending": "We're already reviewing documents for this post.",
     "dailyLimit": "You can't upload more verification documents today. Please try again tomorrow.",
     "notFound": "We couldn't find this verification.",
-    "deleteFailed": "We couldn't delete the files right away. We'll keep retrying automatically."
+    "deleteFailed": "We couldn't delete the files right away. We'll keep retrying automatically.",
+    "workplaceNotDeletable": "Workplace documents can't be deleted while they're being reviewed."
   },
   "points": {
     "notConfigured": "Points are not available yet. Please try again later.",
