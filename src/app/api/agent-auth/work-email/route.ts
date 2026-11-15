@@ -17,7 +17,8 @@ import {
   getEllieoBaseUrl,
 } from '../lib/ellieoServer'
 import { WORKPLACE_COMPANY_MAX } from '@lib/constants/workplace'
-import { notifyErpWorkplaceVerification } from '@lib/erp/notifyWorkplaceVerification'
+import { isParentAccount, PARENT_NOT_ALLOWED_CODE } from '@lib/community/schoolGate'
+import { onWorkplaceRequestSubmitted } from '@lib/verification/workplace.server'
 import {
   accountSuspendedResponse,
   getSupabaseProfile,
@@ -134,6 +135,13 @@ export async function POST(request: Request) {
     }
 
     const existing = await getSupabaseProfile(user.uid)
+    // 학부모 계정은 학교·직장 인증을 하지 않는다
+    if (isParentAccount(existing)) {
+      return NextResponse.json(
+        { error: t('parents.verificationNotAllowed'), code: PARENT_NOT_ALLOWED_CODE },
+        { status: 403 },
+      )
+    }
     if (existing?.workplaceStatus === 'approved') {
       return NextResponse.json(
         { error: t('verification.workplaceAlreadyApproved') },
@@ -199,6 +207,9 @@ export async function POST(request: Request) {
         reviewedByEmail: null,
         reviewedAt: null,
         rejectReason: null,
+        method: 'email',
+        workplaceKind: 'current',
+        submissionId: null,
       })
 
       const profile = await upsertSupabaseProfile(user.uid, {
@@ -206,21 +217,19 @@ export async function POST(request: Request) {
         workEmailVerified: true,
         workplaceCompanyName: companyName,
         workplaceStatus: 'pending',
+        workplaceKind: 'current',
+        workplaceMethod: 'email',
+        workplaceSubmissionId: null,
         workplaceRequestId: savedRequest.id,
         workplaceRejectReason: null,
         workplaceReviewedAt: null,
         workplaceReviewedByEmail: null,
       })
 
-      void notifyErpWorkplaceVerification({
-        requestId: savedRequest.id,
-        companyName,
-        workEmail: email,
-        userEmail: savedRequest.userEmail,
-        userNickname: savedRequest.userNickname,
-      })
+      // 운영자 알림 + 거절로 잡혀 있던 보류 글 삭제 예정 해제. 확인된 이메일 = "대기"라 이제 글을 쓸 수 있다 (보류 글)
+      await onWorkplaceRequestSubmitted(savedRequest)
 
-      return NextResponse.json({ ok: true, profile })
+      return NextResponse.json({ ok: true, profile, canWriteHeld: true })
     }
 
     return NextResponse.json({ error: t('common.badRequest') }, { status: 400 })

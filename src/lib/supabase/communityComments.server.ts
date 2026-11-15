@@ -1,3 +1,4 @@
+import { isAnonBadgeKind } from '@lib/community/heldPosts'
 import { pickTranslationFields } from '@lib/translations/content'
 import type { CommunityComment } from '@/types/nyc'
 import { ApiMessageError } from '@lib/i18n/apiError'
@@ -97,6 +98,8 @@ function normalizeComment(raw: unknown): CommunityComment | null {
     authorSchoolId:
       typeof data.authorSchoolId === 'string' ? data.authorSchoolId : null,
     ...(data.authorDeleted === true ? { authorDeleted: true } : {}),
+    // 익명 댓글 배지 종류 (1.0.7부터) — 다시 저장할 때 잃지 않도록
+    ...(isAnonBadgeKind(data.anonBadgeKind) ? { anonBadgeKind: data.anonBadgeKind } : {}),
     createdAt: Number(data.createdAt) || Date.now(),
     updatedAt: Number(data.updatedAt) || Date.now(),
     status: data.status === 'deleted' ? 'deleted' : 'open',

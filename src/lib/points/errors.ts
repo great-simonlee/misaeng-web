@@ -27,6 +27,9 @@ export const pointsErrors = {
   disabled: () => new PointsError('Feature disabled', 'points.featureDisabled', 409, undefined, 'FEATURE_DISABLED'),
   identityRequired: () =>
     new PointsError('School or work verification required', 'points.identityRequired', 403, undefined, 'IDENTITY_VERIFICATION_REQUIRED'),
+  /** 학부모 계정: 커피챗·커리어 질문·멘토 등록·퀴즈 불가 (1.0.7) */
+  parentNotAllowed: () =>
+    new PointsError('Parent accounts cannot do this', 'points.parentNotAllowed', 403, undefined, 'PARENT_NOT_ALLOWED'),
   verificationRequired: () =>
     new PointsError('Verified account required', 'points.verificationRequired', 403, undefined, 'VERIFICATION_REQUIRED'),
 }

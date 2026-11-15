@@ -19,17 +19,25 @@ export type PointRuleDefault = {
 
 export const POINT_RULE_DEFAULTS = {
   // 3.1 sign-up & participation
-  'earn.verify_first_email': { value: 30, enabled: true, public: true, description: 'Welcome: first school OR work verification, once per account' },
+  'earn.verify_first_email': { value: 30, enabled: false, public: true, description: 'Off from 1.0.7: replaced by the fixed 5P verification bonuses below' },
+  // 1.0.7: fixed bonus per verification, once each (max 15P). Workplace ones are paid at ERP approval.
+  'earn.verify_school': { value: 5, enabled: true, public: true, description: 'School email verified, once per account' },
+  'earn.verify_workplace': { value: 5, enabled: true, public: true, description: 'Current workplace approved (work email or documents), once per account' },
+  'earn.verify_former_workplace': { value: 5, enabled: true, public: true, description: 'Former workplace approved (documents), once per account' },
   'earn.verify_second_email': { value: 10, enabled: false, public: true, description: 'Off by decision: additional verifications earn nothing' },
   'earn.verify_instagram': { value: 5, enabled: true, public: true, description: 'Instagram DM verification approved, once per account' },
   'earn.welcome_instagram_only': { value: 10, enabled: false, public: true, description: 'Off by decision' },
-  'earn.onboarding_quiz': { value: 10, enabled: false, public: true, description: 'Quiz content does not exist yet' },
+  'earn.onboarding_quiz': { value: 10, enabled: true, public: true, description: 'All 20 onboarding quiz questions answered correctly (retries allowed), once per account' },
   'earn.profile_complete': { value: 5, enabled: true, public: true, description: 'Required profile fields completed, once' },
   'earn.checkin': { value: 1, enabled: true, public: true, description: 'Daily check-in (America/New_York day)' },
   'earn.checkin_streak7': { value: 3, enabled: true, public: true, description: 'Every 7th consecutive check-in day' },
   'cap.checkin_monthly': { value: 30, enabled: true, public: true, description: 'Max check-in points per month' },
   'earn.referral': { value: 20, enabled: true, public: true, description: 'Referrer, when the referred user completes school/work verification' },
   'cap.referral_monthly': { value: 5, enabled: true, public: true, description: 'Max referral rewards (people) per month' },
+  // 1.0.7 parent invites (src/lib/parents/parentInvites.server.ts)
+  'earn.parent_invite': { value: 30, enabled: true, public: true, description: 'Student, per parent who joined through their invite link, paid rule.parent_invite_delay_days later if the parent account is still in good standing' },
+  'rule.parent_invite_delay_days': { value: 3, enabled: true, public: true, description: 'Days after the parent joins before the invite reward is paid' },
+  'cap.parent_invites': { value: 2, enabled: true, public: true, description: 'Parents one student can invite (lifetime, joined parents count)' },
 
   // 3.2 boards
   'earn.interview.base': { value: 20, enabled: true, public: true, description: '' },
@@ -65,7 +73,8 @@ export const POINT_RULE_DEFAULTS = {
   'quota.free_unlocks_lifetime': { value: 5, enabled: true, public: true, description: 'Lifetime free unlocks per account (Misaeng + Ellieo)' },
   'spend.coffee_chat': { value: 120, enabled: true, public: true, description: 'Held on request, captured on completion / no-show, released on cancel / decline / expiry' },
   'cap.coffee_chat_monthly': { value: 1, enabled: true, public: true, description: 'Coffee chat requests per month (legacy limit)' },
-  'spend.review_question': { value: 20, enabled: true, public: true, description: 'Private question to an interview/job review author. Held on send, captured on answer, released when declined or unanswered in 7 days' },
+  'spend.review_question': { value: 30, enabled: true, public: true, description: 'Per private question to an interview/job review author. Held on send, captured on answer, released when declined or unanswered in 7 days' },
+  'cap.review_questions_per_send': { value: 3, enabled: true, public: true, description: 'Questions one send can carry (each is its own hold)' },
   'earn.review_answer': { value: 10, enabled: true, public: true, description: 'Review author, per answered question' },
   'cap.review_question_monthly': { value: 3, enabled: true, public: true, description: 'Questions one person can send about the same review per 30 days' },
   'spend.housing_post_boost': { value: 50, enabled: true, public: true, description: 'Roommate/sublet post pinned to the top for rule.housing_boost_days' },

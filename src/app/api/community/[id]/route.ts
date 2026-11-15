@@ -54,6 +54,7 @@ import { sanitizeAnonymousCommunityPost } from '@lib/community/anonymous'
 import { BLOCKED_USER_CODE, getViewerBlockedUids } from '@lib/community/blocks.server'
 import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/contentFilter'
 import { CONTENT_HIDDEN_CODE, isModerationHidden, reportKey } from '@lib/community/moderation'
+import { isHeldPost } from '@lib/community/heldPosts'
 import { getViewerReportedKeys } from '@lib/community/reports.server'
 import { isAnonymousBoard, isMisaengEmail, isStatusCommunityBoard } from '@lib/constants/nyc'
 import {
@@ -153,6 +154,10 @@ export async function GET(request: Request, context: RouteContext) {
     const locale = await getRequestLocale(request)
     // 신고로 숨겨진 글(작성자·운영팀만 볼 수 있음)이나 내가 신고한 글
     const isAuthorViewer = Boolean(user?.uid && user.uid === post.authorUid)
+    // 직장 인증 대기 보류 글: 작성자(와 운영팀)만
+    if (isHeldPost(post) && !isAuthorViewer && !isMisaengEmail(user?.email)) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
     const hiddenForViewer =
       (isModerationHidden(post) && !isAuthorViewer && !isMisaengEmail(user?.email)) ||
       (!isAuthorViewer && (await getViewerReportedKeys(user?.uid)).has(reportKey('post', post.id)))
@@ -647,8 +652,9 @@ export async function PATCH(request: Request, context: RouteContext) {
     )
     try {
       // 포인트: 전환 전 = 기존 크레딧 타임라인 추가 적립, 후 = 대기 중인 claim 갱신 (src/lib/points/WIRING.md)
+      // 보류 글(직장 인증 대기)은 공개될 때 포인트를 준다
       const { onPostUpdated } = await import('@lib/points/facade.server')
-      await onPostUpdated({ uid: user.uid, post: saved })
+      if (!isHeldPost(saved)) await onPostUpdated({ uid: user.uid, post: saved })
     } catch (creditError) {
       console.error('Community credit award (post update) error:', creditError)
     }

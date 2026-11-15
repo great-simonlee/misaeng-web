@@ -233,7 +233,8 @@ export async function appendVerificationConsentLog(input: {
   consentVersion: string
   uiLanguage: string
   source: 'web' | 'ios' | 'android'
-  postId: string
+  /** null = 직장 인증 서류 (글과 상관없음) */
+  postId: string | null
   ipAddress: string | null
   userAgent: string | null
 }): Promise<string> {
@@ -284,7 +285,7 @@ export function deleteDueAfterDecision(uploadedAt: string, decidedAt: Date) {
 export async function createSubmission(input: {
   id: string
   userId: string
-  postId: string
+  postId: string | null
   board: string
   kind: ReviewDocKind
   uploadedAt: Date

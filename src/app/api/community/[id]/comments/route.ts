@@ -9,9 +9,12 @@ import {
   sanitizeAnonymousCommunityComment, hideCommentAuthorEmail,
 } from '@lib/community/anonymous'
 import {
-  isIdentityVerified,
+  canComment,
+  isWorkplacePending,
   SCHOOL_VERIFY_REQUIRED_CODE,
+  WORKPLACE_PENDING_COMMENT_CODE,
 } from '@lib/community/schoolGate'
+import { anonBadgeKindFor, isHeldPost } from '@lib/community/heldPosts'
 import { getMockCommunityPost } from '@lib/constants/communityMock'
 import { listMockCommunityComments } from '@lib/constants/communityCommentsMock'
 import { isAnonymousBoard } from '@lib/constants/nyc'
@@ -152,6 +155,7 @@ async function attachCommentBadges(comments: CommunityComment[]): Promise<Commun
       authorSchoolId: schoolId ?? item.authorSchoolId,
       authorWorkplaceVerified: profile.workplaceStatus === 'approved',
       authorInstagramVerified: Boolean(profile.instagramVerified),
+      authorParent: profile.accountType === 'parent',
     }
   })
 }
@@ -245,7 +249,14 @@ export async function POST(request: Request, context: RouteContext) {
       { status: 403 },
     )
   }
-  if (!isIdentityVerified(profile)) {
+  // 댓글: 학교 인증 · 직장 승인 · 학부모. 직장 인증 대기만으로는 못 쓴다 (src/lib/community/schoolGate.ts)
+  if (!canComment(profile)) {
+    if (isWorkplacePending(profile)) {
+      return NextResponse.json(
+        { error: t('community.held.commentBlocked'), code: WORKPLACE_PENDING_COMMENT_CODE },
+        { status: 403 },
+      )
+    }
     return NextResponse.json(
       {
         error: t('common.identityVerificationRequired'),
@@ -256,10 +267,15 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   const { id: postId } = await context.params
+  const targetPost =
+    !postId.startsWith('mock-') && isCommunityStorageConfigured()
+      ? await getStoredCommunityPost(postId)
+      : null
+  // 보류 글(직장 인증 대기)은 작성자 말고는 없는 글
   const postExists =
     postId.startsWith('mock-') ||
     (isCommunityStorageConfigured()
-      ? Boolean(await getStoredCommunityPost(postId))
+      ? Boolean(targetPost && (!isHeldPost(targetPost) || targetPost.authorUid === user.uid))
       : true)
 
   if (!postExists) {
@@ -343,7 +359,11 @@ export async function POST(request: Request, context: RouteContext) {
         profile.verifiedSchoolId.trim()) ||
       null
 
+  // 익명 댓글: 배지 종류만 남긴다 (1.0.7부터 새 댓글만, 학교 이름은 없음)
+  const anonBadgeKind = isAnonymous ? anonBadgeKindFor(profile) : null
+
   const comment: CommunityComment = {
+    ...(anonBadgeKind ? { anonBadgeKind } : {}),
     id: `cmt_${now.toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
     postId,
     parentId,

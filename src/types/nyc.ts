@@ -295,6 +295,9 @@ export type CommunityBoardId =
   | 'anonymous'
   | 'roommate'
 
+/** 익명 글·댓글에 보이는 배지 종류 (학생 = 학교 인증, 직장인 인증, 학부모) */
+export type AnonBadgeKind = 'student' | 'workplace' | 'parent'
+
 export interface CommunityPost extends TranslationFields {
   id: string
   categoryId: CommunityBoardId
@@ -327,8 +330,24 @@ export interface CommunityPost extends TranslationFields {
   authorWorkplaceVerified?: boolean
   /** 작성자 인스타그램 인증 (응답에만 있음, 아이디는 내보내지 않음) */
   authorInstagramVerified?: boolean
+  /** 작성자 학부모 계정 (응답에만 있음 — 프로필에서 바로 읽어 붙임) */
+  authorParent?: boolean
   /** The author deleted their account: shown as "Deleted user" without photo or badges (src/lib/account) */
   authorDeleted?: boolean
+  /**
+   * 질문·자유 익명 글: 작성 시점 배지 종류 스냅샷 (학생 / 직장인 인증 / 학부모). 학교 이름·닉네임은 절대 없음.
+   * 1.0.7 이전 익명 글에는 없다 (그대로 완전 익명).
+   */
+  anonBadgeKind?: AnonBadgeKind | null
+  /**
+   * 직장 인증 대기 중에 쓴 글: 작성자에게만 보이고 목록·검색·알림·포인트에서 빠진다. 승인되면 false + 공개 시각으로
+   * createdAt을 바꾼다 (src/lib/community/heldPosts.server.ts)
+   */
+  pendingApproval?: boolean
+  /** 보류 글을 공개한 시각 (ms) */
+  publishedAt?: number | null
+  /** 직장 인증이 거절된 시각 (ms) — 보류 글은 30일 뒤 삭제 */
+  heldRejectedAt?: number | null
   createdAt: number
   updatedAt: number
   status: PostStatus
@@ -534,6 +553,9 @@ export interface CommunityComment extends TranslationFields {
   /** 작성자 인증 배지 (응답에만 있음) */
   authorWorkplaceVerified?: boolean
   authorInstagramVerified?: boolean
+  authorParent?: boolean
+  /** 익명 게시판 댓글: 작성 시점 배지 종류 (1.0.7부터. 예전 댓글은 없음 = 완전 익명) */
+  anonBadgeKind?: AnonBadgeKind | null
   /** 보는 사람이 쓴 댓글인지 (GET 응답에만 있음) */
   isMine?: boolean
   /** The author deleted their account (src/lib/account) */
@@ -690,6 +712,16 @@ export interface NycUserProfile {
   workplaceRejectReason: string | null
   workplaceReviewedAt: number | null
   workplaceReviewedByEmail: string | null
+  /** 직장 인증 종류: 현재 직장 / 전 직장 (1.0.7) */
+  workplaceKind: 'current' | 'former' | null
+  /** 직장 인증 방법: 회사 이메일 / 재직·전 직장 서류 */
+  workplaceMethod: 'email' | 'documents' | null
+  /** 'parent' = 학생 초대 링크로 가입한 학부모 계정 (src/lib/parents) */
+  accountType: 'member' | 'parent'
+  /** 학부모: 초대한 학생 uid */
+  invitedByUid: string | null
+  /** 온보딩 퀴즈 완료 시각 (ms) */
+  onboardingQuizCompletedAt: number | null
   /** 휴대폰 인증 */
   phone: string | null
   phoneVerified: boolean

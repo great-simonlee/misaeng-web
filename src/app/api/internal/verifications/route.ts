@@ -8,7 +8,7 @@ import {
   type SubmissionWithFiles,
 } from '@lib/supabase/reviewVerification.server'
 import { isVerificationInternalRequest } from '@lib/verification/internalAuth.server'
-import { REVIEW_DOC_STALE_HOURS } from '@lib/verification/reviewDocs'
+import { REVIEW_DOC_STALE_HOURS, WORKPLACE_DOC_BOARD } from '@lib/verification/reviewDocs'
 import {
   getDeletionDashboard,
   runVerificationCleanupOpportunistically,
@@ -80,7 +80,8 @@ export async function GET(request: Request) {
       view === 'recent' ? listSubmissionsByStatus(null, 150, 'desc') : Promise.resolve(null),
       getDeletionDashboard(new Date(now)),
     ])
-    const rows = recent ?? pending
+    // 직장 인증 서류는 ERP 직장 인증 대기열에서 본다 (/api/internal/workplace)
+    const rows = (recent ?? pending).filter((row) => row.board !== WORKPLACE_DOC_BOARD)
     const submissions = []
     // Small batches: each row reads its post from Storage.
     for (let i = 0; i < rows.length; i += 10) {
@@ -88,7 +89,7 @@ export async function GET(request: Request) {
     }
     return NextResponse.json({
       view,
-      pendingCount: pending.length,
+      pendingCount: pending.filter((row) => row.board !== WORKPLACE_DOC_BOARD).length,
       staleCount: submissions.filter((s) => s.stale).length,
       submissions,
       dashboard,

@@ -1,5 +1,6 @@
 import { getViewerBlockedUids } from '@lib/community/blocks.server'
 import { isModerationHidden } from '@lib/community/moderation'
+import { isHeldPost } from '@lib/community/heldPosts'
 import { getCommunityPostsByIds, getStoredCommunityPost } from '@lib/supabase/community.server'
 import { listProfileCache } from '@lib/supabase/listCache.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
@@ -50,7 +51,7 @@ const clean = (value: unknown) => String(value ?? '').replace(/\r\n/g, '\n').tri
 
 /** A listing people can still talk about: open, not hidden by moderation, on the marketplace board. */
 function isLiveListing(post: CommunityPost | null): post is CommunityPost {
-  return Boolean(post && post.status === 'open' && !isModerationHidden(post))
+  return Boolean(post && post.status === 'open' && !isModerationHidden(post) && !isHeldPost(post))
 }
 
 async function listingFor(postId: string) {

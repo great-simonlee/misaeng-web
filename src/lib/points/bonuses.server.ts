@@ -1,6 +1,7 @@
 import { htmlToPlainText } from '@lib/community/html'
 import { isAnonymousBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile, type SupabaseProfileRecord } from '@lib/supabase/profile.server'
+import { listVerifiedSchools } from '@lib/verification/verifiedSchools'
 
 import {
   earliestAnyVerificationMs,
@@ -88,6 +89,50 @@ async function awardInstagram(uid: string, profile: SupabaseProfileRecord, ident
 }
 
 /**
+ * 1.0.7 fixed verification bonus (5P each, once each): school, current workplace, former workplace.
+ * Workplace kind comes from the profile (`workplaceKind`, set when the request was made). Parents never verify.
+ * A verification made before cutover (paid by the legacy 'school-verify' bonus, or by nothing) is not paid again.
+ */
+async function awardVerificationBonus(uid: string, profile: SupabaseProfileRecord, kind: 'school_email' | 'work_email') {
+  if (profile.accountType === 'parent') return outcome(null, 'parent')
+  const former = kind === 'work_email' && profile.workplaceKind === 'former'
+  const rule = kind === 'school_email' ? 'earn.verify_school' : former ? 'earn.verify_former_workplace' : 'earn.verify_workplace'
+  const config = await getPointsConfig()
+  const amount = ruleAmount(config, rule)
+  if (amount <= 0) return outcome(null, 'disabled')
+  if (kind === 'school_email' && !profile.schoolEmailVerified) return outcome(null, 'not_verified')
+  if (kind === 'work_email' && profile.workplaceStatus !== 'approved') return outcome(null, 'not_verified')
+  if (kind === 'school_email' && (await legacyBonusesClaimed(uid)).has('school-verify')) return outcome(null, 'legacy_bonus')
+
+  const cutoverMs = await getCutoverMs()
+  const at =
+    kind === 'work_email'
+      ? typeof profile.workplaceReviewedAt === 'number'
+        ? profile.workplaceReviewedAt
+        : -Infinity
+      : Math.min(...listVerifiedSchoolTimes(profile))
+  if (cutoverMs !== null && at < cutoverMs) return outcome(null, 'verified_before_cutover')
+
+  const reason = kind === 'school_email' ? 'verify_school' : former ? 'verify_former_workplace' : 'verify_workplace'
+  const result = await earnPoints({
+    uid,
+    amount,
+    reason,
+    sourceType: 'verification',
+    sourceId: reason,
+    key: `verify:${uid}:${reason}`,
+  })
+  if (result.ok && !result.duplicate) notifyPointsEarned(uid, result.amount, reason, result.balance)
+  return outcome(result)
+}
+
+function listVerifiedSchoolTimes(profile: SupabaseProfileRecord): number[] {
+  const schools = listVerifiedSchools(profile)
+  if (schools.length === 0) return [-Infinity]
+  return schools.map((school) => (typeof school.verifiedAt === 'number' ? school.verifiedAt : -Infinity))
+}
+
+/**
  * A verification just completed (school email confirmed, workplace approved, Instagram approved).
  * Pays welcome / instagram, then the referral reward of whoever referred this user, then the profile bonus
  * when this is the user's first verification (so completing the profile before verifying still pays once).
@@ -97,13 +142,14 @@ export async function handleVerificationCompleted(uid: string, kind: Verificatio
   if (!profile) return { verification: outcome(null, 'no_profile') }
   const verification =
     kind === 'instagram' ? await awardInstagram(uid, profile, identifier) : await awardWelcome(uid, profile, kind, identifier)
+  const bonus = kind === 'instagram' ? outcome(null, 'instagram') : await awardVerificationBonus(uid, profile, kind)
   const referral = kind === 'instagram' ? outcome(null, 'instagram_only') : await awardReferral(uid, profile)
 
   let profileBonus: BonusOutcome = outcome(null, 'not_first_verification')
   const cutoverMs = await getCutoverMs()
   const earliest = earliestAnyVerificationMs(profile)
   if (cutoverMs !== null && earliest !== null && earliest >= cutoverMs) profileBonus = await awardProfileComplete(uid, profile)
-  return { verification, referral, profileBonus }
+  return { verification, bonus, referral, profileBonus }
 }
 
 // MARK: profile

@@ -4,6 +4,9 @@ export async function notifyErpWorkplaceVerification(args: {
   workEmail: string
   userEmail: string
   userNickname: string | null
+  /** 1.0.7: 'documents' = 서류 제출 (workEmail 자리에 'Documents') */
+  method?: 'email' | 'documents'
+  workplaceKind?: 'current' | 'former'
 }) {
   const secret = process.env.MISAENG_ERP_NOTIFY_SECRET?.trim()
   const baseUrl = (
@@ -22,8 +25,10 @@ export async function notifyErpWorkplaceVerification(args: {
       body: JSON.stringify({
         type: 'workplace_verification',
         title: 'Workplace verification request',
-        body: `${nickname} · ${args.companyName} · ${args.workEmail}`,
+        body: `${nickname} · ${args.companyName} · ${args.workEmail}${args.workplaceKind === 'former' ? ' · Former job' : ''}`,
         requestId: args.requestId,
+        method: args.method ?? 'email',
+        workplaceKind: args.workplaceKind ?? 'current',
       }),
       signal: AbortSignal.timeout(8000),
     })

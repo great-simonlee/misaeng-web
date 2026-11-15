@@ -4,8 +4,31 @@
  * and never kept longer than 7 days. Only the result is kept.
  */
 
-export const REVIEW_DOC_KINDS = ['interview', 'offer', 'opt', 'visa_approval', 'cpt'] as const
+export const REVIEW_DOC_KINDS = [
+  'interview',
+  'offer',
+  'opt',
+  'visa_approval',
+  'cpt',
+  // 1.0.7: 직장 인증 서류 (글과 상관없음, board 'workplace'). 결정은 ERP 직장 인증 대기열에서 (/api/internal/workplace/decision)
+  'workplace_current',
+  'workplace_former',
+] as const
 export type ReviewDocKind = (typeof REVIEW_DOC_KINDS)[number]
+
+/** 직장 인증 서류 submission의 board 값 */
+export const WORKPLACE_DOC_BOARD = 'workplace'
+export const WORKPLACE_DOC_KINDS = ['workplace_current', 'workplace_former'] as const satisfies readonly ReviewDocKind[]
+
+export function isWorkplaceDocKind(value: unknown): value is (typeof WORKPLACE_DOC_KINDS)[number] {
+  return value === 'workplace_current' || value === 'workplace_former'
+}
+
+/**
+ * 직장 인증 서류 안내(가린 정보·보관 기간) 버전. 클라이언트는 consent=true와 함께 이 값을 그대로 보낸다.
+ * 안내 문구(me.workplaceDocs.notice)를 바꾸면 같이 올린다.
+ */
+export const WORKPLACE_DOC_CONSENT_VERSION = 'workplace-docs-2026-11'
 
 /** Boards whose authors can verify a review, and the document kinds that fit each board. */
 export const REVIEW_DOC_KINDS_BY_BOARD = {

@@ -38,12 +38,16 @@ export function sanitizeAnonymousCommunityPost(
   // 질문·자유에서 닉네임을 공개한 글은 다른 게시판처럼 보인다
   if (!isAnonymousBoard(base.categoryId) || base.showNickname === true) return base
 
+  // 1.0.7부터 새 익명 글은 배지 종류(anonBadgeKind: 학생/직장인 인증/학부모)만 남는다. 학교 이름·인증 배지는 지운다
   return {
     ...base,
     authorNickname: null,
     authorPhotoURL: null,
     authorSchoolId: null,
     authorSchoolName: null,
+    authorWorkplaceVerified: false,
+    authorInstagramVerified: false,
+    authorParent: false,
     authorEmail: isAuthor ? post.authorEmail : '',
     authorUid: isAuthor ? post.authorUid : '',
   }
@@ -61,6 +65,9 @@ export function sanitizeAnonymousCommunityComment(
     authorNickname: null,
     authorPhotoURL: null,
     authorSchoolId: null,
+    authorWorkplaceVerified: false,
+    authorInstagramVerified: false,
+    authorParent: false,
     authorEmail: isAuthor ? comment.authorEmail : '',
     authorUid: isAuthor ? comment.authorUid : '',
   }

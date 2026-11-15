@@ -62,9 +62,16 @@ import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/content
 import { withoutModeratedPosts } from '@lib/community/moderation'
 import { getViewerReportedKeys } from '@lib/community/reports.server'
 import {
-  isIdentityVerified,
+  canWriteOnBoard,
+  canWritePosts,
+  HELD_POST_LIMIT,
+  HELD_POST_LIMIT_CODE,
+  isParentAccount,
+  isWriteHeldForApproval,
+  PARENT_BOARD_NOT_ALLOWED_CODE,
   SCHOOL_VERIFY_REQUIRED_CODE,
 } from '@lib/community/schoolGate'
+import { anonBadgeKindFor, isHeldPost } from '@lib/community/heldPosts'
 import {
   COMMUNITY_BODY_MAX,
   isFoodCategoryId,
@@ -154,6 +161,13 @@ export async function GET(request: Request) {
         } catch (claimError) {
           console.error('Guest post auto-claim error:', claimError)
         }
+      }
+      // 직장 인증이 거절되고 30일 지난 보류 글은 여기서 지운다 (ERP/cron도 /api/internal/workplace/held-cleanup 호출)
+      try {
+        const { cleanupRejectedHeldPosts } = await import('@lib/community/heldPosts.server')
+        await cleanupRejectedHeldPosts({ uid: user.uid })
+      } catch (cleanupError) {
+        console.error('Held post cleanup error:', cleanupError)
       }
       const locale = await getRequestLocale(request)
       // 내 글 목록도 지금 프로필 사진으로 (사진을 바꾼 뒤 예전 글에 옛 사진이 남지 않게)
@@ -303,7 +317,8 @@ export async function POST(request: Request) {
       { status: 403 },
     )
   }
-  if (!isIdentityVerified(profile)) {
+  // 학교 인증 · 직장 승인 · 직장 인증 대기(보류 글) · 학부모(질문·자유만) — src/lib/community/schoolGate.ts
+  if (!canWritePosts(profile)) {
     return NextResponse.json(
       {
         error: t('common.identityVerificationRequired'),
@@ -317,6 +332,23 @@ export async function POST(request: Request) {
   const categoryId = String(body?.categoryId || '').trim()
   if (!isCommunityBoardId(categoryId)) {
     return NextResponse.json({ error: t('community.invalidBoard') }, { status: 400 })
+  }
+  if (isParentAccount(profile) && !canWriteOnBoard(profile, categoryId)) {
+    return NextResponse.json(
+      { error: t('community.parent.boardNotAllowed'), code: PARENT_BOARD_NOT_ALLOWED_CODE },
+      { status: 403 },
+    )
+  }
+  // 직장 인증 대기: 승인 전까지 본인에게만 보이는 보류 글, 동시에 최대 HELD_POST_LIMIT개
+  const held = isWriteHeldForApproval(profile)
+  if (held) {
+    const heldCount = (await listStoredCommunityPostsByAuthor(user.uid)).filter(isHeldPost).length
+    if (heldCount >= HELD_POST_LIMIT) {
+      return NextResponse.json(
+        { error: t('community.held.limit', { max: HELD_POST_LIMIT }), code: HELD_POST_LIMIT_CODE },
+        { status: 409 },
+      )
+    }
   }
 
   const title = String(body?.title || '').trim()
@@ -661,9 +693,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: t(companyResult.errorKey) }, { status: 400 })
   }
 
+  // 익명 글: 닉네임·학교 없이 배지 종류만 (학생 / 직장인 인증 / 학부모). 1.0.7부터 새 글에만 남긴다
+  const anonBadgeKind = isAnonymous ? anonBadgeKindFor(profile) : null
+
   const post: CommunityPost = {
     id,
     ...(isAnonymousBoard(categoryId) ? { showNickname } : {}),
+    ...(anonBadgeKind ? { anonBadgeKind } : {}),
+    ...(held ? { pendingApproval: true } : {}),
     // 작성 화면 언어 = 원문 언어 (번역이 다르면 ERP 번역 단계에서 바로잡는다)
     sourceLocale: locale,
     categoryId,
@@ -738,6 +775,13 @@ export async function POST(request: Request) {
           }
         : undefined,
     )
+    // 보류 글: 포인트·ERP 알림은 직장 인증이 승인되어 공개될 때 (src/lib/community/heldPosts.server.ts)
+    if (held) {
+      return NextResponse.json({
+        post: sanitizeAnonymousCommunityPost(saved, user.uid),
+        pendingApproval: true,
+      })
+    }
     try {
       // 포인트: 전환(cutover) 전에는 기존 크레딧 적립, 후에는 검수 대기 claim (src/lib/points/WIRING.md)
       const { onPostCreated } = await import('@lib/points/facade.server')

@@ -8,7 +8,7 @@ import {
   patchSubmission,
 } from '@lib/supabase/reviewVerification.server'
 import { isVerificationInternalRequest, reviewerEmailFrom } from '@lib/verification/internalAuth.server'
-import { isReviewDocRejectReason } from '@lib/verification/reviewDocs'
+import { isReviewDocRejectReason, isWorkplaceDocKind } from '@lib/verification/reviewDocs'
 import { awardVerifiedComponent } from '@lib/verification/reviewDocsService.server'
 
 export const runtime = 'nodejs'
@@ -48,6 +48,12 @@ export async function POST(request: Request, context: RouteContext) {
   try {
     const submission = await getSubmission(String(id || '').trim())
     if (!submission) return NextResponse.json({ error: 'Submission not found.' }, { status: 404 })
+    if (isWorkplaceDocKind(submission.kind)) {
+      return NextResponse.json(
+        { error: 'Workplace documents are decided in the Workplace queue (/api/internal/workplace/decision).' },
+        { status: 409 },
+      )
+    }
     if (submission.status !== 'pending') {
       return NextResponse.json({ error: `Already ${submission.status}.` }, { status: 409 })
     }

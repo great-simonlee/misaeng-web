@@ -17,6 +17,7 @@ import {
 import { BRAND_CONFIG } from '@lib/brand'
 import { normalizeMarketZip } from '@lib/community/marketplace'
 import { isModerationHidden } from '@lib/community/moderation'
+import { isHeldPost } from '@lib/community/heldPosts'
 import { shareMetadata } from '@lib/share/shareMetadata'
 import { getStoredCommunityPost } from '@lib/supabase/community.server'
 import { localizePost } from '@lib/translations/localize.server'
@@ -42,7 +43,7 @@ export async function generateMetadata({ params }: CommunityDetailPageProps): Pr
 async function marketplaceMetadata(locale: string, city: string, id: string): Promise<Metadata> {
   const path = `/${city}/marketplace/${id}`
   const stored = await getStoredCommunityPost(id).catch(() => null)
-  if (!stored || stored.categoryId !== 'marketplace' || stored.status === 'closed' || isModerationHidden(stored)) {
+  if (!stored || stored.categoryId !== 'marketplace' || stored.status === 'closed' || isModerationHidden(stored) || isHeldPost(stored)) {
     return shareMetadata('marketplace', locale, { path })
   }
   const lang = isLocale(locale) ? locale : BRAND_CONFIG.serviceDefaultLocale

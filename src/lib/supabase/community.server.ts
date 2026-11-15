@@ -48,6 +48,7 @@ import { normalizeProxyAuthor } from '@lib/community/proxyAuthor'
 import { isAnonymousBoard, isCommunityBoardId, isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseProfile, type SupabaseProfileRecord } from '@lib/supabase/profile.server'
 import { isModerationHidden, normalizeModeration } from '@lib/community/moderation'
+import { isAnonBadgeKind, isHeldPost } from '@lib/community/heldPosts'
 import { sanitizeCommunityNickname } from '@lib/community/author'
 import type { CommunityPost, JobReviewSourceId } from '@/types/nyc'
 import { listStoredCommunityComments } from '@lib/supabase/communityComments.server'
@@ -164,6 +165,11 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
     authorSchoolName:
       typeof data.authorSchoolName === 'string' ? data.authorSchoolName : null,
     ...(data.authorDeleted === true ? { authorDeleted: true } : {}),
+    // 익명 글 배지 종류 스냅샷 (1.0.7부터 새 글만), 직장 인증 대기 보류 글 — 다시 저장할 때 잃지 않도록 읽는다
+    ...(isAnonBadgeKind(data.anonBadgeKind) ? { anonBadgeKind: data.anonBadgeKind } : {}),
+    ...(data.pendingApproval === true ? { pendingApproval: true } : {}),
+    ...(Number(data.publishedAt) > 0 ? { publishedAt: Number(data.publishedAt) } : {}),
+    ...(Number(data.heldRejectedAt) > 0 ? { heldRejectedAt: Number(data.heldRejectedAt) } : {}),
     createdAt: Number(data.createdAt) || Date.now(),
     updatedAt: Number(data.updatedAt) || Date.now(),
     status: data.status === 'closed' ? 'closed' : 'open',
@@ -426,7 +432,7 @@ export async function listStoredCommunityPostsRaw(
 ): Promise<CommunityPost[]> {
   const posts = await listAllStoredCommunityPosts()
   const filtered = posts
-    .filter((post) => post.status === 'open' && !isModerationHidden(post))
+    .filter((post) => post.status === 'open' && !isModerationHidden(post) && !isHeldPost(post))
     .filter((post) => {
       if (!boardId) return true
       const boardMatch = isStatusCommunityBoard(boardId)
@@ -483,7 +489,7 @@ export async function getCommunityPostsByIds(ids: string[]): Promise<Map<string,
 /** 공개 글(open, 숨김 아님) 전체 — 모든 도시, 작성자 보강 없이 (홈 배너 통계용) */
 export async function listAllOpenCommunityPosts(): Promise<CommunityPost[]> {
   const posts = await listAllStoredCommunityPosts()
-  return posts.filter((post) => post.status === 'open' && !isModerationHidden(post))
+  return posts.filter((post) => post.status === 'open' && !isModerationHidden(post) && !isHeldPost(post))
 }
 
 /** 한 게시판의 공개 글 — 작성자 프로필 보강 없이 (회사별 후기 수·목록용) */
@@ -495,6 +501,7 @@ export async function listStoredOpenBoardPosts(
   return posts.filter(
     (post) =>
       post.status === 'open' &&
+      !isHeldPost(post) &&
       post.categoryId === boardId &&
       (!city || communityPostMatchesCity(post, city)),
   )
@@ -540,6 +547,7 @@ export const DELETED_AUTHOR_FIELDS = {
   authorSchoolName: null,
   authorWorkplaceVerified: false,
   authorInstagramVerified: false,
+  authorParent: false,
 } as const
 
 /** 후기 게시판은 "어느 학교에서의 경험인가"가 내용이라 글쓴 시점의 학교를 그대로 보여 준다 */
@@ -549,7 +557,8 @@ async function enrichCommunityPostAuthor(
   post: CommunityPost,
   options?: { persist?: boolean; cachedProfile?: boolean },
 ): Promise<CommunityPost> {
-  if (isAnonymousBoard(post.categoryId)) return post
+  // 질문·자유 익명 글은 그대로 (닉네임을 공개한 글만 다른 게시판처럼 프로필·배지를 붙인다)
+  if (isAnonymousBoard(post.categoryId) && post.showNickname !== true) return post
   // 게스트 글(계정 미연결)은 조회할 프로필이 없다.
   if (!post.authorUid) return post
 
@@ -620,6 +629,7 @@ export function authorBadgeFields(
     authorSchoolName: school.name,
     authorWorkplaceVerified: profile?.workplaceStatus === 'approved',
     authorInstagramVerified: Boolean(profile?.instagramVerified),
+    authorParent: profile?.accountType === 'parent',
   }
 }
 
@@ -755,6 +765,13 @@ export async function patchStoredCommunityPost(
   const ok = await writeRawPostJson(bucket, postId, { ...raw, ...patch })
   if (ok) invalidateAllPosts()
   return ok
+}
+
+/** 직장 인증 대기 보류 글 전부 (작성자 지정 시 그 사람 것만), Storage에서 새로 읽는다 — src/lib/community/heldPosts.server.ts */
+export async function listStoredHeldPosts(authorUid?: string): Promise<CommunityPost[]> {
+  const uid = String(authorUid || '').trim()
+  const posts = await listAllStoredCommunityPosts({ fresh: true })
+  return posts.filter((post) => isHeldPost(post) && (!uid || post.authorUid === uid))
 }
 
 /** Every stored post id (open and closed), fresh from Storage. For account deletion. */

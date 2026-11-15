@@ -42,6 +42,22 @@ export type SupabaseProfileRecord = {
   workplaceRejectReason?: string | null
   workplaceReviewedAt?: number | null
   workplaceReviewedByEmail?: string | null
+  /** 1.0.7: 현재 직장 / 전 직장, 회사 이메일 / 서류 (src/lib/verification/workplaceDocs.ts) */
+  workplaceKind?: 'current' | 'former' | null
+  workplaceMethod?: 'email' | 'documents' | null
+  /** 서류 인증일 때 verification_submissions.id */
+  workplaceSubmissionId?: string | null
+  /** 'parent' = 학생 초대 링크로 가입한 학부모 (src/lib/parents/parentInvites.server.ts). 없으면 일반 회원 */
+  accountType?: 'member' | 'parent' | null
+  /** 학부모: 초대한 학생 uid, 사용한 초대 코드, 연결 시각 */
+  invitedByUid?: string | null
+  parentInviteCode?: string | null
+  parentLinkedAt?: number | null
+  /** ERP가 학부모 계정을 일반 계정으로 바꾼 시각 */
+  parentConvertedAt?: number | null
+  /** 온보딩 퀴즈 (src/lib/quiz) 20문제를 모두 맞힌 시각과 문제 버전 */
+  onboardingQuizCompletedAt?: number | null
+  onboardingQuizVersion?: string | null
   phone?: string | null
   phoneVerified?: boolean
   /** 인스타그램 DM 인증 (@misaeng.ny로 코드 DM → ERP 승인). 아이디는 본인·운영자만 본다 */

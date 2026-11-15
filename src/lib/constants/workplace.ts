@@ -1,5 +1,16 @@
 export const WORKPLACE_COMPANY_MAX = 40
 
+/** 1.0.7: 현재 직장 / 전 직장 (서류 인증에서 고른다. 회사 이메일 인증은 현재 직장) */
+export const WORKPLACE_KINDS = ['current', 'former'] as const
+export type WorkplaceKind = (typeof WORKPLACE_KINDS)[number]
+
+export function isWorkplaceKind(value: unknown): value is WorkplaceKind {
+  return value === 'current' || value === 'former'
+}
+
+/** 직장 인증 방법: 회사 이메일 코드 / 재직·전 직장 서류 */
+export type WorkplaceMethod = 'email' | 'documents'
+
 export const WORKPLACE_VERIFICATION_STATUSES = [
   'none',
   'pending',

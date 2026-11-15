@@ -1,6 +1,9 @@
 import { ApiMessageError } from '@lib/i18n/apiError'
 import {
+  isWorkplaceKind,
   normalizeWorkplaceStatus,
+  type WorkplaceKind,
+  type WorkplaceMethod,
   type WorkplaceVerificationStatus,
 } from '@lib/constants/workplace'
 
@@ -17,6 +20,15 @@ export type WorkplaceVerificationRequest = {
   reviewedByEmail: string | null
   reviewedAt: number | null
   rejectReason: string | null
+  /** 1.0.7: 'documents' = 서류 제출 (workEmail 없음, submissionId = verification_submissions.id). 없으면 'email' */
+  method?: WorkplaceMethod
+  workplaceKind?: WorkplaceKind
+  submissionId?: string | null
+  /** 24시간 넘게 처리 안 된 요청 알림을 보낸 시각 */
+  reminderSentAt?: number | null
+  /** 웹이 승인·거절 후속 처리(보류 글 공개, 포인트, 알림)를 끝낸 시각과 그때 상태 (/api/internal/workplace/decision) */
+  decisionHandledAt?: number | null
+  decisionHandledStatus?: 'approved' | 'rejected' | null
 }
 
 const DEFAULT_BUCKET = 'housing'
@@ -91,7 +103,9 @@ function normalizeRequest(raw: unknown): WorkplaceVerificationRequest | null {
   const workEmail = String(data.workEmail || '').trim().toLowerCase()
   const companyName = String(data.companyName || '').trim()
   const status = normalizeWorkplaceStatus(data.status)
-  if (!id || !uid || !workEmail || !companyName) return null
+  const method: WorkplaceMethod = data.method === 'documents' ? 'documents' : 'email'
+  // 서류 요청은 회사 이메일이 없다
+  if (!id || !uid || (!workEmail && method === 'email') || !companyName) return null
   if (status === 'none') return null
   return {
     id,
@@ -117,6 +131,16 @@ function normalizeRequest(raw: unknown): WorkplaceVerificationRequest | null {
     rejectReason:
       typeof data.rejectReason === 'string' && data.rejectReason.trim()
         ? data.rejectReason.trim()
+        : null,
+    method,
+    workplaceKind: isWorkplaceKind(data.workplaceKind) ? data.workplaceKind : 'current',
+    submissionId:
+      typeof data.submissionId === 'string' && data.submissionId.trim() ? data.submissionId.trim() : null,
+    reminderSentAt: Number(data.reminderSentAt) > 0 ? Number(data.reminderSentAt) : null,
+    decisionHandledAt: Number(data.decisionHandledAt) > 0 ? Number(data.decisionHandledAt) : null,
+    decisionHandledStatus:
+      data.decisionHandledStatus === 'approved' || data.decisionHandledStatus === 'rejected'
+        ? data.decisionHandledStatus
         : null,
   }
 }

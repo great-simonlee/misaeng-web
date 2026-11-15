@@ -1,3 +1,4 @@
+import { isParentAccount, PARENT_NOT_ALLOWED_CODE } from '@lib/community/schoolGate'
 import { NextResponse } from 'next/server'
 
 import { ApiMessageError, apiErrorMessage } from '@lib/i18n/apiError'
@@ -234,6 +235,14 @@ export async function POST(request: Request) {
     const action = body.action || 'send'
     const email = body.email?.trim().toLowerCase()
 
+    // 학부모 계정은 학교·직장 인증을 하지 않는다 (ERP에서 일반 계정으로 바꾸면 할 수 있다)
+    if (action !== 'primary' && isParentAccount(await getSupabaseProfile(user.uid))) {
+      return NextResponse.json(
+        { error: t('parents.verificationNotAllowed'), code: PARENT_NOT_ALLOWED_CODE },
+        { status: 403 },
+      )
+    }
+
     // 대표 학교 바꾸기: 이미 인증한 학교 중 하나를 고른다 (글 배지·학교 게시판에 쓰는 학교)
     if (action === 'primary') {
       const profile = await getSupabaseProfile(user.uid)
@@ -308,9 +317,18 @@ export async function POST(request: Request) {
       } catch (creditError) {
         console.error('Community credit award (school) error:', creditError)
       }
+      // 직장 인증 대기 중에 써 둔 보류 글: 학교 인증이면 바로 공개
+      let publishedPosts = 0
+      try {
+        const { publishHeldPosts } = await import('@lib/community/heldPosts.server')
+        publishedPosts = (await publishHeldPosts(user.uid)).published
+      } catch (heldError) {
+        console.error('Held post publish (school) error:', heldError)
+      }
 
       return NextResponse.json({
         ok: true,
+        publishedPosts,
         schoolName: verified.schoolName,
         schoolId: verified.schoolId,
         isPrimary: verified.isPrimary,

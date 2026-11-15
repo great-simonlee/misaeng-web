@@ -78,6 +78,8 @@ export function moderateComments<T extends CommunityComment>(
       authorSchoolId: null,
       authorWorkplaceVerified: false,
       authorInstagramVerified: false,
+      authorParent: false,
+      anonBadgeKind: null,
       translations: undefined,
       moderation: null,
     })
