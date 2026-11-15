@@ -17,6 +17,16 @@ import { PartnerSchoolsMarquee } from '@widgets/nyc/PartnerSchoolsMarquee'
 import { PartnerInfluencersSection } from '@widgets/nyc/PartnerInfluencersSection'
 import { ProfessionalsSection } from '@widgets/nyc/ProfessionalsSection'
 
+/** The boards on the hub, in the app's home order (중고거래 is app-only for now). */
+const HUB_BOARDS = [
+  { path: '/housing', label: 'housing' },
+  { path: '/job-review', label: 'jobReview' },
+  { path: '/status', label: 'status' },
+  { path: '/food', label: 'food' },
+  { path: '/roommate', label: 'roommate' },
+  { path: '/anonymous', label: 'anonymous' },
+] as const
+
 export function NycHubScreen() {
   // Ellieo keeps its own design; this redesign is Misaeng only
   if (BRAND_CONFIG.id !== 'misaeng') return <NycHubScreenClassic />
@@ -28,6 +38,7 @@ function MisaengHubScreen() {
   const href = useCityPath()
   const t = useT('hub')
   const tCommon = useT('common')
+  const tNav = useT('nav')
 
   useEffect(() => {
     captureReferralFromLocation()
@@ -38,8 +49,9 @@ function MisaengHubScreen() {
       {/* phones: point to the app (Misaeng only, hidden for a few days once dismissed) */}
       <AppDownloadPrompt />
 
-      {/* Hero: one strong line, what it is, two ways in */}
-      <section className='relative overflow-hidden bg-white'>
+      {/* Hero: one strong line, what it is, the boards (like the app's home). White fading into the page colour so
+          it runs on into the partner rows below without a hard edge. */}
+      <section className='relative overflow-hidden bg-gradient-to-b from-white via-white to-[var(--canvas)]'>
         <div
           className='pointer-events-none absolute -right-40 -top-40 size-[34rem] rounded-full opacity-70 blur-3xl'
           style={{
@@ -58,38 +70,32 @@ function MisaengHubScreen() {
               <span className='size-1.5 rounded-full bg-[var(--brand)]' aria-hidden />
               {t('brandCity', { brand: BRAND_CONFIG.name, city: cityInfo.shortLabel })}
             </span>
-            <h1 className='mt-4 max-w-3xl text-[2rem] font-bold leading-[1.12] tracking-[-0.035em] text-[var(--foreground)] sm:text-[2.6rem] lg:text-[3rem]'>
+            {/* break-keep: Korean wraps between words, never inside one ("이야 / 기") */}
+            <h1 className='mt-4 max-w-3xl break-keep text-balance text-[2rem] font-bold leading-[1.15] tracking-[-0.035em] text-[var(--foreground)] sm:text-[2.6rem] lg:text-[3rem]'>
               {t(`cities.${cityInfo.id}.headline`)}
             </h1>
-            <p className='mt-3 max-w-xl text-[15px] leading-relaxed text-[var(--muted-foreground)] sm:text-[17px]'>
+            <p className='mt-3 max-w-xl break-keep text-pretty text-[15px] leading-relaxed text-[var(--muted-foreground)] sm:text-[17px]'>
               {t(`cities.${cityInfo.id}.description`)}
             </p>
-            <div className='mt-6 flex flex-wrap items-center gap-2.5'>
-              {/* The boards are in the header; the hero points to the one most people come for */}
-              <Link
-                href={href('/housing')}
-                className='inline-flex h-12 items-center gap-2 rounded-full bg-[var(--foreground)] px-6 text-[15px] font-semibold text-white transition hover:bg-black'
-              >
-                {t('heroCta')}
-                <svg
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeWidth='2'
-                  className='size-4'
-                  aria-hidden
+            {/* Every board as a chip, in the app's order */}
+            <nav aria-label={tNav('menuAria', { city: cityInfo.shortLabel })} className='mt-6 flex flex-wrap gap-2'>
+              {HUB_BOARDS.map((board) => (
+                <Link
+                  key={board.path}
+                  href={href(board.path)}
+                  className='inline-flex h-11 items-center rounded-full bg-white px-4 text-[15px] font-medium text-[var(--foreground)] ring-1 ring-[var(--card-ring)] transition hover:bg-[#fafbfc] hover:ring-black/15 active:scale-[0.98]'
                 >
-                  <path strokeLinecap='round' strokeLinejoin='round' d='M5 12h14M13 6l6 6-6 6' />
-                </svg>
-              </Link>
-              <AppHandoffButton
-                appPath='home'
-                action='open'
-                variant='plain'
-                className='inline-flex h-12 items-center rounded-full bg-white px-6 text-[15px] font-semibold text-[var(--foreground)] ring-1 ring-black/10 transition hover:bg-[#fafbfc]'
-                label={tCommon('appHandoff.buttons.getApp')}
-              />
-            </div>
+                  {tNav(`links.${board.label}`)}
+                </Link>
+              ))}
+            </nav>
+            <AppHandoffButton
+              appPath='home'
+              action='open'
+              variant='plain'
+              className='mt-5 inline-flex h-11 items-center gap-2 rounded-full bg-[var(--foreground)] px-5 text-[15px] font-semibold text-white transition hover:bg-black'
+              label={tCommon('appHandoff.buttons.getApp')}
+            />
           </div>
           <div className='hidden lg:block'>
             <HeroAppCard />

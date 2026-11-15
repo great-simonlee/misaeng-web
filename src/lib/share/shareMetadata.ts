@@ -10,14 +10,17 @@ export const MISAENG_APP_STORE_ID = '6826454902'
 
 export type ShareKind = 'housing' | 'visa' | 'review' | 'company' | 'postings' | 'posting' | 'marketplace'
 
+/** Bumped when an image changes: KakaoTalk and others cache previews by image URL. */
+const DEFAULT_IMAGE = '/og/share-default.png?v=2'
+
 const SHARE_IMAGE: Record<ShareKind, string> = {
   housing: '/og/share-housing.png',
-  visa: '/og/share-default.png',
-  review: '/og/share-default.png',
-  company: '/og/share-default.png',
-  postings: '/og/share-default.png',
-  posting: '/og/share-default.png',
-  marketplace: '/og/share-default.png',
+  visa: DEFAULT_IMAGE,
+  review: DEFAULT_IMAGE,
+  company: DEFAULT_IMAGE,
+  postings: DEFAULT_IMAGE,
+  posting: DEFAULT_IMAGE,
+  marketplace: DEFAULT_IMAGE,
 }
 
 /**

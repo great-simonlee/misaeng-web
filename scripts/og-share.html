@@ -84,10 +84,11 @@
     const kind = p.get('kind') || 'housing'
     const copy = {
       housing: { h: '뉴욕에서 찾은 방,<br>미생 앱에서 확인해요', s: '인증된 매물 · 중개비 무료 혜택', c: ['하우징', '룸메이트', '서블렛'] },
-      default: { h: '뉴욕 유학생·직장인의<br>진짜 이야기', s: '비자 · 면접·취업 후기 · 회사 정보', c: ['비자', '면접·취업', '하우징'] },
+      default: { h: '미국 유학생·직장인의<br>진짜 이야기', s: '비자 · 면접·취업 후기 · 회사 정보 · 중고거래', c: ['비자', '면접·취업', '하우징', '중고거래'] },
     }[kind]
     document.getElementById('headline').innerHTML = copy.h
     document.getElementById('sub').textContent = copy.s
+    if (kind !== 'housing') document.querySelector('.appbar .pill').remove()
     document.getElementById('chips').innerHTML = copy.c.map((c) => `<span class="chip">${c}</span>`).join('')
   </script>
 </body>
