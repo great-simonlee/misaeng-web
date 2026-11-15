@@ -39,6 +39,8 @@ revoke all on public.parent_invites from anon, authenticated;
 grant select, insert, update, delete on public.parent_invites to service_role;
 
 -- MARK: 3. point rules (database rows override src/lib/points/defaults.ts)
+-- RUN THIS PART ONLY WHEN 1.0.7 GOES LIVE (web deploy): it changes live prices/bonuses for the current apps too
+-- (career questions 30P, welcome bonus off, quiz on). Sections 1–2 are safe to run any time.
 
 insert into public.point_rules (key, value, enabled, description) values
   ('earn.verify_school', 5, true, 'School email verified, once per account'),
@@ -72,4 +74,6 @@ insert into public.point_rules_history (target, key, before, after, changed_by, 
 select 'rule', key, null, jsonb_build_object('value', value, 'enabled', enabled), 'release_1_0_7.sql', 'Misaeng 1.0.7'
 from public.point_rules
 where key in ('earn.onboarding_quiz', 'spend.review_question', 'earn.verify_first_email', 'earn.verify_school',
-              'earn.verify_workplace', 'earn.verify_former_workplace', 'earn.parent_invite');
+              'earn.verify_workplace', 'earn.verify_former_workplace', 'earn.parent_invite')
+  -- once: a re-run doesn't add the history rows again
+  and not exists (select 1 from public.point_rules_history h where h.changed_by = 'release_1_0_7.sql' and h.key = point_rules.key);
