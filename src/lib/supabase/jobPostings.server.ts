@@ -131,6 +131,11 @@ export type StoredPosting = PublicPosting & {
 
 let cache: { at: number; value: StoredPosting[] } | null = null
 
+/** 공개 공고 목록 캐시를 비운다 (ERP가 방금 승인한 공고를 바로 읽어야 할 때 — 새 공고 알림). */
+export function invalidatePublicPostingsCache() {
+  cache = null
+}
+
 /**
  * 공고 행 읽기 (나중에 추가된 컬럼 중 아직 없는 것은 오류 메시지를 보고 하나씩 빼고 다시 읽는다).
  * null: 읽지 못함 (표가 아직 없으면 조용히, 그 밖의 오류는 로그).
