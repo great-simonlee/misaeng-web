@@ -3,6 +3,7 @@ import { isStatusCommunityBoard } from '@lib/constants/nyc'
 import { getSupabaseAvatarBucket } from '@lib/supabase/server'
 import { listAllOpenCommunityPosts } from '@lib/supabase/community.server'
 import { listStoredHousingListings } from '@lib/supabase/housing.server'
+import { listPublicPostings } from '@lib/supabase/jobPostings.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import { listProfileCache, TtlCache } from '@lib/supabase/listCache.server'
 
@@ -21,6 +22,8 @@ export type SiteStats = {
     jobReview: number
     anonymous: number
   }
+  /** 지금 열려 있는 채용 공고 (앱 /jobs 와 같은 기준, 인턴·신입·경력) — 공고 수와 그 공고를 낸 회사 수 */
+  jobs: { companies: number; postings: number }
   updatedAt: number
 }
 
@@ -35,11 +38,13 @@ export function getSiteStats(): Promise<SiteStats> {
 }
 
 async function loadSiteStats(): Promise<SiteStats> {
-  const [members, communityPosts, housing] = await Promise.all([
+  const [members, communityPosts, housing, postings] = await Promise.all([
     countMembers(),
     listAllOpenCommunityPosts(),
     listStoredHousingListings(),
+    listPublicPostings(),
   ])
+  const jobs = { companies: new Set(postings.map((posting) => posting.company.id)).size, postings: postings.length }
 
   const posts = { housing: housing.length, food: 0, roommate: 0, visa: 0, jobReview: 0, anonymous: 0 }
   // 팀이 대신 올린 후기의 작성자 (계정 없음, 글마다 다른 사람) — 회원 수에 한 명씩 더한다
@@ -55,7 +60,7 @@ async function loadSiteStats(): Promise<SiteStats> {
     else if (isStatusCommunityBoard(board)) posts.visa += 1
   }
 
-  return { members: members + proxyAuthors, posts, updatedAt: Date.now() }
+  return { members: members + proxyAuthors, posts, jobs, updatedAt: Date.now() }
 }
 
 /**
