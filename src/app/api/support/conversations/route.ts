@@ -1,5 +1,5 @@
 import { getRequestT } from '@lib/i18n/server'
-import { isIdentityVerified } from '@lib/community/schoolGate'
+import { isIdentityVerified, isParentAccount } from '@lib/community/schoolGate'
 import { accountSuspendedResponse, getSupabaseProfile } from '@lib/supabase/profile.server'
 import { SERVER_SUPPORT_BRAND } from '@lib/support/brand'
 import { parseHousingProfile, supportErrorResponse, supportJson, toUserConversation } from '@lib/support/http.server'
@@ -64,7 +64,8 @@ export async function POST(request: Request) {
       const ellieo = brand === 'ellieo'
       if (!ellieo) {
         const profileRecord = await getSupabaseProfile(user.uid)
-        if (!isIdentityVerified(profileRecord ?? undefined)) {
+        // Parents (학부모 accounts) may ask about housing for their child without school/workplace verification
+        if (!isIdentityVerified(profileRecord ?? undefined) && !isParentAccount(profileRecord ?? undefined)) {
           return supportJson({ error: t('support.verifyRequired'), code: 'VERIFICATION_REQUIRED' }, 403)
         }
       }
