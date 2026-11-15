@@ -382,3 +382,50 @@ export function forClientLevels<T extends { level: PostingLevel }>(postings: T[]
   if (new URL(request.url).searchParams.get('levels') === 'all') return postings
   return postings.filter((p) => STUDENT_POSTING_LEVELS.includes(p.level))
 }
+
+/**
+ * 열려 있는 공고 수와 그 공고를 낸 회사 수 (앱 홈 배너, /api/stats — 10분 캐시).
+ * listPublicPostings 와 같은 기준이지만 요약·번역 없이 company_id, source_url 두 열만 1000개씩 끝까지 읽는다.
+ * 공고가 수천 개가 돼도 가볍고, 목록의 1000개 제한에 걸리지 않는다. 읽지 못하면 null.
+ */
+export async function countOpenPostings(): Promise<{ companies: number; postings: number } | null> {
+  const url = getSupabaseUrl()
+  const key = getSupabaseSecretKey()
+  if (!url || !key) return null
+  const today = todayInNewYork()
+  const base = `&status=eq.approved&closed_at=is.null&level=in.(${LEVELS.join(',')})&summary_status=eq.ok&order=id.asc`
+  const read = (filters: string, offset: number) =>
+    fetch(`${url}/rest/v1/job_postings?select=company_id,source_url${filters}&limit=${PAGE_SIZE}&offset=${offset}`, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(15000),
+    }).catch(() => null)
+
+  // 지원 마감일이 지난 공고는 뺀다 (apply_by 열이 없던 DB면 그 조건 없이)
+  let filters = `${base}&or=(apply_by.is.null,apply_by.gte.${today})`
+  const [companies, first] = await Promise.all([listActiveCompanies(), read(filters, 0)])
+  let res = first
+  if (res?.status === 400) {
+    filters = base
+    res = await read(filters, 0)
+  }
+  const active = new Set(companies.map((c) => c.id))
+  const hiring = new Set<string>()
+  let postings = 0
+  for (let offset = 0; ; offset += PAGE_SIZE) {
+    if (offset > 0) res = await read(filters, offset)
+    if (!res?.ok) {
+      if (res && res.status !== 404) console.error('Job postings count error:', res.status, await res.text().catch(() => ''))
+      return null
+    }
+    const rows = ((await res.json().catch(() => null)) as { company_id: string; source_url: string }[] | null) ?? []
+    for (const row of rows) {
+      if (!active.has(row.company_id) || !isHttpsUrl(row.source_url)) continue
+      postings += 1
+      hiring.add(row.company_id)
+    }
+    if (rows.length < PAGE_SIZE) return { companies: hiring.size, postings }
+  }
+}
+
+const PAGE_SIZE = 1000
