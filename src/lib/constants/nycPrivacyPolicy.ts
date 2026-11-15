@@ -118,6 +118,18 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '인증 관련: 학교(또는 인정 기관) 이메일, 인증 상태, 소속 학교명·식별자, 인증 과정에서 제출하는 확인 정보',
             },
             {
+              en: 'Workplace verification: whether you are verifying a current or former workplace, the company name, and either your work email (confirmed with a code) or the workplace documents you upload. Both methods create a review request that our team checks before approval',
+              ko: '직장 인증: 현재 직장인지 이전 직장인지, 회사 이름, 그리고 코드로 확인한 회사 이메일 또는 업로드한 직장 인증 서류. 두 방법 모두 검토 요청이 만들어지며, 미생 팀이 확인한 뒤 승인합니다',
+            },
+            {
+              en: 'Workplace documents (optional): an employment verification letter, offer letter, separation or resignation email, W-2, paystub/payslip, or employee ID card, used only to confirm your current or former workplace. You must hide salary and other amounts, Social Security numbers, and personal information not needed for this purpose before uploading. We remove file metadata on upload, store the files in a private storage bucket that only our review team can access, and delete them within 72 hours after the decision and in any case no later than 7 days after upload. Only the result (approved or rejected, current or former workplace, and the company name) is kept',
+              ko: '직장 인증 서류(선택): 재직증명서, 오퍼 레터, 퇴직·퇴사 관련 이메일, W-2, 페이스텁/페이슬립, 사원증 등으로, 현재 또는 이전 직장을 확인하는 데에만 사용합니다. 올리기 전에 급여 등 금액, 사회보장번호(SSN), 이 목적에 필요하지 않은 개인정보를 가려야 합니다. 업로드할 때 파일 메타데이터를 제거하고, 검토 팀만 접근할 수 있는 비공개 저장소에 보관하며, 결정 후 72시간 이내, 어떤 경우에도 업로드 후 7일 이내에 삭제합니다. 결과(승인·거절, 현재·이전 직장, 회사 이름)만 보관합니다',
+            },
+            {
+              en: 'Parent accounts: if you join through a student’s parent invite link, your account is a parent account linked to the inviting student. We keep the link (who invited whom and when the parent joined), which administrators can see and which we use to prevent abuse and to pay the invite reward. Parent accounts do not go through school or workplace verification',
+              ko: '학부모 계정: 학생의 부모님 초대 링크로 가입하면 초대한 학생과 연결된 학부모 계정이 됩니다. 연결 정보(누가 누구를 초대했는지, 가입 시각)를 보관하며, 관리자가 볼 수 있고 부정 사용 방지와 초대 보상 지급에 사용합니다. 학부모 계정은 학교·직장 인증을 하지 않습니다',
+            },
+            {
               en: 'Posts and communications: post titles, body text, images/attachments, comments, report reasons and details, inquiry messages, and feedback, together with the language they were written in and their translations',
               ko: '게시·소통: 게시글 제목·본문·이미지·첨부, 댓글, 신고 사유·내용, 문의 메시지, 피드백 및 작성 언어와 번역문',
             },
@@ -225,6 +237,11 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
           type: 'p',
           en: 'For operations, abuse prevention, User safety, and legal compliance, the Company may associate anonymously displayed posts with account and log data. See the Anonymous Board section of the Terms of Use for related User responsibilities.',
           ko: '회사는 서비스 운영, 부정이용 방지, 이용자 안전, 법적 의무 이행을 위해 익명으로 표시된 게시물과 계정·로그를 연결하여 처리할 수 있습니다. 자세한 이용자 책임은 이용약관의 익명게시판 조항을 참고하세요.',
+        },
+        {
+          type: 'p',
+          en: 'Anonymous posts and comments on the Q&A/Free board created after this feature was introduced (November 2026) show the kind of the author’s verification badge — “Student,” “Workplace verified,” or “Parent.” They never show the author’s nickname or school name. Anonymous posts and comments created before this change remain fully anonymous.',
+          ko: '이 기능이 도입된 뒤(2026년 11월) 질문·자유 게시판에 작성되는 익명 글·댓글에는 작성자의 인증 배지 종류(“학생”, “직장인 인증”, “학부모”)가 표시됩니다. 작성자의 닉네임이나 학교 이름은 표시되지 않습니다. 이 변경 전에 작성된 익명 글·댓글은 완전한 익명으로 남습니다.',
         },
       ],
     },
@@ -530,6 +547,14 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
             {
               en: 'Verification and security logs: for a reasonable period needed for abuse prevention and audit',
               ko: '인증·보안 로그: 부정이용 방지 및 감사에 필요한 합리적 기간',
+            },
+            {
+              en: 'Workplace verification documents: deleted within 72 hours after the decision and no later than 7 days after upload; only the result is kept. Posts written while a workplace verification was under review and that stay private after a rejection are deleted 30 days after the rejection',
+              ko: '직장 인증 서류: 결정 후 72시간 이내, 늦어도 업로드 후 7일 이내 삭제하며 결과만 보관합니다. 직장 인증 검토 중에 작성되어 거절 후에도 비공개로 남은 글은 거절일로부터 30일 후 삭제합니다',
+            },
+            {
+              en: 'Parent account links: for as long as both accounts exist, and for a reasonable period afterward where needed for abuse prevention and reward records',
+              ko: '학부모 계정 연결 정보: 두 계정이 유지되는 동안, 그리고 부정 방지·보상 기록에 필요한 경우 그 후 합리적인 기간',
             },
             {
               en: 'Inquiries and reports: for a period needed after handling for disputes and legal compliance',

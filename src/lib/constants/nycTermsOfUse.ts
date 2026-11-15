@@ -141,6 +141,14 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
               ko: '학교 이메일 인증이 요구되는 기능에서는, 인증에 사용된 소속·이메일 정보의 정확성에 대한 책임이 회원에게 있습니다. 인증 상태를 허위로 표시하거나 타인의 이메일을 무단 사용하는 행위는 금지됩니다.',
             },
             {
+              en: 'Members may also verify a current or former workplace with a work email code or with workplace documents, which the Company reviews before approval. Posts written while a workplace verification is still under review are kept private (visible only to the author) and are published when the verification is approved; commenting is available only after approval. If the verification is rejected, those posts stay private and are deleted thirty (30) days after the rejection.',
+              ko: '회원은 회사 이메일 인증 코드 또는 재직·전 직장 서류로 현재 또는 이전 직장을 인증할 수 있으며, 회사가 검토한 뒤 승인합니다. 직장 인증이 검토 중일 때 작성한 글은 비공개(작성자 본인만 볼 수 있음)로 보관되었다가 인증이 승인되면 공개되며, 댓글은 승인 후에 쓸 수 있습니다. 인증이 거절되면 해당 글은 비공개로 남고 거절일로부터 30일 후 삭제됩니다.',
+            },
+            {
+              en: 'Workplace documents must be genuine documents of your own. Before uploading, hide salary and other amounts, Social Security numbers, and any personal information that is not needed to confirm the workplace. Submitting forged or another person’s documents is prohibited and may lead to suspension.',
+              ko: '직장 인증 서류는 본인의 실제 서류여야 합니다. 올리기 전에 급여 등 금액, 사회보장번호(SSN), 직장 확인에 필요하지 않은 개인정보를 가려야 합니다. 위조 서류나 타인의 서류를 제출하는 행위는 금지되며 이용 정지 사유가 될 수 있습니다.',
+            },
+            {
               en: 'Members are responsible for safeguarding login credentials (passwords, OAuth tokens, device sessions, and similar). Do not share credentials or leave sessions open on shared devices.',
               ko: '계정 로그인 수단(비밀번호, OAuth 토큰, 기기 세션 등)의 관리 책임은 회원에게 있습니다. 제3자 공유, 공개 기기에서의 방치, 피싱에 의한 유출에 유의하십시오.',
             },
@@ -151,6 +159,40 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
             {
               en: 'For security, operations, and legal compliance, the Company may suspend accounts, request re-verification, expire sessions, or limit features.',
               ko: '회사는 보안·운영·법령 준수를 위해 계정 정지, 재인증 요청, 세션 만료, 기능 제한을 할 수 있습니다.',
+            },
+          ],
+        },
+        {
+          type: 'p',
+          en: 'Parent accounts. A verified student may invite up to two (2) parents through a personal invite link. An account created through that link is a parent account and is linked to the inviting student’s account. The following rules apply:',
+          ko: '학부모 계정. 인증을 마친 학생은 개인 초대 링크로 부모님을 최대 2명까지 초대할 수 있습니다. 이 링크로 만든 계정은 학부모 계정이며, 초대한 학생의 계정과 연결됩니다. 다음 규칙이 적용됩니다.',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Parent accounts do not go through school or workplace verification and cannot create parent invites or earn verification rewards.',
+              ko: '학부모 계정은 학교·직장 인증을 하지 않으며, 부모님 초대를 만들거나 인증 보상을 받을 수 없습니다.',
+            },
+            {
+              en: 'Parent accounts may write posts only on the Q&A/Free board, may comment on all boards, may send housing inquiries, and may browse and buy on the Marketplace, but may not sell items.',
+              ko: '학부모 계정은 질문·자유 게시판에만 글을 쓸 수 있고, 모든 게시판에 댓글을 쓸 수 있으며, 주거 문의를 보낼 수 있고, 중고거래를 둘러보고 구매할 수 있지만 물품을 판매할 수는 없습니다.',
+            },
+            {
+              en: 'Parent accounts may not request coffee chats, send career questions, or act as mentors.',
+              ko: '학부모 계정은 커피챗을 신청하거나 커리어 질문을 보내거나 멘토로 활동할 수 없습니다.',
+            },
+            {
+              en: 'The invite reward is paid to the student after the parent’s account has been active for a period set by the Company, and only if the parent account has not been sanctioned, suspended, or deleted by then.',
+              ko: '초대 보상은 학부모 계정이 회사가 정한 기간 동안 유지된 뒤, 그때까지 해당 계정이 제재·정지·삭제되지 않은 경우에만 학생에게 지급됩니다.',
+            },
+            {
+              en: 'Misuse of parent accounts — for example a student creating a parent account for themselves, creating fake accounts, or farming invite rewards — is prohibited. If misuse is confirmed, the Company may sanction both linked accounts, including withdrawing rewards, limiting features, or suspending the accounts.',
+              ko: '학부모 계정의 부정 사용(예: 학생 본인이 학부모 계정을 만드는 행위, 가짜 계정 생성, 초대 보상 부정 수령)은 금지됩니다. 부정 사용이 확인되면 회사는 연결된 두 계정 모두에 보상 회수, 기능 제한, 이용 정지 등의 제재를 할 수 있습니다.',
+            },
+            {
+              en: 'If a student created a parent account by mistake, the Company may convert it to a regular account on request.',
+              ko: '학생이 실수로 학부모 계정을 만든 경우, 요청하면 회사가 일반 계정으로 전환할 수 있습니다.',
             },
           ],
         },
@@ -363,6 +405,10 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
             {
               en: 'Anonymous display is a UI policy to reduce identity exposure to other ordinary Users. It does not mean complete anonymity, untraceability, or legal immunity toward the Company.',
               ko: '익명 표시는 “다른 일반 이용자에게 신원이 드러나지 않도록 돕는 UI 정책”이며, 회사에 대한 완전한 익명성·추적 불가능성·법적 면책을 의미하지 않습니다.',
+            },
+            {
+              en: 'Anonymous posts and comments created after this feature was introduced (November 2026) show the kind of the author’s verification badge — “Student” (school verified), “Workplace verified,” or “Parent” — so that readers can judge the context. They never show the author’s nickname or school name. Anonymous posts and comments created before this change remain fully anonymous and do not show a badge kind.',
+              ko: '이 기능이 도입된 뒤(2026년 11월) 작성되는 익명 글·댓글에는 읽는 사람이 맥락을 판단할 수 있도록 작성자의 인증 배지 종류(“학생”(학교 인증), “직장인 인증”, “학부모”)가 표시됩니다. 작성자의 닉네임이나 학교 이름은 표시되지 않습니다. 이 변경 전에 작성된 익명 글·댓글은 지금처럼 완전한 익명으로 남으며 배지 종류도 표시되지 않습니다.',
             },
             {
               en: 'Login may be required to edit or delete posts, prevent abuse, and handle reports. The Company may review related records for operations, security, legal compliance, and legitimate requests.',
