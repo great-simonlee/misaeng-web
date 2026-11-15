@@ -98,17 +98,18 @@
       "retry": "Please verify again",
       "rowHint": "Verify with your work email and company name",
       "rowLabel": "Work verification",
-      "submittedToast": "Your email is verified. Work verification will be complete once the Misaeng team reviews it.",
+      "submittedToast": "Email confirmed. You can write posts now; they go public after the Misaeng team approves.",
       "approvedTitle": "Work verification complete",
       "pendingTitle": "Work verification in review",
       "approvedDescription": "The Misaeng team has confirmed your work verification.",
-      "pendingDescription": "Your work email is verified. The Misaeng team is now reviewing your company info.",
+      "pendingDescription": "The Misaeng team is reviewing it. You can already write posts (up to 3, visible only to you); they go public on approval. Comments open after approval.",
       "formDescription": "Your work email will be linked to the account you're signed in with, even if it's different from your sign-up email. After you enter the code, the Misaeng team double-checks your company info.",
       "companyLabel": "Company name",
       "companyPlaceholder": "e.g. Misaeng LLC",
       "emailLabel": "Work email",
       "confirmButton": "Verify email",
-      "editForm": "Change company or email"
+      "editForm": "Change company or email",
+      "kindFormer": "Former job"
     },
     "verifiedShort": "Verified",
     "school": {
@@ -194,7 +195,14 @@
       "title": "Verify your identity",
       "description": "Verify with your school or work email, whichever is easier. It links to this account even if it's different from the email you signed up with.",
       "school": "Verify as a student with school email",
-      "workplace": "Verify as a professional with work email"
+      "workplace": "Verify as a professional with work email",
+      "descriptionV2": "A school email is the fastest. With a work email or job documents, your posts go public after the Misaeng team approves.",
+      "schoolHint": "Done instantly with a code · posts go public right away",
+      "workEmail": "Verify with a work email",
+      "approvalHint": "Public after approval · until then posts are visible only to you",
+      "documents": "Verify with current or former job documents",
+      "documentsHint": "Employment letter, offer letter, W-2, paystub… · public after approval",
+      "fastest": "Fastest"
     },
     "clearInputAria": "Clear input",
     "sending": "Sending…",
@@ -352,7 +360,8 @@
     "browseBoards": "Browse boards",
     "edit": "Edit",
     "deleting": "Deleting…",
-    "delete": "Delete"
+    "delete": "Delete",
+    "inReview": "In review"
   },
   "list": {
     "redirectingToLogin": "Taking you to sign in…",
@@ -423,6 +432,16 @@
         "label": "CPT",
         "example": "The CPT authorization page of your I-20",
         "mask": "SEVIS ID, date of birth, address"
+      },
+      "workplace_current": {
+        "label": "Current job",
+        "example": "Employment letter, offer letter, paystub, employee ID",
+        "mask": "amounts, SSN, address, employee number"
+      },
+      "workplace_former": {
+        "label": "Former job",
+        "example": "Resignation/separation email, W-2, past offer letter",
+        "mask": "amounts, SSN, address"
       }
     },
     "maskLabel": "Be sure to mask: {items}",
@@ -533,5 +552,111 @@
     "loginRequired": "Please log in first.",
     "notFound": "We couldn't find this conversation.",
     "unavailable": "We can't take inquiries right now. Please email info@misaeng.com."
+  },
+  "workplaceDocs": {
+    "notice": {
+      "body": "We confirm your current or former company with a document. Files are stored privately, seen only by the Misaeng team, and permanently deleted within 72 hours of the decision (at the latest 7 days after upload). Only the result (approved or not, current/former, company name) is kept.",
+      "examples": "Accepted: employment verification letter, offer letter, resignation/separation email, W-2, paystub/payslip, employee ID",
+      "hide": "Hide amounts (salary/pay), SSN, address and other personal info. Only the company name and your name need to show.",
+      "deletion": "Files are permanently deleted within 72 hours of the decision, at the latest 7 days after upload."
+    },
+    "done": {
+      "body": "We got your documents. We will let you know once the Misaeng team reviews them.",
+      "detail": "You can write posts now (up to 3, visible only to you until approval). Comments open after approval."
+    },
+    "companyLabel": "Company name",
+    "companyPlaceholder": "e.g. Misaeng LLC",
+    "uploadFailed": "Could not upload the documents. Please try again."
+  },
+  "parentInvite": {
+    "title": "Invite your parents, get {amount}P · up to {max}",
+    "description": "When your parents join with your link, they can read and ask on Q&A · Free. You get {amount}P per parent {days} days after they join (up to {max}).",
+    "verifyFirst": "Verify your school (or workplace) to create an invite link.",
+    "createButton": "Create an invite link",
+    "creating": "Creating…",
+    "createFailed": "Could not create the invite link.",
+    "limitReached": "You have invited the maximum of {max} parents.",
+    "parentFallback": "Parent",
+    "state": {
+      "waiting": "Waiting to join · valid until {date}",
+      "scheduled": "{amount}P · arrives {date}",
+      "paid": "{amount}P paid",
+      "forfeited": "Not paid"
+    },
+    "badge": {
+      "waiting": "Waiting",
+      "scheduled": "Paid in 3 days",
+      "paid": "Paid",
+      "forfeited": "Not paid"
+    },
+    "copyLink": "Copy link",
+    "copyKakao": "Copy KakaoTalk message",
+    "linkCopied": "Invite link copied. Send it to your parent.",
+    "kakaoCopied": "Paste it into KakaoTalk and send.",
+    "copyFailed": "Could not copy.",
+    "kakaoText": "{name} invited you to Misaeng. See study-in-the-US tips and questions together.",
+    "me": "I",
+    "fairUse": "Parent accounts are linked to yours. If misuse is found (e.g. making a parent account yourself), both accounts may be sanctioned."
+  },
+  "afterVerify": {
+    "parentLine": "Your parents can join you on Misaeng · invite them for {amount}P",
+    "quizLine": "Take the Misaeng quiz for {amount}P"
+  },
+  "quiz": {
+    "cardTitle": "Misaeng quiz",
+    "cardCta": "Take the quiz for {amount}P",
+    "cardDone": "Quiz completed",
+    "cardHint": "20 easy questions about how Misaeng works",
+    "doneBadge": "Done",
+    "title": "Misaeng quiz",
+    "intro": "Answer all {total} questions correctly for {amount}P. Wrong answers can be retried right away.",
+    "loadFailed": "Could not load the quiz.",
+    "parentNotAllowed": "The quiz is not available for parent accounts.",
+    "verifyFirst": "Verify your school or workplace to take the quiz.",
+    "backToMe": "Back to My page",
+    "doneTitle": "Quiz complete!",
+    "doneAwarded": "You earned {amount}P.",
+    "doneNoPoints": "All correct. Quiz points are paid once per account.",
+    "correct": "Correct!",
+    "wrong": "Not quite",
+    "tryAgain": "Pick another answer.",
+    "next": "Next question",
+    "finish": "Finish"
+  },
+  "parentAccount": {
+    "title": "Parent account",
+    "linked": "Linked to the student who invited you.",
+    "linkedTo": "Parent account linked to {name}.",
+    "can": "You can post on Q&A · Free, comment on every board, send housing inquiries and ask to buy on the marketplace.",
+    "cannot": "Selling on the marketplace, coffee chats, career questions and mentoring are not available.",
+    "writeCta": "Write on Q&A · Free"
+  },
+  "parentLanding": {
+    "eyebrow": "Parent invite",
+    "title": "{name} invited you to Misaeng",
+    "someone": "Your child",
+    "body": "Follow your child's life in the US on Misaeng. See study-in-the-US tips and questions together.",
+    "point1": "Ask anything on the Q&A · Free board (anonymous; only a \"Parent\" badge shows).",
+    "point2": "Read and comment on every board: visas, housing, reviews and more.",
+    "point3": "No school or workplace verification needed.",
+    "agreement": "Your account will be linked to the student who invited you. If misuse is found, both accounts may be sanctioned.",
+    "linkButton": "Link as a parent account",
+    "linking": "Linking…",
+    "linkFailed": "Could not link the account.",
+    "linked": "Linked with {name}. Welcome!",
+    "toAnonymous": "Browse Q&A · Free",
+    "signupWeb": "Sign up on the web",
+    "haveAccount": "I already signed up · Log in",
+    "orApp": "Or start in the app",
+    "signedInAs": "Signed in as {email}",
+    "notFoundTitle": "Invite link not found",
+    "notFoundBody": "Check the link or ask your child for a new one.",
+    "status": {
+      "used": "This invite link has already been used. Ask your child for a new one.",
+      "expired": "This invite link has expired. Ask your child for a new one.",
+      "revoked": "This invite link is no longer available.",
+      "valid": ""
+    },
+    "toHome": "Explore Misaeng"
   }
 }

@@ -31,7 +31,12 @@
     "adjust": "Điều chỉnh điểm",
     "review_question": "Question to a review author",
     "review_answer": "Answered a question",
-    "coffee_chat_refund": "Hoàn điểm coffee chat"
+    "coffee_chat_refund": "Hoàn điểm coffee chat",
+    "verify_school": "Xác minh trường học",
+    "verify_workplace": "Xác minh nơi làm việc",
+    "verify_former_workplace": "Xác minh nơi làm việc cũ",
+    "parent_invite": "Mời phụ huynh",
+    "onboarding_quiz": "Quiz Misaeng"
   },
   "entryTypes": {
     "earn": "Nhận",

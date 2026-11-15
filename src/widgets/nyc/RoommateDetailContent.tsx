@@ -137,7 +137,7 @@ export function RoommateDetailContent({
             <AuthorBadges
               schoolId={post.authorSchoolId}
               workplaceVerified={post.authorWorkplaceVerified}
-              instagramVerified={post.authorInstagramVerified}
+              instagramVerified={post.authorInstagramVerified} parent={post.authorParent} anonKind={post.anonBadgeKind}
             />
             <span>{format.relative(post.createdAt)}</span>
             <span aria-hidden className='opacity-40'>·</span>

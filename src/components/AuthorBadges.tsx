@@ -2,6 +2,7 @@
 
 import { cn } from '@lib'
 import { useT } from '@lib/i18n/client'
+import type { AnonBadgeKind } from '@/types/nyc'
 
 import { SchoolBadge } from './SchoolBadge'
 
@@ -9,6 +10,13 @@ type AuthorBadgesProps = {
   schoolId?: string | null
   workplaceVerified?: boolean
   instagramVerified?: boolean
+  /** 학부모 계정 (1.0.7) */
+  parent?: boolean
+  /**
+   * 질문·자유 익명 글·댓글: 배지 종류만 (학생 / 직장인 인증 / 학부모). 있으면 학교 이름·다른 배지 대신 이것 하나만 보인다.
+   * 1.0.7 이전 익명 글은 값이 없어 아무것도 안 보인다.
+   */
+  anonKind?: AnonBadgeKind | null
   /** SchoolBadge와 같은 크기 */
   size?: 'sm' | 'md' | 'author'
   className?: string
@@ -22,11 +30,13 @@ export function AuthorBadges({
   schoolId,
   workplaceVerified,
   instagramVerified,
+  parent,
+  anonKind,
   size = 'sm',
   className,
 }: AuthorBadgesProps) {
   const t = useT('community')
-  if (!schoolId && !workplaceVerified && !instagramVerified) return null
+  if (!anonKind && !schoolId && !workplaceVerified && !instagramVerified && !parent) return null
 
   const chip = cn(
     'inline-flex shrink-0 items-center rounded-full font-semibold',
@@ -35,6 +45,25 @@ export function AuthorBadges({
     size === 'sm' && 'gap-0.5 px-1.5 py-0.5 text-[9px] font-bold',
   )
   const icon = size === 'sm' ? 'size-2.5' : 'size-3'
+
+  if (anonKind) {
+    return (
+      <span className={cn('inline-flex flex-wrap items-center gap-1', className)}>
+        <span
+          className={cn(
+            chip,
+            anonKind === 'parent'
+              ? 'bg-[#7c3aed]/[0.08] text-[#6d28d9] ring-[#7c3aed]/15'
+              : anonKind === 'workplace'
+                ? 'bg-[#0f766e]/[0.09] text-[#0f766e] ring-[#0f766e]/15'
+                : 'bg-[#2563eb]/[0.08] text-[#1d4ed8] ring-[#2563eb]/15',
+          )}
+        >
+          {t(`badges.anon.${anonKind}`)}
+        </span>
+      </span>
+    )
+  }
 
   return (
     <span className={cn('inline-flex flex-wrap items-center gap-1', className)}>
@@ -45,6 +74,14 @@ export function AuthorBadges({
             <path strokeLinecap='round' strokeLinejoin='round' d='M8 7V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1M4.5 9.5h15v9a1.5 1.5 0 0 1-1.5 1.5h-12a1.5 1.5 0 0 1-1.5-1.5v-9Z' />
           </svg>
           {t('badges.workplace')}
+        </span>
+      ) : null}
+      {parent ? (
+        <span className={cn(chip, 'bg-[#7c3aed]/[0.08] text-[#6d28d9] ring-[#7c3aed]/15')}>
+          <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.2' className={icon} aria-hidden>
+            <path strokeLinecap='round' strokeLinejoin='round' d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z' />
+          </svg>
+          {t('badges.parent')}
         </span>
       ) : null}
       {instagramVerified ? (

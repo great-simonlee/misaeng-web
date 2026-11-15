@@ -31,7 +31,12 @@
     "adjust": "Points adjustment",
     "review_question": "Career question to a review author",
     "review_answer": "Answered a question",
-    "coffee_chat_refund": "Coffee chat refund"
+    "coffee_chat_refund": "Coffee chat refund",
+    "verify_school": "School verification",
+    "verify_workplace": "Workplace verification",
+    "verify_former_workplace": "Former workplace verification",
+    "parent_invite": "Parent invite",
+    "onboarding_quiz": "Misaeng quiz"
   },
   "entryTypes": {
     "earn": "Earned",

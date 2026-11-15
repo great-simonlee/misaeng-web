@@ -230,6 +230,23 @@
     "first-post": {
       "label": "Bài viết đầu tiên trong cộng đồng",
       "description": "Một lần, cho bài viết đầu tiên của bạn trên bảng tin được tính điểm, như review ăn uống, OPT hoặc việc làm (nếu đáp ứng điều kiện)."
+    },
+    "workplace-verify": {
+      "label": "Xác minh nơi làm việc",
+      "description": "Một lần, khi nơi làm việc hiện tại được duyệt (email công ty hoặc giấy tờ)."
+    },
+    "former-workplace-verify": {
+      "label": "Xác minh nơi làm việc cũ",
+      "description": "Một lần, khi nơi làm việc cũ được duyệt bằng giấy tờ."
+    },
+    "parent-invite": {
+      "label": "Mời bố mẹ",
+      "description": "Được trả 3 ngày sau khi phụ huynh tham gia bằng liên kết mời, nếu tài khoản bình thường.",
+      "unit": "mỗi phụ huynh · tối đa 2"
+    },
+    "onboarding-quiz": {
+      "label": "Quiz Misaeng",
+      "description": "Một lần, khi bạn trả lời đúng cả 20 câu quiz về cách dùng Misaeng."
     }
   },
   "noEarn": {

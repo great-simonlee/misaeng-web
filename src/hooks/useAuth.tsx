@@ -167,6 +167,12 @@ function mapProfile(uid: string, email: string, raw: Record<string, unknown> | n
       typeof raw?.workplaceReviewedByEmail === 'string'
         ? raw.workplaceReviewedByEmail
         : null,
+    workplaceKind: raw?.workplaceKind === 'current' || raw?.workplaceKind === 'former' ? raw.workplaceKind : null,
+    workplaceMethod: raw?.workplaceMethod === 'email' || raw?.workplaceMethod === 'documents' ? raw.workplaceMethod : null,
+    accountType: raw?.accountType === 'parent' ? 'parent' : 'member',
+    invitedByUid: typeof raw?.invitedByUid === 'string' ? raw.invitedByUid : null,
+    onboardingQuizCompletedAt:
+      typeof raw?.onboardingQuizCompletedAt === 'number' ? raw.onboardingQuizCompletedAt : null,
     phone: typeof raw?.phone === 'string' ? raw.phone : null,
     phoneVerified: Boolean(raw?.phoneVerified),
     // 서버 프로필(verifiedSchools 원본) → 계산, 부분 patch면 이전 목록 유지, 예전 프로필은 대표 학교 하나
@@ -283,6 +289,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 workplaceRejectReason: prev.workplaceRejectReason,
                 workplaceReviewedAt: prev.workplaceReviewedAt,
                 workplaceReviewedByEmail: prev.workplaceReviewedByEmail,
+                workplaceKind: prev.workplaceKind,
+                workplaceMethod: prev.workplaceMethod,
+                accountType: prev.accountType,
+                invitedByUid: prev.invitedByUid,
+                onboardingQuizCompletedAt: prev.onboardingQuizCompletedAt,
                 phone: prev.phone,
                 phoneVerified: prev.phoneVerified,
                 verifiedSchoolsList: prev.verifiedSchools,

@@ -55,6 +55,8 @@ export type CommunityCreditBonusRule = {
   id: string
   amount: number
   once: boolean
+  /** 화면 표시만 (1.0.7 원장 규칙): false면 `bonusRules.<id>.unit` (예: 1명당 · 최대 2명) */
+  displayOnly?: boolean
 }
 
 export type CommunityCreditRedeemOption = {
@@ -191,6 +193,11 @@ export const COMMUNITY_CREDIT_EARN_RULES: readonly CommunityCreditEarnRule[] = [
 export const COMMUNITY_CREDIT_BONUS_RULES: readonly CommunityCreditBonusRule[] = [
   { id: 'school-verify', amount: 5, once: true },
   { id: 'first-post', amount: 5, once: true },
+  // 1.0.7 (포인트 원장 규칙과 같은 값: earn.verify_workplace / verify_former_workplace / parent_invite / onboarding_quiz)
+  { id: 'workplace-verify', amount: 5, once: true, displayOnly: true },
+  { id: 'former-workplace-verify', amount: 5, once: true, displayOnly: true },
+  { id: 'parent-invite', amount: 30, once: false, displayOnly: true },
+  { id: 'onboarding-quiz', amount: 10, once: true, displayOnly: true },
 ] as const
 
 /** 적립 대상이 아닌 활동 — 문구 키 `noEarn.<id>` */

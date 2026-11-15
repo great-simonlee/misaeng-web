@@ -276,6 +276,13 @@
     },
     "marketplace": {
       "zipRequired": "Enter a 5-digit ZIP code for the pickup area."
+    },
+    "parent": {
+      "boardNotAllowed": "Parent accounts can post on Q&A · Free."
+    },
+    "held": {
+      "limit": "You can have up to {max} posts waiting for approval. They go public once your workplace is approved.",
+      "commentBlocked": "You can comment once your workplace verification is approved."
     }
   },
   "guest": {
@@ -411,6 +418,24 @@
       "message": {
         "title": "New message · {listing}"
       }
+    },
+    "workplace": {
+      "approved": {
+        "title": "Workplace verified",
+        "body": "Your workplace is approved. Your posts and comments now go public right away.",
+        "bodyWithPosts": "Your workplace is approved and your {count} waiting post(s) are now public."
+      },
+      "rejected": {
+        "title": "Workplace verification declined",
+        "body": "Submit again or verify your school instead. Waiting posts are deleted after 30 days.",
+        "bodyWithReason": "Reason: {reason} · Submit again or verify your school instead."
+      }
+    },
+    "parents": {
+      "joined": {
+        "title": "Your parent joined Misaeng",
+        "body": "Your {amount}P invite reward arrives in {days} days."
+      }
     }
   },
   "reviewDocs": {
@@ -523,8 +548,10 @@
       "notFound": "Question not found.",
       "answerRequired": "Please write an answer.",
       "closed": "This question is already closed.",
-      "reportReasonRequired": "Please enter a reason for the report."
-    }
+      "reportReasonRequired": "Please enter a reason for the report.",
+      "tooMany": "You can send up to 3 questions at once."
+    },
+    "parentNotAllowed": "This is not available for parent accounts."
   },
   "account": {
     "deleted": "This account has been deleted. You can’t sign in with it again.",
@@ -582,5 +609,27 @@
   "companies": {
     "nameInvalid": "Check the company name (up to 80 characters, no links).",
     "tooMany": "You can’t add more companies today. Please try again tomorrow."
+  },
+  "parents": {
+    "verificationNotAllowed": "Parent accounts do not verify a school or workplace.",
+    "notReady": "Parent invites are not ready yet. Please try again later.",
+    "parentCannotInvite": "Parent accounts cannot invite other parents.",
+    "verifyFirst": "Verify your school (or workplace) to invite your parents.",
+    "limit": "You can invite up to {max} parents.",
+    "inviteNotFound": "This invite link was not found.",
+    "inviteUsed": "This invite link has already been used.",
+    "inviteRevoked": "This invite link is no longer available.",
+    "inviteExpired": "This invite link has expired. Ask your child for a new one.",
+    "ownInvite": "You cannot use your own invite link.",
+    "alreadyParent": "This account is already linked to a student as a parent.",
+    "accountIneligible": "Accounts with a school/workplace verification or their own parent invites cannot become parent accounts. Please sign up with a new account.",
+    "agreementRequired": "Please confirm the account link notice.",
+    "failed": "Could not process the parent invite. Please try again.",
+    "notParent": "This is not a parent account."
+  },
+  "quiz": {
+    "parentNotAllowed": "The quiz is not available for parent accounts.",
+    "verifyFirst": "Verify your school or workplace to take the quiz.",
+    "failed": "Could not save the quiz result. Please try again."
   }
 }

@@ -60,7 +60,10 @@ export function CommunityPostFooter({
               {authorName}
             </p>
             {!anonymous ? (
-              <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} size='author' />
+              <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} parent={post.authorParent} size='author' />
+            ) : post.anonBadgeKind ? (
+              // 1.0.7부터 새 익명 글: 배지 종류만
+              <AuthorBadges anonKind={post.anonBadgeKind} size='author' />
             ) : null}
           </div>
         </div>

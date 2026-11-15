@@ -214,7 +214,9 @@
     "marketFree": "Miễn phí",
     "marketNear": "Gần {zip}",
     "marketReserved": "Đã đặt trước",
-    "marketSold": "Đã bán"
+    "marketSold": "Đã bán",
+    "parentInvite": "Cuộc sống của con ở Mỹ, cùng nhau trên Misaeng 👨‍👩‍👧",
+    "parentInviteDescription": "Cùng xem thông tin và câu hỏi về cuộc sống du học Mỹ."
   },
   "appHandoff": {
     "openApp": "Mở trong ứng dụng Misaeng",

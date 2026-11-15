@@ -34,10 +34,11 @@ import {
 import { isSchoolEmail, isValidEmailFormat } from '@lib/utils/verification'
 import { getWorkplaceEmailErrorCode } from '@lib/utils/workplaceEmail'
 import { BRAND_CONFIG } from '@lib/brand'
+import { WorkplaceDocumentsFlow } from '@widgets/nyc/reviewDocs/WorkplaceDocumentsFlow'
 import { useFormat, useT } from '@lib/i18n/client'
 import type { NycUserProfile } from '@/types/nyc'
 
-type VerifyKind = 'school' | 'schools' | 'workplace' | 'instagram' | 'chooser' | null
+type VerifyKind = 'school' | 'schools' | 'workplace' | 'workplaceDocs' | 'instagram' | 'chooser' | null
 
 /** `{name}` 자리에 요소를 끼운다 (언어마다 어순이 달라서 문장을 쪼개지 않는다) */
 function renderWithSlots(template: string, slots: Record<string, ReactNode>) {
@@ -56,6 +57,11 @@ type Props = {
   onWorkplaceVerifyOpenChange?: (open: boolean) => void
   openIdentityVerify?: boolean
   onIdentityVerifyOpenChange?: (open: boolean) => void
+  /** 재직·전 직장 서류 시트 (?verify=workplaceDocs) */
+  openWorkplaceDocsVerify?: boolean
+  onWorkplaceDocsVerifyOpenChange?: (open: boolean) => void
+  /** 학교 인증이 끝났을 때 (부모님 초대·퀴즈 안내 한 줄을 띄운다) */
+  onVerified?: () => void
 }
 
 export function ProfileVerificationSection({
@@ -66,12 +72,17 @@ export function ProfileVerificationSection({
   onWorkplaceVerifyOpenChange,
   openIdentityVerify = false,
   onIdentityVerifyOpenChange,
+  openWorkplaceDocsVerify = false,
+  onWorkplaceDocsVerifyOpenChange,
+  onVerified,
 }: Props) {
   const t = useT('me')
   const { user, refreshSession, mergeStoredProfile } = useAuth()
   const { success, error: toastError } = useToast()
   const [active, setActive] = useState<VerifyKind>(null)
-  const resolvedActive: VerifyKind = openWorkplaceVerify
+  const resolvedActive: VerifyKind = openWorkplaceDocsVerify
+    ? 'workplaceDocs'
+    : openWorkplaceVerify
     ? 'workplace'
     : openSchoolVerify
       ? 'school'
@@ -91,11 +102,15 @@ export function ProfileVerificationSection({
       if (kind === 'chooser') {
         onIdentityVerifyOpenChange?.(false)
       }
+      if (kind === 'workplaceDocs') {
+        onWorkplaceDocsVerifyOpenChange?.(false)
+      }
     },
     [
       onSchoolVerifyOpenChange,
       onWorkplaceVerifyOpenChange,
       onIdentityVerifyOpenChange,
+      onWorkplaceDocsVerifyOpenChange,
     ],
   )
 
@@ -107,9 +122,11 @@ export function ProfileVerificationSection({
   const workplaceApproved = workplaceStatus === 'approved'
   const workplacePending = workplaceStatus === 'pending'
 
+  const workplaceKindLabel =
+    profile?.workplaceKind === 'former' ? t('verification.workplace.kindFormer') : null
   const workplaceDetail =
     workplaceApproved
-      ? [profile?.workplaceCompanyName, profile?.workEmail]
+      ? [profile?.workplaceCompanyName, workplaceKindLabel, profile?.workEmail]
           .filter(Boolean)
           .join(' · ') || t('verification.verifiedShort')
       : workplacePending
@@ -222,7 +239,13 @@ export function ProfileVerificationSection({
                 <button
                   type='button'
                   onClick={() =>
-                    setActive(item.id === 'school' && item.verified ? 'schools' : item.id)
+                    setActive(
+                      item.id === 'school' && item.verified
+                        ? 'schools'
+                        : item.id === 'workplace' && canVerify
+                          ? 'chooser'
+                          : item.id,
+                    )
                   }
                   className='w-full text-left touch-manipulation transition active:bg-[#f8f9fb]'
                 >
@@ -242,28 +265,47 @@ export function ProfileVerificationSection({
           onClose={() => closeVerify('chooser')}
         >
           <p className={verifyDescriptionClass}>
-            {t('verification.chooser.description')}
+            {t('verification.chooser.descriptionV2')}
           </p>
-          <button
-            type='button'
-            onClick={() => {
-              onIdentityVerifyOpenChange?.(false)
-              setActive('school')
-            }}
-            className={verifyPrimaryButtonClass}
-          >
-            {t('verification.chooser.school')}
-          </button>
-          <button
-            type='button'
-            onClick={() => {
-              onIdentityVerifyOpenChange?.(false)
-              setActive('workplace')
-            }}
-            className={verifyGhostButtonClass}
-          >
-            {t('verification.chooser.workplace')}
-          </button>
+          {/* 1.0.7: 학교 이메일(바로 공개)이 가장 빠르다 → 맨 위·강조. 회사 이메일·서류는 승인 후 공개 */}
+          {(
+            [
+              { kind: 'school', title: t('verification.chooser.school'), hint: t('verification.chooser.schoolHint'), fastest: true },
+              { kind: 'workplace', title: t('verification.chooser.workEmail'), hint: t('verification.chooser.approvalHint'), fastest: false },
+              { kind: 'workplaceDocs', title: t('verification.chooser.documents'), hint: t('verification.chooser.documentsHint'), fastest: false },
+            ] as const
+          )
+            .filter((choice) => choice.kind === 'school' || (!workplaceApproved && !workplacePending))
+            .map((choice) => (
+              <button
+                key={choice.kind}
+                type='button'
+                onClick={() => {
+                  onIdentityVerifyOpenChange?.(false)
+                  setActive(choice.kind)
+                }}
+                className={
+                  choice.fastest
+                    ? 'flex w-full items-center gap-3 rounded-2xl bg-[var(--brand)] px-4 py-3.5 text-left text-white touch-manipulation'
+                    : 'flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-left text-[var(--foreground)] ring-1 ring-black/[0.08] touch-manipulation'
+                }
+              >
+                <span className='min-w-0 flex-1'>
+                  <span className='flex flex-wrap items-center gap-1.5'>
+                    <span className='text-[15px] font-semibold tracking-tight'>{choice.title}</span>
+                    {choice.fastest ? (
+                      <span className='rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold'>
+                        {t('verification.chooser.fastest')}
+                      </span>
+                    ) : null}
+                  </span>
+                  <span className={choice.fastest ? 'mt-0.5 block text-[12px] text-white/85' : 'mt-0.5 block text-[12px] text-[var(--muted)]'}>
+                    {choice.hint}
+                  </span>
+                </span>
+                <ChevronRight muted={choice.fastest} />
+              </button>
+            ))}
         </VerifySheet>
       ) : null}
 
@@ -292,6 +334,29 @@ export function ProfileVerificationSection({
         )
       )}
 
+      {resolvedActive === 'workplaceDocs' && user && (
+        workplacePending || workplaceApproved ? (
+          <WorkplaceStatusSheet
+            approved={workplaceApproved}
+            companyName={profile?.workplaceCompanyName}
+            workEmail={profile?.workEmail}
+            rejectReason={profile?.workplaceRejectReason}
+            onClose={() => closeVerify('workplaceDocs')}
+          />
+        ) : (
+          <WorkplaceDocumentsFlow
+            initialCompanyName={profile?.workplaceCompanyName}
+            onClose={() => {
+              void refreshSession()
+              closeVerify('workplaceDocs')
+            }}
+            onSubmitted={(storedProfile) => {
+              if (storedProfile) mergeStoredProfile(storedProfile)
+            }}
+          />
+        )
+      )}
+
       {resolvedActive === 'school' && user && (
         <SchoolEmailVerifyModal
           onClose={() => closeVerify('school')}
@@ -304,6 +369,7 @@ export function ProfileVerificationSection({
                 : t('verification.school.verifiedToast'),
             )
             closeVerify('school')
+            onVerified?.()
             // 두 번째 학교부터는 바로 대표 학교를 고를 수 있게 학교 목록을 연다
             if (isPrimary === false) setActive('schools')
           }}

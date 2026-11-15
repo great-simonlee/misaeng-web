@@ -18,7 +18,7 @@ import {
 } from '@lib/community/client'
 import { COMMUNITY_BODY_MAX } from '@lib/community/food'
 import { htmlToPlainText } from '@lib/community/html'
-import { isAccountSuspended, isIdentityVerified } from '@lib/community/schoolGate'
+import { canWriteOnBoard, isAccountSuspended } from '@lib/community/schoolGate'
 import {
   clearWriteDraft,
   loadWriteDraft,
@@ -250,8 +250,8 @@ export function AnonymousWriteScreen({
     return <AccountSuspendedNotice />
   }
 
-  if (!isIdentityVerified(profile)) {
-    return <SchoolVerificationRequired nextPath={loginNext} />
+  if (!canWriteOnBoard(profile, boardId)) {
+    return <SchoolVerificationRequired nextPath={loginNext} boardId={boardId} />
   }
 
   return (

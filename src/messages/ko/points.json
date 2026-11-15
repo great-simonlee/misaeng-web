@@ -31,7 +31,12 @@
     "adjust": "포인트 조정",
     "review_question": "후기 작성자에게 커리어 질문",
     "review_answer": "질문 답변",
-    "coffee_chat_refund": "커피챗 환불"
+    "coffee_chat_refund": "커피챗 환불",
+    "verify_school": "학교 인증",
+    "verify_workplace": "직장인 인증",
+    "verify_former_workplace": "전 직장 인증",
+    "parent_invite": "부모님 초대",
+    "onboarding_quiz": "미생 퀴즈"
   },
   "entryTypes": {
     "earn": "적립",

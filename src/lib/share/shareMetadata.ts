@@ -8,7 +8,7 @@ import { getT } from '@lib/i18n/server'
 /** Misaeng iOS app (com.misaeng.nyc) on the App Store. */
 export const MISAENG_APP_STORE_ID = '6826454902'
 
-export type ShareKind = 'housing' | 'visa' | 'review' | 'company' | 'postings' | 'posting' | 'marketplace'
+export type ShareKind = 'housing' | 'visa' | 'review' | 'company' | 'postings' | 'posting' | 'marketplace' | 'parentInvite'
 
 /** Bumped when an image changes: KakaoTalk and others cache previews by image URL. */
 const DEFAULT_IMAGE = '/og/share-default.png?v=2'
@@ -21,6 +21,8 @@ const SHARE_IMAGE: Record<ShareKind, string> = {
   postings: DEFAULT_IMAGE,
   posting: DEFAULT_IMAGE,
   marketplace: DEFAULT_IMAGE,
+  // 학부모 초대 링크 (scripts/og-share-parent.html → public/og/share-parent.png)
+  parentInvite: '/og/share-parent.png',
 }
 
 /**

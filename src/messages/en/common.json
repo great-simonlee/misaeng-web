@@ -214,7 +214,9 @@
     "marketFree": "Free",
     "marketNear": "Near {zip}",
     "marketReserved": "Reserved",
-    "marketSold": "Sold"
+    "marketSold": "Sold",
+    "parentInvite": "Your child's life in the US, together on Misaeng 👨‍👩‍👧",
+    "parentInviteDescription": "See study-in-the-US tips and questions together."
   },
   "appHandoff": {
     "openApp": "Open in the Misaeng app",

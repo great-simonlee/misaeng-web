@@ -31,6 +31,9 @@ import { MyPageSkeleton } from '@widgets/nyc/MyPageSkeleton'
 import { ProfileCardAction } from '@widgets/nyc/ProfileCardAction'
 import { MyPageCreditSection } from '@widgets/nyc/MyPageCreditSection'
 import { MyPageReferralSection } from '@widgets/nyc/MyPageReferralSection'
+import { MyPageParentInviteSection } from '@widgets/nyc/MyPageParentInviteSection'
+import { JustVerifiedLine, ParentAccountCard, QuizCard } from '@widgets/nyc/MyPageOnboardingCards'
+import { MISAENG_DESIGN } from '@lib/brand/design'
 import { MyPageReviewVerifications } from '@widgets/nyc/reviewDocs/MyPageReviewVerifications'
 import { MyPageBlockedUsersSection } from '@widgets/nyc/MyPageBlockedUsersSection'
 
@@ -141,6 +144,9 @@ export function MyPageScreen() {
   const [schoolVerifyOpen, setSchoolVerifyOpen] = useState(false)
   const [workplaceVerifyOpen, setWorkplaceVerifyOpen] = useState(false)
   const [identityVerifyOpen, setIdentityVerifyOpen] = useState(false)
+  const [workplaceDocsVerifyOpen, setWorkplaceDocsVerifyOpen] = useState(false)
+  // 학교 인증 직후 한 줄 (부모님 초대 30P · 퀴즈 10P)
+  const [justVerified, setJustVerified] = useState(false)
   const [savingProfileSetup, setSavingProfileSetup] = useState(false)
   const [profileDraft, setProfileDraft] = useState<ProfileSetupDraft>({
     nickname: '',
@@ -158,8 +164,15 @@ export function MyPageScreen() {
   const showWorkplacePendingCta =
     profileComplete && workplaceStatus === 'pending'
   const showIdentityVerifyCta =
-    profileComplete && !identityVerified && !showWorkplacePendingCta
+    profileComplete && !identityVerified && !showWorkplacePendingCta && profile?.accountType !== 'parent'
   const affiliationLabel = getVerifiedAffiliationLabel(profile)
+  const isParent = profile?.accountType === 'parent'
+  // 학교 인증 직후, 또는 직장 승인 3일 안: 부모님 초대·퀴즈 한 줄
+  const recentlyApproved =
+    workplaceStatus === 'approved' &&
+    typeof profile?.workplaceReviewedAt === 'number' &&
+    profile.workplaceReviewedAt > Date.now() - 3 * 24 * 60 * 60 * 1000
+  const showAfterVerifyLine = !isParent && (justVerified || recentlyApproved)
 
   useEffect(() => {
     if (loading || sessionLoading) return
@@ -170,6 +183,13 @@ export function MyPageScreen() {
 
   useEffect(() => {
     const verify = searchParams.get('verify')
+    // 학부모 계정은 학교·직장 인증을 하지 않는다
+    if (profile?.accountType === 'parent') return
+    if (verify === 'workplaceDocs') {
+      if (profile?.workplaceStatus === 'approved') return
+      setWorkplaceDocsVerifyOpen(true)
+      return
+    }
     if (verify === 'workplace') {
       if (profile?.workplaceStatus === 'approved') return
       setWorkplaceVerifyOpen(true)
@@ -192,6 +212,7 @@ export function MyPageScreen() {
     searchParams,
     profile?.schoolEmailVerified,
     profile?.workplaceStatus,
+    profile?.accountType,
   ])
 
   // 가입 직후 (?setup=1): 프로필이 비어 있으면 설정 시트를 한 번 연다
@@ -694,19 +715,37 @@ export function MyPageScreen() {
               </div>
             </section>
 
+            {MISAENG_DESIGN && showAfterVerifyLine ? (
+              <JustVerifiedLine quizAvailable={!profile?.onboardingQuizCompletedAt} />
+            ) : null}
+
+            {MISAENG_DESIGN && isParent ? <ParentAccountCard /> : null}
+
             <MyPageReferralSection />
+
+            {/* 1.0.7 (미생만): 부모님 초대 30P · 최대 2명, 미생 퀴즈 10P */}
+            {MISAENG_DESIGN && !isParent ? <MyPageParentInviteSection /> : null}
+            {MISAENG_DESIGN && !isParent && identityVerified ? (
+              <QuizCard completed={Boolean(profile?.onboardingQuizCompletedAt)} rewardPoints={10} />
+            ) : null}
 
             <MyPageBlockedUsersSection />
 
-            <ProfileVerificationSection
-              profile={profile}
-              openSchoolVerify={schoolVerifyOpen}
-              onSchoolVerifyOpenChange={setSchoolVerifyOpen}
-              openWorkplaceVerify={workplaceVerifyOpen}
-              onWorkplaceVerifyOpenChange={setWorkplaceVerifyOpen}
-              openIdentityVerify={identityVerifyOpen}
-              onIdentityVerifyOpenChange={setIdentityVerifyOpen}
-            />
+            {/* 학부모 계정은 학교·직장 인증이 없다 */}
+            {!isParent ? (
+              <ProfileVerificationSection
+                profile={profile}
+                openSchoolVerify={schoolVerifyOpen}
+                onSchoolVerifyOpenChange={setSchoolVerifyOpen}
+                openWorkplaceVerify={workplaceVerifyOpen}
+                onWorkplaceVerifyOpenChange={setWorkplaceVerifyOpen}
+                openIdentityVerify={identityVerifyOpen}
+                onIdentityVerifyOpenChange={setIdentityVerifyOpen}
+                openWorkplaceDocsVerify={workplaceDocsVerifyOpen}
+                onWorkplaceDocsVerifyOpenChange={setWorkplaceDocsVerifyOpen}
+                onVerified={() => setJustVerified(true)}
+              />
+            ) : null}
 
             <MyPageReviewVerifications />
           </div>

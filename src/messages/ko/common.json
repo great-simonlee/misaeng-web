@@ -214,7 +214,9 @@
     "marketFree": "나눔",
     "marketNear": "{zip} 근처",
     "marketReserved": "예약중",
-    "marketSold": "판매완료"
+    "marketSold": "판매완료",
+    "parentInvite": "자녀의 미국 생활, 미생에서 함께 👨‍👩‍👧",
+    "parentInviteDescription": "미국 유학 생활 정보와 질문을 함께 볼 수 있어요."
   },
   "appHandoff": {
     "openApp": "미생 앱에서 열기",

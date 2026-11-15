@@ -233,6 +233,23 @@
     "first-post": {
       "label": "First community post",
       "description": "One time, for your first post on a board that earns points, like food, OPT or job reviews (if it meets the conditions)."
+    },
+    "workplace-verify": {
+      "label": "Workplace verification",
+      "description": "Once, when your current workplace is approved (work email or documents)."
+    },
+    "former-workplace-verify": {
+      "label": "Former workplace verification",
+      "description": "Once, when a former workplace is approved with documents."
+    },
+    "parent-invite": {
+      "label": "Invite your parents",
+      "description": "Paid 3 days after a parent joins with your invite link, if the account is in good standing.",
+      "unit": "per parent · up to 2"
+    },
+    "onboarding-quiz": {
+      "label": "Misaeng quiz",
+      "description": "Once, when you answer all 20 quiz questions about how Misaeng works."
     }
   },
   "noEarn": {

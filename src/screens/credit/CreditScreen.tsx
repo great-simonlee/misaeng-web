@@ -27,6 +27,7 @@ import {
 import { useFormat, useT } from '@lib/i18n/client'
 import type { Translate, TranslateParams } from '@lib/i18n/translate'
 import { cn } from '@lib'
+import { MISAENG_DESIGN } from '@lib/brand/design'
 
 const TOC = ['redeem', 'process', 'earn', 'principles', 'limits', 'faq'] as const
 
@@ -200,13 +201,13 @@ export function CreditScreen() {
                     </td>
                   </tr>
                 ))}
-                {COMMUNITY_CREDIT_BONUS_RULES.map((bonus) => (
+                {COMMUNITY_CREDIT_BONUS_RULES.filter((bonus) => MISAENG_DESIGN || !('displayOnly' in bonus && bonus.displayOnly)).map((bonus) => (
                   <tr key={bonus.id} className='bg-[#fffbf9]'>
                     <td className='px-4 py-3.5 sm:px-5'>
                       <p className='text-[14px] font-medium text-[var(--foreground)]'>
                         {t(`bonusRules.${bonus.id}.label`)}
                         <span className='ml-1.5 text-[11px] font-normal text-[var(--muted)]'>
-                          {t('earn.once')}
+                          {bonus.once ? t('earn.once') : t(`bonusRules.${bonus.id}.unit`)}
                         </span>
                       </p>
                     </td>

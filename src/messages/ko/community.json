@@ -498,8 +498,14 @@
     "authorNickname": "닉네임"
   },
   "badges": {
-    "workplace": "직장 인증",
-    "instagram": "인스타 인증"
+    "workplace": "직장인 인증",
+    "instagram": "인스타 인증",
+    "parent": "학부모",
+    "anon": {
+      "student": "학생",
+      "workplace": "직장인 인증",
+      "parent": "학부모"
+    }
   },
   "blocks": {
     "action": "차단하기",
@@ -521,5 +527,35 @@
     "unblockFailed": "차단을 해제하지 못했어요. 잠시 후 다시 시도해 주세요.",
     "anonymousUser": "익명 사용자",
     "blockedAt": "{date} 차단"
+  },
+  "verifyChoice": {
+    "description": "글을 쓰려면 인증이 필요해요. 학교 이메일이 가장 빨라요.",
+    "fastest": "가장 빨라요",
+    "heldNote": "회사 이메일·서류로 인증하면 승인 전까지 글이 나에게만 보이고(최대 3개), 승인되면 공개돼요. 댓글은 승인 후에 쓸 수 있어요.",
+    "school": {
+      "title": "학교 이메일",
+      "hint": "코드 확인 즉시 · 글이 바로 공개"
+    },
+    "workEmail": {
+      "title": "회사 이메일",
+      "hint": "미생 팀 승인 후 공개"
+    },
+    "documents": {
+      "title": "재직·전 직장 서류",
+      "hint": "재직증명서·오퍼 레터·W-2 등 · 승인 후 공개"
+    }
+  },
+  "parent": {
+    "writeOnlyAnonymous": "학부모 계정은 질문·자유에 글을 쓸 수 있어요",
+    "writeOnlyAnonymousHint": "다른 게시판은 둘러보고 댓글을 달 수 있어요. 궁금한 건 질문·자유에 남겨 주세요.",
+    "toAnonymousComposer": "질문·자유에 글쓰기",
+    "anonymousBanner": "부모님도 여기서 질문할 수 있어요",
+    "anonymousBannerCta": "초대하기"
+  },
+  "held": {
+    "commentBlocked": "직장 인증 승인 후 댓글을 쓸 수 있어요",
+    "bannerTitle": "검토 중 · 나에게만 보여요",
+    "bannerBody": "직장 인증이 승인되면 공개돼요.",
+    "bannerRejected": "직장 인증이 반려됐어요. 다시 제출하거나 학교 인증을 하면 공개돼요. 그대로 두면 30일 뒤 삭제돼요."
   }
 }

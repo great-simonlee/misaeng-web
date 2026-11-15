@@ -509,7 +509,13 @@
   },
   "badges": {
     "workplace": "Workplace verified",
-    "instagram": "Instagram verified"
+    "instagram": "Instagram verified",
+    "parent": "Parent",
+    "anon": {
+      "student": "Student",
+      "workplace": "Workplace verified",
+      "parent": "Parent"
+    }
   },
   "blocks": {
     "action": "Block",
@@ -531,5 +537,35 @@
     "unblockFailed": "Couldn't unblock this user. Please try again in a moment.",
     "anonymousUser": "Anonymous user",
     "blockedAt": "Blocked {date}"
+  },
+  "verifyChoice": {
+    "description": "Verify to write posts. A school email is the fastest.",
+    "fastest": "Fastest",
+    "heldNote": "With a work email or documents, your posts stay visible only to you until approval (up to 3), then go public. Comments open after approval.",
+    "school": {
+      "title": "School email",
+      "hint": "Instant with a code · posts go public right away"
+    },
+    "workEmail": {
+      "title": "Work email",
+      "hint": "Public after the Misaeng team approves"
+    },
+    "documents": {
+      "title": "Current or former job documents",
+      "hint": "Employment letter, offer letter, W-2… · public after approval"
+    }
+  },
+  "parent": {
+    "writeOnlyAnonymous": "Parent accounts can post on Q&A · Free",
+    "writeOnlyAnonymousHint": "You can browse and comment on every board. Ask your questions on Q&A · Free.",
+    "toAnonymousComposer": "Write on Q&A · Free",
+    "anonymousBanner": "Your parents can ask here too",
+    "anonymousBannerCta": "Invite"
+  },
+  "held": {
+    "commentBlocked": "You can comment once your workplace is approved",
+    "bannerTitle": "In review · only you can see this",
+    "bannerBody": "It goes public once your workplace verification is approved.",
+    "bannerRejected": "Your workplace verification was declined. Submit again or verify your school to publish it; otherwise it is deleted after 30 days."
   }
 }

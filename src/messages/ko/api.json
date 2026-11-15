@@ -276,6 +276,13 @@
     },
     "marketplace": {
       "zipRequired": "거래 지역 ZIP 코드 5자리를 입력해 주세요."
+    },
+    "parent": {
+      "boardNotAllowed": "학부모 계정은 질문·자유에 글을 쓸 수 있어요."
+    },
+    "held": {
+      "limit": "승인 대기 중인 글은 최대 {max}개까지 쓸 수 있어요. 직장 인증이 승인되면 공개돼요.",
+      "commentBlocked": "직장 인증 승인 후 댓글을 쓸 수 있어요."
     }
   },
   "guest": {
@@ -411,6 +418,24 @@
       "message": {
         "title": "중고거래 · {listing}"
       }
+    },
+    "workplace": {
+      "approved": {
+        "title": "직장인 인증 완료",
+        "body": "직장인 인증이 승인됐어요. 이제 글과 댓글이 바로 공개돼요.",
+        "bodyWithPosts": "직장인 인증이 승인돼서 기다리던 글 {count}개가 공개됐어요."
+      },
+      "rejected": {
+        "title": "직장인 인증이 반려됐어요",
+        "body": "다시 제출하거나 학교 인증을 하세요. 승인 전 글은 30일 뒤 삭제돼요.",
+        "bodyWithReason": "사유: {reason} · 다시 제출하거나 학교 인증을 하세요."
+      }
+    },
+    "parents": {
+      "joined": {
+        "title": "부모님이 미생에 가입했어요",
+        "body": "{days}일 후 초대 보상 {amount}P가 지급될 예정이에요."
+      }
     }
   },
   "reviewDocs": {
@@ -523,8 +548,10 @@
       "notFound": "질문을 찾을 수 없어요.",
       "answerRequired": "답변을 적어 주세요.",
       "closed": "이미 마감된 질문이에요.",
-      "reportReasonRequired": "신고 사유를 입력해 주세요."
-    }
+      "reportReasonRequired": "신고 사유를 입력해 주세요.",
+      "tooMany": "한 번에 질문은 최대 3개까지 보낼 수 있어요."
+    },
+    "parentNotAllowed": "학부모 계정은 이용할 수 없는 기능이에요."
   },
   "account": {
     "deleted": "탈퇴한 계정이에요. 같은 계정으로는 다시 로그인할 수 없어요.",
@@ -572,5 +599,27 @@
   "companies": {
     "nameInvalid": "회사 이름을 다시 확인해 주세요. (80자 이내, 링크 제외)",
     "tooMany": "오늘은 회사를 더 등록할 수 없어요. 내일 다시 시도해 주세요."
+  },
+  "parents": {
+    "verificationNotAllowed": "학부모 계정은 학교·직장 인증을 하지 않아요.",
+    "notReady": "부모님 초대 기능을 준비 중이에요. 잠시 후 다시 시도해 주세요.",
+    "parentCannotInvite": "학부모 계정은 다른 학부모를 초대할 수 없어요.",
+    "verifyFirst": "학교 인증(또는 직장인 인증)을 마치면 부모님을 초대할 수 있어요.",
+    "limit": "부모님은 최대 {max}명까지 초대할 수 있어요.",
+    "inviteNotFound": "초대 링크를 찾을 수 없어요.",
+    "inviteUsed": "이미 사용된 초대 링크예요.",
+    "inviteRevoked": "더 이상 쓸 수 없는 초대 링크예요.",
+    "inviteExpired": "초대 링크가 만료됐어요. 자녀에게 새 링크를 받아 주세요.",
+    "ownInvite": "내가 만든 초대 링크로는 연결할 수 없어요.",
+    "alreadyParent": "이미 학생 계정과 연결된 학부모 계정이에요.",
+    "accountIneligible": "학교·직장 인증을 했거나 부모님을 초대한 계정은 학부모 계정이 될 수 없어요. 새 계정으로 가입해 주세요.",
+    "agreementRequired": "연결 안내를 확인해 주세요.",
+    "failed": "부모님 초대를 처리하지 못했어요. 잠시 후 다시 시도해 주세요.",
+    "notParent": "학부모 계정이 아니에요."
+  },
+  "quiz": {
+    "parentNotAllowed": "학부모 계정은 퀴즈 대상이 아니에요.",
+    "verifyFirst": "학교 또는 직장인 인증 후 퀴즈를 풀 수 있어요.",
+    "failed": "퀴즈 결과를 저장하지 못했어요. 다시 시도해 주세요."
   }
 }

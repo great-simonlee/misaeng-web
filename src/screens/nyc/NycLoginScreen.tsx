@@ -67,7 +67,10 @@ export function NycLoginScreen() {
 
   const { locale } = useConsentLocale()
   // verify: the code emailed after sign-up · resetCode: the reset code + a new password (Misaeng's own login)
-  const [mode, setMode] = useState<'signin' | 'signup' | 'reset' | 'verify' | 'resetCode'>('signin')
+  // ?mode=signup: 가입 화면부터 (학부모 초대 링크 → 웹으로 가입)
+  const [mode, setMode] = useState<'signin' | 'signup' | 'reset' | 'verify' | 'resetCode'>(
+    searchParams.get('mode') === 'signup' ? 'signup' : 'signin',
+  )
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [code, setCode] = useState('')

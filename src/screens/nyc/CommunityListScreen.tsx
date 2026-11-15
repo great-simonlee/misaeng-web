@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import dynamic from 'next/dynamic'
 import {
   useCallback,
@@ -31,6 +33,9 @@ import {
   getIdentityVerifyHref,
   isAccountSuspended,
   isIdentityVerified,
+  canWritePosts,
+  isParentAccount,
+  PARENT_WRITE_BOARD,
 } from '@lib/community/schoolGate'
 import {
   CPT_OPT_TYPES,
@@ -81,7 +86,7 @@ import { CompanyDirectoryBanner } from '@widgets/nyc/CompanyDirectoryBanner'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { RoommateListScreen } from '@screens/nyc/RoommateListScreen'
-import { byBrand } from '@lib/brand/design'
+import { byBrand, MISAENG_DESIGN } from '@lib/brand/design'
 
 const FoodPostsMap = dynamic(
   () => import('@widgets/nyc/FoodPostsMap').then((mod) => mod.FoodPostsMap),
@@ -507,18 +512,22 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
 
   const newPath = href(`/${boardId}/new`)
   const loginNext = cityLoginPath(city, newPath)
-  const identityVerified = isIdentityVerified(profile)
+  // 1.0.7: 직장 인증 대기(보류 글)·학부모도 쓸 수 있다. 학부모는 질문·자유에만 (다른 게시판 버튼은 질문·자유 글쓰기로)
+  const identityVerified = canWritePosts(profile)
+  const parentOtherBoard = isParentAccount(profile) && boardId !== PARENT_WRITE_BOARD
   const suspended = isAccountSuspended(profile)
   const canWrite = Boolean(user) && identityVerified && !suspended
   const verifyCta = t('verify.cta')
-  const writeLabel = t(communityBoardKey(boardId, 'writeLabel'))
+  const writeLabel = parentOtherBoard ? t('parent.writeOnlyAnonymous') : t(communityBoardKey(boardId, 'writeLabel'))
   const postHref = !user
     ? loginNext
     : suspended
       ? href('/me')
-      : identityVerified
-        ? newPath
-        : getIdentityVerifyHref(newPath)
+      : parentOtherBoard
+        ? href(`/${PARENT_WRITE_BOARD}/new`)
+        : identityVerified
+          ? newPath
+          : getIdentityVerifyHref(newPath)
   const writeCtaLabel = !user
     ? t('list.login')
     : suspended
@@ -526,6 +535,9 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
       : identityVerified
         ? writeLabel
         : verifyCta
+  // 질문·자유: 인증한 학생에게 "부모님도 여기서 질문할 수 있어요" (미생만, 학부모 본인에게는 안 보인다)
+  const showParentBanner =
+    MISAENG_DESIGN && boardId === 'anonymous' && isIdentityVerified(profile) && !isParentAccount(profile)
   const showWriteCta = !authLoading && Boolean(user) && !suspended
 
   const listSection = (
@@ -599,6 +611,18 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
         filterCount={isFoodBoard ? 0 : activeFilterCount}
       >
         {boardId === 'job-review' ? <CompanyDirectoryBanner /> : null}
+        {showParentBanner ? (
+          <Link
+            href={`${href('/me')}#parent-invite`}
+            className='mt-3 flex items-center gap-2.5 rounded-2xl bg-[var(--brand)]/[0.07] px-4 py-3 text-[13px] font-medium text-[var(--foreground)] ring-1 ring-[var(--brand)]/15 touch-manipulation transition hover:bg-[var(--brand)]/[0.1]'
+          >
+            <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' className='size-4 shrink-0 text-[var(--brand)]' aria-hidden>
+              <path strokeLinecap='round' strokeLinejoin='round' d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' />
+            </svg>
+            <span className='min-w-0 flex-1'>{t('parent.anonymousBanner')}</span>
+            <span className='shrink-0 text-[12px] font-semibold text-[var(--brand)]'>{t('parent.anonymousBannerCta')}</span>
+          </Link>
+        ) : null}
       </BoardListToolbar>
 
       {isFoodBoard ? (

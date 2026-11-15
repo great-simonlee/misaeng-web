@@ -270,6 +270,13 @@
     },
     "marketplace": {
       "zipRequired": "Vui lòng nhập mã ZIP 5 chữ số cho khu vực giao dịch."
+    },
+    "parent": {
+      "boardNotAllowed": "Tài khoản phụ huynh chỉ đăng bài ở mục Hỏi đáp · Tự do."
+    },
+    "held": {
+      "limit": "Bạn chỉ có thể có tối đa {max} bài chờ duyệt. Bài sẽ được công khai khi nơi làm việc được duyệt.",
+      "commentBlocked": "Bạn có thể bình luận sau khi xác minh nơi làm việc được duyệt."
     }
   },
   "guest": {
@@ -386,6 +393,24 @@
       "message": {
         "title": "Tin nhắn mới · {listing}"
       }
+    },
+    "workplace": {
+      "approved": {
+        "title": "Đã xác minh nơi làm việc",
+        "body": "Nơi làm việc của bạn đã được duyệt. Bài viết và bình luận sẽ được công khai ngay.",
+        "bodyWithPosts": "Nơi làm việc đã được duyệt và {count} bài đang chờ đã được công khai."
+      },
+      "rejected": {
+        "title": "Xác minh nơi làm việc bị từ chối",
+        "body": "Hãy gửi lại hoặc xác minh bằng trường học. Bài đang chờ sẽ bị xóa sau 30 ngày.",
+        "bodyWithReason": "Lý do: {reason} · Hãy gửi lại hoặc xác minh bằng trường học."
+      }
+    },
+    "parents": {
+      "joined": {
+        "title": "Phụ huynh của bạn đã tham gia Misaeng",
+        "body": "Phần thưởng mời {amount}P sẽ được trả sau {days} ngày."
+      }
     }
   },
   "reviewDocs": {
@@ -498,8 +523,10 @@
       "notFound": "Question not found.",
       "answerRequired": "Please write an answer.",
       "closed": "This question is already closed.",
-      "reportReasonRequired": "Vui lòng nhập lý do báo cáo."
-    }
+      "reportReasonRequired": "Vui lòng nhập lý do báo cáo.",
+      "tooMany": "Bạn có thể gửi tối đa 3 câu hỏi một lần."
+    },
+    "parentNotAllowed": "Tính năng này không dành cho tài khoản phụ huynh."
   },
   "account": {
     "deleted": "Tài khoản này đã bị xóa. Bạn không thể đăng nhập lại bằng tài khoản này.",
@@ -531,5 +558,27 @@
   "companies": {
     "nameInvalid": "Vui lòng kiểm tra lại tên công ty (tối đa 80 ký tự, không chứa liên kết).",
     "tooMany": "Hôm nay bạn không thể thêm công ty nữa. Vui lòng thử lại vào ngày mai."
+  },
+  "parents": {
+    "verificationNotAllowed": "Tài khoản phụ huynh không cần xác minh trường hay nơi làm việc.",
+    "notReady": "Tính năng mời phụ huynh chưa sẵn sàng. Vui lòng thử lại sau.",
+    "parentCannotInvite": "Tài khoản phụ huynh không thể mời phụ huynh khác.",
+    "verifyFirst": "Hãy xác minh trường (hoặc nơi làm việc) để mời bố mẹ.",
+    "limit": "Bạn có thể mời tối đa {max} phụ huynh.",
+    "inviteNotFound": "Không tìm thấy liên kết mời này.",
+    "inviteUsed": "Liên kết mời này đã được sử dụng.",
+    "inviteRevoked": "Liên kết mời này không còn hiệu lực.",
+    "inviteExpired": "Liên kết mời đã hết hạn. Hãy nhờ con gửi liên kết mới.",
+    "ownInvite": "Bạn không thể dùng liên kết mời của chính mình.",
+    "alreadyParent": "Tài khoản này đã được liên kết với một học sinh.",
+    "accountIneligible": "Tài khoản đã xác minh trường/nơi làm việc hoặc đã mời phụ huynh không thể trở thành tài khoản phụ huynh. Hãy đăng ký tài khoản mới.",
+    "agreementRequired": "Vui lòng xác nhận thông báo liên kết tài khoản.",
+    "failed": "Không thể xử lý lời mời phụ huynh. Vui lòng thử lại.",
+    "notParent": "Đây không phải tài khoản phụ huynh."
+  },
+  "quiz": {
+    "parentNotAllowed": "Tài khoản phụ huynh không tham gia bài quiz.",
+    "verifyFirst": "Hãy xác minh trường hoặc nơi làm việc để làm quiz.",
+    "failed": "Không thể lưu kết quả quiz. Vui lòng thử lại."
   }
 }

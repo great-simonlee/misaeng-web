@@ -25,7 +25,7 @@ import {
   loadWriteDraft,
   saveWriteDraft,
 } from '@lib/community/writeDraft'
-import { isAccountSuspended, isIdentityVerified } from '@lib/community/schoolGate'
+import { canWriteOnBoard, isAccountSuspended } from '@lib/community/schoolGate'
 import {
   COMMUNITY_BODY_MAX,
   getFoodComposeCategories,
@@ -797,8 +797,8 @@ function CommunityBoardNewScreen({
     return <AccountSuspendedNotice />
   }
 
-  if (!isIdentityVerified(profile)) {
-    return <SchoolVerificationRequired nextPath={loginNext} />
+  if (!canWriteOnBoard(profile, boardId)) {
+    return <SchoolVerificationRequired nextPath={loginNext} boardId={boardId} />
   }
 
   if (isFood) {

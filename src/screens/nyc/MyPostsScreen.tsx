@@ -55,6 +55,8 @@ type MyPostItem = {
   categoryId: NycCommunityBoardId
   authorSchoolId: string | null
   status: 'open' | 'closed'
+  /** 직장 인증 승인 전 보류 글 ("검토 중") */
+  pendingApproval: boolean
   canManage: boolean
 }
 
@@ -297,6 +299,11 @@ export function MyPostsScreen() {
                               {boardTitle(post.categoryId)}
                             </span>
                           )}
+                          {post.pendingApproval ? (
+                            <span className='rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-800 ring-1 ring-amber-200/70'>
+                              {t('posts.inReview')}
+                            </span>
+                          ) : null}
                         </div>
                         <div
                           className={cn(
@@ -368,6 +375,7 @@ function mapCommunity(
       categoryId,
       authorSchoolId: post.authorSchoolId,
       status: post.status === 'closed' ? 'closed' : 'open',
+      pendingApproval: post.pendingApproval === true,
       canManage: !isMock,
     }
   })

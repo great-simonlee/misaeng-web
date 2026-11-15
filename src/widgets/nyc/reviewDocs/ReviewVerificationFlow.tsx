@@ -48,11 +48,24 @@ export function ReviewVerificationFlow({
   kinds,
   onClose,
   onSubmitted,
+  kindExtra,
+  kindExtraReady = true,
+  upload: uploadOverride,
+  notice,
+  done,
 }: {
   postId: string
   kinds: ReviewDocKind[]
   onClose: () => void
   onSubmitted: () => void
+  /** 직장 인증 서류 (1.0.7): 종류 단계 위에 더 받는 칸 (회사 이름) — 채워져야(kindExtraReady) 다음으로 */
+  kindExtra?: ReactNode
+  kindExtraReady?: boolean
+  /** 기본 업로드(/api/verifications, 후기 글) 대신 쓸 업로드 */
+  upload?: (input: { kind: ReviewDocKind; files: { blob: Blob; name: string }[] }) => Promise<void>
+  /** 안내·완료 문구 바꾸기 (이미 번역된 문장) */
+  notice?: { body: string; tips: string[] }
+  done?: { body: string; detail: string }
 }) {
   const t = useT('me.reviewDocs')
   const { error: toastError } = useToast()
@@ -156,7 +169,8 @@ export function ReviewVerificationFlow({
         else files.push({ blob: item.file, name: `document-${n}.pdf` })
         n += 1
       }
-      await submitReviewDocs({ postId, kind, files }, t('uploadFailed'))
+      if (uploadOverride) await uploadOverride({ kind, files })
+      else await submitReviewDocs({ postId, kind, files }, t('uploadFailed'))
       release(items)
       setItems([])
       setStep('done')
@@ -191,17 +205,15 @@ export function ReviewVerificationFlow({
         {step === 'notice' ? (
           <div className='space-y-4'>
             <p className='rounded-2xl bg-[var(--surface)] px-4 py-3.5 text-[14px] leading-relaxed text-[var(--foreground)] ring-1 ring-black/[0.05]'>
-              {t('notice.body')}
+              {notice?.body ?? t('notice.body')}
             </p>
             <ul className='space-y-2 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-              <li className='flex gap-2.5'>
-                <span aria-hidden className='mt-[7px] size-1.5 shrink-0 rounded-full bg-[var(--brand)]' />
-                <span>{t('notice.screenshotTip')}</span>
-              </li>
-              <li className='flex gap-2.5'>
-                <span aria-hidden className='mt-[7px] size-1.5 shrink-0 rounded-full bg-[var(--brand)]' />
-                <span>{t('notice.maskTip')}</span>
-              </li>
+              {(notice?.tips ?? [t('notice.screenshotTip'), t('notice.maskTip')]).map((tip) => (
+                <li key={tip} className='flex gap-2.5'>
+                  <span aria-hidden className='mt-[7px] size-1.5 shrink-0 rounded-full bg-[var(--brand)]' />
+                  <span>{tip}</span>
+                </li>
+              ))}
             </ul>
             <label className='flex cursor-pointer items-start gap-3 rounded-2xl bg-white px-4 py-3.5 ring-1 ring-black/10'>
               <input
@@ -220,6 +232,7 @@ export function ReviewVerificationFlow({
 
         {step === 'kind' ? (
           <div className='space-y-3'>
+            {kindExtra}
             <p className='text-[14px] font-semibold text-[var(--foreground)]'>{t('kindTitle')}</p>
             <div className='space-y-2'>
               {kinds.map((k) => (
@@ -242,7 +255,7 @@ export function ReviewVerificationFlow({
             </div>
             <div className='flex gap-2 pt-1'>
               <SecondaryButton onClick={() => setStep('notice')}>{t('back')}</SecondaryButton>
-              <PrimaryButton disabled={!kind} onClick={() => setStep('files')}>
+              <PrimaryButton disabled={!kind || !kindExtraReady} onClick={() => setStep('files')}>
                 {t('next')}
               </PrimaryButton>
             </div>
@@ -376,8 +389,8 @@ export function ReviewVerificationFlow({
             <div className='mx-auto flex size-14 items-center justify-center rounded-full bg-emerald-50 text-2xl text-emerald-600'>
               ✓
             </div>
-            <p className='text-[15px] font-semibold leading-relaxed text-[var(--foreground)]'>{t('done.body')}</p>
-            <p className='text-[13px] leading-relaxed text-[var(--muted-foreground)]'>{t('done.detail')}</p>
+            <p className='text-[15px] font-semibold leading-relaxed text-[var(--foreground)]'>{done?.body ?? t('done.body')}</p>
+            <p className='text-[13px] leading-relaxed text-[var(--muted-foreground)]'>{done?.detail ?? t('done.detail')}</p>
             <PrimaryButton onClick={onClose}>{t('done.close')}</PrimaryButton>
           </div>
         ) : null}

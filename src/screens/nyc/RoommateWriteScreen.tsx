@@ -41,7 +41,7 @@ import {
   loadWriteDraft,
   saveWriteDraft,
 } from '@lib/community/writeDraft'
-import { isAccountSuspended, isIdentityVerified } from '@lib/community/schoolGate'
+import { canWriteOnBoard, isAccountSuspended } from '@lib/community/schoolGate'
 import {
   communityBoardKey,
   type NycCommunityBoardId,
@@ -524,8 +524,8 @@ export function RoommateWriteScreen({
     return <AccountSuspendedNotice />
   }
 
-  if (!isIdentityVerified(profile)) {
-    return <SchoolVerificationRequired nextPath={loginNext} />
+  if (!canWriteOnBoard(profile, boardId)) {
+    return <SchoolVerificationRequired nextPath={loginNext} boardId={boardId} />
   }
 
   const [onePostBefore, onePostAfter = ''] = t(

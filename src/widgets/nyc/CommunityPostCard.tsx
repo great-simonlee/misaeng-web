@@ -273,7 +273,7 @@ function CptOptListingCard({
                 {getCity(postCity).shortLabel}
               </span>
             ) : null}
-            <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} size='md' />
+            <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} parent={post.authorParent} anonKind={post.anonBadgeKind} size='md' />
           </div>
           <PostLikeButton
             kind='community'
@@ -397,7 +397,7 @@ function JobReviewListingCardMisaeng({
             <AuthorBadges
               schoolId={post.authorSchoolId}
               workplaceVerified={post.authorWorkplaceVerified}
-              instagramVerified={post.authorInstagramVerified}
+              instagramVerified={post.authorInstagramVerified} parent={post.authorParent} anonKind={post.anonBadgeKind}
               size='md'
             />
             <span className='inline-flex items-center gap-1' title={t('card.views')}>
@@ -462,11 +462,14 @@ function TextListingCard({
         <div className='flex items-start justify-between gap-3'>
           <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
             {anonymous ? (
-              <span className='rounded-full bg-[#f1f2f4] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted)]'>
-                {t('author.anonymous')}
-              </span>
+              <>
+                <span className='rounded-full bg-[#f1f2f4] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted)]'>
+                  {t('author.anonymous')}
+                </span>
+                {post.anonBadgeKind ? <AuthorBadges anonKind={post.anonBadgeKind} /> : null}
+              </>
             ) : (
-              <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} />
+              <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} parent={post.authorParent} anonKind={post.anonBadgeKind} />
             )}
             {roommateLabel ? (
               <span
@@ -746,7 +749,7 @@ function JobReviewListingCardClassic({
         <div className='flex items-start justify-between gap-3'>
           <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
             <JobReviewTypeBadge type={post.jobReviewType} />
-            <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} size='md' />
+            <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} parent={post.authorParent} anonKind={post.anonBadgeKind} size='md' />
             {contextTag ? (
               <span className='inline-flex max-w-full items-center truncate rounded-full bg-[#eef4ff] px-2.5 py-1 text-[11px] font-semibold text-[#3b5bdb] ring-1 ring-[#3b5bdb]/15'>
                 {contextTag}

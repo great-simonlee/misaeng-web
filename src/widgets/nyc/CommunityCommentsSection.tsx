@@ -26,7 +26,8 @@ import { createCommunityReportRequest } from '@lib/community/engagement.client'
 import {
   getIdentityVerifyHref,
   isAccountSuspended,
-  isIdentityVerified,
+  canComment,
+  isWorkplacePending,
 } from '@lib/community/schoolGate'
 import { countOpenComments } from '@lib/constants/communityCommentsMock'
 import { useT } from '@lib/i18n/client'
@@ -123,7 +124,9 @@ export function CommunityCommentsSection({
   const totalCount = countOpenComments(comments)
   const fallbackNext = loginNext || href()
   const loginHref = cityLoginPath(city, fallbackNext)
-  const identityVerified = isIdentityVerified(profile)
+  // 댓글: 학교 인증 · 직장 승인 · 학부모 (직장 인증 대기만으로는 못 쓴다)
+  const identityVerified = canComment(profile)
+  const workplacePendingOnly = !identityVerified && isWorkplacePending(profile)
   const verifyHref = getIdentityVerifyHref(fallbackNext)
   const canCompose = Boolean(user) && identityVerified && !isAccountSuspended(profile)
   // 문장 가운데 링크가 들어가서 {link} 앞뒤로 나눠 그린다
@@ -136,8 +139,8 @@ export function CommunityCommentsSection({
       toastError(t('verify.suspended'))
       return
     }
-    if (!isIdentityVerified(profile)) {
-      toastError(t('verify.required'))
+    if (!canComment(profile)) {
+      toastError(isWorkplacePending(profile) ? t('held.commentBlocked') : t('verify.required'))
       return
     }
     const text = body.trim()
@@ -347,6 +350,10 @@ export function CommunityCommentsSection({
         ) : isAccountSuspended(profile) ? (
           <div className='mt-4 rounded-xl bg-red-50 px-4 py-3.5 text-[13px] text-red-700'>
             {t('verify.suspended')}
+          </div>
+        ) : workplacePendingOnly ? (
+          <div className='mt-4 rounded-xl bg-amber-50 px-4 py-3.5 text-[13px] text-amber-800'>
+            {t('held.commentBlocked')}
           </div>
         ) : !identityVerified ? (
           <div className='mt-4 rounded-xl bg-[#f7f8fa] px-4 py-3.5 text-[13px] text-[var(--muted-foreground)]'>
@@ -641,9 +648,11 @@ function CommentItem({
             >
               {displayName}
             </span>
-            {!anonymousBoard && (
-              <AuthorBadges schoolId={comment.authorSchoolId} workplaceVerified={comment.authorWorkplaceVerified} instagramVerified={comment.authorInstagramVerified} />
-            )}
+            {!anonymousBoard ? (
+              <AuthorBadges schoolId={comment.authorSchoolId} workplaceVerified={comment.authorWorkplaceVerified} instagramVerified={comment.authorInstagramVerified} parent={comment.authorParent} />
+            ) : comment.anonBadgeKind ? (
+              <AuthorBadges anonKind={comment.anonBadgeKind} />
+            ) : null}
             <time className='text-[11px] text-[var(--muted)]'>
               {format.relativeTime(comment.createdAt)}
             </time>

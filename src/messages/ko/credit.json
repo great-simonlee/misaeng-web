@@ -230,6 +230,23 @@
     "first-post": {
       "label": "첫 커뮤니티 글",
       "description": "맛집·OPT·취업 후기 등 미생 포인트 대상 게시판에 처음 올린 글 1회 (조건 충족 시)."
+    },
+    "workplace-verify": {
+      "label": "직장인 인증",
+      "description": "회사 이메일 또는 재직 서류로 직장인 인증이 승인되면 1회."
+    },
+    "former-workplace-verify": {
+      "label": "전 직장 인증",
+      "description": "전 직장 서류로 인증이 승인되면 1회."
+    },
+    "parent-invite": {
+      "label": "부모님 초대",
+      "description": "초대 링크로 부모님이 가입하고 3일 뒤, 계정이 정상이면 지급돼요.",
+      "unit": "1명당 · 최대 2명"
+    },
+    "onboarding-quiz": {
+      "label": "미생 퀴즈",
+      "description": "미생 이용 규칙 퀴즈 20문제를 모두 맞히면 1회."
     }
   },
   "noEarn": {

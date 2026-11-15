@@ -279,6 +279,16 @@ export function CommunityDetailScreen({
             />
           ) : null}
 
+          {/* 직장 인증 대기 중에 쓴 보류 글: 작성자에게만 보인다 */}
+          {post.pendingApproval && isAuthor ? (
+            <div className='mb-4 rounded-2xl bg-amber-50 px-4 py-3.5 text-[13px] leading-relaxed text-amber-900 ring-1 ring-amber-200/70'>
+              <p className='font-semibold'>{t('held.bannerTitle')}</p>
+              <p className='mt-0.5 text-amber-800'>
+                {post.heldRejectedAt ? t('held.bannerRejected') : t('held.bannerBody')}
+              </p>
+            </div>
+          ) : null}
+
           {isFood ? (
             <FoodDetailContent
               post={post}
@@ -327,9 +337,12 @@ export function CommunityDetailScreen({
                   <div className='flex flex-wrap items-center gap-2'>
                     <BoardMetaChip tone={tone}>{title}</BoardMetaChip>
                     {anonymous ? (
-                      <BoardMetaChip>{t('author.anonymous')}</BoardMetaChip>
+                      <>
+                        <BoardMetaChip>{t('author.anonymous')}</BoardMetaChip>
+                        {post.anonBadgeKind ? <AuthorBadges anonKind={post.anonBadgeKind} /> : null}
+                      </>
                     ) : (
-                      <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} />
+                      <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} parent={post.authorParent} anonKind={post.anonBadgeKind} />
                     )}
                     <span className='text-[12px] text-[var(--muted)]'>
                       {format.relativeTime(post.createdAt)}

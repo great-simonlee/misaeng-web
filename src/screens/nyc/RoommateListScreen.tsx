@@ -32,7 +32,7 @@ import {
 import {
   getIdentityVerifyHref,
   isAccountSuspended,
-  isIdentityVerified,
+  canWritePosts,
 } from '@lib/community/schoolGate'
 import { communityBoardKey } from '@lib/constants/nyc'
 import { cn } from '@lib'
@@ -359,7 +359,8 @@ export function RoommateListScreen() {
 
   const newPath = href(`/${BOARD_ID}/new`)
   const loginNext = cityLoginPath(city, newPath)
-  const identityVerified = isIdentityVerified(profile)
+  // 직장 인증 대기(보류 글)도 쓸 수 있다. 학부모는 질문·자유에만 → 글쓰기 화면이 안내한다
+  const identityVerified = canWritePosts(profile)
   const suspended = isAccountSuspended(profile)
   const canWrite = Boolean(user) && identityVerified && !suspended
   const verifyCta = tCommunity('verify.cta')

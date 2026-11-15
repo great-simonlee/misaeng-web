@@ -98,17 +98,18 @@
       "retry": "Vui lòng xác minh lại",
       "rowHint": "Xác minh bằng email công việc và tên công ty",
       "rowLabel": "Xác minh nơi làm việc",
-      "submittedToast": "Email của bạn đã được xác minh. Việc xác minh nơi làm việc sẽ hoàn tất sau khi đội ngũ Misaeng xem xét.",
+      "submittedToast": "Đã xác nhận email. Bạn có thể viết bài ngay; bài sẽ công khai sau khi đội Misaeng duyệt.",
       "approvedTitle": "Đã xác minh nơi làm việc",
       "pendingTitle": "Đang xem xét xác minh nơi làm việc",
       "approvedDescription": "Đội ngũ Misaeng đã xác nhận nơi làm việc của bạn.",
-      "pendingDescription": "Email công việc của bạn đã được xác minh. Đội ngũ Misaeng đang xem xét thông tin công ty của bạn.",
+      "pendingDescription": "Đội Misaeng đang xem xét. Bạn vẫn có thể viết bài (tối đa 3, chỉ mình bạn thấy); bài sẽ công khai khi được duyệt. Bình luận mở sau khi duyệt.",
       "formDescription": "Email công việc sẽ được liên kết với tài khoản bạn đang đăng nhập, kể cả khi khác với email đăng ký. Sau khi bạn nhập mã, đội ngũ Misaeng sẽ kiểm tra lại thông tin công ty.",
       "companyLabel": "Tên công ty",
       "companyPlaceholder": "VD: Misaeng LLC",
       "emailLabel": "Email công việc",
       "confirmButton": "Xác minh email",
-      "editForm": "Đổi công ty hoặc email"
+      "editForm": "Đổi công ty hoặc email",
+      "kindFormer": "Công việc trước đây"
     },
     "verifiedShort": "Đã xác minh",
     "school": {
@@ -194,7 +195,14 @@
       "title": "Xác minh danh tính",
       "description": "Xác minh bằng email trường hoặc email công việc, tùy cách nào tiện hơn. Email này sẽ liên kết với tài khoản kể cả khi khác với email đăng ký.",
       "school": "Xác minh sinh viên bằng email trường",
-      "workplace": "Xác minh người đi làm bằng email công việc"
+      "workplace": "Xác minh người đi làm bằng email công việc",
+      "descriptionV2": "Email trường là nhanh nhất. Với email công ty hoặc giấy tờ công việc, bài viết sẽ được công khai sau khi đội Misaeng duyệt.",
+      "schoolHint": "Xong ngay bằng mã · bài đăng công khai ngay",
+      "workEmail": "Xác minh bằng email công ty",
+      "approvalHint": "Công khai sau khi duyệt · trước đó chỉ mình bạn thấy bài",
+      "documents": "Xác minh bằng giấy tờ công việc hiện tại / trước đây",
+      "documentsHint": "Thư xác nhận việc làm, thư mời, W-2, phiếu lương… · công khai sau khi duyệt",
+      "fastest": "Nhanh nhất"
     },
     "clearInputAria": "Xóa nội dung đã nhập",
     "sending": "Đang gửi…",
@@ -348,7 +356,8 @@
     "browseBoards": "Xem các bảng tin",
     "edit": "Sửa",
     "deleting": "Đang xóa…",
-    "delete": "Xóa"
+    "delete": "Xóa",
+    "inReview": "Đang duyệt"
   },
   "list": {
     "redirectingToLogin": "Đang chuyển tới trang đăng nhập…",
@@ -418,6 +427,16 @@
         "label": "CPT",
         "example": "Trang phê duyệt CPT trong I-20",
         "mask": "SEVIS ID, ngày sinh, địa chỉ"
+      },
+      "workplace_current": {
+        "label": "Công việc hiện tại",
+        "example": "Thư xác nhận việc làm, thư mời, phiếu lương, thẻ nhân viên",
+        "mask": "số tiền, SSN, địa chỉ, mã nhân viên"
+      },
+      "workplace_former": {
+        "label": "Công việc trước đây",
+        "example": "Email nghỉ việc, W-2, thư mời cũ",
+        "mask": "số tiền, SSN, địa chỉ"
       }
     },
     "maskLabel": "Nhớ che: {items}",
@@ -500,5 +519,111 @@
     "confirm": "Bạn chắc chắn muốn xóa tài khoản?\n\n• Hồ sơ, thông tin xác minh và thông báo sẽ bị xóa ngay\n• Bài đăng tìm bạn cùng phòng/sublet, tin đăng chợ đồ cũ và các cuộc trò chuyện mua bán của bạn sẽ bị xóa; các bài viết và bình luận khác vẫn còn dưới tên \"Người dùng đã xóa tài khoản\"\n• Bạn không thể đăng nhập lại bằng tài khoản này\n• Tài khoản Ellieo (dùng chung đăng nhập với Misaeng) cũng sẽ bị xóa",
     "done": "Đã xóa tài khoản",
     "failed": "Không thể xóa tài khoản. Vui lòng thử lại sau."
+  },
+  "workplaceDocs": {
+    "notice": {
+      "body": "Chúng tôi xác nhận công ty hiện tại hoặc trước đây bằng giấy tờ. Tệp được lưu riêng tư, chỉ đội Misaeng xem và bị xóa vĩnh viễn trong 72 giờ sau khi có kết quả (muộn nhất 7 ngày sau khi tải lên). Chỉ lưu kết quả (duyệt hay không, hiện tại/trước đây, tên công ty).",
+      "examples": "Chấp nhận: thư xác nhận việc làm, thư mời làm việc, email nghỉ việc, W-2, phiếu lương, thẻ nhân viên",
+      "hide": "Hãy che số tiền (lương), SSN, địa chỉ và thông tin cá nhân khác. Chỉ cần hiện tên công ty và tên bạn.",
+      "deletion": "Tệp bị xóa vĩnh viễn trong 72 giờ sau quyết định, muộn nhất 7 ngày sau khi tải lên."
+    },
+    "done": {
+      "body": "Chúng tôi đã nhận giấy tờ. Sẽ báo bạn khi đội Misaeng xem xét xong.",
+      "detail": "Bạn có thể viết bài ngay (tối đa 3, chỉ mình bạn thấy đến khi được duyệt). Bình luận mở sau khi duyệt."
+    },
+    "companyLabel": "Tên công ty",
+    "companyPlaceholder": "VD: Misaeng LLC",
+    "uploadFailed": "Không thể tải giấy tờ lên. Vui lòng thử lại."
+  },
+  "parentInvite": {
+    "title": "Mời bố mẹ, nhận {amount}P · tối đa {max}",
+    "description": "Khi bố mẹ tham gia bằng liên kết, họ có thể đọc và hỏi ở Hỏi đáp · Tự do. Bạn nhận {amount}P cho mỗi phụ huynh {days} ngày sau khi họ tham gia (tối đa {max}).",
+    "verifyFirst": "Hãy xác minh trường (hoặc nơi làm việc) để tạo liên kết mời.",
+    "createButton": "Tạo liên kết mời",
+    "creating": "Đang tạo…",
+    "createFailed": "Không thể tạo liên kết mời.",
+    "limitReached": "Bạn đã mời đủ {max} phụ huynh.",
+    "parentFallback": "Phụ huynh",
+    "state": {
+      "waiting": "Chờ tham gia · hiệu lực đến {date}",
+      "scheduled": "{amount}P · sẽ trả vào {date}",
+      "paid": "Đã trả {amount}P",
+      "forfeited": "Không được trả"
+    },
+    "badge": {
+      "waiting": "Đang chờ",
+      "scheduled": "Trả sau 3 ngày",
+      "paid": "Đã trả",
+      "forfeited": "Không trả"
+    },
+    "copyLink": "Sao chép liên kết",
+    "copyKakao": "Sao chép tin nhắn KakaoTalk",
+    "linkCopied": "Đã sao chép liên kết mời. Hãy gửi cho bố mẹ.",
+    "kakaoCopied": "Hãy dán vào KakaoTalk và gửi.",
+    "copyFailed": "Không thể sao chép.",
+    "kakaoText": "{name} đã mời bạn tham gia Misaeng. Cùng xem thông tin và câu hỏi về cuộc sống du học Mỹ.",
+    "me": "Tôi",
+    "fairUse": "Tài khoản phụ huynh được liên kết với tài khoản của bạn. Nếu phát hiện gian lận (ví dụ tự tạo tài khoản phụ huynh), cả hai tài khoản có thể bị xử lý."
+  },
+  "afterVerify": {
+    "parentLine": "Bố mẹ cũng có thể cùng xem trên Misaeng · mời để nhận {amount}P",
+    "quizLine": "Làm quiz Misaeng để nhận {amount}P"
+  },
+  "quiz": {
+    "cardTitle": "Quiz Misaeng",
+    "cardCta": "Làm quiz để nhận {amount}P",
+    "cardDone": "Đã hoàn thành quiz",
+    "cardHint": "20 câu dễ về cách dùng Misaeng",
+    "doneBadge": "Xong",
+    "title": "Quiz Misaeng",
+    "intro": "Trả lời đúng cả {total} câu để nhận {amount}P. Sai có thể chọn lại ngay.",
+    "loadFailed": "Không thể tải quiz.",
+    "parentNotAllowed": "Tài khoản phụ huynh không tham gia quiz.",
+    "verifyFirst": "Hãy xác minh trường hoặc nơi làm việc để làm quiz.",
+    "backToMe": "Về trang cá nhân",
+    "doneTitle": "Hoàn thành quiz!",
+    "doneAwarded": "Bạn đã nhận {amount}P.",
+    "doneNoPoints": "Đúng hết. Điểm quiz chỉ được nhận một lần mỗi tài khoản.",
+    "correct": "Chính xác!",
+    "wrong": "Chưa đúng",
+    "tryAgain": "Hãy chọn đáp án khác.",
+    "next": "Câu tiếp theo",
+    "finish": "Hoàn thành"
+  },
+  "parentAccount": {
+    "title": "Tài khoản phụ huynh",
+    "linked": "Đã liên kết với học sinh đã mời bạn.",
+    "linkedTo": "Tài khoản phụ huynh liên kết với {name}.",
+    "can": "Bạn có thể đăng bài ở Hỏi đáp · Tự do, bình luận mọi mục, gửi yêu cầu nhà ở và hỏi mua ở chợ đồ cũ.",
+    "cannot": "Không thể bán đồ, đặt coffee chat, gửi câu hỏi nghề nghiệp hay làm mentor.",
+    "writeCta": "Viết ở Hỏi đáp · Tự do"
+  },
+  "parentLanding": {
+    "eyebrow": "Lời mời phụ huynh",
+    "title": "{name} đã mời bạn tham gia Misaeng",
+    "someone": "Con bạn",
+    "body": "Cùng theo dõi cuộc sống của con ở Mỹ trên Misaeng. Cùng xem thông tin và câu hỏi về du học Mỹ.",
+    "point1": "Hỏi bất cứ điều gì ở mục Hỏi đáp · Tự do (ẩn danh, chỉ hiện huy hiệu \"Phụ huynh\").",
+    "point2": "Xem và bình luận ở mọi mục: visa, nhà ở, đánh giá…",
+    "point3": "Không cần xác minh trường hay nơi làm việc.",
+    "agreement": "Tài khoản của bạn sẽ được liên kết với học sinh đã mời. Nếu phát hiện gian lận, cả hai tài khoản có thể bị xử lý.",
+    "linkButton": "Liên kết thành tài khoản phụ huynh",
+    "linking": "Đang liên kết…",
+    "linkFailed": "Không thể liên kết tài khoản.",
+    "linked": "Đã liên kết với {name}. Chào mừng!",
+    "toAnonymous": "Xem Hỏi đáp · Tự do",
+    "signupWeb": "Đăng ký trên web",
+    "haveAccount": "Tôi đã đăng ký · Đăng nhập",
+    "orApp": "Hoặc bắt đầu trên ứng dụng",
+    "signedInAs": "Đang đăng nhập bằng {email}",
+    "notFoundTitle": "Không tìm thấy liên kết mời",
+    "notFoundBody": "Hãy kiểm tra liên kết hoặc nhờ con gửi liên kết mới.",
+    "status": {
+      "used": "Liên kết đã được sử dụng. Hãy nhờ con gửi liên kết mới.",
+      "expired": "Liên kết đã hết hạn. Hãy nhờ con gửi liên kết mới.",
+      "revoked": "Liên kết mời không còn hiệu lực.",
+      "valid": ""
+    },
+    "toHome": "Khám phá Misaeng"
   }
 }

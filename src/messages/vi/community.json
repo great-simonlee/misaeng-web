@@ -499,7 +499,13 @@
   },
   "badges": {
     "workplace": "Đã xác minh nơi làm việc",
-    "instagram": "Đã xác minh Instagram"
+    "instagram": "Đã xác minh Instagram",
+    "parent": "Phụ huynh",
+    "anon": {
+      "student": "Sinh viên",
+      "workplace": "Đã xác minh nơi làm việc",
+      "parent": "Phụ huynh"
+    }
   },
   "blocks": {
     "action": "Chặn",
@@ -521,5 +527,35 @@
     "unblockFailed": "Không thể bỏ chặn. Vui lòng thử lại sau.",
     "anonymousUser": "Người dùng ẩn danh",
     "blockedAt": "Đã chặn {date}"
+  },
+  "verifyChoice": {
+    "description": "Cần xác minh để viết bài. Email trường là nhanh nhất.",
+    "fastest": "Nhanh nhất",
+    "heldNote": "Nếu xác minh bằng email công ty hoặc giấy tờ, bài viết chỉ mình bạn thấy cho đến khi được duyệt (tối đa 3 bài), sau đó sẽ được công khai. Bình luận được mở sau khi duyệt.",
+    "school": {
+      "title": "Email trường học",
+      "hint": "Tức thì bằng mã · bài đăng công khai ngay"
+    },
+    "workEmail": {
+      "title": "Email công ty",
+      "hint": "Công khai sau khi đội Misaeng duyệt"
+    },
+    "documents": {
+      "title": "Giấy tờ công việc hiện tại / trước đây",
+      "hint": "Thư xác nhận việc làm, thư mời, W-2… · công khai sau khi duyệt"
+    }
+  },
+  "parent": {
+    "writeOnlyAnonymous": "Tài khoản phụ huynh đăng bài ở Hỏi đáp · Tự do",
+    "writeOnlyAnonymousHint": "Bạn có thể xem và bình luận ở mọi mục. Hãy đặt câu hỏi ở Hỏi đáp · Tự do.",
+    "toAnonymousComposer": "Viết ở Hỏi đáp · Tự do",
+    "anonymousBanner": "Bố mẹ bạn cũng có thể hỏi ở đây",
+    "anonymousBannerCta": "Mời"
+  },
+  "held": {
+    "commentBlocked": "Bạn có thể bình luận sau khi nơi làm việc được duyệt",
+    "bannerTitle": "Đang duyệt · chỉ bạn thấy bài này",
+    "bannerBody": "Bài sẽ được công khai khi xác minh nơi làm việc được duyệt.",
+    "bannerRejected": "Xác minh nơi làm việc bị từ chối. Hãy gửi lại hoặc xác minh bằng trường để công khai; nếu không bài sẽ bị xóa sau 30 ngày."
   }
 }
