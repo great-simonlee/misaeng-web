@@ -312,16 +312,16 @@
   backdrop-filter: none;
 }
 
+/* Sign in / sign up heading mark: the Ellieo app icon as a rounded tile (the eyebrow text stays for screen readers) */
 [data-brand='ellieo'] [data-ui='auth-eyebrow'] {
-  display: inline-flex;
-  width: fit-content;
-  border-radius: 999px;
-  background: var(--ellieo-lime);
-  padding: 0.125rem 0.625rem;
-  letter-spacing: 0;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--foreground);
+  display: block;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 22%;
+  background: url('/img/ellieo_app_icon.png') center / cover no-repeat;
+  color: transparent;
+  font-size: 0;
+  overflow: hidden;
 }
 
 [data-brand='ellieo'] [data-ui='auth-tabs'] {
@@ -582,9 +582,6 @@
   letter-spacing: -0.03em;
 }
 
-[data-brand='ellieo'] [data-ui='auth-card'] h1::before {
-  content: '👋 ';
-}
 
 [data-brand='ellieo'] [data-ui='auth-google'] {
   background: #fff;
@@ -773,4 +770,177 @@
 /* Comments: each comment reads as a small card */
 [data-brand='ellieo'] [data-ui='comments'] li {
   border-radius: 1.25rem;
+}
+
+/* =====================================================================
+   Companies: logo-first row cards in one feed column (logo · name · industry / badges)
+   ===================================================================== */
+[data-brand='ellieo'] [data-ui='company-grid'] {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.625rem;
+}
+
+[data-brand='ellieo'] [data-ui='company-card'] {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) auto;
+  column-gap: 0.875rem;
+  row-gap: 0.25rem;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  box-shadow: 0 0 0 1px var(--border), var(--ellieo-card-shadow);
+  --tw-ring-color: transparent;
+}
+
+[data-brand='ellieo'] [data-ui='company-card'] > div:first-child {
+  display: contents;
+}
+
+[data-brand='ellieo'] [data-ui='company-card'] > div:first-child > :first-child {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.875rem;
+}
+
+[data-brand='ellieo'] [data-ui='company-card'] > div:first-child > span {
+  grid-column: 3;
+  grid-row: 1;
+  max-width: 9.5rem;
+  overflow: hidden;
+}
+
+[data-brand='ellieo'] [data-ui='company-card'] > span:nth-child(2) {
+  grid-column: 2;
+  grid-row: 1;
+  margin-top: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  -webkit-line-clamp: 1;
+}
+
+[data-brand='ellieo'] [data-ui='company-card'] > span:nth-child(3) {
+  grid-column: 2 / span 2;
+  grid-row: 2;
+  margin-top: 0;
+}
+
+/* Featured company: lime ring around a white card */
+[data-brand='ellieo'] [data-ui='featured-card'] {
+  background-image: none;
+}
+
+/* =====================================================================
+   Job postings: each posting is its own logo-first card
+   ===================================================================== */
+[data-brand='ellieo'] [data-ui='posting-list'] {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  overflow: visible;
+  border-radius: 0;
+  background: transparent;
+  --tw-ring-color: transparent;
+}
+
+[data-brand='ellieo'] [data-ui='posting-list'] > * + * {
+  border-top-width: 0;
+}
+
+[data-brand='ellieo'] [data-ui='posting-row'] {
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--border), var(--ellieo-card-shadow);
+}
+
+[data-brand='ellieo'] [data-ui='posting-row'] [data-ui='posting-logo'] {
+  display: block;
+}
+
+[data-brand='ellieo'] [data-ui='posting-row'] [data-ui='posting-logo'] > * {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.875rem;
+}
+
+[data-brand='ellieo'] [data-ui='posting-row'] .size-5.sm\:hidden {
+  display: none;
+}
+
+/* =====================================================================
+   Documents (points guide, terms, privacy): big title, TOC as surface chips, sections as cards
+   ===================================================================== */
+[data-brand='ellieo'] [data-ui='doc'] {
+  background: #fff;
+}
+
+[data-brand='ellieo'] [data-ui='doc'] > :is(article, div:not([data-ui='doc-header'])),
+[data-brand='ellieo'] [data-ui='doc-header'] > div {
+  max-width: 40rem;
+}
+
+[data-brand='ellieo'] [data-ui='doc-header'] {
+  border: 0;
+}
+
+[data-brand='ellieo'] [data-ui='doc'] h1 {
+  font-size: clamp(2rem, 1.6rem + 1.6vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+[data-brand='ellieo'] [data-ui='doc-toc'] {
+  columns: auto;
+  border: 0;
+  box-shadow: none;
+  background: rgb(255 255 255 / 0.94);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+[data-brand='ellieo'] [data-ui='doc-toc'] :is(ul, ol) {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 0.25rem;
+}
+
+[data-brand='ellieo'] [data-ui='doc-toc'] li {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+[data-brand='ellieo'] [data-ui='doc-toc'] li > span {
+  display: none;
+}
+
+[data-brand='ellieo'] [data-ui='doc-toc'] a {
+  display: inline-flex;
+  height: 2.25rem;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--surface);
+  padding: 0 0.95rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+[data-brand='ellieo'] [data-ui='doc-section'] {
+  border-radius: 1.5rem;
+  background: #fff;
+  padding: 1.25rem;
+  box-shadow: 0 0 0 1px var(--border), var(--ellieo-card-shadow);
+  --tw-ring-color: transparent;
+}
+
+[data-brand='ellieo'] [data-ui='doc-section'] h2 {
+  font-size: 1.1875rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }

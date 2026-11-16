@@ -33,7 +33,7 @@ export function LegalDocumentView({ doc, related }: LegalDocumentViewProps) {
   }
 
   return (
-    <div className='flex flex-1 flex-col bg-[linear-gradient(180deg,#f6f7f9_0%,#ffffff_28%,#ffffff_100%)]'>
+    <div data-ui='doc' className='flex flex-1 flex-col bg-[linear-gradient(180deg,#f6f7f9_0%,#ffffff_28%,#ffffff_100%)]'>
       <article
         lang='en'
         className={cn(
@@ -96,6 +96,7 @@ export function LegalDocumentView({ doc, related }: LegalDocumentViewProps) {
             </p>
           ) : null}
           <nav
+            data-ui='doc-toc'
             className='mt-2.5 columns-1 gap-x-8 sm:columns-2'
             aria-label='Table of contents'
           >
@@ -133,6 +134,7 @@ export function LegalDocumentView({ doc, related }: LegalDocumentViewProps) {
         <div className='mt-10 space-y-10'>
           {doc.sections.map((section) => (
             <section
+              data-ui='doc-section'
               key={section.id}
               id={section.id}
               className={cn(

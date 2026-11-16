@@ -146,7 +146,7 @@ const ELLIEO: BrandConfig = {
   colors: { brand: '#1f5eff', brandHover: '#1748c7' },
   assets: {
     banner: { src: '/brand/ellieo-banner.png', width: 1073, height: 296 },
-    square: '/img/ellieo_logo.png',
+    square: '/img/ellieo_app_icon.png',
     vertical: '/brand/ellieo-logo-vertical.png',
     favicon: '/brand/ellieo-favicon.ico',
   },

@@ -223,6 +223,7 @@ export function PostingRow({
   return (
     <li
       data-posting-id={posting.id}
+      data-ui='posting-row'
       className={cn('scroll-mt-24 transition-colors', open ? 'bg-[#fafafa]' : 'hover:bg-[#fafafa]')}
     >
       <div className='flex items-start gap-3 px-4 py-3.5 sm:px-5'>
@@ -230,6 +231,7 @@ export function PostingRow({
           // 넓은 화면에서만 로고 열. 모바일은 제목 폭을 위해 회사 줄에 작은 로고를 넣는다.
           <Link
             href={href(`/companies/${posting.company.slug}`)}
+            data-ui='posting-logo'
             className='mt-0.5 hidden shrink-0 sm:block'
             aria-label={posting.company.name}
           >
@@ -405,6 +407,7 @@ export function PostingRows({ postings, showCompany = false }: { postings: Publi
 
   return (
     <ul
+      data-ui='posting-list'
       ref={listRef}
       className='divide-y divide-black/[0.05] overflow-hidden rounded-[1.25rem] bg-white ring-1 ring-black/[0.06]'
     >

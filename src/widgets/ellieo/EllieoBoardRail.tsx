@@ -1,5 +1,6 @@
 'use client'
 
+import { EllieoAppIcon } from '@widgets/ellieo/EllieoAppIcon'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -49,7 +50,8 @@ function ProfileCard() {
   if (!user) {
     return (
       <section className='rounded-[1.5rem] bg-[var(--brand)] p-5 text-white'>
-        <p className='text-[17px] font-extrabold tracking-[-0.02em]'>👋 {t('ellieo.rail.guestTitle')}</p>
+        <EllieoAppIcon size={44} className='mb-3 ring-2 ring-white/30' />
+        <p className='text-[17px] font-extrabold tracking-[-0.02em]'>{t('ellieo.rail.guestTitle')}</p>
         <p className='mt-1 text-[13px] leading-relaxed text-white/85'>{t('ellieo.rail.guestBody')}</p>
         <div className='mt-4 flex gap-2'>
           <Link
