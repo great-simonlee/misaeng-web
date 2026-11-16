@@ -320,13 +320,14 @@ function ExploreBoards() {
 
 /* ---------- Board shortcuts: the boards that aren't in the bottom tab bar (no chip row on Home) ---------- */
 
-const TAB_BAR_BOARDS: NycCategoryId[] = ['housing', 'marketplace', 'status', 'job-review']
+const TAB_BAR_BOARDS: NycCategoryId[] = ['housing', 'food', 'marketplace', 'status', 'job-review', 'anonymous']
 
 function BoardShortcuts() {
   const tn = useT('nav')
   const href = useCityPath()
   const boards = ELLIEO_BOARDS.filter((board) => board.available && !TAB_BAR_BOARDS.includes(board.id))
-  if (boards.length === 0) return null
+  // A row of one shortcut (only Roommates outside the tab bar) isn't worth it
+  if (boards.length < 2) return null
 
   return (
     <nav aria-label={tn('ellieo.boardsAria')} className='-mx-4 mt-3'>

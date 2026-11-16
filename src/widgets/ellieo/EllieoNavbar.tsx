@@ -26,7 +26,8 @@ import {
   HomeIcon,
   BagIcon,
   GlobeIcon,
-  PencilIcon,
+  BowlIcon,
+  ChatIcon,
   StarIcon,
 } from '@widgets/ellieo/icons'
 import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
@@ -58,7 +59,7 @@ export function EllieoNavbar() {
   const [accountOpen, setAccountOpen] = useState(false)
   const accountRef = useRef<HTMLDivElement>(null)
   const tabPage = useEllieoTabPage()
-  const [tabBarCollapsed, setTabBarCollapsed] = useCollapseOnScroll()
+  const [tabBarCompact, setTabBarCompact] = useCollapseOnScroll()
   const cityPillRef = useRef<HTMLButtonElement>(null)
 
   const [navPath, setNavPath] = useState(pathname)
@@ -67,7 +68,7 @@ export function EllieoNavbar() {
     setAccountOpen(false)
     setCityOpen(false)
     setSheet(null)
-    setTabBarCollapsed(false)
+    setTabBarCompact(false)
   }
 
   useEffect(() => {
@@ -126,9 +127,17 @@ export function EllieoNavbar() {
     { key: 'market', label: t('ellieo.tabs.market'), icon: BagIcon, href: marketHref, active: isActive(marketHref), fillActive: true },
     { key: 'careers', label: t('ellieo.tabs.visaJobs'), icon: BriefcaseIcon, href: visaHref, active: careersActive, fillActive: true },
   ] as const
-  // Mini pill (collapsed tab bar): the current tab's icon, Home when no tab is active
-  const miniTab = tabs.find((tab) => tab.active) ?? tabs[0]
-  const MiniTabIcon = miniTab.icon
+  // Phones/tablets: the Misaeng app's floating tab bar (ios/Misaeng/App/TabBar.swift), user 11-16
+  const foodHref = href('/food')
+  const askHref = href('/anonymous')
+  const appTabs = [
+    { key: 'home', label: t('ellieo.tabs.home'), icon: GridIcon, href: home, active: pathname === home, fillActive: true },
+    { key: 'housing', label: t('ellieo.tabs.housing'), icon: HomeIcon, href: housingHref, active: isActive(housingHref), fillActive: true },
+    { key: 'food', label: t('ellieo.short.food'), icon: BowlIcon, href: foodHref, active: isActive(foodHref), fillActive: false },
+    { key: 'market', label: t('ellieo.tabs.market'), icon: BagIcon, href: marketHref, active: isActive(marketHref), fillActive: true },
+    { key: 'careers', label: t('ellieo.tabs.jobsVisa'), icon: BriefcaseIcon, href: visaHref, active: careersActive, fillActive: true },
+    { key: 'ask', label: t('ellieo.short.anonymous'), icon: ChatIcon, href: askHref, active: isActive(askHref), fillActive: true },
+  ] as const
   // Housing / Visa / Jobs list pages: no top bar below 1024px (the tab bar already says where you are, user 11-16)
 
   return (
@@ -242,18 +251,55 @@ export function EllieoNavbar() {
         </div>
       </header>
 
-      {/* Bottom tab bar: every width (a floating pill from 1024px) */}
+      {/* Phones/tablets: floating frosted capsule like the Misaeng app; icons only and smaller while scrolling down */}
       <nav
         aria-label={t('menuAria', { city: cityInfo.shortLabel })}
-        aria-hidden={tabBarCollapsed || undefined}
-        inert={tabBarCollapsed || undefined}
         className={cn(
-          'fixed inset-x-0 bottom-0 z-[10000] border-t border-[var(--border)] bg-white pb-[env(safe-area-inset-bottom)]',
-          'transition-[transform,opacity] duration-[350ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-opacity motion-reduce:duration-200',
-          tabBarCollapsed &&
-            'max-lg:pointer-events-none max-lg:translate-y-full max-lg:opacity-0 max-lg:motion-reduce:translate-y-0',
-          'lg:inset-x-auto lg:bottom-4 lg:left-1/2 lg:w-[27.5rem] lg:-translate-x-1/2 lg:rounded-full lg:border lg:pb-0 lg:shadow-[var(--shadow-lg)]',
+          'fixed bottom-[calc(0.5rem+env(safe-area-inset-bottom))] left-1/2 z-[10000] -translate-x-1/2 rounded-full border border-white/70 bg-white/80 shadow-[0_8px_18px_rgb(0_0_0/0.12),0_1px_2px_rgb(0_0_0/0.05)] backdrop-blur-xl backdrop-saturate-150 lg:hidden',
+          'transition-[padding] duration-[350ms] ease-[cubic-bezier(0.34,1.2,0.64,1)] motion-reduce:transition-none',
+          tabBarCompact ? 'p-1' : 'p-1.5',
         )}
+      >
+        <ul className={cn('flex', tabBarCompact ? 'gap-px' : 'gap-0.5')}>
+          {appTabs.map((tab) => {
+            const Icon = tab.icon
+            const filled = tab.active && tab.fillActive
+            return (
+              <li key={tab.key}>
+                <Link
+                  href={tab.href}
+                  aria-current={tab.active ? 'page' : undefined}
+                  aria-label={tab.label}
+                  onClick={() => setTabBarCompact(false)}
+                  className={cn(
+                    'flex flex-col items-center justify-center gap-[3px] rounded-full touch-manipulation',
+                    'transition-[width,height,background-color,color] duration-[350ms] ease-[cubic-bezier(0.34,1.2,0.64,1)] motion-reduce:transition-colors',
+                    tabBarCompact ? 'h-[2.625rem] w-[2.875rem]' : 'h-[3.375rem] w-[min(3.625rem,calc((100vw-2.5rem)/6))]',
+                    tab.active ? 'bg-[rgb(var(--brand-rgb)/0.1)] text-[var(--brand)]' : 'text-[rgb(20_18_31/0.75)]',
+                  )}
+                >
+                  <Icon
+                    className={cn('shrink-0 transition-[width,height] duration-300', tabBarCompact ? 'size-[18px]' : 'size-5')}
+                    strokeWidth={tab.active ? 2.1 : 1.85}
+                    fill={filled ? 'currentColor' : 'none'}
+                    style={filled ? ({ '--ellieo-icon-cut': '#fff' } as React.CSSProperties) : undefined}
+                  />
+                  {tabBarCompact ? null : (
+                    <span className='line-clamp-2 max-w-full text-center text-[9px] font-semibold leading-[1.05] tracking-[-0.02em] [overflow-wrap:anywhere]'>
+                      {tab.label}
+                    </span>
+                  )}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+
+      {/* Desktop: the floating tab pill */}
+      <nav
+        aria-label={t('menuAria', { city: cityInfo.shortLabel })}
+        className='fixed bottom-4 left-1/2 z-[10000] hidden w-[27.5rem] -translate-x-1/2 rounded-full border border-[var(--border)] bg-white shadow-[var(--shadow-lg)] lg:block'
       >
         <ul className='mx-auto grid h-[4.25rem] max-w-[30rem] grid-cols-4 items-center px-2 lg:h-16'>
           {tabs.map((tab) => {
@@ -283,50 +329,6 @@ export function EllieoNavbar() {
           })}
         </ul>
       </nav>
-
-      {/* Phones/tablets, scrolling down: the tab bar shrinks to one mini pill (the current tab's icon), user 11-16 */}
-      <div
-        aria-hidden={!tabBarCollapsed || undefined}
-        inert={!tabBarCollapsed || undefined}
-        className={cn(
-          'fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-1/2 z-[10000] -ml-[1.625rem] flex size-[3.25rem] items-center justify-center rounded-full border border-[#E6EAF5] bg-white px-1.5 shadow-[0_10px_28px_-12px_rgb(20_18_31/0.35)] lg:hidden',
-          'transition-[transform,opacity] duration-[350ms] ease-[cubic-bezier(0.34,1.36,0.64,1)] motion-reduce:transition-opacity motion-reduce:duration-200',
-          tabBarCollapsed
-            ? 'translate-y-0 scale-100 opacity-100'
-            : 'pointer-events-none translate-y-4 scale-90 opacity-0 motion-reduce:translate-y-0 motion-reduce:scale-100',
-        )}
-      >
-        <button
-          type='button'
-          onClick={() => setTabBarCollapsed(false)}
-          aria-label={t('menuAria', { city: cityInfo.shortLabel })}
-          className='inline-flex size-10 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)] touch-manipulation transition active:scale-95'
-        >
-          <MiniTabIcon
-            className='size-[22px]'
-            strokeWidth={2.25}
-            fill={miniTab.fillActive ? 'currentColor' : 'none'}
-            style={{ '--ellieo-icon-cut': 'var(--brand-soft)' } as React.CSSProperties}
-          />
-        </button>
-      </div>
-
-      {/* Home: Write button (bottom-right, above the tab bar; drops down beside the mini pill when it collapses) */}
-      {pathname === home ? (
-        <button
-          type='button'
-          onClick={() => setSheet('compose')}
-          aria-expanded={sheet === 'compose'}
-          className={cn(
-            'fixed bottom-[calc(var(--bottom-nav-h)+1rem)] right-4 z-[10000] inline-flex h-12 items-center gap-1.5 rounded-full bg-[var(--brand)] pl-4 pr-5 text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(31,94,255,0.7)] touch-manipulation hover:bg-[var(--brand-hover)] active:scale-95 lg:bottom-6 lg:right-6',
-            'transition-[transform,background-color] duration-[350ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
-            tabBarCollapsed && 'max-lg:translate-y-[3.5rem]',
-          )}
-        >
-          <PencilIcon className='size-[18px]' strokeWidth={2.25} />
-          {t('ellieo.write')}
-        </button>
-      ) : null}
 
       <EllieoSheet
         open={sheet === 'compose'}
@@ -388,8 +390,8 @@ export function EllieoAvatar({ photoURL, name, size = 40 }: { photoURL?: string 
 }
 
 /**
- * Phones/tablets: collapse the bottom tab bar into the mini pill while scrolling down, expand when scrolling up
- * (> 8px) or near the top. Passive scroll listener + one rAF per frame; never collapses from 1024px up.
+ * Phones/tablets: compact tab bar (icons only, smaller) while scrolling down, full size when scrolling up
+ * (> 8px) or near the top — same thresholds as the Misaeng app's TabBarScrollTracker. Passive scroll listener + one rAF per frame; never collapses from 1024px up.
  */
 function useCollapseOnScroll() {
   const [collapsed, setCollapsed] = useState(false)

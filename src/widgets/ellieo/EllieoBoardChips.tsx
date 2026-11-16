@@ -13,6 +13,8 @@ import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 const TAB_PAGES = {
   housing: ['/housing'],
   market: ['/marketplace'],
+  food: ['/food'],
+  ask: ['/anonymous'],
   visa: ['/status', '/cpt-opt', '/visa', '/green-card'],
   jobs: ['/job-review'],
   companies: ['/companies'],
@@ -44,13 +46,14 @@ export function EllieoBoardChips() {
   const href = useCityPath()
   const t = useT('nav')
   const tabPage = useEllieoTabPage()
-  // Only the boards outside the tab bar (Housing, Market, Visa · Jobs have tabs)
+  // Only the boards outside the tab bar (Housing, Food, Market, Jobs & Visa, Ask & Talk have tabs)
   const boards = ELLIEO_BOARDS.filter(
-    (board) => board.available && !['housing', 'marketplace', 'status', 'job-review'].includes(board.id),
+    (board) => board.available && !['housing', 'food', 'marketplace', 'status', 'job-review', 'anonymous'].includes(board.id),
   )
   const boardPaths = boards.map((board) => href(board.path))
   const onBoardList = boardPaths.includes(pathname)
-  if (tabPage || !onBoardList) return null
+  // One board left outside the bar (Roommates): nothing to switch between
+  if (tabPage || !onBoardList || boards.length < 2) return null
 
   return (
     <nav aria-label={t('ellieo.boardsAria')} className='w-full border-b border-[var(--border)] bg-white'>

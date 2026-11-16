@@ -70,7 +70,7 @@ export const UsersIcon = (p: IconProps) => (
 export const ChatIcon = (p: IconProps) => (
   <Base {...p}>
     <path d='M20 12a7.5 7.5 0 0 1-11.1 6.6L4 20l1.4-4.6A7.5 7.5 0 1 1 20 12Z' />
-    <path d='M9 11h.01M12 11h.01M15 11h.01' strokeWidth={2.4} />
+    <path d='M9 11h.01M12 11h.01M15 11h.01' strokeWidth={2.4} stroke='var(--ellieo-icon-cut, currentColor)' />
   </Base>
 )
 
