@@ -111,6 +111,10 @@
     "notifications": "Inbox",
     "login": "Log in",
     "close": "Close",
-    "boardsAria": "Boards"
+    "boardsAria": "Boards",
+    "menu": {
+      "points": "Ellieo Points",
+      "about": "About Ellieo"
+    }
   }
 }

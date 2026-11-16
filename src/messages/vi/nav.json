@@ -110,6 +110,10 @@
     "notifications": "Hộp thư",
     "login": "Đăng nhập",
     "close": "Đóng",
-    "boardsAria": "Chuyên mục"
+    "boardsAria": "Chuyên mục",
+    "menu": {
+      "points": "Điểm Ellieo",
+      "about": "Về Ellieo"
+    }
   }
 }

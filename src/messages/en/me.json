@@ -533,5 +533,9 @@
     "loginRequired": "Please log in first.",
     "notFound": "We couldn't find this conversation.",
     "unavailable": "We can't take inquiries right now. Please email info@misaeng.com."
+  },
+  "ellieoPoints": {
+    "title": "Ellieo Points",
+    "body": "How to earn points and what you can use them for"
   }
 }

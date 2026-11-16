@@ -466,6 +466,20 @@ export function MyPageScreen() {
                 ) : null}
 
                 <MyPageCreditSection className='mt-3' />
+                {BRAND_CONFIG.theme === 'ellieo' ? (
+                  // Ellieo: the points guide lives here now (no Explore sheet)
+                  <Link
+                    href={href('/credit')}
+                    className='mt-3 flex items-center gap-3 rounded-[1.25rem] bg-[var(--ellieo-lime-soft)] px-4 py-3 text-left transition hover:brightness-[0.98]'
+                  >
+                    <span aria-hidden className='text-[22px] leading-none'>⭐</span>
+                    <span className='min-w-0 flex-1'>
+                      <span className='block text-[14px] font-bold text-[var(--foreground)]'>{t('ellieoPoints.title')}</span>
+                      <span className='block text-[12.5px] text-[var(--muted-foreground)]'>{t('ellieoPoints.body')}</span>
+                    </span>
+                    <span aria-hidden className='text-[var(--muted)]'>›</span>
+                  </Link>
+                ) : null}
               </div>
 
               {showWorkplacePendingCta ? (

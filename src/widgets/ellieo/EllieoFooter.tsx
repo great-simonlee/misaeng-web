@@ -60,6 +60,7 @@ export function EllieoFooter() {
 
   const support = [
     { href: href('/about'), label: t('footer.links.about') },
+    { href: href('/credit'), label: t('ellieo.menu.points') },
     { href: href('/me'), label: t('footer.links.me') },
     // Help: the inquiry board (login required; the page sends guests to log in first)
     ...(supportConfig?.inquiries ? [{ href: href('/me/inquiries'), label: t('footer.links.inquiries') }] : []),

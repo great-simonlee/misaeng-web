@@ -90,6 +90,11 @@ export function EllieoNavbar() {
     ...(supportConfig?.inquiries ? [{ path: '/me/inquiries', key: 'inquiries', exact: false } as const] : []),
     ...(isMisaengUser ? [{ path: '/team/credit-reviews', key: 'creditReviews', exact: false } as const] : []),
   ].map((item) => ({ ...item, href: href(item.path), label: t(`account.${item.key}`) }))
+  // Pages that lived in the Explore sheet: points guide and the Ellieo intro
+  const extraLinks = [
+    { href: href('/credit'), label: `⭐ ${t('ellieo.menu.points')}` },
+    { href: href('/about'), label: t('ellieo.menu.about') },
+  ]
   const boards = ELLIEO_BOARDS.filter((board) => board.available)
   const composeBoards = boards.map((board) => ({
     ...board,
@@ -182,6 +187,20 @@ export function EllieoNavbar() {
                           (item.exact ? pathname === item.href : isActive(item.href))
                             ? 'font-bold text-[var(--brand)]'
                             : 'text-[var(--foreground)]',
+                        )}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                    <div className='my-1.5 h-px bg-[var(--border)]' />
+                    {extraLinks.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        role='menuitem'
+                        className={cn(
+                          'flex h-10 items-center rounded-xl px-2.5 text-[14px] font-medium transition hover:bg-[var(--surface)]',
+                          isActive(item.href) ? 'font-bold text-[var(--brand)]' : 'text-[var(--foreground)]',
                         )}
                       >
                         {item.label}

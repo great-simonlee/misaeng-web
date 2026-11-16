@@ -72,6 +72,15 @@ Navigation lives in a bottom tab bar on every screen size (web too).
   ≥640px... keep 1 column on phones).
 - Footer: small, muted, inside the column, above the tab bar padding.
 
+## App launch (user 11-16: "clean like Misaeng's first screen"; photo and logo-draw versions rejected)
+
+- Same structure as Misaeng's SplashView (misaeng-app ios/Misaeng/App/RootView.swift): plain white, one vertical
+  lockup optically centred (~28pt above the middle): Ellieo house mark above the ELLIEO wordmark
+  (`ellieo-logo-vertical.png`), **~112pt wide** (smaller than the first Ellieo try); city name below as a quiet
+  caption (12pt light, muted, letter-spaced, 16pt gap); the three-dot loader (blue, blue, lime) 40pt below.
+- Appears with a soft 0.4s ease-out (scale 0.97→1). Shown ~1.5–2s while Home prefetches, then fades (0.35s).
+- System launch screen: plain white. No photo, no gradient, no drawing animation, no app-icon tile.
+
 ## Components
 
 - **Post card**: header row = avatar 40px (anonymous → brand blue-soft circle with 💬) + nickname (600) + verified
