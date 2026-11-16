@@ -20,7 +20,8 @@ import { enc, inList, pointsRest, pointsRpc, PointsStoreError, type PointsRpcRes
 
 /**
  * Coffee chat v2 — peer mentors (misaeng-app only; supabase/coffee_chat_mentors.sql).
- *   * Mentor = a user with an approved 'offer' review verification who agreed to the mentor consent. No reward.
+ *   * Mentor = a user with an approved 'offer' review verification — or (1.0.7) an approved workplace verification —
+ *     who agreed to the mentor consent. No reward.
  *   * Requester proposes 1–3 times, pays spend.coffee_chat (hold; 0 = free, no hold), identity tier required.
  *   * Mentor accepts one proposed time + pastes their own Zoom link, or declines. Either side may cancel
  *     (requester: only more than 6 hours before the start). Holds are released on cancel / decline / expiry.
@@ -70,7 +71,10 @@ export const RETIME_MAX = 1
 
 type MentorRow = {
   user_id: string
-  submission_id: string
+  /** The approved offer verification; null for a mentor through workplace verification by work email. */
+  submission_id: string | null
+  /** 'offer' (합격 인증) | 'workplace' (직장 인증, current or former) — coffee_chat_mentors_auto.sql */
+  verified_kind: string
   company: string
   role: string
   intro: string
@@ -91,7 +95,7 @@ type MentorRow = {
 
 /** Public card columns: no LinkedIn (a mentor's LinkedIn must never reach lists / cards / profiles). */
 const MENTOR_SELECT =
-  'user_id,submission_id,company,role,intro,topics,active,consent_version,agreed_at,created_at,updated_at,takes_coffee,takes_questions,source'
+  'user_id,submission_id,company,role,intro,topics,active,consent_version,agreed_at,created_at,updated_at,takes_coffee,takes_questions,source,verified_kind'
 /** The mentor's own row (GET mentor/me, accept). */
 const MENTOR_OWN_SELECT = `${MENTOR_SELECT},linkedin`
 
@@ -157,6 +161,8 @@ export type MentorView = {
   intro: string
   topics: string[]
   verified: true
+  /** Which verification the card stands on: 'offer' (합격 인증) or 'workplace' (직장 인증) */
+  verifiedKind: 'offer' | 'workplace'
   schoolVerified: boolean
   /** "커피챗 가능" — coffee chat requests open (false: career questions only, on their reviews) */
   takesCoffee: boolean
@@ -279,6 +285,7 @@ function toMentor(row: MentorRow, profile: SupabaseProfileRecord | null | undefi
     intro: row.intro,
     topics: row.topics ?? [],
     verified: true,
+    verifiedKind: row.verified_kind === 'workplace' ? 'workplace' : 'offer',
     schoolVerified: Boolean(profile?.schoolEmailVerified),
     takesCoffee: row.takes_coffee !== false,
     takesQuestions: row.takes_questions !== false,
@@ -289,7 +296,7 @@ function toMyMentor(row: MentorRow, profile: SupabaseProfileRecord | null | unde
   return {
     ...toMentor(row, profile),
     active: row.active,
-    submissionId: row.submission_id,
+    submissionId: row.verified_kind === 'workplace' ? WORKPLACE_OPTION_ID : (row.submission_id ?? ''),
     consentVersion: row.consent_version,
     linkedinUrl: row.linkedin ?? null,
   }
@@ -372,9 +379,38 @@ async function getChatRow(id: string): Promise<ChatRow | null> {
   return rows?.[0] ?? null
 }
 
-// MARK: offers (approved 'offer' review verifications)
+// MARK: offers (approved 'offer' review verifications) + workplace verification
 
-export type OfferOption = { submissionId: string; company: string }
+/**
+ * What a mentor card can stand on: an approved offer verification (합격 인증), or — from 1.0.7 — an approved
+ * workplace verification (직장 인증, current or former; by work email or documents), so people who didn't get the
+ * offer can mentor too. The workplace option's submissionId is WORKPLACE_OPTION_ID (the card stores
+ * verified_kind 'workplace' and the documents submission when there is one).
+ */
+export type OfferOption = { submissionId: string; company: string; kind: 'offer' | 'workplace' }
+export const WORKPLACE_OPTION_ID = 'workplace'
+
+/** Approved offers (newest first), then the approved workplace verification. */
+export async function listMentorEligibility(uid: string, options: { fresh?: boolean } = {}): Promise<OfferOption[]> {
+  // fresh: right after a workplace decision the 5-minute profile cache may still say pending
+  const [offers, profile] = await Promise.all([
+    listApprovedOffers(uid),
+    options.fresh ? getSupabaseProfile(uid).catch(() => null) : profileOf(uid),
+  ])
+  const company = profile?.workplaceCompanyName?.trim() || ''
+  const workplace: OfferOption[] =
+    profile?.workplaceStatus === 'approved' && company
+      ? [{ submissionId: WORKPLACE_OPTION_ID, company: company.slice(0, 80), kind: 'workplace' }]
+      : []
+  return [...offers, ...workplace]
+}
+
+/** A card still stands on a valid verification (offer still approved / workplace still approved). */
+function stillEligible(row: MentorRow, options: OfferOption[]) {
+  return row.verified_kind === 'workplace'
+    ? options.some((option) => option.kind === 'workplace')
+    : options.some((option) => option.submissionId === row.submission_id)
+}
 
 export async function listApprovedOffers(uid: string): Promise<OfferOption[]> {
   try {
@@ -382,7 +418,7 @@ export async function listApprovedOffers(uid: string): Promise<OfferOption[]> {
       `verification_submissions?user_id=eq.${enc(uid)}&kind=eq.offer&status=eq.approved&select=id,result_label&order=decided_at.desc.nullslast`,
     )
     return (rows ?? [])
-      .map((row) => ({ submissionId: row.id, company: row.result_label?.trim() || '' }))
+      .map((row) => ({ submissionId: row.id, company: row.result_label?.trim() || '', kind: 'offer' as const }))
       .filter((row) => row.company)
   } catch (error) {
     // verification.sql not run → nobody is eligible
@@ -452,12 +488,12 @@ export async function mentorForPost(viewerUid: string, postId: string): Promise<
   const row = await getMentorRow(authorUid).catch(() => null)
   if (!row?.active || row.takes_coffee === false || row.consent_version !== COFFEE_CHAT_MENTOR_CONSENT_VERSION) return null
   const [offers, authorProfile, viewerProfile, myBlocked] = await Promise.all([
-    listApprovedOffers(authorUid),
+    listMentorEligibility(authorUid),
     profileOf(authorUid),
     profileOf(viewerUid),
     getViewerBlockedUids(viewerUid),
   ])
-  if (!offers.some((offer) => offer.submissionId === row.submission_id)) return null
+  if (!stillEligible(row, offers)) return null
   if (
     !authorProfile ||
     isGone(authorProfile) ||
@@ -472,7 +508,7 @@ export async function mentorForPost(viewerUid: string, postId: string): Promise<
 
 export async function getMyMentorState(uid: string, t: Translate) {
   const [offers, row, profile] = await Promise.all([
-    listApprovedOffers(uid),
+    listMentorEligibility(uid, { fresh: true }),
     getMentorRow(uid, true).catch(storeError),
     profileOf(uid),
   ])
@@ -543,7 +579,7 @@ export function parseMentorInput(body: Record<string, unknown>): MentorInput {
 
 /** Creates or updates my mentor card. 403 unless the submission is my approved offer verification. */
 export async function saveMentor(uid: string, input: MentorInput): Promise<MyMentorView> {
-  const [offers, profile] = await Promise.all([listApprovedOffers(uid), getSupabaseProfile(uid)])
+  const [offers, profile] = await Promise.all([listMentorEligibility(uid, { fresh: true }), getSupabaseProfile(uid)])
   if (profile?.accountType === 'parent') throw pointsErrors.parentNotAllowed()
   const offer = offers.find((item) => item.submissionId === input.submissionId)
   if (!offer) {
@@ -558,7 +594,8 @@ export async function saveMentor(uid: string, input: MentorInput): Promise<MyMen
     prefer: 'resolution=merge-duplicates,return=representation',
     body: JSON.stringify({
       user_id: uid,
-      submission_id: offer.submissionId,
+      submission_id: offer.kind === 'workplace' ? (profile?.workplaceSubmissionId ?? null) : offer.submissionId,
+      verified_kind: offer.kind,
       company: offer.company,
       role: input.role,
       intro: input.intro,
@@ -612,6 +649,7 @@ export async function deleteMentor(uid: string, options: { actorDeleted?: boolea
 
 /**
  * Writing a job review with career questions or coffee chats on (both on by default) makes the author a mentor —
+ * (offer or workplace verification: see listMentorEligibility)
  * the write screen's last step says so and that counts as agreeing to the mentor consent (the post keeps the version
  * in jobReviewMentorConsent). The card goes live once they have an approved offer verification: right after posting
  * when they already have one, else when it is approved (verification decision route). Runs after the response;
@@ -664,8 +702,8 @@ export async function syncAutoMentor(uid: string): Promise<void> {
       })
       return
     }
-    const offers = await listApprovedOffers(uid)
-    if (offers.length === 0) return // goes live when the offer verification is approved
+    const offers = await listMentorEligibility(uid, { fresh: true })
+    if (offers.length === 0) return // goes live when the offer or workplace verification is approved
     const latest = [...reviews].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))[0]
     const offer =
       offers.find((item) => normalizeCompany(item.company) === normalizeCompany(latest?.location ?? '')) ?? offers[0]
@@ -674,7 +712,8 @@ export async function syncAutoMentor(uid: string): Promise<void> {
       prefer: 'resolution=ignore-duplicates,return=minimal',
       body: JSON.stringify({
         user_id: uid,
-        submission_id: offer.submissionId,
+        submission_id: offer.kind === 'workplace' ? (profile.workplaceSubmissionId ?? null) : offer.submissionId,
+        verified_kind: offer.kind,
         company: offer.company,
         role: String(latest?.title ?? '').trim().slice(0, MENTOR_ROLE_MAX),
         intro: '',

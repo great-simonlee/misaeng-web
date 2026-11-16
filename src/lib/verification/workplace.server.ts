@@ -138,6 +138,9 @@ export async function handleWorkplaceDecision(input: {
   let points: unknown = null
   if (status === 'approved') {
     publishedPosts = (await publishHeldPosts(input.uid)).published
+    // 직장 인증도 멘토 자격 (1.0.7): 질문·커피챗을 켜 둔 후기가 있으면 이제 멘토로 공개
+    const { syncAutoMentor } = await import('@lib/points/coffeeChatMentors.server')
+    await syncAutoMentor(input.uid)
     // 직장 인증 5P(현재/전 직장) + 추천인 보상 등 (facade, 멱등)
     const { onVerificationCompleted } = await import('@lib/points/facade.server')
     points = await onVerificationCompleted(input.uid, 'work_email', request?.workEmail || profile?.workEmail || null)

@@ -4,6 +4,9 @@
 --     verification — right away, or when it is approved (misaeng-web syncAutoMentor).
 --   * takes_coffee / takes_questions: what the mentor takes. The mentor list shows "커피챗 가능" / "커리어 질문 가능";
 --     a mentor with takes_coffee = false gets no coffee chat requests (career questions stay per review).
+--   * verified_kind: 'offer' (합격 인증) | 'workplace' (직장 인증, current or former — people who didn't get the offer
+--     can mentor too). A workplace mentor verified by work email has no documents submission, so submission_id
+--     becomes nullable.
 --   * source: 'settings' (registered in 멘토 설정) | 'review' (registered automatically). Saving 멘토 설정 makes it
 --     'settings' with coffee chats on.
 --
@@ -17,4 +20,12 @@ alter table public.coffee_chat_mentors add column if not exists source text not 
 do $$ begin
   alter table public.coffee_chat_mentors add constraint coffee_chat_mentors_source_check
     check (source in ('settings', 'review'));
+exception when duplicate_object then null; end $$;
+
+alter table public.coffee_chat_mentors alter column submission_id drop not null;
+alter table public.coffee_chat_mentors add column if not exists verified_kind text not null default 'offer';
+
+do $$ begin
+  alter table public.coffee_chat_mentors add constraint coffee_chat_mentors_verified_kind_check
+    check (verified_kind in ('offer', 'workplace'));
 exception when duplicate_object then null; end $$;
