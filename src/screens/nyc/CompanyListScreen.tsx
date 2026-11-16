@@ -1,5 +1,7 @@
 'use client'
 
+import { BRAND_CONFIG } from '@lib/brand'
+import { EllieoDots } from '@components/EllieoDots'
 import Link from 'next/link'
 import {
   useCallback,
@@ -487,7 +489,9 @@ function HeroStat({
   return (
     <div className='flex items-baseline gap-1'>
       <dd data-ui={accent ? 'hero-stat-accent' : undefined} className={cn('font-semibold tabular-nums', accent ? 'text-[#ff8a65]' : 'text-white')}>
-        {value === null ? (
+        {value === null && BRAND_CONFIG.theme === 'ellieo' ? (
+          <EllieoDots className='scale-75' />
+        ) : value === null ? (
           <span className='inline-block h-3 w-5 animate-pulse rounded bg-white/15 align-middle' />
         ) : (
           format.number(value)

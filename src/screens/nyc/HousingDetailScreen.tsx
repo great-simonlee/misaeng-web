@@ -1,5 +1,6 @@
 'use client'
 
+import { EllieoDots } from '@components/EllieoDots'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -62,9 +63,14 @@ const HousingLocationMap = dynamic(
     ),
   {
     ssr: false,
-    loading: () => (
-      <div className='aspect-[16/10] animate-pulse rounded-[1.25rem] bg-[#e8eaee] sm:aspect-[16/9]' />
-    ),
+    loading: () =>
+      BRAND_CONFIG.theme === 'ellieo' ? (
+        <div className='flex aspect-[16/10] items-center justify-center rounded-[1.5rem] bg-[var(--surface)] sm:aspect-[16/9]'>
+          <EllieoDots />
+        </div>
+      ) : (
+        <div className='aspect-[16/10] animate-pulse rounded-[1.25rem] bg-[#e8eaee] sm:aspect-[16/9]' />
+      ),
   },
 )
 import {

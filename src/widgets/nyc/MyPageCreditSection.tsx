@@ -1,5 +1,7 @@
 'use client'
 
+import { BRAND_CONFIG } from '@lib/brand'
+import { EllieoDots } from '@components/EllieoDots'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -189,7 +191,9 @@ export function MyPageCreditSection({ className }: Props) {
 
   return (
     <div className={cn('flex flex-wrap items-center justify-center gap-2', className)}>
-      {loading ? (
+      {loading && BRAND_CONFIG.theme === 'ellieo' ? (
+        <EllieoDots />
+      ) : loading ? (
         <div
           className='h-9 w-[9.5rem] animate-pulse rounded-full bg-[#f0f1f3]'
           aria-busy
@@ -357,7 +361,11 @@ export function MyPageCreditSection({ className }: Props) {
             </Link>
           </div>
 
-          {ledgerLoading ? (
+          {ledgerLoading && BRAND_CONFIG.theme === 'ellieo' ? (
+            <div className='flex justify-center py-6' aria-busy>
+              <EllieoDots />
+            </div>
+          ) : ledgerLoading ? (
             <div className='space-y-2' aria-busy>
               {Array.from({ length: 3 }).map((_, index) => (
                 <div

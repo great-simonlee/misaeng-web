@@ -67,7 +67,9 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 - **Chips**: pill 36px, surface bg, 14px/600; selected ink bg.
 - **Inputs**: surface bg, no border until focus; focus = 2px violet ring.
 - **Empty states**: big emoji (48px) + one line + action button, centered, in a surface card.
-- **Loading**: spinner (violet ring), never gray skeleton blocks; one full-screen loader if two would show.
+- **Loading** (user choice 11-16): **three bouncing dots** — violet, violet, lime; ~8px dots, 6px gap, each hops
+  ~6px in turn (stagger ~0.15s, ~0.9s loop). No logo above it, no ring. Same component for full-screen,
+  section, button busy and pull-to-refresh. Never gray skeleton blocks; one full-screen loader if two would show.
 - **Badges**: `New` = lime pill ink text; `Verified` = violet-soft pill violet text.
 - **Sheets/modals**: bottom sheet on phones (28px top radius, grab handle), centered card on desktop.
 

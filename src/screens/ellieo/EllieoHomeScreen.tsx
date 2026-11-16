@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import { EllieoDots } from '@components/EllieoDots'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { captureReferralFromLocation } from '@lib/community/referral'
 import { cityLoginPath, hrefForHousingListing } from '@lib/constants/cities'
@@ -329,7 +330,7 @@ function CommunityFeed() {
   if (feed.loading) {
     return (
       <div className='flex justify-center py-16'>
-        <span className='ellieo-spinner size-8' aria-hidden />
+        <EllieoDots />
       </div>
     )
   }

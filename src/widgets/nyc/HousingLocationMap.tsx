@@ -1,5 +1,7 @@
 'use client'
 
+import { BRAND_CONFIG } from '@lib/brand'
+import { EllieoDots } from '@components/EllieoDots'
 import { useEffect, useRef, useState } from 'react'
 import type { Map as LeafletMap, Marker as LeafletMarker } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -218,7 +220,13 @@ export function HousingLocationMap({
 
       <div className='relative mt-3 aspect-[16/10] overflow-hidden bg-[#e8eaee] sm:aspect-[16/9]'>
         {loading ? (
-          <div className='absolute inset-0 animate-pulse bg-[#e8eaee]' />
+          BRAND_CONFIG.theme === 'ellieo' ? (
+            <div className='absolute inset-0 flex items-center justify-center bg-[var(--surface)]'>
+              <EllieoDots />
+            </div>
+          ) : (
+            <div className='absolute inset-0 animate-pulse bg-[#e8eaee]' />
+          )
         ) : hasCoords ? (
           <div
             ref={setContainer}

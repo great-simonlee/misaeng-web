@@ -1,5 +1,7 @@
 'use client'
 
+import { LoadingState } from '@components/LoadingSpinner'
+import { BRAND_CONFIG } from '@lib/brand'
 import { Skeleton } from '@components/Skeleton'
 import { cn } from '@lib'
 import { useT } from '@lib/i18n/client'
@@ -52,6 +54,8 @@ export function HousingPostCardSkeletonGrid({
   className,
 }: HousingPostCardSkeletonGridProps) {
   const t = useT('housing')
+  // Ellieo: one loader everywhere (three dots), never gray blocks
+  if (BRAND_CONFIG.theme === 'ellieo') return <LoadingState label={t('card.loadingLabel')} className={className} />
   return (
     <div
       className={cn(

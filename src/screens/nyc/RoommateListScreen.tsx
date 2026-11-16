@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   BottomSheet,
+  LoadingState,
   PullToRefresh,
   RangeSlider,
   Skeleton,
@@ -422,7 +423,9 @@ export function RoommateListScreen() {
         </BoardListToolbar>
 
         <section className='flex-1 pb-14 pt-4 sm:pb-16 sm:pt-5'>
-          {loading ? (
+          {loading && BRAND_CONFIG.theme === 'ellieo' ? (
+            <LoadingState />
+          ) : loading ? (
             <div className='space-y-4'>
               <Skeleton className='h-3.5 w-28' />
               {Array.from({ length: 3 }).map((_, index) => (

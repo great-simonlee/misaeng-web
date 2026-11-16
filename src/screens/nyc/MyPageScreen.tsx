@@ -1,5 +1,6 @@
 'use client'
 
+import { EllieoDots } from '@components/EllieoDots'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -430,7 +431,9 @@ export function MyPageScreen() {
                   >
                     <ProfileImage photoURL={avatarURL} displayName={displayName} avatarName={avatarName} />
                     <span className='absolute -bottom-0.5 -right-0.5 flex size-8 items-center justify-center rounded-full border-[3px] border-white bg-[var(--foreground)] text-white shadow-sm transition group-active:scale-95'>
-                      {uploading ? (
+                      {uploading && BRAND_CONFIG.theme === 'ellieo' ? (
+                        <EllieoDots className='scale-[0.6]' />
+                      ) : uploading ? (
                         <span className='size-3.5 animate-pulse rounded-full bg-white/70' />
                       ) : (
                         <CameraIcon />

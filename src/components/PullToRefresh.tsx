@@ -1,5 +1,6 @@
 'use client'
 
+import { EllieoDots } from '@components/EllieoDots'
 import Image from 'next/image'
 import {
   useCallback,
@@ -248,78 +249,88 @@ export function PullToRefresh({
             refreshing ? 'py-3' : 'mb-2.5 pt-3',
           )}
         >
-          <div
-            className={cn(
-              'relative flex size-11 items-center justify-center rounded-full bg-white transition-[box-shadow,transform]',
-              ready || refreshing
-                ? 'shadow-[0_6px_20px_rgb(var(--brand-rgb)/0.28)]'
-                : 'shadow-[0_4px_14px_rgba(15,23,42,0.08)]',
-            )}
-            style={{
-              transform: `scale(${logoScale})`,
-            }}
-          >
-            {/* 진행 링 */}
-            <span
-              className={cn(
-                'absolute inset-0',
-                refreshing && 'misaeng-ptr-orbit',
-              )}
-              aria-hidden
+          {BRAND_CONFIG.theme === 'ellieo' ? (
+            // Ellieo: the three dots in a white pill (one loader everywhere)
+            <div
+              className='flex h-10 items-center rounded-full bg-white px-3.5 shadow-[0_6px_20px_-6px_rgba(124,92,255,0.45)]'
+              style={{ transform: `scale(${logoScale})` }}
             >
-              <svg
-                className='size-full -rotate-90'
-                viewBox='0 0 44 44'
-              >
-                <circle
-                  cx='22'
-                  cy='22'
-                  r='19'
-                  fill='none'
-                  style={{ stroke: 'rgb(var(--brand-rgb) / 0.12)' }}
-                  strokeWidth='2.5'
-                />
-                <circle
-                  cx='22'
-                  cy='22'
-                  r='19'
-                  fill='none'
-                  style={{ stroke: 'var(--brand)' }}
-                  strokeWidth='2.5'
-                  strokeLinecap='round'
-                  strokeDasharray={
-                    refreshing
-                      ? `${2 * Math.PI * 19 * 0.28} ${2 * Math.PI * 19}`
-                      : 2 * Math.PI * 19
-                  }
-                  strokeDashoffset={
-                    refreshing ? 0 : 2 * Math.PI * 19 * (1 - progress)
-                  }
-                />
-              </svg>
-            </span>
-
-            <span className='relative z-[1] flex size-6 items-center justify-center'>
-              <Image
-                src={BRAND_CONFIG.assets.square}
-                alt=''
-                width={48}
-                height={48}
-                className={cn(
-                  'size-full object-contain',
-                  BRAND_CONFIG.id === 'misaeng' && 'mix-blend-lighten',
-                )}
-                priority
-              />
-            </span>
-
-            {(ready || refreshing) && (
+              <EllieoDots />
+            </div>
+          ) : (
+            <div
+              className={cn(
+                'relative flex size-11 items-center justify-center rounded-full bg-white transition-[box-shadow,transform]',
+                ready || refreshing
+                  ? 'shadow-[0_6px_20px_rgb(var(--brand-rgb)/0.28)]'
+                  : 'shadow-[0_4px_14px_rgba(15,23,42,0.08)]',
+              )}
+              style={{
+                transform: `scale(${logoScale})`,
+              }}
+            >
+              {/* 진행 링 */}
               <span
-                className='absolute inset-0 rounded-full ring-2 ring-brand/25'
+                className={cn(
+                  'absolute inset-0',
+                  refreshing && 'misaeng-ptr-orbit',
+                )}
                 aria-hidden
-              />
-            )}
-          </div>
+              >
+                <svg
+                  className='size-full -rotate-90'
+                  viewBox='0 0 44 44'
+                >
+                  <circle
+                    cx='22'
+                    cy='22'
+                    r='19'
+                    fill='none'
+                    style={{ stroke: 'rgb(var(--brand-rgb) / 0.12)' }}
+                    strokeWidth='2.5'
+                  />
+                  <circle
+                    cx='22'
+                    cy='22'
+                    r='19'
+                    fill='none'
+                    style={{ stroke: 'var(--brand)' }}
+                    strokeWidth='2.5'
+                    strokeLinecap='round'
+                    strokeDasharray={
+                      refreshing
+                        ? `${2 * Math.PI * 19 * 0.28} ${2 * Math.PI * 19}`
+                        : 2 * Math.PI * 19
+                    }
+                    strokeDashoffset={
+                      refreshing ? 0 : 2 * Math.PI * 19 * (1 - progress)
+                    }
+                  />
+                </svg>
+              </span>
+
+              <span className='relative z-[1] flex size-6 items-center justify-center'>
+                <Image
+                  src={BRAND_CONFIG.assets.square}
+                  alt=''
+                  width={48}
+                  height={48}
+                  className={cn(
+                    'size-full object-contain',
+                    BRAND_CONFIG.id === 'misaeng' && 'mix-blend-lighten',
+                  )}
+                  priority
+                />
+              </span>
+
+              {(ready || refreshing) && (
+                <span
+                  className='absolute inset-0 rounded-full ring-2 ring-brand/25'
+                  aria-hidden
+                />
+              )}
+            </div>
+          )}
 
           <p
             className={cn(

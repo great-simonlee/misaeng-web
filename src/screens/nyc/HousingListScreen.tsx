@@ -555,7 +555,7 @@ export function HousingListScreen() {
       <section className='flex-1 pb-14 pt-4 sm:pb-16 sm:pt-5'>
         {loading ? (
           <>
-            <Skeleton className='mb-3.5 h-3.5 w-36' />
+            {BRAND_CONFIG.theme === 'ellieo' ? null : <Skeleton className='mb-3.5 h-3.5 w-36' />}
             <HousingPostCardSkeletonGrid />
           </>
         ) : filteredPosts.length === 0 ? (

@@ -458,16 +458,25 @@
 }
 
 /* =====================================================================
-   Loading: violet ring spinner + wave bars (Ellieo loader)
+   Loading: three hopping dots (EllieoDots) — violet, violet, lime. No logo, no ring
    ===================================================================== */
-@keyframes ellieo-wave {
+@keyframes ellieo-hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes ellieo-dot-pulse {
   0%,
   100% {
-    transform: scaleY(0.2727);
     opacity: 0.35;
   }
   50% {
-    transform: scaleY(1);
     opacity: 1;
   }
 }
@@ -481,35 +490,41 @@
   }
 }
 
-@keyframes ellieo-spin {
-  to {
-    transform: rotate(360deg);
-  }
+.ellieo-dots {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 14px;
+  vertical-align: middle;
 }
 
-.ellieo-wave-bar {
-  background: linear-gradient(180deg, var(--ellieo-lime, #c6f432), var(--brand, #7c5cff));
-  animation: ellieo-wave 1.1s ease-in-out infinite;
-  transform-origin: center;
-}
-
-.ellieo-spinner {
+.ellieo-dot {
+  width: 8px;
+  height: 8px;
   border-radius: 999px;
-  border: 3px solid var(--brand-subtle, #e4dcff);
-  border-top-color: var(--brand, #7c5cff);
-  animation: ellieo-spin 0.8s linear infinite;
+  background: #7c5cff;
+  animation: ellieo-hop 0.9s ease-in-out infinite;
 }
 
-/* Fade in after 350ms so quick loads go straight to the content */
+.ellieo-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.ellieo-dot:nth-child(3) {
+  background: #c6f432;
+  animation-delay: 0.3s;
+}
+
+/* Fade in after 350ms so quick page/section loads go straight to the content (buttons show the dots at once) */
 .ellieo-loading {
   opacity: 0;
   animation: ellieo-loading-in 0.25s ease-out 0.35s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ellieo-wave-bar,
-  .ellieo-spinner {
-    animation: none;
+  .ellieo-dot {
+    animation-name: ellieo-dot-pulse;
+    animation-duration: 1.2s;
   }
 
   .ellieo-loading {

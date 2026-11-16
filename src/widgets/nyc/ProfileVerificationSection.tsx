@@ -1,5 +1,6 @@
 'use client'
 
+import { EllieoDots } from '@components/EllieoDots'
 import type { HTMLInputTypeAttribute, InputHTMLAttributes, ReactNode } from 'react'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 
@@ -1221,9 +1222,12 @@ function SchoolsSheet({
                   </span>
                   <span className='block truncate text-[12px] text-[var(--muted)]'>{school.email}</span>
                 </span>
-                {saving === school.email && (
-                  <span className='size-4 shrink-0 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent' />
-                )}
+                {saving === school.email &&
+                  (BRAND_CONFIG.theme === 'ellieo' ? (
+                    <EllieoDots className='shrink-0' />
+                  ) : (
+                    <span className='size-4 shrink-0 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent' />
+                  ))}
               </button>
             </li>
           )

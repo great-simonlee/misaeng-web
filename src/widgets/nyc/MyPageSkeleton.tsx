@@ -1,5 +1,7 @@
 'use client'
 
+import { LoadingState } from '@components/LoadingSpinner'
+import { BRAND_CONFIG } from '@lib/brand'
 import { Skeleton, SkeletonCircle } from '@components/Skeleton'
 import { useT } from '@lib/i18n/client'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
@@ -11,6 +13,8 @@ type Props = {
 
 export function MyPageSkeleton({ className }: Props) {
   const t = useT('me')
+  // Ellieo: one loader everywhere (three dots), never gray blocks
+  if (BRAND_CONFIG.theme === 'ellieo') return <LoadingState fullPage label={t('loadingAria')} className={className} />
   return (
     <div
       className={cn(

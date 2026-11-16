@@ -9,6 +9,7 @@ export {
   type LoadingSpinnerSize,
 } from './LoadingSpinner'
 export { Skeleton, SkeletonCircle } from './Skeleton'
+export { EllieoDots } from './EllieoDots'
 export { SchoolBadge } from './SchoolBadge'
 export { AuthorBadges } from './AuthorBadges'
 export { HousingPricePair } from './HousingPricePair'

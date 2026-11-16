@@ -1,5 +1,7 @@
 'use client'
 
+import { BRAND_CONFIG } from '@lib/brand'
+import { EllieoDots } from '@components/EllieoDots'
 import dynamic from 'next/dynamic'
 import { useMemo, useState, type ReactNode } from 'react'
 
@@ -27,9 +29,14 @@ const FoodPlaceMap = dynamic(
     import('@widgets/nyc/FoodPlaceMap').then((mod) => mod.FoodPlaceMap),
   {
     ssr: false,
-    loading: () => (
-      <div className='h-48 animate-pulse rounded-2xl bg-[#e8eaee] sm:h-56' />
-    ),
+    loading: () =>
+      BRAND_CONFIG.theme === 'ellieo' ? (
+        <div className='flex h-48 items-center justify-center rounded-[1.5rem] bg-[var(--surface)] sm:h-56'>
+          <EllieoDots />
+        </div>
+      ) : (
+        <div className='h-48 animate-pulse rounded-2xl bg-[#e8eaee] sm:h-56' />
+      ),
   },
 )
 

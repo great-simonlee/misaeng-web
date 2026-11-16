@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { BRAND_CONFIG } from '@lib/brand'
 
 import { cn } from '@lib'
+import { EllieoDots } from '@components/EllieoDots'
 import { useT } from '@lib/i18n/client'
 
 const SIZE_MAP = {
@@ -101,17 +102,8 @@ export function LoadingSpinner({
   )
 }
 
-/** Ellieo vertical logo (symbol over ELLIEO) width per size; the wordmark needs more room than the app's 48pt symbol */
-const ELLIEO_LOGO_PX = { sm: 52, md: 76, lg: 92 } as const
-const ELLIEO_WAVE_SCALE = { sm: 0.7, md: 0.95, lg: 1.05 } as const
-
-/**
- * Ellieo loader, same as the Misaeng app's SectionLoading (ios/Misaeng/Components/LoadingWave.swift):
- * the vertical logo (symbol over ELLIEO) over five short bars rising and falling in one wave, left → right, fading in after 350ms
- * so fast loads never flash it. Logo and bars use the Ellieo cyan → blue gradient. Motion: globals ellieo-wave.
- */
+/** Ellieo: the three hopping dots only (no logo, no ring), fading in after 350ms so fast loads never flash it */
 function EllieoLoading({
-  size,
   label,
   accessibleName,
   className,
@@ -121,33 +113,14 @@ function EllieoLoading({
   accessibleName: string
   className?: string
 }) {
-  const scale = ELLIEO_WAVE_SCALE[size]
   return (
     <div
-      className={cn('ellieo-loading inline-flex flex-col items-center justify-center gap-3', className)}
+      className={cn('ellieo-loading inline-flex items-center justify-center', className)}
       role='status'
       aria-live='polite'
       aria-label={accessibleName}
     >
-      <Image
-        src={BRAND_CONFIG.assets.vertical ?? BRAND_CONFIG.assets.square}
-        alt=''
-        width={ELLIEO_LOGO_PX[size]}
-        height={ELLIEO_LOGO_PX[size]}
-        className='object-contain'
-        style={{ width: ELLIEO_LOGO_PX[size], height: ELLIEO_LOGO_PX[size] }}
-        priority
-      />
-      <span aria-hidden className='flex items-center' style={{ gap: 5.5 * scale, height: 22 * scale }}>
-        {Array.from({ length: 5 }, (_, index) => (
-          <span
-            key={index}
-            className='ellieo-wave-bar rounded-full'
-            style={{ width: 4.5 * scale, height: 22 * scale, animationDelay: `${(index * 0.096).toFixed(3)}s` }}
-          />
-        ))}
-      </span>
-      {/* Like the app: logo and wave only; the text is for screen readers */}
+      <EllieoDots />
       <span className='sr-only'>{label ?? accessibleName}</span>
     </div>
   )
