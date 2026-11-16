@@ -562,5 +562,6 @@
       "success": "Pinned to the top · until {date}",
       "failed": "Couldn't pin the post. Please try again in a moment."
     }
-  }
+  },
+  "ellieoPerMonth": "/mo"
 }

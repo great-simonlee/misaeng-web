@@ -643,3 +643,134 @@
 [data-brand='ellieo'] [data-composer] button[type='submit']:disabled {
   opacity: 0.45;
 }
+
+/* =====================================================================
+   My page: white page, blue profile card banner with a lime spot, card sections
+   ===================================================================== */
+[data-brand='ellieo'] [data-ui='me-page'] {
+  background: #fff;
+}
+
+[data-brand='ellieo'] [data-ui='me-page'] > div {
+  max-width: 40rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1.25rem;
+}
+
+/* One column like the feed: profile card on top, settings under it */
+[data-brand='ellieo'] [data-ui='me-page'] .lg\:grid-cols-\[minmax\(260px\,300px\)_minmax\(0\,1fr\)\] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+[data-brand='ellieo'] [data-ui='me-page'] .lg\:sticky {
+  position: static;
+}
+
+[data-brand='ellieo'] [data-ui='me-eyebrow'] {
+  display: none;
+}
+
+[data-brand='ellieo'] [data-ui='me-page'] h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+[data-brand='ellieo'] [data-ui='me-card'] {
+  border-radius: 1.75rem;
+  box-shadow: 0 0 0 1px var(--border), var(--ellieo-card-shadow);
+}
+
+[data-brand='ellieo'] [data-ui='me-banner'] {
+  height: 6rem;
+  background: var(--brand) radial-gradient(circle at 92% -10%, var(--ellieo-lime) 0 3.25rem, transparent 3.3rem);
+}
+
+[data-brand='ellieo'] [data-ui='me-page'] :is(h2, h3).text-\[13px\] {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+[data-brand='ellieo'] [data-ui='me-page'] :is([class*='rounded-[1.25rem]'], [class*='rounded-2xl']) {
+  border-radius: 1.5rem;
+}
+
+[data-brand='ellieo'] [data-ui='me-page'] [class*='ring-black/'] {
+  --tw-ring-color: var(--border);
+}
+
+[data-brand='ellieo'] [data-ui='me-page'] .text-\[\#C9340A\] {
+  color: var(--brand);
+}
+
+/* =====================================================================
+   Housing detail: photo first (bigger corners), sticky ask bar above the tab bar
+   ===================================================================== */
+[data-brand='ellieo'] [data-ui='housing-gallery'] {
+  border-radius: 1.5rem;
+  background: var(--surface);
+  box-shadow: none;
+  --tw-ring-color: transparent;
+}
+
+[data-brand='ellieo'] [data-ui='housing-cta'] {
+  position: sticky;
+  bottom: calc(var(--bottom-nav-h) + 0.75rem);
+  z-index: 30;
+  flex-direction: row;
+  margin-top: 1.25rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.94);
+  backdrop-filter: blur(10px);
+  padding: 0.375rem;
+  box-shadow: 0 0 0 1px var(--border), 0 12px 28px -14px rgb(20 18 31 / 0.35);
+}
+
+[data-brand='ellieo'] [data-ui='housing-cta'] > :first-child {
+  flex: 2 1 0%;
+  box-shadow: none;
+}
+
+[data-brand='ellieo'] [data-ui='housing-cta'] > :last-child {
+  flex: 1 1 0%;
+  border: 0;
+  background: var(--surface);
+}
+
+/* Phones/tablets: the ask bar stays on screen for the whole page */
+@media (max-width: 1023px) {
+  [data-brand='ellieo'] [data-ui='housing-cta'] {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    max-width: 38rem;
+    margin: 0 auto;
+  }
+
+  [data-brand='ellieo'] main:has([data-ui='housing-cta']) {
+    padding-bottom: 5rem;
+  }
+}
+
+/* =====================================================================
+   Post detail: author-first card, reactions as a sticky action bar above the tab bar
+   ===================================================================== */
+[data-brand='ellieo'] [data-ui='post-footer'] {
+  position: sticky;
+  bottom: calc(var(--bottom-nav-h) + 0.75rem);
+  z-index: 30;
+  border-radius: 1.5rem;
+  background: rgb(255 255 255 / 0.94);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 0 1px var(--border), 0 12px 28px -14px rgb(20 18 31 / 0.35);
+}
+
+/* Comments: each comment reads as a small card */
+[data-brand='ellieo'] [data-ui='comments'] li {
+  border-radius: 1.25rem;
+}

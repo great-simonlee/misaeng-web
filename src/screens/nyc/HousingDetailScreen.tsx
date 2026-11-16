@@ -320,7 +320,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
 
         <div className='grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-10'>
           <div className='min-w-0'>
-            <div className='relative aspect-[4/3] overflow-hidden rounded-[1.25rem] bg-[#e8eaee] shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_28px_rgba(15,23,42,0.045)] ring-1 ring-black/[0.03] sm:aspect-[16/11]'>
+            <div data-ui='housing-gallery' className='relative aspect-[4/3] overflow-hidden rounded-[1.25rem] bg-[#e8eaee] shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_28px_rgba(15,23,42,0.045)] ring-1 ring-black/[0.03] sm:aspect-[16/11]'>
               {images.length > 0 ? (
                 <div
                   ref={galleryScrollRef}
@@ -350,6 +350,14 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                   {t('detail.noPhotos')}
                 </div>
               )}
+
+              {BRAND_CONFIG.theme === 'ellieo' && getListingUnitRent(listing) ? (
+                // Ellieo: lime price tag on the photo
+                <span className='pointer-events-none absolute bottom-3 left-3 z-10 rounded-full bg-[var(--ellieo-lime)] px-3.5 py-1.5 text-[18px] font-extrabold tracking-[-0.01em] text-[var(--foreground)]'>
+                  ${getListingUnitRent(listing).toLocaleString('en-US')}
+                  <span className='text-[13px] font-semibold'>{t('ellieoPerMonth')}</span>
+                </span>
+              ) : null}
 
               <div className='absolute right-3 top-3 z-10 sm:right-4 sm:top-4'>
                 <PostLikeButton
@@ -637,7 +645,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
 
             <HousingDescriptionSection listing={listing} className='mt-5' />
 
-            <div className='mt-6 flex flex-col gap-2.5 border-t border-black/[0.04] pt-5 sm:flex-row sm:items-stretch'>
+            <div data-ui='housing-cta' className='mt-6 flex flex-col gap-2.5 border-t border-black/[0.04] pt-5 sm:flex-row sm:items-stretch'>
               {/* Ellieo: "Ask about this listing" opens a board thread (login required). KakaoTalk / app: Misaeng only */}
               {BRAND_CONFIG.theme === 'ellieo' ? (
                 supportConfig?.housingChat ? (

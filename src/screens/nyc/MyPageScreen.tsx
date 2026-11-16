@@ -394,7 +394,7 @@ export function MyPageScreen() {
   }
 
   return (
-    <div className='flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
+    <div data-ui='me-page' className='flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
       <div
         className={cn(
           'flex flex-1 flex-col pb-14 pt-8 sm:pb-16 sm:pt-10 lg:pb-20 lg:pt-12',
@@ -402,7 +402,7 @@ export function MyPageScreen() {
         )}
       >
         <div className='mb-6 lg:mb-8'>
-          <p className='text-[11px] font-medium tracking-[0.18em] text-[var(--muted)]'>
+          <p data-ui='me-eyebrow' className='text-[11px] font-medium tracking-[0.18em] text-[var(--muted)]'>
             ACCOUNT
           </p>
           <h1 className='mt-1.5 text-[1.5rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] lg:text-[1.75rem]'>
@@ -417,8 +417,8 @@ export function MyPageScreen() {
 
         <div className='grid gap-6 lg:grid-cols-[minmax(260px,300px)_minmax(0,1fr)] lg:items-start lg:gap-8'>
           <div className='flex flex-col gap-2 lg:sticky lg:top-24'>
-            <aside className='overflow-hidden rounded-[1.5rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_rgba(15,23,42,0.05)] ring-1 ring-black/[0.04]'>
-            <div className='relative h-20 bg-[linear-gradient(135deg,#1e293b_0%,#0f172a_55%,var(--brand)_160%)] lg:h-24' />
+            <aside data-ui='me-card' className='overflow-hidden rounded-[1.5rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_rgba(15,23,42,0.05)] ring-1 ring-black/[0.04]'>
+            <div data-ui='me-banner' className='relative h-20 bg-[linear-gradient(135deg,#1e293b_0%,#0f172a_55%,var(--brand)_160%)] lg:h-24' />
             <div className='relative px-5 pb-6 pt-0 sm:px-6 lg:px-4 lg:pb-5'>
               <div className='text-center'>
                 <div className='flex justify-center'>
@@ -498,7 +498,7 @@ export function MyPageScreen() {
           {/* 설정 영역 */}
           <div className='min-w-0 space-y-6 lg:space-y-7'>
             <section>
-              <h3 className='mb-3 px-0.5 text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
+              <h3 data-ui='me-section-title' className='mb-3 px-0.5 text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
                 {t('profile.title')}
               </h3>
               <div className='overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04] lg:grid lg:grid-cols-2 lg:divide-x lg:divide-[#f0f1f3]'>
@@ -674,7 +674,7 @@ export function MyPageScreen() {
             </section>
 
             <section>
-              <h3 className='mb-3 px-0.5 text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
+              <h3 data-ui='me-section-title' className='mb-3 px-0.5 text-[13px] font-semibold tracking-tight text-[var(--foreground)]'>
                 {tLanguage('settingLabel')}
               </h3>
               <div className='overflow-hidden rounded-[1.25rem] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.04]'>

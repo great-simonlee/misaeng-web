@@ -542,5 +542,6 @@
       "success": "Đã ghim lên đầu · đến {date}",
       "failed": "Không thể ghim bài. Vui lòng thử lại sau."
     }
-  }
+  },
+  "ellieoPerMonth": "/tháng"
 }
