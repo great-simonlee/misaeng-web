@@ -26,7 +26,7 @@ import {
   HomeIcon,
   BagIcon,
   GlobeIcon,
-  PlusIcon,
+  PencilIcon,
   StarIcon,
 } from '@widgets/ellieo/icons'
 import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
@@ -123,13 +123,11 @@ export function EllieoNavbar() {
     // Line icons, filled when active (user 11-16): Home = 2×2 tiles, Housing = house, Market = bag, Visa · Jobs = briefcase
     { key: 'home', label: t('ellieo.tabs.home'), icon: GridIcon, href: home, active: pathname === home, fillActive: true },
     { key: 'housing', label: t('ellieo.tabs.housing'), icon: HomeIcon, href: housingHref, active: isActive(housingHref), fillActive: true },
-    { key: 'post' },
     { key: 'market', label: t('ellieo.tabs.market'), icon: BagIcon, href: marketHref, active: isActive(marketHref), fillActive: true },
     { key: 'careers', label: t('ellieo.tabs.visaJobs'), icon: BriefcaseIcon, href: visaHref, active: careersActive, fillActive: true },
   ] as const
   // Mini pill (collapsed tab bar): the current tab's icon, Home when no tab is active
-  const linkTabs = tabs.filter((tab) => 'href' in tab)
-  const miniTab = linkTabs.find((tab) => tab.active) ?? linkTabs[0]
+  const miniTab = tabs.find((tab) => tab.active) ?? tabs[0]
   const MiniTabIcon = miniTab.icon
   // Housing / Visa / Jobs list pages: no top bar below 1024px (the tab bar already says where you are, user 11-16)
 
@@ -257,23 +255,8 @@ export function EllieoNavbar() {
           'lg:inset-x-auto lg:bottom-4 lg:left-1/2 lg:w-[27.5rem] lg:-translate-x-1/2 lg:rounded-full lg:border lg:pb-0 lg:shadow-[var(--shadow-lg)]',
         )}
       >
-        <ul className='mx-auto grid h-[4.25rem] max-w-[30rem] grid-cols-5 items-center px-2 lg:h-16'>
+        <ul className='mx-auto grid h-[4.25rem] max-w-[30rem] grid-cols-4 items-center px-2 lg:h-16'>
           {tabs.map((tab) => {
-            if (tab.key === 'post') {
-              return (
-                <li key='post' className='flex justify-center'>
-                  <button
-                    type='button'
-                    onClick={() => setSheet('compose')}
-                    aria-label={t('ellieo.tabs.post')}
-                    aria-expanded={sheet === 'compose'}
-                    className='inline-flex size-[3.25rem] -translate-y-1 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-[0_8px_20px_-8px_rgba(31,94,255,0.6)] hover:bg-[var(--brand-hover)] ring-4 ring-white transition hover:scale-[1.04] active:scale-95 lg:translate-y-0 lg:ring-0'
-                  >
-                    <PlusIcon className='size-6' strokeWidth={2.5} />
-                  </button>
-                </li>
-              )
-            }
             const Icon = tab.icon
             const body = (
               <>
@@ -301,12 +284,12 @@ export function EllieoNavbar() {
         </ul>
       </nav>
 
-      {/* Phones/tablets, scrolling down: the tab bar shrinks to one mini pill (current tab + post), user 11-16 */}
+      {/* Phones/tablets, scrolling down: the tab bar shrinks to one mini pill (the current tab's icon), user 11-16 */}
       <div
         aria-hidden={!tabBarCollapsed || undefined}
         inert={!tabBarCollapsed || undefined}
         className={cn(
-          'fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-1/2 z-[10000] -ml-[4.25rem] flex h-[3.25rem] w-[8.5rem] items-center justify-center gap-2.5 rounded-full border border-[#E6EAF5] bg-white px-1.5 shadow-[0_10px_28px_-12px_rgb(20_18_31/0.35)] lg:hidden',
+          'fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-1/2 z-[10000] -ml-[1.625rem] flex size-[3.25rem] items-center justify-center rounded-full border border-[#E6EAF5] bg-white px-1.5 shadow-[0_10px_28px_-12px_rgb(20_18_31/0.35)] lg:hidden',
           'transition-[transform,opacity] duration-[350ms] ease-[cubic-bezier(0.34,1.36,0.64,1)] motion-reduce:transition-opacity motion-reduce:duration-200',
           tabBarCollapsed
             ? 'translate-y-0 scale-100 opacity-100'
@@ -326,17 +309,24 @@ export function EllieoNavbar() {
             style={{ '--ellieo-icon-cut': 'var(--brand-soft)' } as React.CSSProperties}
           />
         </button>
-        <span aria-hidden className='h-6 w-px bg-[var(--border)]' />
+      </div>
+
+      {/* Home: Write button (bottom-right, above the tab bar; drops down beside the mini pill when it collapses) */}
+      {pathname === home ? (
         <button
           type='button'
           onClick={() => setSheet('compose')}
-          aria-label={t('ellieo.tabs.post')}
           aria-expanded={sheet === 'compose'}
-          className='inline-flex size-10 items-center justify-center rounded-full bg-[var(--brand)] text-white touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-95'
+          className={cn(
+            'fixed bottom-[calc(var(--bottom-nav-h)+1rem)] right-4 z-[10000] inline-flex h-12 items-center gap-1.5 rounded-full bg-[var(--brand)] pl-4 pr-5 text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(31,94,255,0.7)] touch-manipulation hover:bg-[var(--brand-hover)] active:scale-95 lg:bottom-6 lg:right-6',
+            'transition-[transform,background-color] duration-[350ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
+            tabBarCollapsed && 'max-lg:translate-y-[3.5rem]',
+          )}
         >
-          <PlusIcon className='size-5' strokeWidth={2.5} />
+          <PencilIcon className='size-[18px]' strokeWidth={2.25} />
+          {t('ellieo.write')}
         </button>
-      </div>
+      ) : null}
 
       <EllieoSheet
         open={sheet === 'compose'}

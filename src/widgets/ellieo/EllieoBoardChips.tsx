@@ -44,7 +44,10 @@ export function EllieoBoardChips() {
   const href = useCityPath()
   const t = useT('nav')
   const tabPage = useEllieoTabPage()
-  const boards = ELLIEO_BOARDS.filter((board) => board.available)
+  // Only the boards outside the tab bar (Housing, Market, Visa · Jobs have tabs)
+  const boards = ELLIEO_BOARDS.filter(
+    (board) => board.available && !['housing', 'marketplace', 'status', 'job-review'].includes(board.id),
+  )
   const boardPaths = boards.map((board) => href(board.path))
   const onBoardList = boardPaths.includes(pathname)
   if (tabPage || !onBoardList) return null

@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import { EllieoAppIcon } from '@widgets/ellieo/EllieoAppIcon'
 import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
-import { BellIcon, BowlIcon, BriefcaseIcon, ChatIcon, GridIcon, HeartIcon, HomeIcon, PlaneIcon } from '@widgets/ellieo/icons'
+import { BagIcon, BellIcon, BowlIcon, BriefcaseIcon, ChatIcon, GridIcon, HeartIcon, HomeIcon, PlaneIcon } from '@widgets/ellieo/icons'
 
 /**
  * Ellieo app page (ellieo.com/mobile-app), social-feed design. The app isn't in the stores yet: no download
@@ -105,10 +105,7 @@ export function MobileAppScreen() {
               <div className='flex items-center justify-around border-t border-[var(--border)] px-3 py-2 text-[var(--muted)]'>
                 <GridIcon className='size-4' fill='currentColor' />
                 <HomeIcon className='size-4' />
-                <span className='flex size-8 items-center justify-center rounded-full bg-[var(--brand)] text-[18px] font-bold text-white'>
-                  +
-                </span>
-                <PlaneIcon className='size-4' />
+                <BagIcon className='size-4' />
                 <BriefcaseIcon className='size-4' />
               </div>
             </div>
