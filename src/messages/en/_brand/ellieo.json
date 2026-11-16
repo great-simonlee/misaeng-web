@@ -5,7 +5,6 @@
         "description": "Verified {city} listings from the Ellieo housing team"
       },
       "anonymous": {
-        "title": "Anonymous Q&A",
         "description": "Ask what you'd rather not put your name on"
       }
     },
@@ -32,9 +31,7 @@
     }
   },
   "nav": {
-    "links": {
-      "anonymous": "Anonymous Q&A"
-    },
+    "links": {},
     "account": {
       "creditReviews": "Ellieo Points reviews",
       "inquiries": "Inquiries & suggestions"

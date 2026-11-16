@@ -5,7 +5,6 @@
         "description": "Tin đăng nhà ở tại {city} đã được đội ngũ Ellieo kiểm tra"
       },
       "anonymous": {
-        "title": "Hỏi đáp ẩn danh",
         "description": "Hỏi những điều bạn không muốn ghi tên"
       }
     },
@@ -32,9 +31,7 @@
     }
   },
   "nav": {
-    "links": {
-      "anonymous": "Hỏi đáp ẩn danh"
-    },
+    "links": {},
     "footer": {
       "links": {
         "credit": "Điểm Ellieo",
