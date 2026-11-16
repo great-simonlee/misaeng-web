@@ -131,7 +131,7 @@ type BoardBackLinkProps = {
   className?: string
 }
 
-export function BoardBackLink({ href, label, className }: BoardBackLinkProps) {
+export function BoardBackLink({ href, label, className, leading }: BoardBackLinkProps & { leading?: ReactNode }) {
   return (
     <Link
       href={href}
@@ -150,6 +150,7 @@ export function BoardBackLink({ href, label, className }: BoardBackLinkProps) {
       >
         <path strokeLinecap='round' strokeLinejoin='round' d='M15 19l-7-7 7-7' />
       </svg>
+      {leading}
       {label}
     </Link>
   )
