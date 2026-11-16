@@ -148,9 +148,18 @@ export function replyMarketThread(id: string, body: string) {
   })
 }
 
-export function reportMarketThread(id: string, reason: string) {
+/** Reasons offered on the web; "prohibited" is sent as the shared code "other" with a tagged detail */
+export const MARKET_REPORT_REASONS = ['spam', 'inappropriate', 'prohibited', 'other'] as const
+export type MarketReportReason = (typeof MARKET_REPORT_REASONS)[number]
+
+export function reportMarketThread(id: string, reason: MarketReportReason, detail: string) {
+  const text = detail.trim()
+  const payload =
+    reason === 'prohibited'
+      ? { reason: 'other', detail: `[prohibited item] ${text}`.trim().slice(0, 500) }
+      : { reason, detail: text.slice(0, 500) || undefined }
   return request<{ ok?: boolean }>(`/api/marketplace/inquiries/${encodeURIComponent(id)}/report`, {
     method: 'POST',
-    body: JSON.stringify({ reason: 'other', detail: reason.slice(0, 500) }),
+    body: JSON.stringify(payload),
   })
 }

@@ -93,11 +93,21 @@
         "closed": "This conversation is closed.",
         "report": "Report",
         "reported": "Thanks — our team will review this conversation.",
-        "reportReason": "Why are you reporting this conversation?",
         "open": "Open",
         "hide": "Hide",
         "loadFailed": "We couldn't load the conversations.",
-        "retry": "Try again"
+        "retry": "Try again",
+        "reportTitle": "Report this conversation",
+        "reportSubtitle": "Our team reviews every report. The other person isn't told who reported.",
+        "reportReasons": {
+          "spam": "Spam or scam",
+          "inappropriate": "Inappropriate or abusive",
+          "prohibited": "Prohibited item",
+          "other": "Other"
+        },
+        "reportDetail": "Anything else we should know? (optional)",
+        "reportSubmit": "Send report",
+        "reportCancel": "Cancel"
       },
       "form": {
         "newTitle": "Sell an item",

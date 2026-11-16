@@ -93,11 +93,21 @@
         "closed": "Cuộc trò chuyện này đã đóng.",
         "report": "Báo cáo",
         "reported": "Cảm ơn bạn — đội ngũ sẽ xem xét cuộc trò chuyện này.",
-        "reportReason": "Vì sao bạn báo cáo cuộc trò chuyện này?",
         "open": "Mở",
         "hide": "Ẩn",
         "loadFailed": "Không tải được các cuộc trò chuyện.",
-        "retry": "Thử lại"
+        "retry": "Thử lại",
+        "reportTitle": "Báo cáo cuộc trò chuyện",
+        "reportSubtitle": "Đội ngũ xem xét mọi báo cáo. Người kia không biết ai đã báo cáo.",
+        "reportReasons": {
+          "spam": "Spam hoặc lừa đảo",
+          "inappropriate": "Không phù hợp hoặc xúc phạm",
+          "prohibited": "Món đồ bị cấm",
+          "other": "Khác"
+        },
+        "reportDetail": "Bạn muốn cho chúng tôi biết thêm điều gì? (không bắt buộc)",
+        "reportSubmit": "Gửi báo cáo",
+        "reportCancel": "Hủy"
       },
       "form": {
         "newTitle": "Đăng bán",
