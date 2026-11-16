@@ -174,7 +174,7 @@ export function MyLikesScreen() {
   }
 
   return (
-    <div className='relative flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
+    <div data-ui='me-page' className='relative flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
       <div
         className={cn(
           'flex flex-1 flex-col pb-14 pt-8 sm:pb-16 sm:pt-10 lg:pb-20 lg:pt-12',
@@ -183,7 +183,7 @@ export function MyLikesScreen() {
       >
         <div className='flex flex-wrap items-end justify-between gap-4'>
           <div className='min-w-0'>
-            <p className='text-[11px] font-medium tracking-[0.18em] text-[var(--muted)]'>
+            <p data-ui='me-eyebrow' className='text-[11px] font-medium tracking-[0.18em] text-[var(--muted)]'>
               ACCOUNT
             </p>
             <h1 className='mt-1.5 text-[1.5rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] lg:text-[1.75rem]'>
