@@ -61,8 +61,8 @@ export function EllieoHousingCard({
   )
 
   return (
-    <article className='group flex flex-col rounded-[1.5rem] bg-white p-2.5 shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)] transition hover:shadow-[0_0_0_1px_var(--border-muted),0_14px_30px_-18px_rgb(20_18_31/0.28)]'>
-      <div className='relative aspect-[4/3] overflow-hidden rounded-[1.125rem] bg-[var(--surface)]'>
+    <article className='group flex flex-col border-b border-[var(--border)] bg-white py-3.5'>
+      <div className='relative aspect-video overflow-hidden rounded-xl bg-[var(--surface)]'>
         {images.length > 0 ? (
           <div
             ref={galleryRef}
@@ -111,14 +111,9 @@ export function EllieoHousingCard({
           </span>
         ) : null}
 
-        {/* White price tag over the photo (ink text) */}
-        <span className='pointer-events-none absolute bottom-2.5 left-2.5 rounded-full bg-white tabular-nums px-3 py-1 text-[15px] font-extrabold shadow-[0_2px_8px_-2px_rgb(20_18_31/0.25)] tracking-[-0.01em] text-[var(--foreground)]'>
-          {format.usd(unitRent, 0)}
-          <span className='text-[12px] font-semibold'>{th('ellieo.perMonth')}</span>
-        </span>
       </div>
 
-      <div className='flex flex-1 flex-col px-1.5 pb-1.5 pt-3'>
+      <div className='flex flex-1 flex-col pt-2.5'>
         {badges.length > 0 ? (
           <div className='mb-2 flex flex-wrap gap-1'>
             {badges.map((badge, index) => (
@@ -138,7 +133,11 @@ export function EllieoHousingCard({
         ) : null}
 
         <Link href={detailHref} className='block min-w-0 touch-manipulation'>
-          <h3 className='flex min-w-0 items-center gap-1.5 text-[16px] font-bold tracking-[-0.01em] text-[var(--foreground)]'>
+          <p className='text-[16px] font-semibold tabular-nums text-[var(--brand)]'>
+            {format.usd(unitRent, 0)}
+            <span className='text-[13px] font-medium'>{th('ellieo.perMonth')}</span>
+          </p>
+          <h3 className='flex min-w-0 items-center gap-1.5 text-[16px] font-semibold text-[var(--foreground)]'>
             <span className='min-w-0 truncate'>{displayAddress}</span>
             <SchoolBadge schoolId={listing.authorSchoolId} />
           </h3>
@@ -163,7 +162,7 @@ export function EllieoHousingCard({
         </Link>
 
         {showOptionRows ? (
-          <ul className='mt-3 divide-y divide-white overflow-hidden rounded-2xl bg-[var(--surface)]'>
+          <ul className='mt-2.5 divide-y divide-white overflow-hidden rounded-xl bg-[var(--surface)]'>
             {roomRows.map((room, index) => {
               const key = getRoomSelectionKey(room, index)
               const highlighted = highlightRoomType !== 'all' && room.type === highlightRoomType

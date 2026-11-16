@@ -957,3 +957,14 @@
     padding-left: 15rem;
   }
 }
+
+/* e/Companies, e/Jobs: the community banner names the page, so the hero keeps only its stats/search */
+[data-brand='ellieo'] [data-ui='hero-panel'] h1,
+[data-brand='ellieo'] [data-ui='hero-panel'] h1 + p {
+  display: none;
+}
+
+[data-brand='ellieo'] [data-ui='hero-panel'] {
+  border-radius: 1rem;
+  padding: 1rem;
+}

@@ -570,7 +570,14 @@ export function HousingListScreen() {
             <p className='mb-3.5 text-[12px] font-medium text-[var(--muted)] sm:mb-4 sm:text-[13px]'>
               {summaryLabel}
             </p>
-            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5'>
+            <div
+              className={
+                // Ellieo: e/Rent listing rows, one column (docs/design/ellieo-community.md)
+                BRAND_CONFIG.theme === 'ellieo'
+                  ? 'flex flex-col border-t border-[var(--border)] sm:grid sm:grid-cols-2 sm:gap-x-5'
+                  : 'grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5'
+              }
+            >
               {filteredPosts.map((listing) => (
                 <HousingPostCard
                   key={listing.id}
