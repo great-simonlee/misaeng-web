@@ -71,7 +71,9 @@
       "me": "Me",
       "explore": "Explore",
       "post": "Post",
-      "inbox": "Inbox"
+      "inbox": "Inbox",
+      "market": "Market",
+      "visaJobs": "Visa · Jobs"
     },
     "join": "Join Ellieo",
     "comingSoon": "Coming soon",
@@ -116,6 +118,13 @@
       "points": "Ellieo Points",
       "about": "About Ellieo"
     },
-    "chooseCity": "Choose your city"
+    "chooseCity": "Choose your city",
+    "careerTabs": {
+      "visa": "Visa",
+      "jobs": "Jobs",
+      "companies": "Companies",
+      "postings": "Postings",
+      "aria": "Visa and jobs"
+    }
   }
 }

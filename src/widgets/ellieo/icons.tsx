@@ -54,7 +54,8 @@ export const PassportIcon = (p: IconProps) => (
 export const BriefcaseIcon = (p: IconProps) => (
   <Base {...p}>
     <rect x='3.5' y='7' width='17' height='12.5' rx='2' />
-    <path d='M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3.5 12.5h17' />
+    <path d='M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7' fill='none' />
+    <path d='M3.5 12.5h17' fill='none' stroke='var(--ellieo-icon-cut, currentColor)' />
   </Base>
 )
 
@@ -76,7 +77,7 @@ export const ChatIcon = (p: IconProps) => (
 export const BagIcon = (p: IconProps) => (
   <Base {...p}>
     <path d='M5 8h14l-1 12H6L5 8Z' />
-    <path d='M9 8V6.5a3 3 0 0 1 6 0V8' />
+    <path d='M9 8V6.5a3 3 0 0 1 6 0V8' fill='none' />
   </Base>
 )
 

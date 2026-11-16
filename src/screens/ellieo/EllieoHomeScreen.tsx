@@ -320,7 +320,7 @@ function ExploreBoards() {
 
 /* ---------- Board shortcuts: the boards that aren't in the bottom tab bar (no chip row on Home) ---------- */
 
-const TAB_BAR_BOARDS: NycCategoryId[] = ['housing', 'status', 'job-review']
+const TAB_BAR_BOARDS: NycCategoryId[] = ['housing', 'marketplace', 'status', 'job-review']
 
 function BoardShortcuts() {
   const tn = useT('nav')

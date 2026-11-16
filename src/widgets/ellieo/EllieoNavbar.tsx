@@ -24,7 +24,7 @@ import {
   ChevronDownIcon,
   GridIcon,
   HomeIcon,
-  PlaneIcon,
+  BagIcon,
   GlobeIcon,
   PlusIcon,
   StarIcon,
@@ -111,18 +111,21 @@ export function EllieoNavbar() {
   }))
 
   const housingHref = href('/housing')
+  const marketHref = href('/marketplace')
   const visaHref = href('/status')
   const jobsHref = href('/job-review')
   const companiesHref = href('/companies')
-  // Visa: the merged board and its legacy routes (cpt-opt, visa, green-card redirect there)
-  const visaActive = ['/status', '/cpt-opt', '/visa', '/green-card'].some((path) => isActive(href(path)))
+  // Visa · Jobs (one tab, user 11-16): the visa board and its legacy routes, job reviews, companies, postings
+  const careersActive = ['/status', '/cpt-opt', '/visa', '/green-card'].some((path) => isActive(href(path))) ||
+    isActive(jobsHref) ||
+    isActive(companiesHref)
   const tabs = [
-    // Home = 2×2 tile grid, Housing = house (user 11-16); both fill in when active
+    // Line icons, filled when active (user 11-16): Home = 2×2 tiles, Housing = house, Market = bag, Visa · Jobs = briefcase
     { key: 'home', label: t('ellieo.tabs.home'), icon: GridIcon, href: home, active: pathname === home, fillActive: true },
     { key: 'housing', label: t('ellieo.tabs.housing'), icon: HomeIcon, href: housingHref, active: isActive(housingHref), fillActive: true },
     { key: 'post' },
-    { key: 'visa', label: t('ellieo.short.status'), icon: PlaneIcon, href: visaHref, active: visaActive, fillActive: true },
-    { key: 'jobs', label: t('ellieo.tabs.jobs'), icon: BriefcaseIcon, href: jobsHref, active: isActive(jobsHref) || isActive(companiesHref), fillActive: false },
+    { key: 'market', label: t('ellieo.tabs.market'), icon: BagIcon, href: marketHref, active: isActive(marketHref), fillActive: true },
+    { key: 'careers', label: t('ellieo.tabs.visaJobs'), icon: BriefcaseIcon, href: visaHref, active: careersActive, fillActive: true },
   ] as const
   // Mini pill (collapsed tab bar): the current tab's icon, Home when no tab is active
   const linkTabs = tabs.filter((tab) => 'href' in tab)
@@ -278,8 +281,9 @@ export function EllieoNavbar() {
                   className='size-6'
                   strokeWidth={tab.active ? 2.25 : 1.75}
                   fill={tab.active && tab.fillActive ? 'currentColor' : 'none'}
+                  style={tab.active && tab.fillActive ? ({ '--ellieo-icon-cut': '#fff' } as React.CSSProperties) : undefined}
                 />
-                <span className='text-[11px] font-semibold leading-none'>{tab.label}</span>
+                <span className='whitespace-nowrap text-[11px] font-semibold leading-none tracking-[-0.01em]'>{tab.label}</span>
               </>
             )
             const className = cn(
@@ -315,7 +319,12 @@ export function EllieoNavbar() {
           aria-label={t('menuAria', { city: cityInfo.shortLabel })}
           className='inline-flex size-10 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)] touch-manipulation transition active:scale-95'
         >
-          <MiniTabIcon className='size-[22px]' strokeWidth={2.25} fill={miniTab.fillActive ? 'currentColor' : 'none'} />
+          <MiniTabIcon
+            className='size-[22px]'
+            strokeWidth={2.25}
+            fill={miniTab.fillActive ? 'currentColor' : 'none'}
+            style={{ '--ellieo-icon-cut': 'var(--brand-soft)' } as React.CSSProperties}
+          />
         </button>
         <span aria-hidden className='h-6 w-px bg-[var(--border)]' />
         <button

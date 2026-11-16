@@ -70,7 +70,9 @@
       "me": "Tôi",
       "explore": "Khám phá",
       "post": "Đăng",
-      "inbox": "Hộp thư"
+      "inbox": "Hộp thư",
+      "market": "Chợ",
+      "visaJobs": "Visa · Việc làm"
     },
     "join": "Tham gia Ellieo",
     "comingSoon": "Sắp ra mắt",
@@ -115,6 +117,13 @@
       "points": "Điểm Ellieo",
       "about": "Về Ellieo"
     },
-    "chooseCity": "Chọn thành phố"
+    "chooseCity": "Chọn thành phố",
+    "careerTabs": {
+      "visa": "Visa",
+      "jobs": "Việc làm",
+      "companies": "Công ty",
+      "postings": "Tuyển dụng",
+      "aria": "Visa và việc làm"
+    }
   }
 }

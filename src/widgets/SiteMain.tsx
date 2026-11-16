@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { BRAND_CONFIG } from '@lib/brand'
 import { isAppViewPathname } from '@lib/constants/cities'
 import { cn } from '@lib'
-import { EllieoBoardChips, useEllieoTabPage } from '@widgets/ellieo/EllieoBoardChips'
+import { EllieoBoardChips, EllieoCareerTabs, useEllieoTabPage } from '@widgets/ellieo/EllieoBoardChips'
 
 /** Page body. Leaves room for the fixed site header, except in the native app's viewer (/{city}/app-view/…). */
 export function SiteMain({ children }: { children: ReactNode }) {
@@ -22,7 +22,12 @@ export function SiteMain({ children }: { children: ReactNode }) {
       }
     >
       {/* Ellieo: emoji board chips under the top bar on the home and board lists */}
-      {!appView && BRAND_CONFIG.theme === 'ellieo' ? <EllieoBoardChips /> : null}
+      {!appView && BRAND_CONFIG.theme === 'ellieo' ? (
+        <>
+          <EllieoBoardChips />
+          <EllieoCareerTabs />
+        </>
+      ) : null}
       {children}
     </main>
   )
