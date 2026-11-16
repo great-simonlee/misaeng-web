@@ -14,7 +14,7 @@ import { NYC_CATEGORIES } from '@lib/constants/nyc'
 import { useT } from '@lib/i18n/client'
 import { useSupportConfig } from '@lib/support/client'
 import { LanguageMenu } from '@widgets/LanguageMenu'
-import { CitySelectModal } from '@widgets/nyc/CitySelectModal'
+import { EllieoCityMenu } from '@widgets/ellieo/EllieoCityMenu'
 import { EllieoSheet } from '@widgets/ellieo/EllieoSheet'
 import {
   BellIcon,
@@ -53,6 +53,7 @@ export function EllieoNavbar() {
   const [sheet, setSheet] = useState<'compose' | null>(null)
   const [accountOpen, setAccountOpen] = useState(false)
   const accountRef = useRef<HTMLDivElement>(null)
+  const cityPillRef = useRef<HTMLButtonElement>(null)
 
   const [navPath, setNavPath] = useState(pathname)
   if (pathname !== navPath) {
@@ -79,6 +80,7 @@ export function EllieoNavbar() {
   }, [accountOpen])
 
   const closeSheet = useCallback(() => setSheet(null), [])
+  const closeCity = useCallback(() => setCityOpen(false), [])
   const isActive = (target: string) => pathname === target || pathname.startsWith(`${target}/`)
   const home = href()
   const signedIn = !loading && Boolean(user)
@@ -129,17 +131,21 @@ export function EllieoNavbar() {
               priority
             />
           </Link>
-          <button
-            type='button'
-            onClick={() => setCityOpen(true)}
-            className='ml-1 inline-flex h-8 items-center gap-1 rounded-full bg-[var(--surface)] px-3 text-[13px] font-bold text-[var(--foreground)] touch-manipulation transition hover:bg-[var(--border)]'
-            aria-haspopup='dialog'
-            aria-expanded={cityOpen}
-            aria-label={t('selectCity')}
-          >
-            {cityInfo.shortLabel}
-            <ChevronDownIcon className='size-3.5' />
-          </button>
+          <div className='relative ml-1'>
+            <button
+              ref={cityPillRef}
+              type='button'
+              onClick={() => setCityOpen((value) => !value)}
+              className='inline-flex h-8 items-center gap-1 rounded-full bg-[var(--surface)] px-3 text-[13px] font-bold text-[var(--foreground)] touch-manipulation transition hover:bg-[var(--border)]'
+              aria-haspopup='menu'
+              aria-expanded={cityOpen}
+              aria-label={t('selectCity')}
+            >
+              {cityInfo.shortLabel}
+              <ChevronDownIcon className={cn('size-3.5 transition', cityOpen && 'rotate-180')} />
+            </button>
+            <EllieoCityMenu open={cityOpen} onClose={closeCity} currentCity={city} anchorRef={cityPillRef} />
+          </div>
           <span className='flex-1' aria-hidden />
 
           <div className='hidden sm:block'>
@@ -294,7 +300,6 @@ export function EllieoNavbar() {
       </EllieoSheet>
 
 
-      <CitySelectModal open={cityOpen} onClose={() => setCityOpen(false)} currentCity={city} />
     </>
   )
 }

@@ -18,7 +18,7 @@ const ALWAYS_OPEN: readonly CityId[] = ['nyc', 'boston']
 
 let enabledCitiesRequest: Promise<CityId[]> | null = null
 
-function loadEnabledCities(): Promise<CityId[]> {
+export function loadEnabledCities(): Promise<CityId[]> {
   enabledCitiesRequest ??= fetch('/api/cities')
     .then((res) => (res.ok ? res.json() : null))
     .then((data: { cities?: string[] } | null) =>
