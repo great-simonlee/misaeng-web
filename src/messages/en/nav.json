@@ -127,6 +127,64 @@
       "postings": "Postings",
       "aria": "Visa and jobs"
     },
-    "write": "Write"
+    "write": "Write",
+    "communities": {
+      "rent": {
+        "name": "e/Rent",
+        "description": "Verified apartments and rooms from the Ellieo housing team"
+      },
+      "roommates": {
+        "name": "e/Roommates",
+        "description": "Find a roommate or a sublet"
+      },
+      "visa": {
+        "name": "e/Visa",
+        "description": "OPT, CPT and green card timelines, step by step"
+      },
+      "interviews": {
+        "name": "e/Interviews",
+        "description": "Interview and job search stories"
+      },
+      "companies": {
+        "name": "e/Companies",
+        "description": "Official careers pages and reviews by company"
+      },
+      "jobs": {
+        "name": "e/Jobs",
+        "description": "Internship, new grad and experienced job postings"
+      },
+      "food": {
+        "name": "e/Food",
+        "description": "Restaurants and cafes members actually tried"
+      },
+      "market": {
+        "name": "e/Market",
+        "description": "Buy, sell and give away with verified neighbors"
+      },
+      "ask": {
+        "name": "e/Ask",
+        "description": "Questions and everyday talk"
+      }
+    },
+    "groups": {
+      "housing": "Housing",
+      "careers": "Jobs & Visa",
+      "life": "Life"
+    },
+    "bar": {
+      "home": "Home",
+      "communities": "Communities",
+      "write": "Write",
+      "inbox": "Inbox",
+      "me": "Me"
+    },
+    "communitiesTitle": "Communities",
+    "postTo": "Post to…",
+    "postToSubtitle": "Pick a community.",
+    "post": "Post",
+    "joinRow": "Join verified students & pros in {city}",
+    "signUp": "Sign up",
+    "sidebarHome": "Home",
+    "partners": "Partners & creators"
   }
 }

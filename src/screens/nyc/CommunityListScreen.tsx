@@ -74,7 +74,6 @@ import {
   AnonymousBoardNoticeModal,
   useAnonymousBoardNotice,
 } from '@widgets/nyc/AnonymousBoardNoticeModal'
-import { useEllieoTabPage } from '@widgets/ellieo/EllieoBoardChips'
 import { EllieoBoardRail } from '@widgets/ellieo/EllieoBoardRail'
 import { EllieoPostRow } from '@widgets/ellieo/EllieoPostRow'
 import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
@@ -130,10 +129,6 @@ function FoodCategoryStickyBar({
   const barRef = useRef<HTMLDivElement>(null)
   const [stuck, setStuck] = useState(false)
   const [barHeight, setBarHeight] = useState(0)
-  // Ellieo tab pages (Food) have no top bar below 1024px: the bar pins to the very top there
-  const ellieoNoTopBar = useEllieoTabPage() !== null && BRAND_CONFIG.theme === 'ellieo'
-  const noTopBarRef = useRef(ellieoNoTopBar)
-  noTopBarRef.current = ellieoNoTopBar
 
   useEffect(() => {
     const bar = barRef.current
@@ -152,7 +147,6 @@ function FoodCategoryStickyBar({
     let observer: IntersectionObserver | null = null
 
     function navOffsetPx() {
-      if (noTopBarRef.current && !window.matchMedia('(min-width: 1024px)').matches) return 0
       return window.matchMedia('(min-width: 640px)').matches ? 64 : 56
     }
 
@@ -175,13 +169,10 @@ function FoodCategoryStickyBar({
 
     connect()
     const mq = window.matchMedia('(min-width: 640px)')
-    const mqDesktop = window.matchMedia('(min-width: 1024px)')
     const onChange = () => connect()
     mq.addEventListener('change', onChange)
-    mqDesktop.addEventListener('change', onChange)
     return () => {
       mq.removeEventListener('change', onChange)
-      mqDesktop.removeEventListener('change', onChange)
       observer?.disconnect()
     }
   }, [])
@@ -245,7 +236,7 @@ function FoodCategoryStickyBar({
           byBrand('', 'border-b border-black/[0.04] bg-white/95 backdrop-blur-md supports-[backdrop-filter]:bg-white/85'),
           // In place it sits on the page canvas; once pinned under the header it turns to frosted canvas
           stuck
-            ? byBrand('fixed inset-x-0 top-14 border-b border-black/[0.05] bg-[var(--canvas)]/90 py-2.5 backdrop-blur-md sm:top-16', ellieoNoTopBar ? 'fixed inset-x-0 top-[env(safe-area-inset-top)] py-2.5 lg:top-16' : 'fixed inset-x-0 top-14 py-2.5 sm:top-16')
+            ? byBrand('fixed inset-x-0 top-14 border-b border-black/[0.05] bg-[var(--canvas)]/90 py-2.5 backdrop-blur-md sm:top-16', 'fixed inset-x-0 top-14 py-2.5 sm:top-16 lg:left-60')
             : byBrand('relative -mx-4 mt-2 bg-transparent px-4 py-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8', 'relative -mx-4 mt-2 px-4 py-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8')
         )}
       >

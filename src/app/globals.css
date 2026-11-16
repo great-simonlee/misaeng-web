@@ -49,16 +49,17 @@
 /* Ellieo 토큰 (social feed, docs/design/ellieo-social.md): 색·글꼴·모서리·그림자. 화면 규칙은 ellieo-theme.css */
 [data-brand='ellieo'] {
   --background: #ffffff;
-  --foreground: #14121f;
+  /* Community design neutrals (docs/design/ellieo-community.md) */
+  --foreground: #0f1419;
   --canvas: #ffffff;
-  --surface: #f5f4fa;
+  --surface: #f6f7f9;
   --surface-elevated: #ffffff;
-  --border: #eceaf3;
-  --border-muted: #dcd9e7;
-  --card-ring: #eceaf3;
-  --muted: #8a86a0;
-  --muted-foreground: #4a4660;
-  --navy: #14121f;
+  --border: #e6e8ec;
+  --border-muted: #d5d9df;
+  --card-ring: #e6e8ec;
+  --muted: #8a929c;
+  --muted-foreground: #5b6470;
+  --navy: #0f1419;
   --navy-light: #2a2640;
   --navy-muted: #4a4660;
   --brand-rgb: 31 94 255;
@@ -95,7 +96,7 @@
   --shadow-lg: 0 1px 2px rgb(20 18 31 / 0.04), 0 16px 36px -18px rgb(20 18 31 / 0.25);
   --shadow-xl: 0 2px 4px rgb(20 18 31 / 0.04), 0 24px 48px -20px rgb(20 18 31 / 0.3);
   /* 하단 탭 바 높이 (모든 화면 폭). 고정 버튼·시트가 탭 바 위에 뜬다 */
-  --bottom-nav-h: calc(4.875rem + env(safe-area-inset-bottom));
+  --bottom-nav-h: calc(3.5rem + env(safe-area-inset-bottom));
 }
 
 @theme inline {

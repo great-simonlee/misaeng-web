@@ -126,6 +126,64 @@
       "postings": "Tuyển dụng",
       "aria": "Visa và việc làm"
     },
-    "write": "Viết bài"
+    "write": "Viết bài",
+    "communities": {
+      "rent": {
+        "name": "e/Thuê nhà",
+        "description": "Căn hộ và phòng đã xác minh từ đội ngũ nhà ở Ellieo"
+      },
+      "roommates": {
+        "name": "e/Ở ghép",
+        "description": "Tìm bạn ở ghép hoặc sublet"
+      },
+      "visa": {
+        "name": "e/Visa",
+        "description": "Lộ trình OPT, CPT và thẻ xanh, từng bước một"
+      },
+      "interviews": {
+        "name": "e/Phỏng vấn",
+        "description": "Kinh nghiệm phỏng vấn và tìm việc"
+      },
+      "companies": {
+        "name": "e/Công ty",
+        "description": "Trang tuyển dụng chính thức và review theo công ty"
+      },
+      "jobs": {
+        "name": "e/Tuyển dụng",
+        "description": "Tin tuyển thực tập, new grad và có kinh nghiệm"
+      },
+      "food": {
+        "name": "e/Ăn uống",
+        "description": "Nhà hàng và quán cà phê thành viên đã thử"
+      },
+      "market": {
+        "name": "e/Chợ",
+        "description": "Mua, bán và cho tặng với hàng xóm đã xác minh"
+      },
+      "ask": {
+        "name": "e/Hỏi đáp",
+        "description": "Hỏi đáp và trò chuyện hằng ngày"
+      }
+    },
+    "groups": {
+      "housing": "Nhà ở",
+      "careers": "Việc làm & Visa",
+      "life": "Đời sống"
+    },
+    "bar": {
+      "home": "Trang chủ",
+      "communities": "Cộng đồng",
+      "write": "Viết",
+      "inbox": "Hộp thư",
+      "me": "Tôi"
+    },
+    "communitiesTitle": "Cộng đồng",
+    "postTo": "Đăng vào…",
+    "postToSubtitle": "Chọn một cộng đồng.",
+    "post": "Đăng",
+    "joinRow": "Tham gia cộng đồng sinh viên & người đi làm đã xác minh tại {city}",
+    "signUp": "Đăng ký",
+    "sidebarHome": "Trang chủ",
+    "partners": "Đối tác & nhà sáng tạo"
   }
 }

@@ -61,13 +61,13 @@ export function EllieoMarketListScreen() {
 
   return (
     <div className='min-w-0 flex-1 bg-white'>
-      <div className='mx-auto w-full max-w-[40rem] px-4 pb-28 pt-3 lg:max-w-[52rem] lg:pt-8'>
-        <header className='max-lg:sr-only'>
+      <div className='mx-auto w-full max-w-[52rem] px-4 pb-28 pt-4'>
+        <header className='sr-only'>
           <h1 className='text-[2rem] font-bold tracking-[-0.03em] text-[var(--foreground)]'>{t('ellieoMarket.title')}</h1>
           <p className='mt-1 text-[15px] text-[var(--muted-foreground)]'>{t('ellieoMarket.intro')}</p>
         </header>
 
-        <nav aria-label={t('ellieoMarket.title')} className='-mx-4 lg:mt-5'>
+        <nav aria-label={t('ellieoMarket.title')} className='-mx-4'>
           <ul className='flex gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
             {TABS.map((id) => (
               <li key={id} className='shrink-0'>
@@ -134,7 +134,7 @@ export function EllieoMarketListScreen() {
       {/* Sell button: bottom-right, above the tab bar */}
       <Link
         href={sellTarget}
-        className='fixed bottom-[calc(var(--bottom-nav-h)+0.75rem)] right-4 z-[9000] inline-flex h-12 items-center gap-1.5 rounded-full bg-[var(--brand)] pl-4 pr-5 text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(31,94,255,0.7)] transition hover:bg-[var(--brand-hover)] active:scale-95 lg:bottom-24 lg:right-8'
+        className='fixed bottom-[calc(var(--bottom-nav-h)+0.75rem)] right-4 z-[9000] inline-flex h-12 items-center gap-1.5 rounded-full bg-[var(--brand)] pl-4 pr-5 text-[15px] font-bold text-white shadow-[0_10px_24px_-10px_rgba(31,94,255,0.7)] transition hover:bg-[var(--brand-hover)] active:scale-95 lg:bottom-6 lg:right-8'
       >
         <PlusIcon className='size-[18px]' strokeWidth={2.4} />
         {t('ellieoMarket.sell')}

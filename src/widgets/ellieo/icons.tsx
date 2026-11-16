@@ -296,3 +296,25 @@ export const PlaneIcon = (p: IconProps) => (
     <path d='M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2Z' />
   </Base>
 )
+
+/** Write tab (square.and.pencil) */
+export const ComposeIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M11 4.5H6.5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V13' />
+    <path d='M17.6 3.9a1.9 1.9 0 0 1 2.7 2.7L12.5 14.4 9 15l.6-3.5 8-7.6Z' />
+  </Base>
+)
+
+/** Upvote-style like (arrow.up); fill when liked */
+export const ArrowUpIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M12 4 5 12h4.2v8h5.6v-8H19L12 4Z' />
+  </Base>
+)
+
+export const ShareIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M12 3.5v11M7.5 8 12 3.5 16.5 8' />
+    <path d='M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5' />
+  </Base>
+)

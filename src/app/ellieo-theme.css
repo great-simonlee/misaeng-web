@@ -923,39 +923,37 @@
   }
 }
 
-/* Housing list on phones/tablets: no top bar, the page starts at its filters; the h1 is screen-reader only */
-@media (max-width: 1023px) {
-  [data-brand='ellieo'] [data-ui='board-title'].ellieo-tab-title {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+/* Community pages: the community banner (EllieoCommunityBanner) carries the title and intro, so the page's own
+   h1 / intro are screen-reader only and the filter + write row sits right under the banner */
+[data-brand='ellieo'] [data-ui='board-title'].ellieo-tab-title,
+[data-brand='ellieo'] [data-ui='board-header'].ellieo-tab-header [data-ui='board-title'],
+[data-brand='ellieo'] [data-ui='board-header'].ellieo-tab-header [data-ui='board-description'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+[data-brand='ellieo'] [data-ui='board-title'].ellieo-tab-title + [data-ui='board-description'] {
+  display: none;
+}
+
+[data-brand='ellieo'] [data-ui='board-header'].ellieo-tab-header > div:first-child {
+  justify-content: flex-end;
+}
+
+/* Desktop: room for the fixed community sidebar (EllieoNavbar) */
+@media (min-width: 1024px) {
+  [data-brand='ellieo'] {
+    --bottom-nav-h: 0px;
   }
 
-  [data-brand='ellieo'] [data-ui='board-title'].ellieo-tab-title + [data-ui='board-description'] {
-    display: none;
-  }
-
-  /* Visa / Jobs lists: title + intro screen-reader only, filter + write buttons as one right-aligned row */
-  [data-brand='ellieo'] [data-ui='board-header'].ellieo-tab-header [data-ui='board-title'],
-  [data-brand='ellieo'] [data-ui='board-header'].ellieo-tab-header [data-ui='board-description'] {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  [data-brand='ellieo'] [data-ui='board-header'].ellieo-tab-header > div:first-child {
-    justify-content: flex-end;
+  [data-brand='ellieo'] body {
+    padding-left: 15rem;
   }
 }
