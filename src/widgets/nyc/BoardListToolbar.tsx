@@ -5,7 +5,9 @@ import type { ReactNode } from 'react'
 
 import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
+import { BRAND_CONFIG } from '@lib/brand'
 import { byBrand } from '@lib/brand/design'
+import { useEllieoTabPage } from '@widgets/ellieo/EllieoBoardChips'
 
 type BoardListToolbarProps = {
   breadcrumbLabel: string
@@ -35,8 +37,10 @@ export function BoardListToolbar({
   children,
 }: BoardListToolbarProps) {
   const t = useT('community')
+  // Ellieo Visa / Jobs lists on phones/tablets: no top bar, so the header is just the filter + write row (ellieo-theme.css)
+  const ellieoTabPage = useEllieoTabPage() !== null && BRAND_CONFIG.theme === 'ellieo'
   return (
-    <header data-ui='board-header' className={cn('pt-4 sm:pt-5 lg:pt-6', className)}>
+    <header data-ui='board-header' className={cn('pt-4 sm:pt-5 lg:pt-6', ellieoTabPage && 'ellieo-tab-header', className)}>
       <div className='flex items-center justify-between gap-3'>
         <h1 data-ui='board-title' className={byBrand('min-w-0 flex-1 truncate font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'min-w-0 flex-1 truncate text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]')}>
           {breadcrumbLabel}

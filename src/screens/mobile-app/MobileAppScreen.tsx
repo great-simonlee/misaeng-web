@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import { EllieoAppIcon } from '@widgets/ellieo/EllieoAppIcon'
 import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
-import { BellIcon, BowlIcon, BriefcaseIcon, ChatIcon, GridIcon, HeartIcon, HomeIcon, PassportIcon } from '@widgets/ellieo/icons'
+import { BellIcon, BowlIcon, BriefcaseIcon, ChatIcon, GridIcon, HeartIcon, HomeIcon, PlaneIcon } from '@widgets/ellieo/icons'
 
 /**
  * Ellieo app page (ellieo.com/mobile-app), social-feed design. The app isn't in the stores yet: no download
@@ -13,7 +13,7 @@ const APP_LAUNCHED = false
 
 const FEATURES = [
   { icon: HomeIcon, title: 'Housing', body: 'Rentals and rooms with clear prices, perks and move-in dates. Ask about a listing in one tap.' },
-  { icon: PassportIcon, title: 'Visa', body: 'OPT, CPT and green card timelines, shared step by step by people who just went through it.' },
+  { icon: PlaneIcon, title: 'Visa', body: 'OPT, CPT and green card timelines, shared step by step by people who just went through it.' },
   { icon: BriefcaseIcon, title: 'Jobs', body: 'Interview reviews, company pages and internship / new grad postings.' },
   { icon: ChatIcon, title: 'Ask & Talk', body: 'Ask anything, anonymously or with your nickname.' },
   { icon: BowlIcon, title: 'Food', body: 'Places members actually tried, with photos and a map.' },
@@ -21,7 +21,7 @@ const FEATURES = [
 ] as const
 
 const SAMPLE_FEED = [
-  { name: 'minh.opt', school: 'Baruch', tag: PassportIcon, title: 'OPT approved in 62 days', likes: 24 },
+  { name: 'minh.opt', school: 'Baruch', tag: PlaneIcon, title: 'OPT approved in 62 days', likes: 24 },
   { name: 'phoholic', school: 'Columbia', tag: BowlIcon, title: 'Best phở near campus?', likes: 57 },
 ] as const
 
@@ -68,7 +68,7 @@ export function MobileAppScreen() {
               <div className='flex items-center justify-between px-4 pb-2 pt-4'>
                 <EllieoAppIcon size={24} />
                 <span className='flex gap-1.5'>
-                  {[HomeIcon, PassportIcon, BriefcaseIcon].map((Icon, index) => (
+                  {[HomeIcon, PlaneIcon, BriefcaseIcon].map((Icon, index) => (
                     <span key={index} className='rounded-full bg-[var(--surface)] px-2 py-1 text-[var(--foreground)]'>
                       <Icon className='size-3.5' />
                     </span>
@@ -108,7 +108,7 @@ export function MobileAppScreen() {
                 <span className='flex size-8 items-center justify-center rounded-full bg-[var(--brand)] text-[18px] font-bold text-white'>
                   +
                 </span>
-                <PassportIcon className='size-4' />
+                <PlaneIcon className='size-4' />
                 <BriefcaseIcon className='size-4' />
               </div>
             </div>

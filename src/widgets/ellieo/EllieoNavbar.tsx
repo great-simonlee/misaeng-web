@@ -24,7 +24,7 @@ import {
   ChevronDownIcon,
   GridIcon,
   HomeIcon,
-  PassportIcon,
+  PlaneIcon,
   GlobeIcon,
   PlusIcon,
   StarIcon,
@@ -121,7 +121,7 @@ export function EllieoNavbar() {
     { key: 'home', label: t('ellieo.tabs.home'), icon: GridIcon, href: home, active: pathname === home, fillActive: true },
     { key: 'housing', label: t('ellieo.tabs.housing'), icon: HomeIcon, href: housingHref, active: isActive(housingHref), fillActive: true },
     { key: 'post' },
-    { key: 'visa', label: t('ellieo.short.status'), icon: PassportIcon, href: visaHref, active: visaActive, fillActive: false },
+    { key: 'visa', label: t('ellieo.short.status'), icon: PlaneIcon, href: visaHref, active: visaActive, fillActive: true },
     { key: 'jobs', label: t('ellieo.tabs.jobs'), icon: BriefcaseIcon, href: jobsHref, active: isActive(jobsHref) || isActive(companiesHref), fillActive: false },
   ] as const
   // Mini pill (collapsed tab bar): the current tab's icon, Home when no tab is active

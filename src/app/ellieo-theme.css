@@ -925,4 +925,22 @@
   [data-brand='ellieo'] [data-ui='board-title'].ellieo-tab-title + [data-ui='board-description'] {
     display: none;
   }
+
+  /* Visa / Jobs lists: title + intro screen-reader only, filter + write buttons as one right-aligned row */
+  [data-brand='ellieo'] [data-ui='board-header'].ellieo-tab-header [data-ui='board-title'],
+  [data-brand='ellieo'] [data-ui='board-header'].ellieo-tab-header [data-ui='board-description'] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  [data-brand='ellieo'] [data-ui='board-header'].ellieo-tab-header > div:first-child {
+    justify-content: flex-end;
+  }
 }

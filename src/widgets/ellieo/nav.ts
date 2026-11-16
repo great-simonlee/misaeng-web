@@ -8,7 +8,7 @@ import {
   CalendarIcon,
   ChatIcon,
   HomeIcon,
-  PassportIcon,
+  PlaneIcon,
   PencilIcon,
   UsersIcon,
 } from '@widgets/ellieo/icons'
@@ -32,7 +32,7 @@ const ICONS: Record<NycCategoryId, ComponentType<{ className?: string }>> = {
   events: CalendarIcon,
   food: BowlIcon,
   marketplace: BagIcon,
-  status: PassportIcon,
+  status: PlaneIcon,
   'job-review': BriefcaseIcon,
   roommate: UsersIcon,
   anonymous: ChatIcon,
