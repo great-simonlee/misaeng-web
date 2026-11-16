@@ -31,20 +31,19 @@ export function useEllieoTabPage(): EllieoTabPage | null {
 }
 
 /**
- * Board chips (line icon + label) under the top bar (home, board lists, housing list). Scrolls sideways on phones.
- * Renders nothing on detail, write, account and legal pages, nor on the bottom-tab pages (Housing · Visa · Jobs).
+ * Board chips (line icon + label) under the top bar, only on the board lists outside the tab bar (Roommates, Food,
+ * Ask & Talk, …) to switch between them. Scrolls sideways on phones. Not on Home (it has board shortcuts in its
+ * Community section), the bottom-tab pages (Housing · Visa · Jobs), detail, write, account or legal pages (user 11-16).
  */
 export function EllieoBoardChips() {
   const pathname = usePathname()
   const href = useCityPath()
   const t = useT('nav')
   const tabPage = useEllieoTabPage()
-  const home = href()
   const boards = ELLIEO_BOARDS.filter((board) => board.available)
   const boardPaths = boards.map((board) => href(board.path))
-  const onHome = pathname === home
   const onBoardList = boardPaths.includes(pathname)
-  if (tabPage || (!onHome && !onBoardList)) return null
+  if (tabPage || !onBoardList) return null
 
   return (
     <nav aria-label={t('ellieo.boardsAria')} className='w-full border-b border-[var(--border)] bg-white'>

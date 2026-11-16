@@ -288,7 +288,7 @@ function ExploreBoards() {
   const tc = useT('community')
   const href = useCityPath()
   const cityInfo = useCityInfo()
-  const boards = ELLIEO_BOARDS.filter((board) => board.available && board.id !== 'housing')
+  const boards = ELLIEO_BOARDS.filter((board) => board.available && !TAB_BAR_BOARDS.includes(board.id))
 
   return (
     <section className='min-w-0'>
@@ -315,6 +315,36 @@ function ExploreBoards() {
         ))}
       </ul>
     </section>
+  )
+}
+
+/* ---------- Board shortcuts: the boards that aren't in the bottom tab bar (no chip row on Home) ---------- */
+
+const TAB_BAR_BOARDS: NycCategoryId[] = ['housing', 'status', 'job-review']
+
+function BoardShortcuts() {
+  const tn = useT('nav')
+  const href = useCityPath()
+  const boards = ELLIEO_BOARDS.filter((board) => board.available && !TAB_BAR_BOARDS.includes(board.id))
+  if (boards.length === 0) return null
+
+  return (
+    <nav aria-label={tn('ellieo.boardsAria')} className='-mx-4 mt-3'>
+      <ul className='flex gap-1 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+        {boards.map((board) => (
+          <li key={board.id} className='w-[4.75rem] shrink-0'>
+            <Link href={href(board.path)} className='group flex flex-col items-center gap-1.5 rounded-2xl py-1.5'>
+              <span className='inline-flex size-12 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)] transition group-hover:bg-[var(--brand-subtle)]'>
+                <board.icon className='size-[22px]' />
+              </span>
+              <span className='max-w-full truncate text-center text-[12.5px] font-semibold text-[var(--foreground)]'>
+                {tn(`ellieo.short.${board.id}`)}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   )
 }
 
@@ -432,6 +462,7 @@ function CommunityFeed() {
       ) : (
         <>
           <FeedHeading title={t('ellieo.community.title')} aside={feed.sample ? <SampleTag /> : null} />
+          <BoardShortcuts />
           <ul className='mt-3 flex flex-col gap-3'>{cards.slice(0, 2)}</ul>
         </>
       )}
