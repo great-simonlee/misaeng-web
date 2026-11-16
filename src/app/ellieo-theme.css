@@ -871,3 +871,38 @@
     padding-bottom: 3.5rem;
   }
 }
+
+/* City dropdown: fade + scale in from the pill (reduced motion: fade only) */
+@keyframes ellieo-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ellieo-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ellieo-pop-in {
+  animation: ellieo-pop-in 180ms ease-out both;
+}
+
+.ellieo-fade-in {
+  animation: ellieo-fade-in 180ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ellieo-pop-in {
+    animation-name: ellieo-fade-in;
+  }
+}
