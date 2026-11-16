@@ -157,7 +157,7 @@ export const COFFEE_CHAT_DISCLAIMER =
  * Coffee chat v2: consent a peer mentor agrees to (required checkbox). The text itself is localized
  * (api.points.coffeeChat.mentorConsent in src/messages/<locale>/api.json); bump the version whenever it changes.
  */
-export const COFFEE_CHAT_MENTOR_CONSENT_VERSION = '2026-10-28-mentor-times'
+export const COFFEE_CHAT_MENTOR_CONSENT_VERSION = '2026-11-15-auto-mentor'
 export const COFFEE_CHAT_MENTOR_CONSENT_KEY = 'points.coffeeChat.mentorConsent'
 
 /**
