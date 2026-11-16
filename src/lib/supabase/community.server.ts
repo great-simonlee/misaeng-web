@@ -235,6 +235,10 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
     jobReviewOutcome: isJobReviewOutcomeId(data.jobReviewOutcome)
       ? data.jobReviewOutcome
       : null,
+    jobReviewQuestionsOpen:
+      typeof data.jobReviewQuestionsOpen === 'boolean' ? data.jobReviewQuestionsOpen : null,
+    jobReviewCoffeeChatOpen:
+      typeof data.jobReviewCoffeeChatOpen === 'boolean' ? data.jobReviewCoffeeChatOpen : null,
     jobReviewIndustry:
       typeof data.jobReviewIndustry === 'string' &&
       data.jobReviewIndustry.trim()

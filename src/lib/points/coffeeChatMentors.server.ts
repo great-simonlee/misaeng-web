@@ -346,7 +346,7 @@ export async function getMyLinkedin(uid: string) {
   return { linkedinUrl: profiles?.[0]?.linkedin ?? null, mentorLinkedinUrl: mentor?.linkedin ?? null }
 }
 
-async function saveLastLinkedin(uid: string, linkedin: string) {
+export async function saveLastLinkedin(uid: string, linkedin: string) {
   await pointsRest(`coffee_chat_profiles?on_conflict=user_id`, {
     method: 'POST',
     prefer: 'resolution=merge-duplicates,return=minimal',
@@ -431,7 +431,9 @@ export async function mentorForPost(viewerUid: string, postId: string): Promise<
     post.categoryId !== 'job-review' ||
     isAnonymousBoard(post.categoryId) ||
     post.status === 'closed' ||
-    isModerationHidden(post)
+    isModerationHidden(post) ||
+    // 작성자가 이 후기에서는 커피챗을 받지 않기로 함 (글쓰기 마지막 단계, 기본 받기)
+    post.jobReviewCoffeeChatOpen === false
   ) {
     return null
   }

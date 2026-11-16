@@ -101,6 +101,7 @@ import {
 } from '@lib/supabase/community.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import { notifyJobReviewCreated } from '@lib/erp/notifyJobReview'
+import { notifyNewJobReview } from '@lib/push/newJobReviewNotify.server'
 import { notifyBoardPostCreated } from '@lib/erp/notifyBoardPost'
 import type {
   CommunityPost,
@@ -286,6 +287,8 @@ type CreateBody = {
   jobReviewSource?: string | null
   jobReviewSourceOrgId?: string | null
   jobReviewOutcome?: string | null
+  jobReviewQuestionsOpen?: boolean | null
+  jobReviewCoffeeChatOpen?: boolean | null
   companyId?: string | null
   roommateLookingFor?: RoommateLookingFor | null
   roommateBudgetMax?: number | null
@@ -749,6 +752,9 @@ export async function POST(request: Request) {
     jobReviewTips: isJobReview ? jobReviewTips || null : null,
     jobReviewIndustry: isJobReview ? jobReviewIndustry : null,
     jobReviewOutcome,
+    // 후배 질문·커피챗 받기: 기본은 받기 (앱 1.0.7 글쓰기 마지막 단계에서 끌 수 있음)
+    jobReviewQuestionsOpen: isJobReview ? body?.jobReviewQuestionsOpen !== false : null,
+    jobReviewCoffeeChatOpen: isJobReview ? body?.jobReviewCoffeeChatOpen !== false : null,
     companyId: isJobReview ? (companyResult.companyId ?? null) : null,
     roommateLookingFor: isRoommate ? roommateLookingFor : null,
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
@@ -790,6 +796,7 @@ export async function POST(request: Request) {
       console.error('Community credit award (post) error:', creditError)
     }
     if (isJobReview && jobReviewSource) after(() => notifyJobReviewCreated(saved, jobReviewSource))
+    if (isJobReview) after(() => notifyNewJobReview(saved))
     after(() => notifyBoardPostCreated(saved))
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),

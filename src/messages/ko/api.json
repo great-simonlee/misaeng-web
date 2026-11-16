@@ -436,6 +436,10 @@
         "title": "부모님이 미생에 가입했어요",
         "body": "{days}일 후 초대 보상 {amount}P가 지급될 예정이에요."
       }
+    },
+    "newJobReview": {
+      "title": "미생 · 면접/취업 후기",
+      "body": "새로운 면접/취업 후기가 올라왔어요!\n선배님께 궁금한 점을 물어보세요."
     }
   },
   "reviewDocs": {
@@ -550,7 +554,9 @@
       "answerRequired": "답변을 적어 주세요.",
       "closed": "이미 마감된 질문이에요.",
       "reportReasonRequired": "신고 사유를 입력해 주세요.",
-      "tooMany": "한 번에 질문은 최대 3개까지 보낼 수 있어요."
+      "tooMany": "한 번에 질문은 최대 3개까지 보낼 수 있어요.",
+      "questionsClosed": "작성자가 이 후기에서는 질문을 받지 않아요.",
+      "linkedinRequired": "질문을 보내려면 내 링크드인 프로필 주소를 첨부해 주세요."
     },
     "parentNotAllowed": "학부모 계정은 이용할 수 없는 기능이에요."
   },

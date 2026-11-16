@@ -8,6 +8,7 @@ import { getPointsConfig, ruleAmount, ruleCap } from './config.server'
 import { isPointsLedgerActive } from './engine.server'
 import { pointsErrors, PointsError } from './errors'
 import { captureHold, earnPoints, getPointsState, holdPoints, releaseHold } from './ledger.server'
+import { linkedinInvalid, parseLinkedinUrl, saveLastLinkedin } from './coffeeChatMentors.server'
 import { notifyReviewQuestion } from './notify.server'
 import { enc, pointsRest, PointsStoreError } from './rest.server'
 
@@ -52,6 +53,8 @@ type Row = {
   expires_at: string
   reported_at: string | null
   report_reason: string | null
+  /** The asker's LinkedIn (1.0.7, supabase/review_questions_linkedin.sql). Only the author ever sees it. */
+  asker_linkedin: string | null
 }
 
 export type ReviewQuestionView = {
@@ -75,9 +78,11 @@ export type ReviewQuestionView = {
   expiresAt: string
   /** The viewer's side or the other side reported it (the team reviews it). */
   reported: boolean
+  /** The asker's LinkedIn, for the author only (to decide whether to answer); null for the asker and old questions. */
+  askerLinkedinUrl: string | null
 }
 
-const SELECT = 'id,post_id,asker_id,author_id,question,topic,context,answer,status,hold_id,amount,reward,created_at,answered_at,expires_at,reported_at,report_reason'
+const SELECT = 'id,post_id,asker_id,author_id,question,topic,context,answer,status,hold_id,amount,reward,created_at,answered_at,expires_at,reported_at,report_reason,asker_linkedin'
 
 function storeError(error: unknown): never {
   if (error instanceof PointsStoreError && error.setupRequired) throw pointsErrors.notConfigured()
@@ -161,6 +166,7 @@ async function view(rows: Row[], viewer: string): Promise<ReviewQuestionView[]> 
       answeredAt: r.answered_at,
       expiresAt: r.expires_at,
       reported: Boolean(r.reported_at),
+      askerLinkedinUrl: role === 'author' ? r.asker_linkedin : null,
     }
   })
 }
@@ -186,12 +192,17 @@ export async function questionsForPost(viewer: string | null, postId: string) {
   }
   // 학부모 계정은 커리어 질문을 보낼 수 없다 (1.0.7)
   const viewerIsParent = viewer ? (await profileOf(viewer))?.accountType === 'parent' : false
+  const questionsOpen = post?.jobReviewQuestionsOpen !== false
   return {
     enabled: true as const,
     count: all.length,
     cost: ruleAmount(config, 'spend.review_question'),
     reward: ruleAmount(config, 'earn.review_answer'),
-    canAsk: Boolean(viewer && post && post.categoryId === 'job-review' && post.authorUid && !isAuthor && !viewerIsParent),
+    canAsk: Boolean(
+      viewer && post && post.categoryId === 'job-review' && post.authorUid && !isAuthor && !viewerIsParent && questionsOpen,
+    ),
+    /** 작성자가 이 후기에서 질문을 받는지 (글쓰기 마지막 단계에서 끌 수 있음, 기본 받기) */
+    questionsOpen,
     isAuthor,
     remaining,
     /** 한 번에 보낼 수 있는 질문 수 (각각 cost씩 홀드) */
@@ -203,13 +214,19 @@ export async function questionsForPost(viewer: string | null, postId: string) {
 
 export type AskInput = { question: string; topic?: unknown; context?: unknown; requestKey?: unknown }
 
+/** 1.0.7: 질문을 보낼 때 링크드인 필수 (작성자가 보고 답할지 정한다). 1.0.6의 한 개 보내기는 없이도 받는다. */
+const linkedinRequired = () => err('linkedinRequired', 400, 'LINKEDIN_REQUIRED')
+
 /**
  * 1.0.7: 같은 후기에 질문 여러 개를 한 번에 (최대 cap.review_questions_per_send = 3). 질문마다 따로 홀드(30P씩)되고,
  * 답변되면 그 질문만 차감, 거절·만료되면 그 질문만 돌려준다. 월 한도(cap.review_question_monthly)와 잔액을 먼저 확인해
  * 중간에 실패하지 않게 한다. 그래도 중간에 실패하면 보낸 질문까지만 돌려준다 (failed = 못 보낸 수).
  */
-export async function askQuestions(input: { uid: string; postId: string; items: AskInput[] }) {
+export async function askQuestions(input: { uid: string; postId: string; items: AskInput[]; linkedin?: unknown }) {
   const config = await assertReviewQnaEnabled()
+  if (typeof input.linkedin !== 'string' || !input.linkedin.trim()) throw linkedinRequired()
+  const linkedin = parseLinkedinUrl(input.linkedin)
+  if (!linkedin) throw linkedinInvalid()
   const items = input.items.slice(0, 10)
   const perSend = ruleCap(config, 'cap.review_questions_per_send') ?? 3
   if (items.length === 0) throw err('tooShort', 400, 'QUESTION_TOO_SHORT')
@@ -252,6 +269,7 @@ export async function askQuestions(input: { uid: string; postId: string; items: 
           topic: item.topic,
           context: item.context,
           requestKey: item.requestKey,
+          linkedin,
         }),
       )
     } catch (error) {
@@ -260,6 +278,8 @@ export async function askQuestions(input: { uid: string; postId: string; items: 
       break
     }
   }
+  // 다음 질문·커피챗 신청에 미리 채울 주소 (커피챗과 같은 저장소)
+  if (questions.length > 0) await saveLastLinkedin(input.uid, linkedin).catch((e) => console.error('Q&A LinkedIn:', e))
   return { questions, failed: items.length - questions.length }
 }
 
@@ -271,6 +291,8 @@ export async function askQuestion(input: {
   context?: unknown
   /** The app's per-screen key (a uuid): a retry of the same send returns the first question instead of a second. */
   requestKey?: unknown
+  /** Normalized LinkedIn (askQuestions checks it); the single 1.0.6 send may leave it out. */
+  linkedin?: string | null
 }) {
   const config = await assertReviewQnaEnabled()
   const key = typeof input.requestKey === 'string' && /^[0-9a-f-]{36}$/i.test(input.requestKey) ? input.requestKey.toLowerCase() : null
@@ -292,6 +314,7 @@ export async function askQuestion(input: {
   }
   const authorId = post.authorUid
   if (authorId === input.uid) throw err('ownReview', 400, 'OWN_REVIEW')
+  if (post.jobReviewQuestionsOpen === false) throw err('questionsClosed', 409, 'QUESTIONS_CLOSED')
 
   const [me, author] = await Promise.all([getSupabaseProfile(input.uid), profileOf(authorId)])
   if (me?.accountType === 'parent') throw pointsErrors.parentNotAllowed()
@@ -329,6 +352,7 @@ export async function askQuestion(input: {
         context,
         hold_id: holdId,
         amount,
+        ...(input.linkedin ? { asker_linkedin: input.linkedin } : {}),
       }),
     })
     notifyReviewQuestion({ kind: 'asked', to: authorId, questionId: id, postId: input.postId, preview: text })

@@ -11,7 +11,8 @@ export const dynamic = 'force-dynamic'
  *   GET ?postId=        → { enabled, count, cost, reward, canAsk, isAuthor, remaining, mine[] } (signed out: count only)
  *   GET ?box=sent|received → { questions[] }
  *   POST { postId, question, topic?, context?, requestKey? } → { question } (30P held; same requestKey → same question)
- *   POST { postId, questions: [{ question, topic?, context?, requestKey? }] (1–3) } → { questions[], failed, question }
+ *   POST { postId, linkedin, questions: [{ question, topic?, context?, requestKey? }] (1–3) } → { questions[], failed, question }
+ *        (linkedin required: 400 LINKEDIN_REQUIRED / LINKEDIN_INVALID; 409 QUESTIONS_CLOSED when the author turned questions off)
  *        (each question its own 30P hold; 409 INSUFFICIENT_POINTS / MONTHLY_CAP checked for the whole send first;
  *         403 PARENT_NOT_ALLOWED for parent accounts)
  */
@@ -42,6 +43,7 @@ export async function POST(request: Request) {
       context?: unknown
       requestKey?: unknown
       questions?: unknown
+      linkedin?: unknown
     }
     // 1.0.7: { postId, questions: [{ question, topic?, context?, requestKey? }] } — 최대 3개, 질문마다 30P 홀드
     if (Array.isArray(body.questions)) {
@@ -49,6 +51,7 @@ export async function POST(request: Request) {
         uid: user.uid,
         postId: String(body.postId || ''),
         items: body.questions.filter((item): item is AskInput => Boolean(item) && typeof item === 'object'),
+        linkedin: body.linkedin,
       })
       return pointsJson({ ...result, question: result.questions[0] ?? null })
     }

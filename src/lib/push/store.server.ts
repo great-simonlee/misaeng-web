@@ -5,8 +5,13 @@ import type { ApnsEnvironment } from './apns.server'
  * Missing tables (SQL not run yet) behave like "nothing stored": reads return empty, writes report not configured.
  */
 
-/** post_recommend / post_save: someone recommended / saved my community post (columns added by supabase/post_saves.sql) */
-export const PUSH_TYPES = ['comment', 'reply', 'posting', 'credit', 'post_recommend', 'post_save'] as const
+/**
+ * post_recommend / post_save: someone recommended / saved my community post (columns added by supabase/post_saves.sql)
+ * job_review: a new interview / job review was posted — to every app user (supabase/push_job_review.sql)
+ */
+export const PUSH_TYPES = ['comment', 'reply', 'posting', 'credit', 'post_recommend', 'post_save', 'job_review'] as const
+/** Columns before push_job_review.sql, for databases where it has not run yet */
+const PRE_JOB_REVIEW_TYPES: readonly PushType[] = ['comment', 'reply', 'posting', 'credit', 'post_recommend', 'post_save']
 /** The columns of the original push.sql, for databases where post_saves.sql has not run yet */
 const LEGACY_PUSH_TYPES: readonly PushType[] = ['comment', 'reply', 'posting', 'credit']
 export type PushType = (typeof PUSH_TYPES)[number]
@@ -27,6 +32,7 @@ const ALL_ON: PushPreferences = {
   credit: true,
   post_recommend: true,
   post_save: true,
+  job_review: true,
 }
 
 function config() {
@@ -115,6 +121,20 @@ export async function listPushDevices(userIds: string[]): Promise<PushDevice[]> 
   return rows ?? []
 }
 
+/** Everyone with at least one app device (broadcasts such as a new job review), paged through PostgREST. */
+export async function listPushUserIds(): Promise<string[]> {
+  const ids = new Set<string>()
+  const page = 1000
+  for (let offset = 0; offset < 200_000; offset += page) {
+    const rows = await rest<{ user_id: string }[]>(
+      `push_devices?select=user_id&user_id=not.is.null&order=user_id&limit=${page}&offset=${offset}`,
+    ).catch(() => null)
+    for (const row of rows ?? []) if (row.user_id) ids.add(row.user_id)
+    if (!rows || rows.length < page) break
+  }
+  return [...ids]
+}
+
 // MARK: preferences
 
 export async function getPushPreferences(userId: string): Promise<PushPreferences> {
@@ -143,12 +163,19 @@ export async function savePushPreferences(userId: string, patch: Partial<PushPre
       prefer: 'resolution=merge-duplicates,return=minimal',
       body: JSON.stringify({ user_id: userId, ...prefs, updated_at: new Date().toISOString() }),
     })
+  const unknownColumn = (error: unknown) =>
+    error instanceof PushStoreError && (error.code === 'PGRST204' || error.code === '42703')
   try {
     await save(next)
   } catch (error) {
-    // Unknown column (post_saves.sql not run yet): save the original switches only.
-    if (!(error instanceof PushStoreError && (error.code === 'PGRST204' || error.code === '42703'))) throw error
-    await save(Object.fromEntries(LEGACY_PUSH_TYPES.map((type) => [type, next[type]])))
+    // Unknown column (push_job_review.sql / post_saves.sql not run yet): save the switches the table has.
+    if (!unknownColumn(error)) throw error
+    try {
+      await save(Object.fromEntries(PRE_JOB_REVIEW_TYPES.map((type) => [type, next[type]])))
+    } catch (again) {
+      if (!unknownColumn(again)) throw again
+      await save(Object.fromEntries(LEGACY_PUSH_TYPES.map((type) => [type, next[type]])))
+    }
   }
   return next
 }

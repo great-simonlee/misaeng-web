@@ -411,6 +411,10 @@
         "title": "Phụ huynh của bạn đã tham gia Misaeng",
         "body": "Phần thưởng mời {amount}P sẽ được trả sau {days} ngày."
       }
+    },
+    "newJobReview": {
+      "title": "Misaeng · Review phỏng vấn & việc làm",
+      "body": "Có review phỏng vấn & việc làm mới!\nHãy hỏi tác giả bất cứ điều gì bạn muốn biết."
     }
   },
   "reviewDocs": {
@@ -525,7 +529,9 @@
       "answerRequired": "Please write an answer.",
       "closed": "This question is already closed.",
       "reportReasonRequired": "Vui lòng nhập lý do báo cáo.",
-      "tooMany": "Bạn có thể gửi tối đa 3 câu hỏi một lần."
+      "tooMany": "Bạn có thể gửi tối đa 3 câu hỏi một lần.",
+      "questionsClosed": "Tác giả không nhận câu hỏi cho bài review này.",
+      "linkedinRequired": "Hãy đính kèm đường dẫn hồ sơ LinkedIn của bạn để gửi câu hỏi."
     },
     "parentNotAllowed": "Tính năng này không dành cho tài khoản phụ huynh."
   },

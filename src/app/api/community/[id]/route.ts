@@ -124,6 +124,8 @@ type UpdateBody = {
   jobReviewSource?: string | null
   jobReviewSourceOrgId?: string | null
   jobReviewOutcome?: string | null
+  jobReviewQuestionsOpen?: boolean | null
+  jobReviewCoffeeChatOpen?: boolean | null
   companyId?: string | null
   roommateLookingFor?: RoommateLookingFor | null
   roommateBudgetMax?: number | null
@@ -615,6 +617,17 @@ export async function PATCH(request: Request, context: RouteContext) {
     jobReviewTips: isJobReview ? jobReviewTips || null : null,
     jobReviewIndustry: isJobReview ? jobReviewIndustry : null,
     jobReviewOutcome: isJobReview ? jobReviewOutcome : null,
+    // 후배 질문·커피챗 받기: 보낸 값만 바꾼다 (예전 앱·웹 수정은 기존 설정 유지)
+    jobReviewQuestionsOpen: isJobReview
+      ? typeof body.jobReviewQuestionsOpen === 'boolean'
+        ? body.jobReviewQuestionsOpen
+        : (existing.jobReviewQuestionsOpen ?? null)
+      : null,
+    jobReviewCoffeeChatOpen: isJobReview
+      ? typeof body.jobReviewCoffeeChatOpen === 'boolean'
+        ? body.jobReviewCoffeeChatOpen
+        : (existing.jobReviewCoffeeChatOpen ?? null)
+      : null,
     companyId: isJobReview
       ? companyResult.companyId === undefined
         ? (existing.companyId ?? null)

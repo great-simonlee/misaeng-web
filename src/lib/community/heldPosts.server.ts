@@ -1,5 +1,6 @@
 import { notifyBoardPostCreated } from '@lib/erp/notifyBoardPost'
 import { notifyJobReviewCreated } from '@lib/erp/notifyJobReview'
+import { notifyNewJobReview } from '@lib/push/newJobReviewNotify.server'
 import { notifyUsers } from '@lib/push/notify.server'
 import {
   deleteStoredCommunityPost,
@@ -48,6 +49,8 @@ export async function publishHeldPosts(uid: string): Promise<PublishHeldResult> 
     }
     void notifyBoardPostCreated(post).catch(() => undefined)
     if (post.categoryId === 'job-review') {
+      // 승인되어 공개된 순간: 앱 사용자 전체에 새 후기 알림 (한 번)
+      notifyNewJobReview({ ...post, pendingApproval: false })
       const source = await getStoredJobReviewSource(post.id).catch(() => null)
       if (source?.source) void notifyJobReviewCreated(post, { source: source.source, orgId: source.orgId }).catch(() => undefined)
     }

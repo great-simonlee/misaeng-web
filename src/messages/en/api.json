@@ -436,6 +436,10 @@
         "title": "Your parent joined Misaeng",
         "body": "Your {amount}P invite reward arrives in {days} days."
       }
+    },
+    "newJobReview": {
+      "title": "Misaeng · Interview & Job Reviews",
+      "body": "A new interview & job review is up!\nAsk the author anything you want to know."
     }
   },
   "reviewDocs": {
@@ -550,7 +554,9 @@
       "answerRequired": "Please write an answer.",
       "closed": "This question is already closed.",
       "reportReasonRequired": "Please enter a reason for the report.",
-      "tooMany": "You can send up to 3 questions at once."
+      "tooMany": "You can send up to 3 questions at once.",
+      "questionsClosed": "The author isn't taking questions on this review.",
+      "linkedinRequired": "Add your LinkedIn profile URL to send a question."
     },
     "parentNotAllowed": "This is not available for parent accounts."
   },

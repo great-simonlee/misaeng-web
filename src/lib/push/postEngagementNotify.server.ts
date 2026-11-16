@@ -51,7 +51,7 @@ async function rest<T>(path: string, init: RequestInit & { prefer?: string } = {
 }
 
 /** Inserts `key`; true only when it did not exist yet (first time). Errors / missing table → false. */
-async function claimFirstTime(key: string): Promise<boolean> {
+export async function claimFirstTime(key: string): Promise<boolean> {
   try {
     const rows = await rest<{ key: string }[]>(`${DEDUPE_TABLE}?on_conflict=key&select=key`, {
       method: 'POST',

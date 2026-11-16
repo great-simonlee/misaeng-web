@@ -410,6 +410,13 @@ export interface CommunityPost extends TranslationFields {
   jobReviewSourceOrgId?: string | null
   /** 면접/취업 후기: 최종 결과 (공개) */
   jobReviewOutcome?: JobReviewOutcomeId | null
+  /**
+   * 면접/취업 후기: 후배들의 커리어 질문(글로 답장, 7일 안)을 받는지. 작성자가 글쓰기 마지막 단계에서 고른다.
+   * 없거나 null이면 받는다 (기본값 = 받기, 이 설정 전에 쓴 후기도 그대로 받음)
+   */
+  jobReviewQuestionsOpen?: boolean | null
+  /** 면접/취업 후기: 이 후기에서 커피챗(30분) 신청을 받는지. 없거나 null이면 받는다 (멘토 등록은 따로 필요) */
+  jobReviewCoffeeChatOpen?: boolean | null
   /** 룸메이트/서블렛: 구하는 유형 */
   roommateLookingFor: RoommateLookingFor | null
   /** 룸메이트/서블렛: 월 예산·월세 (USD) */
