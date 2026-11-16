@@ -1,5 +1,6 @@
 'use client'
 
+import { composerEmoji } from '@widgets/ellieo/nav'
 import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
@@ -803,7 +804,7 @@ function CommunityBoardNewScreen({
 
   if (isFood) {
     return (
-      <BoardPageShell width='narrow'>
+      <BoardPageShell width='narrow' composer={composerEmoji(boardId)}>
         <form
           onSubmit={handleSubmit}
           className='relative pb-8 pt-4 sm:pt-6'

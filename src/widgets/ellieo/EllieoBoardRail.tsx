@@ -85,7 +85,7 @@ function ProfileCard() {
         ) : (
           <span
             aria-hidden
-            className='flex size-12 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#7c5cff,#9b83ff)] text-[17px] font-bold uppercase text-white'
+            className='flex size-12 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#1f5eff,#3d7bff)] text-[17px] font-bold uppercase text-white'
           >
             {displayName.charAt(0)}
           </span>

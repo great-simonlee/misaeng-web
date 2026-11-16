@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { cn } from '@lib'
+import { BRAND_CONFIG } from '@lib/brand'
 import { byBrand } from '@lib/brand/design'
 
 type BoardPageShellProps = {
@@ -11,6 +12,8 @@ type BoardPageShellProps = {
   className?: string
   /** Desktop side rail next to the content (Ellieo passes EllieoBoardRail; Misaeng passes nothing) */
   aside?: ReactNode
+  /** Write screens: board emoji. Ellieo draws its composer layout (emoji header, sticky submit); Misaeng ignores it */
+  composer?: string
 }
 
 /** 목록·상세 공통 페이지 캔버스 */
@@ -19,11 +22,14 @@ export function BoardPageShell({
   width = 'narrow',
   className,
   aside,
+  composer,
 }: BoardPageShellProps) {
+  const ellieoComposer = composer && BRAND_CONFIG.theme === 'ellieo' ? composer : null
   return (
     <div data-ui='canvas' className={cn(byBrand('relative min-h-screen bg-[var(--canvas)]', 'relative min-h-screen bg-white'), className)}>
       <div
         data-shell={width}
+        data-composer={ellieoComposer ? '' : undefined}
         className={cn(
           'relative mx-auto w-full',
           width === 'wide'
@@ -31,6 +37,13 @@ export function BoardPageShell({
             : 'max-w-2xl px-4 sm:px-5',
         )}
       >
+        {ellieoComposer ? (
+          <div aria-hidden className='flex justify-center pt-6'>
+            <span className='flex size-16 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[32px] leading-none'>
+              {ellieoComposer}
+            </span>
+          </div>
+        ) : null}
         {aside ? (
           <div data-ui='shell-grid' className='grid gap-10 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-14'>
             <div className='min-w-0'>{children}</div>

@@ -7,7 +7,7 @@ import { useFormat } from '@lib/i18n/client'
 import { BadgeCheckIcon, CommentIcon, EyeIcon, HeartIcon } from '@widgets/ellieo/icons'
 
 /** Avatar fills when there is no photo: soft tints, ink-friendly */
-const AVATAR_FILLS = ['#7c5cff', '#16b47e', '#e8861a', '#e0579b', '#2a9fd6', '#14121f']
+const AVATAR_FILLS = ['#1f5eff', '#16b47e', '#e8861a', '#e0579b', '#2a9fd6', '#14121f']
 
 function fillFor(text: string): string {
   let hash = 0

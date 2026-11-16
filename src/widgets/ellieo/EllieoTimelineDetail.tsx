@@ -53,7 +53,7 @@ type Step = {
 }
 
 const AVATAR_GRADIENTS = [
-  'linear-gradient(135deg, #7c5cff, #9b83ff)',
+  'linear-gradient(135deg, #1f5eff, #3d7bff)',
   'linear-gradient(135deg, #16b47e, #7fd8b8)',
   'linear-gradient(135deg, #e8861a, #ff5a5f)',
   'linear-gradient(135deg, #7a4cff, #c13584)',

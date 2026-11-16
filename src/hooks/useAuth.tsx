@@ -8,8 +8,11 @@ import {
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from 'react'
+
+import { noopSubscribe, PREVIEW_PROFILE, PREVIEW_USER, readPreviewMember } from '@hooks/designPreview'
 import {
   instagramStateFromProfile,
   type InstagramVerificationState,
@@ -720,8 +723,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext)
+  // Dev-only design preview (designPreview.ts): false on the server and in production builds
+  const preview = useSyncExternalStore(noopSubscribe, readPreviewMember, () => false)
   if (!ctx) {
     throw new Error('useAuth는 AuthProvider 안에서만 사용할 수 있습니다')
   }
-  return ctx
+  if (!preview || ctx.user) return ctx
+  return {
+    ...ctx,
+    loading: false,
+    sessionLoading: false,
+    user: PREVIEW_USER,
+    profile: PREVIEW_PROFILE,
+    displayName: 'linh.tran',
+  }
 }

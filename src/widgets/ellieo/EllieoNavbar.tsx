@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -7,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useEllieoViewer } from '@hooks/useEllieoViewer'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
+import { BRAND_CONFIG } from '@lib/brand'
 import { cityLoginPath } from '@lib/constants/cities'
 import { NYC_CATEGORIES } from '@lib/constants/nyc'
 import { useT } from '@lib/i18n/client'
@@ -110,8 +112,14 @@ export function EllieoNavbar() {
       <header className='fixed inset-x-0 top-0 z-[10000] border-b border-[var(--border)] bg-white'>
         <div className='mx-auto flex h-14 w-full max-w-[63rem] min-w-0 items-center gap-2 px-4 sm:h-16'>
           <Link href={home} className='flex shrink-0 items-center gap-2 touch-manipulation' aria-label={t('homeAria', { city: cityInfo.shortLabel })}>
-            <EllieoMark />
-            <span className='text-[21px] font-extrabold tracking-[-0.04em] text-[var(--foreground)]'>ellieo</span>
+            <Image
+              src={BRAND_CONFIG.assets.banner.src}
+              alt={BRAND_CONFIG.name}
+              width={BRAND_CONFIG.assets.banner.width}
+              height={BRAND_CONFIG.assets.banner.height}
+              className='h-[22px] w-auto sm:h-6'
+              priority
+            />
           </Link>
           <button
             type='button'
@@ -206,7 +214,7 @@ export function EllieoNavbar() {
                     onClick={() => setSheet('compose')}
                     aria-label={t('ellieo.tabs.post')}
                     aria-expanded={sheet === 'compose'}
-                    className='inline-flex size-[3.25rem] -translate-y-1 items-center justify-center rounded-full bg-[var(--ellieo-lime)] text-[var(--foreground)] shadow-[0_8px_20px_-8px_rgba(124,92,255,0.55)] ring-4 ring-white transition hover:scale-[1.04] active:scale-95 lg:translate-y-0 lg:ring-0'
+                    className='inline-flex size-[3.25rem] -translate-y-1 items-center justify-center rounded-full bg-[var(--ellieo-lime)] text-[var(--foreground)] shadow-[0_8px_20px_-8px_rgba(31,94,255,0.45)] ring-4 ring-white transition hover:scale-[1.04] active:scale-95 lg:translate-y-0 lg:ring-0'
                   >
                     <PlusIcon className='size-6' strokeWidth={2.5} />
                   </button>
@@ -316,19 +324,6 @@ export function EllieoNavbar() {
 
       <CitySelectModal open={cityOpen} onClose={() => setCityOpen(false)} currentCity={city} />
     </>
-  )
-}
-
-/** Logo mark: violet rounded square with a lowercase "e" and a lime dot */
-export function EllieoMark({ size = 30 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox='0 0 32 32' aria-hidden>
-      <rect width='32' height='32' rx='10' fill='#7c5cff' />
-      <text x='15' y='22.5' textAnchor='middle' fontSize='20' fontWeight='800' fill='#fff' fontFamily='var(--font-ellieo), system-ui, sans-serif'>
-        e
-      </text>
-      <circle cx='25' cy='7.5' r='3' fill='#c6f432' />
-    </svg>
   )
 }
 

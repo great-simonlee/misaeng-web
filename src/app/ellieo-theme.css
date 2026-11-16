@@ -502,7 +502,7 @@
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: #7c5cff;
+  background: #1f5eff;
   animation: ellieo-hop 0.9s ease-in-out infinite;
 }
 
@@ -589,4 +589,57 @@
 [data-brand='ellieo'] [data-ui='auth-google'] {
   background: #fff;
   border-color: var(--border-muted);
+}
+
+/* =====================================================================
+   Composer (every write screen): emoji header (BoardPageShell composer), centered title,
+   form sections as surface cards, sticky violet submit above the tab bar
+   ===================================================================== */
+[data-brand='ellieo'] [data-composer] h1 {
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+[data-brand='ellieo'] [data-composer] h1 + p {
+  text-align: center;
+}
+
+[data-brand='ellieo'] [data-composer] form {
+  border: 0;
+  background: transparent;
+}
+
+[data-brand='ellieo'] [data-composer] form label {
+  font-weight: 700;
+}
+
+[data-brand='ellieo'] [data-composer] :has(> button[type='submit']) {
+  position: sticky;
+  bottom: calc(var(--bottom-nav-h) + 0.75rem);
+  z-index: 30;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.92);
+  backdrop-filter: blur(10px);
+  padding: 0.375rem;
+  box-shadow: 0 0 0 1px var(--border), 0 12px 28px -14px rgb(20 18 31 / 0.35);
+}
+
+[data-brand='ellieo'] [data-composer] button[type='submit'] {
+  min-height: 3rem;
+  border-radius: 999px;
+  border: 0;
+  background: var(--brand);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+[data-brand='ellieo'] [data-composer] button[type='submit']:hover:not(:disabled) {
+  background: var(--brand-hover);
+}
+
+[data-brand='ellieo'] [data-composer] button[type='submit']:disabled {
+  opacity: 0.45;
 }

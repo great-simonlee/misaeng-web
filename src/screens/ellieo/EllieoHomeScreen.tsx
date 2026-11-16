@@ -120,8 +120,8 @@ const PLATFORM_URL: Record<EllieoCreator['platform'], (handle: string) => string
 }
 
 /** Partners get a blue→jade ring, creators a warm one, so the two kinds read apart at a glance */
-const PARTNER_RING = 'linear-gradient(135deg, #c6f432, #7c5cff)'
-const CREATOR_RING = 'linear-gradient(135deg, #7c5cff, #e0579b)'
+const PARTNER_RING = 'linear-gradient(135deg, #c6f432, #1f5eff)'
+const CREATOR_RING = 'linear-gradient(135deg, #1f5eff, #e0579b)'
 
 function StoriesStrip() {
   const t = useT('hub')

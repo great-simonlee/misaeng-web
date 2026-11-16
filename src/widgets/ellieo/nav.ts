@@ -74,7 +74,7 @@ export const BOARD_EMOJI: Record<NycCategoryId, string> = {
 
 /** Board accent colors (feed tags, rail icons): text on a soft tint of the same hue */
 export const BOARD_TONE: Partial<Record<NycCategoryId, string>> = {
-  status: '#7c5cff',
+  status: '#1f5eff',
   housing: '#16b47e',
   roommate: '#e0579b',
   food: '#e8861a',
@@ -82,4 +82,10 @@ export const BOARD_TONE: Partial<Record<NycCategoryId, string>> = {
   events: '#f0445a',
   anonymous: '#4a4660',
   marketplace: '#2a9fd6',
+}
+
+/** Write screens: emoji for any board id (legacy visa ids → the visa board) */
+export function composerEmoji(boardId: string): string {
+  const id = boardId === 'cpt-opt' || boardId === 'visa' || boardId === 'green-card' ? 'status' : boardId
+  return BOARD_EMOJI[id as NycCategoryId] ?? '✏️'
 }

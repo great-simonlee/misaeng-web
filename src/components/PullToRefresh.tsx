@@ -252,7 +252,7 @@ export function PullToRefresh({
           {BRAND_CONFIG.theme === 'ellieo' ? (
             // Ellieo: the three dots in a white pill (one loader everywhere)
             <div
-              className='flex h-10 items-center rounded-full bg-white px-3.5 shadow-[0_6px_20px_-6px_rgba(124,92,255,0.45)]'
+              className='flex h-10 items-center rounded-full bg-white px-3.5 shadow-[0_6px_20px_-6px_rgba(31,94,255,0.45)]'
               style={{ transform: `scale(${logoScale})` }}
             >
               <EllieoDots />

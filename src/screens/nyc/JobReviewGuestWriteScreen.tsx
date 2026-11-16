@@ -1,5 +1,6 @@
 'use client'
 
+import { composerEmoji } from '@widgets/ellieo/nav'
 import Link from 'next/link'
 import type { FormEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -439,7 +440,7 @@ export function JobReviewGuestWriteScreen() {
   const listHref = href(`/${BOARD_ID}`)
 
   return (
-    <BoardPageShell width='narrow'>
+    <BoardPageShell width='narrow' composer={composerEmoji('job-review')}>
       <div className='pb-16 pt-4 sm:pt-6'>
         <BoardBackLink
           href={listHref}

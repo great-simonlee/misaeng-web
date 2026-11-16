@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -7,7 +8,6 @@ import { useCityInfo, useCityPath } from '@hooks/useCity'
 import { BRAND_CONFIG } from '@lib/brand'
 import { useT } from '@lib/i18n/client'
 import { useSupportConfig } from '@lib/support/client'
-import { EllieoMark } from '@widgets/ellieo/EllieoNavbar'
 import {
   BadgeCheckIcon,
   FlagIcon,
@@ -123,8 +123,13 @@ export function EllieoFooter() {
 
         <div className='flex items-center gap-2'>
           <Link href={href()} className='inline-flex items-center gap-1.5' aria-label={t('homeAria', { city: cityInfo.shortLabel })}>
-            <EllieoMark size={22} />
-            <span className='text-[16px] font-extrabold tracking-[-0.04em]'>ellieo</span>
+            <Image
+              src={BRAND_CONFIG.assets.banner.src}
+              alt={BRAND_CONFIG.name}
+              width={BRAND_CONFIG.assets.banner.width}
+              height={BRAND_CONFIG.assets.banner.height}
+              className='h-5 w-auto'
+            />
           </Link>
         </div>
         <nav aria-label={t('ellieo.legalGroup')} className='mt-3'>

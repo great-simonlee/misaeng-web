@@ -1,5 +1,6 @@
 'use client'
 
+import { BRAND_CONFIG } from '@lib/brand'
 import Link from 'next/link'
 import type { FormEvent } from 'react'
 import { useState } from 'react'
@@ -130,7 +131,17 @@ export function HousingNewScreen() {
 
   return (
     <div className='min-h-screen bg-[var(--background)]'>
-      <div className='mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-12'>
+      <div
+        data-composer={BRAND_CONFIG.theme === 'ellieo' ? '' : undefined}
+        className='mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-12'
+      >
+        {BRAND_CONFIG.theme === 'ellieo' ? (
+          <div aria-hidden className='mb-4 flex justify-center'>
+            <span className='flex size-16 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[32px] leading-none'>
+              🏠
+            </span>
+          </div>
+        ) : null}
         <p className='text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]'>
           <Link href={href('/housing')} className='hover:text-brand'>
             {t('list.title')}

@@ -1,5 +1,6 @@
 'use client'
 
+import { composerEmoji } from '@widgets/ellieo/nav'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { FormEvent, ReactNode } from 'react'
@@ -318,7 +319,7 @@ export function CptOptWriteScreen({
   }
 
   return (
-    <BoardPageShell width='narrow'>
+    <BoardPageShell width='narrow' composer={composerEmoji(boardId)}>
       <div className='pb-16 pt-4 sm:pt-6'>
         <BoardBackLink
           href={
