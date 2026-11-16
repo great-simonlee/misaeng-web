@@ -161,6 +161,11 @@
         "credit": "Ellieo Points",
         "inquiries": "Inquiries & suggestions"
       }
+    },
+    "ellieo": {
+      "short": {
+        "marketplace": "Market"
+      }
     }
   },
   "hub": {

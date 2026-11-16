@@ -349,6 +349,21 @@
       "signup": "Đăng ký miễn phí",
       "haveAccount": "Đã có tài khoản?",
       "login": "Đăng nhập"
+    },
+    "quickNav": {
+      "aria": "Lối tắt",
+      "housing": "Nhà ở",
+      "careers": "Việc làm & Visa",
+      "community": "Cộng đồng",
+      "rent": "Thuê nhà",
+      "roommates": "Ở ghép",
+      "visa": "Kinh nghiệm visa",
+      "interviews": "Review phỏng vấn",
+      "companies": "Công ty",
+      "postings": "Tuyển dụng",
+      "food": "Ăn uống",
+      "market": "Chợ",
+      "ask": "Hỏi đáp"
     }
   },
   "appPrompt": {

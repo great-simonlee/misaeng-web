@@ -349,6 +349,21 @@
       "signup": "Sign up — it's free",
       "haveAccount": "Already a member?",
       "login": "Log in"
+    },
+    "quickNav": {
+      "aria": "Quick links",
+      "housing": "Housing",
+      "careers": "Jobs & Visa",
+      "community": "Community",
+      "rent": "Rent",
+      "roommates": "Roommates & Sublets",
+      "visa": "Visa reviews",
+      "interviews": "Interview reviews",
+      "companies": "Companies",
+      "postings": "Job postings",
+      "food": "Food",
+      "market": "Market",
+      "ask": "Ask & Talk"
     }
   },
   "appPrompt": {

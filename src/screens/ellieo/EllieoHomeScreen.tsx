@@ -1,6 +1,18 @@
 'use client'
 
-import { BellIcon, ChatIcon, GlobeIcon, PencilIcon } from '@widgets/ellieo/icons'
+import {
+  BagIcon,
+  BellIcon,
+  BookIcon,
+  BowlIcon,
+  BriefcaseIcon,
+  BuildingIcon,
+  ChatIcon,
+  HomeIcon,
+  PencilIcon,
+  PlaneIcon,
+  UsersIcon,
+} from '@widgets/ellieo/icons'
 import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -8,6 +20,7 @@ import { useEffect, useState } from 'react'
 import { EllieoDots } from '@components/EllieoDots'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { useEllieoViewer } from '@hooks/useEllieoViewer'
+import { cn } from '@lib'
 import { captureReferralFromLocation } from '@lib/community/referral'
 import { cityLoginPath, hrefForHousingListing } from '@lib/constants/cities'
 import {
@@ -72,14 +85,82 @@ export function EllieoHomeScreen() {
 
 function HomeHero() {
   const { user, loading } = useEllieoViewer()
-  if (loading) {
-    return (
-      <section className='flex min-h-[15rem] items-center justify-center rounded-[1.5rem] bg-[var(--brand-soft)]'>
-        <EllieoDots />
-      </section>
-    )
-  }
-  return user ? <WelcomeCard /> : <GuestHero />
+  // Quick links always on top; visitors also get the sign-up card under them (members: no welcome banner)
+  return (
+    <>
+      <QuickNav />
+      {!loading && !user ? (
+        <div className='mt-4'>
+          <GuestHero />
+        </div>
+      ) : null}
+    </>
+  )
+}
+
+/* ---------- Quick links: every board / sub-tab one tap away (user 11-16) ---------- */
+
+const QUICK_NAV = [
+  {
+    group: 'housing',
+    items: [
+      { key: 'rent', path: '/housing', icon: HomeIcon },
+      { key: 'roommates', path: '/roommate', icon: UsersIcon },
+    ],
+  },
+  {
+    group: 'careers',
+    items: [
+      { key: 'visa', path: '/status', icon: PlaneIcon },
+      { key: 'interviews', path: '/job-review', icon: BookIcon },
+      { key: 'companies', path: '/companies', icon: BuildingIcon },
+      { key: 'postings', path: '/companies/postings', icon: BriefcaseIcon },
+    ],
+  },
+  {
+    group: 'community',
+    items: [
+      { key: 'food', path: '/food', icon: BowlIcon },
+      { key: 'market', path: '/marketplace', icon: BagIcon },
+      { key: 'ask', path: '/anonymous', icon: ChatIcon },
+    ],
+  },
+] as const
+
+function QuickNav() {
+  const t = useT('hub')
+  const href = useCityPath()
+  return (
+    <nav
+      aria-label={t('ellieo.quickNav.aria')}
+      className='rounded-[1.5rem] bg-white px-3 py-4 shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)] sm:px-5'
+    >
+      {QUICK_NAV.map((section, index) => (
+        <section key={section.group} className={cn(index > 0 && 'mt-3 border-t border-[var(--border)] pt-3')}>
+          <h2 className='px-1 text-[12px] font-semibold uppercase tracking-[0.04em] text-[var(--muted)]'>
+            {t(`ellieo.quickNav.${section.group}`)}
+          </h2>
+          <ul className='mt-2 grid grid-cols-4 gap-y-2 sm:flex sm:flex-wrap sm:gap-x-2'>
+            {section.items.map((item) => (
+              <li key={item.key} className='sm:w-[5.75rem]'>
+                <Link
+                  href={href(item.path)}
+                  className='group flex flex-col items-center gap-1.5 rounded-2xl px-0.5 py-1 text-center'
+                >
+                  <span className='inline-flex size-12 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)] transition group-hover:bg-[var(--brand-subtle)]'>
+                    <item.icon className='size-[22px]' />
+                  </span>
+                  <span className='line-clamp-2 text-[12.5px] font-medium leading-tight text-[var(--foreground)]'>
+                    {t(`ellieo.quickNav.${item.key}`)}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </nav>
+  )
 }
 
 /** Logged-out: who you join, what you can do, one white sign-up button, log in under it (user 11-16) */
@@ -122,42 +203,6 @@ function GuestHero() {
           {t('ellieo.guestHero.login')}
         </Link>
       </p>
-    </section>
-  )
-}
-
-/* ---------- Welcome card: what Ellieo is ---------- */
-
-function WelcomeCard() {
-  const t = useT('hub')
-  const href = useCityPath()
-  const city = useCity()
-
-  return (
-    <section className='relative overflow-hidden rounded-[1.75rem] bg-[var(--brand)] px-5 pb-5 pt-5 text-white sm:px-6 sm:pt-6'>
-      <span aria-hidden className='absolute -right-6 -top-8 size-32 rounded-full bg-white/10' />
-      <EllieoIconBadge icon={GlobeIcon} size={56} className='absolute right-6 top-7' />
-      <span className='relative inline-flex rounded-full bg-white/15 px-2.5 py-0.5 text-[12px] font-bold'>
-        ✓ {t('ellieo.hero.eyebrow')}
-      </span>
-      <h2 className='relative mt-3 max-w-[16rem] text-[26px] font-extrabold leading-[1.15] tracking-[-0.03em] sm:max-w-none sm:text-[30px]'>
-        {t('ellieo.hero.title')}
-      </h2>
-      <p className='relative mt-2 max-w-[30rem] text-[14.5px] leading-relaxed text-white/85'>{t('ellieo.hero.body')}</p>
-      <div className='relative mt-4 flex flex-wrap gap-2'>
-        <Link
-          href={`${cityLoginPath(city)}?mode=signup`}
-          className='inline-flex h-11 items-center rounded-full bg-white px-5 text-[15px] font-bold text-[var(--brand)] transition hover:bg-white/90'
-        >
-          {t('ellieo.hero.join')}
-        </Link>
-        <Link
-          href={href('/about')}
-          className='inline-flex h-11 items-center rounded-full bg-white/15 px-5 text-[15px] font-bold text-white transition hover:bg-white/25'
-        >
-          {t('ellieo.hero.cta')}
-        </Link>
-      </div>
     </section>
   )
 }
