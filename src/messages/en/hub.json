@@ -331,7 +331,16 @@
     "detail": {
       "latest": "Latest",
       "updated": "updated {date}"
-    }
+    },
+    "hero": {
+      "eyebrow": "Verified community",
+      "title": "Life in the US, together",
+      "body": "International students and young professionals helping each other with housing, visas, jobs and everyday life. Every member is verified.",
+      "cta": "See our mission",
+      "join": "Join Ellieo"
+    },
+    "listingsStrip": "New listings",
+    "feedEmpty": "No posts yet — be the first to share something."
   },
   "appPrompt": {
     "title": "Misaeng works better in the app",

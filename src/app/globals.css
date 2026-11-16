@@ -46,52 +46,56 @@
   --btn-secondary-hover: #f1f5f9;
 }
 
-/* Ellieo 토큰: 색·글꼴·모서리·그림자. 화면 규칙은 ellieo-theme.css (src/lib/brand의 colors와 같게) */
+/* Ellieo 토큰 (social feed, docs/design/ellieo-social.md): 색·글꼴·모서리·그림자. 화면 규칙은 ellieo-theme.css */
 [data-brand='ellieo'] {
-  /* White canvas everywhere (feed style); --surface is the soft fill for chips, inputs and panels */
   --background: #ffffff;
-  --foreground: #0e1a2f;
-  --surface: #eef1f6;
+  --foreground: #14121f;
+  --canvas: #ffffff;
+  --surface: #f5f4fa;
   --surface-elevated: #ffffff;
-  --border: #dfe4ec;
-  --border-muted: #c9d1dd;
-  --muted: #5b6779;
-  --muted-foreground: #3e4a5c;
-  --navy: #0e1a2f;
-  --navy-light: #1b2a45;
-  --navy-muted: #2c3b57;
-  --brand-rgb: 31 94 255;
-  --brand: #1f5eff;
-  --brand-hover: #1748c7;
-  --brand-deep: #143fb0;
-  --brand-bright: #3d7bff;
-  --brand-soft: #f0f5ff;
-  --brand-subtle: #e2ebff;
-  --btn-secondary-border: #dfe4ec;
-  --btn-secondary-hover: #eef1f6;
-  /* 신뢰 표시 (인증·선입금 없음) */
-  --ellieo-jade: #0b8f6a;
-  --ellieo-jade-soft: #e2f5ee;
-  --ellieo-sun: #f2a516;
-  --ellieo-sun-soft: #fff4dc;
+  --border: #eceaf3;
+  --border-muted: #dcd9e7;
+  --card-ring: #eceaf3;
+  --muted: #8a86a0;
+  --muted-foreground: #4a4660;
+  --navy: #14121f;
+  --navy-light: #2a2640;
+  --navy-muted: #4a4660;
+  --brand-rgb: 124 92 255;
+  --brand: #7c5cff;
+  --brand-hover: #6a48f5;
+  --brand-deep: #5a3be0;
+  --brand-bright: #9b83ff;
+  --brand-soft: #f1edff;
+  --brand-subtle: #e4dcff;
+  --brand-light: #f1edff;
+  --btn-secondary-border: #eceaf3;
+  --btn-secondary-bg: #f5f4fa;
+  --btn-secondary-hover: #eceaf3;
+  --ellieo-lime: #c6f432;
+  --ellieo-lime-soft: #f3fcd6;
+  --ellieo-lime-ink: #2f3d00;
+  --ellieo-danger: #f0445a;
+  --ellieo-success: #16b47e;
+  --ellieo-success-soft: #e3f7ef;
+  /* kept names used by older Ellieo widgets */
+  --ellieo-jade: #16b47e;
+  --ellieo-jade-soft: #e3f7ef;
+  --ellieo-sun: #c6f432;
+  --ellieo-sun-soft: #f3fcd6;
   --font-ellieo-stack: var(--font-ellieo), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  /* Tailwind 모서리·그림자 토큰: Misaeng보다 각지고 그림자 대신 선 */
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.625rem;
-  --radius-2xl: 0.75rem;
-  --radius-3xl: 1rem;
-  --shadow-sm: 0 1px 0 rgb(14 26 47 / 0.04);
-  --shadow-md: 0 1px 0 rgb(14 26 47 / 0.04), 0 0 0 1px rgb(14 26 47 / 0.06);
-  --shadow-lg: 0 12px 28px -18px rgb(14 26 47 / 0.35), 0 0 0 1px rgb(14 26 47 / 0.06);
-  --shadow-xl: 0 18px 40px -20px rgb(14 26 47 / 0.4), 0 0 0 1px rgb(14 26 47 / 0.06);
-  /* 모바일 하단 탭 바 높이 (고정 버튼이 탭 바 위에 뜨게) */
-  --bottom-nav-h: calc(3.75rem + env(safe-area-inset-bottom));
-}
-
-@media (min-width: 64rem) {
-  [data-brand='ellieo'] {
-    --bottom-nav-h: 0px;
-  }
+  /* Tailwind 모서리·그림자 토큰: 크고 둥근 카드, 부드러운 그림자 */
+  --radius-lg: 0.875rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --ellieo-card-shadow: 0 1px 2px rgb(20 18 31 / 0.04), 0 8px 24px -16px rgb(20 18 31 / 0.18);
+  --shadow-sm: 0 1px 2px rgb(20 18 31 / 0.04);
+  --shadow-md: var(--ellieo-card-shadow);
+  --shadow-lg: 0 1px 2px rgb(20 18 31 / 0.04), 0 16px 36px -18px rgb(20 18 31 / 0.25);
+  --shadow-xl: 0 2px 4px rgb(20 18 31 / 0.04), 0 24px 48px -20px rgb(20 18 31 / 0.3);
+  /* 하단 탭 바 높이 (모든 화면 폭). 고정 버튼·시트가 탭 바 위에 뜬다 */
+  --bottom-nav-h: calc(4.25rem + env(safe-area-inset-bottom));
 }
 
 @theme inline {

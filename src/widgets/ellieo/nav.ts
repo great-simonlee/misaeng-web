@@ -60,14 +60,26 @@ export const ELLIEO_BOARDS: EllieoBoard[] = ORDER.map((id) => {
   }
 })
 
+/** Emoji per board (chips, composer, feed tags) */
+export const BOARD_EMOJI: Record<NycCategoryId, string> = {
+  housing: '🏠',
+  status: '🛂',
+  'job-review': '💼',
+  roommate: '🤝',
+  food: '🍜',
+  anonymous: '💬',
+  marketplace: '🛍️',
+  events: '🎉',
+}
+
 /** Board accent colors (feed tags, rail icons): text on a soft tint of the same hue */
 export const BOARD_TONE: Partial<Record<NycCategoryId, string>> = {
-  status: '#1f5eff',
-  housing: '#0b8f6a',
-  roommate: '#7a4cff',
-  food: '#d4870a',
-  'job-review': '#0e1a2f',
-  events: '#d6336c',
-  anonymous: '#5b6779',
-  marketplace: '#12a4c7',
+  status: '#7c5cff',
+  housing: '#16b47e',
+  roommate: '#e0579b',
+  food: '#e8861a',
+  'job-review': '#14121f',
+  events: '#f0445a',
+  anonymous: '#4a4660',
+  marketplace: '#2a9fd6',
 }

@@ -3,13 +3,20 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import { MarqueeRow } from '@components'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { captureReferralFromLocation } from '@lib/community/referral'
+import { cityLoginPath, hrefForHousingListing } from '@lib/constants/cities'
+import {
+  formatListingBedBath,
+  getHousingUnitRent,
+  getListingArea,
+  getListingImages,
+} from '@lib/constants/housingMock'
 import { resolveMergedCommunityBoardId, type NycCategoryId } from '@lib/constants/nyc'
-import type { CommunityPost } from '@/types/nyc'
+import { fetchHousingListings } from '@lib/housing/fetchListings'
+import type { CommunityPost, HousingListing } from '@/types/nyc'
 import { useFormat, useLocale, useT } from '@lib/i18n/client'
-import { BadgeCheckIcon, ChatIcon, HeartIcon } from '@widgets/ellieo/icons'
+import { EllieoBoardTag, EllieoFeedCard, EllieoPersonAvatar } from '@widgets/ellieo/EllieoFeedCard'
 import {
   ELLIEO_CREATORS,
   ELLIEO_PARTNER_ORGS,
@@ -19,8 +26,8 @@ import {
   isMockList,
   type EllieoCreator,
 } from '@widgets/ellieo/mockContent'
-import { EllieoSideRail, FeedHeading, SampleTag, shortSchool } from '@widgets/ellieo/EllieoRail'
-import { BOARD_TONE, ELLIEO_BOARDS } from '@widgets/ellieo/nav'
+import { EllieoSideRail, FeedHeading, RoommatesRail, SampleTag, shortSchool } from '@widgets/ellieo/EllieoRail'
+import { BOARD_EMOJI, ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 
 /**
  * Ellieo city home, social-feed style: a stories strip of partner student associations and creators,
@@ -37,56 +44,59 @@ export function EllieoHomeScreen() {
   }, [])
 
   return (
-    // flex-1: fill the layout's main column so no gray canvas shows above the footer
+    // flex-1: fill the layout's main column above the footer
     <div className='min-w-0 flex-1 bg-white'>
       <h1 className='sr-only'>{t('ellieo.intro.title', { city: cityInfo.shortLabel })}</h1>
-
-      <TopBanner />
-      <StoriesStrip />
-
-      {/* Feed on the left; new listings and roommates/sublets as two separate blocks in the side rail */}
-      <div className='mx-auto grid w-full max-w-7xl gap-10 px-4 pb-2 pt-5 sm:px-6 sm:pt-7 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 lg:px-8'>
-        <CommunityFeed />
-        <EllieoSideRail />
+      {/* One 640px feed column; the side rail (new listings, roommates) joins it from 1280px */}
+      <div className='mx-auto grid w-full max-w-[40rem] gap-8 px-4 pb-4 pt-4 xl:max-w-[63rem] xl:grid-cols-[minmax(0,40rem)_20rem] xl:justify-center'>
+        <div className='min-w-0'>
+          <WelcomeCard />
+          <StoriesStrip />
+          <CommunityFeed />
+        </div>
+        <div className='hidden xl:block'>
+          <div className='sticky top-24'>
+            <EllieoSideRail />
+          </div>
+        </div>
       </div>
     </div>
   )
 }
 
-/* ---------- Top banner: what Ellieo is, as an image above the stories ---------- */
+/* ---------- Welcome card: what Ellieo is ---------- */
 
-/**
- * Banner images live in public/brand/banner/ellieo-banner-{en|vi}-{desktop|mobile}.<ext>.
- * To swap in designer artwork, drop files with the same base names and change BANNER_EXT.
- */
-const BANNER_EXT = 'svg'
-const bannerSrc = (locale: string, size: 'desktop' | 'mobile') =>
-  `/brand/banner/ellieo-banner-${locale === 'vi' ? 'vi' : 'en'}-${size}.${BANNER_EXT}`
-
-/** The whole banner opens the Ellieo intro page (/<city>/about) */
-function TopBanner() {
+function WelcomeCard() {
   const t = useT('hub')
-  const locale = useLocale()
   const href = useCityPath()
+  const city = useCity()
 
   return (
-    <div className='mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 sm:pt-4 lg:px-8'>
-      <Link
-        href={href('/about')}
-        className='block rounded-2xl transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-12px_rgba(31,94,255,0.55)] hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand)]'
-      >
-        <picture>
-          <source media='(max-width: 639px)' srcSet={bannerSrc(locale, 'mobile')} />
-          <img
-            src={bannerSrc(locale, 'desktop')}
-            alt={t('ellieo.banner.alt')}
-            width={1280}
-            height={132}
-            className='block h-auto w-full rounded-2xl'
-          />
-        </picture>
-      </Link>
-    </div>
+    <section className='relative overflow-hidden rounded-[1.75rem] bg-[var(--brand)] px-5 pb-5 pt-5 text-white sm:px-6 sm:pt-6'>
+      <span aria-hidden className='absolute -right-6 -top-8 size-32 rounded-full bg-[var(--ellieo-lime)] opacity-90' />
+      <span aria-hidden className='absolute right-8 top-10 text-[44px] leading-none'>🌏</span>
+      <span className='relative inline-flex rounded-full bg-white/15 px-2.5 py-0.5 text-[12px] font-bold'>
+        ✓ {t('ellieo.hero.eyebrow')}
+      </span>
+      <h2 className='relative mt-3 max-w-[16rem] text-[26px] font-extrabold leading-[1.15] tracking-[-0.03em] sm:max-w-none sm:text-[30px]'>
+        {t('ellieo.hero.title')}
+      </h2>
+      <p className='relative mt-2 max-w-[30rem] text-[14.5px] leading-relaxed text-white/85'>{t('ellieo.hero.body')}</p>
+      <div className='relative mt-4 flex flex-wrap gap-2'>
+        <Link
+          href={`${cityLoginPath(city)}?mode=signup`}
+          className='inline-flex h-11 items-center rounded-full bg-[var(--ellieo-lime)] px-5 text-[15px] font-bold text-[var(--foreground)] transition hover:brightness-95'
+        >
+          {t('ellieo.hero.join')}
+        </Link>
+        <Link
+          href={href('/about')}
+          className='inline-flex h-11 items-center rounded-full bg-white/15 px-5 text-[15px] font-bold text-white transition hover:bg-white/25'
+        >
+          {t('ellieo.hero.cta')}
+        </Link>
+      </div>
+    </section>
   )
 }
 
@@ -109,8 +119,8 @@ const PLATFORM_URL: Record<EllieoCreator['platform'], (handle: string) => string
 }
 
 /** Partners get a blue→jade ring, creators a warm one, so the two kinds read apart at a glance */
-const PARTNER_RING = 'conic-gradient(from 210deg, #1f5eff, #12b5cb, #0b8f6a, #1f5eff)'
-const CREATOR_RING = 'conic-gradient(from 210deg, #f2a516, #ff5a5f, #c13584, #f2a516)'
+const PARTNER_RING = 'linear-gradient(135deg, #c6f432, #7c5cff)'
+const CREATOR_RING = 'linear-gradient(135deg, #7c5cff, #e0579b)'
 
 function StoriesStrip() {
   const t = useT('hub')
@@ -149,9 +159,9 @@ function StoriesStrip() {
   const sample = isMockList(orgs, ELLIEO_PARTNER_ORGS) || isMockList(creators, ELLIEO_CREATORS)
 
   return (
-    <section className='mx-auto w-full max-w-7xl pt-3 sm:pt-4'>
-      <div className='flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-8'>
-        <h2 className='text-[13px] font-semibold text-[var(--muted)]'>
+    <section className='pt-5'>
+      <div className='flex items-center justify-between gap-3'>
+        <h2 className='text-[15px] font-extrabold tracking-[-0.01em] text-[var(--foreground)]'>
           {t('ellieo.stories.title')}
         </h2>
         <div className='flex shrink-0 items-center gap-2'>
@@ -164,23 +174,22 @@ function StoriesStrip() {
           </Link>
         </div>
       </div>
-      {/* Slides by itself; pauses on hover, stops for reduced motion (partner-marquee in globals.css) */}
-      <MarqueeRow className='mt-1 lg:mx-8'>
+      <div className='-mx-4 mt-2 flex gap-1 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
         {stories.map((story) => {
           const inner = (
             <>
-              <span className='rounded-full p-[2px]' style={{ background: story.ring }}>
+              <span className='rounded-full p-[3px]' style={{ background: story.ring }}>
                 <span className='block rounded-full bg-white p-[2px]'>
                   <span
                     aria-hidden
-                    className='flex size-11 items-center justify-center rounded-full text-[12px] font-bold tracking-tight text-white'
+                    className='flex size-14 items-center justify-center rounded-full text-[13px] font-bold tracking-tight text-white'
                     style={{ background: story.color }}
                   >
                     {story.mark}
                   </span>
                 </span>
               </span>
-              <span className='mt-0.5 block w-full truncate text-center text-[11.5px] font-semibold leading-tight text-[var(--foreground)]'>
+              <span className='mt-1 block w-full truncate text-center text-[12px] font-semibold leading-tight text-[var(--foreground)]'>
                 {story.name}
               </span>
               <span className='block w-full truncate text-center text-[10px] leading-tight text-[var(--muted)]'>
@@ -188,7 +197,7 @@ function StoriesStrip() {
               </span>
             </>
           )
-          const itemClass = 'flex w-[5rem] shrink-0 flex-col items-center px-0.5 py-0.5'
+          const itemClass = 'flex w-[4.75rem] shrink-0 flex-col items-center gap-0.5 py-0.5'
           return story.url ? (
             <a
               key={story.id}
@@ -205,14 +214,13 @@ function StoriesStrip() {
             </div>
           )
         })}
-      </MarqueeRow>
+      </div>
     </section>
   )
 }
 
-/* ---------- No feed yet: board shortcuts instead of an empty column ---------- */
+/* ---------- No feed yet: board shortcuts as emoji tiles ---------- */
 
-/** Housing has its own block in the side rail, so the shortcuts start at visa */
 function ExploreBoards() {
   const t = useT('hub')
   const tc = useT('community')
@@ -223,33 +231,73 @@ function ExploreBoards() {
   return (
     <section className='min-w-0'>
       <FeedHeading title={t('ellieo.explore.title')} />
-      <p className='mt-1 text-[13.5px] leading-relaxed text-[var(--muted)]'>
+      <p className='mt-1 text-[14px] leading-relaxed text-[var(--muted-foreground)]'>
         {t('ellieo.explore.subtitle', { city: cityInfo.shortLabel })}
       </p>
-      <ul className='mt-4 grid grid-cols-1 gap-2 min-[480px]:grid-cols-2'>
-        {boards.map((board) => {
-          const Icon = board.icon
-          const tone = BOARD_TONE[board.id] ?? '#5b6779'
+      <ul className='mt-4 grid grid-cols-2 gap-2.5'>
+        {boards.map((board) => (
+          <li key={board.id}>
+            <Link
+              href={href(board.path)}
+              className='flex h-full flex-col gap-2 rounded-[1.25rem] bg-[var(--surface)] p-4 transition hover:bg-[var(--border)]'
+            >
+              <span aria-hidden className='text-[28px] leading-none'>{BOARD_EMOJI[board.id]}</span>
+              <span className='text-[15px] font-bold leading-tight text-[var(--foreground)]'>
+                {tc(`categories.${board.id}.title`)}
+              </span>
+              <span className='line-clamp-2 text-[12.5px] leading-snug text-[var(--muted-foreground)]'>
+                {tc(`categories.${board.id}.description`, { city: cityInfo.shortLabel })}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+/* ---------- New listings strip inside the feed (phones / tablets; the side rail has them from 1280px) ---------- */
+
+function ListingsStrip() {
+  const t = useT('hub')
+  const city = useCity()
+  const href = useCityPath()
+  const format = useFormat()
+  const [listings, setListings] = useState<HousingListing[] | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    void fetchHousingListings(city).then((all) => {
+      if (!cancelled) setListings(all.slice(0, 6))
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [city])
+
+  if (!listings || listings.length === 0) return null
+  return (
+    <section className='xl:hidden'>
+      <FeedHeading size='sm' title={`🏠 ${t('ellieo.listingsStrip')}`} href={href('/housing')} linkLabel={t('ellieo.seeAll')} />
+      <ul className='-mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+        {listings.map((listing) => {
+          const [cover] = getListingImages(listing)
           return (
-            <li key={board.id}>
-              <Link
-                href={href(board.path)}
-                className='group flex min-h-[3.75rem] items-center gap-3 rounded-xl px-3 py-2.5 ring-1 ring-inset ring-[var(--border)] transition hover:bg-[#f8f9fc]'
-              >
-                <span
-                  aria-hidden
-                  className='flex size-10 shrink-0 items-center justify-center rounded-full'
-                  style={{ color: tone, background: `${tone}14` }}
-                >
-                  <Icon className='size-[18px]' />
+            <li key={listing.id} className='w-[13.5rem] shrink-0'>
+              <Link href={hrefForHousingListing(listing)} className='group block rounded-[1.5rem] bg-white p-2 shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)]'>
+                <span className='relative block aspect-[4/3] overflow-hidden rounded-[1.125rem] bg-[var(--surface)]'>
+                  {cover ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- listing photo URL
+                    <img src={cover} alt='' loading='lazy' className='size-full object-cover transition duration-300 group-hover:scale-[1.04]' />
+                  ) : null}
+                  <span className='absolute bottom-2 left-2 rounded-full bg-[var(--ellieo-lime)] px-2.5 py-0.5 text-[13.5px] font-extrabold text-[var(--foreground)]'>
+                    {format.usd(getHousingUnitRent(listing), 0)}
+                    <span className='text-[11px] font-semibold'>{t('ellieo.perMonth')}</span>
+                  </span>
                 </span>
-                <span className='min-w-0 flex-1'>
-                  <span className='block truncate text-[14.5px] font-semibold text-[var(--foreground)] group-hover:text-[var(--brand)]'>
-                    {tc(`categories.${board.id}.title`)}
-                  </span>
-                  <span className='block truncate text-[12.5px] text-[var(--muted)]'>
-                    {tc(`categories.${board.id}.description`, { city: cityInfo.shortLabel })}
-                  </span>
+                <span className='block px-1.5 pb-1 pt-2'>
+                  <span className='block truncate text-[14px] font-bold text-[var(--foreground)]'>{getListingArea(listing)}</span>
+                  <span className='block truncate text-[12.5px] text-[var(--muted)]'>{formatListingBedBath(listing)}</span>
                 </span>
               </Link>
             </li>
@@ -262,32 +310,15 @@ function ExploreBoards() {
 
 /* ---------- Community feed ---------- */
 
-const AVATAR_GRADIENTS = [
-  'linear-gradient(135deg, #1f5eff, #12b5cb)',
-  'linear-gradient(135deg, #0b8f6a, #7fd8b8)',
-  'linear-gradient(135deg, #f2a516, #ff5a5f)',
-  'linear-gradient(135deg, #7a4cff, #c13584)',
-  'linear-gradient(135deg, #e0475b, #f2a516)',
-  'linear-gradient(135deg, #12a4c7, #1f5eff)',
-]
-
-/** Board tag colors in the feed (text on a soft tint of the same hue) */
-
-/** Housing and roommates/sublets have their own blocks in the side rail, so the feed leaves them out */
+/** Housing and roommates/sublets have their own blocks, so the feed leaves them out */
 const FEED_EXCLUDED_BOARDS: readonly NycCategoryId[] = ['housing', 'roommate']
 
 /** Posts at or above this many likes get the Trending tag */
 const TRENDING_LIKES = 40
 
-function gradientFor(text: string): string {
-  let hash = 0
-  for (const char of text) hash = (hash * 31 + char.charCodeAt(0)) >>> 0
-  return AVATAR_GRADIENTS[hash % AVATAR_GRADIENTS.length]
-}
-
 function CommunityFeed() {
   const t = useT('hub')
-  const tc = useT('community')
+  const tn = useT('nav')
   const locale = useLocale()
   const format = useFormat()
   const href = useCityPath()
@@ -295,119 +326,60 @@ function CommunityFeed() {
   const [now] = useState(() => Date.now())
   const feed = useHomeFeed(locale, now)
   const posts = feed.items.filter((post) => !FEED_EXCLUDED_BOARDS.includes(post.board))
-  const [filter, setFilter] = useState<NycCategoryId | 'all'>('all')
-  if (feed.loading) return null
-  if (posts.length === 0) return <ExploreBoards />
+  if (feed.loading) {
+    return (
+      <div className='flex justify-center py-16'>
+        <span className='ellieo-spinner size-8' aria-hidden />
+      </div>
+    )
+  }
 
-  // Chips only for boards that have posts, in the Ellieo board order
-  const boards = ELLIEO_BOARDS.filter((board) => posts.some((post) => post.board === board.id))
-  const visible = filter === 'all' ? posts : posts.filter((post) => post.board === filter)
+  const cards = posts.map((post) => {
+    const board = ELLIEO_BOARDS.find((item) => item.id === post.board)
+    const anonymous = post.board === 'anonymous'
+    const name = anonymous ? t('ellieo.community.anonymous') : post.nickname || '?'
+    return (
+      <li key={post.id}>
+        <EllieoFeedCard
+          href={href(post.path ?? board?.path ?? '/')}
+          avatar={<EllieoPersonAvatar name={name} anonymous={anonymous} />}
+          name={name}
+          verified={!anonymous}
+          meta={[anonymous || !post.school ? null : shortSchool(post.school), format.relative(post.at)].filter(Boolean).join(' · ')}
+          tag={<EllieoBoardTag emoji={BOARD_EMOJI[post.board]} label={tn(`ellieo.short.${post.board}`)} />}
+          badge={
+            post.likes >= TRENDING_LIKES ? (
+              <span className='rounded-full bg-[var(--ellieo-lime)] px-2 py-0.5 text-[11.5px] font-bold text-[var(--foreground)]'>
+                🔥 {t('ellieo.community.trending')}
+              </span>
+            ) : null
+          }
+          title={post.title}
+          excerpt={post.excerpt}
+          likes={post.likes}
+          comments={post.comments}
+        />
+      </li>
+    )
+  })
 
   return (
-    <section className='min-w-0'>
-      <FeedHeading title={t('ellieo.community.title')} aside={feed.sample ? <SampleTag /> : null} />
-
-      {/* Board filter chips */}
-      <div className='-mx-4 mt-3 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden'>
-        <div role='tablist' aria-label={t('ellieo.community.title')} className='flex w-max gap-1.5'>
-          {[
-            { id: 'all' as const, label: t('ellieo.community.all') },
-            ...boards.map((board) => ({ id: board.id, label: tc(`categories.${board.id}.title`) })),
-          ].map((chip) => {
-            const active = filter === chip.id
-            return (
-              <button
-                key={chip.id}
-                type='button'
-                role='tab'
-                aria-selected={active}
-                onClick={() => setFilter(chip.id)}
-                className={
-                  active
-                    ? 'h-8 rounded-full bg-[var(--foreground)] px-3.5 text-[13px] font-semibold text-white'
-                    : 'h-8 rounded-full bg-white px-3.5 text-[13px] font-semibold text-[var(--muted-foreground)] ring-1 ring-inset ring-[var(--border)] transition hover:ring-[var(--border-muted)]'
-                }
-              >
-                {chip.label}
-              </button>
-            )
-          })}
-        </div>
+    <section className='mt-7 min-w-0'>
+      {posts.length === 0 ? (
+        <ExploreBoards />
+      ) : (
+        <>
+          <FeedHeading title={t('ellieo.community.title')} aside={feed.sample ? <SampleTag /> : null} />
+          <ul className='mt-3 flex flex-col gap-3'>{cards.slice(0, 2)}</ul>
+        </>
+      )}
+      <div className='mt-7'>
+        <ListingsStrip />
       </div>
-
-      <ul className='mt-1'>
-        {visible.map((post) => {
-          const board = ELLIEO_BOARDS.find((item) => item.id === post.board)
-          const BoardIcon = board?.icon
-          const tone = BOARD_TONE[post.board] ?? '#5b6779'
-          const anonymous = post.board === 'anonymous'
-          return (
-            <li key={post.id} className='border-b border-[var(--border)] last:border-b-0'>
-              <Link
-                href={href(post.path ?? board?.path ?? '/')}
-                data-ui='hover-row'
-                className='group block py-3.5'
-              >
-                {/* Author line: one row. Anonymous Q&A hides nickname and school, like the board itself (lib/community/anonymous) */}
-                <span className='flex items-center gap-2'>
-                  <span
-                    aria-hidden
-                    className='flex size-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold uppercase text-white'
-                    style={{ background: anonymous ? '#9aa4b2' : gradientFor(post.nickname || '?') }}
-                  >
-                    {anonymous ? '?' : (post.nickname || '?').charAt(0)}
-                  </span>
-                  <span className='flex min-w-0 flex-1 items-center gap-1 text-[12.5px]'>
-                    <span className='truncate font-semibold text-[var(--foreground)]'>
-                      {anonymous ? t('ellieo.community.anonymous') : post.nickname}
-                    </span>
-                    <BadgeCheckIcon className='size-3.5 shrink-0 text-[var(--ellieo-jade)]' />
-                    <span className='truncate text-[var(--muted)]'>
-                      {anonymous || !post.school ? '' : ` · ${shortSchool(post.school)}`} ·{' '}
-                      {format.relative(post.at)}
-                    </span>
-                  </span>
-                  <span
-                    className='inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-1 text-[11.5px] font-semibold sm:px-2 sm:py-0.5'
-                    style={{ color: tone, background: `${tone}14` }}
-                  >
-                    {BoardIcon ? <BoardIcon className='size-3' /> : null}
-                    {/* Phones: icon only, so the nickname has room */}
-                    <span className='sr-only sm:not-sr-only'>
-                      {tc(`categories.${post.board}.title`)}
-                    </span>
-                  </span>
-                </span>
-
-                {/* Body */}
-                <span className='mt-1.5 line-clamp-1 text-[15px] font-bold leading-snug tracking-[-0.01em] text-[var(--foreground)] group-hover:text-[var(--brand)]'>
-                  {post.likes >= TRENDING_LIKES ? (
-                    <span className='mr-1.5 inline-flex -translate-y-px items-center rounded-full bg-[var(--ellieo-sun-soft)] px-1.5 py-px align-middle text-[11px] font-bold text-[#9a6200]'>
-                      {t('ellieo.community.trending')}
-                    </span>
-                  ) : null}
-                  {post.title}
-                </span>
-                <span className='mt-0.5 line-clamp-1 text-[13.5px] leading-relaxed text-[var(--muted)]'>
-                  {post.excerpt}
-                </span>
-
-                {/* Reactions */}
-                <span className='mt-1.5 flex items-center gap-3.5 text-[12.5px] font-medium text-[var(--muted)]'>
-                  <span className='inline-flex items-center gap-1'>
-                    <HeartIcon className='size-4' />
-                    {format.number(post.likes)}
-                  </span>
-                  <span className='inline-flex items-center gap-1'>
-                    <ChatIcon className='size-4' />
-                    {format.number(post.comments)}
-                  </span>
-                </span>
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
+      {posts.length > 2 ? <ul className='mt-7 flex flex-col gap-3 xl:mt-3'>{cards.slice(2)}</ul> : null}
+      <div className='mt-8 xl:hidden'>
+        <RoommatesRail />
+      </div>
     </section>
   )
 }

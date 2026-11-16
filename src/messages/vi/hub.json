@@ -331,7 +331,16 @@
     "detail": {
       "latest": "Mới nhất",
       "updated": "cập nhật {date}"
-    }
+    },
+    "hero": {
+      "eyebrow": "Cộng đồng đã xác minh",
+      "title": "Cùng nhau sống ở Mỹ",
+      "body": "Du học sinh và người đi làm trẻ giúp nhau về nhà ở, visa, việc làm và cuộc sống hằng ngày. Mọi thành viên đều đã xác minh.",
+      "cta": "Xem sứ mệnh",
+      "join": "Tham gia Ellieo"
+    },
+    "listingsStrip": "Tin nhà mới",
+    "feedEmpty": "Chưa có bài viết — hãy là người đầu tiên chia sẻ."
   },
   "appPrompt": {
     "title": "Misaeng tiện hơn trên ứng dụng",

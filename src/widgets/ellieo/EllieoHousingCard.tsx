@@ -26,7 +26,7 @@ import {
 } from '@lib/constants/housingMock'
 import { shouldUnoptimizeHousingImage } from '@lib/housing/fetchListings'
 import { translateListingCardBadges } from '@lib/housing/listing'
-import { useT } from '@lib/i18n/client'
+import { useFormat, useT } from '@lib/i18n/client'
 import type { HousingListing } from '@/types/nyc'
 import { CalendarIcon, PinIcon } from '@widgets/ellieo/icons'
 import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
@@ -43,6 +43,8 @@ export function EllieoHousingCard({
   highlightRoomType?: string | 'all'
 }) {
   const t = useT('housing')
+  const th = useT('hub')
+  const format = useFormat()
   const images = getListingImages(listing)
   const displayAddress = getListingDisplayAddress(listing)
   const area = getListingArea(listing)
@@ -59,8 +61,8 @@ export function EllieoHousingCard({
   )
 
   return (
-    <article className='group flex flex-col'>
-      <div className='relative aspect-[4/3] overflow-hidden rounded-2xl bg-[var(--surface)]'>
+    <article className='group flex flex-col rounded-[1.5rem] bg-white p-2.5 shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)] transition hover:shadow-[0_0_0_1px_var(--border-muted),0_14px_30px_-18px_rgb(20_18_31/0.28)]'>
+      <div className='relative aspect-[4/3] overflow-hidden rounded-[1.125rem] bg-[var(--surface)]'>
         {images.length > 0 ? (
           <div
             ref={galleryRef}
@@ -104,23 +106,29 @@ export function EllieoHousingCard({
         </div>
 
         {images.length > 1 ? (
-          <span className='pointer-events-none absolute bottom-2 right-2 rounded-md bg-[rgb(14_26_47/0.7)] px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-white'>
+          <span className='pointer-events-none absolute bottom-2.5 right-2.5 rounded-full bg-[rgb(20_18_31/0.6)] px-2 py-0.5 text-[11px] font-semibold tabular-nums text-white'>
             {activeIndex + 1}/{images.length}
           </span>
         ) : null}
+
+        {/* Lime price tag over the photo */}
+        <span className='pointer-events-none absolute bottom-2.5 left-2.5 rounded-full bg-[var(--ellieo-lime)] px-3 py-1 text-[15px] font-extrabold tracking-[-0.01em] text-[var(--foreground)]'>
+          {format.usd(unitRent, 0)}
+          <span className='text-[12px] font-semibold'>{th('ellieo.perMonth')}</span>
+        </span>
       </div>
 
-      <div className='flex flex-1 flex-col pt-3'>
+      <div className='flex flex-1 flex-col px-1.5 pb-1.5 pt-3'>
         {badges.length > 0 ? (
           <div className='mb-2 flex flex-wrap gap-1'>
             {badges.map((badge, index) => (
               <span
                 key={badge.key}
                 className={cn(
-                  'inline-flex items-center rounded-[6px] px-1.5 py-0.5 text-[12px] font-semibold',
+                  'inline-flex items-center rounded-full px-2.5 py-0.5 text-[12px] font-semibold',
                   index === 0
-                    ? 'bg-[var(--ellieo-jade-soft)] text-[var(--ellieo-jade)]'
-                    : 'bg-[var(--ellieo-sun-soft)] text-[#8a5800]',
+                    ? 'bg-[var(--ellieo-success-soft)] text-[#0d7a55]'
+                    : 'bg-[var(--brand-soft)] text-[var(--brand-deep)]',
                 )}
               >
                 {badge.label}
@@ -130,8 +138,7 @@ export function EllieoHousingCard({
         ) : null}
 
         <Link href={detailHref} className='block min-w-0 touch-manipulation'>
-          <HousingPricePair gross={unitRent} net={unitNet} size='lg' align='start' layout='row' />
-          <h3 className='mt-1 flex min-w-0 items-center gap-1.5 text-[15px] font-semibold text-[var(--foreground)]'>
+          <h3 className='flex min-w-0 items-center gap-1.5 text-[16px] font-bold tracking-[-0.01em] text-[var(--foreground)]'>
             <span className='min-w-0 truncate'>{displayAddress}</span>
             <SchoolBadge schoolId={listing.authorSchoolId} />
           </h3>
@@ -141,6 +148,11 @@ export function EllieoHousingCard({
               <span className='truncate'>{area}</span>
             </span>
             <span>{formatListingBedBath(listing)}</span>
+            {unitNet && unitNet !== unitRent ? (
+              <span className='font-semibold text-[var(--foreground)]'>
+                {t('price.net')} {format.usd(unitNet, 0)}
+              </span>
+            ) : null}
             <span className='inline-flex items-center gap-1'>
               <CalendarIcon className='size-3.5 shrink-0' />
               {t('card.moveIn', {
@@ -151,7 +163,7 @@ export function EllieoHousingCard({
         </Link>
 
         {showOptionRows ? (
-          <ul className='mt-3 divide-y divide-[var(--border)] overflow-hidden rounded-xl bg-[var(--surface)]/60'>
+          <ul className='mt-3 divide-y divide-white overflow-hidden rounded-2xl bg-[var(--surface)]'>
             {roomRows.map((room, index) => {
               const key = getRoomSelectionKey(room, index)
               const highlighted = highlightRoomType !== 'all' && room.type === highlightRoomType

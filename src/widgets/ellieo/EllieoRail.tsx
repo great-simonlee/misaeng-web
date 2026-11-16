@@ -97,8 +97,8 @@ export function RoommatesRail() {
                 <span
                   className={
                     post.kind === 'sublet'
-                      ? 'rounded-full bg-[var(--ellieo-sun-soft)] px-2 py-px text-[11px] font-bold text-[#9a6200]'
-                      : 'rounded-full bg-[#7a4cff14] px-2 py-px text-[11px] font-bold text-[#7a4cff]'
+                      ? 'rounded-full bg-[var(--ellieo-lime)] px-2 py-px text-[11px] font-bold text-[var(--foreground)]'
+                      : 'rounded-full bg-[var(--brand-soft)] px-2 py-px text-[11px] font-bold text-[var(--brand-deep)]'
                   }
                 >
                   {t(`ellieo.roommates.${post.kind}`)}
@@ -182,7 +182,7 @@ export function FeedHeading({
 export function SampleTag({ short = false }: { short?: boolean }) {
   const t = useT('hub')
   return (
-    <span className='whitespace-nowrap rounded-full bg-[var(--ellieo-sun-soft)] px-2.5 py-0.5 text-[12px] font-semibold text-[#9a6200]'>
+    <span className='whitespace-nowrap rounded-full bg-[var(--ellieo-lime-soft)] px-2.5 py-0.5 text-[12px] font-semibold text-[var(--ellieo-lime-ink)]'>
       {t(short ? 'ellieo.sampleShort' : 'ellieo.sampleData')}
     </span>
   )

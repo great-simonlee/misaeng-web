@@ -7,7 +7,7 @@ import { Be_Vietnam_Pro } from 'next/font/google'
  */
 export const beVietnamPro = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
   // 한 코드베이스라 Misaeng 빌드에도 이 모듈이 들어간다. Misaeng 첫 화면에 Ellieo 글꼴 preload가 붙지 않게 끈다.
   preload: false,

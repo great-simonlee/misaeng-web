@@ -67,7 +67,10 @@
       "housing": "Nhà ở",
       "boards": "Chuyên mục",
       "jobs": "Việc làm",
-      "me": "Tôi"
+      "me": "Tôi",
+      "explore": "Khám phá",
+      "post": "Đăng",
+      "inbox": "Hộp thư"
     },
     "join": "Tham gia Ellieo",
     "comingSoon": "Sắp ra mắt",
@@ -87,6 +90,26 @@
       "reportTitle": "Xử lý báo cáo trong {hours} giờ",
       "reportBody": "Báo cáo bất cứ điều gì đáng ngờ, đội ngũ của chúng tôi sẽ kiểm tra và phản hồi."
     },
-    "language": "Ngôn ngữ"
+    "language": "Ngôn ngữ",
+    "compose": {
+      "title": "Bạn muốn đăng gì?",
+      "subtitle": "Chọn một chuyên mục. Thành viên đã xác minh có thể đăng bài, bình luận và nhắn tin.",
+      "housing": "Đăng tin nhà"
+    },
+    "explore": {
+      "title": "Khám phá",
+      "boards": "Chuyên mục",
+      "more": "Thêm trên Ellieo",
+      "companies": "Công ty",
+      "postings": "Tin tuyển dụng",
+      "partners": "Đối tác",
+      "about": "Về Ellieo",
+      "points": "Hướng dẫn điểm",
+      "inquiries": "Hỏi đáp & góp ý"
+    },
+    "notifications": "Hộp thư",
+    "login": "Đăng nhập",
+    "close": "Đóng",
+    "boardsAria": "Chuyên mục"
   }
 }

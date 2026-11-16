@@ -68,7 +68,10 @@
       "housing": "Housing",
       "boards": "Boards",
       "jobs": "Jobs",
-      "me": "Me"
+      "me": "Me",
+      "explore": "Explore",
+      "post": "Post",
+      "inbox": "Inbox"
     },
     "join": "Join Ellieo",
     "comingSoon": "Coming soon",
@@ -88,6 +91,26 @@
       "reportTitle": "Reports reviewed within {hours} hours",
       "reportBody": "Report anything suspicious and our team will review it and follow up."
     },
-    "language": "Language"
+    "language": "Language",
+    "compose": {
+      "title": "What do you want to post?",
+      "subtitle": "Pick a board. Verified members can post, comment and message.",
+      "housing": "List a place"
+    },
+    "explore": {
+      "title": "Explore",
+      "boards": "Boards",
+      "more": "More on Ellieo",
+      "companies": "Companies",
+      "postings": "Job postings",
+      "partners": "Partners",
+      "about": "About Ellieo",
+      "points": "Points guide",
+      "inquiries": "Inquiries & suggestions"
+    },
+    "notifications": "Inbox",
+    "login": "Log in",
+    "close": "Close",
+    "boardsAria": "Boards"
   }
 }

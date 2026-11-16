@@ -179,3 +179,48 @@ export const MenuIcon = (p: IconProps) => (
     <path d='M4 7h16M4 12h16M4 17h16' />
   </Base>
 )
+
+export const CompassIcon = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx='12' cy='12' r='8.5' />
+    <path d='m15.5 8.5-2 5-5 2 2-5 5-2Z' />
+  </Base>
+)
+
+export const BellIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M6.5 10a5.5 5.5 0 0 1 11 0c0 4.5 2 6 2 6h-15s2-1.5 2-6Z' />
+    <path d='M10 19a2 2 0 0 0 4 0' />
+  </Base>
+)
+
+export const InboxIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M4.5 6.5A2.5 2.5 0 0 1 7 4h10a2.5 2.5 0 0 1 2.5 2.5v8A2.5 2.5 0 0 1 17 17h-6.5L6 20.5V17h0a2.5 2.5 0 0 1-1.5-2.3v-8.2Z' />
+  </Base>
+)
+
+export const PlusIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M12 5v14M5 12h14' />
+  </Base>
+)
+
+export const ChevronRightIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='m9 6 6 6-6 6' />
+  </Base>
+)
+
+export const CommentIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M20 12a7.5 7.5 0 0 1-11.2 6.5L4 20l1.5-4.6A7.5 7.5 0 1 1 20 12Z' />
+  </Base>
+)
+
+export const EyeIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z' />
+    <circle cx='12' cy='12' r='2.75' />
+  </Base>
+)

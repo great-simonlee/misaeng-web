@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -8,6 +7,7 @@ import { useCityInfo, useCityPath } from '@hooks/useCity'
 import { BRAND_CONFIG } from '@lib/brand'
 import { useT } from '@lib/i18n/client'
 import { useSupportConfig } from '@lib/support/client'
+import { EllieoMark } from '@widgets/ellieo/EllieoNavbar'
 import {
   BadgeCheckIcon,
   FlagIcon,
@@ -84,109 +84,74 @@ export function EllieoFooter() {
     .filter((item): item is string => Boolean(item))
     .map((item) => item.replace(/\.$/, ''))
 
+  const links = [...support, ...legal]
+
   return (
-    <footer className='mt-auto bg-white pt-4 text-[var(--foreground)]'>
-      {/* Trust: quiet, light panel. Who runs Ellieo, then the three commitments. Home only */}
-      {isHome ? (
-        <div className='mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <section className='grid gap-4 rounded-2xl border border-[var(--border)] bg-[#f8f9fc] px-4 py-5 sm:gap-6 sm:px-7 sm:py-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] lg:gap-10'>
-            {/* Phones: shield beside the headline; lg+: stacked */}
-            <div className='flex min-w-0 items-start gap-3 lg:block'>
-              <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-[var(--navy)] text-white sm:size-10'>
-                <ShieldCheckIcon className='size-5' />
-              </span>
-              <div className='min-w-0'>
-                <h2 className='text-[15px] font-bold tracking-[-0.01em] text-[var(--foreground)] sm:text-[16px] lg:mt-3'>
-                  {t('ellieo.trust.headline')}
-                </h2>
-                {trust.operator ? (
-                  <p className='mt-1 text-[13px] leading-relaxed text-[var(--muted)]'>
-                    {t('ellieo.trust.subline', {
-                      company: trust.operator.name,
-                      city: trust.operator.city,
-                    })}
-                  </p>
-                ) : null}
-              </div>
+    <footer className='mt-auto bg-white pb-6 pt-8 text-[var(--foreground)]'>
+      <div className='mx-auto w-full max-w-[40rem] px-4'>
+        {/* Trust: three promises as small cards, home only */}
+        {isHome ? (
+          <section aria-label={t('ellieo.trust.headline')} className='mb-8 rounded-[1.5rem] bg-[var(--brand-soft)] p-5'>
+            <div className='flex items-center gap-2'>
+              <ShieldCheckIcon className='size-5 text-[var(--brand)]' />
+              <h2 className='text-[17px] font-extrabold tracking-[-0.02em]'>{t('ellieo.trust.headline')}</h2>
             </div>
-            {/* Phones: compact rows (icon left); sm+: three columns */}
-            <ul className='grid gap-3.5 sm:grid-cols-3 sm:gap-8'>
-              {trustItems.map(({ icon: Icon, title, body }) => (
-                <li key={title} className='flex min-w-0 gap-3 sm:block'>
-                  <span className='inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--navy)] sm:size-9'>
-                    <Icon className='size-4 sm:size-[18px]' />
-                  </span>
-                  <div className='min-w-0'>
-                    <p className='text-[13.5px] font-semibold text-[var(--foreground)] sm:mt-2.5 sm:text-[14px]'>
-                      {title}
-                    </p>
-                    <p className='mt-0.5 text-[12.5px] leading-relaxed text-[var(--muted)] sm:mt-1 sm:text-[13px]'>
-                      {body}
-                    </p>
-                  </div>
-                </li>
-              ))}
+            <p className='mt-1 text-[13.5px] leading-snug text-[var(--muted-foreground)]'>
+              {t('ellieo.trust.subline', {
+                company: trust.operator?.name ?? 'Misaeng LLC',
+                city: trust.operator?.city ?? 'New York',
+              })}
+            </p>
+            <ul className='mt-4 grid gap-2'>
+              {trustItems.map((item) => {
+                const Icon = item.icon
+                return (
+                  <li key={item.title} className='flex gap-3 rounded-[1.125rem] bg-white p-3.5'>
+                    <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--ellieo-lime)] text-[var(--foreground)]'>
+                      <Icon className='size-[18px]' />
+                    </span>
+                    <span className='min-w-0'>
+                      <span className='block text-[14px] font-bold'>{item.title}</span>
+                      <span className='mt-0.5 block text-[13px] leading-snug text-[var(--muted-foreground)]'>{item.body}</span>
+                    </span>
+                  </li>
+                )
+              })}
             </ul>
           </section>
-        </div>
-      ) : null}
+        ) : null}
 
-      {/* Compact: logo + contact, one row of links, one legal line */}
-      <div className='mx-auto w-full max-w-7xl px-4 pb-6 pt-6 sm:px-6 lg:px-8'>
-        <div className='flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-[var(--border)] pt-5'>
-          <Link
-            href={href()}
-            className='inline-flex items-center'
-            aria-label={t('homeAria', { city: cityInfo.shortLabel })}
-          >
-            <Image
-              src={BRAND_CONFIG.assets.banner.src}
-              alt={BRAND_CONFIG.name}
-              width={BRAND_CONFIG.assets.banner.width}
-              height={BRAND_CONFIG.assets.banner.height}
-              className='h-[18px] w-auto'
-            />
-            {trust.registeredMark ? (
-              <sup className='ml-0.5 self-start text-[8px] font-semibold text-[var(--muted)]'>
-                ®
-              </sup>
-            ) : null}
+        <div className='flex items-center gap-2'>
+          <Link href={href()} className='inline-flex items-center gap-1.5' aria-label={t('homeAria', { city: cityInfo.shortLabel })}>
+            <EllieoMark size={22} />
+            <span className='text-[16px] font-extrabold tracking-[-0.04em]'>ellieo</span>
           </Link>
-          <nav
-            aria-label={t('ellieo.legalGroup')}
-            className='grid w-full grid-cols-2 gap-x-4 gap-y-1 text-[13px] sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-y-1.5'
-          >
-            {[...support, ...legal].map((item) =>
-              /^(https?:|mailto:)/.test(item.href) ? (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className='py-1 text-[var(--muted-foreground)] transition hover:text-[var(--brand)] sm:py-0'
-                >
-                  {item.label}
-                </a>
-              ) : (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className='py-1 text-[var(--muted-foreground)] transition hover:text-[var(--brand)] sm:py-0'
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className='col-span-2 inline-flex items-center gap-1 py-1 font-semibold text-[var(--foreground)] hover:text-[var(--brand)] sm:py-0'
-            >
-              <MailIcon className='size-3.5' />
-              {CONTACT_EMAIL}
-            </a>
-          </nav>
         </div>
-        <p className='mt-3 text-[11.5px] leading-relaxed text-[var(--muted)]'>
-          {legalLine.join(' · ')}
-        </p>
+        <nav aria-label={t('ellieo.legalGroup')} className='mt-3'>
+          <ul className='flex flex-wrap gap-x-4 gap-y-2 text-[13px] font-medium text-[var(--muted-foreground)]'>
+            {links.map((item) => (
+              <li key={item.href}>
+                {/^(https?:|mailto:)/.test(item.href) ? (
+                  <a href={item.href} className='transition hover:text-[var(--foreground)]'>
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link href={item.href} className='transition hover:text-[var(--foreground)]'>
+                    {item.label}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <a
+          href={`mailto:${CONTACT_EMAIL}`}
+          className='mt-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--brand)]'
+        >
+          <MailIcon className='size-4' />
+          {CONTACT_EMAIL}
+        </a>
+        <p className='mt-3 text-[12px] leading-relaxed text-[var(--muted)]'>{legalLine.join(' · ')}</p>
       </div>
     </footer>
   )
