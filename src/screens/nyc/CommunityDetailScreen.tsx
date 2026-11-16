@@ -246,8 +246,11 @@ export function CommunityDetailScreen({
   const metaBits = [
     // CPT/OPT posts no longer show the employer; older posts keep it stored.
     !isCptOpt && post.location && {
-      // The form label says "(optional)"; on a filled-in post that suffix is noise
-      label: t(communityBoardKey(boardId, 'locationLabel')).replace(/\s*[(（][^)）]*[)）]\s*$/, ''),
+      // Ellieo: the form label says "(optional)"; on a filled-in post that suffix is noise. Misaeng unchanged.
+      label:
+        BRAND_CONFIG.theme === 'ellieo'
+          ? t(communityBoardKey(boardId, 'locationLabel')).replace(/\s*[(（][^)）]*[)）]\s*$/, '')
+          : t(communityBoardKey(boardId, 'locationLabel')),
       value: post.location,
     },
     post.detail &&
