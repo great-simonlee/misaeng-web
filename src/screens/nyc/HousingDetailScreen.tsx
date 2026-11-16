@@ -311,7 +311,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
   return (
     <PullToRefresh onRefresh={refreshListing}>
     <BoardPageShell width='wide'>
-      <article className='pb-16 pt-5 sm:pb-20 sm:pt-7'>
+      <article data-ui='housing-detail' className='pb-16 pt-5 sm:pb-20 sm:pt-7'>
         <BoardBackLink
           href={href('/housing')}
           label={t('detail.backToList')}
@@ -351,13 +351,6 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                 </div>
               )}
 
-              {BRAND_CONFIG.theme === 'ellieo' && getListingUnitRent(listing) ? (
-                // Ellieo: white price tag (ink text) on the photo
-                <span className='pointer-events-none absolute bottom-3 left-3 z-10 rounded-full bg-white tabular-nums px-3.5 py-1.5 shadow-[0_2px_8px_-2px_rgb(20_18_31/0.25)] text-[18px] font-extrabold tracking-[-0.01em] text-[var(--foreground)]'>
-                  ${getListingUnitRent(listing).toLocaleString('en-US')}
-                  <span className='text-[13px] font-semibold'>{t('ellieoPerMonth')}</span>
-                </span>
-              ) : null}
 
               <div className='absolute right-3 top-3 z-10 sm:right-4 sm:top-4'>
                 <PostLikeButton

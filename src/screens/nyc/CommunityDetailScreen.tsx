@@ -246,7 +246,8 @@ export function CommunityDetailScreen({
   const metaBits = [
     // CPT/OPT posts no longer show the employer; older posts keep it stored.
     !isCptOpt && post.location && {
-      label: t(communityBoardKey(boardId, 'locationLabel')),
+      // The form label says "(optional)"; on a filled-in post that suffix is noise
+      label: t(communityBoardKey(boardId, 'locationLabel')).replace(/\s*[(（][^)）]*[)）]\s*$/, ''),
       value: post.location,
     },
     post.detail &&
