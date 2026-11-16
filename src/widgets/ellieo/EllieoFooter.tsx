@@ -92,30 +92,20 @@ export function EllieoFooter() {
     <footer className='mt-auto bg-white pb-6 pt-8 text-[var(--foreground)]'>
       <div className='mx-auto w-full max-w-[40rem] px-4'>
         {/* Trust: three promises as small cards, home only */}
+        {/* Trust: compact list, phones/tablets on Home (desktop has it in the right column) */}
         {isHome ? (
-          <section aria-label={t('ellieo.trust.headline')} className='mb-8 rounded-[1.5rem] bg-[var(--brand-soft)] p-5 lg:hidden'>
-            <div className='flex items-center gap-2'>
-              <ShieldCheckIcon className='size-5 text-[var(--brand)]' />
-              <h2 className='text-[17px] font-extrabold tracking-[-0.02em]'>{t('ellieo.trust.headline')}</h2>
-            </div>
-            <p className='mt-1 text-[13.5px] leading-snug text-[var(--muted-foreground)]'>
-              {t('ellieo.trust.subline', {
-                company: trust.operator?.name ?? 'Misaeng LLC',
-                city: trust.operator?.city ?? 'New York',
-              })}
-            </p>
-            <ul className='mt-4 grid gap-2'>
+          <section aria-label={t('ellieo.trust.headline')} className='mb-6 border-y border-[var(--border)] py-3 lg:hidden'>
+            <h2 className='flex items-center gap-1.5 text-[13px] font-semibold text-[var(--foreground)]'>
+              <ShieldCheckIcon className='size-4 text-[var(--brand)]' />
+              {t('ellieo.trust.headline')}
+            </h2>
+            <ul className='mt-2 space-y-1.5'>
               {trustItems.map((item) => {
                 const Icon = item.icon
                 return (
-                  <li key={item.title} className='flex gap-3 rounded-[1.125rem] bg-white p-3.5'>
-                    <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]'>
-                      <Icon className='size-[18px]' />
-                    </span>
-                    <span className='min-w-0'>
-                      <span className='block text-[14px] font-bold'>{item.title}</span>
-                      <span className='mt-0.5 block text-[13px] leading-snug text-[var(--muted-foreground)]'>{item.body}</span>
-                    </span>
+                  <li key={item.title} className='flex items-center gap-2 text-[12.5px] text-[var(--muted-foreground)]'>
+                    <Icon className='size-3.5 shrink-0 text-[var(--brand)]' />
+                    {item.title}
                   </li>
                 )
               })}

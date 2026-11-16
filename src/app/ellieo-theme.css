@@ -941,9 +941,33 @@
   display: none;
 }
 
+/* v4: no blue hero on Jobs / Companies — a plain white block with the stats line and a simple search input */
 [data-brand='ellieo'] [data-ui='hero-panel'] {
-  border-radius: 1rem;
-  padding: 1rem;
+  border-radius: 0;
+  padding: 0.75rem 0 0;
+  background: transparent !important;
+  color: var(--foreground);
+  box-shadow: none;
+}
+
+[data-brand='ellieo'] [data-ui='hero-panel'] :is(.text-white, [class*='text-white\/']) {
+  color: var(--muted-foreground);
+}
+
+[data-brand='ellieo'] [data-ui='hero-panel'] input {
+  height: 2.75rem;
+  border-radius: 0.5rem;
+  background: var(--surface);
+}
+
+[data-brand='ellieo'] [data-ui='hero-panel'] div:has(> input) {
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+[data-brand='ellieo'] [data-ui='hero-panel'] .mt-5 {
+  margin-top: 0.75rem;
 }
 
 /* =====================================================================
@@ -1028,4 +1052,8 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.625rem;
+}
+
+[data-brand='ellieo'] [data-ui='hero-panel'] [data-ui='hero-stat-accent'] {
+  color: var(--foreground);
 }
