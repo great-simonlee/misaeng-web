@@ -15,6 +15,9 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 - Web: `public/brand/ellieo-banner.png` (house mark + ELLIEO wordmark), favicon `public/brand/ellieo-favicon.ico`,
   square `public/img/ellieo_logo.png`. App icon: `public/img/ellieo_app_icon.png` (white house mark on blue
   gradient). Do not draw a new logo.
+- Square brand spots (login card icon, "official website" rows, join cards, team avatars, empty states): the
+  **app icon image** as a rounded tile (~22% radius), never the blue outline house on white. The horizontal
+  house+ELLIEO banner is only for top bar / footer wordmark spots.
 
 ## Tokens
 
@@ -29,7 +32,7 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 | brand (Ellieo blue) | `#1F5EFF` | brand: links, active tab, primary buttons, verified mark (user 11-16: keep Ellieo's own color) |
 | brand-hover | `#1748C7` | |
 | brand-soft | `#EEF3FF` | tinted backgrounds, badges |
-| lime | `#C6F432` | highlight: FAB (+), "New" badges, selected-state underline, price tags; text on lime is ink |
+| lime (accent, confirmed 11-16) | `#C6F432` | highlight: FAB (+), "New" badges, selected-state underline, price tags; text on lime is ink |
 | lime-soft | `#F3FCD6` | |
 | danger | `#F0445A` | likes (filled heart), errors |
 | success | `#16B47E` | "No broker fee", verified ok |
@@ -40,6 +43,15 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 - Shadow: cards `0 1px 2px rgba(20,18,31,.04), 0 8px 24px -16px rgba(20,18,31,.18)` + 1px `line` border.
   No hard shadows, no gradients except the lime→brand blue ring on story avatars.
 - Spacing: 16px page gutter on phones; feed cards 12px apart; card padding 16px (phones) / 20px (≥640px).
+
+### Color rules (blue main + lime accent, confirmed 11-16)
+
+- Split-complementary pair (blue ~223°, lime ~76°): high energy, still harmonious.
+- Contrast: white on blue ≈ 5.1:1 (AA) · ink on lime ≈ 14.5:1 · blue vs lime ≈ 4:1 (large shapes only) ·
+  lime on white ≈ 1.3:1 → **never lime text on white**, never blue text on lime or lime text on blue.
+- Proportions: white 60–70% · ink/grays 20–30% · blue ~10% · lime ≤5% (FAB, price tags, New badges, one dot).
+- Keep white or ink between large blue and lime areas (both are highly saturated and vibrate when they touch).
+- Roles: blue = things you tap (buttons, links, active tab, verified); lime = things that must catch the eye.
 
 ## Layout
 
