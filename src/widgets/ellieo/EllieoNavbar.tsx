@@ -18,13 +18,12 @@ import { CitySelectModal } from '@widgets/nyc/CitySelectModal'
 import { EllieoSheet } from '@widgets/ellieo/EllieoSheet'
 import {
   BellIcon,
+  BriefcaseIcon,
   ChevronDownIcon,
-  ChevronRightIcon,
-  CompassIcon,
   HomeIcon,
-  InboxIcon,
+  KeyIcon,
+  PassportIcon,
   PlusIcon,
-  UserIcon,
 } from '@widgets/ellieo/icons'
 import { BOARD_EMOJI, ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 
@@ -48,11 +47,10 @@ export function EllieoNavbar() {
   const cityInfo = useCityInfo()
   const href = useCityPath()
   const t = useT('nav')
-  const tc = useT('community')
   const { user, loading, avatarURL, displayName, isMisaengUser } = useEllieoViewer()
   const supportConfig = useSupportConfig()
   const [cityOpen, setCityOpen] = useState(false)
-  const [sheet, setSheet] = useState<'compose' | 'explore' | null>(null)
+  const [sheet, setSheet] = useState<'compose' | null>(null)
   const [accountOpen, setAccountOpen] = useState(false)
   const accountRef = useRef<HTMLDivElement>(null)
 
@@ -87,7 +85,6 @@ export function EllieoNavbar() {
   const gated = (target: string) => (signedIn ? target : cityLoginPath(city, target))
   const loginHref = cityLoginPath(city, pathname)
   const inboxHref = href('/me/inquiries')
-  const meHref = href('/me')
   const accountLinks = [
     ...ACCOUNT_LINKS,
     ...(supportConfig?.inquiries ? [{ path: '/me/inquiries', key: 'inquiries', exact: false } as const] : []),
@@ -99,12 +96,18 @@ export function EllieoNavbar() {
     postHref: href(NYC_CATEGORIES.find((item) => item.id === board.id)!.postHref),
   }))
 
+  const housingHref = href('/housing')
+  const visaHref = href('/status')
+  const jobsHref = href('/job-review')
+  const companiesHref = href('/companies')
+  // Visa: the merged board and its legacy routes (cpt-opt, visa, green-card redirect there)
+  const visaActive = ['/status', '/cpt-opt', '/visa', '/green-card'].some((path) => isActive(href(path)))
   const tabs = [
     { key: 'home', label: t('ellieo.tabs.home'), icon: HomeIcon, href: home, active: pathname === home },
-    { key: 'explore', label: t('ellieo.tabs.explore'), icon: CompassIcon, onClick: () => setSheet('explore'), active: sheet === 'explore' },
+    { key: 'housing', label: t('ellieo.tabs.housing'), icon: KeyIcon, href: housingHref, active: isActive(housingHref) },
     { key: 'post' },
-    { key: 'inbox', label: t('ellieo.tabs.inbox'), icon: InboxIcon, href: gated(inboxHref), active: isActive(inboxHref) },
-    { key: 'me', label: t('ellieo.tabs.me'), icon: UserIcon, href: gated(meHref), active: pathname === meHref || (isActive(meHref) && !isActive(inboxHref)) },
+    { key: 'visa', label: t('ellieo.short.status'), icon: PassportIcon, href: visaHref, active: visaActive },
+    { key: 'jobs', label: t('ellieo.tabs.jobs'), icon: BriefcaseIcon, href: jobsHref, active: isActive(jobsHref) || isActive(companiesHref) },
   ] as const
 
   return (
@@ -234,15 +237,9 @@ export function EllieoNavbar() {
             )
             return (
               <li key={tab.key}>
-                {'href' in tab ? (
-                  <Link href={tab.href} aria-current={tab.active ? 'page' : undefined} className={className}>
-                    {body}
-                  </Link>
-                ) : (
-                  <button type='button' onClick={tab.onClick} aria-expanded={tab.active} className={className}>
-                    {body}
-                  </button>
-                )}
+                <Link href={tab.href} aria-current={tab.active ? 'page' : undefined} className={className}>
+                  {body}
+                </Link>
               </li>
             )
           })}
@@ -277,50 +274,6 @@ export function EllieoNavbar() {
         </ul>
       </EllieoSheet>
 
-      <EllieoSheet open={sheet === 'explore'} onClose={closeSheet} title={t('ellieo.explore.title')} closeLabel={t('ellieo.close')}>
-        <p className='text-[12px] font-bold uppercase tracking-[0.04em] text-[var(--muted)]'>{t('ellieo.explore.boards')}</p>
-        <ul className='mt-2 grid gap-1'>
-          {boards.map((board) => (
-            <li key={board.id}>
-              <Link
-                href={href(board.path)}
-                className='flex items-center gap-3 rounded-2xl px-2 py-2.5 transition hover:bg-[var(--surface)]'
-              >
-                <span aria-hidden className='inline-flex size-10 items-center justify-center rounded-full bg-[var(--surface)] text-[20px]'>
-                  {BOARD_EMOJI[board.id]}
-                </span>
-                <span className='min-w-0 flex-1'>
-                  <span className='block text-[15px] font-bold text-[var(--foreground)]'>{tc(`categories.${board.id}.title`)}</span>
-                </span>
-                <ChevronRightIcon className='size-4 text-[var(--muted)]' />
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <p className='mt-5 text-[12px] font-bold uppercase tracking-[0.04em] text-[var(--muted)]'>{t('ellieo.explore.more')}</p>
-        <ul className='mt-2 flex flex-wrap gap-2'>
-          {[
-            { label: t('ellieo.explore.companies'), path: '/companies' },
-            { label: t('ellieo.explore.postings'), path: '/companies/postings' },
-            { label: t('ellieo.explore.partners'), path: '/partners' },
-            { label: t('ellieo.explore.points'), path: '/credit' },
-            { label: t('ellieo.explore.about'), path: '/about' },
-          ].map((item) => (
-            <li key={item.path}>
-              <Link
-                href={href(item.path)}
-                className='inline-flex h-9 items-center rounded-full bg-[var(--surface)] px-3.5 text-[14px] font-semibold text-[var(--foreground)] transition hover:bg-[var(--border)]'
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <div className='mt-5 flex items-center justify-between rounded-2xl bg-[var(--surface)] px-4 py-3 sm:hidden'>
-          <span className='text-[14px] font-bold text-[var(--foreground)]'>{t('ellieo.language')}</span>
-          <LanguageMenu variant='segmented' />
-        </div>
-      </EllieoSheet>
 
       <CitySelectModal open={cityOpen} onClose={() => setCityOpen(false)} currentCity={city} />
     </>

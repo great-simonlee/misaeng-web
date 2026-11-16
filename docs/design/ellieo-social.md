@@ -61,9 +61,12 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 - **Board chips row** under the top bar on home and board lists, horizontally scrollable, emoji + label:
   🏠 Housing · 🛂 Visa · 💼 Jobs · 🤝 Roommates · 🍜 Food · 💬 Ask & Talk · 🛍️ Marketplace · 🎉 Events.
   Selected = ink pill with white text; others = surface pill.
-- **Bottom tab bar** on every width: Home · Explore · (+) · Inbox · Me. The (+) is a 52px lime circle with an ink
-  plus, raised; it opens a "What do you want to post?" sheet listing the boards with emoji. Active tab = brand blue
-  icon + label; others muted. On ≥1024px the bar is a floating white pill (max 440px wide) centered at the bottom.
+- **Bottom tab bar** on every width (user 11-16): **Home · Housing · (+) · Visa · Jobs**. No Inbox / Me / Explore
+  tabs — inbox (bell) and profile (avatar) live in the top bar; other boards (Roommates, Food, Ask & Talk,
+  Marketplace, Events) are reached from the emoji chips. Jobs = interview reviews + companies + postings. The (+) is
+  a 52px lime circle with an ink plus, raised; it opens a "What do you want to post?" sheet listing the boards with
+  emoji. Active tab = brand blue icon + label; others muted. On ≥1024px the bar is a floating white pill (max 440px
+  wide) centered at the bottom.
 - **Desktop**: one centered feed column, **max 640px**. Optional right rail (≥1280px, 320px) for "Join" card,
   trending posts. No left sidebar, no wide grids except housing photos (2 columns inside the 640 column is OK at
   ≥640px... keep 1 column on phones).

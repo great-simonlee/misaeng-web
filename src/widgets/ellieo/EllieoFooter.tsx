@@ -1,5 +1,6 @@
 'use client'
 
+import { LanguageMenu } from '@widgets/LanguageMenu'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -156,6 +157,10 @@ export function EllieoFooter() {
           <MailIcon className='size-4' />
           {CONTACT_EMAIL}
         </a>
+        <div className='mt-4 flex items-center gap-3 sm:hidden'>
+          <span className='text-[13px] font-semibold text-[var(--muted-foreground)]'>{t('ellieo.language')}</span>
+          <LanguageMenu variant='segmented' />
+        </div>
         <p className='mt-3 text-[12px] leading-relaxed text-[var(--muted)]'>{legalLine.join(' · ')}</p>
       </div>
     </footer>
