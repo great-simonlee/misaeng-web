@@ -383,6 +383,7 @@ export function CommunityDetailScreen({
                       {metaBits.map((item) => (
                         <div
                           key={`${item.label}-${item.value}`}
+                          data-ui='detail-fact'
                           className='rounded-xl bg-white/80 px-3.5 py-2.5 ring-1 ring-black/[0.04]'
                         >
                           <p className='text-[11px] font-medium text-[var(--muted)]'>
@@ -397,7 +398,7 @@ export function CommunityDetailScreen({
                   )}
                 </div>
 
-                <div lang={translated.lang} className='px-5 py-6 sm:px-8 sm:py-8'>
+                <div lang={translated.lang} data-ui='detail-body' className='px-5 py-6 sm:px-8 sm:py-8'>
                   <CommunityRichBody html={bodyHtml} />
                 </div>
 

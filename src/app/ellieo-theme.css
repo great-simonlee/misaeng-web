@@ -1057,3 +1057,44 @@
 [data-brand='ellieo'] [data-ui='hero-panel'] [data-ui='hero-stat-accent'] {
   color: var(--foreground);
 }
+
+/* v4 board post detail: dense portal style — fact boxes become a hairline table, author row flat */
+[data-brand='ellieo'] [data-ui='post-detail'] [data-ui='detail-fact'] {
+  border-radius: 0;
+  background: transparent;
+  --tw-ring-color: transparent;
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 0;
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  align-items: baseline;
+}
+
+[data-brand='ellieo'] [data-ui='post-detail'] [data-ui='detail-fact'] > p {
+  margin: 0;
+  font-size: 0.84375rem;
+}
+
+[data-brand='ellieo'] [data-ui='post-detail'] [data-ui='detail-fact'] > p:first-child {
+  color: var(--muted-foreground);
+  font-weight: 400;
+}
+
+[data-brand='ellieo'] [data-ui='post-detail'] .sm\:grid-cols-2:has(> [data-ui='detail-fact']) {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+[data-brand='ellieo'] [data-ui='post-detail'] [data-ui='detail-body'] {
+  padding: 1rem 0;
+  font-size: 0.9375rem;
+}
+
+[data-brand='ellieo'] [data-ui='post-detail'] [data-ui='post-footer'] {
+  border-radius: 0;
+  border-width: 1px 0;
+  border-color: var(--border);
+  background: transparent;
+  padding: 0.75rem 0;
+}
