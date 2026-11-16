@@ -339,7 +339,14 @@ export function CommunityDetailScreen({
           ) : (
             <>
               <BoardSurface as='article' className='overflow-hidden'>
-                <div className='border-b border-black/[0.04] bg-gradient-to-b from-white to-[#fafbfc] px-5 py-5 sm:px-8 sm:py-7'>
+                <div
+                  className={
+                    // Ellieo: no tinted header band; the title block sits on the same white as the body
+                    BRAND_CONFIG.theme === 'ellieo'
+                      ? 'bg-white px-5 pb-1 pt-5 sm:px-8 sm:pt-7'
+                      : 'border-b border-black/[0.04] bg-gradient-to-b from-white to-[#fafbfc] px-5 py-5 sm:px-8 sm:py-7'
+                  }
+                >
                   <div className='flex flex-wrap items-center gap-2'>
                     <BoardMetaChip tone={tone}>{title}</BoardMetaChip>
                     {anonymous ? (

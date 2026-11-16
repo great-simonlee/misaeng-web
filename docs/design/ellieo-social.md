@@ -37,7 +37,7 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 | danger | `#F0445A` | likes (filled heart), errors |
 | success | `#16B47E` | "No broker fee", verified ok |
 
-- Font: **Be Vietnam Pro** (OFL; Vietnamese diacritics). Weights 400/500/600/700/800. Titles 700–800, tight
+- Font: **Inter** (variable, latin + vietnamese; user 11-16). Body 400, labels 500–600, titles 600–700 (no 800), tight
   tracking (-0.02em). Body 15–16px, line-height 1.55 (Vietnamese tone marks need room).
 - Radius: cards **24px**, photos inside cards 18px, chips/buttons full pill, inputs 16px, sheets 28px top.
 - Shadow: cards `0 1px 2px rgba(20,18,31,.04), 0 8px 24px -16px rgba(20,18,31,.18)` + 1px `line` border.

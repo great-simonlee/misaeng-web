@@ -8,7 +8,7 @@ import { BRAND, BRAND_CONFIG } from '@lib/brand'
 import { LocaleProvider } from '@lib/i18n/client'
 import type { Locale } from '@lib/i18n/locales'
 import type { MessageTree } from '@lib/i18n/translate'
-import { beVietnamPro } from '@lib/fonts/ellieo'
+import { ellieoInter } from '@lib/fonts/ellieo'
 import { pretendard } from '@lib/fonts/pretendard'
 import { SiteFooter } from '@widgets/SiteFooter'
 import { PreferredLocaleSync } from '@widgets/PreferredLocaleSync'
@@ -16,7 +16,7 @@ import { SiteHeader } from '@widgets/SiteHeader'
 import { SiteMain } from '@widgets/SiteMain'
 
 /** Ellieo만 Be Vietnam Pro를 내려받는다. Misaeng은 Pretendard 그대로 */
-const brandFontVariable = BRAND_CONFIG.theme === 'ellieo' ? beVietnamPro.variable : ''
+const brandFontVariable = BRAND_CONFIG.theme === 'ellieo' ? ellieoInter.variable : ''
 
 /**
  * 회사 페이지·도시 서비스 두 루트 layout이 같이 쓰는 문서 뼈대.

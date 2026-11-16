@@ -383,7 +383,7 @@ function ListingsStrip() {
                     // eslint-disable-next-line @next/next/no-img-element -- listing photo URL
                     <img src={cover} alt='' loading='lazy' className='size-full object-cover transition duration-300 group-hover:scale-[1.04]' />
                   ) : null}
-                  <span className='absolute bottom-2 left-2 rounded-full bg-white px-2.5 py-0.5 shadow-[0_2px_8px_-2px_rgb(20_18_31/0.25)] text-[13.5px] font-extrabold text-[var(--foreground)]'>
+                  <span className='absolute bottom-2 left-2 rounded-full bg-white px-2.5 py-0.5 tabular-nums shadow-[0_2px_8px_-2px_rgb(20_18_31/0.25)] text-[13.5px] font-extrabold text-[var(--foreground)]'>
                     {format.usd(getHousingUnitRent(listing), 0)}
                     <span className='text-[11px] font-semibold'>{t('ellieo.perMonth')}</span>
                   </span>
