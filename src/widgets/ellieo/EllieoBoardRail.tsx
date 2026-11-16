@@ -1,6 +1,7 @@
 'use client'
 
 import { EllieoAppIcon } from '@widgets/ellieo/EllieoAppIcon'
+import { EllieoCityCard, EllieoSafetyCard } from '@widgets/ellieo/EllieoSidebarCards'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -32,9 +33,11 @@ function boardKey(categoryId: string): string {
  */
 export function EllieoBoardRail() {
   return (
-    <aside className='flex min-w-0 flex-col gap-8'>
+    <aside className='flex min-w-0 flex-col gap-6'>
+      <EllieoCityCard />
       <ProfileCard />
       <PopularPosts />
+      <EllieoSafetyCard />
     </aside>
   )
 }

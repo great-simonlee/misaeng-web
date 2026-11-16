@@ -184,6 +184,8 @@
     "joinRow": "Tham gia cộng đồng sinh viên & người đi làm đã xác minh tại {city}",
     "signUp": "Đăng ký",
     "sidebarHome": "Trang chủ",
-    "partners": "Đối tác & nhà sáng tạo"
+    "partners": "Đối tác & nhà sáng tạo",
+    "cityCardTitle": "Thành phố của bạn",
+    "cityCardBody": "Bài viết, tin nhà và cộng đồng tại {city} ({regions})."
   }
 }

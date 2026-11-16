@@ -185,6 +185,8 @@
     "joinRow": "Join verified students & pros in {city}",
     "signUp": "Sign up",
     "sidebarHome": "Home",
-    "partners": "Partners & creators"
+    "partners": "Partners & creators",
+    "cityCardTitle": "Your city",
+    "cityCardBody": "Posts, listings and boards for {city} ({regions})."
   }
 }

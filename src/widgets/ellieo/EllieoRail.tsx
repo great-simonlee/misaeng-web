@@ -1,5 +1,6 @@
 'use client'
 
+import { EllieoCityCard, EllieoSafetyCard } from '@widgets/ellieo/EllieoSidebarCards'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -23,9 +24,11 @@ const HOUSING_PREVIEW_COUNT = 4
 /** The rail itself; `hideRoommates` on the roommate board (its own list is the page) */
 export function EllieoSideRail({ hideRoommates = false }: { hideRoommates?: boolean }) {
   return (
-    <aside className='flex min-w-0 flex-col gap-9'>
+    <aside className='flex min-w-0 flex-col gap-7'>
+      <EllieoCityCard />
       <NewListingsRail />
       {hideRoommates ? null : <RoommatesRail />}
+      <EllieoSafetyCard />
     </aside>
   )
 }

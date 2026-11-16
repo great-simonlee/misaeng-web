@@ -93,7 +93,7 @@ export function EllieoFooter() {
       <div className='mx-auto w-full max-w-[40rem] px-4'>
         {/* Trust: three promises as small cards, home only */}
         {isHome ? (
-          <section aria-label={t('ellieo.trust.headline')} className='mb-8 rounded-[1.5rem] bg-[var(--brand-soft)] p-5'>
+          <section aria-label={t('ellieo.trust.headline')} className='mb-8 rounded-[1.5rem] bg-[var(--brand-soft)] p-5 lg:hidden'>
             <div className='flex items-center gap-2'>
               <ShieldCheckIcon className='size-5 text-[var(--brand)]' />
               <h2 className='text-[17px] font-extrabold tracking-[-0.02em]'>{t('ellieo.trust.headline')}</h2>
