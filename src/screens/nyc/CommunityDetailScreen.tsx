@@ -265,6 +265,7 @@ export function CommunityDetailScreen({
         aside={BRAND_CONFIG.theme === 'ellieo' && !isFood ? <EllieoBoardRail /> : undefined}
       >
         <div
+          data-ui='post-detail'
           className={
             isFood
               ? 'pb-16 pt-0 sm:pb-20 sm:pt-6 lg:pt-8'
