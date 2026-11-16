@@ -89,6 +89,11 @@ export function EllieoNavbar() {
     }
   }, [accountOpen])
 
+  const stripRef = useRef<HTMLUListElement>(null)
+  // Keep the selected category visible in the sideways strip
+  useEffect(() => {
+    stripRef.current?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: 'nearest', inline: 'center' })
+  }, [pathname])
   const closeCompose = useCallback(() => setComposeOpen(false), [])
   const closeCity = useCallback(() => setCityOpen(false), [])
   const isActive = (target: string) => pathname === target || pathname.startsWith(`${target}/`)
@@ -268,7 +273,7 @@ export function EllieoNavbar() {
         {/* Phones/tablets: category text strip (sticky with the header) */}
         {showStrip ? (
           <nav aria-label={t('ellieo.categoriesAria')} className='border-b border-[var(--border)] bg-white lg:hidden'>
-            <ul className='flex overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+            <ul ref={stripRef} className='flex overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
               {showAll ? tab('all', onHome, home, 'strip') : null}
               {stripKeys.map((key) => tab(key, current?.key === key, href(communityByKey(key).path), 'strip'))}
             </ul>

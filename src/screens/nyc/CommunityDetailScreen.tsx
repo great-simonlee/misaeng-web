@@ -28,7 +28,6 @@ import {
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { BRAND_CONFIG } from '@lib/brand'
-import { EllieoCommunityAvatar } from '@widgets/ellieo/EllieoCommunityAvatar'
 import { communityForBoard } from '@widgets/ellieo/communities'
 import { useT } from '@lib/i18n/client'
 import type { CommunityPost } from '@/types/nyc'
@@ -286,11 +285,9 @@ export function CommunityDetailScreen({
                 fromCompany
                   ? fromCompany.name
                   : ellieoCommunity
-                    ? tNav(`ellieo.communities.${ellieoCommunity.key}.name`)
+                    ? tNav(`ellieo.cat.${ellieoCommunity.key}`)
                     : t('detail.backToList', { board: title })
               }
-              // Ellieo: "‹ (avatar) e/Community" header row (docs/design/ellieo-community.md)
-              leading={!fromCompany && ellieoCommunity ? <EllieoCommunityAvatar community={ellieoCommunity} size={20} /> : undefined}
               className={isCptOpt || isJobReview ? 'mb-4 px-1 sm:px-0' : 'mb-4'}
             />
           ) : null}
