@@ -80,6 +80,9 @@
       "intro": {
         "body": "Thông tin visa, việc làm, ăn uống và sự kiện từ du học sinh và người đi làm ở New York, tất cả ở một nơi."
       }
+    },
+    "appPrompt": {
+      "title": "Ellieo tiện hơn trên ứng dụng"
     }
   },
   "api": {
@@ -307,7 +310,30 @@
       "review": "Đánh giá phỏng vấn & việc làm trên Ellieo 💼",
       "company": "Một công ty được chia sẻ trên Ellieo 🏢",
       "postings": "Tin tuyển dụng được chia sẻ trên Ellieo 📋",
-      "memberOnly": "Dành cho thành viên Ellieo."
+      "memberOnly": "Dành cho thành viên Ellieo.",
+      "posting": "Một tin tuyển dụng được chia sẻ từ Ellieo! 📋",
+      "marketplace": "Một món đồ trên chợ Ellieo! 🛍️"
+    },
+    "appHandoff": {
+      "openApp": "Mở trong ứng dụng Ellieo",
+      "open": {
+        "title": "Dùng Ellieo tiện hơn trên ứng dụng"
+      },
+      "coffeeChat": {
+        "title": "Đăng ký coffee chat trên ứng dụng Ellieo"
+      },
+      "ask": {
+        "title": "Đặt câu hỏi trên ứng dụng Ellieo"
+      },
+      "follow": {
+        "title": "Nhận thông báo tin tuyển dụng mới trên ứng dụng Ellieo"
+      },
+      "inquiry": {
+        "title": "Hỏi về căn hộ này trên ứng dụng Ellieo"
+      },
+      "message": {
+        "title": "Gửi tin nhắn trên ứng dụng Ellieo"
+      }
     }
   },
   "housing": {
@@ -350,5 +376,16 @@
       "appInquiryBody": "Gửi câu hỏi của bạn tới đội ngũ nhà ở của Ellieo.",
       "orKakao": "Hoặc gửi email cho chúng tôi."
     }
+  },
+  "companies": {
+    "postings": {
+      "shared": {
+        "openInAppFull": "Xem toàn bộ tin trong ứng dụng Ellieo",
+        "teaserNote": "Yêu cầu, điểm cộng, mẹo ứng tuyển và link tin gốc có trong ứng dụng Ellieo."
+      }
+    }
+  },
+  "consent": {
+    "reconsentDeclineBody": "Bạn cần đồng ý với điều khoản mới để sử dụng {brand} khi đã đăng nhập. Bạn vẫn có thể xem bài viết khi đã đăng xuất và đồng ý khi đăng nhập lại. Để xóa tài khoản, hãy truy cập ellieo.com/account-deletion."
   }
 }

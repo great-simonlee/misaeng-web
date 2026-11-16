@@ -81,6 +81,9 @@
       "intro": {
         "body": "Visa, job, food, and event info from students and professionals in New York, all in one place."
       }
+    },
+    "appPrompt": {
+      "title": "Ellieo works better in the app"
     }
   },
   "api": {
@@ -307,7 +310,30 @@
       "review": "An interview & job review shared on Ellieo 💼",
       "company": "A company shared on Ellieo 🏢",
       "postings": "Job postings shared on Ellieo 📋",
-      "memberOnly": "For Ellieo members."
+      "memberOnly": "For Ellieo members.",
+      "posting": "A job posting shared from Ellieo! 📋",
+      "marketplace": "A Ellieo marketplace listing! 🛍️"
+    },
+    "appHandoff": {
+      "openApp": "Open in the Ellieo app",
+      "open": {
+        "title": "Ellieo works better in the app"
+      },
+      "coffeeChat": {
+        "title": "Request coffee chats in the Ellieo app"
+      },
+      "ask": {
+        "title": "Ask questions in the Ellieo app"
+      },
+      "follow": {
+        "title": "Get new posting alerts in the Ellieo app"
+      },
+      "inquiry": {
+        "title": "Ask about this listing in the Ellieo app"
+      },
+      "message": {
+        "title": "Send messages in the Ellieo app"
+      }
     }
   },
   "housing": {
@@ -350,5 +376,16 @@
       "appInquiryBody": "Send your question to the Ellieo housing team.",
       "orKakao": "Or email us."
     }
+  },
+  "companies": {
+    "postings": {
+      "shared": {
+        "openInAppFull": "See the full posting in the Ellieo app",
+        "teaserNote": "Qualifications, preferred skills, apply tips and the original posting link are in the Ellieo app."
+      }
+    }
+  },
+  "consent": {
+    "reconsentDeclineBody": "You need to agree to the updated terms to use {brand} signed in. You can still browse posts signed out, and agree whenever you sign in again. To delete your account, go to ellieo.com/account-deletion."
   }
 }
