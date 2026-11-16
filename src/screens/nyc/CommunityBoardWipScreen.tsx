@@ -9,7 +9,8 @@ import { communityBoardKey, type NycCommunityBoardId } from '@lib/constants/nyc'
 import { useT } from '@lib/i18n/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { EmptyState } from '@widgets/nyc/EmptyState'
-import { composerEmoji } from '@widgets/ellieo/nav'
+import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
+import { boardIcon } from '@widgets/ellieo/nav'
 
 interface CommunityBoardWipScreenProps {
   boardId: NycCommunityBoardId
@@ -40,9 +41,7 @@ export function CommunityBoardWipScreen({
       <BoardPageShell>
         <section className='pb-14 pt-6'>
           <div className='flex flex-col items-center rounded-[1.75rem] bg-[var(--surface)] px-6 py-12 text-center'>
-            <span aria-hidden className='flex size-20 items-center justify-center rounded-full bg-white text-[40px] leading-none shadow-[var(--ellieo-card-shadow)]'>
-              {composerEmoji(boardId)}
-            </span>
+            <EllieoIconBadge icon={boardIcon(boardId)} />
             <span className='mt-5 rounded-full bg-[var(--ellieo-lime)] px-3 py-1 text-[12px] font-bold text-[var(--foreground)]'>
               {t('wip.title')}
             </span>
@@ -62,7 +61,7 @@ export function CommunityBoardWipScreen({
                 href={href('/food')}
                 className='inline-flex h-12 items-center rounded-full bg-white px-6 text-[15px] font-bold text-[var(--foreground)] transition hover:bg-[var(--border)]'
               >
-                🍜 {t('categories.food.title')}
+                {t('categories.food.title')}
               </Link>
             </div>
           </div>

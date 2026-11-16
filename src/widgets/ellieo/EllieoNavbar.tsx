@@ -1,5 +1,6 @@
 'use client'
 
+import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -23,9 +24,11 @@ import {
   HomeIcon,
   KeyIcon,
   PassportIcon,
+  GlobeIcon,
   PlusIcon,
+  StarIcon,
 } from '@widgets/ellieo/icons'
-import { BOARD_EMOJI, ELLIEO_BOARDS } from '@widgets/ellieo/nav'
+import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 
 /** Account links (labels: nav.account.<key>) */
 const ACCOUNT_LINKS = [
@@ -94,8 +97,8 @@ export function EllieoNavbar() {
   ].map((item) => ({ ...item, href: href(item.path), label: t(`account.${item.key}`) }))
   // Pages that lived in the Explore sheet: points guide and the Ellieo intro
   const extraLinks = [
-    { href: href('/credit'), label: `⭐ ${t('ellieo.menu.points')}` },
-    { href: href('/about'), label: t('ellieo.menu.about') },
+    { href: href('/credit'), label: t('ellieo.menu.points'), icon: StarIcon },
+    { href: href('/about'), label: t('ellieo.menu.about'), icon: GlobeIcon },
   ]
   const boards = ELLIEO_BOARDS.filter((board) => board.available)
   const composeBoards = boards.map((board) => ({
@@ -205,10 +208,11 @@ export function EllieoNavbar() {
                         href={item.href}
                         role='menuitem'
                         className={cn(
-                          'flex h-10 items-center rounded-xl px-2.5 text-[14px] font-medium transition hover:bg-[var(--surface)]',
+                          'flex h-10 items-center gap-2 rounded-xl px-2.5 text-[14px] font-medium transition hover:bg-[var(--surface)]',
                           isActive(item.href) ? 'font-bold text-[var(--brand)]' : 'text-[var(--foreground)]',
                         )}
                       >
+                        <item.icon className='size-[18px] text-[var(--muted-foreground)]' />
                         {item.label}
                       </Link>
                     ))}
@@ -289,7 +293,7 @@ export function EllieoNavbar() {
                 }}
                 className='flex w-full flex-col items-start gap-2 rounded-[1.25rem] bg-[var(--surface)] p-4 text-left transition hover:bg-[var(--border)]'
               >
-                <span aria-hidden className='text-[26px] leading-none'>{BOARD_EMOJI[board.id]}</span>
+                <EllieoIconBadge icon={board.icon} size={44} />
                 <span className='text-[15px] font-bold leading-tight text-[var(--foreground)]'>
                   {board.id === 'housing' ? t('ellieo.compose.housing') : t(`ellieo.short.${board.id}`)}
                 </span>

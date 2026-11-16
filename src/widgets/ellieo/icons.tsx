@@ -224,3 +224,57 @@ export const EyeIcon = (p: IconProps) => (
     <circle cx='12' cy='12' r='2.75' />
   </Base>
 )
+
+export const StarIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='m12 3.75 2.55 5.17 5.7.83-4.13 4.02.98 5.68L12 16.77l-5.1 2.68.98-5.68-4.13-4.02 5.7-.83L12 3.75Z' />
+  </Base>
+)
+
+export const SproutIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M12 20v-8' />
+    <path d='M12 12c0-3.5-2.5-6-6.5-6 0 3.5 2.5 6 6.5 6Z' />
+    <path d='M12 14c0-3.2 2.3-5.5 6.5-5.5 0 3.2-2.3 5.5-6.5 5.5Z' />
+  </Base>
+)
+
+export const GlobeIcon = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx='12' cy='12' r='8.5' />
+    <path d='M3.5 12h17M12 3.5c2.4 2.4 3.6 5.2 3.6 8.5s-1.2 6.1-3.6 8.5c-2.4-2.4-3.6-5.2-3.6-8.5S9.6 5.9 12 3.5Z' />
+  </Base>
+)
+
+export const GiftIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M4.5 9.5h15v3h-15zM5.5 12.5h13V20h-13zM12 9.5V20' />
+    <path d='M12 9.5c-1-2.8-4.5-3.6-4.5-1.3 0 1.3 2 1.3 4.5 1.3Zm0 0c1-2.8 4.5-3.6 4.5-1.3 0 1.3-2 1.3-4.5 1.3Z' />
+  </Base>
+)
+
+export const SparkleIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M12 4.5 13.8 10l5.7 2-5.7 2L12 19.5 10.2 14l-5.7-2 5.7-2L12 4.5Z' />
+  </Base>
+)
+
+export const AlertIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M12 4 21 19.5H3L12 4Z' />
+    <path d='M12 10v4M12 16.8v.2' />
+  </Base>
+)
+
+export const BanIcon = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx='12' cy='12' r='8.5' />
+    <path d='m6 6 12 12' />
+  </Base>
+)
+
+export const PencilIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M4.5 19.5 5.6 15 15.8 4.8a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L9 18.4l-4.5 1.1Z' />
+  </Base>
+)

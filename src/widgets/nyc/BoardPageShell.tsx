@@ -4,6 +4,8 @@ import type { ReactNode } from 'react'
 import { cn } from '@lib'
 import { BRAND_CONFIG } from '@lib/brand'
 import { byBrand } from '@lib/brand/design'
+import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
+import { boardIcon } from '@widgets/ellieo/nav'
 
 type BoardPageShellProps = {
   children: ReactNode
@@ -12,7 +14,7 @@ type BoardPageShellProps = {
   className?: string
   /** Desktop side rail next to the content (Ellieo passes EllieoBoardRail; Misaeng passes nothing) */
   aside?: ReactNode
-  /** Write screens: board emoji. Ellieo draws its composer layout (emoji header, sticky submit); Misaeng ignores it */
+  /** Write screens: the board id. Ellieo draws its composer layout (board icon header, sticky submit); Misaeng ignores it */
   composer?: string
 }
 
@@ -39,9 +41,7 @@ export function BoardPageShell({
       >
         {ellieoComposer ? (
           <div aria-hidden className='flex justify-center pt-6'>
-            <span className='flex size-16 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[32px] leading-none'>
-              {ellieoComposer}
-            </span>
+            <EllieoIconBadge icon={boardIcon(ellieoComposer)} />
           </div>
         ) : null}
         {aside ? (

@@ -1,6 +1,8 @@
 import Link from 'next/link'
 
 import { EllieoAppIcon } from '@widgets/ellieo/EllieoAppIcon'
+import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
+import { BellIcon, BowlIcon, BriefcaseIcon, ChatIcon, HeartIcon, HomeIcon, KeyIcon, PassportIcon } from '@widgets/ellieo/icons'
 
 /**
  * Ellieo app page (ellieo.com/mobile-app), social-feed design. The app isn't in the stores yet: no download
@@ -10,12 +12,12 @@ import { EllieoAppIcon } from '@widgets/ellieo/EllieoAppIcon'
 const APP_LAUNCHED = false
 
 const FEATURES = [
-  { emoji: '🏠', title: 'Housing', body: 'Rentals and rooms with clear prices, perks and move-in dates. Ask about a listing in one tap.' },
-  { emoji: '🛂', title: 'Visa', body: 'OPT, CPT and green card timelines, shared step by step by people who just went through it.' },
-  { emoji: '💼', title: 'Jobs', body: 'Interview reviews, company pages and internship / new grad postings.' },
-  { emoji: '💬', title: 'Ask & Talk', body: 'Ask anything, anonymously or with your nickname.' },
-  { emoji: '🍜', title: 'Food', body: 'Places members actually tried, with photos and a map.' },
-  { emoji: '🔔', title: 'Alerts', body: 'Replies to your posts and answers to your listing questions, right on your phone.' },
+  { icon: KeyIcon, title: 'Housing', body: 'Rentals and rooms with clear prices, perks and move-in dates. Ask about a listing in one tap.' },
+  { icon: PassportIcon, title: 'Visa', body: 'OPT, CPT and green card timelines, shared step by step by people who just went through it.' },
+  { icon: BriefcaseIcon, title: 'Jobs', body: 'Interview reviews, company pages and internship / new grad postings.' },
+  { icon: ChatIcon, title: 'Ask & Talk', body: 'Ask anything, anonymously or with your nickname.' },
+  { icon: BowlIcon, title: 'Food', body: 'Places members actually tried, with photos and a map.' },
+  { icon: BellIcon, title: 'Alerts', body: 'Replies to your posts and answers to your listing questions, right on your phone.' },
 ] as const
 
 const SAMPLE_FEED = [
@@ -93,18 +95,21 @@ export function MobileAppScreen() {
                       <span className='ml-auto'>{post.tag}</span>
                     </p>
                     <p className='mt-1.5 text-[12.5px] font-bold leading-snug'>{post.title}</p>
-                    <p className='mt-1 text-[11px] text-[var(--muted)]'>♡ {post.likes}</p>
+                    <p className='mt-1 inline-flex items-center gap-1 text-[11px] text-[var(--muted)]'>
+                      <HeartIcon className='size-3' />
+                      {post.likes}
+                    </p>
                   </div>
                 ))}
               </div>
               <div className='flex items-center justify-around border-t border-[var(--border)] px-3 py-2 text-[var(--muted)]'>
-                <span className='text-[16px]'>⌂</span>
-                <span className='text-[16px]'>◎</span>
+                <HomeIcon className='size-4' />
+                <KeyIcon className='size-4' />
                 <span className='flex size-8 items-center justify-center rounded-full bg-[var(--ellieo-lime)] text-[18px] font-bold text-[var(--foreground)]'>
                   +
                 </span>
-                <span className='text-[16px]'>✉</span>
-                <span className='text-[16px]'>☺</span>
+                <PassportIcon className='size-4' />
+                <BriefcaseIcon className='size-4' />
               </div>
             </div>
           </div>
@@ -116,7 +121,7 @@ export function MobileAppScreen() {
           <ul className='mt-4 grid grid-cols-1 gap-2.5 min-[480px]:grid-cols-2'>
             {FEATURES.map((feature) => (
               <li key={feature.title} className='rounded-[1.25rem] bg-[var(--surface)] p-4'>
-                <span aria-hidden className='text-[26px] leading-none'>{feature.emoji}</span>
+                <EllieoIconBadge icon={feature.icon} size={44} />
                 <p className='mt-2 text-[15px] font-bold text-[var(--foreground)]'>{feature.title}</p>
                 <p className='mt-1 text-[13.5px] leading-snug text-[var(--muted-foreground)]'>{feature.body}</p>
               </li>

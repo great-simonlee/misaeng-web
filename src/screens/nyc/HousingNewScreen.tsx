@@ -1,5 +1,7 @@
 'use client'
 
+import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
+import { KeyIcon } from '@widgets/ellieo/icons'
 import { BRAND_CONFIG } from '@lib/brand'
 import Link from 'next/link'
 import type { FormEvent } from 'react'
@@ -137,9 +139,7 @@ export function HousingNewScreen() {
       >
         {BRAND_CONFIG.theme === 'ellieo' ? (
           <div aria-hidden className='mb-4 flex justify-center'>
-            <span className='flex size-16 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[32px] leading-none'>
-              🏠
-            </span>
+            <EllieoIconBadge icon={KeyIcon} />
           </div>
         ) : null}
         <p className='text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]'>

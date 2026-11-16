@@ -1,5 +1,7 @@
 'use client'
 
+import { GlobeIcon } from '@widgets/ellieo/icons'
+import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -75,7 +77,7 @@ function WelcomeCard() {
   return (
     <section className='relative overflow-hidden rounded-[1.75rem] bg-[var(--brand)] px-5 pb-5 pt-5 text-white sm:px-6 sm:pt-6'>
       <span aria-hidden className='absolute -right-6 -top-8 size-32 rounded-full bg-[var(--ellieo-lime)] opacity-90' />
-      <span aria-hidden className='absolute right-8 top-10 text-[44px] leading-none'>🌏</span>
+      <EllieoIconBadge icon={GlobeIcon} size={56} className='absolute right-6 top-7' />
       <span className='relative inline-flex rounded-full bg-white/15 px-2.5 py-0.5 text-[12px] font-bold'>
         ✓ {t('ellieo.hero.eyebrow')}
       </span>
@@ -242,7 +244,7 @@ function ExploreBoards() {
               href={href(board.path)}
               className='flex h-full flex-col gap-2 rounded-[1.25rem] bg-[var(--surface)] p-4 transition hover:bg-[var(--border)]'
             >
-              <span aria-hidden className='text-[28px] leading-none'>{BOARD_EMOJI[board.id]}</span>
+              <EllieoIconBadge icon={board.icon} size={44} />
               <span className='text-[15px] font-bold leading-tight text-[var(--foreground)]'>
                 {tc(`categories.${board.id}.title`)}
               </span>
@@ -279,7 +281,7 @@ function ListingsStrip() {
   if (!listings || listings.length === 0) return null
   return (
     <section className='xl:hidden'>
-      <FeedHeading size='sm' title={`🏠 ${t('ellieo.listingsStrip')}`} href={href('/housing')} linkLabel={t('ellieo.seeAll')} />
+      <FeedHeading size='sm' title={t('ellieo.listingsStrip')} href={href('/housing')} linkLabel={t('ellieo.seeAll')} />
       <ul className='-mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
         {listings.map((listing) => {
           const [cover] = getListingImages(listing)
@@ -351,7 +353,7 @@ function CommunityFeed() {
           badge={
             post.likes >= TRENDING_LIKES ? (
               <span className='rounded-full bg-[var(--ellieo-lime)] px-2 py-0.5 text-[11.5px] font-bold text-[var(--foreground)]'>
-                🔥 {t('ellieo.community.trending')}
+                {t('ellieo.community.trending')}
               </span>
             ) : null
           }

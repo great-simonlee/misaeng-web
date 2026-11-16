@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState, type ReactNode } from 'react'
 
 import { useFormat } from '@lib/i18n/client'
-import { BadgeCheckIcon, CommentIcon, EyeIcon, HeartIcon } from '@widgets/ellieo/icons'
+import { BadgeCheckIcon, ChatIcon, CommentIcon, EyeIcon, HeartIcon } from '@widgets/ellieo/icons'
 
 /** Avatar fills when there is no photo: soft tints, ink-friendly */
 const AVATAR_FILLS = ['#1f5eff', '#16b47e', '#e8861a', '#e0579b', '#2a9fd6', '#14121f']
@@ -15,7 +15,7 @@ function fillFor(text: string): string {
   return AVATAR_FILLS[hash % AVATAR_FILLS.length]
 }
 
-/** Person-first avatar: photo when it loads, otherwise a colored initial; anonymous = 💬 on violet-soft */
+/** Person-first avatar: photo when it loads, otherwise a colored initial; anonymous = chat icon on blue-soft */
 export function EllieoPersonAvatar({
   photo,
   name,
@@ -31,8 +31,8 @@ export function EllieoPersonAvatar({
   const style = { width: size, height: size }
   if (anonymous) {
     return (
-      <span aria-hidden style={style} className='flex shrink-0 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[18px]'>
-        💬
+      <span aria-hidden style={style} className='flex shrink-0 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]'>
+        <ChatIcon className='size-5' />
       </span>
     )
   }

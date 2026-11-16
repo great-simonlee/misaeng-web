@@ -1,5 +1,6 @@
 'use client'
 
+import { PinIcon } from '@widgets/ellieo/icons'
 import Link from 'next/link'
 
 import { useCity, useCityPath } from '@hooks/useCity'
@@ -74,8 +75,9 @@ function Teaser({ posting }: { posting: PublicPosting }) {
         <PostingChips posting={posting} className='mt-4' />
         <h1 className='mt-2.5 text-[22px] font-extrabold leading-snug tracking-[-0.03em] text-[var(--foreground)]'>{posting.title}</h1>
         {regions.length ? (
-          <p className='mt-2 inline-flex rounded-full bg-[var(--surface)] px-3 py-1 text-[13px] font-semibold text-[var(--muted-foreground)]'>
-            📍 {regions.join(' · ')}
+          <p className='mt-2 inline-flex items-center gap-1.5 rounded-full bg-[var(--surface)] px-3 py-1 text-[13px] font-semibold text-[var(--muted-foreground)]'>
+            <PinIcon className='size-4 shrink-0' />
+            {regions.join(' · ')}
           </p>
         ) : null}
       </section>

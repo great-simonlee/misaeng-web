@@ -1,7 +1,9 @@
 'use client'
 
+import { AlertIcon, BanIcon, ChatIcon, CompassIcon, GiftIcon, ShieldCheckIcon, SparkleIcon, StarIcon, UsersIcon } from '@widgets/ellieo/icons'
+import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
 import Link from 'next/link'
-import { useMemo, type ReactNode } from 'react'
+import { useMemo, type ComponentType, type CSSProperties, type ReactNode } from 'react'
 
 import { useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
@@ -29,16 +31,16 @@ import type { TranslateParams } from '@lib/i18n/translate'
 
 /**
  * Ellieo points guide: same rules, numbers and copy as the Misaeng page (screens/credit/CreditScreen), drawn in the
- * Ellieo feed style — blue hero card, chip contents row, every section a card with an emoji, earn rules as rows with
+ * Ellieo feed style — blue hero card, chip contents row, every section a card with a line icon, earn rules as rows with
  * lime point pills, FAQ as tap-to-open cards.
  */
 const TOC = [
-  { id: 'redeem', emoji: '🎁' },
-  { id: 'process', emoji: '🧭' },
-  { id: 'earn', emoji: '✨' },
-  { id: 'principles', emoji: '🤝' },
-  { id: 'limits', emoji: '🛡️' },
-  { id: 'faq', emoji: '💬' },
+  { id: 'redeem', icon: GiftIcon },
+  { id: 'process', icon: CompassIcon },
+  { id: 'earn', icon: SparkleIcon },
+  { id: 'principles', icon: UsersIcon },
+  { id: 'limits', icon: ShieldCheckIcon },
+  { id: 'faq', icon: ChatIcon },
 ] as const
 
 function useCreditParams(): TranslateParams {
@@ -69,7 +71,7 @@ export function EllieoCreditScreen() {
   const params = useCreditParams()
   const openOptions = COMMUNITY_CREDIT_REDEEM_OPTIONS.filter((option) => !option.comingSoon)
   const comingSoonOptions = COMMUNITY_CREDIT_REDEEM_OPTIONS.filter((option) => option.comingSoon)
-  const emoji = (id: (typeof TOC)[number]['id']) => TOC.find((item) => item.id === id)!.emoji
+  const icon = (id: (typeof TOC)[number]['id']) => TOC.find((item) => item.id === id)!.icon
 
   return (
     <div className='min-w-0 flex-1 bg-white'>
@@ -77,7 +79,7 @@ export function EllieoCreditScreen() {
         {/* Hero */}
         <header className='relative overflow-hidden rounded-[1.75rem] bg-[var(--brand)] px-5 pb-5 pt-5 text-white sm:px-6'>
           <span aria-hidden className='absolute -right-8 -top-10 size-32 rounded-full bg-[var(--ellieo-lime)]' />
-          <span aria-hidden className='absolute right-6 top-8 text-[40px] leading-none'>⭐</span>
+          <EllieoIconBadge icon={StarIcon} size={56} className='absolute right-5 top-6' />
           <span className='relative inline-flex rounded-full bg-white/15 px-2.5 py-0.5 text-[12px] font-bold'>
             {t('header.eyebrow', { brand: BRAND_CONFIG.name.toUpperCase() })}
           </span>
@@ -106,7 +108,7 @@ export function EllieoCreditScreen() {
                   href={`#${item.id}`}
                   className='inline-flex h-9 items-center gap-1.5 rounded-full bg-[var(--surface)] px-3.5 text-[13.5px] font-semibold text-[var(--foreground)] hover:bg-[var(--border)]'
                 >
-                  <span aria-hidden>{item.emoji}</span>
+                  <item.icon className='size-4 text-[var(--muted-foreground)]' />
                   {t(`toc.${item.id}`)}
                 </a>
               </li>
@@ -114,7 +116,7 @@ export function EllieoCreditScreen() {
           </ul>
         </nav>
 
-        <Card id='redeem' emoji={emoji('redeem')} title={t('redeem.title')} description={t('redeem.description')}>
+        <Card id='redeem' icon={icon('redeem')} title={t('redeem.title')} description={t('redeem.description')}>
           <div className='space-y-3'>
             {openOptions.map((option) => (
               <RedeemOption key={option.id} option={option} />
@@ -133,12 +135,12 @@ export function EllieoCreditScreen() {
           </p>
         </Card>
 
-        <Card id='process' emoji={emoji('process')} title={t('process.title')} description={t('process.description')}>
+        <Card id='process' icon={icon('process')} title={t('process.title')} description={t('process.description')}>
           <Steps group='redeemProcess' steps={COMMUNITY_CREDIT_REDEEM_PROCESS} />
           <p className='mt-4 text-[13px] leading-relaxed text-[var(--muted)]'>{t('process.cancelNote')}</p>
         </Card>
 
-        <Card id='earn' emoji={emoji('earn')} title={t('earn.title')} description={t('earn.description')}>
+        <Card id='earn' icon={icon('earn')} title={t('earn.title')} description={t('earn.description')}>
           <ul className='space-y-2'>
             {COMMUNITY_CREDIT_EARN_RULES.map((rule) => (
               <li key={rule.id} className='flex items-center gap-3 rounded-[1.125rem] bg-[var(--surface)] px-4 py-3'>
@@ -206,7 +208,7 @@ export function EllieoCreditScreen() {
               <ul className='space-y-1 text-[13px] text-[var(--muted-foreground)]'>
                 {COMMUNITY_CREDIT_NO_EARN.map((id) => (
                   <li key={id} className='flex gap-2'>
-                    <span aria-hidden>🚫</span>
+                    <BanIcon className='mt-0.5 size-4 shrink-0 text-[var(--muted)]' />
                     {t(`noEarn.${id}`)}
                   </li>
                 ))}
@@ -215,7 +217,7 @@ export function EllieoCreditScreen() {
           </details>
         </Card>
 
-        <Card id='principles' emoji={emoji('principles')} title={t('principlesSection.title')} description={t('principlesSection.description')}>
+        <Card id='principles' icon={icon('principles')} title={t('principlesSection.title')} description={t('principlesSection.description')}>
           <ul className='grid gap-2.5 sm:grid-cols-2'>
             {COMMUNITY_CREDIT_PRINCIPLES.map((item) => (
               <li key={item.id} className='rounded-[1.125rem] bg-[var(--surface)] px-4 py-3.5'>
@@ -228,7 +230,7 @@ export function EllieoCreditScreen() {
           <Steps group='workflow' steps={COMMUNITY_CREDIT_WORKFLOW} />
         </Card>
 
-        <Card id='limits' emoji={emoji('limits')} title={t('limits.title')} description={t('limits.description')}>
+        <Card id='limits' icon={icon('limits')} title={t('limits.title')} description={t('limits.description')}>
           <div className='grid gap-2.5 sm:grid-cols-2'>
             <div className='rounded-[1.125rem] bg-[var(--surface)] px-4 py-3.5'>
               <p className='text-[14px] font-bold text-[var(--foreground)]'>{t('limits.earnTitle')}</p>
@@ -267,20 +269,20 @@ export function EllieoCreditScreen() {
           <ul className='mt-3 space-y-2'>
             {COMMUNITY_CREDIT_REVOCATION.map((id) => (
               <li key={id} className='flex gap-2.5 text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
-                <span aria-hidden>⚠️</span>
+                <AlertIcon className='mt-0.5 size-4 shrink-0 text-[var(--muted)]' />
                 {t(`revocation.${id}`)}
               </li>
             ))}
           </ul>
         </Card>
 
-        <Card id='faq' emoji={emoji('faq')} title={t('faqSection.title')}>
+        <Card id='faq' icon={icon('faq')} title={t('faqSection.title')}>
           <div className='space-y-2'>
             {COMMUNITY_CREDIT_FAQ.map((id) => (
               <Question key={id} q={t(`faq.${id}.q`, params)} a={t(`faq.${id}.a`, params)} />
             ))}
           </div>
-          <p className='mb-2 mt-5 text-[14px] font-bold text-[var(--foreground)]'>📖 {t('faqSection.glossaryTitle')}</p>
+          <p className='mb-2 mt-5 text-[14px] font-bold text-[var(--foreground)]'>{t('faqSection.glossaryTitle')}</p>
           <div className='space-y-2'>
             {COMMUNITY_CREDIT_GLOSSARY.map((id) => (
               <Question key={id} q={t(`glossary.${id}.term`)} a={t(`glossary.${id}.definition`, params)} />
@@ -301,7 +303,7 @@ export function EllieoCreditScreen() {
               href={href('/food/new')}
               className='inline-flex h-11 items-center rounded-full bg-white px-5 text-[14px] font-bold text-[var(--foreground)] transition hover:bg-[var(--border)]'
             >
-              🍜 {t('footer.writeFood')}
+              {t('footer.writeFood')}
             </Link>
           </div>
         </footer>
@@ -312,13 +314,13 @@ export function EllieoCreditScreen() {
 
 function Card({
   id,
-  emoji,
+  icon,
   title,
   description,
   children,
 }: {
   id: string
-  emoji: string
+  icon: ComponentType<{ className?: string; style?: CSSProperties }>
   title: string
   description?: string
   children: ReactNode
@@ -329,9 +331,7 @@ function Card({
       className='mt-4 scroll-mt-32 rounded-[1.5rem] bg-white p-5 shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)]'
     >
       <div className='flex items-start gap-3'>
-        <span aria-hidden className='flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--surface)] text-[20px]'>
-          {emoji}
-        </span>
+        <EllieoIconBadge icon={icon} size={40} />
         <div className='min-w-0 pt-0.5'>
           <h2 className='text-[19px] font-extrabold leading-snug tracking-[-0.02em] text-[var(--foreground)]'>{title}</h2>
           {description ? <p className='mt-1 text-[13.5px] leading-relaxed text-[var(--muted-foreground)]'>{description}</p> : null}

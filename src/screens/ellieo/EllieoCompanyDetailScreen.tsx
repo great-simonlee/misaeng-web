@@ -204,7 +204,7 @@ export function EllieoCompanyDetailScreen({ slug }: { slug: string }) {
         {/* Reviews */}
         <section className='mt-8'>
           <div className='flex items-center gap-2'>
-            <h2 className='text-[20px] font-extrabold tracking-[-0.02em] text-[var(--foreground)]'>💼 {t('detail.reviewsTitle')}</h2>
+            <h2 className='text-[20px] font-extrabold tracking-[-0.02em] text-[var(--foreground)]'>{t('detail.reviewsTitle')}</h2>
             {!reviewsLoading ? (
               <span className='rounded-full bg-[var(--surface)] px-2 py-0.5 text-[12px] font-bold tabular-nums text-[var(--muted-foreground)]'>
                 {reviews.length}

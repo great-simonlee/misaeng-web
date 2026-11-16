@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import { SproutIcon } from '@widgets/ellieo/icons'
+import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
 import { cn } from '@lib'
 import { BRAND_CONFIG } from '@lib/brand'
 
@@ -29,10 +31,8 @@ export function EmptyState({
       )}
     >
       {BRAND_CONFIG.theme === 'ellieo' ? (
-        // Ellieo: a big emoji instead of the icon box (docs/design/ellieo-social.md)
-        <span aria-hidden className='mb-3 block text-[48px] leading-none'>
-          🌱
-        </span>
+        // Ellieo: a line icon in a soft blue circle instead of the icon box (docs/design/ellieo-social.md)
+        <EllieoIconBadge icon={SproutIcon} className='mx-auto mb-4' />
       ) : (
         <div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-[#f4f5f7] text-[var(--muted)]'>
           <EmptyIcon className='size-5' />

@@ -9,6 +9,7 @@ import {
   ChatIcon,
   KeyIcon,
   PassportIcon,
+  PencilIcon,
   UsersIcon,
 } from '@widgets/ellieo/icons'
 
@@ -84,8 +85,8 @@ export const BOARD_TONE: Partial<Record<NycCategoryId, string>> = {
   marketplace: '#2a9fd6',
 }
 
-/** Write screens: emoji for any board id (legacy visa ids → the visa board) */
-export function composerEmoji(boardId: string): string {
+/** Line icon for any board id (composer headers, coming-soon, sheets); legacy visa ids → the visa board */
+export function boardIcon(boardId: string): ComponentType<{ className?: string }> {
   const id = boardId === 'cpt-opt' || boardId === 'visa' || boardId === 'green-card' ? 'status' : boardId
-  return BOARD_EMOJI[id as NycCategoryId] ?? '✏️'
+  return ICONS[id as NycCategoryId] ?? PencilIcon
 }

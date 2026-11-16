@@ -1,5 +1,7 @@
 'use client'
 
+import { StarIcon } from '@widgets/ellieo/icons'
+import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
 import { EllieoDots } from '@components/EllieoDots'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -472,7 +474,7 @@ export function MyPageScreen() {
                     href={href('/credit')}
                     className='mt-3 flex items-center gap-3 rounded-[1.25rem] bg-[var(--ellieo-lime-soft)] px-4 py-3 text-left transition hover:brightness-[0.98]'
                   >
-                    <span aria-hidden className='text-[22px] leading-none'>⭐</span>
+                    <EllieoIconBadge icon={StarIcon} size={40} />
                     <span className='min-w-0 flex-1'>
                       <span className='block text-[14px] font-bold text-[var(--foreground)]'>{t('ellieoPoints.title')}</span>
                       <span className='block text-[12.5px] text-[var(--muted-foreground)]'>{t('ellieoPoints.body')}</span>

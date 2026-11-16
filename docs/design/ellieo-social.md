@@ -96,7 +96,9 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 - **Buttons**: primary = brand blue pill, white text, 48px; secondary = surface pill, ink text; destructive = danger.
 - **Chips**: pill 36px, surface bg, 14px/600; selected ink bg.
 - **Inputs**: surface bg, no border until focus; focus = 2px brand blue ring.
-- **Empty states**: big emoji (48px) + one line + action button, centered, in a surface card.
+- **Empty states / sheet heroes / composer headers** (user 11-16): NO big emoji or 3D-looking illustrations.
+  Use a clean line icon (SF Symbols / Material Symbols Rounded / Lucide, outline, ~28px) in brand blue on a
+  64px brand-soft circle, then one line + action button. Emoji stay only as small inline labels in board chips.
 - **Loading** (user choice 11-16): **three bouncing dots** — brand blue, brand blue, lime; ~8px dots, 6px gap, each hops
   ~6px in turn (stagger ~0.15s, ~0.9s loop). No logo above it, no ring. Same component for full-screen,
   section, button busy and pull-to-refresh. Never gray skeleton blocks; one full-screen loader if two would show.
