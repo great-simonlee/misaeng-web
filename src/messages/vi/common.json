@@ -256,5 +256,10 @@
       "openInApp": "Mở trong ứng dụng",
       "getApp": "Tải ứng dụng"
     }
+  },
+  "ellieoNotFound": {
+    "title": "Trang này đã đi lạc",
+    "body": "Bài viết có thể đã bị xoá, hoặc đường dẫn chưa đúng.",
+    "home": "Về trang chủ"
   }
 }

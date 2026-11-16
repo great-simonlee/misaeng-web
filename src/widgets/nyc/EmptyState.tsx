@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { cn } from '@lib'
+import { BRAND_CONFIG } from '@lib/brand'
 
 interface EmptyStateProps {
   title: string
@@ -27,9 +28,16 @@ export function EmptyState({
         className,
       )}
     >
-      <div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-[#f4f5f7] text-[var(--muted)]'>
-        <EmptyIcon className='size-5' />
-      </div>
+      {BRAND_CONFIG.theme === 'ellieo' ? (
+        // Ellieo: a big emoji instead of the icon box (docs/design/ellieo-social.md)
+        <span aria-hidden className='mb-3 block text-[48px] leading-none'>
+          🌱
+        </span>
+      ) : (
+        <div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-[#f4f5f7] text-[var(--muted)]'>
+          <EmptyIcon className='size-5' />
+        </div>
+      )}
       <h3 className='text-[1.05rem] font-semibold tracking-tight text-[var(--foreground)] sm:text-[1.125rem]'>
         {title}
       </h3>

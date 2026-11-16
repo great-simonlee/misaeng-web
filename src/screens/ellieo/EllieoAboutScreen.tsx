@@ -319,7 +319,7 @@ function VerifiedCard() {
         <ul className='mt-4 space-y-2'>
           {(['school', 'work'] as const).map((key) => (
             <li key={key} className='flex items-center gap-2 rounded-xl bg-[#f6f8ff] px-3 py-2 text-[13px] font-medium text-[var(--foreground)]'>
-              <ShieldCheckIcon className='size-4 text-[#0b8f6a]' />
+              <ShieldCheckIcon className='size-4 text-[#16b47e]' />
               {t(`ellieo.about.promise.card.${key}`)}
             </li>
           ))}

@@ -537,3 +537,41 @@
     margin-top: 0.5rem;
   }
 }
+
+/* =====================================================================
+   Inputs everywhere: surface fill, no border until focus (spec)
+   ===================================================================== */
+[data-brand='ellieo'] :is(main, [role='dialog']) :is(input[type='text'], input[type='email'], input[type='password'], input[type='search'], input[type='tel'], input[type='url'], input[type='number'], input[type='date'], input:not([type]), textarea, select) {
+  background-color: var(--surface);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+[data-brand='ellieo'] :is(main, [role='dialog']) :is(input[type='text'], input[type='email'], input[type='password'], input[type='search'], input[type='tel'], input[type='url'], input[type='number'], input[type='date'], input:not([type]), textarea, select):focus {
+  background-color: #fff;
+  border-color: var(--brand);
+}
+
+/* Sign in: open page, no boxed card — big friendly heading */
+[data-brand='ellieo'] [data-ui='auth-card'] {
+  border-color: transparent;
+  box-shadow: none;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+[data-brand='ellieo'] [data-ui='auth-card'] h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+[data-brand='ellieo'] [data-ui='auth-card'] h1::before {
+  content: '👋 ';
+}
+
+[data-brand='ellieo'] [data-ui='auth-google'] {
+  background: #fff;
+  border-color: var(--border-muted);
+}

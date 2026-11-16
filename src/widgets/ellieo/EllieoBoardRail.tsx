@@ -48,19 +48,19 @@ function ProfileCard() {
 
   if (!user) {
     return (
-      <section className='rounded-2xl border border-[var(--border)] bg-[#f8f9fc] p-5'>
-        <p className='text-[15px] font-bold text-[var(--foreground)]'>{t('ellieo.rail.guestTitle')}</p>
-        <p className='mt-1 text-[13px] leading-relaxed text-[var(--muted)]'>{t('ellieo.rail.guestBody')}</p>
+      <section className='rounded-[1.5rem] bg-[var(--brand)] p-5 text-white'>
+        <p className='text-[17px] font-extrabold tracking-[-0.02em]'>👋 {t('ellieo.rail.guestTitle')}</p>
+        <p className='mt-1 text-[13px] leading-relaxed text-white/85'>{t('ellieo.rail.guestBody')}</p>
         <div className='mt-4 flex gap-2'>
           <Link
             href={`${cityLoginPath(city)}?mode=signup`}
-            className='inline-flex h-9 flex-1 items-center justify-center rounded-full bg-[var(--brand)] text-[13.5px] font-semibold text-white transition hover:bg-[var(--brand-hover)]'
+            className='inline-flex h-10 flex-1 items-center justify-center rounded-full bg-[var(--ellieo-lime)] text-[14px] font-bold text-[var(--foreground)] transition hover:brightness-95'
           >
             {t('ellieo.rail.join')}
           </Link>
           <Link
             href={cityLoginPath(city)}
-            className='inline-flex h-9 flex-1 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[13.5px] font-semibold text-[var(--foreground)] transition hover:border-[var(--border-muted)]'
+            className='inline-flex h-10 flex-1 items-center justify-center rounded-full bg-white/15 text-[14px] font-bold text-white transition hover:bg-white/25'
           >
             {t('ellieo.rail.login')}
           </Link>
@@ -77,7 +77,7 @@ function ProfileCard() {
   ]
 
   return (
-    <section className='rounded-2xl border border-[var(--border)] p-5'>
+    <section className='rounded-[1.5rem] p-5 shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)]'>
       <div className='flex items-center gap-3'>
         {avatarURL ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -85,7 +85,7 @@ function ProfileCard() {
         ) : (
           <span
             aria-hidden
-            className='flex size-12 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#1f5eff,#12b5cb)] text-[17px] font-bold uppercase text-white'
+            className='flex size-12 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#7c5cff,#9b83ff)] text-[17px] font-bold uppercase text-white'
           >
             {displayName.charAt(0)}
           </span>
@@ -95,7 +95,7 @@ function ProfileCard() {
           <span className='mt-0.5 flex items-center gap-1 text-[12.5px] text-[var(--muted)]'>
             {school ? (
               <>
-                <BadgeCheckIcon className='size-3.5 shrink-0 text-[var(--ellieo-jade)]' />
+                <BadgeCheckIcon className='size-3.5 shrink-0 text-[var(--brand)]' />
                 <span className='truncate'>{school}</span>
               </>
             ) : (
@@ -201,7 +201,7 @@ function PopularPosts() {
             className={cn(
               'h-8 truncate rounded-full px-2 text-[12.5px] font-semibold transition',
               tab === item.id
-                ? 'bg-white text-[var(--foreground)] shadow-[0_1px_3px_rgb(14_26_47/0.12)]'
+                ? 'bg-white text-[var(--foreground)] shadow-[0_1px_3px_rgb(20_18_31/0.12)]'
                 : 'text-[var(--muted)] hover:text-[var(--foreground)]',
             )}
           >
@@ -220,7 +220,7 @@ function PopularPosts() {
             const key = boardKey(post.categoryId) as NycCategoryId
             const board = ELLIEO_BOARDS.find((item) => item.id === key)
             const Icon = board?.icon
-            const tone = BOARD_TONE[key] ?? '#5b6779'
+            const tone = BOARD_TONE[key] ?? '#4a4660'
             return (
               <li key={post.id}>
                 <Link

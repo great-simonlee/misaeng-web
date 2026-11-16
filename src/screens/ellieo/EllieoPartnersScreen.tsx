@@ -90,7 +90,7 @@ export function EllieoPartnersScreen() {
         />
 
         {/* Become a partner */}
-        <section className='mt-10 rounded-2xl border border-[var(--border)] bg-[#f8f9fc] px-5 py-6 sm:px-7'>
+        <section className='mt-10 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-5 py-6 sm:px-7'>
           <h2 className='text-[16px] font-bold text-[var(--foreground)]'>
             {t('ellieo.partnersPage.joinTitle')}
           </h2>
@@ -137,7 +137,7 @@ function PartnerList({
           {title}
         </h2>
         {sample ? (
-          <span className='rounded-full bg-[var(--ellieo-sun-soft)] px-2.5 py-0.5 text-[12px] font-semibold text-[#9a6200]'>
+          <span className='rounded-full bg-[var(--ellieo-lime)] px-2.5 py-0.5 text-[12px] font-semibold text-[var(--foreground)]'>
             {t('ellieo.sampleData')}
           </span>
         ) : null}

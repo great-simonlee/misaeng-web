@@ -50,7 +50,7 @@ export function EllieoHousingRow({ listing }: { listing: HousingListing }) {
           {formatListingBedBath(listing)} · {getListingArea(listing)}
         </span>
         {badge ? (
-          <span className='mt-1 inline-block rounded-full bg-[var(--ellieo-jade-soft)] px-2 py-px text-[11px] font-semibold text-[var(--ellieo-jade)]'>
+          <span className='mt-1 inline-block rounded-full bg-[var(--ellieo-success-soft)] px-2 py-px text-[11px] font-semibold text-[#0d7a55]'>
             {badge.label}
           </span>
         ) : null}

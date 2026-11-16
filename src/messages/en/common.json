@@ -256,5 +256,10 @@
       "openInApp": "Open in app",
       "getApp": "Get the app"
     }
+  },
+  "ellieoNotFound": {
+    "title": "This page wandered off",
+    "body": "The post may have been removed, or the link isn't quite right.",
+    "home": "Back to home"
   }
 }

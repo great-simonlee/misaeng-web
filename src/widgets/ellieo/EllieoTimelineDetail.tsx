@@ -53,9 +53,9 @@ type Step = {
 }
 
 const AVATAR_GRADIENTS = [
-  'linear-gradient(135deg, #1f5eff, #12b5cb)',
-  'linear-gradient(135deg, #0b8f6a, #7fd8b8)',
-  'linear-gradient(135deg, #f2a516, #ff5a5f)',
+  'linear-gradient(135deg, #7c5cff, #9b83ff)',
+  'linear-gradient(135deg, #16b47e, #7fd8b8)',
+  'linear-gradient(135deg, #e8861a, #ff5a5f)',
   'linear-gradient(135deg, #7a4cff, #c13584)',
 ]
 
@@ -156,7 +156,7 @@ export function EllieoTimelineDetail({ post, boardId, isAuthor, onDelete, transl
             <span className='truncate'>{name}</span>
             {school ? (
               <>
-                <BadgeCheckIcon className='size-4 shrink-0 text-[var(--ellieo-jade)]' />
+                <BadgeCheckIcon className='size-4 shrink-0 text-[#0d7a55]' />
                 <span className='font-medium text-[var(--muted-foreground)]'>{school}</span>
               </>
             ) : null}
@@ -174,7 +174,7 @@ export function EllieoTimelineDetail({ post, boardId, isAuthor, onDelete, transl
       {/* Author tools: add a step, credit review */}
       {isAuthor ? (
         <div className='mt-6 space-y-3'>
-          <div className='flex flex-col gap-3 rounded-2xl border border-[var(--border)] bg-[#f8f9fc] p-4 sm:flex-row sm:items-center sm:justify-between'>
+          <div className='flex flex-col gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:flex-row sm:items-center sm:justify-between'>
             <div className='min-w-0'>
               <p className='text-[14px] font-semibold text-[var(--foreground)]'>{t(`${prefix}.detail.authorTitle`)}</p>
               <p className='mt-0.5 text-[13px] leading-relaxed text-[var(--muted)]'>{t(`${prefix}.detail.authorBody`)}</p>
@@ -210,8 +210,8 @@ export function EllieoTimelineDetail({ post, boardId, isAuthor, onDelete, transl
 
       {/* Tips */}
       {tipsHtml ? (
-        <section className='mt-6 rounded-2xl border border-[#f5dfae] bg-[var(--ellieo-sun-soft)]/70 p-5 sm:p-6'>
-          <h2 className='flex items-center gap-2 text-[14px] font-bold text-[#8a5800]'>
+        <section className='mt-6 rounded-2xl border border-[#f5dfae] bg-[var(--ellieo-lime)]/70 p-5 sm:p-6'>
+          <h2 className='flex items-center gap-2 text-[14px] font-bold text-[var(--foreground)]'>
             <FlagIcon className='size-4' />
             {t(`${prefix}.detail.tipsTitle`)}
           </h2>
@@ -282,7 +282,7 @@ function TimelineStep({ step, index, last }: { step: Step; index: number; last: 
         <div
           className={cn(
             'flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-[var(--border)] px-4 py-3 sm:px-5',
-            step.latest ? 'bg-[var(--brand-soft)]' : 'bg-[#f8f9fc]',
+            step.latest ? 'bg-[var(--brand-soft)]' : 'bg-[var(--surface)]',
           )}
         >
           <span className='text-[15px] font-bold text-[var(--foreground)]'>{step.headline || step.date}</span>

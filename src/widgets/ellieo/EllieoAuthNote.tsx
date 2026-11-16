@@ -7,8 +7,10 @@ import { ShieldCheckIcon } from '@widgets/ellieo/icons'
 export function EllieoAuthNote() {
   const t = useT('auth')
   return (
-    <div className='mt-3 flex gap-2.5 rounded-xl bg-[var(--ellieo-jade-soft)] px-3.5 py-3 text-[13px] leading-relaxed text-[#0b5c45]'>
-      <ShieldCheckIcon className='mt-0.5 size-[18px] shrink-0' />
+    <div className='mt-3 flex gap-3 rounded-[1.25rem] bg-[var(--brand-soft)] px-4 py-3.5 text-[13.5px] leading-relaxed text-[var(--brand-deep)]'>
+      <span className='inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--ellieo-lime)] text-[var(--foreground)]'>
+        <ShieldCheckIcon className='size-[17px]' />
+      </span>
       <p>{t('ellieo.verifyNote')}</p>
     </div>
   )
