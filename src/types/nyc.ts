@@ -417,6 +417,11 @@ export interface CommunityPost extends TranslationFields {
   jobReviewQuestionsOpen?: boolean | null
   /** 면접/취업 후기: 이 후기에서 커피챗(30분) 신청을 받는지. 없거나 null이면 받는다 (멘토 등록은 따로 필요) */
   jobReviewCoffeeChatOpen?: boolean | null
+  /**
+   * 면접/취업 후기: 글쓰기 마지막 단계에서 질문·커피챗 중 하나라도 켜고 등록 = 멘토 동의 (그 버전). 자동 멘토 등록의 근거
+   * (src/lib/points/coffeeChatMentors.server.ts syncAutoMentor). 둘 다 끄면 null
+   */
+  jobReviewMentorConsent?: string | null
   /** 룸메이트/서블렛: 구하는 유형 */
   roommateLookingFor: RoommateLookingFor | null
   /** 룸메이트/서블렛: 월 예산·월세 (USD) */

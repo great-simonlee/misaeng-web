@@ -239,6 +239,8 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
       typeof data.jobReviewQuestionsOpen === 'boolean' ? data.jobReviewQuestionsOpen : null,
     jobReviewCoffeeChatOpen:
       typeof data.jobReviewCoffeeChatOpen === 'boolean' ? data.jobReviewCoffeeChatOpen : null,
+    jobReviewMentorConsent:
+      typeof data.jobReviewMentorConsent === 'string' && data.jobReviewMentorConsent ? data.jobReviewMentorConsent : null,
     jobReviewIndustry:
       typeof data.jobReviewIndustry === 'string' &&
       data.jobReviewIndustry.trim()

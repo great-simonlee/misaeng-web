@@ -73,6 +73,11 @@ export async function POST(request: Request, context: RouteContext) {
     )
     if (!saved) return NextResponse.json({ error: 'Already decided.' }, { status: 409 })
 
+    if (action === 'approve' && saved.kind === 'offer') {
+      // 합격 인증 승인: 후기를 쓰며 질문·커피챗을 켜 둔 작성자는 이제 멘토로 공개된다
+      const { syncAutoMentor } = await import('@lib/points/coffeeChatMentors.server')
+      await syncAutoMentor(saved.user_id)
+    }
     if (action === 'approve') {
       await awardVerifiedComponent({
         postId: saved.post_id,

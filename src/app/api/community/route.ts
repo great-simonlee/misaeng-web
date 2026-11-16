@@ -102,6 +102,8 @@ import {
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import { notifyJobReviewCreated } from '@lib/erp/notifyJobReview'
 import { notifyNewJobReview } from '@lib/push/newJobReviewNotify.server'
+import { syncAutoMentor } from '@lib/points/coffeeChatMentors.server'
+import { COFFEE_CHAT_MENTOR_CONSENT_VERSION } from '@lib/points/defaults'
 import { notifyBoardPostCreated } from '@lib/erp/notifyBoardPost'
 import type {
   CommunityPost,
@@ -289,6 +291,8 @@ type CreateBody = {
   jobReviewOutcome?: string | null
   jobReviewQuestionsOpen?: boolean | null
   jobReviewCoffeeChatOpen?: boolean | null
+  /** 1.0.7: the write screen's mentor line was shown (either switch on = agreed to the mentor consent) */
+  jobReviewMentorAgreed?: boolean | null
   companyId?: string | null
   roommateLookingFor?: RoommateLookingFor | null
   roommateBudgetMax?: number | null
@@ -755,6 +759,12 @@ export async function POST(request: Request) {
     // 후배 질문·커피챗 받기: 기본은 받기 (앱 1.0.7 글쓰기 마지막 단계에서 끌 수 있음)
     jobReviewQuestionsOpen: isJobReview ? body?.jobReviewQuestionsOpen !== false : null,
     jobReviewCoffeeChatOpen: isJobReview ? body?.jobReviewCoffeeChatOpen !== false : null,
+    jobReviewMentorConsent:
+      isJobReview &&
+      body?.jobReviewMentorAgreed === true &&
+      (body.jobReviewQuestionsOpen !== false || body.jobReviewCoffeeChatOpen !== false)
+        ? COFFEE_CHAT_MENTOR_CONSENT_VERSION
+        : null,
     companyId: isJobReview ? (companyResult.companyId ?? null) : null,
     roommateLookingFor: isRoommate ? roommateLookingFor : null,
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
@@ -797,6 +807,10 @@ export async function POST(request: Request) {
     }
     if (isJobReview && jobReviewSource) after(() => notifyJobReviewCreated(saved, jobReviewSource))
     if (isJobReview) after(() => notifyNewJobReview(saved))
+    if (isJobReview && saved.jobReviewMentorConsent && saved.authorUid) {
+      const authorUid = saved.authorUid
+      after(() => syncAutoMentor(authorUid))
+    }
     after(() => notifyBoardPostCreated(saved))
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),

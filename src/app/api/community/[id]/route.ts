@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { after, NextResponse } from 'next/server'
 import { finalizePost, localizePost } from '@lib/translations/localize.server'
 
 import { apiErrorMessage } from '@lib/i18n/apiError'
@@ -66,6 +66,8 @@ import {
   normalizeMarketZip,
 } from '@lib/community/marketplace'
 import { closeThreadsForPost, reopenThreadsForPost } from '@lib/marketplace/inquiries.server'
+import { syncAutoMentor } from '@lib/points/coffeeChatMentors.server'
+import { COFFEE_CHAT_MENTOR_CONSENT_VERSION } from '@lib/points/defaults'
 import {
   deleteStoredCommunityPost,
   getStoredCommunityPost,
@@ -126,6 +128,7 @@ type UpdateBody = {
   jobReviewOutcome?: string | null
   jobReviewQuestionsOpen?: boolean | null
   jobReviewCoffeeChatOpen?: boolean | null
+  jobReviewMentorAgreed?: boolean | null
   companyId?: string | null
   roommateLookingFor?: RoommateLookingFor | null
   roommateBudgetMax?: number | null
@@ -628,6 +631,14 @@ export async function PATCH(request: Request, context: RouteContext) {
         ? body.jobReviewCoffeeChatOpen
         : (existing.jobReviewCoffeeChatOpen ?? null)
       : null,
+    // 수정 화면에서 멘토 문구를 보고 하나라도 켜 두면 동의, 둘 다 끄면 철회. 안 보낸 클라이언트는 그대로
+    jobReviewMentorConsent: !isJobReview
+      ? null
+      : body.jobReviewMentorAgreed === true
+        ? body.jobReviewQuestionsOpen !== false || body.jobReviewCoffeeChatOpen !== false
+          ? COFFEE_CHAT_MENTOR_CONSENT_VERSION
+          : null
+        : (existing.jobReviewMentorConsent ?? null),
     companyId: isJobReview
       ? companyResult.companyId === undefined
         ? (existing.companyId ?? null)
@@ -675,6 +686,10 @@ export async function PATCH(request: Request, context: RouteContext) {
     if (saved.categoryId === 'marketplace') {
       if (saved.marketStatus === 'sold') await closeThreadsForPost(saved.id)
       else if (existing.marketStatus === 'sold') await reopenThreadsForPost(saved.id)
+    }
+    // 질문·커피챗 받기를 바꾸면 자동 멘토 카드도 맞춘다 (켜기 → 등록·활성, 모두 끄기 → 비활성)
+    if (saved.categoryId === 'job-review' && !isHeldPost(saved) && (saved.jobReviewMentorConsent || existing.jobReviewMentorConsent)) {
+      after(() => syncAutoMentor(user.uid))
     }
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),

@@ -80,12 +80,18 @@ type MentorRow = {
   agreed_at: string
   created_at: string
   updated_at: string
+  /** 1.0.7 (coffee_chat_mentors_auto.sql): what the mentor takes. Auto mentors may take career questions only. */
+  takes_coffee: boolean
+  takes_questions: boolean
+  /** 'settings' = registered in 멘토 설정, 'review' = registered automatically by writing a job review */
+  source: string
   /** Only selected for the mentor themself (MENTOR_OWN_SELECT); never read for lists or cards. */
   linkedin?: string | null
 }
 
 /** Public card columns: no LinkedIn (a mentor's LinkedIn must never reach lists / cards / profiles). */
-const MENTOR_SELECT = 'user_id,submission_id,company,role,intro,topics,active,consent_version,agreed_at,created_at,updated_at'
+const MENTOR_SELECT =
+  'user_id,submission_id,company,role,intro,topics,active,consent_version,agreed_at,created_at,updated_at,takes_coffee,takes_questions,source'
 /** The mentor's own row (GET mentor/me, accept). */
 const MENTOR_OWN_SELECT = `${MENTOR_SELECT},linkedin`
 
@@ -152,6 +158,10 @@ export type MentorView = {
   topics: string[]
   verified: true
   schoolVerified: boolean
+  /** "커피챗 가능" — coffee chat requests open (false: career questions only, on their reviews) */
+  takesCoffee: boolean
+  /** "커리어 질문 가능" — takes career questions on their job reviews */
+  takesQuestions: boolean
 }
 
 export type MyMentorView = MentorView & {
@@ -270,6 +280,8 @@ function toMentor(row: MentorRow, profile: SupabaseProfileRecord | null | undefi
     topics: row.topics ?? [],
     verified: true,
     schoolVerified: Boolean(profile?.schoolEmailVerified),
+    takesCoffee: row.takes_coffee !== false,
+    takesQuestions: row.takes_questions !== false,
   }
 }
 
@@ -438,7 +450,7 @@ export async function mentorForPost(viewerUid: string, postId: string): Promise<
     return null
   }
   const row = await getMentorRow(authorUid).catch(() => null)
-  if (!row?.active || row.consent_version !== COFFEE_CHAT_MENTOR_CONSENT_VERSION) return null
+  if (!row?.active || row.takes_coffee === false || row.consent_version !== COFFEE_CHAT_MENTOR_CONSENT_VERSION) return null
   const [offers, authorProfile, viewerProfile, myBlocked] = await Promise.all([
     listApprovedOffers(authorUid),
     profileOf(authorUid),
@@ -555,6 +567,9 @@ export async function saveMentor(uid: string, input: MentorInput): Promise<MyMen
       consent_version: input.consentVersion,
       agreed_at: now,
       updated_at: now,
+      // 멘토 설정에서 등록·저장 = 커피챗 받기 (자동 등록된 질문 전용 멘토도 여기서 커피챗을 켠다)
+      takes_coffee: true,
+      source: 'settings',
       // merge-duplicates only updates the columns sent: leaving it out keeps the stored LinkedIn
       ...(input.linkedinUrl === undefined ? {} : { linkedin: input.linkedinUrl }),
     }),
@@ -591,6 +606,91 @@ export async function deleteMentor(uid: string, options: { actorDeleted?: boolea
   }
   await pointsRest(`coffee_chat_mentors?user_id=eq.${enc(uid)}`, { method: 'DELETE' }).catch(storeError)
   return { declined: (open?.length ?? 0) - failed, failed }
+}
+
+// MARK: automatic mentors (1.0.7)
+
+/**
+ * Writing a job review with career questions or coffee chats on (both on by default) makes the author a mentor —
+ * the write screen's last step says so and that counts as agreeing to the mentor consent (the post keeps the version
+ * in jobReviewMentorConsent). The card goes live once they have an approved offer verification: right after posting
+ * when they already have one, else when it is approved (verification decision route). Runs after the response;
+ * never throws.
+ *   * new card: company = the offer's company, role = the review's position (title), takes_coffee / takes_questions
+ *     = any of their open, agreed job reviews has coffee chats / career questions on; source 'review'
+ *   * a card made in 멘토 설정: kept as is, only takes_questions turns on
+ *   * an automatic card whose reviews all turned both off: deactivated
+ */
+export async function syncAutoMentor(uid: string): Promise<void> {
+  try {
+    const [{ listStoredCommunityPostsByAuthor }, profile] = await Promise.all([
+      import('@lib/supabase/community.server'),
+      getSupabaseProfile(uid),
+    ])
+    if (!profile || profile.accountType === 'parent' || isGone(profile) || !profile.nickname?.trim()) return
+    const reviews = (await listStoredCommunityPostsByAuthor(uid)).filter(
+      (post) =>
+        post.categoryId === 'job-review' &&
+        post.status !== 'closed' &&
+        !post.pendingApproval &&
+        post.jobReviewMentorConsent === COFFEE_CHAT_MENTOR_CONSENT_VERSION,
+    )
+    const takesQuestions = reviews.some((post) => post.jobReviewQuestionsOpen !== false)
+    const takesCoffee = reviews.some((post) => post.jobReviewCoffeeChatOpen !== false)
+    const existing = await getMentorRow(uid, true)
+    const now = new Date().toISOString()
+    if (existing && existing.source !== 'review') {
+      if (takesQuestions && existing.takes_questions === false) {
+        await pointsRest(`coffee_chat_mentors?user_id=eq.${enc(uid)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ takes_questions: true, updated_at: now }),
+        })
+      }
+      return
+    }
+    if (!takesQuestions && !takesCoffee) {
+      if (existing?.active) {
+        await pointsRest(`coffee_chat_mentors?user_id=eq.${enc(uid)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ active: false, takes_coffee: false, takes_questions: false, updated_at: now }),
+        })
+      }
+      return
+    }
+    if (existing) {
+      await pointsRest(`coffee_chat_mentors?user_id=eq.${enc(uid)}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ active: true, takes_coffee: takesCoffee, takes_questions: takesQuestions, updated_at: now }),
+      })
+      return
+    }
+    const offers = await listApprovedOffers(uid)
+    if (offers.length === 0) return // goes live when the offer verification is approved
+    const latest = [...reviews].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))[0]
+    const offer =
+      offers.find((item) => normalizeCompany(item.company) === normalizeCompany(latest?.location ?? '')) ?? offers[0]
+    await pointsRest(`coffee_chat_mentors?on_conflict=user_id`, {
+      method: 'POST',
+      prefer: 'resolution=ignore-duplicates,return=minimal',
+      body: JSON.stringify({
+        user_id: uid,
+        submission_id: offer.submissionId,
+        company: offer.company,
+        role: String(latest?.title ?? '').trim().slice(0, MENTOR_ROLE_MAX),
+        intro: '',
+        topics: [],
+        active: true,
+        consent_version: COFFEE_CHAT_MENTOR_CONSENT_VERSION,
+        agreed_at: latest?.createdAt ? new Date(latest.createdAt).toISOString() : now,
+        updated_at: now,
+        takes_coffee: takesCoffee,
+        takes_questions: takesQuestions,
+        source: 'review',
+      }),
+    })
+  } catch (error) {
+    console.error('Auto mentor sync failed:', uid, error)
+  }
 }
 
 // MARK: lazy upkeep
@@ -779,6 +879,7 @@ export async function requestMentorChat(input: {
   if (pointsTierOf(myProfile) !== 'identity') throw pointsErrors.identityRequired()
   if (
     !mentorRow?.active ||
+    mentorRow.takes_coffee === false ||
     !mentorProfile ||
     isGone(mentorProfile) ||
     blocks(mentorProfile, uid) ||

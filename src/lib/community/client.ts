@@ -107,6 +107,7 @@ function withLocalCounts(post: CommunityPost): CommunityPost {
     jobReviewOutcome: post.jobReviewOutcome ?? null,
     jobReviewQuestionsOpen: post.jobReviewQuestionsOpen ?? null,
     jobReviewCoffeeChatOpen: post.jobReviewCoffeeChatOpen ?? null,
+    jobReviewMentorConsent: post.jobReviewMentorConsent ?? null,
     roommateLookingFor: post.roommateLookingFor ?? null,
     roommateBudgetMax: post.roommateBudgetMax ?? null,
     roommateMoveInDate: post.roommateMoveInDate ?? null,
