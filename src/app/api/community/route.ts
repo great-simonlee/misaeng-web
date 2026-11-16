@@ -798,7 +798,10 @@ async function communityListPage(input: {
           return ua < ub ? 1 : -1
         })
       : visible
-  const matching = ordered.filter((post) => matchesListFilters(post, board, filters))
+  // Posts hidden until translated (Ellieo: no en/vi yet) leave before paging, so a page is never empty mid-list
+  const matching = ordered.filter(
+    (post) => matchesListFilters(post, board, filters) && localizePosts([post], locale).length > 0,
+  )
   const { page, nextCursor } = pageAfter(matching, cursor, limit)
   const enriched = status ? page : await enrichCommunityListPosts(page, board)
   const offerVerified = board === 'job-review' ? await getOfferVerifiedPostIds(enriched) : null
