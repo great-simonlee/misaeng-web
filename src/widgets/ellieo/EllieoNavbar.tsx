@@ -128,23 +128,13 @@ export function EllieoNavbar() {
   const linkTabs = tabs.filter((tab) => 'href' in tab)
   const miniTab = linkTabs.find((tab) => tab.active) ?? linkTabs[0]
   const MiniTabIcon = miniTab.icon
-  // Housing / Visa / Jobs pages: page title instead of the logo on phones and tablets (tab bar already says where you are)
-  const pageTitle = tabPage ? tabs.find((tab) => tab.key === tabPage && 'label' in tab) : null
+  // Housing / Visa / Jobs list pages: no top bar below 1024px (the tab bar already says where you are, user 11-16)
 
   return (
     <>
-      <header className='fixed inset-x-0 top-0 z-[10000] border-b border-[var(--border)] bg-white'>
+      <header className={cn('fixed inset-x-0 top-0 z-[10000] border-b border-[var(--border)] bg-white', tabPage && 'max-lg:hidden')}>
         <div className='mx-auto flex h-14 w-full max-w-[63rem] min-w-0 items-center gap-2 px-4 sm:h-16'>
-          {pageTitle && 'label' in pageTitle ? (
-            <p className='shrink-0 truncate text-[24px] font-extrabold leading-none tracking-[-0.03em] text-[var(--foreground)] lg:hidden'>
-              {pageTitle.label}
-            </p>
-          ) : null}
-          <Link
-            href={home}
-            className={cn('flex shrink-0 items-center gap-2 touch-manipulation', pageTitle && 'max-lg:hidden')}
-            aria-label={t('homeAria', { city: cityInfo.shortLabel })}
-          >
+          <Link href={home} className='flex shrink-0 items-center gap-2 touch-manipulation' aria-label={t('homeAria', { city: cityInfo.shortLabel })}>
             <Image
               src={BRAND_CONFIG.assets.banner.src}
               alt={BRAND_CONFIG.name}

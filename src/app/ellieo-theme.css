@@ -908,7 +908,7 @@
   }
 }
 
-/* Housing list on phones/tablets: the top bar already shows "Housing", so the page h1 is screen-reader only */
+/* Housing list on phones/tablets: no top bar, the page starts at its filters; the h1 is screen-reader only */
 @media (max-width: 1023px) {
   [data-brand='ellieo'] [data-ui='board-title'].ellieo-tab-title {
     position: absolute;
@@ -923,6 +923,6 @@
   }
 
   [data-brand='ellieo'] [data-ui='board-title'].ellieo-tab-title + [data-ui='board-description'] {
-    margin-top: 0;
+    display: none;
   }
 }
