@@ -23,7 +23,7 @@ import { useFormat, useT } from '@lib/i18n/client'
 import type { CommunityPost } from '@/types/nyc'
 import { EllieoPersonAvatar } from '@widgets/ellieo/EllieoFeedCard'
 import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
-import { BadgeCheckIcon, BagIcon, ChevronRightIcon, PinIcon, ShieldCheckIcon } from '@widgets/ellieo/icons'
+import { BadgeCheckIcon, BagIcon, ChevronRightIcon, ShieldCheckIcon } from '@widgets/ellieo/icons'
 import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 
 import { MarketStatusBadge, useMarketPrice } from './MarketCard'
@@ -95,7 +95,7 @@ export function EllieoMarketDetailScreen({ postId }: { postId: string }) {
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className='min-w-0 flex-1 bg-white'>
-      <div className='mx-auto w-full max-w-[40rem] px-4 pb-28 pt-4 lg:pt-8'>{children}</div>
+      <div className='mx-auto w-full max-w-[40rem] px-4 pb-32 pt-3 lg:pb-16 lg:pt-6'>{children}</div>
     </div>
   )
 }
@@ -113,49 +113,51 @@ function ListingBody({ post }: { post: CommunityPost }) {
     <article className='mt-3'>
       <PhotoCarousel photos={photos} sold={post.marketStatus === 'sold'} />
 
-      <div className='mt-4 flex flex-wrap items-center gap-2'>
+      <div className='mt-3 flex flex-wrap items-center gap-1.5'>
         <MarketStatusBadge status={post.marketStatus} />
-        {post.marketCategory ? (
-          <span className='rounded-full bg-[var(--surface)] px-2.5 py-0.5 text-[12px] font-semibold text-[var(--foreground)]'>
-            {t(`ellieoMarket.categories.${post.marketCategory}`)}
-          </span>
-        ) : null}
       </div>
-      <h1 className='mt-2 text-[24px] font-bold leading-tight tracking-[-0.025em] text-[var(--foreground)] sm:text-[28px]'>
-        {post.title}
-      </h1>
-      <p className={cn('mt-1 text-[24px] font-bold tabular-nums', post.price === 0 ? 'text-[var(--brand)]' : 'text-[var(--foreground)]')}>
+      <p className={cn('mt-1.5 text-[22px] font-bold tabular-nums leading-tight', post.price === 0 ? 'text-[var(--brand)]' : 'text-[var(--foreground)]')}>
         {price(post.price)}
       </p>
-      <p className='mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13.5px] text-[var(--muted)]'>
-        {zip ? (
-          <span className='inline-flex items-center gap-1'>
-            <PinIcon className='size-4' />
-            {t('ellieoMarket.detail.near', { zip })}
-          </span>
-        ) : null}
+      <h1 className='mt-1 text-[17px] font-semibold leading-snug text-[var(--foreground)]'>{post.title}</h1>
+      <p className='mt-1 flex flex-wrap items-center gap-x-1.5 text-[13px] text-[var(--muted)]'>
+        {zip ? <span>{t('ellieoMarket.detail.near', { zip })}</span> : null}
+        {zip ? <span aria-hidden>·</span> : null}
         <span>{format.relative(post.createdAt)}</span>
         {post.viewCount ? <span>· {t('ellieoMarket.detail.views', { count: post.viewCount })}</span> : null}
       </p>
 
-      {post.marketPayments && post.marketPayments.length > 0 ? (
-        <div className='mt-4'>
-          <p className='text-[13px] font-semibold text-[var(--muted-foreground)]'>{t('ellieoMarket.detail.payments')}</p>
-          <div className='mt-1.5 flex flex-wrap gap-1.5'>
-            {post.marketPayments.map((payment) => (
-              <span key={payment} className='rounded-full bg-[var(--brand-soft)] px-3 py-1 text-[13px] font-semibold text-[var(--brand-deep)]'>
-                {t(`ellieoMarket.payments.${payment}`)}
-              </span>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      {/* Key facts: 2 columns with hairlines */}
+      <dl className='mt-4 grid grid-cols-[7rem_1fr] border-t border-[var(--border)] text-[13.5px]'>
+        {post.marketCategory ? (
+          <>
+            <dt className='border-b border-[var(--border)] py-2 text-[var(--muted-foreground)]'>{t('ellieoMarket.form.category')}</dt>
+            <dd className='border-b border-[var(--border)] py-2 text-[var(--foreground)]'>{t(`ellieoMarket.categories.${post.marketCategory}`)}</dd>
+          </>
+        ) : null}
+        <dt className='border-b border-[var(--border)] py-2 text-[var(--muted-foreground)]'>{t('ellieoMarket.detail.statusLabel')}</dt>
+        <dd className='border-b border-[var(--border)] py-2 text-[var(--foreground)]'>{t(`ellieoMarket.status.${post.marketStatus ?? 'selling'}`)}</dd>
+        {post.marketPayments && post.marketPayments.length > 0 ? (
+          <>
+            <dt className='border-b border-[var(--border)] py-2 text-[var(--muted-foreground)]'>{t('ellieoMarket.detail.payments')}</dt>
+            <dd className='border-b border-[var(--border)] py-2 text-[var(--foreground)]'>
+              {post.marketPayments.map((payment) => t(`ellieoMarket.payments.${payment}`)).join(', ')}
+            </dd>
+          </>
+        ) : null}
+        {zip ? (
+          <>
+            <dt className='border-b border-[var(--border)] py-2 text-[var(--muted-foreground)]'>{t('ellieoMarket.form.zip')}</dt>
+            <dd className='border-b border-[var(--border)] py-2 text-[var(--foreground)]'>{zip}</dd>
+          </>
+        ) : null}
+      </dl>
 
       {post.contentHtml ? (
-        <CommunityRichBody html={post.contentHtml} className='mt-5 !text-[15.5px] !leading-[1.7] text-[var(--foreground)]' />
+        <CommunityRichBody html={post.contentHtml} className='mt-4 !text-[15px] !leading-[1.6] text-[var(--foreground)]' />
       ) : null}
 
-      <div className='mt-6 flex items-center gap-3 rounded-[1.25rem] bg-[var(--surface)] p-3.5'>
+      <div className='mt-5 flex items-center gap-3 border-y border-[var(--border)] py-3'>
         <EllieoPersonAvatar name={post.authorNickname || '?'} photo={post.authorPhotoURL} />
         <div className='min-w-0 flex-1'>
           <p className='text-[12px] text-[var(--muted)]'>{t('ellieoMarket.detail.seller')}</p>
@@ -182,7 +184,7 @@ function PhotoCarousel({ photos, sold }: { photos: string[]; sold: boolean }) {
 
   if (photos.length === 0) {
     return (
-      <div className='flex aspect-square items-center justify-center rounded-[1.5rem] bg-[var(--surface)] text-[var(--muted)] sm:aspect-[4/3]'>
+      <div className='flex aspect-square items-center justify-center rounded-[10px] bg-[var(--surface)] text-[var(--muted)] sm:aspect-[4/3]'>
         <BagIcon className='size-10' />
       </div>
     )
@@ -196,7 +198,7 @@ function PhotoCarousel({ photos, sold }: { photos: string[]; sold: boolean }) {
           const el = event.currentTarget
           setIndex(Math.round(el.scrollLeft / Math.max(1, el.clientWidth)))
         }}
-        className='flex aspect-square snap-x snap-mandatory overflow-x-auto rounded-[1.5rem] bg-[var(--surface)] [scrollbar-width:none] sm:aspect-[4/3] [&::-webkit-scrollbar]:hidden'
+        className='flex aspect-square snap-x snap-mandatory overflow-x-auto rounded-[10px] bg-[var(--surface)] [scrollbar-width:none] sm:aspect-[4/3] [&::-webkit-scrollbar]:hidden'
       >
         {photos.map((src, i) => (
           // eslint-disable-next-line @next/next/no-img-element -- listing photo URL
@@ -209,11 +211,9 @@ function PhotoCarousel({ photos, sold }: { photos: string[]; sold: boolean }) {
         ))}
       </div>
       {photos.length > 1 ? (
-        <div className='pointer-events-none absolute inset-x-0 bottom-3 flex justify-center gap-1.5'>
-          {photos.map((src, i) => (
-            <span key={src + i} className={cn('size-1.5 rounded-full', i === index ? 'bg-white' : 'bg-white/50')} />
-          ))}
-        </div>
+        <span className='pointer-events-none absolute bottom-2.5 right-2.5 rounded bg-black/60 px-2 py-0.5 text-[12px] font-semibold tabular-nums text-white'>
+          {index + 1}/{photos.length}
+        </span>
       ) : null}
     </div>
   )
@@ -238,8 +238,9 @@ function BuyerPanel({ post, signedIn }: { post: CommunityPost; signedIn: boolean
   }, [loadThreads])
 
   return (
-    <section className='mt-6 rounded-[1.5rem] bg-white p-4 shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)] sm:p-5'>
-      <h2 className='text-[17px] font-bold text-[var(--foreground)]'>{t('ellieoMarket.ask.title')}</h2>
+    <>
+    <section id='ask-seller' className='mt-6 scroll-mt-28 border-t border-[var(--border)] pt-4'>
+      <h2 className='text-[16px] font-bold text-[var(--foreground)]'>{t('ellieoMarket.ask.title')}</h2>
       {!signedIn ? (
         <Link
           href={cityLoginPath(city, href(`/marketplace/${encodeURIComponent(post.id)}`))}
@@ -263,6 +264,21 @@ function BuyerPanel({ post, signedIn }: { post: CommunityPost; signedIn: boolean
         <MarketAskBox postId={post.id} onSent={loadThreads} />
       )}
     </section>
+    {/* Phones/tablets: bottom action bar with the main action (spec v4) */}
+    {post.marketStatus !== 'sold' ? (
+      <div
+        className='fixed inset-x-0 z-[9500] border-t border-[var(--border)] bg-white px-4 py-2.5 lg:hidden'
+        style={{ bottom: 'var(--bottom-nav-h)' }}
+      >
+        <a
+          href={signedIn ? '#ask-seller' : cityLoginPath(city, href(`/marketplace/${encodeURIComponent(post.id)}`))}
+          className='flex h-11 items-center justify-center rounded-lg bg-[var(--brand)] text-[15px] font-semibold text-white'
+        >
+          {signedIn ? t('ellieoMarket.ask.title') : t('ellieoMarket.ask.login')}
+        </a>
+      </div>
+    ) : null}
+    </>
   )
 }
 
@@ -315,7 +331,7 @@ function OwnerPanel({ post, onChange }: { post: CommunityPost; onChange: (post: 
 
   return (
     <>
-      <section className='mt-6 rounded-[1.5rem] bg-white p-4 shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)] sm:p-5'>
+      <section className='mt-6 border-t border-[var(--border)] pt-4'>
         <p className='text-[13px] font-semibold text-[var(--muted-foreground)]'>{t('ellieoMarket.detail.statusLabel')}</p>
         <div role='radiogroup' className='mt-2 grid grid-cols-3 gap-1 rounded-full bg-[var(--surface)] p-1'>
           {MARKET_STATUSES.map((status) => {
@@ -356,7 +372,7 @@ function OwnerPanel({ post, onChange }: { post: CommunityPost; onChange: (post: 
         </div>
       </section>
 
-      <section className='mt-4 rounded-[1.5rem] bg-white p-4 shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)] sm:p-5'>
+      <section className='mt-5 border-t border-[var(--border)] pt-4'>
         <h2 className='text-[17px] font-bold text-[var(--foreground)]'>{t('ellieoMarket.ask.threads')}</h2>
         {threads === null ? (
           <div className='flex justify-center py-6'>
