@@ -755,16 +755,13 @@
 }
 
 /* =====================================================================
-   Post detail: author-first card, reactions as a sticky action bar above the tab bar
+   Post detail: author + reactions panel
    ===================================================================== */
+/* (A sticky version overlapped the post body: the footer also holds the author row, so it stays in place) */
 [data-brand='ellieo'] [data-ui='post-footer'] {
-  position: sticky;
-  bottom: calc(var(--bottom-nav-h) + 0.75rem);
-  z-index: 30;
   border-radius: 1.5rem;
-  background: rgb(255 255 255 / 0.94);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 0 1px var(--border), 0 12px 28px -14px rgb(20 18 31 / 0.35);
+  background: var(--surface);
+  box-shadow: none;
 }
 
 /* Comments: each comment reads as a small card */
