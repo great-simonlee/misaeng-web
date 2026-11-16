@@ -22,7 +22,7 @@ import {
   BriefcaseIcon,
   ChevronDownIcon,
   HomeIcon,
-  KeyIcon,
+  BuildingIcon,
   PassportIcon,
   GlobeIcon,
   PlusIcon,
@@ -114,7 +114,7 @@ export function EllieoNavbar() {
   const visaActive = ['/status', '/cpt-opt', '/visa', '/green-card'].some((path) => isActive(href(path)))
   const tabs = [
     { key: 'home', label: t('ellieo.tabs.home'), icon: HomeIcon, href: home, active: pathname === home },
-    { key: 'housing', label: t('ellieo.tabs.housing'), icon: KeyIcon, href: housingHref, active: isActive(housingHref) },
+    { key: 'housing', label: t('ellieo.tabs.housing'), icon: BuildingIcon, href: housingHref, active: isActive(housingHref) },
     { key: 'post' },
     { key: 'visa', label: t('ellieo.short.status'), icon: PassportIcon, href: visaHref, active: visaActive },
     { key: 'jobs', label: t('ellieo.tabs.jobs'), icon: BriefcaseIcon, href: jobsHref, active: isActive(jobsHref) || isActive(companiesHref) },

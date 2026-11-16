@@ -278,3 +278,11 @@ export const PencilIcon = (p: IconProps) => (
     <path d='M4.5 19.5 5.6 15 15.8 4.8a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L9 18.4l-4.5 1.1Z' />
   </Base>
 )
+
+/** Housing everywhere (Home is HomeIcon): an apartment building */
+export const BuildingIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M5 20.5V5.5A1.5 1.5 0 0 1 6.5 4h7A1.5 1.5 0 0 1 15 5.5v15M15 9.5h3.5A1.5 1.5 0 0 1 20 11v9.5M3.5 20.5h17' />
+    <path d='M8 7.5h1M11 7.5h1M8 10.5h1M11 10.5h1M8 13.5h1M11 13.5h1M17.5 13h0M17.5 16h0M9.5 20.5v-3h1v3' />
+  </Base>
+)
