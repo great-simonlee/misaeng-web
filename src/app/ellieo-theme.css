@@ -1009,3 +1009,46 @@
 [data-brand='ellieo'] [data-ui='post-detail'] [data-ui='comments'] .border-l-2 {
   border-left-color: var(--border);
 }
+
+/* =====================================================================
+   Community design: e/Companies and e/Jobs as flat list rows (hairline, no card shell)
+   ===================================================================== */
+[data-brand='ellieo'] [data-ui='company-grid'] {
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+[data-brand='ellieo'] [data-ui='company-grid'] [data-ui='company-card'] {
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 0;
+}
+
+[data-brand='ellieo'] [data-ui='company-grid'] [data-ui='company-card'] > div:first-child > :first-child {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.625rem;
+}
+
+[data-brand='ellieo'] [data-ui='company-grid'] [data-ui='company-card'] > span:nth-child(2) {
+  font-weight: 600;
+}
+
+[data-brand='ellieo'] [data-ui='posting-list'] {
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+[data-brand='ellieo'] [data-ui='posting-list'] [data-ui='posting-row'] {
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: 1px solid var(--border);
+}
+
+[data-brand='ellieo'] [data-ui='posting-list'] [data-ui='posting-row'] [data-ui='posting-logo'] > * {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.625rem;
+}
