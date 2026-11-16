@@ -8,7 +8,7 @@ import { MobileAppScreen } from '@screens/mobile-app/MobileAppScreen'
 /** 앱 소개: misaeng.com은 미생·엘리오 두 앱, ellieo는 엘리오 앱 */
 const ELLIEO_TITLE = 'Mobile App — Ellieo'
 const ELLIEO_DESCRIPTION =
-  'Download the Ellieo app for iOS and Android. Verified listings, roommate matching, and secure messaging for NYC.'
+  'The Ellieo app for iOS and Android is coming soon: housing, visas, jobs and everyday life for international students in the US.'
 
 // The (corporate) layout's Open Graph is Misaeng's (misaeng.com): override it here for Ellieo.
 export const metadata: Metadata =
