@@ -84,7 +84,7 @@ export function EllieoAboutScreen() {
               {showJoin ? (
                 <Link
                   href={joinHref}
-                  className='inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-[14px] font-semibold text-[#0b4fe0] transition hover:bg-white/90'
+                  className='inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-[14px] font-semibold text-[#6a48f5] transition hover:bg-white/90'
                 >
                   {t('ellieo.about.hero.primary')}
                 </Link>
@@ -144,8 +144,8 @@ export function EllieoAboutScreen() {
           <div className='grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10'>
             <ul className='grid grid-cols-2 gap-2.5 sm:gap-3'>
               {promises.map(({ key, icon: ItemIcon }) => (
-                <li key={key} className='rounded-2xl bg-[#f6f8ff] p-3.5 sm:p-5'>
-                  <span className='flex size-9 items-center justify-center rounded-full bg-[#1f6bff] text-white sm:size-10'>
+                <li key={key} className='rounded-2xl bg-[#f1edff] p-3.5 sm:p-5'>
+                  <span className='flex size-9 items-center justify-center rounded-full bg-[#7c5cff] text-white sm:size-10'>
                     <ItemIcon className='size-[18px]' />
                   </span>
                   <h3 className='mt-2.5 text-[14px] font-semibold leading-snug text-[var(--foreground)] sm:mt-3 sm:text-[15px]'>
@@ -211,7 +211,7 @@ export function EllieoAboutScreen() {
             <p className='mt-3 text-[15px] leading-relaxed text-[var(--muted-foreground)] sm:text-[16px]'>
               {t('ellieo.about.care.body2')}
             </p>
-            <p className='mt-5 flex gap-2 border-l-[3px] border-[#1f6bff] pl-3 text-[15px] font-semibold leading-relaxed text-[var(--foreground)]'>
+            <p className='mt-5 flex gap-2 border-l-[3px] border-[#7c5cff] pl-3 text-[15px] font-semibold leading-relaxed text-[var(--foreground)]'>
               {t('ellieo.about.care.closing')}
             </p>
             <TeamMembers />
@@ -236,7 +236,7 @@ export function EllieoAboutScreen() {
         {/* Closing call to action */}
         <section
           className='mb-12 mt-12 rounded-3xl px-5 py-9 text-center text-white sm:mt-16 sm:px-10 sm:py-12'
-          style={{ background: 'linear-gradient(90deg, #1f6bff 0%, #0b4fe0 55%, #0a2f8f 100%)' }}
+          style={{ background: 'linear-gradient(90deg, #7c5cff 0%, #6a48f5 55%, #5a3be0 100%)' }}
         >
           <h2 className='text-balance text-[1.45rem] font-bold leading-tight tracking-[-0.02em] sm:text-[1.9rem]'>
             {t('ellieo.about.cta.title')}
@@ -248,7 +248,7 @@ export function EllieoAboutScreen() {
             {showJoin ? (
               <Link
                 href={joinHref}
-                className='inline-flex h-11 w-full items-center justify-center rounded-full bg-white px-6 text-[14.5px] font-semibold text-[#0b4fe0] transition hover:bg-white/90 sm:w-auto'
+                className='inline-flex h-11 w-full items-center justify-center rounded-full bg-white px-6 text-[14.5px] font-semibold text-[#6a48f5] transition hover:bg-white/90 sm:w-auto'
               >
                 {t('ellieo.about.cta.join')}
               </Link>
@@ -299,26 +299,26 @@ function VerifiedCard() {
   return (
     <figure
       className='relative overflow-hidden rounded-3xl p-5 sm:p-6'
-      style={{ background: 'linear-gradient(135deg, #1f6bff 0%, #0b4fe0 55%, #0a2f8f 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #7c5cff 0%, #6a48f5 55%, #5a3be0 100%)' }}
     >
       <div aria-hidden className='absolute -right-10 -top-10 size-40 rounded-full bg-white/10' />
       <div className='relative rounded-2xl bg-white p-4 shadow-[0_18px_40px_-18px_rgba(10,47,143,0.6)]'>
         <div className='flex items-center gap-3'>
-          <span aria-hidden className='size-11 shrink-0 rounded-full bg-[linear-gradient(135deg,#bfd3ff,#1f6bff)]' />
+          <span aria-hidden className='size-11 shrink-0 rounded-full bg-[linear-gradient(135deg,#c6f432,#7c5cff)]' />
           <div className='min-w-0 flex-1'>
             <p className='flex items-center gap-1 text-[14.5px] font-semibold text-[var(--foreground)]'>
               {t('ellieo.about.promise.card.title')}
-              <BadgeCheckIcon className='size-4 text-[#1f6bff]' />
+              <BadgeCheckIcon className='size-4 text-[#7c5cff]' />
             </p>
-            <span aria-hidden className='mt-1.5 block h-2 w-24 rounded-full bg-[#e6ecf8]' />
+            <span aria-hidden className='mt-1.5 block h-2 w-24 rounded-full bg-[#eceaf3]' />
           </div>
-          <span className='shrink-0 rounded-full bg-[#f1f4fa] px-2 py-0.5 text-[10.5px] font-semibold text-[var(--muted)]'>
+          <span className='shrink-0 rounded-full bg-[#f5f4fa] px-2 py-0.5 text-[10.5px] font-semibold text-[var(--muted)]'>
             {t('ellieo.about.promise.card.label')}
           </span>
         </div>
         <ul className='mt-4 space-y-2'>
           {(['school', 'work'] as const).map((key) => (
-            <li key={key} className='flex items-center gap-2 rounded-xl bg-[#f6f8ff] px-3 py-2 text-[13px] font-medium text-[var(--foreground)]'>
+            <li key={key} className='flex items-center gap-2 rounded-xl bg-[#f1edff] px-3 py-2 text-[13px] font-medium text-[var(--foreground)]'>
               <ShieldCheckIcon className='size-4 text-[#16b47e]' />
               {t(`ellieo.about.promise.card.${key}`)}
             </li>
