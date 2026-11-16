@@ -369,13 +369,14 @@
 }
 
 [data-brand='ellieo'] [data-ui='hero-stat-accent'] {
-  color: var(--ellieo-lime);
+  color: #fff;
+  font-weight: 800;
 }
 
-/* Featured company: lime ring */
+/* Featured company: blue ring */
 [data-brand='ellieo'] [data-ui='featured-card'] {
   border-radius: 1.5rem;
-  background: var(--ellieo-lime);
+  background: var(--brand);
 }
 
 [data-brand='ellieo'] [data-ui='featured-card'] > span {
@@ -458,7 +459,7 @@
 }
 
 /* =====================================================================
-   Loading: three hopping dots (EllieoDots) — violet, violet, lime. No logo, no ring
+   Loading: three hopping dots (EllieoDots) — blue, blue, lime (the one sanctioned lime accent). No logo, no ring
    ===================================================================== */
 @keyframes ellieo-hop {
   0%,
@@ -642,7 +643,7 @@
 }
 
 /* =====================================================================
-   My page: white page, blue profile card banner with a lime spot, card sections
+   My page: white page, blue profile card banner with a soft white spot, card sections
    ===================================================================== */
 [data-brand='ellieo'] [data-ui='me-page'] {
   background: #fff;
@@ -683,7 +684,7 @@
 
 [data-brand='ellieo'] [data-ui='me-banner'] {
   height: 6rem;
-  background: var(--brand) radial-gradient(circle at 92% -10%, var(--ellieo-lime) 0 3.25rem, transparent 3.3rem);
+  background: var(--brand) radial-gradient(circle at 92% -10%, rgb(255 255 255 / 0.14) 0 3.25rem, transparent 3.3rem);
 }
 
 [data-brand='ellieo'] [data-ui='me-page'] :is(h2, h3).text-\[13px\] {
@@ -822,7 +823,7 @@
   margin-top: 0;
 }
 
-/* Featured company: lime ring around a white card */
+/* Featured company: blue ring around a white card */
 [data-brand='ellieo'] [data-ui='featured-card'] {
   background-image: none;
 }

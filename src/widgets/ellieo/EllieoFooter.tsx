@@ -109,7 +109,7 @@ export function EllieoFooter() {
                 const Icon = item.icon
                 return (
                   <li key={item.title} className='flex gap-3 rounded-[1.125rem] bg-white p-3.5'>
-                    <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--ellieo-lime)] text-[var(--foreground)]'>
+                    <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]'>
                       <Icon className='size-[18px]' />
                     </span>
                     <span className='min-w-0'>

@@ -32,7 +32,7 @@ import type { TranslateParams } from '@lib/i18n/translate'
 /**
  * Ellieo points guide: same rules, numbers and copy as the Misaeng page (screens/credit/CreditScreen), drawn in the
  * Ellieo feed style — blue hero card, chip contents row, every section a card with a line icon, earn rules as rows with
- * lime point pills, FAQ as tap-to-open cards.
+ * blue point pills, FAQ as tap-to-open cards.
  */
 const TOC = [
   { id: 'redeem', icon: GiftIcon },
@@ -78,7 +78,7 @@ export function EllieoCreditScreen() {
       <div className='mx-auto w-full max-w-[40rem] px-4 pb-14 pt-5'>
         {/* Hero */}
         <header className='relative overflow-hidden rounded-[1.75rem] bg-[var(--brand)] px-5 pb-5 pt-5 text-white sm:px-6'>
-          <span aria-hidden className='absolute -right-8 -top-10 size-32 rounded-full bg-[var(--ellieo-lime)]' />
+          <span aria-hidden className='absolute -right-8 -top-10 size-32 rounded-full bg-white/10' />
           <EllieoIconBadge icon={StarIcon} size={56} className='absolute right-5 top-6' />
           <span className='relative inline-flex rounded-full bg-white/15 px-2.5 py-0.5 text-[12px] font-bold'>
             {t('header.eyebrow', { brand: BRAND_CONFIG.name.toUpperCase() })}
@@ -93,7 +93,7 @@ export function EllieoCreditScreen() {
                 {tag}
               </span>
             ))}
-            <span className='rounded-full bg-[var(--ellieo-lime)] px-2.5 py-1 text-[12px] font-bold text-[var(--foreground)]'>
+            <span className='rounded-full bg-white px-2.5 py-1 text-[12px] font-bold text-[var(--brand)]'>
               {t('header.policyVersion', { version: COMMUNITY_CREDIT_POLICY_VERSION })}
             </span>
           </div>
@@ -166,7 +166,7 @@ export function EllieoCreditScreen() {
               </li>
             ))}
             {COMMUNITY_CREDIT_BONUS_RULES.map((bonus) => (
-              <li key={bonus.id} className='flex items-center gap-3 rounded-[1.125rem] bg-[var(--ellieo-lime-soft)] px-4 py-3'>
+              <li key={bonus.id} className='flex items-center gap-3 rounded-[1.125rem] bg-[var(--brand-soft)] px-4 py-3'>
                 <p className='min-w-0 flex-1 text-[14.5px] font-bold text-[var(--foreground)]'>
                   {t(`bonusRules.${bonus.id}.label`)}{' '}
                   <span className='text-[12px] font-semibold text-[var(--muted-foreground)]'>{t('earn.once')}</span>
@@ -345,7 +345,7 @@ function Card({
 function PointPill({ amount }: { amount: number }) {
   const format = useFormat()
   return (
-    <span className='shrink-0 rounded-full bg-[var(--ellieo-lime)] px-3 py-1 text-[15px] font-extrabold tabular-nums text-[var(--foreground)]'>
+    <span className='shrink-0 rounded-full bg-[var(--brand)] px-3 py-1 text-[15px] font-extrabold tabular-nums text-white'>
       +{format.number(amount)}
     </span>
   )

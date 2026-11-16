@@ -29,11 +29,11 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 | ink | `#14121F` | text, selected chip, primary dark buttons |
 | ink-2 | `#4A4660` | secondary text |
 | muted | `#8A86A0` | meta (time, counts) |
-| brand (Ellieo blue) | `#1F5EFF` | brand: links, active tab, primary buttons, verified mark (user 11-16: keep Ellieo's own color) |
+| brand (Ellieo blue) | `#1F5EFF` | **main color** (user 11-16): links, active tab, primary buttons/CTAs, the (+) post button, prices, verified/trust badges |
 | brand-hover | `#1748C7` | |
-| brand-soft | `#EEF3FF` | tinted backgrounds, badges |
-| lime (accent, confirmed 11-16) | `#C6F432` | highlight: FAB (+), "New" badges, selected-state underline, price tags; text on lime is ink |
-| lime-soft | `#F3FCD6` | |
+| brand-soft | `#EEF3FF` | tinted backgrounds, badges (verified/trust = brand-soft bg + blue text/icon) |
+| lime (tiny accent only) | `#C6F432` | ONLY the 3rd loader dot and small new/unread/current-step dots (≤5% of a screen). Never a fill on buttons, pills, badges, FABs, chips, banners, heroes or sheets |
+| lime-soft | `#F3FCD6` | not used (kept as a token) |
 | danger | `#F0445A` | likes (filled heart), errors |
 | success | `#16B47E` | "No broker fee", verified ok |
 
@@ -41,17 +41,19 @@ Navigation lives in a bottom tab bar on every screen size (web too).
   tracking (-0.02em). Body 15–16px, line-height 1.55 (Vietnamese tone marks need room).
 - Radius: cards **24px**, photos inside cards 18px, chips/buttons full pill, inputs 16px, sheets 28px top.
 - Shadow: cards `0 1px 2px rgba(20,18,31,.04), 0 8px 24px -16px rgba(20,18,31,.18)` + 1px `line` border.
-  No hard shadows, no gradients except the lime→brand blue ring on story avatars.
+  No hard shadows, no gradients except the blue (#3D7BFF→#143FB0) ring on partner story avatars.
 - Spacing: 16px page gutter on phones; feed cards 12px apart; card padding 16px (phones) / 20px (≥640px).
 
-### Color rules (blue main + lime accent, confirmed 11-16)
+### Color rules (blue main, lime = tiny accent only; revised 11-16)
 
-- Split-complementary pair (blue ~223°, lime ~76°): high energy, still harmonious.
+- User 11-16: "main color is Ellieo blue, lime is only an accent". Every screen must read as BLUE + white, not lime.
 - Contrast: white on blue ≈ 5.1:1 (AA) · ink on lime ≈ 14.5:1 · blue vs lime ≈ 4:1 (large shapes only) ·
   lime on white ≈ 1.3:1 → **never lime text on white**, never blue text on lime or lime text on blue.
-- Proportions: white 60–70% · ink/grays 20–30% · blue ~10% · lime ≤5% (FAB, price tags, New badges, one dot).
+- Proportions: white 60–70% · ink/grays 20–30% · blue 10–15% · lime ≤5% (loader 3rd dot, tiny new/unread dots only).
 - Keep white or ink between large blue and lime areas (both are highly saturated and vibrate when they touch).
-- Roles: blue = things you tap (buttons, links, active tab, verified); lime = things that must catch the eye.
+- Roles: blue = main/action color — (+) post button (solid blue, white plus), primary buttons/CTAs, active tab, links,
+  prices, verified/trust badges (brand-soft bg + blue text, or blue bg + white text). On a blue card the CTA is a white
+  pill with blue text. Price tags on photos = white pill, ink bold text. Lime = loader 3rd dot + tiny dots, nothing else.
 
 ## Layout
 
@@ -64,7 +66,7 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 - **Bottom tab bar** on every width (user 11-16): **Home · Housing · (+) · Visa · Jobs**. No Inbox / Me / Explore
   tabs — inbox (bell) and profile (avatar) live in the top bar; other boards (Roommates, Food, Ask & Talk,
   Marketplace, Events) are reached from the emoji chips. Jobs = interview reviews + companies + postings. The (+) is
-  a 52px lime circle with an ink plus, raised; it opens a "What do you want to post?" sheet listing the boards with
+  a 52px solid brand-blue circle with a white plus, raised; it opens a "What do you want to post?" sheet listing the boards with
   emoji. Active tab = brand blue icon + label; others muted. On ≥1024px the bar is a floating white pill (max 440px
   wide) centered at the bottom.
 - **Desktop**: one centered feed column, **max 640px**. Optional right rail (≥1280px, 320px) for "Join" card,
@@ -87,8 +89,8 @@ Navigation lives in a bottom tab bar on every screen size (web too).
   check (brand blue) + school/work label + `· 2h`; board tag at the right as an emoji chip. Title 17px/700, 2-line
   body excerpt, optional photo (18px radius, full card width, 4:3). Footer = ♥ count, 💬 count, views; icons
   outline, filled red heart when liked.
-- **Housing card**: photo first (4:3, 18px radius, inside card padding), lime price tag over the photo bottom-left
-  (`$1,450/mo`, ink text), then title, area · beds/baths, perk chips (`No broker fee` success-soft).
+- **Housing card**: photo first (4:3, 18px radius, inside card padding), white price tag over the photo bottom-left
+  (`$1,450/mo`, ink bold text, soft shadow), then title, area · beds/baths, perk chips (`No broker fee` success-soft).
 - **Job review / company / posting cards**: same card shell; company logo 40px rounded-12 in the header instead
   of a person avatar.
 - **Detail pages**: same card shell, full content; comments as a feed of small cards with avatars; sticky bottom
@@ -102,7 +104,8 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 - **Loading** (user choice 11-16): **three bouncing dots** — brand blue, brand blue, lime; ~8px dots, 6px gap, each hops
   ~6px in turn (stagger ~0.15s, ~0.9s loop). No logo above it, no ring. Same component for full-screen,
   section, button busy and pull-to-refresh. Never gray skeleton blocks; one full-screen loader if two would show.
-- **Badges**: `New` = lime pill ink text; `Verified` = brand blue-soft pill brand blue text.
+- **Badges**: `New`/`Trending`/`Coming soon` = brand-soft pill, brand-deep text; `Verified` = brand-soft pill brand blue
+  text (or blue pill white text). Sample-data tags = surface pill, muted text. No lime pills.
 - **Sheets/modals**: bottom sheet on phones (28px top radius, grab handle), centered card on desktop.
 
 ## Copy

@@ -246,7 +246,7 @@ export function EllieoNavbar() {
                     onClick={() => setSheet('compose')}
                     aria-label={t('ellieo.tabs.post')}
                     aria-expanded={sheet === 'compose'}
-                    className='inline-flex size-[3.25rem] -translate-y-1 items-center justify-center rounded-full bg-[var(--ellieo-lime)] text-[var(--foreground)] shadow-[0_8px_20px_-8px_rgba(31,94,255,0.45)] ring-4 ring-white transition hover:scale-[1.04] active:scale-95 lg:translate-y-0 lg:ring-0'
+                    className='inline-flex size-[3.25rem] -translate-y-1 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-[0_8px_20px_-8px_rgba(31,94,255,0.6)] hover:bg-[var(--brand-hover)] ring-4 ring-white transition hover:scale-[1.04] active:scale-95 lg:translate-y-0 lg:ring-0'
                   >
                     <PlusIcon className='size-6' strokeWidth={2.5} />
                   </button>

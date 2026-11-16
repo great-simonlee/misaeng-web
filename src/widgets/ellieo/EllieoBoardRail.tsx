@@ -56,7 +56,7 @@ function ProfileCard() {
         <div className='mt-4 flex gap-2'>
           <Link
             href={`${cityLoginPath(city)}?mode=signup`}
-            className='inline-flex h-10 flex-1 items-center justify-center rounded-full bg-[var(--ellieo-lime)] text-[14px] font-bold text-[var(--foreground)] transition hover:brightness-95'
+            className='inline-flex h-10 flex-1 items-center justify-center rounded-full bg-white text-[14px] font-bold text-[var(--brand)] transition hover:bg-white/90'
           >
             {t('ellieo.rail.join')}
           </Link>

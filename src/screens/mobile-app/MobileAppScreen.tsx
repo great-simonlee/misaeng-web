@@ -31,7 +31,7 @@ export function MobileAppScreen() {
       <div className='mx-auto w-full max-w-[40rem] px-4 pb-12 pt-6'>
         {/* Hero */}
         <section className='relative overflow-hidden rounded-[1.75rem] bg-[var(--brand)] px-5 pb-6 pt-6 text-white sm:px-7'>
-          <span aria-hidden className='absolute -right-8 -top-10 size-36 rounded-full bg-[var(--ellieo-lime)]' />
+          <span aria-hidden className='absolute -right-8 -top-10 size-36 rounded-full bg-white/10' />
           <div className='relative flex items-center gap-3'>
             <EllieoAppIcon size={56} className='ring-2 ring-white/30' />
             <span className='rounded-full bg-white/15 px-2.5 py-0.5 text-[12px] font-bold'>Coming soon</span>
@@ -47,7 +47,7 @@ export function MobileAppScreen() {
             {APP_LAUNCHED ? null : (
               <Link
                 href='/nyc/login?mode=signup'
-                className='inline-flex h-12 items-center rounded-full bg-[var(--ellieo-lime)] px-6 text-[15px] font-bold text-[var(--foreground)] transition hover:brightness-95'
+                className='inline-flex h-12 items-center rounded-full bg-white px-6 text-[15px] font-bold text-[var(--brand)] transition hover:bg-white/90'
               >
                 Join on the web now
               </Link>
@@ -78,7 +78,7 @@ export function MobileAppScreen() {
               <div className='space-y-2 px-3 pb-3'>
                 <div className='overflow-hidden rounded-[1.25rem] bg-[var(--surface)] p-1.5'>
                   <div className='relative h-24 rounded-[1rem] bg-[linear-gradient(135deg,#dce6ff,#eef3ff)]'>
-                    <span className='absolute bottom-2 left-2 rounded-full bg-[var(--ellieo-lime)] px-2 py-0.5 text-[12px] font-extrabold'>
+                    <span className='absolute bottom-2 left-2 rounded-full bg-white px-2 py-0.5 text-[12px] font-extrabold text-[var(--foreground)]'>
                       $1,450/mo
                     </span>
                   </div>
@@ -105,7 +105,7 @@ export function MobileAppScreen() {
               <div className='flex items-center justify-around border-t border-[var(--border)] px-3 py-2 text-[var(--muted)]'>
                 <HomeIcon className='size-4' />
                 <BuildingIcon className='size-4' />
-                <span className='flex size-8 items-center justify-center rounded-full bg-[var(--ellieo-lime)] text-[18px] font-bold text-[var(--foreground)]'>
+                <span className='flex size-8 items-center justify-center rounded-full bg-[var(--brand)] text-[18px] font-bold text-white'>
                   +
                 </span>
                 <PassportIcon className='size-4' />

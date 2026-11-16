@@ -210,7 +210,7 @@ export function EllieoTimelineDetail({ post, boardId, isAuthor, onDelete, transl
 
       {/* Tips */}
       {tipsHtml ? (
-        <section className='mt-6 rounded-2xl border border-[#c6f432] bg-[var(--ellieo-lime)]/70 p-5 sm:p-6'>
+        <section className='mt-6 rounded-2xl border border-[var(--brand-subtle)] bg-[var(--brand-soft)] p-5 sm:p-6'>
           <h2 className='flex items-center gap-2 text-[14px] font-bold text-[var(--foreground)]'>
             <FlagIcon className='size-4' />
             {t(`${prefix}.detail.tipsTitle`)}

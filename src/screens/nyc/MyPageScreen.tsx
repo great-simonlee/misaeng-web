@@ -472,7 +472,7 @@ export function MyPageScreen() {
                   // Ellieo: the points guide lives here now (no Explore sheet)
                   <Link
                     href={href('/credit')}
-                    className='mt-3 flex items-center gap-3 rounded-[1.25rem] bg-[var(--ellieo-lime-soft)] px-4 py-3 text-left transition hover:brightness-[0.98]'
+                    className='mt-3 flex items-center gap-3 rounded-[1.25rem] bg-[var(--brand-soft)] px-4 py-3 text-left transition hover:brightness-[0.98]'
                   >
                     <EllieoIconBadge icon={StarIcon} size={40} />
                     <span className='min-w-0 flex-1'>

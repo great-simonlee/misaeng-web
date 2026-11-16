@@ -76,7 +76,7 @@ function WelcomeCard() {
 
   return (
     <section className='relative overflow-hidden rounded-[1.75rem] bg-[var(--brand)] px-5 pb-5 pt-5 text-white sm:px-6 sm:pt-6'>
-      <span aria-hidden className='absolute -right-6 -top-8 size-32 rounded-full bg-[var(--ellieo-lime)] opacity-90' />
+      <span aria-hidden className='absolute -right-6 -top-8 size-32 rounded-full bg-white/10' />
       <EllieoIconBadge icon={GlobeIcon} size={56} className='absolute right-6 top-7' />
       <span className='relative inline-flex rounded-full bg-white/15 px-2.5 py-0.5 text-[12px] font-bold'>
         ✓ {t('ellieo.hero.eyebrow')}
@@ -88,7 +88,7 @@ function WelcomeCard() {
       <div className='relative mt-4 flex flex-wrap gap-2'>
         <Link
           href={`${cityLoginPath(city)}?mode=signup`}
-          className='inline-flex h-11 items-center rounded-full bg-[var(--ellieo-lime)] px-5 text-[15px] font-bold text-[var(--foreground)] transition hover:brightness-95'
+          className='inline-flex h-11 items-center rounded-full bg-white px-5 text-[15px] font-bold text-[var(--brand)] transition hover:bg-white/90'
         >
           {t('ellieo.hero.join')}
         </Link>
@@ -121,8 +121,8 @@ const PLATFORM_URL: Record<EllieoCreator['platform'], (handle: string) => string
   tiktok: (handle) => `https://tiktok.com/@${handle}`,
 }
 
-/** Partners get a blue→jade ring, creators a warm one, so the two kinds read apart at a glance */
-const PARTNER_RING = 'linear-gradient(135deg, #c6f432, #1f5eff)'
+/** Partners get a blue ring, creators a warm one, so the two kinds read apart at a glance */
+const PARTNER_RING = 'linear-gradient(135deg, #3d7bff, #143fb0)'
 const CREATOR_RING = 'linear-gradient(135deg, #1f5eff, #e0579b)'
 
 function StoriesStrip() {
@@ -293,7 +293,7 @@ function ListingsStrip() {
                     // eslint-disable-next-line @next/next/no-img-element -- listing photo URL
                     <img src={cover} alt='' loading='lazy' className='size-full object-cover transition duration-300 group-hover:scale-[1.04]' />
                   ) : null}
-                  <span className='absolute bottom-2 left-2 rounded-full bg-[var(--ellieo-lime)] px-2.5 py-0.5 text-[13.5px] font-extrabold text-[var(--foreground)]'>
+                  <span className='absolute bottom-2 left-2 rounded-full bg-white px-2.5 py-0.5 shadow-[0_2px_8px_-2px_rgb(20_18_31/0.25)] text-[13.5px] font-extrabold text-[var(--foreground)]'>
                     {format.usd(getHousingUnitRent(listing), 0)}
                     <span className='text-[11px] font-semibold'>{t('ellieo.perMonth')}</span>
                   </span>
@@ -352,7 +352,7 @@ function CommunityFeed() {
           tag={<EllieoBoardTag boardId={post.board} label={tn(`ellieo.short.${post.board}`)} />}
           badge={
             post.likes >= TRENDING_LIKES ? (
-              <span className='rounded-full bg-[var(--ellieo-lime)] px-2 py-0.5 text-[11.5px] font-bold text-[var(--foreground)]'>
+              <span className='rounded-full bg-[var(--brand-soft)] px-2 py-0.5 text-[11.5px] font-bold text-[var(--brand-deep)]'>
                 {t('ellieo.community.trending')}
               </span>
             ) : null

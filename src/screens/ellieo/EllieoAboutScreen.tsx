@@ -304,7 +304,7 @@ function VerifiedCard() {
       <div aria-hidden className='absolute -right-10 -top-10 size-40 rounded-full bg-white/10' />
       <div className='relative rounded-2xl bg-white p-4 shadow-[0_18px_40px_-18px_rgba(10,47,143,0.6)]'>
         <div className='flex items-center gap-3'>
-          <span aria-hidden className='size-11 shrink-0 rounded-full bg-[linear-gradient(135deg,#c6f432,#1f5eff)]' />
+          <span aria-hidden className='size-11 shrink-0 rounded-full bg-[linear-gradient(135deg,#3d7bff,#143fb0)]' />
           <div className='min-w-0 flex-1'>
             <p className='flex items-center gap-1 text-[14.5px] font-semibold text-[var(--foreground)]'>
               {t('ellieo.about.promise.card.title')}

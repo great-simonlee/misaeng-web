@@ -42,7 +42,7 @@ export function CommunityBoardWipScreen({
         <section className='pb-14 pt-6'>
           <div className='flex flex-col items-center rounded-[1.75rem] bg-[var(--surface)] px-6 py-12 text-center'>
             <EllieoIconBadge icon={boardIcon(boardId)} />
-            <span className='mt-5 rounded-full bg-[var(--ellieo-lime)] px-3 py-1 text-[12px] font-bold text-[var(--foreground)]'>
+            <span className='mt-5 rounded-full bg-[var(--brand-soft)] px-3 py-1 text-[12px] font-bold text-[var(--brand-deep)]'>
               {t('wip.title')}
             </span>
             <h1 className='mt-3 text-[1.75rem] font-extrabold tracking-[-0.03em] text-[var(--foreground)]'>{title}</h1>

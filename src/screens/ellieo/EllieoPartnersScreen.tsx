@@ -137,7 +137,7 @@ function PartnerList({
           {title}
         </h2>
         {sample ? (
-          <span className='rounded-full bg-[var(--ellieo-lime)] px-2.5 py-0.5 text-[12px] font-semibold text-[var(--foreground)]'>
+          <span className='rounded-full bg-[var(--surface)] px-2.5 py-0.5 text-[12px] font-semibold text-[var(--muted-foreground)]'>
             {t('ellieo.sampleData')}
           </span>
         ) : null}

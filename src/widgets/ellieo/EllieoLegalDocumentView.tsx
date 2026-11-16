@@ -47,7 +47,7 @@ export function EllieoLegalDocumentView({
           <span className='rounded-full bg-[var(--surface)] px-2.5 py-1 text-[var(--muted-foreground)]'>
             Updated {doc.lastUpdated}
           </span>
-          <span className='rounded-full bg-[var(--ellieo-lime)] px-2.5 py-1 text-[var(--foreground)]'>Effective {doc.effectiveDate}</span>
+          <span className='rounded-full bg-[var(--brand)] px-2.5 py-1 text-white'>Effective {doc.effectiveDate}</span>
         </div>
         {ref ? (
           <p lang={ref} className='mt-2 text-[12px] text-[var(--muted)]'>

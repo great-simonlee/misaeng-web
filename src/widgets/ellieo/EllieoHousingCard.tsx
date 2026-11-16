@@ -111,8 +111,8 @@ export function EllieoHousingCard({
           </span>
         ) : null}
 
-        {/* Lime price tag over the photo */}
-        <span className='pointer-events-none absolute bottom-2.5 left-2.5 rounded-full bg-[var(--ellieo-lime)] px-3 py-1 text-[15px] font-extrabold tracking-[-0.01em] text-[var(--foreground)]'>
+        {/* White price tag over the photo (ink text) */}
+        <span className='pointer-events-none absolute bottom-2.5 left-2.5 rounded-full bg-white px-3 py-1 text-[15px] font-extrabold shadow-[0_2px_8px_-2px_rgb(20_18_31/0.25)] tracking-[-0.01em] text-[var(--foreground)]'>
           {format.usd(unitRent, 0)}
           <span className='text-[12px] font-semibold'>{th('ellieo.perMonth')}</span>
         </span>
