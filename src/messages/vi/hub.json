@@ -340,7 +340,16 @@
       "join": "Tham gia Ellieo"
     },
     "listingsStrip": "Tin nhà mới",
-    "feedEmpty": "Chưa có bài viết — hãy là người đầu tiên chia sẻ."
+    "feedEmpty": "Chưa có bài viết — hãy là người đầu tiên chia sẻ.",
+    "guestHero": {
+      "title": "Tham gia cộng đồng sinh viên & người đi làm đã xác minh tại {city}",
+      "benefitContact": "Liên hệ trực tiếp chủ nhà",
+      "benefitPost": "Đăng bài và bình luận",
+      "benefitSave": "Lưu tin và nhận thông báo",
+      "signup": "Đăng ký miễn phí",
+      "haveAccount": "Đã có tài khoản?",
+      "login": "Đăng nhập"
+    }
   },
   "appPrompt": {
     "title": "Misaeng tiện hơn trên ứng dụng",

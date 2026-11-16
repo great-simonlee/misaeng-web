@@ -340,7 +340,16 @@
       "join": "Join Ellieo"
     },
     "listingsStrip": "New listings",
-    "feedEmpty": "No posts yet — be the first to share something."
+    "feedEmpty": "No posts yet — be the first to share something.",
+    "guestHero": {
+      "title": "Join verified students & pros in {city}",
+      "benefitContact": "Contact hosts directly",
+      "benefitPost": "Post & comment on boards",
+      "benefitSave": "Save listings & get alerts",
+      "signup": "Sign up — it's free",
+      "haveAccount": "Already a member?",
+      "login": "Log in"
+    }
   },
   "appPrompt": {
     "title": "Misaeng works better in the app",

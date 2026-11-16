@@ -1,12 +1,13 @@
 'use client'
 
-import { GlobeIcon } from '@widgets/ellieo/icons'
+import { BellIcon, ChatIcon, GlobeIcon, PencilIcon } from '@widgets/ellieo/icons'
 import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { EllieoDots } from '@components/EllieoDots'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
+import { useEllieoViewer } from '@hooks/useEllieoViewer'
 import { captureReferralFromLocation } from '@lib/community/referral'
 import { cityLoginPath, hrefForHousingListing } from '@lib/constants/cities'
 import {
@@ -53,7 +54,7 @@ export function EllieoHomeScreen() {
       {/* One 640px feed column; the side rail (new listings, roommates) joins it from 1280px */}
       <div className='mx-auto grid w-full max-w-[40rem] gap-8 px-4 pb-4 pt-4 xl:max-w-[63rem] xl:grid-cols-[minmax(0,40rem)_20rem] xl:justify-center'>
         <div className='min-w-0'>
-          <WelcomeCard />
+          <HomeHero />
           <StoriesStrip />
           <CommunityFeed />
         </div>
@@ -64,6 +65,64 @@ export function EllieoHomeScreen() {
         </div>
       </div>
     </div>
+  )
+}
+
+/* ---------- Top card: sign-up prompt for visitors, welcome card for members ---------- */
+
+function HomeHero() {
+  const { user, loading } = useEllieoViewer()
+  if (loading) {
+    return (
+      <section className='flex min-h-[15rem] items-center justify-center rounded-[1.5rem] bg-[var(--brand-soft)]'>
+        <EllieoDots />
+      </section>
+    )
+  }
+  return user ? <WelcomeCard /> : <GuestHero />
+}
+
+/** Logged-out: who you join, what you can do, one white sign-up button, log in under it (user 11-16) */
+function GuestHero() {
+  const t = useT('hub')
+  const city = useCity()
+  const cityInfo = useCityInfo()
+  const benefits = [
+    { icon: ChatIcon, label: t('ellieo.guestHero.benefitContact') },
+    { icon: PencilIcon, label: t('ellieo.guestHero.benefitPost') },
+    { icon: BellIcon, label: t('ellieo.guestHero.benefitSave') },
+  ]
+
+  return (
+    <section className='relative overflow-hidden rounded-[1.5rem] bg-[var(--brand)] px-5 pb-5 pt-6 text-white sm:px-7 sm:pb-6 sm:pt-7'>
+      <span aria-hidden className='absolute -right-10 -top-12 size-40 rounded-full bg-white/[0.08]' />
+      <span aria-hidden className='absolute -right-2 top-16 size-16 rounded-full bg-white/[0.06]' />
+      <h2 className='relative max-w-[30rem] text-[24px] font-extrabold leading-[1.2] tracking-[-0.03em] sm:text-[28px]'>
+        {t('ellieo.guestHero.title', { city: cityInfo.name })}
+      </h2>
+      <ul className='relative mt-4 grid gap-2.5'>
+        {benefits.map(({ icon: Icon, label }) => (
+          <li key={label} className='flex items-center gap-3 text-[15px] font-semibold'>
+            <span aria-hidden className='inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-white/15'>
+              <Icon className='size-[17px]' />
+            </span>
+            {label}
+          </li>
+        ))}
+      </ul>
+      <Link
+        href={`${cityLoginPath(city)}?mode=signup`}
+        className='relative mt-5 flex h-12 w-full items-center justify-center rounded-full bg-white px-7 text-[16px] font-bold text-[var(--brand)] transition hover:bg-white/90 sm:inline-flex sm:w-auto'
+      >
+        {t('ellieo.guestHero.signup')}
+      </Link>
+      <p className='relative mt-3 text-center text-[13.5px] text-white/80 sm:text-left'>
+        {t('ellieo.guestHero.haveAccount')}{' '}
+        <Link href={cityLoginPath(city)} className='font-bold text-white underline-offset-2 hover:underline'>
+          {t('ellieo.guestHero.login')}
+        </Link>
+      </p>
+    </section>
   )
 }
 
