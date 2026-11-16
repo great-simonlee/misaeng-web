@@ -579,7 +579,7 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
             isFoodBoard
               ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-5'
               : BRAND_CONFIG.theme === 'ellieo'
-                ? 'flex flex-col gap-3'
+                ? 'flex flex-col border-t border-[var(--border)]'
                 : 'flex flex-col gap-4 sm:gap-5'
           }
         >

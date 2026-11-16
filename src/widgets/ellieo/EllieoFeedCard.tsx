@@ -4,7 +4,9 @@ import Link from 'next/link'
 import { createElement, useState, type ReactNode } from 'react'
 
 import { useFormat } from '@lib/i18n/client'
-import { BadgeCheckIcon, ChatIcon, CommentIcon, EyeIcon, HeartIcon } from '@widgets/ellieo/icons'
+import { ArrowUpIcon, BadgeCheckIcon, ChatIcon, CommentIcon, EyeIcon } from '@widgets/ellieo/icons'
+import { EllieoCommunityAvatar } from '@widgets/ellieo/EllieoCommunityAvatar'
+import type { EllieoCommunity } from '@widgets/ellieo/communities'
 import { boardIcon } from '@widgets/ellieo/nav'
 
 /** Avatar fills when there is no photo: soft tints, ink-friendly */
@@ -65,9 +67,10 @@ export function EllieoBoardTag({ boardId, label }: { boardId: string; label: str
 }
 
 /**
- * Ellieo feed card (docs/design/ellieo-social.md): avatar · name · verified · meta, tag on the right,
- * then title, two-line excerpt, optional extra block and photo, then reactions. `action` (e.g. save) sits at the
- * right of the reactions row, outside the link.
+ * Ellieo post row (docs/design/ellieo-community.md): flat, full width, hairline under it. Meta line = community
+ * avatar · e/Community · author · verified · time; then title (16/600, 2 lines), body preview (2 lines), optional
+ * extra block and 16:9 photo, then the action bar (up · comments · views). `action` (like/save) sits at the right
+ * of the action bar, outside the link. `avatar`/`tag` are kept for callers without a community.
  */
 export function EllieoFeedCard({
   href,
@@ -76,6 +79,8 @@ export function EllieoFeedCard({
   verified,
   meta,
   tag,
+  community,
+  communityName,
   title,
   badge,
   excerpt,
@@ -93,6 +98,8 @@ export function EllieoFeedCard({
   verified?: boolean
   meta?: string
   tag?: ReactNode
+  community?: EllieoCommunity | null
+  communityName?: string
   title: string
   badge?: ReactNode
   excerpt?: string
@@ -106,48 +113,52 @@ export function EllieoFeedCard({
 }) {
   const format = useFormat()
   return (
-    <article className='relative rounded-[1.5rem] bg-white shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)] transition hover:shadow-[0_0_0_1px_var(--border-muted),0_14px_30px_-18px_rgb(20_18_31/0.28)]'>
-      <Link href={href} className='group block p-4 sm:p-5'>
-        <span className='flex items-center gap-2.5'>
-          {avatar}
-          <span className='min-w-0 flex-1'>
-            <span className='flex min-w-0 items-center gap-1'>
-              <span className='truncate text-[14.5px] font-bold text-[var(--foreground)]'>{name}</span>
-              {verified ? <BadgeCheckIcon className='size-4 shrink-0 text-[var(--brand)]' /> : null}
-            </span>
-            {meta ? <span className='block truncate text-[12.5px] text-[var(--muted)]'>{meta}</span> : null}
-          </span>
-          {tag}
+    <article className='relative border-b border-[var(--border)] bg-white'>
+      <Link href={href} className='group block py-3.5'>
+        <span className='flex min-w-0 items-center gap-1.5 text-[12px] font-medium text-[var(--muted-foreground)]'>
+          {community ? (
+            <>
+              <EllieoCommunityAvatar community={community} size={20} />
+              <span className='shrink-0 font-semibold text-[var(--foreground)]'>{communityName}</span>
+              <span aria-hidden>·</span>
+            </>
+          ) : (
+            <span className='shrink-0 [&>*]:!size-5'>{avatar}</span>
+          )}
+          <span className='truncate'>{name}</span>
+          {verified ? <BadgeCheckIcon className='size-3.5 shrink-0 text-[var(--brand)]' /> : null}
+          {meta ? <span className='truncate text-[var(--muted)]'>· {meta}</span> : null}
+          {!community && tag ? <span className='ml-auto'>{tag}</span> : null}
         </span>
 
-        {badge ? <span className='mt-3 flex flex-wrap gap-1.5'>{badge}</span> : null}
-        <span className={`${badge ? 'mt-1.5' : 'mt-3'} line-clamp-2 text-[17px] font-bold leading-snug tracking-[-0.015em] text-[var(--foreground)]`}>
+        {badge ? <span className='mt-2 flex flex-wrap gap-1.5'>{badge}</span> : null}
+        <span className={`${badge ? 'mt-1.5' : 'mt-2'} line-clamp-2 text-[16px] font-semibold leading-snug text-[var(--foreground)] group-hover:underline-offset-2`}>
           {title}
         </span>
         {excerpt ? (
-          <span className='mt-1 line-clamp-2 text-[14.5px] leading-relaxed text-[var(--muted-foreground)]'>{excerpt}</span>
+          <span className='mt-1 line-clamp-2 text-[15px] leading-[1.45] text-[var(--muted-foreground)]'>{excerpt}</span>
         ) : null}
-        {extra ? <span className='mt-3 block'>{extra}</span> : null}
+        {extra ? <span className='mt-2.5 block'>{extra}</span> : null}
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element -- stored post photo URL
-          <img src={photo} alt='' loading='lazy' className='mt-3 aspect-[4/3] w-full rounded-[1.125rem] object-cover' />
+          <img src={photo} alt='' loading='lazy' className='mt-2.5 aspect-video w-full rounded-xl object-cover' />
         ) : null}
 
-        <span className='mt-3.5 flex items-center gap-4 pr-10 text-[13px] font-semibold text-[var(--muted)]'>
+        <span className='mt-2.5 flex items-center gap-4 pr-12 text-[12.5px] font-semibold text-[var(--muted-foreground)]'>
           {likes != null ? (
-            <span className='inline-flex items-center gap-1.5'>
-              <HeartIcon className='size-[18px]' />
+            <span className='inline-flex items-center gap-1'>
+              <ArrowUpIcon className='size-[18px]' />
               {format.number(likes)}
             </span>
           ) : null}
           {comments != null ? (
-            <span className='inline-flex items-center gap-1.5'>
+            <span className='inline-flex items-center gap-1'>
               <CommentIcon className='size-[18px]' />
               {format.number(comments)}
             </span>
           ) : null}
           {views != null ? (
-            <span className='inline-flex items-center gap-1.5'>
+            <span className='inline-flex items-center gap-1'>
               <EyeIcon className='size-[18px]' />
               <span>
                 {format.number(views)}
@@ -157,7 +168,7 @@ export function EllieoFeedCard({
           ) : null}
         </span>
       </Link>
-      {action ? <div className='absolute bottom-3 right-3 sm:bottom-4 sm:right-4'>{action}</div> : null}
+      {action ? <div className='absolute bottom-2.5 right-0'>{action}</div> : null}
     </article>
   )
 }

@@ -11,6 +11,7 @@ import { getVerifiedSchool } from '@lib/constants/schools'
 import { useFormat, useT } from '@lib/i18n/client'
 import type { CommunityPost } from '@/types/nyc'
 import { EllieoBoardTag, EllieoFeedCard, EllieoPersonAvatar } from '@widgets/ellieo/EllieoFeedCard'
+import { communityForBoard } from '@widgets/ellieo/communities'
 import { CptOptTypeBadge } from '@widgets/nyc/CptOptTypeBadge'
 import { JobReviewTypeBadge } from '@widgets/nyc/JobReviewTypeBadge'
 import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
@@ -67,12 +68,14 @@ export function EllieoPostRow({ post, boardId }: { post: CommunityPost; boardId:
       verified={Boolean(school)}
       meta={[school, format.relative(post.createdAt)].filter(Boolean).join(' · ')}
       tag={<EllieoBoardTag boardId={boardKey} label={tn(`ellieo.short.${boardKey}`)} />}
+      community={communityForBoard(boardKey)}
+      communityName={communityForBoard(boardKey) ? tn(`ellieo.communities.${communityForBoard(boardKey)!.key}.name`) : undefined}
       badge={typeBadge}
       title={post.title}
       excerpt={excerpt}
       extra={
         timeline.count > 0 ? (
-          <span className='flex min-w-0 items-center gap-2.5 rounded-2xl bg-[var(--brand-soft)] px-3 py-2.5'>
+          <span className='flex min-w-0 items-center gap-2.5 rounded-xl bg-[var(--surface)] px-3 py-2'>
             <span aria-hidden className='flex shrink-0 items-center'>
               {Array.from({ length: dots }, (_, index) => (
                 <span key={index} className='flex items-center'>
@@ -80,7 +83,7 @@ export function EllieoPostRow({ post, boardId }: { post: CommunityPost; boardId:
                   <span
                     className={cn(
                       'size-2.5 rounded-full',
-                      index === dots - 1 ? 'bg-[var(--ellieo-lime)] ring-2 ring-[var(--brand)]' : 'bg-[var(--brand)]',
+                      index === dots - 1 ? 'bg-white ring-2 ring-[var(--brand)]' : 'bg-[var(--brand)]',
                     )}
                   />
                 </span>
