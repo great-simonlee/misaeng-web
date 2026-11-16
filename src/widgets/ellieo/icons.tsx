@@ -21,6 +21,7 @@ function Base({ children, className = 'size-5', ...rest }: IconProps & { childre
   )
 }
 
+/** Housing everywhere (tab bar, board chips/tags, shortcuts). The Home tab uses GridIcon */
 export const HomeIcon = (p: IconProps) => (
   <Base {...p}>
     <path d='M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1v-8.5Z' />
@@ -86,6 +87,7 @@ export const CalendarIcon = (p: IconProps) => (
   </Base>
 )
 
+/** Home tab: 2×2 rounded tiles (pass fill='currentColor' for the active state) */
 export const GridIcon = (p: IconProps) => (
   <Base {...p}>
     <rect x='4' y='4' width='6.5' height='6.5' rx='1.5' />
@@ -279,7 +281,7 @@ export const PencilIcon = (p: IconProps) => (
   </Base>
 )
 
-/** Housing everywhere (Home is HomeIcon): an apartment building */
+/** Apartment building (no longer used for Housing: Housing = HomeIcon, the Home tab = GridIcon, user 11-16) */
 export const BuildingIcon = (p: IconProps) => (
   <Base {...p}>
     <path d='M5 20.5V5.5A1.5 1.5 0 0 1 6.5 4h7A1.5 1.5 0 0 1 15 5.5v15M15 9.5h3.5A1.5 1.5 0 0 1 20 11v9.5M3.5 20.5h17' />

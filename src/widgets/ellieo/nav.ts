@@ -7,7 +7,7 @@ import {
   BriefcaseIcon,
   CalendarIcon,
   ChatIcon,
-  BuildingIcon,
+  HomeIcon,
   PassportIcon,
   PencilIcon,
   UsersIcon,
@@ -28,7 +28,7 @@ export type EllieoBoard = {
 }
 
 const ICONS: Record<NycCategoryId, ComponentType<{ className?: string }>> = {
-  housing: BuildingIcon,
+  housing: HomeIcon,
   events: CalendarIcon,
   food: BowlIcon,
   marketplace: BagIcon,

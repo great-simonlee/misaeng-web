@@ -22,8 +22,8 @@ import {
   BellIcon,
   BriefcaseIcon,
   ChevronDownIcon,
+  GridIcon,
   HomeIcon,
-  BuildingIcon,
   PassportIcon,
   GlobeIcon,
   PlusIcon,
@@ -115,11 +115,12 @@ export function EllieoNavbar() {
   // Visa: the merged board and its legacy routes (cpt-opt, visa, green-card redirect there)
   const visaActive = ['/status', '/cpt-opt', '/visa', '/green-card'].some((path) => isActive(href(path)))
   const tabs = [
-    { key: 'home', label: t('ellieo.tabs.home'), icon: HomeIcon, href: home, active: pathname === home },
-    { key: 'housing', label: t('ellieo.tabs.housing'), icon: BuildingIcon, href: housingHref, active: isActive(housingHref) },
+    // Home = 2×2 tile grid, Housing = house (user 11-16); both fill in when active
+    { key: 'home', label: t('ellieo.tabs.home'), icon: GridIcon, href: home, active: pathname === home, fillActive: true },
+    { key: 'housing', label: t('ellieo.tabs.housing'), icon: HomeIcon, href: housingHref, active: isActive(housingHref), fillActive: true },
     { key: 'post' },
-    { key: 'visa', label: t('ellieo.short.status'), icon: PassportIcon, href: visaHref, active: visaActive },
-    { key: 'jobs', label: t('ellieo.tabs.jobs'), icon: BriefcaseIcon, href: jobsHref, active: isActive(jobsHref) || isActive(companiesHref) },
+    { key: 'visa', label: t('ellieo.short.status'), icon: PassportIcon, href: visaHref, active: visaActive, fillActive: false },
+    { key: 'jobs', label: t('ellieo.tabs.jobs'), icon: BriefcaseIcon, href: jobsHref, active: isActive(jobsHref) || isActive(companiesHref), fillActive: false },
   ] as const
   // Housing / Visa / Jobs pages: page title instead of the logo on phones and tablets (tab bar already says where you are)
   const pageTitle = tabPage ? tabs.find((tab) => tab.key === tabPage && 'label' in tab) : null
@@ -269,7 +270,11 @@ export function EllieoNavbar() {
             const Icon = tab.icon
             const body = (
               <>
-                <Icon className='size-6' strokeWidth={tab.active ? 2.25 : 1.75} />
+                <Icon
+                  className='size-6'
+                  strokeWidth={tab.active ? 2.25 : 1.75}
+                  fill={tab.active && tab.fillActive ? 'currentColor' : 'none'}
+                />
                 <span className='text-[11px] font-semibold leading-none'>{tab.label}</span>
               </>
             )

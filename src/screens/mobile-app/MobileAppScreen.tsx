@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import { EllieoAppIcon } from '@widgets/ellieo/EllieoAppIcon'
 import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
-import { BellIcon, BowlIcon, BriefcaseIcon, ChatIcon, HeartIcon, HomeIcon, BuildingIcon, PassportIcon } from '@widgets/ellieo/icons'
+import { BellIcon, BowlIcon, BriefcaseIcon, ChatIcon, GridIcon, HeartIcon, HomeIcon, PassportIcon } from '@widgets/ellieo/icons'
 
 /**
  * Ellieo app page (ellieo.com/mobile-app), social-feed design. The app isn't in the stores yet: no download
@@ -12,7 +12,7 @@ import { BellIcon, BowlIcon, BriefcaseIcon, ChatIcon, HeartIcon, HomeIcon, Build
 const APP_LAUNCHED = false
 
 const FEATURES = [
-  { icon: BuildingIcon, title: 'Housing', body: 'Rentals and rooms with clear prices, perks and move-in dates. Ask about a listing in one tap.' },
+  { icon: HomeIcon, title: 'Housing', body: 'Rentals and rooms with clear prices, perks and move-in dates. Ask about a listing in one tap.' },
   { icon: PassportIcon, title: 'Visa', body: 'OPT, CPT and green card timelines, shared step by step by people who just went through it.' },
   { icon: BriefcaseIcon, title: 'Jobs', body: 'Interview reviews, company pages and internship / new grad postings.' },
   { icon: ChatIcon, title: 'Ask & Talk', body: 'Ask anything, anonymously or with your nickname.' },
@@ -68,7 +68,7 @@ export function MobileAppScreen() {
               <div className='flex items-center justify-between px-4 pb-2 pt-4'>
                 <EllieoAppIcon size={24} />
                 <span className='flex gap-1.5'>
-                  {[BuildingIcon, PassportIcon, BriefcaseIcon].map((Icon, index) => (
+                  {[HomeIcon, PassportIcon, BriefcaseIcon].map((Icon, index) => (
                     <span key={index} className='rounded-full bg-[var(--surface)] px-2 py-1 text-[var(--foreground)]'>
                       <Icon className='size-3.5' />
                     </span>
@@ -103,8 +103,8 @@ export function MobileAppScreen() {
                 ))}
               </div>
               <div className='flex items-center justify-around border-t border-[var(--border)] px-3 py-2 text-[var(--muted)]'>
+                <GridIcon className='size-4' fill='currentColor' />
                 <HomeIcon className='size-4' />
-                <BuildingIcon className='size-4' />
                 <span className='flex size-8 items-center justify-center rounded-full bg-[var(--brand)] text-[18px] font-bold text-white'>
                   +
                 </span>
