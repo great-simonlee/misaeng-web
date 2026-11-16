@@ -92,13 +92,16 @@ export function PostingListScreen() {
   return (
     <BoardPageShell width='wide'>
       <header className='pt-4 sm:pt-5 lg:pt-6'>
-        <Link
-          href={href('/companies')}
-          className='flex w-fit items-center gap-1 text-[12px] font-medium text-[var(--muted)] hover:text-[var(--foreground)] sm:text-[13px]'
-        >
-          <span aria-hidden>‹</span> {t('postings.backToCompanies')}
-        </Link>
-        <CompanyHeroPanel className='mt-3'>
+        {/* Ellieo: the Visa · Jobs sub-tab row above already links back to companies */}
+        {BRAND_CONFIG.theme === 'ellieo' ? null : (
+          <Link
+            href={href('/companies')}
+            className='flex w-fit items-center gap-1 text-[12px] font-medium text-[var(--muted)] hover:text-[var(--foreground)] sm:text-[13px]'
+          >
+            <span aria-hidden>‹</span> {t('postings.backToCompanies')}
+          </Link>
+        )}
+        <CompanyHeroPanel className={BRAND_CONFIG.theme === 'ellieo' ? undefined : 'mt-3'}>
           <h1 className={byBrand('font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'text-[1.4rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.6rem]')}>
             {t('postings.listTitle')}
           </h1>

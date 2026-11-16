@@ -147,22 +147,25 @@ export function CompanyListScreen() {
   return (
     <BoardPageShell width='wide'>
       <header className='pt-4 sm:pt-5 lg:pt-6'>
-        <div className='flex items-center justify-between gap-3'>
-          <Link
-            href={href('/job-review')}
-            className='inline-flex items-center gap-1 text-[12px] font-medium text-[var(--muted)] hover:text-[var(--foreground)] sm:text-[13px]'
-          >
-            <span aria-hidden>‹</span> {t('list.backToJobReviews')}
-          </Link>
-          <Link
-            href={href('/companies/postings')}
-            className='inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--brand)] hover:underline sm:text-[13px]'
-          >
-            {t('postings.listLink')} <span aria-hidden>›</span>
-          </Link>
-        </div>
+        {/* Ellieo: the Visa · Jobs sub-tab row above already links reviews and postings */}
+        {BRAND_CONFIG.theme === 'ellieo' ? null : (
+          <div className='flex items-center justify-between gap-3'>
+            <Link
+              href={href('/job-review')}
+              className='inline-flex items-center gap-1 text-[12px] font-medium text-[var(--muted)] hover:text-[var(--foreground)] sm:text-[13px]'
+            >
+              <span aria-hidden>‹</span> {t('list.backToJobReviews')}
+            </Link>
+            <Link
+              href={href('/companies/postings')}
+              className='inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--brand)] hover:underline sm:text-[13px]'
+            >
+              {t('postings.listLink')} <span aria-hidden>›</span>
+            </Link>
+          </div>
+        )}
 
-        <CompanyHeroPanel className='mt-3'>
+        <CompanyHeroPanel className={BRAND_CONFIG.theme === 'ellieo' ? undefined : 'mt-3'}>
           <div className='relative'>
             <div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
               <div className='min-w-0'>

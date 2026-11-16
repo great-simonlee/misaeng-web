@@ -3,7 +3,7 @@
   "links": {
     "housing": "Nhà ở",
     "food": "Ăn uống",
-    "marketplace": "Mua bán",
+    "marketplace": "Chợ",
     "status": "CPT·OPT·Visa·Thẻ xanh",
     "jobReview": "Phỏng vấn·Việc làm",
     "roommate": "Bạn cùng phòng·Sublet",
@@ -59,7 +59,7 @@
       "roommate": "Ở ghép",
       "food": "Ăn uống",
       "anonymous": "Hỏi đáp",
-      "marketplace": "Mua bán",
+      "marketplace": "Chợ",
       "events": "Sự kiện"
     },
     "tabs": {
