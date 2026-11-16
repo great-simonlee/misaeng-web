@@ -187,6 +187,32 @@
     "sidebarHome": "Home",
     "partners": "Partners & creators",
     "cityCardTitle": "Your city",
-    "cityCardBody": "Posts, listings and boards for {city} ({regions})."
+    "cityCardBody": "Posts, listings and boards for {city} ({regions}).",
+    "cat": {
+      "all": "All",
+      "rent": "Rent",
+      "roommates": "Roommates",
+      "market": "Market",
+      "jobs": "Jobs",
+      "interviews": "Interviews",
+      "companies": "Companies",
+      "visa": "Visa",
+      "food": "Food",
+      "ask": "Ask"
+    },
+    "bar4": {
+      "home": "Home",
+      "rent": "Rent",
+      "write": "Write",
+      "community": "Community",
+      "me": "Me"
+    },
+    "writeTitle": "What are you posting?",
+    "boardBlock": "Visa & Q&A",
+    "more": "More",
+    "from": "From {price}",
+    "free": "Free",
+    "categoriesAria": "Categories",
+    "inbox": "Inbox"
   }
 }

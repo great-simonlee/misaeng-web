@@ -15,7 +15,7 @@ import type { CommunityPost } from '@/types/nyc'
 import { EllieoIconBadge } from '@widgets/ellieo/EllieoIconBadge'
 import { BagIcon, PlusIcon } from '@widgets/ellieo/icons'
 
-import { MarketCard } from './MarketCard'
+import { PostTile } from '@screens/ellieo/EllieoHomeScreen'
 
 /** List tabs, same order as the app: moving sale, free, then the categories */
 const TABS = ['all', 'moving', 'free', ...MARKET_CATEGORIES.filter((id) => id !== 'moving')] as const
@@ -61,7 +61,7 @@ export function EllieoMarketListScreen() {
 
   return (
     <div className='min-w-0 flex-1 bg-white'>
-      <div className='mx-auto w-full max-w-[52rem] px-4 pb-28 pt-4'>
+      <div className='mx-auto w-full max-w-[67.5rem] px-4 pb-28 pt-3'>
         <header className='sr-only'>
           <h1 className='text-[2rem] font-bold tracking-[-0.03em] text-[var(--foreground)]'>{t('ellieoMarket.title')}</h1>
           <p className='mt-1 text-[15px] text-[var(--muted-foreground)]'>{t('ellieoMarket.intro')}</p>
@@ -108,10 +108,10 @@ export function EllieoMarketListScreen() {
           </div>
         ) : (
           <>
-            <ul className='mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3'>
+            <ul className='mt-4 grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-4'>
               {posts.map((post) => (
-                <li key={post.id}>
-                  <MarketCard post={post} href={href(`/marketplace/${encodeURIComponent(post.id)}`)} />
+                <li key={post.id} className='min-w-0'>
+                  <PostTile post={post} />
                 </li>
               ))}
             </ul>

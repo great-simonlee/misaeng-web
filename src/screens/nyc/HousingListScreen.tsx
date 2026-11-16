@@ -36,8 +36,8 @@ import type {
   HousingRoomType,
   HousingUnitType,
 } from '@/types/nyc'
-import { EllieoBoardRail } from '@widgets/ellieo/EllieoBoardRail'
 import { HousingPostCard } from '@widgets/nyc/HousingPostCard'
+import { ListingTile } from '@screens/ellieo/EllieoHomeScreen'
 import { HousingPostCardSkeletonGrid } from '@widgets/nyc/HousingPostCardSkeleton'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { EmptyState } from '@widgets/nyc/EmptyState'
@@ -428,7 +428,8 @@ export function HousingListScreen() {
     <BoardPageShell
       width='wide'
       className='flex flex-1 flex-col'
-      aside={BRAND_CONFIG.theme === 'ellieo' ? <EllieoBoardRail /> : undefined}
+      // Ellieo v4: photo grid uses the full 1080px container, no rail
+      aside={undefined}
     >
       <header data-ui='board-header' className='pt-5 sm:pt-8 lg:pt-10'>
         <h1 data-ui='board-title' className={byBrand('font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] ellieo-tab-title sm:text-[1.75rem] lg:text-[2rem]')}>
@@ -572,13 +573,16 @@ export function HousingListScreen() {
             </p>
             <div
               className={
-                // Ellieo: e/Rent listing rows, one column (docs/design/ellieo-community.md)
+                // Ellieo v4: photo tiles, 2 / 3 / 4 columns (docs/design/ellieo-classifieds.md)
                 BRAND_CONFIG.theme === 'ellieo'
-                  ? 'flex flex-col border-t border-[var(--border)] sm:grid sm:grid-cols-2 sm:gap-x-5'
+                  ? 'grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-4'
                   : 'grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5'
               }
             >
-              {filteredPosts.map((listing) => (
+              {filteredPosts.map((listing) =>
+                BRAND_CONFIG.theme === 'ellieo' ? (
+                  <ListingTile key={listing.id} listing={listing} />
+                ) : (
                 <HousingPostCard
                   key={listing.id}
                   listing={listing}
@@ -586,7 +590,8 @@ export function HousingListScreen() {
                     listingKind === 'room' ? roomType : 'all'
                   }
                 />
-              ))}
+                ),
+              )}
             </div>
           </>
         )}

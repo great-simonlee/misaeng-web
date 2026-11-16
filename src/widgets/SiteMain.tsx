@@ -3,17 +3,31 @@
 import type { ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 
+import { useCityPath } from '@hooks/useCity'
+import { cn } from '@lib'
 import { BRAND_CONFIG } from '@lib/brand'
 import { isAppViewPathname } from '@lib/constants/cities'
-import { EllieoCommunityBanner } from '@widgets/ellieo/EllieoCommunityBanner'
+import { communityForPath } from '@widgets/ellieo/communities'
 
-/** Page body. Leaves room for the fixed site header, except in the native app's viewer (/{city}/app-view/…). */
+/**
+ * Page body. Leaves room for the fixed site header, except in the native app's viewer (/{city}/app-view/…).
+ * Ellieo phones/tablets: Home and category pages also have the 44px category strip under the header.
+ */
 export function SiteMain({ children }: { children: ReactNode }) {
-  const appView = isAppViewPathname(usePathname())
+  const pathname = usePathname()
+  const href = useCityPath()
+  const appView = isAppViewPathname(pathname)
+  const ellieoStrip =
+    BRAND_CONFIG.theme === 'ellieo' && (pathname === href() || Boolean(communityForPath(pathname, href)))
   return (
-    <main className={appView ? 'flex flex-1 flex-col' : 'flex flex-1 flex-col pt-14 sm:pt-16'}>
-      {/* Ellieo: community pages open with the community banner */}
-      {!appView && BRAND_CONFIG.theme === 'ellieo' ? <EllieoCommunityBanner /> : null}
+    <main
+      data-strip={ellieoStrip || undefined}
+      className={
+        appView
+          ? 'flex flex-1 flex-col'
+          : cn('flex flex-1 flex-col', ellieoStrip ? 'pt-[6.25rem] lg:pt-16' : 'pt-14 sm:pt-16')
+      }
+    >
       {children}
     </main>
   )

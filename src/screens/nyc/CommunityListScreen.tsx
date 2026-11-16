@@ -76,6 +76,7 @@ import {
 } from '@widgets/nyc/AnonymousBoardNoticeModal'
 import { EllieoBoardRail } from '@widgets/ellieo/EllieoBoardRail'
 import { EllieoPostRow } from '@widgets/ellieo/EllieoPostRow'
+import { PostTile } from '@screens/ellieo/EllieoHomeScreen'
 import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
@@ -147,6 +148,8 @@ function FoodCategoryStickyBar({
     let observer: IntersectionObserver | null = null
 
     function navOffsetPx() {
+      // Ellieo: header + category strip below 1024px (EllieoNavbar)
+      if (BRAND_CONFIG.theme === 'ellieo') return window.matchMedia('(min-width: 1024px)').matches ? 64 : 100
       return window.matchMedia('(min-width: 640px)').matches ? 64 : 56
     }
 
@@ -236,7 +239,7 @@ function FoodCategoryStickyBar({
           byBrand('', 'border-b border-black/[0.04] bg-white/95 backdrop-blur-md supports-[backdrop-filter]:bg-white/85'),
           // In place it sits on the page canvas; once pinned under the header it turns to frosted canvas
           stuck
-            ? byBrand('fixed inset-x-0 top-14 border-b border-black/[0.05] bg-[var(--canvas)]/90 py-2.5 backdrop-blur-md sm:top-16', 'fixed inset-x-0 top-14 py-2.5 sm:top-16 lg:left-60')
+            ? byBrand('fixed inset-x-0 top-14 border-b border-black/[0.05] bg-[var(--canvas)]/90 py-2.5 backdrop-blur-md sm:top-16', 'fixed inset-x-0 top-[6.25rem] py-2.5 lg:top-16')
             : byBrand('relative -mx-4 mt-2 bg-transparent px-4 py-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8', 'relative -mx-4 mt-2 px-4 py-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8')
         )}
       >
@@ -577,14 +580,19 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
         <div
           className={
             isFoodBoard
-              ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-5'
+              ? BRAND_CONFIG.theme === 'ellieo'
+                ? 'grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-4'
+                : 'grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-5'
               : BRAND_CONFIG.theme === 'ellieo'
                 ? 'flex flex-col border-t border-[var(--border)]'
                 : 'flex flex-col gap-4 sm:gap-5'
           }
         >
           {filteredPosts.map((post) =>
-            BRAND_CONFIG.theme === 'ellieo' && !isFoodBoard ? (
+            BRAND_CONFIG.theme === 'ellieo' && isFoodBoard ? (
+              // Ellieo v4: food = photo tiles
+              <PostTile key={post.id} post={post} />
+            ) : BRAND_CONFIG.theme === 'ellieo' ? (
               <EllieoPostRow key={post.id} post={post} boardId={boardId} />
             ) : (
               <CommunityPostCard key={post.id} post={post} boardId={boardId} />
@@ -598,7 +606,8 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
   return (
     <BoardPageShell
       width={isFoodBoard ? 'wide' : 'narrow'}
-      aside={BRAND_CONFIG.theme === 'ellieo' ? <EllieoBoardRail /> : undefined}
+      // Ellieo v4: boards keep the right rail; the food photo grid uses the full width
+      aside={BRAND_CONFIG.theme === 'ellieo' && !isFoodBoard ? <EllieoBoardRail /> : undefined}
     >
       <BoardListToolbar
         breadcrumbLabel={title}

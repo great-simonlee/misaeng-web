@@ -3,9 +3,8 @@
 import Link from 'next/link'
 import { createElement, useState, type ReactNode } from 'react'
 
-import { useFormat } from '@lib/i18n/client'
-import { ArrowUpIcon, BadgeCheckIcon, ChatIcon, CommentIcon, EyeIcon } from '@widgets/ellieo/icons'
-import { EllieoCommunityAvatar } from '@widgets/ellieo/EllieoCommunityAvatar'
+import { useFormat, useT } from '@lib/i18n/client'
+import { BadgeCheckIcon, ChatIcon, EyeIcon } from '@widgets/ellieo/icons'
 import type { EllieoCommunity } from '@widgets/ellieo/communities'
 import { boardIcon } from '@widgets/ellieo/nav'
 
@@ -67,33 +66,26 @@ export function EllieoBoardTag({ boardId, label }: { boardId: string; label: str
 }
 
 /**
- * Ellieo post row (docs/design/ellieo-community.md): flat, full width, hairline under it. Meta line = community
- * avatar · e/Community · author · verified · time; then title (16/600, 2 lines), body preview (2 lines), optional
- * extra block and 16:9 photo, then the action bar (up · comments · views). `action` (like/save) sits at the right
- * of the action bar, outside the link. `avatar`/`tag` are kept for callers without a community.
+ * Ellieo board row (docs/design/ellieo-classifieds.md v4): line 1 = [category tag] title + blue [comment count];
+ * line 2 = nickname · verified + school · time · views; optional 56px thumbnail on the right. Hairline between
+ * rows. `extra` (e.g. visa step summary) sits under line 2. Like/save live on the detail page.
  */
 export function EllieoFeedCard({
   href,
-  avatar,
   name,
   verified,
   meta,
-  tag,
   community,
-  communityName,
   title,
   badge,
-  excerpt,
   extra,
   photo,
-  likes,
   comments,
   views,
   viewsLabel,
-  action,
 }: {
   href: string
-  avatar: ReactNode
+  avatar?: ReactNode
   name: string
   verified?: boolean
   meta?: string
@@ -112,63 +104,41 @@ export function EllieoFeedCard({
   action?: ReactNode
 }) {
   const format = useFormat()
+  const t = useT('nav')
   return (
     <article className='relative border-b border-[var(--border)] bg-white'>
-      <Link href={href} className='group block py-3.5'>
-        <span className='flex min-w-0 items-center gap-1.5 text-[12px] font-medium text-[var(--muted-foreground)]'>
-          {community ? (
-            <>
-              <EllieoCommunityAvatar community={community} size={20} />
-              <span className='shrink-0 font-semibold text-[var(--foreground)]'>{communityName}</span>
-              <span aria-hidden>·</span>
-            </>
-          ) : (
-            <span className='shrink-0 [&>*]:!size-5'>{avatar}</span>
-          )}
-          <span className='truncate'>{name}</span>
-          {verified ? <BadgeCheckIcon className='size-3.5 shrink-0 text-[var(--brand)]' /> : null}
-          {meta ? <span className='truncate text-[var(--muted)]'>· {meta}</span> : null}
-          {!community && tag ? <span className='ml-auto'>{tag}</span> : null}
-        </span>
-
-        {badge ? <span className='mt-2 flex flex-wrap gap-1.5'>{badge}</span> : null}
-        <span className={`${badge ? 'mt-1.5' : 'mt-2'} line-clamp-2 text-[16px] font-semibold leading-snug text-[var(--foreground)] group-hover:underline-offset-2`}>
-          {title}
-        </span>
-        {excerpt ? (
-          <span className='mt-1 line-clamp-2 text-[15px] leading-[1.45] text-[var(--muted-foreground)]'>{excerpt}</span>
-        ) : null}
-        {extra ? <span className='mt-2.5 block'>{extra}</span> : null}
-        {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element -- stored post photo URL
-          <img src={photo} alt='' loading='lazy' className='mt-2.5 aspect-video w-full rounded-xl object-cover' />
-        ) : null}
-
-        <span className='mt-2.5 flex items-center gap-4 pr-12 text-[12.5px] font-semibold text-[var(--muted-foreground)]'>
-          {likes != null ? (
-            <span className='inline-flex items-center gap-1'>
-              <ArrowUpIcon className='size-[18px]' />
-              {format.number(likes)}
-            </span>
-          ) : null}
-          {comments != null ? (
-            <span className='inline-flex items-center gap-1'>
-              <CommentIcon className='size-[18px]' />
-              {format.number(comments)}
-            </span>
-          ) : null}
-          {views != null ? (
-            <span className='inline-flex items-center gap-1'>
-              <EyeIcon className='size-[18px]' />
-              <span>
-                {format.number(views)}
+      <Link href={href} className='flex items-start gap-3 py-3'>
+        <span className='min-w-0 flex-1'>
+          <span className='flex min-w-0 items-center gap-1.5'>
+            {community ? (
+              <span className='shrink-0 rounded bg-[var(--brand-soft)] px-1.5 py-0.5 text-[11px] font-semibold leading-none text-[var(--brand)]'>
+                {t(`ellieo.cat.${community.key}`)}
+              </span>
+            ) : null}
+            <span className='min-w-0 truncate text-[15px] font-medium text-[var(--foreground)]'>{title}</span>
+            {comments ? (
+              <span className='shrink-0 text-[13px] font-semibold tabular-nums text-[var(--brand)]'>[{format.number(comments)}]</span>
+            ) : null}
+          </span>
+          {badge ? <span className='mt-1 flex flex-wrap gap-1'>{badge}</span> : null}
+          <span className='mt-1 flex min-w-0 items-center gap-1 text-[12px] text-[var(--muted)]'>
+            <span className='truncate'>{name}</span>
+            {verified ? <BadgeCheckIcon className='size-3.5 shrink-0 text-[var(--brand)]' /> : null}
+            {meta ? <span className='truncate'>· {meta}</span> : null}
+            {views != null ? (
+              <span className='shrink-0'>
+                · <EyeIcon className='inline size-3.5 align-[-2px]' /> {format.number(views)}
                 {viewsLabel ? <span className='sr-only'> {viewsLabel}</span> : null}
               </span>
-            </span>
-          ) : null}
+            ) : null}
+          </span>
+          {extra ? <span className='mt-2 block'>{extra}</span> : null}
         </span>
+        {photo ? (
+          // eslint-disable-next-line @next/next/no-img-element -- stored post photo URL
+          <img src={photo} alt='' loading='lazy' className='size-14 shrink-0 rounded-lg object-cover' />
+        ) : null}
       </Link>
-      {action ? <div className='absolute bottom-2.5 right-0'>{action}</div> : null}
     </article>
   )
 }

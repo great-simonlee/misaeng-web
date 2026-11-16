@@ -186,6 +186,32 @@
     "sidebarHome": "Trang chủ",
     "partners": "Đối tác & nhà sáng tạo",
     "cityCardTitle": "Thành phố của bạn",
-    "cityCardBody": "Bài viết, tin nhà và cộng đồng tại {city} ({regions})."
+    "cityCardBody": "Bài viết, tin nhà và cộng đồng tại {city} ({regions}).",
+    "cat": {
+      "all": "Tất cả",
+      "rent": "Thuê nhà",
+      "roommates": "Ở ghép",
+      "market": "Chợ",
+      "jobs": "Tuyển dụng",
+      "interviews": "Phỏng vấn",
+      "companies": "Công ty",
+      "visa": "Visa",
+      "food": "Ăn uống",
+      "ask": "Hỏi đáp"
+    },
+    "bar4": {
+      "home": "Trang chủ",
+      "rent": "Thuê nhà",
+      "write": "Viết",
+      "community": "Cộng đồng",
+      "me": "Tôi"
+    },
+    "writeTitle": "Bạn muốn đăng gì?",
+    "boardBlock": "Visa & Hỏi đáp",
+    "more": "Xem thêm",
+    "from": "Từ {price}",
+    "free": "Miễn phí",
+    "categoriesAria": "Danh mục",
+    "inbox": "Hộp thư"
   }
 }

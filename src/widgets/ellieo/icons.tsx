@@ -318,3 +318,12 @@ export const ShareIcon = (p: IconProps) => (
     <path d='M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5' />
   </Base>
 )
+
+/** Market tile mark (storefront) */
+export const StoreIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d='M4 9.5 5.5 4.5h13L20 9.5' />
+    <path d='M4 9.5a2.67 2.67 0 0 0 5.33 0 2.67 2.67 0 0 0 5.34 0 2.67 2.67 0 0 0 5.33 0' />
+    <path d='M5.5 12v7.5h13V12M10 19.5v-4h4v4' />
+  </Base>
+)

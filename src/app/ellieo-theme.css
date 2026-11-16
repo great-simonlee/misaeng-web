@@ -82,15 +82,12 @@
   background: var(--background);
 }
 
+/* v4 classifieds (docs/design/ellieo-classifieds.md): one centered 1080px container; boards keep a right rail
+   from 1024px, photo pages (no rail) use the full width with a 2/3/4-column tile grid */
 [data-brand='ellieo'] [data-shell] {
-  max-width: 40rem;
+  max-width: 67.5rem;
   padding-left: 1rem;
   padding-right: 1rem;
-}
-
-/* With the right rail (≥1280px): feed column + 20rem rail, centered together */
-[data-brand='ellieo'] [data-shell]:has(> [data-ui='shell-grid']) {
-  max-width: 40rem;
 }
 
 [data-brand='ellieo'] [data-ui='shell-grid'] {
@@ -101,31 +98,15 @@
   display: none;
 }
 
-@media (min-width: 80rem) {
-  [data-brand='ellieo'] [data-shell]:has(> [data-ui='shell-grid']) {
-    max-width: 63rem;
-  }
-
+@media (min-width: 1024px) {
   [data-brand='ellieo'] [data-ui='shell-grid'] {
     display: grid;
-    grid-template-columns: minmax(0, 40rem) 20rem;
-    gap: 2rem;
-    justify-content: center;
+    grid-template-columns: minmax(0, 1fr) 18.75rem;
+    gap: 2.5rem;
   }
 
   [data-brand='ellieo'] [data-ui='shell-grid'] > :nth-child(2) {
     display: block;
-  }
-}
-
-/* Photo grids inside the 640px column: at most 2 columns */
-[data-brand='ellieo'] [data-shell] :is(.lg\:grid-cols-4, .lg\:grid-cols-3, .xl\:grid-cols-4, .xl\:grid-cols-3, .md\:grid-cols-3) {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-@media (max-width: 639px) {
-  [data-brand='ellieo'] [data-shell] :is(.sm\:grid-cols-2, .md\:grid-cols-2, .lg\:grid-cols-4, .lg\:grid-cols-3, .xl\:grid-cols-4, .xl\:grid-cols-3, .md\:grid-cols-3) {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -947,14 +928,10 @@
   justify-content: flex-end;
 }
 
-/* Desktop: room for the fixed community sidebar (EllieoNavbar) */
+/* Desktop: no bottom bar */
 @media (min-width: 1024px) {
   [data-brand='ellieo'] {
     --bottom-nav-h: 0px;
-  }
-
-  [data-brand='ellieo'] body {
-    padding-left: 15rem;
   }
 }
 
@@ -987,7 +964,7 @@
 }
 
 [data-brand='ellieo'] [data-ui='post-detail'] h1 {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 700;
   line-height: 1.3;
   letter-spacing: -0.02em;
