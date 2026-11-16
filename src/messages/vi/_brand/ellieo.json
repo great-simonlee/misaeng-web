@@ -160,6 +160,11 @@
     },
     "account": {
       "inquiries": "Hỏi đáp & góp ý"
+    },
+    "ellieo": {
+      "short": {
+        "marketplace": "Chợ"
+      }
     }
   },
   "hub": {

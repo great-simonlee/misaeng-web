@@ -20,7 +20,6 @@ import { useEffect, useState } from 'react'
 import { EllieoDots } from '@components/EllieoDots'
 import { useCity, useCityInfo, useCityPath } from '@hooks/useCity'
 import { useEllieoViewer } from '@hooks/useEllieoViewer'
-import { cn } from '@lib'
 import { captureReferralFromLocation } from '@lib/community/referral'
 import { cityLoginPath, hrefForHousingListing } from '@lib/constants/cities'
 import {
@@ -101,64 +100,39 @@ function HomeHero() {
 /* ---------- Quick links: every board / sub-tab one tap away (user 11-16) ---------- */
 
 const QUICK_NAV = [
-  {
-    group: 'housing',
-    items: [
-      { key: 'rent', path: '/housing', icon: HomeIcon },
-      { key: 'roommates', path: '/roommate', icon: UsersIcon },
-    ],
-  },
-  {
-    group: 'careers',
-    items: [
-      { key: 'visa', path: '/status', icon: PlaneIcon },
-      { key: 'interviews', path: '/job-review', icon: BookIcon },
-      { key: 'companies', path: '/companies', icon: BuildingIcon },
-      { key: 'postings', path: '/companies/postings', icon: BriefcaseIcon },
-    ],
-  },
-  {
-    group: 'community',
-    items: [
-      { key: 'food', path: '/food', icon: BowlIcon },
-      { key: 'market', path: '/marketplace', icon: BagIcon },
-      { key: 'ask', path: '/anonymous', icon: ChatIcon },
-    ],
-  },
+  { key: 'rent', path: '/housing', icon: HomeIcon },
+  { key: 'roommates', path: '/roommate', icon: UsersIcon },
+  { key: 'visa', path: '/status', icon: PlaneIcon },
+  { key: 'interviews', path: '/job-review', icon: BookIcon },
+  { key: 'companies', path: '/companies', icon: BuildingIcon },
+  { key: 'postings', path: '/companies/postings', icon: BriefcaseIcon },
+  { key: 'food', path: '/food', icon: BowlIcon },
+  { key: 'market', path: '/marketplace', icon: BagIcon },
+  { key: 'ask', path: '/anonymous', icon: ChatIcon },
 ] as const
 
+/**
+ * Shortcuts, as plain as possible (user 11-16): 3×3 on phones, one row of 9 from 640px; blue line icon over a
+ * centered 13px label (Vietnamese may wrap to 2 lines), no cell background, card or dividers.
+ */
 function QuickNav() {
   const t = useT('hub')
   const href = useCityPath()
   return (
-    <nav
-      aria-label={t('ellieo.quickNav.aria')}
-      className='rounded-[1.5rem] bg-white px-3 py-4 shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)] sm:px-5'
-    >
-      {QUICK_NAV.map((section, index) => (
-        <section key={section.group} className={cn(index > 0 && 'mt-3 border-t border-[var(--border)] pt-3')}>
-          <h2 className='px-1 text-[12px] font-semibold uppercase tracking-[0.04em] text-[var(--muted)]'>
-            {t(`ellieo.quickNav.${section.group}`)}
-          </h2>
-          <ul className='mt-2 grid grid-cols-4 gap-y-2 sm:flex sm:flex-wrap sm:gap-x-2'>
-            {section.items.map((item) => (
-              <li key={item.key} className='sm:w-[5.75rem]'>
-                <Link
-                  href={href(item.path)}
-                  className='group flex flex-col items-center gap-1.5 rounded-2xl px-0.5 py-1 text-center'
-                >
-                  <span className='inline-flex size-12 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)] transition group-hover:bg-[var(--brand-subtle)]'>
-                    <item.icon className='size-[22px]' />
-                  </span>
-                  <span className='line-clamp-2 text-[12.5px] font-medium leading-tight text-[var(--foreground)]'>
-                    {t(`ellieo.quickNav.${item.key}`)}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+    <nav aria-label={t('ellieo.quickNav.aria')}>
+      <ul className='grid grid-cols-3 gap-1 sm:grid-cols-9 sm:gap-0.5'>
+        {QUICK_NAV.map((item) => (
+          <li key={item.key}>
+            <Link
+              href={href(item.path)}
+              className='flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-center transition hover:bg-[var(--surface)] sm:px-0'
+            >
+              <item.icon className='size-[22px] shrink-0 text-[var(--brand)]' />
+              <span className='text-[13px] font-medium leading-[1.25] text-[var(--foreground)] sm:tracking-[-0.02em]'>{t(`ellieo.quickNav.${item.key}`)}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </nav>
   )
 }

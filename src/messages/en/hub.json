@@ -352,18 +352,15 @@
     },
     "quickNav": {
       "aria": "Quick links",
-      "housing": "Housing",
-      "careers": "Jobs & Visa",
-      "community": "Community",
       "rent": "Rent",
-      "roommates": "Roommates & Sublets",
-      "visa": "Visa reviews",
-      "interviews": "Interview reviews",
+      "roommates": "Roommates",
+      "visa": "Visa",
+      "interviews": "Interviews",
       "companies": "Companies",
-      "postings": "Job postings",
+      "postings": "Jobs",
       "food": "Food",
       "market": "Market",
-      "ask": "Ask & Talk"
+      "ask": "Ask"
     }
   },
   "appPrompt": {
