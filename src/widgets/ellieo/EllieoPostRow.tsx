@@ -11,7 +11,6 @@ import { getVerifiedSchool } from '@lib/constants/schools'
 import { useFormat, useT } from '@lib/i18n/client'
 import type { CommunityPost } from '@/types/nyc'
 import { EllieoBoardTag, EllieoFeedCard, EllieoPersonAvatar } from '@widgets/ellieo/EllieoFeedCard'
-import { BOARD_EMOJI } from '@widgets/ellieo/nav'
 import { CptOptTypeBadge } from '@widgets/nyc/CptOptTypeBadge'
 import { JobReviewTypeBadge } from '@widgets/nyc/JobReviewTypeBadge'
 import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
@@ -58,7 +57,7 @@ export function EllieoPostRow({ post, boardId }: { post: CommunityPost; boardId:
     ) : boardId === 'job-review' ? (
       <JobReviewTypeBadge type={post.jobReviewType} className='!py-0.5' />
     ) : null
-  const boardKey = (boardId === 'cpt-opt' || boardId === 'visa' || boardId === 'green-card' ? 'status' : boardId) as keyof typeof BOARD_EMOJI
+  const boardKey = boardId === 'cpt-opt' || boardId === 'visa' || boardId === 'green-card' ? 'status' : boardId
 
   return (
     <EllieoFeedCard
@@ -67,7 +66,7 @@ export function EllieoPostRow({ post, boardId }: { post: CommunityPost; boardId:
       name={name}
       verified={Boolean(school)}
       meta={[school, format.relative(post.createdAt)].filter(Boolean).join(' · ')}
-      tag={BOARD_EMOJI[boardKey] ? <EllieoBoardTag emoji={BOARD_EMOJI[boardKey]} label={tn(`ellieo.short.${boardKey}`)} /> : null}
+      tag={<EllieoBoardTag boardId={boardKey} label={tn(`ellieo.short.${boardKey}`)} />}
       badge={typeBadge}
       title={post.title}
       excerpt={excerpt}

@@ -61,18 +61,6 @@ export const ELLIEO_BOARDS: EllieoBoard[] = ORDER.map((id) => {
   }
 })
 
-/** Emoji per board (chips, composer, feed tags) */
-export const BOARD_EMOJI: Record<NycCategoryId, string> = {
-  housing: '🏠',
-  status: '🛂',
-  'job-review': '💼',
-  roommate: '🤝',
-  food: '🍜',
-  anonymous: '💬',
-  marketplace: '🛍️',
-  events: '🎉',
-}
-
 /** Board accent colors (feed tags, rail icons): text on a soft tint of the same hue */
 export const BOARD_TONE: Partial<Record<NycCategoryId, string>> = {
   status: '#1f5eff',

@@ -98,7 +98,7 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 - **Inputs**: surface bg, no border until focus; focus = 2px brand blue ring.
 - **Empty states / sheet heroes / composer headers** (user 11-16): NO big emoji or 3D-looking illustrations.
   Use a clean line icon (SF Symbols / Material Symbols Rounded / Lucide, outline, ~28px) in brand blue on a
-  64px brand-soft circle, then one line + action button. Emoji stay only as small inline labels in board chips.
+  64px brand-soft circle, then one line + action button. No emoji anywhere in the UI: board chips and board tags use small line icons too (user 11-16).
 - **Loading** (user choice 11-16): **three bouncing dots** — brand blue, brand blue, lime; ~8px dots, 6px gap, each hops
   ~6px in turn (stagger ~0.15s, ~0.9s loop). No logo above it, no ring. Same component for full-screen,
   section, button busy and pull-to-refresh. Never gray skeleton blocks; one full-screen loader if two would show.

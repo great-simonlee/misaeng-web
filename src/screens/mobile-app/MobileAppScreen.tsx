@@ -21,8 +21,8 @@ const FEATURES = [
 ] as const
 
 const SAMPLE_FEED = [
-  { name: 'minh.opt', school: 'Baruch', tag: '🛂', title: 'OPT approved in 62 days', likes: 24 },
-  { name: 'phoholic', school: 'Columbia', tag: '🍜', title: 'Best phở near campus?', likes: 57 },
+  { name: 'minh.opt', school: 'Baruch', tag: PassportIcon, title: 'OPT approved in 62 days', likes: 24 },
+  { name: 'phoholic', school: 'Columbia', tag: BowlIcon, title: 'Best phở near campus?', likes: 57 },
 ] as const
 
 export function MobileAppScreen() {
@@ -68,9 +68,9 @@ export function MobileAppScreen() {
               <div className='flex items-center justify-between px-4 pb-2 pt-4'>
                 <EllieoAppIcon size={24} />
                 <span className='flex gap-1.5'>
-                  {['🏠', '🛂', '💼'].map((emoji) => (
-                    <span key={emoji} className='rounded-full bg-[var(--surface)] px-2 py-0.5 text-[12px]'>
-                      {emoji}
+                  {[KeyIcon, PassportIcon, BriefcaseIcon].map((Icon, index) => (
+                    <span key={index} className='rounded-full bg-[var(--surface)] px-2 py-1 text-[var(--foreground)]'>
+                      <Icon className='size-3.5' />
                     </span>
                   ))}
                 </span>
@@ -92,7 +92,7 @@ export function MobileAppScreen() {
                       </span>
                       <span className='font-bold'>{post.name}</span>
                       <span className='text-[var(--muted)]'>· {post.school}</span>
-                      <span className='ml-auto'>{post.tag}</span>
+                      <post.tag className='ml-auto size-3.5 text-[var(--foreground)]' />
                     </p>
                     <p className='mt-1.5 text-[12.5px] font-bold leading-snug'>{post.title}</p>
                     <p className='mt-1 inline-flex items-center gap-1 text-[11px] text-[var(--muted)]'>

@@ -113,7 +113,7 @@
     "support": {
       "push": {
         "reportResolvedBody": "We reviewed it and took action. Thanks for keeping Ellieo safe.",
-        "feedbackShippedTitle": "Your feedback made it into Ellieo 🎉",
+        "feedbackShippedTitle": "Your feedback made it into Ellieo",
         "feedbackShippedBody": "\"{title}\" is now live on Ellieo."
       },
       "email": {
@@ -302,14 +302,14 @@
       "jobReviewDescription": "{company} {type} interview and hiring timeline on {brand}."
     },
     "share": {
-      "housing": "A room shared on Ellieo 🏠",
-      "visa": "A visa post shared on Ellieo 🛂",
-      "review": "An interview & job review shared on Ellieo 💼",
-      "company": "A company shared on Ellieo 🏢",
-      "postings": "Job postings shared on Ellieo 📋",
+      "housing": "A room shared on Ellieo",
+      "visa": "A visa post shared on Ellieo",
+      "review": "An interview & job review shared on Ellieo",
+      "company": "A company shared on Ellieo",
+      "postings": "Job postings shared on Ellieo",
       "memberOnly": "For Ellieo members.",
-      "posting": "A job posting shared from Ellieo! 📋",
-      "marketplace": "A Ellieo marketplace listing! 🛍️"
+      "posting": "A job posting shared from Ellieo!",
+      "marketplace": "An Ellieo marketplace listing!"
     },
     "appHandoff": {
       "openApp": "Open in the Ellieo app",

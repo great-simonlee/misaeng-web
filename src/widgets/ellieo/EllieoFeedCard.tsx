@@ -1,10 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, type ReactNode } from 'react'
+import { createElement, useState, type ReactNode } from 'react'
 
 import { useFormat } from '@lib/i18n/client'
 import { BadgeCheckIcon, ChatIcon, CommentIcon, EyeIcon, HeartIcon } from '@widgets/ellieo/icons'
+import { boardIcon } from '@widgets/ellieo/nav'
 
 /** Avatar fills when there is no photo: soft tints, ink-friendly */
 const AVATAR_FILLS = ['#1f5eff', '#16b47e', '#e8861a', '#e0579b', '#2a9fd6', '#14121f']
@@ -53,11 +54,11 @@ export function EllieoPersonAvatar({
   )
 }
 
-/** Emoji board tag (right of the author row) */
-export function EllieoBoardTag({ emoji, label }: { emoji: string; label: string }) {
+/** Board tag (right of the author row): line icon + label */
+export function EllieoBoardTag({ boardId, label }: { boardId: string; label: string }) {
   return (
     <span className='inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--surface)] px-2.5 py-1 text-[12px] font-semibold text-[var(--foreground)]'>
-      <span aria-hidden>{emoji}</span>
+      {createElement(boardIcon(boardId), { className: 'size-4 shrink-0' })}
       <span className='hidden min-[420px]:inline'>{label}</span>
     </span>
   )

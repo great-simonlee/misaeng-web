@@ -115,7 +115,7 @@
         "reportResolvedTitle": "Chúng tôi đã xử lý báo cáo của bạn",
         "reportResolvedBody": "Chúng tôi đã xem xét và xử lý. Cảm ơn bạn đã giúp Ellieo an toàn.",
         "reportDismissedBody": "Chúng tôi đã xem xét nhưng nội dung này không vi phạm quy định. Cảm ơn bạn đã báo cho chúng tôi.",
-        "feedbackShippedTitle": "Góp ý của bạn đã được áp dụng vào Ellieo 🎉",
+        "feedbackShippedTitle": "Góp ý của bạn đã được áp dụng vào Ellieo",
         "feedbackShippedBody": "\"{title}\" đã có trên Ellieo."
       },
       "email": {
@@ -302,14 +302,14 @@
       "jobReviewDescription": "Timeline phỏng vấn và tuyển dụng {type} tại {company} trên {brand}."
     },
     "share": {
-      "housing": "Một căn phòng được chia sẻ trên Ellieo 🏠",
-      "visa": "Bài viết về visa được chia sẻ trên Ellieo 🛂",
-      "review": "Đánh giá phỏng vấn & việc làm trên Ellieo 💼",
-      "company": "Một công ty được chia sẻ trên Ellieo 🏢",
-      "postings": "Tin tuyển dụng được chia sẻ trên Ellieo 📋",
+      "housing": "Một căn phòng được chia sẻ trên Ellieo",
+      "visa": "Bài viết về visa được chia sẻ trên Ellieo",
+      "review": "Đánh giá phỏng vấn & việc làm trên Ellieo",
+      "company": "Một công ty được chia sẻ trên Ellieo",
+      "postings": "Tin tuyển dụng được chia sẻ trên Ellieo",
       "memberOnly": "Dành cho thành viên Ellieo.",
-      "posting": "Một tin tuyển dụng được chia sẻ từ Ellieo! 📋",
-      "marketplace": "Một món đồ trên chợ Ellieo! 🛍️"
+      "posting": "Một tin tuyển dụng được chia sẻ từ Ellieo!",
+      "marketplace": "Một món đồ trên chợ Ellieo!"
     },
     "appHandoff": {
       "openApp": "Mở trong ứng dụng Ellieo",

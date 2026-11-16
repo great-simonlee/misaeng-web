@@ -279,7 +279,7 @@ export function EllieoCompanyDetailScreen({ slug }: { slug: string }) {
                         avatar={<EllieoPersonAvatar name={name} />}
                         name={name}
                         meta={format.relative(meta.createdAt)}
-                        tag={typeLabel ? <EllieoBoardTag emoji='💼' label={typeLabel} /> : null}
+                        tag={typeLabel ? <EllieoBoardTag boardId='job-review' label={typeLabel} /> : null}
                         title={meta.title}
                         likes={meta.recommendCount}
                         comments={meta.commentCount}

@@ -30,7 +30,7 @@ import {
   type EllieoCreator,
 } from '@widgets/ellieo/mockContent'
 import { EllieoSideRail, FeedHeading, RoommatesRail, SampleTag, shortSchool } from '@widgets/ellieo/EllieoRail'
-import { BOARD_EMOJI, ELLIEO_BOARDS } from '@widgets/ellieo/nav'
+import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 
 /**
  * Ellieo city home, social-feed style: a stories strip of partner student associations and creators,
@@ -349,7 +349,7 @@ function CommunityFeed() {
           name={name}
           verified={!anonymous}
           meta={[anonymous || !post.school ? null : shortSchool(post.school), format.relative(post.at)].filter(Boolean).join(' · ')}
-          tag={<EllieoBoardTag emoji={BOARD_EMOJI[post.board]} label={tn(`ellieo.short.${post.board}`)} />}
+          tag={<EllieoBoardTag boardId={post.board} label={tn(`ellieo.short.${post.board}`)} />}
           badge={
             post.likes >= TRENDING_LIKES ? (
               <span className='rounded-full bg-[var(--ellieo-lime)] px-2 py-0.5 text-[11.5px] font-bold text-[var(--foreground)]'>

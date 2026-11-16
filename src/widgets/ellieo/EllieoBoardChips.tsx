@@ -6,10 +6,10 @@ import { usePathname } from 'next/navigation'
 import { useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
 import { useT } from '@lib/i18n/client'
-import { BOARD_EMOJI, ELLIEO_BOARDS } from '@widgets/ellieo/nav'
+import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 
 /**
- * Emoji board chips under the top bar (home, board lists, housing list). Scrolls sideways on phones.
+ * Board chips (line icon + label) under the top bar (home, board lists, housing list). Scrolls sideways on phones.
  * Renders nothing on detail, write, account and legal pages.
  */
 export function EllieoBoardChips() {
@@ -42,7 +42,7 @@ export function EllieoBoardChips() {
                       : 'bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--border)]',
                   )}
                 >
-                  <span aria-hidden className='text-[15px] leading-none'>{BOARD_EMOJI[board.id]}</span>
+                  <board.icon className='size-4 shrink-0' />
                   {t(`ellieo.short.${board.id}`)}
                 </Link>
               </li>
