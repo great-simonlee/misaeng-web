@@ -59,7 +59,7 @@ Navigation lives in a bottom tab bar on every screen size (web too).
 
 - **Top bar** (56px, white, hairline bottom): left = Ellieo logo (house mark + ELLIEO wordmark, `ellieo-banner.png`) +
   city pill (`NYC ▾`, surface bg). Right = language (EN/VI, ≥640px), bell (inbox),
-  avatar (or `Log in` pill, ink bg, white text).
+  avatar (or `Log in` pill, brand blue bg, white text).
 - **Board chips row** under the top bar on home and board lists, horizontally scrollable, emoji + label:
   🏠 Housing · 🛂 Visa · 💼 Jobs · 🤝 Roommates · 🍜 Food · 💬 Ask & Talk · 🛍️ Marketplace · 🎉 Events.
   Selected = ink pill with white text; others = surface pill.

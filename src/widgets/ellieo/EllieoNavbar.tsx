@@ -243,7 +243,7 @@ export function EllieoNavbar() {
           ) : !loading ? (
             <Link
               href={loginHref}
-              className='inline-flex h-9 items-center rounded-full bg-[var(--foreground)] px-4 text-[14px] font-bold text-white transition hover:bg-black'
+              className='inline-flex h-9 items-center rounded-full bg-[var(--brand)] px-4 text-[14px] font-bold text-white transition hover:bg-[var(--brand-hover)]'
             >
               {t('ellieo.login')}
             </Link>
