@@ -29,8 +29,8 @@
       "description": "Tìm roommate, phòng và sublet"
     },
     "anonymous": {
-      "title": "Bảng tin ẩn danh",
-      "description": "Thoải mái trò chuyện mà không cần ghi tên"
+      "title": "Hỏi đáp & Tự do",
+      "description": "Hỏi bất cứ điều gì, trò chuyện thoải mái"
     },
     "comingSoon": "Sắp ra mắt"
   },
@@ -122,7 +122,7 @@
     },
     "anonymous": {
       "writeLabel": "Đăng ẩn danh",
-      "listIntro": "Bảng tin ẩn danh {city}, nơi bạn thoải mái trò chuyện mà không cần ghi tên.",
+      "listIntro": "Bảng Hỏi đáp & Tự do {city}: hỏi bất cứ điều gì và trò chuyện thoải mái.",
       "locationLabel": "Chủ đề (không bắt buộc)",
       "locationPlaceholder": "Chọn chủ đề",
       "titlePlaceholder": "Một dòng về ngày hôm nay của bạn",
@@ -159,7 +159,7 @@
   },
   "author": {
     "member": "Thành viên",
-    "anonymous": "Ẩn danh"
+    "anonymous": "Hỏi đáp"
   },
   "verify": {
     "required": "Bạn cần xác minh là sinh viên hoặc người đi làm để đăng bài và bình luận.",
@@ -176,11 +176,11 @@
     },
     "anonymous": {
       "noTargeting": "Dù ẩn danh, bài viết nêu tên hoặc ám chỉ một người cụ thể, hay nói xấu sau lưng người khác đều không được phép.",
-      "stillResponsible": "Người khác không thấy tên, trường hay ảnh của bạn, nhưng bạn vẫn chịu trách nhiệm pháp lý về những gì mình đăng.",
+      "stillResponsible": "Khi đăng ẩn danh, người khác không thấy tên, trường hay ảnh của bạn, nhưng bạn vẫn chịu trách nhiệm pháp lý về những gì mình đăng.",
       "loginRequired": "Bạn cần đăng nhập để có thể sửa hoặc xóa bài viết. Đội ngũ của chúng tôi có thể kiểm tra người đăng khi xử lý báo cáo."
     },
     "commonTitle": "Nguyên tắc cộng đồng",
-    "anonymousTitle": "Nguyên tắc bảng tin ẩn danh"
+    "anonymousTitle": "Nguyên tắc Hỏi đáp & Tự do"
   },
   "anonymousTopics": {
     "opt": "OPT·CPT·STEM OPT",
@@ -243,9 +243,9 @@
   "anonymousNotice": {
     "close": "Đóng",
     "eyebrow": "Trước khi bắt đầu",
-    "board": "Bảng tin ẩn danh",
-    "title": "Không gian ẩn danh mà chúng ta cùng giữ an toàn",
-    "body": "Để {brand} luôn là một cộng đồng lành mạnh và hữu ích, hãy tuân thủ quy tắc và tôn trọng nhau, kể cả trên bảng tin ẩn danh nhé!",
+    "board": "Hỏi đáp & Tự do",
+    "title": "Không gian hỏi đáp và trò chuyện mà chúng ta cùng giữ an toàn",
+    "body": "Để {brand} luôn là một cộng đồng lành mạnh và hữu ích, hãy tuân thủ quy tắc và tôn trọng nhau, kể cả trên Hỏi đáp & Tự do nhé!",
     "confirm": "Đã hiểu",
     "snooze24h": "Không hiện lại trong 24 giờ"
   },
@@ -291,7 +291,8 @@
     "perMonth": "/tháng",
     "stepNumber": "Bước {n}",
     "noStepInfo": "Chưa có chi tiết các bước",
-    "views": "Lượt xem"
+    "views": "Lượt xem",
+    "offerVerified": "Đã xác minh trúng tuyển"
   },
   "anonymous": {
     "topicPlaceholder": "Chọn chủ đề",
@@ -486,12 +487,15 @@
   "anonymousWrite": {
     "topicTitle": "Chủ đề là gì?",
     "topicDescription": "Bạn có thể bỏ qua mục này.",
-    "topicAria": "Chủ đề bảng tin ẩn danh",
+    "topicAria": "Chủ đề Hỏi đáp & Tự do",
     "titleDescription": "Viết một tiêu đề ngắn để mọi người đọc là hiểu ngay.",
     "bodyDescription": "Viết bất cứ điều gì bạn đang nghĩ. Bạn sẽ hiển thị là ẩn danh.",
-    "createTitle": "Đăng bài trên bảng tin ẩn danh",
-    "createDescription": "Tên, trường và ảnh của bạn sẽ được ẩn. Cứ thoải mái chia sẻ.",
-    "editTitle": "Sửa bài viết ẩn danh"
+    "createTitle": "Đăng bài trên Hỏi đáp & Tự do",
+    "createDescription": "Đăng ẩn danh hoặc với biệt danh. Cứ thoải mái hỏi và chia sẻ.",
+    "editTitle": "Sửa bài viết ẩn danh",
+    "authorLabel": "Đăng với tên",
+    "authorAnonymous": "Ẩn danh",
+    "authorNickname": "Biệt danh"
   },
   "badges": {
     "workplace": "Đã xác minh công việc",

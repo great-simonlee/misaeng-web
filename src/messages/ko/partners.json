@@ -45,6 +45,44 @@
     },
     "parsons-ksa": {
       "name": "파슨스 한인학생회"
+    },
+    "rutgers-kisa": {
+      "name": "럿거스 한인학생회"
+    },
+    "yale-hanppuri": {
+      "name": "예일 한뿌리"
+    },
+    "neu-kisa": {
+      "name": "노스이스턴 한인학생회"
+    },
+    "bu-kisa": {
+      "name": "보스턴대 한인학생회"
+    },
+    "bc-kisa": {
+      "name": "보스턴칼리지 한인학생회"
+    },
+    "hc-kisa": {
+      "name": "하버드 한인학생회"
+    },
+    "berklee-kcsa": {
+      "name": "버클리음대 한인학생회"
+    },
+    "tufts-kiso": {
+      "name": "터프츠 한인학생회"
+    },
+    "risd-ksa": {
+      "name": "RISD 한인학생회"
+    },
+    "brown-kisa": {
+      "name": "브라운 한인학생회"
+    },
+    "uw-ksu": {
+      "name": "워싱턴대 한인학생회"
     }
+  },
+  "orgGroups": {
+    "nyc": "New York",
+    "boston": "Boston",
+    "other": "그 외 지역"
   }
 }

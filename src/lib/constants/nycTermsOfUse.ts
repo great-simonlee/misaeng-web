@@ -5,11 +5,11 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
   eyebrow: 'LEGAL',
   title: 'Terms of Use',
   titleKo: '이용약관',
-  version: '2026-11-23',
-  lastUpdated: 'October 23, 2026',
-  lastUpdatedKo: '2026년 10월 23일',
-  effectiveDate: 'November 23, 2026',
-  effectiveDateKo: '2026년 11월 23일',
+  version: '2026-12-15',
+  lastUpdated: 'November 15, 2026',
+  lastUpdatedKo: '2026년 11월 15일',
+  effectiveDate: 'December 15, 2026',
+  effectiveDateKo: '2026년 12월 15일',
   contactEmail: 'info@misaeng.com',
   companyName: 'Misaeng LLC',
   companyAddress:
@@ -61,6 +61,10 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
             {
               en: '“Housing” means rental or residential information and listings posted by the Company or Users on the Services.',
               ko: '“하우징”이란 회사가 또는 이용자가 서비스에 게시하는 임대·주거 관련 정보·매물 안내를 말합니다.',
+            },
+            {
+              en: '“Marketplace” means the used-goods board where Members list personal items for sale or for free and contact each other about them through in-Service inquiry messages (see Section 10).',
+              ko: '“중고거래”란 회원이 개인 물품을 판매하거나 무료로 나누기 위해 등록하고, 서비스 내 문의 메시지로 서로 연락하는 게시판을 말합니다(제10조 참고).',
             },
             {
               en: '“Anonymous Board” means a board where a poster’s nickname, school, and profile photo are generally hidden or masked from other Users. This does not guarantee absolute anonymity for operational or legal purposes.',
@@ -174,6 +178,10 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
               ko: '하우징: 주거·매물 관련 정보 열람 및 (해당 시) 등록·문의',
             },
             {
+              en: 'Marketplace: listing personal items for sale or for free and contacting sellers through in-Service inquiry messages (see Section 10)',
+              ko: '중고거래: 개인 물품의 판매·무료 나눔 등록 및 서비스 내 문의 메시지를 통한 판매자 연락(제10조 참고)',
+            },
+            {
               en: 'My Page: your posts, saves, and profile/settings features',
               ko: '마이페이지: 내 글, 찜, 프로필·설정 관련 기능',
             },
@@ -257,8 +265,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
               ko: '번역문은 부정확하거나 불완전할 수 있고 뉘앙스가 달라질 수 있습니다. 게시물은 원문이 번역문보다 우선하며, 번역문이 표시된 경우 “원문 보기”로 원문을 확인할 수 있습니다.',
             },
             {
-              en: 'Do not rely on a translation alone for decisions about visas or immigration, employment, housing contracts or payments, or legal or tax matters. Check the original and consult a qualified professional (see Section 11).',
-              ko: '비자·이민, 취업, 주거 계약·지급, 법률·세무 관련 결정을 번역문에만 의존해서 내리지 마십시오. 원문을 확인하고 자격 있는 전문가와 상담하십시오(제11조 참고).',
+              en: 'Do not rely on a translation alone for decisions about visas or immigration, employment, housing contracts or payments, or legal or tax matters. Check the original and consult a qualified professional (see Section 12).',
+              ko: '비자·이민, 취업, 주거 계약·지급, 법률·세무 관련 결정을 번역문에만 의존해서 내리지 마십시오. 원문을 확인하고 자격 있는 전문가와 상담하십시오(제12조 참고).',
             },
             {
               en: 'The Company may choose not to translate some Content (for example, suspected spam, advertising, harmful Content, or Content containing personal contact details), may show Content untranslated until a translation is available, and may correct or remove translations at any time.',
@@ -422,9 +430,184 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
       ],
     },
     {
+      id: 'marketplace',
+      title: '10. Marketplace (Used-Goods Trading)',
+      titleKo: '10. 중고거래',
+      blocks: [
+        {
+          type: 'p',
+          en: '10.1 What the Marketplace is. The Marketplace lets Members list personal items (for example furniture, electronics, household goods, clothing, books, and tickets or gift cards), including moving sales and free giveaways, and lets other Members contact the seller through in-Service inquiry messages. A listing may include a title, a description, up to six photos, a category, an asking price (or “free”), the payment methods the seller accepts (cash, Zelle, Venmo, or other), the ZIP code of the trade area, and a trade status. Listings may be shown on Misaeng NYC and Ellieo in their original language or in translation (see Section 6).',
+          ko: '10.1 중고거래의 의미. 중고거래에서 회원은 개인 물품(예: 가구, 전자기기, 생활용품, 의류·잡화, 책·교재, 티켓·기프트)을 무빙세일·무료 나눔을 포함하여 등록할 수 있고, 다른 회원은 서비스 내 문의 메시지로 판매자에게 연락할 수 있습니다. 등록 글에는 제목, 설명, 사진(최대 6장), 카테고리, 희망 가격(또는 “나눔”), 판매자가 받는 결제 방법(현금, Zelle, Venmo, 그 외), 거래 지역의 ZIP 코드, 거래 상태가 포함될 수 있습니다. 등록 글은 원문 또는 번역문으로 Misaeng NYC와 Ellieo에 표시될 수 있습니다(제6조 참고).',
+        },
+        {
+          type: 'p',
+          en: '10.2 Misaeng is only a venue. The Company only provides a place where Users can find each other and is not a party to any transaction between Users. The Company is not the seller, buyer, agent, broker, or escrow for any item. The Company does not process or collect payments, hold funds, or offer buyer or seller protection; does not inspect, authenticate, store, deliver, or ship items; and does not guarantee any item, listing, User, or payment—including the existence, quality, safety, legality, condition, or authenticity of an item, the accuracy of a listing, the identity, intentions, or ability to pay or deliver of any User, or that a transaction will be completed. Payments (including through Zelle, Venmo, or other apps) are made directly between Users through services the Company does not control, and many of them cannot be reversed.',
+          ko: '10.2 미생은 거래의 장소일 뿐입니다. 회사는 이용자들이 서로를 찾을 수 있는 공간을 제공할 뿐이며, 이용자 간 거래의 당사자가 아닙니다. 회사는 어떤 물품에 대해서도 판매자·구매자·대리인·중개인·에스크로가 아닙니다. 회사는 결제를 처리·수령하거나 대금을 보관하지 않고, 구매자·판매자 보호를 제공하지 않으며, 물품을 검수·진품 확인·보관·전달·배송하지 않습니다. 또한 물품, 등록 글, 이용자, 결제에 관하여 어떠한 보증도 하지 않습니다(물품의 실재·품질·안전성·적법성·상태·진위, 등록 글의 정확성, 이용자의 신원·의도·지급 또는 인도 능력, 거래의 성사 등을 포함). 결제(Zelle, Venmo 또는 다른 앱을 통한 결제 포함)는 회사가 관리하지 않는 서비스를 통해 이용자 간에 직접 이루어지며, 상당수는 되돌릴 수 없습니다.',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Sellers are responsible for having the right to sell each item and for its legality, for describing its condition, defects, and price accurately with genuine photos, and for keeping the listing’s status up to date.',
+              ko: '판매자는 물품을 판매할 권리와 그 적법성, 상태·하자·가격을 실제 사진과 함께 정확하게 기재할 책임, 그리고 등록 글의 거래 상태를 최신으로 유지할 책임을 집니다.',
+            },
+            {
+              en: 'Buyers are responsible for checking items in person before paying and for their own decision to trade.',
+              ko: '구매자는 결제 전에 물품을 직접 확인하고, 거래 여부를 스스로 판단할 책임을 집니다.',
+            },
+            {
+              en: 'Buyers and sellers are each responsible for arranging meetups, payment, and pickup or delivery, and for complying with applicable laws, including tax, reporting, consumer-protection, product-safety, and recall laws.',
+              ko: '구매자와 판매자는 각자 만남, 결제, 수령·전달을 조율할 책임과 세금·신고·소비자 보호·제품 안전·리콜 관련 법령 등 적용 법령을 준수할 책임을 집니다.',
+            },
+            {
+              en: 'Any dispute about an item, a meetup, or a payment is between the buyer and the seller. The Company may, but is not obligated to, review reports or help resolve a dispute, and does not provide refunds or compensation for transactions between Users.',
+              ko: '물품·만남·결제에 관한 분쟁은 구매자와 판매자 사이의 문제입니다. 회사는 신고를 검토하거나 분쟁 해결을 도울 수 있으나 그럴 의무는 없으며, 이용자 간 거래에 대해 환불이나 보상을 제공하지 않습니다.',
+            },
+          ],
+        },
+        {
+          type: 'p',
+          en: '10.3 Prohibited items. You may not list, offer, request, or trade the following on the Marketplace. The Company may add to this list in on-Service guidelines.',
+          ko: '10.3 거래 금지 물품. 중고거래에서 다음 물품을 등록·제안·요청·거래해서는 안 됩니다. 회사는 서비스 화면의 가이드라인으로 이 목록을 추가할 수 있습니다.',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Weapons, including firearms, firearm parts and accessories, ammunition, explosives, fireworks, and knives or self-defense devices (such as stun guns or pepper spray) that are restricted where the trade takes place',
+              ko: '무기: 총기, 총기 부품·액세서리, 탄약, 폭발물, 폭죽, 거래 장소에서 규제되는 칼·호신용품(전기충격기, 페퍼 스프레이 등)',
+            },
+            {
+              en: 'Illegal drugs, cannabis and cannabis products (including edibles and THC vapes), drug paraphernalia, and prescription or controlled medications',
+              ko: '불법 약물, 대마 및 대마 제품(에디블·THC 베이프 포함), 마약 용품, 처방약·규제 의약품',
+            },
+            {
+              en: 'Alcohol, tobacco, e-cigarettes, vapes, and other nicotine products',
+              ko: '주류, 담배, 전자담배, 베이프 및 기타 니코틴 제품',
+            },
+            {
+              en: 'Recalled or unsafe products, and hazardous materials (such as flammable, toxic, or corrosive chemicals and gas cylinders)',
+              ko: '리콜되었거나 안전하지 않은 제품, 위험물(인화성·독성·부식성 화학물질, 가스통 등)',
+            },
+            {
+              en: 'Stolen goods, counterfeit or replica goods, and items that infringe intellectual property rights',
+              ko: '도난품, 위조품·모조품, 지식재산권을 침해하는 물품',
+            },
+            {
+              en: 'Live animals, including pets',
+              ko: '반려동물을 포함한 살아 있는 동물',
+            },
+            {
+              en: 'Adult or sexual products and content',
+              ko: '성인용품 및 성적 콘텐츠',
+            },
+            {
+              en: 'Personal information, accounts, or credentials (such as social-media, email, streaming, or game accounts and verification codes), identity documents, and forged or fake documents',
+              ko: '개인정보, 계정·로그인 정보(SNS·이메일·스트리밍·게임 계정, 인증번호 등), 신분증, 위조·허위 서류',
+            },
+            {
+              en: 'Tickets resold above face value where that is prohibited, or otherwise in violation of applicable ticket-resale laws',
+              ko: '액면가를 초과한 재판매가 금지된 경우의 티켓, 기타 적용되는 티켓 재판매 법령을 위반하는 티켓',
+            },
+            {
+              en: 'Items whose sale requires a license, permit, or prescription that the seller does not hold',
+              ko: '판매에 면허·허가·처방이 필요하지만 판매자가 이를 갖추지 않은 물품',
+            },
+            {
+              en: 'Services, jobs, housing, rentals, or sublets (use the applicable boards instead), and currency exchange, money transfers, or other financial products',
+              ko: '서비스, 구인·구직, 주거·임대·서블렛(해당 게시판 이용), 환전·송금 대행 및 기타 금융상품',
+            },
+            {
+              en: 'Any other item that is illegal to sell, buy, or possess where the trade takes place',
+              ko: '기타 거래 장소에서 판매·구매·소지가 불법인 물품',
+            },
+          ],
+        },
+        {
+          type: 'p',
+          en: '10.4 Inquiry messages. Buyers contact sellers through in-Service inquiry messages, and each message is delivered to the other side as a notification. Sending inquiries may require login and student or professional verification, and the Company may limit the number of new inquiries and messages to prevent spam. When a listing is marked sold or deleted, its conversations close and become read only. In inquiry messages, you must not:',
+          ko: '10.4 문의 메시지. 구매자는 서비스 내 문의 메시지로 판매자에게 연락하며, 각 메시지는 상대방에게 알림으로 전달됩니다. 문의를 보내려면 로그인과 학생·직장인 인증이 필요할 수 있으며, 회사는 스팸 방지를 위해 새 문의와 메시지 수를 제한할 수 있습니다. 등록 글이 판매완료로 바뀌거나 삭제되면 그 대화는 닫히고 읽기 전용이 됩니다. 문의 메시지에서 다음 행위를 해서는 안 됩니다.',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Harass, threaten, or pressure another User, or send sexual, hateful, or abusive messages',
+              ko: '다른 이용자를 괴롭히거나 위협·압박하는 행위, 성적·혐오·모욕적 메시지 전송',
+            },
+            {
+              en: 'Send spam, phishing, or external links or payment pages, or try to move the conversation off the Services to scam or defraud another User',
+              ko: '스팸, 피싱, 외부 링크·결제 페이지 전송, 또는 사기를 목적으로 대화를 서비스 밖으로 옮기도록 유도하는 행위',
+            },
+            {
+              en: 'Request advance payments or deposits from someone you have not met, verification codes (such as Google Voice, bank, or email codes), or personal or financial information that the trade does not need',
+              ko: '만나지 않은 상대에게 선입금·보증금을 요구하거나, 인증번호(Google Voice·은행·이메일 인증번호 등) 또는 거래에 필요하지 않은 개인·금융 정보를 요구하는 행위',
+            },
+            {
+              en: 'Use information you learn from a conversation for any purpose other than the trade',
+              ko: '대화에서 알게 된 정보를 거래 외 목적으로 이용하는 행위',
+            },
+          ],
+        },
+        {
+          type: 'p',
+          en: '10.5 Safe-trading rules and agreement. Before you list an item or contact a seller, the Services may ask you to read and agree to the safe-trading rules shown on screen. Those rules, summarized below, form part of these Terms. Agreeing to or following them does not guarantee a safe trade and does not make the Company responsible for any transaction.',
+          ko: '10.5 안전 거래 수칙 및 동의. 물품을 등록하거나 판매자에게 문의하기 전에, 서비스는 화면에 표시되는 안전 거래 수칙을 읽고 동의하도록 요청할 수 있습니다. 아래에 요약된 이 수칙은 본 약관의 일부를 이룹니다. 수칙에 동의하거나 이를 따른다고 해서 안전한 거래가 보장되거나 회사가 거래에 책임을 지게 되는 것은 아닙니다.',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Never send money before you have seen the item. Requests for advance payment are almost always scams, and transfers through Zelle, Venmo, Cash App, and similar apps generally cannot be reversed.',
+              ko: '물건을 보기 전에는 절대 돈을 보내지 마세요. 선입금 요구는 거의 다 사기이며, Zelle·Venmo·Cash App 등의 송금은 일반적으로 되돌릴 수 없습니다.',
+            },
+            {
+              en: 'Do not post your phone number, email, messenger ID, social-media handle, or home address. Keep conversations in the in-Service inquiry messages, and be suspicious of requests to move to text or other messaging apps or to open external links or payment pages.',
+              ko: '전화번호·이메일·메신저 ID·SNS·집 주소를 공개하지 마세요. 대화는 서비스 내 문의 메시지로만 하고, 문자나 다른 메신저로 옮기자고 하거나 외부 링크·결제 페이지를 보내면 의심하세요.',
+            },
+            {
+              en: 'Never share verification codes (for example Google Voice, bank, or email codes) with anyone.',
+              ko: '인증번호(Google Voice·은행·이메일 인증번호 등)는 누구에게도 알려 주지 마세요.',
+            },
+            {
+              en: 'Meet in daylight in a busy public place, such as a café, a subway station, or a police station’s safe exchange zone. If you trade at a home, bring someone with you.',
+              ko: '밝은 시간에 카페, 지하철역, 경찰서 앞 Safe Exchange Zone 등 사람이 많은 공공장소에서 만나세요. 집에서 거래한다면 지인과 함께하세요.',
+            },
+            {
+              en: 'Check electronics in person before paying, including power, function, serial number, and that activation locks such as iCloud/Find My are removed.',
+              ko: '전자기기는 결제 전에 현장에서 전원·작동, 시리얼 번호, iCloud/Find My 등 활성화 잠금 해제 여부를 확인하세요.',
+            },
+            {
+              en: 'Be suspicious of prices far below market value, pressure to decide quickly, and requests for shipping or third-party pickup. Refuse checks, money orders, gift-card payments, and “I overpaid, please refund the difference” requests.',
+              ko: '시세보다 지나치게 싼 가격, 급한 결정 요구, 배송·대리 수령 요청은 의심하세요. 수표, Money order, 기프트카드 결제, “더 보냈으니 차액을 돌려 달라”는 요청은 거절하세요.',
+            },
+            {
+              en: 'Report suspicious listings, Users, or conversations in the Services. If you are the victim of a crime, also contact the police (311 for non-emergencies in New York City, 911 in an emergency) and the FTC at reportfraud.ftc.gov.',
+              ko: '수상한 등록 글·이용자·대화는 서비스에서 신고하세요. 범죄 피해를 입었다면 경찰(뉴욕시 비긴급 311, 긴급 911)과 FTC(reportfraud.ftc.gov)에도 신고하세요.',
+            },
+          ],
+        },
+        {
+          type: 'p',
+          en: '10.6 Trade area and listing status. A listing’s trade area is shown only as a 5-digit ZIP code and an approximate area on a map, not an exact address; agree on the meeting place in the inquiry conversation. Sellers must keep each listing’s status accurate: “selling” (shown in lists and open to inquiries), “reserved” (a trade has been arranged, but inquiries are still accepted), or “sold” (hidden from lists, and its conversations close). Prices, status, and availability are set by the seller and may change at any time.',
+          ko: '10.6 거래 지역 및 거래 상태. 등록 글의 거래 지역은 정확한 주소가 아니라 5자리 ZIP 코드와 지도상의 대략적인 지역으로만 표시됩니다. 만날 장소는 문의 대화에서 정하세요. 판매자는 각 등록 글의 거래 상태를 정확하게 유지해야 합니다: “판매중”(목록에 표시되고 누구나 문의 가능), “예약중”(거래 약속이 잡혔으나 문의는 계속 받음), “판매완료”(목록에서 숨겨지고 문의 대화가 닫힘). 가격·상태·거래 가능 여부는 판매자가 정하며 언제든 바뀔 수 있습니다.',
+        },
+        {
+          type: 'p',
+          en: '10.7 Reports, blocks, and enforcement. You can report a listing or an inquiry conversation and block another User. When you report a conversation, its most recent messages are sent to the Company with your report for review. Blocking a User stops messages in both directions and removes the conversation from your list. The Company may, at its discretion and without prior notice, remove or hide listings, close conversations, limit Marketplace features, or suspend or terminate accounts that violate these Terms or that it reasonably believes create a risk of fraud or harm, and may cooperate with law enforcement (see Section 17).',
+          ko: '10.7 신고, 차단 및 조치. 이용자는 등록 글이나 문의 대화를 신고하고 다른 이용자를 차단할 수 있습니다. 대화를 신고하면 그 대화의 최근 메시지가 신고 내용과 함께 회사에 전달되어 검토됩니다. 이용자를 차단하면 서로 메시지를 보낼 수 없고 해당 대화는 목록에서 사라집니다. 회사는 본 약관을 위반하거나 사기·피해 위험이 있다고 합리적으로 판단되는 등록 글을 재량에 따라 사전 통지 없이 삭제·숨김 처리하거나, 대화를 닫거나, 중고거래 기능을 제한하거나, 계정을 이용 정지·해지할 수 있으며, 수사기관에 협조할 수 있습니다(제17조 참고).',
+        },
+        {
+          type: 'note',
+          en: 'The Company does not screen Users or listings in advance and does not mediate, refund, or compensate for transactions between Users. To the maximum extent permitted by law, the Company is not liable for any loss, injury, or damage arising from items, listings, meetups, payments, or other dealings between Users (see Sections 19 and 20).',
+          ko: '회사는 이용자나 등록 글을 사전에 심사하지 않으며, 이용자 간 거래를 중재·환불·보상하지 않습니다. 관련 법령이 허용하는 최대 범위에서, 회사는 이용자 간의 물품·등록 글·만남·결제 및 기타 거래로 인해 발생한 손실·상해·손해에 대해 책임지지 않습니다(제19조 및 제20조 참고).',
+        },
+      ],
+    },
+    {
       id: 'fair-housing',
-      title: '10. Fair Housing and Equal Opportunity',
-      titleKo: '10. 공정주거 및 평등한 기회',
+      title: '11. Fair Housing and Equal Opportunity',
+      titleKo: '11. 공정주거 및 평등한 기회',
       blocks: [
         {
           type: 'p',
@@ -452,8 +635,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'no-advice',
-      title: '11. Visa, Career, Legal, and Tax Information — Not Advice',
-      titleKo: '11. 비자·취업·법률·세무 정보 — 조언이 아님',
+      title: '12. Visa, Career, Legal, and Tax Information — Not Advice',
+      titleKo: '12. 비자·취업·법률·세무 정보 — 조언이 아님',
       blocks: [
         {
           type: 'p',
@@ -481,8 +664,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'credits',
-      title: '12. Community Credits',
-      titleKo: '12. 커뮤니티 크레딧',
+      title: '13. Community Credits',
+      titleKo: '13. 커뮤니티 크레딧',
       blocks: [
         {
           type: 'p',
@@ -514,8 +697,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'ip',
-      title: '13. Company Intellectual Property',
-      titleKo: '13. 회사의 지식재산권',
+      title: '14. Company Intellectual Property',
+      titleKo: '14. 회사의 지식재산권',
       blocks: [
         {
           type: 'p',
@@ -531,8 +714,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'third-party',
-      title: '14. Third-Party Services and Links',
-      titleKo: '14. 제3자 서비스 및 링크',
+      title: '15. Third-Party Services and Links',
+      titleKo: '15. 제3자 서비스 및 링크',
       blocks: [
         {
           type: 'p',
@@ -543,8 +726,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'copyright',
-      title: '15. Copyright Complaints and DMCA Designated Agent',
-      titleKo: '15. 저작권 침해 신고 및 DMCA Designated Agent',
+      title: '16. Copyright Complaints and DMCA Designated Agent',
+      titleKo: '16. 저작권 침해 신고 및 DMCA Designated Agent',
       blocks: [
         {
           type: 'p',
@@ -616,8 +799,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'moderation',
-      title: '16. Reports, Monitoring, and Enforcement',
-      titleKo: '16. 신고, 모니터링 및 조치',
+      title: '17. Reports, Monitoring, and Enforcement',
+      titleKo: '17. 신고, 모니터링 및 조치',
       blocks: [
         {
           type: 'p',
@@ -650,8 +833,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'availability',
-      title: '17. Availability, Changes, and Interruptions',
-      titleKo: '17. 서비스 제공, 변경 및 중단',
+      title: '18. Availability, Changes, and Interruptions',
+      titleKo: '18. 서비스 제공, 변경 및 중단',
       blocks: [
         {
           type: 'p',
@@ -662,8 +845,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'disclaimers',
-      title: '18. Disclaimer of Warranties',
-      titleKo: '18. 보증의 부인',
+      title: '19. Disclaimer of Warranties',
+      titleKo: '19. 보증의 부인',
       blocks: [
         {
           type: 'p',
@@ -674,8 +857,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'liability',
-      title: '19. Limitation of Liability',
-      titleKo: '19. 책임의 제한',
+      title: '20. Limitation of Liability',
+      titleKo: '20. 책임의 제한',
       blocks: [
         {
           type: 'p',
@@ -691,8 +874,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'indemnity',
-      title: '20. Indemnification',
-      titleKo: '20. 면책(Indemnification)',
+      title: '21. Indemnification',
+      titleKo: '21. 면책(Indemnification)',
       blocks: [
         {
           type: 'p',
@@ -703,8 +886,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'termination',
-      title: '21. Suspension and Termination',
-      titleKo: '21. 이용 제한 및 해지',
+      title: '22. Suspension and Termination',
+      titleKo: '22. 이용 제한 및 해지',
       blocks: [
         {
           type: 'ul',
@@ -727,8 +910,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'changes',
-      title: '22. Changes to These Terms',
-      titleKo: '22. 약관의 변경',
+      title: '23. Changes to These Terms',
+      titleKo: '23. 약관의 변경',
       blocks: [
         {
           type: 'p',
@@ -739,61 +922,61 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'governing-law',
-      title: '23. Governing Law; Informal Resolution; Arbitration; Class-Action Waiver',
-      titleKo: '23. 준거법, 사전 협의, 중재, 집단소송 포기',
+      title: '24. Governing Law; Informal Resolution; Arbitration; Class-Action Waiver',
+      titleKo: '24. 준거법, 사전 협의, 중재, 집단소송 포기',
       emphasized: true,
       blocks: [
         {
           type: 'note',
-          en: 'IMPORTANT — PLEASE READ. This Section includes a binding individual arbitration agreement and a class-action waiver that affect your legal rights. You may opt out within 30 days as described in Section 23.7.',
-          ko: '중요 — 꼭 읽어 주세요. 본 조에는 법적 권리에 영향을 미치는 구속력 있는 개별 중재 합의 및 집단소송 포기 조항이 포함됩니다. 23.7에 따라 30일 이내 옵트아웃할 수 있습니다.',
+          en: 'IMPORTANT — PLEASE READ. This Section includes a binding individual arbitration agreement and a class-action waiver that affect your legal rights. You may opt out within 30 days as described in Section 24.7.',
+          ko: '중요 — 꼭 읽어 주세요. 본 조에는 법적 권리에 영향을 미치는 구속력 있는 개별 중재 합의 및 집단소송 포기 조항이 포함됩니다. 24.7에 따라 30일 이내 옵트아웃할 수 있습니다.',
         },
         {
           type: 'p',
-          en: '23.1 Governing law. These Terms and disputes relating to the Services are governed by the laws of the State of New York, United States, without regard to conflict-of-law principles, except that the Federal Arbitration Act governs the interpretation and enforcement of the arbitration agreement below to the fullest extent permitted.',
-          ko: '23.1 준거법. 본 약관 및 서비스 관련 분쟁에는 미국 뉴욕주 법률(법 충돌 원칙 제외)이 적용됩니다. 다만 아래 중재 합의의 해석·집행에는 허용되는 최대 범위에서 Federal Arbitration Act가 적용됩니다.',
+          en: '24.1 Governing law. These Terms and disputes relating to the Services are governed by the laws of the State of New York, United States, without regard to conflict-of-law principles, except that the Federal Arbitration Act governs the interpretation and enforcement of the arbitration agreement below to the fullest extent permitted.',
+          ko: '24.1 준거법. 본 약관 및 서비스 관련 분쟁에는 미국 뉴욕주 법률(법 충돌 원칙 제외)이 적용됩니다. 다만 아래 중재 합의의 해석·집행에는 허용되는 최대 범위에서 Federal Arbitration Act가 적용됩니다.',
         },
         {
           type: 'p',
-          en: '23.2 Informal resolution first. Before starting arbitration or a lawsuit that is not subject to arbitration, you and the Company agree to try to resolve the dispute informally for at least thirty (30) days after written notice to info@misaeng.com (include your name, the email on your account, a description of the dispute, and the relief sought).',
-          ko: '23.2 사전 협의. 중재 또는 중재 대상이 아닌 소송을 시작하기 전에, 귀하와 회사는 info@misaeng.com 으로 서면 통지(이름, 계정 이메일, 분쟁 내용, 구하는 구제) 후 최소 30일간 성실한 비공식 해결을 시도하기로 합니다.',
+          en: '24.2 Informal resolution first. Before starting arbitration or a lawsuit that is not subject to arbitration, you and the Company agree to try to resolve the dispute informally for at least thirty (30) days after written notice to info@misaeng.com (include your name, the email on your account, a description of the dispute, and the relief sought).',
+          ko: '24.2 사전 협의. 중재 또는 중재 대상이 아닌 소송을 시작하기 전에, 귀하와 회사는 info@misaeng.com 으로 서면 통지(이름, 계정 이메일, 분쟁 내용, 구하는 구제) 후 최소 30일간 성실한 비공식 해결을 시도하기로 합니다.',
         },
         {
           type: 'p',
-          en: '23.3 Binding individual arbitration. Except for the carve-outs below, you and the Company agree that any dispute, claim, or controversy arising out of or relating to these Terms or the Services will be resolved by binding individual arbitration administered by the American Arbitration Association (“AAA”) under its Consumer Arbitration Rules (or other AAA rules the AAA determines apply). The arbitration will be conducted in English. Hearings may be held in New York County, New York, or by video/phone as the arbitrator allows. Judgment on the award may be entered in any court of competent jurisdiction.',
-          ko: '23.3 구속력 있는 개별 중재. 아래 예외를 제외하고, 본 약관 또는 서비스에서 비롯되거나 이와 관련된 모든 분쟁·청구·쟁점은 American Arbitration Association(AAA)의 Consumer Arbitration Rules(또는 AAA가 적용한다고 정하는 규칙)에 따른 구속력 있는 개별 중재로 해결합니다. 중재는 영어로 진행되며, 심리는 뉴욕주 New York County 또는 중재인이 허용하는 화상/전화로 진행될 수 있습니다. 중재판정은 관할 법원에 집행판결을 구할 수 있습니다.',
+          en: '24.3 Binding individual arbitration. Except for the carve-outs below, you and the Company agree that any dispute, claim, or controversy arising out of or relating to these Terms or the Services will be resolved by binding individual arbitration administered by the American Arbitration Association (“AAA”) under its Consumer Arbitration Rules (or other AAA rules the AAA determines apply). The arbitration will be conducted in English. Hearings may be held in New York County, New York, or by video/phone as the arbitrator allows. Judgment on the award may be entered in any court of competent jurisdiction.',
+          ko: '24.3 구속력 있는 개별 중재. 아래 예외를 제외하고, 본 약관 또는 서비스에서 비롯되거나 이와 관련된 모든 분쟁·청구·쟁점은 American Arbitration Association(AAA)의 Consumer Arbitration Rules(또는 AAA가 적용한다고 정하는 규칙)에 따른 구속력 있는 개별 중재로 해결합니다. 중재는 영어로 진행되며, 심리는 뉴욕주 New York County 또는 중재인이 허용하는 화상/전화로 진행될 수 있습니다. 중재판정은 관할 법원에 집행판결을 구할 수 있습니다.',
         },
         {
           type: 'p',
-          en: '23.4 Class-action and representative-action waiver. YOU AND THE COMPANY AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN AN INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, COLLECTIVE, CONSOLIDATED, PRIVATE ATTORNEY GENERAL, OR REPRESENTATIVE PROCEEDING. The arbitrator may not consolidate more than one person’s claims or otherwise preside over any form of representative proceeding, unless both parties agree in writing after the dispute arises.',
-          ko: '23.4 집단·대표소송 포기. 귀하와 회사는 상대방에 대한 청구를 오직 개인 자격으로만 제기할 수 있으며, 집단·집합·병합·사인검찰(private attorney general)·대표 소송의 원고 또는 구성원으로서 제기할 수 없습니다. 분쟁 발생 후 양 당사자가 서면 합의하지 않는 한, 중재인은 복수 개인의 청구를 병합하거나 대표 절차를 주재할 수 없습니다.',
+          en: '24.4 Class-action and representative-action waiver. YOU AND THE COMPANY AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN AN INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, COLLECTIVE, CONSOLIDATED, PRIVATE ATTORNEY GENERAL, OR REPRESENTATIVE PROCEEDING. The arbitrator may not consolidate more than one person’s claims or otherwise preside over any form of representative proceeding, unless both parties agree in writing after the dispute arises.',
+          ko: '24.4 집단·대표소송 포기. 귀하와 회사는 상대방에 대한 청구를 오직 개인 자격으로만 제기할 수 있으며, 집단·집합·병합·사인검찰(private attorney general)·대표 소송의 원고 또는 구성원으로서 제기할 수 없습니다. 분쟁 발생 후 양 당사자가 서면 합의하지 않는 한, 중재인은 복수 개인의 청구를 병합하거나 대표 절차를 주재할 수 없습니다.',
         },
         {
           type: 'p',
-          en: '23.5 Carve-outs. This arbitration agreement does not require arbitration of: (a) individual claims in small-claims court within that court’s jurisdiction; (b) claims for injunctive or other equitable relief to stop unauthorized use or infringement of intellectual property; or (c) claims that applicable law prohibits from being subject to pre-dispute arbitration (including certain rights that cannot be waived). Disputes about whether a claim is arbitrable are for the arbitrator to decide, except that a court may decide gateway issues of enforceability of this Section’s class waiver if required by controlling law.',
-          ko: '23.5 예외. 다음에는 본 중재 합의가 강제 중재를 요구하지 않습니다: (a) 소액재판소 관할 내 개인 청구; (b) 지식재산의 무단 이용·침해를 막기 위한 금지명령 등 형평법상 구제; (c) 적용법이 사전 중재 합의 대상에서 금지하는 청구(포기할 수 없는 권리 포함). 청구의 중재 가능성에 관한 분쟁은 원칙적으로 중재인이 판단하되, 통제법상 요구되는 경우 본 조의 집단소송 포기 집행 가능성 등 gateway 쟁점은 법원이 판단할 수 있습니다.',
+          en: '24.5 Carve-outs. This arbitration agreement does not require arbitration of: (a) individual claims in small-claims court within that court’s jurisdiction; (b) claims for injunctive or other equitable relief to stop unauthorized use or infringement of intellectual property; or (c) claims that applicable law prohibits from being subject to pre-dispute arbitration (including certain rights that cannot be waived). Disputes about whether a claim is arbitrable are for the arbitrator to decide, except that a court may decide gateway issues of enforceability of this Section’s class waiver if required by controlling law.',
+          ko: '24.5 예외. 다음에는 본 중재 합의가 강제 중재를 요구하지 않습니다: (a) 소액재판소 관할 내 개인 청구; (b) 지식재산의 무단 이용·침해를 막기 위한 금지명령 등 형평법상 구제; (c) 적용법이 사전 중재 합의 대상에서 금지하는 청구(포기할 수 없는 권리 포함). 청구의 중재 가능성에 관한 분쟁은 원칙적으로 중재인이 판단하되, 통제법상 요구되는 경우 본 조의 집단소송 포기 집행 가능성 등 gateway 쟁점은 법원이 판단할 수 있습니다.',
         },
         {
           type: 'p',
-          en: '23.6 Licensed real-estate matters. Separate brokerage agreements, agency disclosures, or New York Department of State / licensing procedures may provide additional or different dispute paths for a specific licensed transaction. Those documents control that brokerage relationship. This Section still applies to platform/community disputes that are not governed by such separate brokerage paperwork, to the extent permitted by law.',
-          ko: '23.6 면허 부동산 사항. 개별 중개 계약, 대리관계 공시, 또는 뉴욕주 Department of State/라이선스 절차가 특정 면허 거래에 대해 추가·다른 분쟁 경로를 둘 수 있으며, 해당 중개 관계에는 그 서류가 우선합니다. 법이 허용하는 범위에서, 그러한 별도 중개 서류가 규율하지 않는 플랫폼·커뮤니티 분쟁에는 본 조가 계속 적용됩니다.',
+          en: '24.6 Licensed real-estate matters. Separate brokerage agreements, agency disclosures, or New York Department of State / licensing procedures may provide additional or different dispute paths for a specific licensed transaction. Those documents control that brokerage relationship. This Section still applies to platform/community disputes that are not governed by such separate brokerage paperwork, to the extent permitted by law.',
+          ko: '24.6 면허 부동산 사항. 개별 중개 계약, 대리관계 공시, 또는 뉴욕주 Department of State/라이선스 절차가 특정 면허 거래에 대해 추가·다른 분쟁 경로를 둘 수 있으며, 해당 중개 관계에는 그 서류가 우선합니다. 법이 허용하는 범위에서, 그러한 별도 중개 서류가 규율하지 않는 플랫폼·커뮤니티 분쟁에는 본 조가 계속 적용됩니다.',
         },
         {
           type: 'p',
-          en: '23.7 30-day opt-out. You may opt out of this arbitration agreement by emailing info@misaeng.com with subject line “Arbitration Opt-Out” within thirty (30) days after you first accept these Terms (or after this arbitration section first becomes applicable to you). Include your full name and account email. Opting out does not affect other Terms.',
-          ko: '23.7 30일 옵트아웃. 본 약관에 처음 동의한 날(또는 본 중재 조항이 처음 적용된 날)부터 30일 이내에 제목 “Arbitration Opt-Out”으로 info@misaeng.com 에 이메일하면 본 중재 합의에서 옵트아웃할 수 있습니다. 성명과 계정 이메일을 포함하세요. 옵트아웃은 나머지 약관에 영향을 주지 않습니다.',
+          en: '24.7 30-day opt-out. You may opt out of this arbitration agreement by emailing info@misaeng.com with subject line “Arbitration Opt-Out” within thirty (30) days after you first accept these Terms (or after this arbitration section first becomes applicable to you). Include your full name and account email. Opting out does not affect other Terms.',
+          ko: '24.7 30일 옵트아웃. 본 약관에 처음 동의한 날(또는 본 중재 조항이 처음 적용된 날)부터 30일 이내에 제목 “Arbitration Opt-Out”으로 info@misaeng.com 에 이메일하면 본 중재 합의에서 옵트아웃할 수 있습니다. 성명과 계정 이메일을 포함하세요. 옵트아웃은 나머지 약관에 영향을 주지 않습니다.',
         },
         {
           type: 'p',
-          en: '23.8 Court venue if arbitration does not apply. If a claim is not subject to arbitration, exclusive venue lies in the state or federal courts located in New York County, New York, subject to any non-waivable consumer protections.',
-          ko: '23.8 중재가 적용되지 않는 경우의 관할. 청구가 중재 대상이 아니면, 소비자의 강행법상 권리를 침해하지 않는 범위에서 뉴욕주 New York County 소재 주·연방 법원이 배타적 관할입니다.',
+          en: '24.8 Court venue if arbitration does not apply. If a claim is not subject to arbitration, exclusive venue lies in the state or federal courts located in New York County, New York, subject to any non-waivable consumer protections.',
+          ko: '24.8 중재가 적용되지 않는 경우의 관할. 청구가 중재 대상이 아니면, 소비자의 강행법상 권리를 침해하지 않는 범위에서 뉴욕주 New York County 소재 주·연방 법원이 배타적 관할입니다.',
         },
       ],
     },
     {
       id: 'misc',
-      title: '24. Miscellaneous',
-      titleKo: '24. 기타',
+      title: '25. Miscellaneous',
+      titleKo: '25. 기타',
       blocks: [
         {
           type: 'ul',
@@ -824,8 +1007,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'contact',
-      title: '25. Contact',
-      titleKo: '25. 문의',
+      title: '26. Contact',
+      titleKo: '26. 문의',
       blocks: [
         {
           type: 'p',

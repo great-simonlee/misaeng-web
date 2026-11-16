@@ -1,9 +1,14 @@
+import type { PostingPay, PreviousPay } from '@lib/company/postingPay'
+import type { MinDegree } from '@lib/company/postingList'
 import type { ContentI18n } from '@lib/translations/content'
 import type { CityId } from '@lib/constants/cities'
 import type { DegreeLevel, JobFunction } from '@lib/constants/postingCopy'
 
-/** 사용자에게 보이는 채용 공고 (승인된 인턴·신입 공고) */
-export type PostingLevel = 'intern' | 'new_grad'
+/** 사용자에게 보이는 채용 공고 (승인된 인턴·신입·경력 공고) */
+export type PostingLevel = 'intern' | 'new_grad' | 'experienced'
+
+/** 학생 대상 레벨. 경력(experienced) 공고를 모르는 예전 앱에는 이 레벨만 보낸다 (/api/postings ?levels=all 이 없을 때). */
+export const STUDENT_POSTING_LEVELS: PostingLevel[] = ['intern', 'new_grad']
 export type WorkArrangement = 'onsite' | 'hybrid' | 'remote' | 'unknown'
 
 export type PublicPosting = {
@@ -18,6 +23,12 @@ export type PublicPosting = {
   summary: {
     overview: string[]
     qualifications: string[]
+    /** 우대 사항 (상세 요약, 2026-11~). 예전 요약은 빈 배열 */
+    preferred: string[]
+    /** 급여 (공고에 있을 때만), 예: "연봉 $120,000–$150,000 (뉴욕 기준)" */
+    compensation: string | null
+    /** 복지·혜택 (공고에 있을 때만) */
+    benefits: string[]
     workType: string
     location: string
     /** 지원 팁 (수시 심사, 지원 횟수 제한, 제출 서류 등) */
@@ -39,6 +50,14 @@ export type PublicPosting = {
   applyBy: string | null
   applyUrl: string
   postedAt: number
+  /** 급여 단위·범위 (요약에 저장된 숫자, 없으면 급여 문장에서 추정, 없으면 null). src/lib/company/postingPay.ts */
+  pay?: PostingPay | null
+  /** 지원 가능 학력 (앱 필터): 요약에 저장된 값, 없으면 제목·자격요건에서 추정. src/lib/company/postingList.ts */
+  minDegree?: MinDegree
+  /** 같은 포지션의 지난 시즌 공고 급여 (연도만 다른 제목, 최근 시즌부터) */
+  previousPay?: PreviousPay[]
+  /** 마감된 공고 목록(?closed=1)에서만: 마감된 때 (ms) */
+  closedAt?: number | null
   /** 요약을 보는 언어로 바꾼 상태 (API 응답에만 있음, src/lib/translations/postings.ts) */
   i18n?: ContentI18n
 }
@@ -98,7 +117,8 @@ export async function fetchPostingsWithMore(
   city: CityId,
   company?: string,
 ): Promise<{ postings: PublicPosting[]; moreUrl: string | null }> {
-  const params = new URLSearchParams({ city })
+  // levels=all: 경력 공고 포함 (이 웹은 경력 칩을 안다)
+  const params = new URLSearchParams({ city, levels: 'all' })
   if (company) params.set('company', company)
   const res = await fetch(`/api/postings?${params}`, { cache: 'no-store' })
   const data = (await res.json().catch(() => ({}))) as {
@@ -111,11 +131,20 @@ export async function fetchPostingsWithMore(
   return { postings: data.postings ?? [], moreUrl: data.moreUrl ?? null }
 }
 
-/** 공고 목록 구분 필터: 레벨(인턴·신입)과 태그(한국어 우대·한국 근무) 중 하나 */
-export type PostingKind = 'all' | 'intern' | 'new_grad' | 'korean_preferred' | 'korea_based'
+/** 공고 목록 구분 필터: 레벨(인턴·신입·경력)과 태그(한국어 우대·한국 근무) 중 하나 */
+export type PostingKind = 'all' | 'intern' | 'new_grad' | 'experienced' | 'korean_preferred' | 'korea_based'
 
 export function matchesKind(posting: PublicPosting, kind: PostingKind) {
   if (kind === 'all') return true
-  if (kind === 'intern' || kind === 'new_grad') return posting.level === kind
+  if (kind === 'intern' || kind === 'new_grad' || kind === 'experienced') return posting.level === kind
   return posting.tags.includes(kind)
+}
+
+/**
+ * 공고 원문을 Google 번역으로 여는 주소 (원문은 저장·재게시하지 않고, 읽는 사람의 브라우저가 번역해서 본다).
+ * 영어 화면에서는 null (원문이 대부분 영어).
+ */
+export function translatedPostingUrl(url: string, locale: string): string | null {
+  if (!url || locale === 'en') return null
+  return `https://translate.google.com/translate?sl=auto&tl=${encodeURIComponent(locale)}&u=${encodeURIComponent(url)}`
 }

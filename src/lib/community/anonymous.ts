@@ -35,7 +35,8 @@ export function sanitizeAnonymousCommunityPost(
     ...sanitizeGuestAuthorForViewer(post, viewerUid),
     authorEmail: isAuthor ? post.authorEmail : '',
   }
-  if (!isAnonymousBoard(base.categoryId)) return base
+  // 질문·자유에서 닉네임을 공개한 글은 다른 게시판처럼 보인다
+  if (!isAnonymousBoard(base.categoryId) || base.showNickname === true) return base
 
   return {
     ...base,

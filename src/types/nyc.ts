@@ -1,3 +1,4 @@
+import type { ProxyAuthor } from '@lib/community/proxyAuthor'
 import type { Locale } from '@lib/i18n/locales'
 import type { ContentBrandFields } from '@lib/community/contentBrand'
 import type { ContentI18n, TranslationFields } from '@lib/translations/content'
@@ -309,6 +310,14 @@ export interface CommunityPost extends TranslationFields, ContentBrandFields {
   detail: string
   authorUid: string
   authorEmail: string
+  /** 질문·자유(anonymous 보드): 글쓴이가 닉네임을 보이기로 했을 때 true. 없거나 false = 익명 (예전 글 전부) */
+  showNickname?: boolean
+  /** 중고거래: 가격 (달러, 0 = 나눔), 카테고리, 거래 상태 (src/lib/community/marketplace.ts) */
+  price?: number | null
+  marketCategory?: string | null
+  marketStatus?: 'selling' | 'reserved' | 'sold' | null
+  /** 중고거래: 받는 결제 방법 (cash, zelle, venmo, other) */
+  marketPayments?: string[] | null
   /** 프로필 닉네임 (작성 시점 스냅샷) */
   authorNickname: string | null
   /** 프로필 사진 URL (작성 시점 스냅샷) */
@@ -399,6 +408,8 @@ export interface CommunityPost extends TranslationFields, ContentBrandFields {
    * 계정에 연결되면 authorUid가 채워지고 linkedUid/linkedAt이 기록된다.
    */
   guestAuthor: CommunityGuestAuthor | null
+  /** 팀이 대신 올린 후기 (ERP). 계정 없는 작성자 — 커피챗·커리어 질문 불가 (@lib/community/proxyAuthor) */
+  proxyAuthor?: ProxyAuthor | null
   /** 보는 언어로 바꾼 결과 (API 응답에만 있음, src/lib/translations) */
   i18n?: ContentI18n
 }

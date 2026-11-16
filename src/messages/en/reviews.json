@@ -481,7 +481,7 @@
     "backToList": "Back to list",
     "saveFailed": "We couldn't save your agreement. Please try again.",
     "roommateEyebrow": "Roommates · Sublets",
-    "anonymousEyebrow": "Anonymous board",
+    "anonymousEyebrow": "Ask & Talk",
     "cptOpt": {
       "step1": {
         "title": "Log it by date",
@@ -508,6 +508,32 @@
       "step3": {
         "title": "Stack with \"Add this entry\"",
         "body": "Added entries stack above; keep going with the next date."
+      }
+    },
+    "guideButton": "Guidelines",
+    "close": "Got it",
+    "example": {
+      "button": "See an example",
+      "title": "A great review, step by step",
+      "intro": "A real member's post, \"Amazon Non-Tech Intern timeline + review\", as it looks in the app. The author is hidden.",
+      "close": "Close",
+      "s1": {
+        "title": "① A timeline with dates",
+        "p1": "Look back through your inbox, LinkedIn and the application site for the dates you applied, heard back, took the OA, interviewed and got the result or offer.",
+        "p2": "Exact dates show the next applicants when to expect each email.",
+        "p3": "Keep step names short and clear: Online Assessment, Interview, Offer, Internship start."
+      },
+      "s2": {
+        "title": "② What to note for each step",
+        "p1": "Where they reached you (email, LinkedIn, the application site) and what you submitted.",
+        "p2": "How many interviews, in what format (phone, video, in person), how long they took and the result.",
+        "p3": "How long you waited for the next email helps a lot, e.g. offer email two weeks after the interview."
+      },
+      "s3": {
+        "title": "③ The final result and after",
+        "p1": "Add the final result (offer, rejection, waitlist) and the date you got it.",
+        "p2": "Explain what the result means and what happens next, as you were told, e.g. Inclined = hired when a spot opens.",
+        "p3": "Write as much detail as you remember. Small facts help the next applicant a lot."
       }
     }
   },
@@ -688,6 +714,7 @@
       "referral": "Someone I know introduced me",
       "other": "Some other way"
     },
+    "organizationRequired": "Choose one",
     "studentOrg": {
       "label": "Through a student organization",
       "description": "My school's student organization reached out",

@@ -69,6 +69,7 @@ export type SupabaseProfileRecord = {
     | 'job-review'
     | 'roommate'
     | 'anonymous'
+    | 'marketplace'
     | null
   /** deleted: the user deleted their account (src/lib/account/deleteAccount.server.ts). Sign-in is refused. */
   status?: 'active' | 'suspended' | 'deleted' | null

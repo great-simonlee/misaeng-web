@@ -37,16 +37,18 @@ function GooglePlayIcon({ className }: { className?: string }) {
 type StoreBadgeProps = {
   href: string
   className?: string
+  /** Screen-reader label when a page shows badges for more than one app */
+  label?: string
 }
 
-export function AppStoreBadge({ href, className }: StoreBadgeProps) {
+export function AppStoreBadge({ href, className, label }: StoreBadgeProps) {
   return (
     <a
       href={href}
       target='_blank'
       rel='noopener noreferrer'
       className={cn(badgeClass, className)}
-      aria-label='Download on the App Store'
+      aria-label={label ?? 'Download on the App Store'}
     >
       <AppleIcon className='h-5 w-5 sm:h-6 sm:w-6' />
       <span className='text-xs font-semibold tracking-tight sm:hidden'>App Store</span>
@@ -58,14 +60,14 @@ export function AppStoreBadge({ href, className }: StoreBadgeProps) {
   )
 }
 
-export function GooglePlayBadge({ href, className }: StoreBadgeProps) {
+export function GooglePlayBadge({ href, className, label }: StoreBadgeProps) {
   return (
     <a
       href={href}
       target='_blank'
       rel='noopener noreferrer'
       className={cn(badgeClass, className)}
-      aria-label='Get it on Google Play'
+      aria-label={label ?? 'Get it on Google Play'}
     >
       <GooglePlayIcon className='h-5 w-5 sm:h-6 sm:w-6' />
       <span className='text-xs font-semibold tracking-tight sm:hidden'>Google Play</span>

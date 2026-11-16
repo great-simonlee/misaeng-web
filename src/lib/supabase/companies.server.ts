@@ -12,6 +12,7 @@ import {
   type VisaStatus,
 } from '@lib/constants/company'
 import { listStoredOpenBoardPosts } from '@lib/supabase/community.server'
+import { companyKeys, normalizeCompanyKey } from '@lib/company/companyRules'
 
 /*
  * 회사 데이터는 ellieo-erp 관리자 화면이 관리하고 Supabase Postgres에 있다
@@ -298,6 +299,145 @@ export async function resolveReviewCompanyId(
   if (value === null || value === '') return { ok: true, companyId: null }
   if (typeof value !== 'string') return { ok: false, errorKey: 'community.companyReselect' }
   const company = await getActiveCompanyById(value.trim())
-  if (!company) return { ok: false, errorKey: 'community.companyReselect' }
-  return { ok: true, companyId: company.id }
+  if (company) return { ok: true, companyId: company.id }
+  // 회원이 등록한 검토 대기 회사 (findOrProposeCompany): 노출 전이어도 후기를 이어 둔다
+  const proposed = await getProposedCompanyById(value.trim())
+  if (proposed) return { ok: true, companyId: proposed.id }
+  return { ok: false, errorKey: 'community.companyReselect' }
+}
+
+/*
+ * 회원이 후기 작성 화면에서 등록한 회사 (목록에 없는 회사).
+ * 공개 회사로 바로 만들지 않는다: is_active = false (Misaeng에 안 보임) 인 "검토 대기" 행으로 만들고
+ * internal_notes 맨 앞에 MEMBER_PROPOSED_TAG 를 붙인다. ERP 회사 화면에서 이름·채용 링크·업계·로고를 확인하고
+ * "Show on Misaeng site" 를 켜면 그때부터 회사 목록에 나오고, 그 사이에 쓴 후기도 companyId 로 바로 이어진다.
+ * 관리자가 숨긴 회사(태그 없음)에는 후기를 이을 수 없다.
+ */
+export const MEMBER_PROPOSED_TAG = '[member-proposed]'
+const PROPOSALS_PER_DAY = 5
+export const PROPOSED_NAME_MAX = 80
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+type ProposedRow = { id: string; slug: string; name: string; aliases: string[] | null; industry: string; internal_notes: string | null }
+
+/** 회원이 등록한 검토 대기 회사 (노출 전, 삭제 안 됨) */
+async function listProposedCompanies(extraFilters = ''): Promise<ProposedRow[]> {
+  const url = getSupabaseUrl()
+  if (!url || !getSupabaseSecretKey()) return []
+  const tag = encodeURIComponent(`${MEMBER_PROPOSED_TAG}*`)
+  const res = await fetch(
+    `${url}/rest/v1/companies?select=id,slug,name,aliases,industry,internal_notes&is_active=eq.false&deleted_at=is.null&internal_notes=like.${tag}${extraFilters}&limit=1000`,
+    { headers: storageHeaders(), cache: 'no-store', signal: AbortSignal.timeout(15000) },
+  ).catch(() => null)
+  if (!res?.ok) return []
+  return ((await res.json().catch(() => null)) as ProposedRow[] | null) ?? []
+}
+
+async function getProposedCompanyById(id: string): Promise<ProposedRow | null> {
+  if (!UUID_RE.test(id)) return null
+  return (await listProposedCompanies(`&id=eq.${id}`))[0] ?? null
+}
+
+/** 회사 이름 입력 정리: 공백 한 칸, 제어 문자 제거. 비었거나 너무 길거나 링크면 null. */
+export function cleanProposedCompanyName(value: unknown): string | null {
+  const name = String(value ?? '')
+    .normalize('NFKC')
+    .replace(/[\u0000-\u001f\u007f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (!name || name.length > PROPOSED_NAME_MAX) return null
+  if (/https?:\/\/|www\.|[<>{}]/i.test(name)) return null
+  return name
+}
+
+function proposedSlug(name: string): string {
+  const base = name
+    .normalize('NFKD')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40)
+    .replace(/-+$/g, '')
+  const suffix = Math.random().toString(36).slice(2, 8).replace(/[^a-z0-9]/g, '') || 'new'
+  return `${base || 'company'}-${suffix}`
+}
+
+export type ProposedCompanyResult =
+  | { ok: true; company: { id: string; slug: string; name: string; industry: string; pending: boolean } | null; created: boolean }
+  | { ok: false; reason: 'invalid' | 'tooMany' | 'failed' }
+
+/**
+ * 이름으로 회사 찾기, 없으면 검토 대기 회사로 등록.
+ * - 노출 중인 회사 이름·별칭과 같으면 그 회사 (pending: false)
+ * - 다른 회원이 이미 등록한 검토 대기 회사와 같으면 그 회사 (pending: true)
+ * - 관리자가 숨긴 회사와 이름이 같으면 company: null (후기는 이름만 남는다)
+ * - 아니면 새로 등록 (회원당 하루 5개까지)
+ */
+export async function findOrProposeCompany(input: { name: unknown; industry?: unknown; uid: string }): Promise<ProposedCompanyResult> {
+  const name = cleanProposedCompanyName(input.name)
+  if (!name) return { ok: false, reason: 'invalid' }
+  const key = normalizeCompanyKey(name)
+  if (!key) return { ok: false, reason: 'invalid' }
+
+  const active = (await listActiveCompanies()).find((c) => companyKeys(c).includes(key))
+  if (active) {
+    return { ok: true, created: false, company: { id: active.id, slug: active.slug, name: active.name, industry: active.industry, pending: false } }
+  }
+  const url = getSupabaseUrl()
+  if (!url || !getSupabaseSecretKey()) return { ok: false, reason: 'failed' }
+
+  // 숨겨진 회사까지 이름으로 확인 (같은 회사를 두 번 만들지 않는다)
+  const hiddenRes = await fetch(
+    `${url}/rest/v1/companies?select=id,slug,name,aliases,industry,internal_notes&is_active=eq.false&deleted_at=is.null&limit=5000`,
+    { headers: storageHeaders(), cache: 'no-store', signal: AbortSignal.timeout(15000) },
+  ).catch(() => null)
+  if (!hiddenRes?.ok) return { ok: false, reason: 'failed' }
+  const hidden = ((await hiddenRes.json().catch(() => null)) as ProposedRow[] | null) ?? []
+  const same = hidden.find((c) => companyKeys({ name: c.name, aliases: c.aliases ?? [] }).includes(key))
+  if (same) {
+    const proposed = (same.internal_notes ?? '').startsWith(MEMBER_PROPOSED_TAG)
+    return {
+      ok: true,
+      created: false,
+      company: proposed ? { id: same.id, slug: same.slug, name: same.name, industry: same.industry, pending: true } : null,
+    }
+  }
+
+  // 회원당 하루 등록 수 제한 (internal_notes 에 uid 를 남긴다)
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const uidTag = encodeURIComponent(`*uid=${input.uid.replace(/[^A-Za-z0-9_-]/g, '')}*`)
+  const mine = await listProposedCompanies(`&created_at=gte.${encodeURIComponent(since)}&internal_notes=like.${uidTag}`)
+  if (mine.length >= PROPOSALS_PER_DAY) return { ok: false, reason: 'tooMany' }
+
+  const industries = await listIndustries()
+  const industry =
+    typeof input.industry === 'string' && industries.some((i) => i.code === input.industry) ? input.industry : 'other'
+  const notes =
+    `${MEMBER_PROPOSED_TAG} uid=${input.uid.replace(/[^A-Za-z0-9_-]/g, '')} ${new Date().toISOString()} — ` +
+    'Added by a member from the Misaeng review composer. Check the name, careers URL, industry and logo, then turn on "Show on Misaeng site".'
+  const insert = (slug: string) =>
+    fetch(`${url}/rest/v1/companies?select=id,slug,name,industry`, {
+      method: 'POST',
+      headers: { ...storageHeaders('application/json'), Prefer: 'return=representation' },
+      body: JSON.stringify({
+        slug,
+        name,
+        industry,
+        // 필수 컬럼이라 검색 링크를 넣어 둔다 (관리자가 공식 채용 페이지로 바꾼다)
+        careers_url: `https://www.google.com/search?q=${encodeURIComponent(`${name} careers`)}`,
+        is_active: false,
+        internal_notes: notes,
+      }),
+      signal: AbortSignal.timeout(15000),
+    }).catch(() => null)
+  let res = await insert(proposedSlug(name))
+  if (res?.status === 409) res = await insert(proposedSlug(name))
+  if (!res?.ok) {
+    if (res) console.error('Company propose error:', res.status, await res.text().catch(() => ''))
+    return { ok: false, reason: 'failed' }
+  }
+  const row = ((await res.json().catch(() => null)) as { id: string; slug: string; name: string; industry: string }[] | null)?.[0]
+  if (!row?.id) return { ok: false, reason: 'failed' }
+  return { ok: true, created: true, company: { id: row.id, slug: row.slug, name: row.name, industry: row.industry, pending: true } }
 }

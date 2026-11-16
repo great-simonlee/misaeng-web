@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * 앱 홈 배너 숫자 — 로그인 없이 공개, 모든 도시 합계.
- * { members, posts: { housing, food, roommate, visa, jobReview, anonymous }, updatedAt }
+ * { members, posts: { housing, food, roommate, visa, jobReview, anonymous }, jobs: { companies, postings }, updatedAt }
  * 서버는 10분 캐시, CDN·브라우저는 5분 + 그 뒤 10분은 지난 값을 보여 주며 새로 받는다.
  */
 export async function GET() {

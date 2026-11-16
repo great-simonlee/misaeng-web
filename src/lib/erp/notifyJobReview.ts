@@ -1,4 +1,4 @@
-import { sendStaffPush, type StaffPush } from '@lib/support/staffPush.server'
+import { sendStaffPush, SUPER_ADMIN_EMAIL, type StaffPush } from '@lib/support/staffPush.server'
 import type { CommunityPost } from '@/types/nyc'
 import { contactSourceShortName } from '@lib/community/contactSources'
 import { getContactSourceConfig } from '@lib/supabase/contactSources.server'
@@ -67,7 +67,6 @@ async function jobReviewPush(
     subtitle: oneLineTitle(post.title),
     body: postedAtLabel(post.createdAt || Date.now()),
     threadId: 'job-review',
-    sound: 'review',
     data: {
       type: 'job_review',
       ...(post.id ? { postId: post.id } : {}),
@@ -83,8 +82,9 @@ export async function notifyJobReviewCreated(
   try {
     // Staff test posts never reach a partner's dashboard
     if (/@misaeng\.com$/i.test(String(post.authorEmail || '').trim())) return
-    const recipients = await fetchRecipients(source.source, source.orgId)
-    if (!recipients?.emails?.length) return
+    // ERP unreachable: the Super Admin still hears about it (the partner is picked by the ERP)
+    const recipients = (await fetchRecipients(source.source, source.orgId)) ?? { emails: [SUPER_ADMIN_EMAIL], target: null }
+    if (!recipients.emails?.length) return
     await sendStaffPush(recipients.emails, await jobReviewPush(post, source, recipients.target))
   } catch (error) {
     console.error('[job review push] error:', error)

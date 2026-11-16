@@ -37,8 +37,9 @@ import { revokeAppleTokens, type AppleRevokeOutcome } from './appleRevoke.server
  *     is refused from now on even if a later step fails; a repeated call is a no-op re-run of the cleanup)
  *  2. nickname index, referral code index, avatar files
  *  3. verification documents (deleteAllVerificationFilesForUser), push devices / preferences / company follows,
- *     in-app notifications, saved posts, open coffee chats + coffee chat mentor card (points tables only), reporter email on reports they made
- *  4. roommate/sublet posts (personal housing info) are deleted with their uploaded photos; other posts and every
+ *     in-app notifications, saved posts, open coffee chats + coffee chat mentor card (points tables only), reporter email on reports they made,
+ *     중고거래 inquiry threads they're in (as seller or buyer) with their messages
+ *  4. roommate/sublet posts (personal housing info) and 중고거래 listings are deleted with their uploaded photos; other posts and every
  *     comment are kept for the threads but anonymized ("Deleted user", no photo/badges — render-time too)
  *  5. Sign in with Apple tokens revoked (when Apple keys are configured), Ellieo user/deletion + auth/logout
  * Every step is best effort and logged; only step 1 failing fails the request.
@@ -47,8 +48,8 @@ import { revokeAppleTokens, type AppleRevokeOutcome } from './appleRevoke.server
 /** Stored author name of a deleted account. Responses show it in the viewer's language (localize.server.ts). */
 export const DELETED_AUTHOR_NAME = '탈퇴한 회원'
 
-/** Housing boards: personal housing info, deleted instead of anonymized */
-const DELETE_BOARDS = new Set(['roommate'])
+/** Housing boards (personal housing info) and 중고거래 listings (a deleted seller can't sell): deleted instead of anonymized */
+const DELETE_BOARDS = new Set(['roommate', 'marketplace'])
 
 /** Profile fields kept on the tombstone (legal consent record + state). Everything else is cleared. */
 const KEEP_PROFILE_KEYS = new Set([
@@ -328,6 +329,10 @@ export async function deleteMisaengAccount(input: {
     return cleanupQuestionsForDeletedUser(uid)
   })
   await step(report, 'reports', () => forgetReporterEmail(uid))
+  await step(report, 'marketplaceInquiries', async () => {
+    const { deleteThreadsForUser } = await import('@lib/marketplace/inquiries.server')
+    await deleteThreadsForUser(uid)
+  })
 
   // 4. community: delete housing posts, anonymize the rest (comments in the background — render-time hiding covers the gap)
   await step(report, 'posts', async () => {

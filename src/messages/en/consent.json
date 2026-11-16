@@ -15,5 +15,14 @@
   "reconsentVersions": "Terms {terms} · Privacy {privacy}",
   "optOutHint": "Arbitration opt-out: email info@misaeng.com within 30 days of agreeing, with the subject line “Arbitration Opt-Out”.",
   "saving": "Saving…",
-  "defaultSummary": "Please review the Terms of Use and Privacy Policy. These Terms include a binding individual arbitration agreement and class-action waiver."
+  "defaultSummary": "Please review the Terms of Use and Privacy Policy. These Terms include a binding individual arbitration agreement and class-action waiver.",
+  "reconsentEyebrow": "Policy update",
+  "reconsentVersion": "Version {version}",
+  "reconsentViewTerms": "View Terms of Use",
+  "reconsentViewPrivacy": "View Privacy Policy",
+  "reconsentDecline": "I don't agree",
+  "reconsentDeclineTitle": "You'll be signed out",
+  "reconsentDeclineBody": "You need to agree to the updated terms to use {brand} signed in. You can still browse posts signed out, and agree whenever you sign in again. To delete your account, go to misaeng.com/account-deletion.",
+  "reconsentDeclineConfirm": "Sign out",
+  "reconsentDeclineCancel": "Cancel"
 }

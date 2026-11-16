@@ -173,7 +173,8 @@
     "reviewBonusReplaced": "Sau khi cập nhật hệ thống điểm, điểm cho review được cộng sau khi đội ngũ xét duyệt từng bài thay cho khoản thưởng này. Vui lòng dùng hàng chờ xét duyệt điểm trong ERP."
   },
   "postings": {
-    "loadFailed": "Không thể tải tin tuyển dụng."
+    "loadFailed": "Không thể tải tin tuyển dụng.",
+    "notFound": "Không tìm thấy tin tuyển dụng. Tin có thể đã hết hạn hoặc bị gỡ."
   },
   "comments": {
     "bodyRequired": "Vui lòng viết bình luận.",
@@ -275,6 +276,9 @@
     "contentBlocked": "Nội dung có từ ngữ không được phép (chửi thề, phát ngôn thù ghét hoặc quấy rối tình dục). Vui lòng sửa lại rồi thử lại.",
     "moderation": {
       "hidden": "Nội dung này đã bị ẩn do bị báo cáo hoặc không còn khả dụng."
+    },
+    "marketplace": {
+      "zipRequired": "Vui lòng nhập mã ZIP 5 chữ số cho khu vực giao dịch."
     }
   },
   "guest": {
@@ -383,6 +387,14 @@
         "body": "There was no answer within 7 days."
       },
       "refunded": "{amount}P refunded."
+    },
+    "marketplace": {
+      "newInquiry": {
+        "title": "Câu hỏi mới · {listing}"
+      },
+      "message": {
+        "title": "Tin nhắn mới · {listing}"
+      }
     }
   },
   "reviewDocs": {
@@ -524,5 +536,9 @@
       "openWeb": "Xem phản hồi",
       "footer": "Đây là địa chỉ chỉ gửi. Vui lòng trả lời trên ellieo.com."
     }
+  },
+  "companies": {
+    "nameInvalid": "Vui lòng kiểm tra lại tên công ty (tối đa 80 ký tự, không chứa liên kết).",
+    "tooMany": "Hôm nay bạn không thể thêm công ty nữa. Vui lòng thử lại vào ngày mai."
   }
 }

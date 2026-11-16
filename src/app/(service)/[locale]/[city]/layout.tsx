@@ -1,8 +1,11 @@
 import type { ReactNode } from 'react'
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { connection } from 'next/server'
 
 import { isCityEnabled } from '@lib/cities/availability.server'
+import { BRAND_CONFIG } from '@lib/brand'
+import { MISAENG_APP_STORE_ID } from '@widgets/nyc/MisaengStoreButtons'
 import { CITY_IDS, isCityId } from '@lib/constants/cities'
 
 interface CityLayoutProps {
@@ -17,6 +20,13 @@ interface CityLayoutProps {
 export function generateStaticParams() {
   return CITY_IDS.map((city) => ({ city }))
 }
+
+/**
+ * iPhone Safari's app banner on every city page (Misaeng only). With the app installed, "Open" goes to the same
+ * page in the app through the universal link; otherwise it shows the App Store.
+ */
+export const metadata: Metadata =
+  BRAND_CONFIG.id === 'misaeng' ? { other: { 'apple-itunes-app': `app-id=${MISAENG_APP_STORE_ID}` } } : {}
 
 export default async function CityLayout({
   children,

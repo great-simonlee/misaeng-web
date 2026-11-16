@@ -479,7 +479,7 @@
     "backToList": "Quay lại danh sách",
     "saveFailed": "Không thể lưu sự đồng ý của bạn. Vui lòng thử lại.",
     "roommateEyebrow": "Bạn cùng phòng · Sublet",
-    "anonymousEyebrow": "Bảng tin ẩn danh",
+    "anonymousEyebrow": "Hỏi đáp & Tự do",
     "cptOpt": {
       "step1": {
         "title": "Review ghi lại theo ngày",
@@ -506,6 +506,32 @@
       "step3": {
         "title": "\"Thêm mục này\" sẽ xếp mục lên trên",
         "body": "Khi xong, nhấn \"Thêm mục này\" và mục đó sẽ chuyển vào danh sách phía trên form. Tiếp tục với ngày tiếp theo trong form bên dưới."
+      }
+    },
+    "guideButton": "Hướng dẫn",
+    "close": "Đã hiểu",
+    "example": {
+      "button": "Xem ví dụ",
+      "title": "Một bài review tốt, từng bước",
+      "intro": "Bài viết thật của một thành viên, \"Timeline + review thực tập Non-Tech tại Amazon\", như hiển thị trong ứng dụng. Thông tin người viết đã được ẩn.",
+      "close": "Đóng",
+      "s1": {
+        "title": "① Timeline theo ngày",
+        "p1": "Xem lại hộp thư, LinkedIn và trang ứng tuyển để ghi ngày nộp đơn, ngày được liên hệ, ngày làm OA, ngày phỏng vấn và ngày nhận kết quả hoặc offer.",
+        "p2": "Ngày càng chính xác, người ứng tuyển sau càng biết khi nào sẽ nhận được email.",
+        "p3": "Đặt tên bước ngắn gọn, rõ ràng: Online Assessment, Interview, Offer, Bắt đầu thực tập."
+      },
+      "s2": {
+        "title": "② Nên ghi gì ở mỗi bước",
+        "p1": "Bạn được liên hệ qua đâu (email, LinkedIn, trang ứng tuyển) và đã nộp hồ sơ gì.",
+        "p2": "Số vòng phỏng vấn, hình thức (điện thoại, video, trực tiếp), thời lượng và kết quả.",
+        "p3": "Thời gian chờ đến email tiếp theo cũng rất hữu ích, ví dụ: email offer 2 tuần sau phỏng vấn."
+      },
+      "s3": {
+        "title": "③ Kết quả cuối cùng và sau đó",
+        "p1": "Ghi kết quả cuối cùng (offer, bị từ chối, chờ) và ngày nhận được.",
+        "p2": "Giải thích kết quả có nghĩa là gì và bước tiếp theo như bạn được cho biết, ví dụ: Inclined = sẽ tuyển khi có vị trí.",
+        "p3": "Hãy viết càng chi tiết càng tốt. Thông tin nhỏ cũng giúp ích rất nhiều cho người ứng tuyển sau."
       }
     }
   },
@@ -679,6 +705,7 @@
       "referral": "Người quen giới thiệu",
       "other": "Cách khác"
     },
+    "organizationRequired": "Hãy chọn một",
     "studentOrg": {
       "label": "Qua hội sinh viên",
       "description": "Hội sinh viên của trường đã liên hệ với tôi",

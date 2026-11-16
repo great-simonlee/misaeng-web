@@ -364,7 +364,10 @@ const OFFER_VERIFIED_CHUNK = 100
 export async function getOfferVerifiedPostIds(
   posts: ReadonlyArray<{ id: string; authorUid?: string | null }>,
 ): Promise<Set<string>> {
-  const candidates = posts.filter((post) => post.id && post.authorUid)
+  // Reviews the team added for someone without an account carry NO_ACCOUNT_UID on an admin grant
+  const candidates = posts
+    .filter((post) => post.id)
+    .map((post) => ({ id: post.id, authorUid: post.authorUid || NO_ACCOUNT_UID }))
   if (!candidates.length || !isReviewDocStoreConfigured()) return new Set()
 
   const missing: { id: string; authorUid: string }[] = []
@@ -557,4 +560,89 @@ export function toOwnerSubmission(row: SubmissionWithFiles): ReviewDocSubmission
 
 export function newId() {
   return randomUUID()
+}
+
+/*
+ * 합격 인증 given by an admin in the ERP without an upload (reviews written or moved in by the team, offers checked
+ * elsewhere). Stored as an approved 'offer' submission with no files, so every reader of the badge sees it the
+ * same way; consent_log_id marks it as an admin grant so it can be told apart and taken back.
+ */
+export const ADMIN_GRANT_CONSENT = 'admin-grant'
+/** user_id of an admin grant on a review with no author account (added by the team) */
+export const NO_ACCOUNT_UID = 'no-account'
+
+/** Post ids (of these) with an approved offer verification, and which of them an admin granted. */
+export async function listOfferVerifications(postIds: string[]) {
+  const ids = [...new Set(postIds.map((id) => String(id || '').trim()).filter(Boolean))].slice(0, 500)
+  const verified = new Map<string, { resultLabel: string | null; adminGrant: boolean }>()
+  for (let i = 0; i < ids.length; i += OFFER_VERIFIED_CHUNK) {
+    const list = ids.slice(i, i + OFFER_VERIFIED_CHUNK).map((id) => `"${id.replace(/"/g, '')}"`)
+    const rows = await rest<{ post_id: string | null; result_label: string | null; consent_log_id: string }[]>(
+      `verification_submissions?post_id=in.(${enc(list.join(','))})&kind=eq.offer&status=eq.approved` +
+        '&select=post_id,result_label,consent_log_id',
+    )
+    for (const row of rows ?? []) {
+      if (!row.post_id) continue
+      const adminGrant = row.consent_log_id === ADMIN_GRANT_CONSENT
+      const seen = verified.get(row.post_id)
+      verified.set(row.post_id, {
+        resultLabel: seen?.resultLabel ?? row.result_label,
+        adminGrant: Boolean(seen?.adminGrant) || adminGrant,
+      })
+    }
+  }
+  return verified
+}
+
+export async function grantOfferVerification(input: {
+  postId: string
+  userId: string
+  board: string
+  resultLabel: string
+  reviewerEmail: string
+}) {
+  const now = new Date().toISOString()
+  const rows = await rest<SubmissionRow[]>('verification_submissions', {
+    method: 'POST',
+    prefer: 'return=representation',
+    body: JSON.stringify({
+      id: newId(),
+      user_id: input.userId,
+      post_id: input.postId,
+      board: input.board,
+      kind: 'offer',
+      status: 'approved',
+      uploaded_at: now,
+      decided_at: now,
+      decided_by: input.reviewerEmail,
+      result_label: input.resultLabel,
+      // No files to keep or delete
+      delete_due_at: now,
+      deleted_at: now,
+      consent_log_id: ADMIN_GRANT_CONSENT,
+      consent_version: 'admin',
+    }),
+  })
+  offerVerifiedCache.delete(`${input.postId}:${input.userId}`)
+  return rows?.[0] ?? null
+}
+
+/** Takes back the admin grants on a post (a member's own approved upload stays). */
+export async function revokeOfferVerificationGrant(input: { postId: string; userId: string; reviewerEmail: string }) {
+  const rows = await rest<SubmissionRow[]>(
+    `verification_submissions?post_id=eq.${enc(input.postId)}&kind=eq.offer&status=eq.approved` +
+      `&consent_log_id=eq.${ADMIN_GRANT_CONSENT}`,
+    {
+      method: 'PATCH',
+      prefer: 'return=representation',
+      body: JSON.stringify({
+        status: 'rejected',
+        reject_reason: 'other',
+        decided_at: new Date().toISOString(),
+        decided_by: input.reviewerEmail,
+      }),
+    },
+  )
+  offerVerifiedCache.delete(`${input.postId}:${input.userId}`)
+  return rows?.length ?? 0
 }

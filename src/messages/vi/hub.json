@@ -107,6 +107,11 @@
       "headline": "Nơi mọi sinh viên ở New York nên biết",
       "body": "Chúng tôi hợp tác với hội sinh viên Hàn Quốc ở từng trường để tập hợp thông tin visa, việc làm, ăn uống và sự kiện vào một nơi. Kèm theo kết nối với chuyên gia."
     },
+    "introBoston": {
+      "kicker": "{brand}",
+      "headline": "Nơi mọi sinh viên ở Boston nên biết",
+      "body": "Chúng tôi hợp tác với hội sinh viên Hàn Quốc ở từng trường để tập hợp thông tin visa, việc làm, ăn uống và sự kiện vào một nơi. Kèm theo kết nối với chuyên gia."
+    },
     "status": {
       "kicker": "Visa · Tình trạng",
       "headline": "Mình làm vậy có đúng không?",
@@ -123,7 +128,7 @@
       "body": "So sánh tin đăng đã xác minh và bạn cùng phòng có lối sống hợp với bạn, tất cả ở một nơi."
     },
     "anonymous": {
-      "kicker": "Bảng tin ẩn danh",
+      "kicker": "Hỏi đáp & Tự do",
       "headline": "Những câu hỏi bạn không muốn ghi tên",
       "body": "Dù là visa hay chuyện tình cảm, ẩn danh thì dễ thành thật hơn."
     },
@@ -327,5 +332,18 @@
       "latest": "Mới nhất",
       "updated": "cập nhật {date}"
     }
-  }
+  },
+  "appPrompt": {
+    "title": "Misaeng tiện hơn trên ứng dụng",
+    "subtitle": "Cộng đồng du học sinh và người đi làm tại Mỹ",
+    "perks": {
+      "alerts": "Nhận thông báo tin tuyển dụng mới từ công ty bạn theo dõi, bình luận và tin nhắn",
+      "chat": "Nhắn tin hỏi về nhà ở ngay trong ứng dụng",
+      "full": "Xem đánh giá phỏng vấn và tin tuyển dụng nhanh hơn"
+    },
+    "downloadIos": "Tải miễn phí trên App Store",
+    "downloadAndroid": "Tải miễn phí trên Google Play",
+    "continueWeb": "Không, tiếp tục trên web"
+  },
+  "heroCta": "Xem nhà cho thuê"
 }

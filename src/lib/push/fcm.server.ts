@@ -82,6 +82,7 @@ export async function sendFcm(devices: { token: string }[], message: ApnsMessage
   const url = `https://fcm.googleapis.com/v1/projects/${sa.project_id}/messages:send`
   const data: Record<string, string> = { ...(message.data ?? {}), title: message.title, body: message.body }
   if (message.threadId) data.threadId = message.threadId
+  if (typeof message.badge === 'number') data.badge = String(message.badge)
 
   return Promise.all(
     devices.map(async (device): Promise<FcmResult> => {

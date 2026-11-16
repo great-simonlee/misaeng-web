@@ -55,7 +55,16 @@ import { BLOCKED_USER_CODE, getViewerBlockedUids } from '@lib/community/blocks.s
 import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/contentFilter'
 import { CONTENT_HIDDEN_CODE, isModerationHidden, reportKey } from '@lib/community/moderation'
 import { getViewerReportedKeys } from '@lib/community/reports.server'
-import { isMisaengEmail, isStatusCommunityBoard } from '@lib/constants/nyc'
+import { isAnonymousBoard, isMisaengEmail, isStatusCommunityBoard } from '@lib/constants/nyc'
+import {
+  MARKET_PHOTO_MAX,
+  normalizeMarketCategory,
+  normalizeMarketPayments,
+  normalizeMarketPrice,
+  normalizeMarketStatus,
+  normalizeMarketZip,
+} from '@lib/community/marketplace'
+import { closeThreadsForPost, reopenThreadsForPost } from '@lib/marketplace/inquiries.server'
 import {
   deleteStoredCommunityPost,
   getStoredCommunityPost,
@@ -82,6 +91,12 @@ interface RouteContext {
 }
 
 type UpdateBody = {
+  price?: number | string | null
+  marketCategory?: string
+  marketPayments?: unknown
+  marketStatus?: string
+  /** 질문·자유: 닉네임 공개 */
+  showNickname?: boolean
   title?: string
   contentHtml?: string
   location?: string
@@ -222,7 +237,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   const contentHtml = sanitizeCommunityHtml(
     String(body.contentHtml ?? existing.contentHtml).trim(),
   )
-  if (!title || !contentHtml || contentHtml === '<p></p>') {
+  // 중고거래는 본문이 비어 있어도 된다 (상태만 바꾸는 PATCH { marketStatus } 도 제목·본문을 그대로 둔다)
+  const emptyBody = !contentHtml || contentHtml === '<p></p>'
+  if (!title || (emptyBody && existing.categoryId !== 'marketplace')) {
     return NextResponse.json(
       { error: t('community.write.titleBodyRequired') },
       { status: 400 },
@@ -266,13 +283,19 @@ export async function PATCH(request: Request, context: RouteContext) {
     existing.categoryId === 'status' || existing.categoryId === 'cpt-opt'
   const isJobReview = existing.categoryId === 'job-review'
   const isRoommate = existing.categoryId === 'roommate'
+  const isMarket = existing.categoryId === 'marketplace'
   const menuItems = isFood
     ? normalizeFoodMenuItems(body.menuItems ?? existing.menuItems)
     : []
   const galleryPhotos =
-    isFood || isRoommate
-      ? normalizeFoodGalleryPhotos(body.galleryPhotos ?? existing.galleryPhotos)
+    isFood || isRoommate || isMarket
+      ? normalizeFoodGalleryPhotos(body.galleryPhotos ?? existing.galleryPhotos).slice(0, isMarket ? MARKET_PHOTO_MAX : undefined)
       : []
+  // 중고거래: 위치는 ZIP 코드만. 예전 글의 동네 이름은 위치를 바꾸지 않으면 그대로 둔다
+  const marketZip = isMarket && body.location !== undefined ? normalizeMarketZip(body.location) : null
+  if (isMarket && body.location !== undefined && !marketZip) {
+    return NextResponse.json({ error: t('community.marketplace.zipRequired') }, { status: 400 })
+  }
   const partySize = isFood
     ? normalizePartySize(body.partySize ?? existing.partySize)
     : null
@@ -551,11 +574,15 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const next = {
     ...existing,
+    // 질문·자유: 수정할 때 익명 / 닉네임 공개를 바꿀 수 있다 (안 보내면 그대로)
+    ...(isAnonymousBoard(existing.categoryId) && typeof body.showNickname === 'boolean'
+      ? { showNickname: body.showNickname }
+      : {}),
     ...(isCptOpt ? { categoryId: 'status' as const } : {}),
     title,
     contentHtml,
     description: htmlToPlainText(contentHtml).slice(0, 240),
-    location: String(body.location ?? existing.location).trim() || (placeName ?? ''),
+    location: marketZip ?? (String(body.location ?? existing.location).trim() || (placeName ?? '')),
     detail: isCptOpt
       ? getCptOptTypeLabel(cptOptType)
       : isJobReview
@@ -564,7 +591,7 @@ export async function PATCH(request: Request, context: RouteContext) {
           ? getRoommateLookingForLabel(roommateLookingFor)
           : String(body.detail ?? existing.detail).trim(),
     updatedAt: Date.now(),
-    thumbnailUrl: isFood || isRoommate ? thumbnailUrl : null,
+    thumbnailUrl: isFood || isRoommate || isMarket ? thumbnailUrl : null,
     partySize: isFood ? partySize : null,
     totalSpend: isFood ? totalSpend : null,
     tipIncluded: isFood ? tipIncluded : null,
@@ -593,6 +620,17 @@ export async function PATCH(request: Request, context: RouteContext) {
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
     roommateMoveInDate: isRoommate ? roommateMoveInDate : null,
     roommateMoveOutDate: isRoommate ? roommateMoveOutDate : null,
+    // 중고거래: price, category and trade status (판매중 / 예약중 / 판매완료) — each kept unless sent
+    ...(isMarket
+      ? {
+          price: body.price === undefined ? (existing.price ?? null) : normalizeMarketPrice(body.price),
+          marketCategory:
+            body.marketCategory === undefined ? (existing.marketCategory ?? 'other') : normalizeMarketCategory(body.marketCategory),
+          marketPayments:
+            body.marketPayments === undefined ? (existing.marketPayments ?? []) : normalizeMarketPayments(body.marketPayments),
+          marketStatus: normalizeMarketStatus(body.marketStatus) ?? existing.marketStatus ?? 'selling',
+        }
+      : {}),
     city: isCptOpt
       ? parseCityId(body.city) ?? existing.city
       : existing.city,
@@ -614,6 +652,11 @@ export async function PATCH(request: Request, context: RouteContext) {
       await onPostUpdated({ uid: user.uid, post: saved })
     } catch (creditError) {
       console.error('Community credit award (post update) error:', creditError)
+    }
+    // 판매완료: the listing's inquiry threads become read only; back on sale: they open again
+    if (saved.categoryId === 'marketplace') {
+      if (saved.marketStatus === 'sold') await closeThreadsForPost(saved.id)
+      else if (existing.marketStatus === 'sold') await reopenThreadsForPost(saved.id)
     }
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),
@@ -659,6 +702,8 @@ export async function DELETE(request: Request, context: RouteContext) {
     if (!ok) {
       return NextResponse.json({ error: t('community.deleteFailed') }, { status: 500 })
     }
+    // 중고거래: the deleted listing's inquiry threads become read only
+    if (existing.categoryId === 'marketplace') await closeThreadsForPost(id)
     try {
       const { onPostDeleted } = await import('@lib/points/facade.server')
       await onPostDeleted({ uid: user.uid, postId: id })

@@ -41,7 +41,16 @@ import {
   isSharedCommunityBoard,
   parseCityId,
   resolveCityId,
+  type CityId,
 } from '@lib/constants/cities'
+import {
+  matchesListFilters,
+  pageAfter,
+  pageLimit,
+  readListFilters,
+  toListPost,
+  type ListFilters,
+} from '@lib/community/listPage'
 import {
   isAnonymousBoard,
   isCommunityBoardId,
@@ -68,14 +77,24 @@ import {
 } from '@lib/community/food'
 import { htmlToPlainText, sanitizeCommunityHtml } from '@lib/community/html'
 import {
+  MARKET_PHOTO_MAX,
+  normalizeMarketCategory,
+  normalizeMarketPayments,
+  normalizeMarketPrice,
+  normalizeMarketZip,
+} from '@lib/community/marketplace'
+import {
   isCommunityStorageConfigured,
+  enrichCommunityListPosts,
   listStoredCommunityPosts,
   listStoredCommunityPostsByAuthor,
+  listStoredCommunityPostsRaw,
   withLiveAuthors,
   saveStoredCommunityPost,
 } from '@lib/supabase/community.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import { notifyJobReviewCreated } from '@lib/erp/notifyJobReview'
+import { notifyBoardPostCreated } from '@lib/erp/notifyBoardPost'
 import type {
   CommunityPost,
   CptOptTimelineEntry,
@@ -154,6 +173,22 @@ export async function GET(request: Request) {
     const user = await resolveAuthenticatedUser()
     const city = resolveCityId(searchParams.get('city'))
     const locale = await getRequestLocale(request)
+    // 앱이 ?limit= 을 보내면 페이지 단위로 (예전 앱은 지금처럼 전체 목록)
+    const limit = pageLimit(searchParams.get('limit'))
+    if (limit != null) {
+      return NextResponse.json(
+        await communityListPage({
+          board,
+          city,
+          locale,
+          user,
+          limit,
+          cursor: searchParams.get('cursor'),
+          filters: readListFilters(searchParams),
+          light: searchParams.get('view') === 'list',
+        }),
+      )
+    }
     // 차단한 작성자는 캐시된 목록을 꺼낸 뒤 보는 사람마다 거른다 (익명 정리 전에)
     const [stored, blocked, reported] = await Promise.all([
       listStoredCommunityPosts(board, city),
@@ -161,7 +196,11 @@ export async function GET(request: Request) {
       getViewerReportedKeys(user?.uid),
     ])
     // 숨김 글은 목록 캐시에서 이미 빠진다. 내가 신고한 글은 보는 사람마다 뺀다 (차단과 같은 방식)
-    const visible = withoutModeratedPosts(withoutBlockedAuthors(stored, blocked), reported)
+    const unfiltered = withoutModeratedPosts(withoutBlockedAuthors(stored, blocked), reported)
+    // 중고거래: 페이지 목록과 같은 규칙 (판매완료 빼기, category / category=free 탭)
+    const listFilters = readListFilters(searchParams)
+    const visible =
+      board === 'marketplace' ? unfiltered.filter((post) => matchesListFilters(post, board, listFilters)) : unfiltered
     // 룸메이트 게시판: 포인트로 부스트한 글을 위로 (부스트는 전환 후에만 생긴다, WIRING.md 5)
     const boosts = board === 'roommate' ? await loadRoommateBoosts() : null
     const ordered =
@@ -197,6 +236,11 @@ export async function GET(request: Request) {
 }
 
 type CreateBody = {
+  price?: number | string | null
+  marketCategory?: string
+  marketPayments?: unknown
+  /** 질문·자유: 닉네임 공개 (기본 익명) */
+  showNickname?: boolean
   categoryId?: string
   city?: string | null
   title?: string
@@ -280,7 +324,9 @@ export async function POST(request: Request) {
   const contentHtml = sanitizeCommunityHtml(
     String(body?.contentHtml || '').trim(),
   )
-  if (!title || !contentHtml || contentHtml === '<p></p>') {
+  // 중고거래는 본문 없이 제목·사진·가격만으로 올릴 수 있다 (제목은 필수)
+  const emptyBody = !contentHtml || contentHtml === '<p></p>'
+  if (!title || (emptyBody && categoryId !== 'marketplace')) {
     return NextResponse.json(
       { error: t('community.write.titleBodyRequired') },
       { status: 400 },
@@ -325,12 +371,20 @@ export async function POST(request: Request) {
   const isCptOpt = categoryId === 'status' || categoryId === 'cpt-opt'
   const isJobReview = categoryId === 'job-review'
   const isRoommate = categoryId === 'roommate'
-  const isAnonymous = isAnonymousBoard(categoryId)
+  const isMarket = categoryId === 'marketplace'
+  // 질문·자유 보드: 기본은 익명, 글쓴이가 고르면 닉네임·프로필·인증 배지를 보인다
+  const showNickname = isAnonymousBoard(categoryId) && body?.showNickname === true
+  const isAnonymous = isAnonymousBoard(categoryId) && !showNickname
   const menuItems = isFood ? normalizeFoodMenuItems(body?.menuItems) : []
   const galleryPhotos =
-    isFood || isRoommate
-      ? normalizeFoodGalleryPhotos(body?.galleryPhotos)
+    isFood || isRoommate || isMarket
+      ? normalizeFoodGalleryPhotos(body?.galleryPhotos).slice(0, isMarket ? MARKET_PHOTO_MAX : undefined)
       : []
+  // 중고거래: 위치는 ZIP 코드만 (정확한 주소는 받지 않는다)
+  const marketZip = isMarket ? normalizeMarketZip(body?.location) : null
+  if (isMarket && !marketZip) {
+    return NextResponse.json({ error: t('community.marketplace.zipRequired') }, { status: 400 })
+  }
   const partySize = isFood ? normalizePartySize(body?.partySize) : null
   const totalSpend = isFood ? normalizeTotalSpend(body?.totalSpend) : null
   const tipIncluded = isFood ? normalizeTipIncluded(body?.tipIncluded) : null
@@ -610,6 +664,7 @@ export async function POST(request: Request) {
 
   const post: CommunityPost = {
     id,
+    ...(isAnonymousBoard(categoryId) ? { showNickname } : {}),
     // 작성 화면 언어 = 원문 언어 (번역이 다르면 ERP 번역 단계에서 바로잡는다)
     // Site it was written on (contentBrand.ts): from the server config, never from the request
     brand: BRAND_CONFIG.id,
@@ -619,7 +674,7 @@ export async function POST(request: Request) {
     title,
     contentHtml,
     description: htmlToPlainText(contentHtml).slice(0, 240),
-    location: String(body?.location || '').trim() || (placeName ?? ''),
+    location: marketZip ?? (String(body?.location || '').trim() || (placeName ?? '')),
     detail: isCptOpt
       ? getCptOptTypeLabel(cptOptType)
       : isJobReview
@@ -640,7 +695,7 @@ export async function POST(request: Request) {
     recommendCount: 0,
     commentCount: 0,
     beenThereCount: 0,
-    thumbnailUrl: isFood || isRoommate ? thumbnailUrl : null,
+    thumbnailUrl: isFood || isRoommate || isMarket ? thumbnailUrl : null,
     partySize: isFood ? partySize : null,
     totalSpend: isFood ? totalSpend : null,
     tipIncluded: isFood ? tipIncluded : null,
@@ -665,6 +720,14 @@ export async function POST(request: Request) {
     roommateBudgetMax: isRoommate ? roommateBudgetMax : null,
     roommateMoveInDate: isRoommate ? roommateMoveInDate : null,
     roommateMoveOutDate: isRoommate ? roommateMoveOutDate : null,
+    ...(isMarket
+      ? {
+          price: normalizeMarketPrice(body?.price),
+          marketCategory: normalizeMarketCategory(body?.marketCategory),
+          marketPayments: normalizeMarketPayments(body?.marketPayments),
+          marketStatus: 'selling' as const,
+        }
+      : {}),
     guestAuthor: null,
   }
 
@@ -686,6 +749,7 @@ export async function POST(request: Request) {
       console.error('Community credit award (post) error:', creditError)
     }
     if (isJobReview && jobReviewSource) after(() => notifyJobReviewCreated(saved, jobReviewSource))
+    after(() => notifyBoardPostCreated(saved))
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),
     })
@@ -698,4 +762,60 @@ export async function POST(request: Request) {
       { status: 500 },
     )
   }
+}
+
+/**
+ * 한 페이지 (?limit=&cursor=&view=list + 게시판 필터). 필터·차단·정렬은 전체 글로, 작성자 보강·합격 인증·번역은
+ * 보낼 글만. total = 필터 뒤 전체 개수. 비자 게시판은 학교별 글 수(facets.schools)도 준다 (학교 칩).
+ */
+async function communityListPage(input: {
+  board: string | undefined
+  city: CityId | undefined
+  locale: Awaited<ReturnType<typeof getRequestLocale>>
+  user: Awaited<ReturnType<typeof resolveAuthenticatedUser>>
+  limit: number
+  cursor: string | null
+  filters: ListFilters
+  light: boolean
+}) {
+  const { board, city, locale, user, limit, cursor, filters, light } = input
+  const status = board != null && isStatusCommunityBoard(board)
+  const [raw, blocked, reported] = await Promise.all([
+    listStoredCommunityPostsRaw(board, city),
+    getViewerBlockedUids(user?.uid),
+    getViewerReportedKeys(user?.uid),
+  ])
+  // 학교 필터·학교별 개수는 작성자 프로필(authorSchoolId)이 있어야 해서 비자 게시판만 먼저 보강한다
+  const stored = status ? await enrichCommunityListPosts(raw, board) : raw
+  const visible = withoutModeratedPosts(withoutBlockedAuthors(stored, blocked), reported)
+  const boosts = board === 'roommate' ? await loadRoommateBoosts() : null
+  const ordered =
+    boosts && boosts.size > 0
+      ? [...visible].sort((a, b) => {
+          const ua = boosts.get(a.id) ?? ''
+          const ub = boosts.get(b.id) ?? ''
+          if (ua === ub) return 0
+          return ua < ub ? 1 : -1
+        })
+      : visible
+  const matching = ordered.filter((post) => matchesListFilters(post, board, filters))
+  const { page, nextCursor } = pageAfter(matching, cursor, limit)
+  const enriched = status ? page : await enrichCommunityListPosts(page, board)
+  const offerVerified = board === 'job-review' ? await getOfferVerifiedPostIds(enriched) : null
+  const posts = localizePosts(enriched, locale).map((item) => {
+    const finalized = finalizePost(applyReviewBodyAccess(sanitizeAnonymousCommunityPost(item, user?.uid), user))
+    const shaped = light ? toListPost(finalized) : finalized
+    const boostedUntil = boosts?.get(item.id)
+    const withBoost = boostedUntil ? { ...shaped, boostedUntil } : shaped
+    return offerVerified ? { ...withBoost, offerVerified: offerVerified.has(item.id) } : withBoost
+  })
+  const facets = status
+    ? {
+        schools: ordered.reduce<Record<string, number>>((counts, post) => {
+          if (post.authorSchoolId) counts[post.authorSchoolId] = (counts[post.authorSchoolId] || 0) + 1
+          return counts
+        }, {}),
+      }
+    : undefined
+  return { posts, nextCursor, total: matching.length, ...(facets ? { facets } : {}) }
 }

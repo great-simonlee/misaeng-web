@@ -45,6 +45,44 @@
     },
     "parsons-ksa": {
       "name": "Hội sinh viên Hàn Quốc Parsons"
+    },
+    "rutgers-kisa": {
+      "name": "Hội sinh viên Hàn Quốc Rutgers"
+    },
+    "yale-hanppuri": {
+      "name": "Hanppuri – Yale"
+    },
+    "neu-kisa": {
+      "name": "Hội sinh viên Hàn Quốc Northeastern"
+    },
+    "bu-kisa": {
+      "name": "Hội sinh viên Hàn Quốc BU"
+    },
+    "bc-kisa": {
+      "name": "Hội sinh viên Hàn Quốc Boston College"
+    },
+    "hc-kisa": {
+      "name": "Hội sinh viên Hàn Quốc Harvard"
+    },
+    "berklee-kcsa": {
+      "name": "Hội sinh viên Hàn Quốc Berklee"
+    },
+    "tufts-kiso": {
+      "name": "Hội sinh viên Hàn Quốc Tufts"
+    },
+    "risd-ksa": {
+      "name": "Hội sinh viên Hàn Quốc RISD"
+    },
+    "brown-kisa": {
+      "name": "Hội sinh viên Hàn Quốc Brown"
+    },
+    "uw-ksu": {
+      "name": "Hội sinh viên Hàn Quốc UW"
     }
+  },
+  "orgGroups": {
+    "nyc": "New York",
+    "boston": "Boston",
+    "other": "Khu vực khác"
   }
 }

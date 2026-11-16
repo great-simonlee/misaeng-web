@@ -17,6 +17,7 @@ import {
   type PostingKind,
   type PostingLevel,
   type PublicPosting,
+  translatedPostingUrl,
 } from '@lib/company/postings'
 import {
   DEGREE_LABELS,
@@ -25,7 +26,7 @@ import {
   type DegreeLevel,
   type JobFunction,
 } from '@lib/constants/postingCopy'
-import { useFormat, useT } from '@lib/i18n/client'
+import { useFormat, useLocale, useT } from '@lib/i18n/client'
 import type { Translate } from '@lib/i18n/translate'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CompanyMark } from '@widgets/nyc/CompanyBrand'
@@ -34,10 +35,12 @@ import { CompanyMark } from '@widgets/nyc/CompanyBrand'
 const LEVEL_LABEL: Record<PostingLevel, string> = {
   intern: 'postings.level.intern',
   new_grad: 'postings.level.new_grad',
+  experienced: 'postings.level.experienced',
 }
 const LEVEL_TONE: Record<PostingLevel, string> = {
   intern: 'bg-[#fff1eb] text-[var(--brand)] ring-[#ffd2c2]',
   new_grad: 'bg-[#eef2ff] text-[#4338ca] ring-[#c7d2fe]',
+  experienced: 'bg-[#f0fdf4] text-[#15803d] ring-[#bbf7d0]',
 }
 const WORK_LABEL: Partial<Record<PublicPosting['workArrangement'], string>> = {
   remote: 'postings.work.remote',
@@ -52,10 +55,11 @@ const DEGREE_TAG: Record<DegreeLevel, string> = {
   both: 'bg-[#f5f3ff] text-[#6d28d9] ring-[#ddd6fe]',
   unspecified: 'bg-[#f4f5f7] text-[var(--muted)] ring-black/[0.05]',
 }
-/** 구분 필터 칩: 레벨(인턴·신입)과 자동 태그(한국어 우대·한국 근무). labelKey: companies 문구 키 */
+/** 구분 필터 칩: 레벨(인턴·신입·경력)과 자동 태그(한국어 우대·한국 근무). labelKey: companies 문구 키 */
 export const KIND_OPTIONS: { id: Exclude<PostingKind, 'all'>; labelKey: string }[] = [
   { id: 'intern', labelKey: 'postings.level.intern' },
   { id: 'new_grad', labelKey: 'postings.level.new_grad' },
+  { id: 'experienced', labelKey: 'postings.level.experienced' },
   { id: 'korean_preferred', labelKey: 'postings.tag.korean_preferred' },
   { id: 'korea_based', labelKey: 'postings.tag.korea_based' },
 ]
@@ -155,6 +159,28 @@ function ApplyGuide({ posting }: { posting: PublicPosting }) {
   )
 }
 
+/** 레벨 · 직무 · 지원 대상 · 자동 태그(한국어 우대·한국 근무) 칩 줄 (공고 줄과 공유 링크 페이지) */
+export function PostingChips({ posting, className }: { posting: PublicPosting; className?: string }) {
+  const t = useT('companies')
+  const { degree } = posting.summary
+  return (
+    <span className={cn('flex flex-wrap items-center gap-1.5', className)}>
+      <span className={cn(TAG, LEVEL_TONE[posting.level])}>{t(LEVEL_LABEL[posting.level])}</span>
+      {posting.jobFunction && posting.jobFunction !== 'other' ? (
+        <span className={cn(TAG, FUNCTION_TAG)}>{t(JOB_FUNCTION_LABELS[posting.jobFunction])}</span>
+      ) : null}
+      <span className={cn(TAG, DEGREE_TAG[degree])}>{t(DEGREE_LABELS[degree])}</span>
+      {posting.tags
+        .filter((tag) => TAG_LABEL[tag])
+        .map((tag) => (
+          <span key={tag} className={cn(TAG, 'bg-[#fff1f2] text-[#be123c] ring-[#fecdd3]')}>
+            {t(TAG_LABEL[tag])}
+          </span>
+        ))}
+    </span>
+  )
+}
+
 /** "Charlotte, NC · Dallas, TX 외 1곳" */
 function regionSummary(regions: string[], t: Translate) {
   if (regions.length <= 2) return regions.join(' · ')
@@ -182,6 +208,8 @@ export function PostingRow({
   const format = useFormat()
   const brand = BRAND_CONFIG.name
   const { summary } = posting
+  // 원문 전문은 Google 번역으로 (저장하지 않음). 영어 화면에서는 버튼 없음
+  const translatedUrl = translatedPostingUrl(posting.applyUrl, useLocale())
   const workKey = WORK_LABEL[posting.workArrangement]
   const work = workKey ? t(workKey) : undefined
   const postedDate =
@@ -222,20 +250,7 @@ export function PostingRow({
                 {posting.company.name}
               </span>
             ) : null}
-            <span className='flex flex-wrap items-center gap-1.5'>
-              <span className={cn(TAG, LEVEL_TONE[posting.level])}>{t(LEVEL_LABEL[posting.level])}</span>
-              {posting.jobFunction && posting.jobFunction !== 'other' ? (
-                <span className={cn(TAG, FUNCTION_TAG)}>{t(JOB_FUNCTION_LABELS[posting.jobFunction])}</span>
-              ) : null}
-              <span className={cn(TAG, DEGREE_TAG[summary.degree])}>{t(DEGREE_LABELS[summary.degree])}</span>
-              {posting.tags
-                .filter((tag) => TAG_LABEL[tag])
-                .map((tag) => (
-                  <span key={tag} className={cn(TAG, 'bg-[#fff1f2] text-[#be123c] ring-[#fecdd3]')}>
-                    {t(TAG_LABEL[tag])}
-                  </span>
-                ))}
-            </span>
+            <PostingChips posting={posting} />
             <span className='mt-1.5 block text-[15px] font-semibold leading-snug tracking-tight text-[var(--foreground)]'>
               {posting.title}
             </span>
@@ -303,7 +318,33 @@ export function PostingRow({
               </ul>
             </div>
           ) : null}
+          {summary.preferred?.length ? (
+            <div>
+              <p className='font-semibold text-[var(--foreground)]'>{t('postings.preferredTitle')}</p>
+              <ul className='mt-1 list-disc space-y-0.5 pl-5 text-[var(--muted-foreground)]'>
+                {summary.preferred.map((line, i) => (
+                  <li key={i}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {summary.benefits?.length ? (
+            <div>
+              <p className='font-semibold text-[var(--foreground)]'>{t('postings.benefitsTitle')}</p>
+              <ul className='mt-1 list-disc space-y-0.5 pl-5 text-[var(--muted-foreground)]'>
+                {summary.benefits.map((line, i) => (
+                  <li key={i}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <dl className='grid gap-1.5 sm:grid-cols-[80px_1fr]'>
+            {summary.compensation ? (
+              <>
+                <dt className='font-semibold text-[var(--foreground)]'>{t('postings.compensationLabel')}</dt>
+                <dd className='text-[var(--muted-foreground)]'>{summary.compensation}</dd>
+              </>
+            ) : null}
             {summary.workType ? (
               <>
                 <dt className='font-semibold text-[var(--foreground)]'>{t('postings.workTypeLabel')}</dt>
@@ -328,6 +369,18 @@ export function PostingRow({
               {t('postings.applyButton')}
               <ExternalIcon className='size-3.5' />
             </a>
+            {translatedUrl ? (
+              <a
+                href={translatedUrl}
+                target='_blank'
+                rel='noopener noreferrer'
+                onClick={() => trackPostingClick(posting.id)}
+                className='inline-flex h-9 items-center gap-1 rounded-full border border-black/10 bg-white px-4 text-[13px] font-semibold text-[var(--foreground)] transition hover:bg-black/[0.03] active:scale-[0.98]'
+              >
+                {t('postings.translateButton')}
+                <ExternalIcon className='size-3.5' />
+              </a>
+            ) : null}
             <p className='min-w-0 flex-1 text-[11px] text-[var(--muted)]'>{t('postings.summaryNotice', { brand })}</p>
           </div>
         </div>

@@ -25,6 +25,7 @@ import {
   type CptOptTimelineEntry,
 } from '@lib/community/cptOpt'
 import { useFormat, useT } from '@lib/i18n/client'
+import { WriteGuideButton } from '@widgets/nyc/WriteGuideButton'
 import {
   clearWriteDraft,
   loadWriteDraft,
@@ -339,6 +340,8 @@ export function CptOptWriteScreen({
           <CreateHero writeLabel={tCommunity(communityBoardKey(boardId, 'writeLabel'))} />
         )}
 
+        <WriteGuideButton onClick={orientation.show} />
+
         <form onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
           {isEdit ? (
             <>
@@ -533,16 +536,14 @@ export function CptOptWriteScreen({
           </p>
         </form>
       </div>
-
-      {!isEdit ? (
-        <CptOptWriteOrientationModal
-          open={orientation.open}
-          agreeing={orientation.agreeing}
-          error={orientation.error}
-          onClose={() => void orientation.agree()}
-          listHref={href(`/${boardId}`)}
-        />
-      ) : null}
+      <CptOptWriteOrientationModal
+        open={orientation.open}
+        agreeing={orientation.agreeing}
+        error={orientation.error}
+        onClose={() => void orientation.agree()}
+        readOnly={orientation.readOnly}
+        listHref={href(`/${boardId}`)}
+      />
     </BoardPageShell>
   )
 }

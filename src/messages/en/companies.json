@@ -83,14 +83,21 @@
     "DE": "Germany",
     "FR": "France",
     "AU": "Australia",
-    "IN": "India"
+    "IN": "India",
+    "NL": "the Netherlands",
+    "SE": "Sweden",
+    "CH": "Switzerland",
+    "IE": "Ireland",
+    "IL": "Israel",
+    "TW": "Taiwan"
   },
   "postings": {
-    "sectionTitle": "Internship & New Grad Jobs",
+    "sectionTitle": "Job Postings",
+    "overviewTitle": "About the role",
     "sectionDescription": "{brand} read the postings and pulled out the key points.",
-    "listTitle": "Internship & New Grad Jobs",
-    "listIntro": "{brand} sums up the key points of internship and new grad postings from US companies.",
-    "listLink": "See internship & new grad jobs",
+    "listTitle": "Job Postings",
+    "listIntro": "{brand} sums up the key points of internship, new grad and experienced postings from US companies.",
+    "listLink": "See job postings",
     "backToCompanies": "Company careers pages",
     "allLevels": "All",
     "allRegions": "All locations",
@@ -100,6 +107,10 @@
     "postingCount_one": "{count} job",
     "postingCount_other": "{count} jobs",
     "qualificationsTitle": "Key qualifications",
+    "preferredTitle": "Preferred qualifications",
+    "benefitsTitle": "Benefits",
+    "compensationLabel": "Pay",
+    "translateButton": "Read translated",
     "workTypeLabel": "Work type",
     "locationLabel": "Location",
     "showLess": "Show less",
@@ -126,12 +137,13 @@
     "searchPlaceholder": "Search companies or roles (e.g. Analyst)",
     "loadError": "We couldn't load the jobs",
     "emptyTitle": "No jobs posted yet",
-    "emptyDescription": "New internship and new grad jobs will show up here.",
+    "emptyDescription": "New job postings will show up here.",
     "noMatchTitle": "No jobs match your filters",
     "noMatchDescription": "Try a different location or search term.",
     "level": {
       "intern": "Intern",
-      "new_grad": "New grad"
+      "new_grad": "New grad",
+      "experienced": "Experienced"
     },
     "tag": {
       "korean_preferred": "Korean preferred",
@@ -161,6 +173,15 @@
       "graduate": "Graduate",
       "both": "Undergrad & Grad",
       "unspecified": "Degree not specified"
+    },
+    "shared": {
+      "openInAppFull": "See the full posting in the Misaeng app",
+      "teaserNote": "Qualifications, preferred skills, apply tips and the original posting link are in the Misaeng app.",
+      "noApp": "Don't have the app yet?",
+      "appStore": "Download on the App Store",
+      "googlePlay": "Get it on Google Play",
+      "notFoundTitle": "This posting isn't available",
+      "notFoundDescription": "It may have closed or been taken down. Browse other postings instead."
     }
   },
   "industries": {

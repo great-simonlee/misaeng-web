@@ -23,6 +23,7 @@ import { JobReviewTypeBadge } from '@widgets/nyc/JobReviewTypeBadge'
 import { CommunityRichBody } from '@widgets/nyc/CommunityRichBody'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
 import { CreditReviewRequestCard } from '@widgets/nyc/CreditReviewRequestCard'
+import { ReviewAppActions } from '@widgets/nyc/ReviewAppActions'
 import { TimelineAccordion } from '@widgets/nyc/TimelineAccordion'
 import { TimelineFieldGrid } from '@widgets/nyc/TimelineFieldGrid'
 import type { NycCommunityBoardId } from '@lib/constants/nyc'
@@ -236,6 +237,9 @@ export function JobReviewDetailContent({
           </BoardSurface>
         </section>
       ) : null}
+
+      {/* Coffee chat and questions happen in the app; comments stay on the web */}
+      {!isAuthor ? <ReviewAppActions postId={post.id} /> : null}
 
       <div className='mt-8'>
         <CommunityPostFooter

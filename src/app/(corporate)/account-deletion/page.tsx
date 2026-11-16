@@ -106,7 +106,8 @@ export default function AccountDeletionPage() {
       </ul>
       <p className="mt-4 text-[15px] leading-7">
         <b>Deleted right away</b>: profile and sign-in data, school/work/Instagram verifications and uploaded documents,
-        notifications and push devices, saved items, roommate/sublet posts, coffee-chat mentor profile.
+        notifications and push devices, saved items, roommate/sublet posts, marketplace (중고거래) listings and the marketplace conversations you took part in
+        (for both sides), coffee-chat mentor profile.
       </p>
       <p className="mt-3 text-[15px] leading-7">
         <b>Kept</b>: other posts and comments remain under “Deleted member”; report and safety records for as long as

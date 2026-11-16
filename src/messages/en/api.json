@@ -179,7 +179,8 @@
     "reviewBonusReplaced": "Since the points update, review points are paid after the team reviews each post instead of this bonus. Please use the points review queue in the ERP."
   },
   "postings": {
-    "loadFailed": "Couldn't load job postings."
+    "loadFailed": "Couldn't load job postings.",
+    "notFound": "This posting isn't available. It may have closed or been taken down."
   },
   "comments": {
     "bodyRequired": "Please write a comment.",
@@ -281,6 +282,9 @@
     "contentBlocked": "Your text contains language that isn’t allowed (profanity, hate speech or sexual harassment). Please edit it and try again.",
     "moderation": {
       "hidden": "This content was hidden after reports or is no longer available."
+    },
+    "marketplace": {
+      "zipRequired": "Enter a 5-digit ZIP code for the pickup area."
     }
   },
   "guest": {
@@ -408,6 +412,14 @@
         "body": "There was no answer within 7 days."
       },
       "refunded": "{amount}P refunded."
+    },
+    "marketplace": {
+      "newInquiry": {
+        "title": "New inquiry · {listing}"
+      },
+      "message": {
+        "title": "New message · {listing}"
+      }
     }
   },
   "reviewDocs": {
@@ -575,5 +587,9 @@
       "openWeb": "View reply",
       "footer": "This is a send-only address. Please reply on ellieo.com."
     }
+  },
+  "companies": {
+    "nameInvalid": "Check the company name (up to 80 characters, no links).",
+    "tooMany": "You can’t add more companies today. Please try again tomorrow."
   }
 }

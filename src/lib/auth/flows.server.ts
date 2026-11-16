@@ -190,7 +190,7 @@ export async function emailVerifySignup(t: Translate, request: Request, rawEmail
       if (!recorded.ok) console.error('Sign-up consent not recorded:', recorded)
     }
     // Every new Misaeng login from the sign-up form, also an old Ellieo member linked by email (isNew = false)
-    if (linked.created) notifyNewSignup(email, 'email', !linked.isNew)
+    if (linked.created) notifyNewSignup(email, 'email', !linked.isNew, linked.uid)
     const name = typeof session.user.metadata.name === 'string' ? session.user.metadata.name : null
     return { ok: true, session, uid: linked.uid, registered: linked.isNew, displayName: name }
   } catch (error) {
@@ -293,7 +293,7 @@ export async function idTokenSignIn(
       const recorded = await recordConsent(request, t, linked.uid, session.user.email, options.consent, method)
       if (!recorded.ok) console.error('Sign-up consent not recorded:', recorded)
     }
-    if (linked.created) notifyNewSignup(session.user.email, provider, !linked.isNew)
+    if (linked.created) notifyNewSignup(session.user.email, provider, !linked.isNew, linked.uid)
     const meta = session.user.metadata
     const displayName = options.name?.trim() || (typeof meta.full_name === 'string' ? meta.full_name : null) || (typeof meta.name === 'string' ? meta.name : null)
     return { ok: true, session, uid: linked.uid, registered: linked.isNew, displayName }

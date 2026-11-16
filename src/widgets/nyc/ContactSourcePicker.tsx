@@ -4,60 +4,26 @@ import { useEffect, useState } from 'react'
 
 import { LoadingSpinner } from '@components/LoadingSpinner'
 import {
-  findContactSourceOptionId,
-  type ContactSourceOption,
-  type ContactSourceValue,
+  normalizeStoredContactSource,
+  type ContactSourceCategoryView,
+  type ContactSourceOrganizationView,
 } from '@lib/community/contactSources'
 import { useT } from '@lib/i18n/client'
 import { useCity } from '@hooks/useCity'
 import { ChoiceCards } from '@widgets/nyc/JobReviewOutcomePicker'
 
-async function fetchContactSourceOptions(city: string): Promise<ContactSourceOption[]> {
-  const res = await fetch(`/api/community/contact-sources?city=${encodeURIComponent(city)}`, {
+async function fetchContactSourceCategories(city: string): Promise<ContactSourceCategoryView[]> {
+  const res = await fetch(`/api/community/contact-sources?v=2&city=${encodeURIComponent(city)}`, {
     cache: 'no-store',
   })
   if (!res.ok) throw new Error(`contact sources ${res.status}`)
-  const data = (await res.json()) as { options?: ContactSourceOption[] }
-  return Array.isArray(data.options) ? data.options : []
+  const data = (await res.json()) as { categories?: ContactSourceCategoryView[] }
+  return Array.isArray(data.categories) ? data.categories : []
 }
 
-const STUDENT_ORG = 'student-org'
-
-type Row = { id: string; label: string; description: string }
-
-/** 큰 선택 카드: 직접·파트너는 하나씩, 학생회는 한 장으로 묶고 (고르면 아래에 학생회 목록), 지인·기타 */
-function buildRows(options: ContactSourceOption[], t: ReturnType<typeof useT>): Row[] {
-  const rows: Row[] = []
-  for (const option of options) {
-    if (option.kind === 'student-org') {
-      if (!rows.some((row) => row.id === STUDENT_ORG)) {
-        rows.push({
-          id: STUDENT_ORG,
-          label: t('contactSource.studentOrg.label'),
-          description: t('contactSource.studentOrg.description'),
-        })
-      }
-    } else if (option.kind === 'direct' || option.kind === 'partner') {
-      rows.push({
-        id: option.id,
-        label: t('contactSource.via', { name: option.label }),
-        description: t(`contactSource.descriptions.${option.kind}`, { name: option.label }),
-      })
-    } else {
-      rows.push({
-        id: option.id,
-        label: option.label,
-        description: t(`contactSource.descriptions.${option.kind}`),
-      })
-    }
-  }
-  return rows
-}
-
-/** 학생회 안에서 지역별로 (API 순서 그대로) */
-function groupByArea(options: ContactSourceOption[]) {
-  const rows: { area: string | null; areaLabel: string | null; options: ContactSourceOption[] }[] =
-    []
+/** 카테고리 안 조직을 지역별로 (API 순서 그대로) */
+function groupByArea(options: ContactSourceOrganizationView[]) {
+  const rows: { area: string | null; areaLabel: string | null; options: ContactSourceOrganizationView[] }[] = []
   for (const option of options) {
     const last = rows[rows.length - 1]
     if (last && last.area === option.area) last.options.push(option)
@@ -69,25 +35,29 @@ function groupByArea(options: ContactSourceOption[]) {
 type ContactSourcePickerProps = {
   source: string | null
   orgId: string | null
-  onChange: (value: ContactSourceValue) => void
+  /** 조직이 있는 카테고리를 열고 조직을 고르기 전에는 source가 null */
+  onChange: (value: { source: string | null; orgId: string | null }) => void
 }
 
 /**
  * 어떤 경로로 연락받았는지 (필수, 비공개). 면접/취업 · 비자 글쓰기 공용.
- * 선택지는 ERP(Contact Sources)에서 관리하고 브랜드별로 다르다.
+ * 카테고리(줄)와 조직(칩)은 ERP(Contact sources)에서 관리하고 브랜드별로 다르다.
+ * 조직이 있는 카테고리는 열어서 조직을 골라야 값이 생긴다.
  */
 export function ContactSourcePicker({ source, orgId, onChange }: ContactSourcePickerProps) {
   const t = useT('reviews')
   const city = useCity()
-  const [options, setOptions] = useState<ContactSourceOption[] | null>(null)
+  const [categories, setCategories] = useState<ContactSourceCategoryView[] | null>(null)
   const [failed, setFailed] = useState(false)
   const [attempt, setAttempt] = useState(0)
+  // 조직을 아직 안 고른 채 연 카테고리 (고르기 전까지 값은 비워 둔다)
+  const [openCategory, setOpenCategory] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
-    fetchContactSourceOptions(city)
+    fetchContactSourceCategories(city)
       .then((next) => {
-        if (!cancelled) setOptions(next)
+        if (!cancelled) setCategories(next)
       })
       .catch(() => {
         if (!cancelled) setFailed(true)
@@ -99,7 +69,7 @@ export function ContactSourcePicker({ source, orgId, onChange }: ContactSourcePi
 
   function retry() {
     setFailed(false)
-    setOptions(null)
+    setCategories(null)
     setAttempt((value) => value + 1)
   }
 
@@ -120,7 +90,7 @@ export function ContactSourcePicker({ source, orgId, onChange }: ContactSourcePi
     )
   }
 
-  if (!options) {
+  if (!categories) {
     return (
       <div className='flex justify-center py-4'>
         <LoadingSpinner size='sm' />
@@ -128,47 +98,51 @@ export function ContactSourcePicker({ source, orgId, onChange }: ContactSourcePi
     )
   }
 
-  const rows = buildRows(options, t)
-  const selectedRow =
-    source === STUDENT_ORG ? STUDENT_ORG : findContactSourceOptionId(options, source, orgId)
-  const studentOrgs = options.filter((option) => option.kind === 'student-org')
+  const stored = normalizeStoredContactSource(source, orgId)
+  const storedCategory = categories.find((cat) => cat.id === stored.source) ?? null
+  // 조직이 있는 카테고리: 저장된 조직, 없으면 (지점 생기기 전 글) 첫 조직
+  const storedOrg = storedCategory?.options.length
+    ? (storedCategory.options.find((org) => org.id === stored.orgId) ?? storedCategory.options[0])
+    : null
+  const selectedCategory = storedCategory ?? categories.find((cat) => cat.id === openCategory) ?? null
+  const rows = categories.map((cat) => ({ id: cat.id, label: cat.title, description: cat.description }))
 
   return (
     <div className='space-y-3'>
       <ChoiceCards
         options={rows}
-        value={selectedRow}
+        value={selectedCategory?.id ?? null}
         onChange={(id) => {
-          if (id === STUDENT_ORG) {
-            onChange({ source: STUDENT_ORG, orgId: source === STUDENT_ORG ? orgId : null })
+          const cat = categories.find((item) => item.id === id)
+          if (!cat) return
+          if (cat.options.length === 0) {
+            setOpenCategory(null)
+            onChange({ source: cat.id, orgId: null })
             return
           }
-          const option = options.find((item) => item.id === id)
-          if (option) onChange({ source: option.source, orgId: option.orgId })
+          if (selectedCategory?.id === cat.id) return
+          // 조직을 고를 때까지 미완료로 둔다
+          setOpenCategory(cat.id)
+          onChange({ source: null, orgId: null })
         }}
       />
-      {source === STUDENT_ORG ? (
-        <div>
-          <p className='mb-2 text-[13px] font-medium text-[var(--foreground)]'>
-            {t('contactSource.studentOrg.question')}
-            <span className='text-[var(--brand)]'> *</span>
-          </p>
-          <div className='space-y-3'>
-            {groupByArea(studentOrgs).map((group) => (
-              <div key={group.area ?? 'all'}>
-                {group.areaLabel ? (
-                  <p className='mb-1.5 text-[12px] font-semibold text-[var(--muted-foreground)]'>
-                    {group.areaLabel}
-                  </p>
-                ) : null}
-                <ChoiceCards
-                  options={group.options.map((option) => ({ id: option.id, label: option.label }))}
-                  value={orgId}
-                  onChange={(nextOrg) => onChange({ source: STUDENT_ORG, orgId: nextOrg })}
-                />
-              </div>
-            ))}
-          </div>
+      {selectedCategory && selectedCategory.options.length > 0 ? (
+        <div className='space-y-3'>
+          {source ? null : (
+            <p className='text-[13px] font-medium text-[var(--brand)]'>{t('contactSource.organizationRequired')}</p>
+          )}
+          {groupByArea(selectedCategory.options).map((group) => (
+            <div key={group.area ?? 'all'}>
+              {group.areaLabel && selectedCategory.options.some((org) => org.area !== group.area) ? (
+                <p className='mb-1.5 text-[12px] font-semibold text-[var(--muted-foreground)]'>{group.areaLabel}</p>
+              ) : null}
+              <ChoiceCards
+                options={group.options.map((org) => ({ id: org.id, label: org.label }))}
+                value={source ? (storedOrg?.id ?? null) : null}
+                onChange={(nextOrg) => onChange({ source: selectedCategory.id, orgId: nextOrg })}
+              />
+            </div>
+          ))}
         </div>
       ) : null}
     </div>

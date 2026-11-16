@@ -6,7 +6,8 @@ import { useCity } from '@hooks/useCity'
 import { getCityCategories } from '@lib/constants/nyc'
 import { useT } from '@lib/i18n/client'
 
-export function BoardHighlightCards() {
+/** Ellieo city home board chips (the classic design; Misaeng has its own home) */
+export function BoardHighlightCardsClassic() {
   const t = useT('community')
   const city = useCity()
   const categories = getCityCategories(city)

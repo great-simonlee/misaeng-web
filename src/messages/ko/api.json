@@ -170,7 +170,8 @@
     "reviewBonusReplaced": "포인트 개편 후에는 이 보너스 대신 운영팀이 후기 포인트를 검수해서 지급해요. ERP의 포인트 검수 화면을 이용해 주세요."
   },
   "postings": {
-    "loadFailed": "공고를 불러오지 못했어요."
+    "loadFailed": "공고를 불러오지 못했어요.",
+    "notFound": "공고를 찾을 수 없어요. 마감됐거나 내려간 공고예요."
   },
   "comments": {
     "bodyRequired": "댓글을 입력해 주세요.",
@@ -272,6 +273,9 @@
     "contentBlocked": "욕설·혐오·성적 괴롭힘 등 허용되지 않는 표현이 있어요. 내용을 고친 뒤 다시 시도해 주세요.",
     "moderation": {
       "hidden": "신고로 숨겨졌거나 볼 수 없는 글이에요."
+    },
+    "marketplace": {
+      "zipRequired": "거래 지역 ZIP 코드 5자리를 입력해 주세요."
     }
   },
   "guest": {
@@ -399,6 +403,14 @@
         "body": "7일 동안 답변이 없었어요."
       },
       "refunded": "{amount}P를 돌려드렸어요."
+    },
+    "marketplace": {
+      "newInquiry": {
+        "title": "새 중고거래 문의 · {listing}"
+      },
+      "message": {
+        "title": "중고거래 · {listing}"
+      }
     }
   },
   "reviewDocs": {
@@ -556,5 +568,9 @@
       "openWeb": "답변 보기",
       "footer": "이 메일은 발신 전용이에요. 답장은 미생 앱이나 웹에서 보내 주세요."
     }
+  },
+  "companies": {
+    "nameInvalid": "회사 이름을 다시 확인해 주세요. (80자 이내, 링크 제외)",
+    "tooMany": "오늘은 회사를 더 등록할 수 없어요. 내일 다시 시도해 주세요."
   }
 }

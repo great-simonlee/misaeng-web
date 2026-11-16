@@ -9,13 +9,13 @@ import '../globals.css'
 export const metadata: Metadata = {
   metadataBase: new URL(BRAND_CONFIG.siteUrl),
   icons: { icon: BRAND_CONFIG.assets.favicon },
-  title: 'Misaeng – Ellieo | Verified Housing for New York City Students & Professionals',
+  title: 'Misaeng & Ellieo | Everyday-Life Platforms for Housing, Roommates, Jobs & Community',
   description:
-    'Official corporate site for Misaeng and Ellieo—next-gen housing platform for New York City. Identity verification, scam prevention, roommate matching. U.S. business expansion.',
+    'Misaeng LLC runs Misaeng (Korean · English) and Ellieo (Vietnamese · English), everyday-life platforms for students and professionals in the U.S.: rentals and New York City real estate brokerage, roommate matching, jobs, visa info, a used-goods marketplace and community.',
   openGraph: {
-    title: 'Misaeng – Ellieo | Verified Housing for New York City Students & Professionals',
+    title: 'Misaeng & Ellieo | Everyday-Life Platforms for Housing, Roommates, Jobs & Community',
     description:
-      'Official corporate site for Misaeng and Ellieo—next-gen housing platform for New York City. Identity verification, scam prevention, roommate matching. U.S. business expansion.',
+      'Misaeng LLC runs Misaeng (Korean · English) and Ellieo (Vietnamese · English), everyday-life platforms for students and professionals in the U.S.: rentals and New York City real estate brokerage, roommate matching, jobs, visa info, a used-goods marketplace and community.',
     url: 'https://misaeng.com',
     siteName: 'Misaeng',
     locale: 'en_US',
@@ -25,15 +25,15 @@ export const metadata: Metadata = {
         url: '/opengraph-image.png',
         width: 1200,
         height: 630,
-        alt: 'Misaeng – Ellieo verified housing platform',
+        alt: 'Misaeng & Ellieo everyday-life platforms',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Misaeng – Ellieo | Verified Housing for New York City Students & Professionals',
+    title: 'Misaeng & Ellieo | Everyday-Life Platforms for Housing, Roommates, Jobs & Community',
     description:
-      'Official corporate site for Misaeng and Ellieo—next-gen housing platform for New York City. Identity verification, scam prevention, roommate matching. U.S. business expansion.',
+      'Misaeng LLC runs Misaeng (Korean · English) and Ellieo (Vietnamese · English), everyday-life platforms for students and professionals in the U.S.: rentals and New York City real estate brokerage, roommate matching, jobs, visa info, a used-goods marketplace and community.',
     images: ['/twitter-image.png'],
   },
 }

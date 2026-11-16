@@ -1,7 +1,7 @@
 import { timingSafeEqual } from 'node:crypto'
 import { NextResponse } from 'next/server'
 
-import { listPublicPostings } from '@lib/supabase/jobPostings.server'
+import { invalidatePublicPostingsCache, listPublicPostings } from '@lib/supabase/jobPostings.server'
 import { notifyUsers } from '@lib/push/notify.server'
 import { sendJobReviewTestPush } from '@lib/erp/notifyJobReview'
 import { sendStaffPush } from '@lib/support/staffPush.server'
@@ -73,7 +73,13 @@ export async function POST(request: Request) {
 
   if (body.type === 'posting') {
     const postingId = String(body.postingId || '').trim()
-    const posting = (await listPublicPostings()).find((p) => p.id === postingId)
+    // The public list is cached for a minute: a posting the ERP approved just now is usually not in it yet, so a
+    // miss reads the list again before giving up (otherwise followers never got the new-posting push).
+    let posting = (await listPublicPostings()).find((p) => p.id === postingId)
+    if (!posting) {
+      invalidatePublicPostingsCache()
+      posting = (await listPublicPostings()).find((p) => p.id === postingId)
+    }
     if (!posting) return NextResponse.json({ sent: false, reason: 'not public' })
     const followers = await listCompanyFollowers(posting.company.id)
     notifyUsers({

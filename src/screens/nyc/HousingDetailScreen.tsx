@@ -690,6 +690,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
               <AppInquiryModal
                 open={appInquiryOpen}
                 onClose={() => setAppInquiryOpen(false)}
+                listingId={listing.id}
                 mailHref={listing.contactEmail ? mailHref : null}
                 onKakao={handleKakaoInquiry}
               />

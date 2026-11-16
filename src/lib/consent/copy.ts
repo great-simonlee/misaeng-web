@@ -22,10 +22,10 @@ export const DEFAULT_POLICY: LegalPolicy = {
   termsChangeType: 'material',
   privacyChangeType: 'material',
   summaryEn:
-    'Please review the Terms of Use and Privacy Policy. These Terms include a binding individual arbitration agreement and class-action waiver.',
+    'We updated the Terms of Use and Privacy Policy for the Marketplace (used-goods trading) in the Misaeng app: Misaeng is not a party to trades, prohibited items, safe-trading rules, and what marketplace data we keep. These Terms include a binding individual arbitration agreement and class-action waiver.',
   summaryKo:
-    '이용약관 및 개인정보처리방침을 확인해 주세요. 본 약관에는 구속력 있는 개별 중재 합의 및 집단소송 포기 조항이 포함되어 있습니다.',
-  publishedAt: '2026-08-30T00:00:00.000Z',
+    '미생 앱의 중고거래에 맞춰 이용약관과 개인정보처리방침이 바뀌었어요. 회사는 거래 당사자가 아니라는 점, 거래 금지 품목, 안전거래 수칙, 중고거래 정보의 보관이 추가되었습니다. 본 약관에는 구속력 있는 개별 중재 합의 및 집단소송 포기 조항이 포함되어 있습니다.',
+  publishedAt: '2026-11-15T00:00:00.000Z',
   publishedBy: 'system',
 }
 

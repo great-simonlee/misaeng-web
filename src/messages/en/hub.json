@@ -107,6 +107,11 @@
       "headline": "The place every student in New York should know",
       "body": "We teamed up with Korean student associations at each school to bring visa, job, food, and event info together in one place. Plus expert connections."
     },
+    "introBoston": {
+      "kicker": "{brand}",
+      "headline": "The place every student in Boston should know",
+      "body": "We teamed up with Korean student associations at each school to bring visa, job, food, and event info together in one place. Plus expert connections."
+    },
     "status": {
       "kicker": "Visa · Status",
       "headline": "Am I doing this right?",
@@ -123,7 +128,7 @@
       "body": "Compare verified listings and roommates whose lifestyle fits yours, all in one place."
     },
     "anonymous": {
-      "kicker": "Anonymous board",
+      "kicker": "Ask & Talk",
       "headline": "The questions you'd rather not put your name on",
       "body": "Visas or relationships, it's easier to be honest when you're anonymous."
     },
@@ -327,5 +332,18 @@
       "latest": "Latest",
       "updated": "updated {date}"
     }
-  }
+  },
+  "appPrompt": {
+    "title": "Misaeng works better in the app",
+    "subtitle": "The community for students and young professionals in the US",
+    "perks": {
+      "alerts": "Get alerts for new postings from companies you follow, comments and messages",
+      "chat": "Chat about housing listings right in the app",
+      "full": "Browse interview reviews and job postings faster"
+    },
+    "downloadIos": "Get it free on the App Store",
+    "downloadAndroid": "Get it free on Google Play",
+    "continueWeb": "No thanks, continue on the web"
+  },
+  "heroCta": "Browse listings"
 }
