@@ -22,6 +22,7 @@ import { getStoredCommunityPost } from '@lib/supabase/community.server'
 import { localizePost } from '@lib/translations/localize.server'
 import { CommunityBoardWipScreen } from '@screens/nyc/CommunityBoardWipScreen'
 import { CommunityDetailScreen } from '@screens/nyc/CommunityDetailScreen'
+import { EllieoMarketDetailScreen } from '@screens/ellieo/market/EllieoMarketDetailScreen'
 import { loadPagePost } from '@lib/seo/content.server'
 import { PER_PAGE_METADATA, pageMetadata, serviceLocale } from '@lib/seo/pageMetadata.server'
 
@@ -122,6 +123,8 @@ export default async function CommunityDetailPage({
     const found = await loadPagePost(id, serviceLocale(locale))
     if (found.exists && !found.post) notFound()
   }
+
+  if (board === 'marketplace' && BRAND_CONFIG.theme === 'ellieo') return <EllieoMarketDetailScreen postId={id} />
 
   const detail = <CommunityDetailScreen boardId={board} title={title} postId={id} />
   // Same screen in the app (misaeng-app AppRouter: review/, status/, food/, anonymous/, roommate/)

@@ -15,6 +15,8 @@ import {
 } from '@lib/constants/nyc'
 import { CommunityBoardWipScreen } from '@screens/nyc/CommunityBoardWipScreen'
 import { CommunityListScreen } from '@screens/nyc/CommunityListScreen'
+import { EllieoMarketListScreen } from '@screens/ellieo/market/EllieoMarketListScreen'
+import { BRAND_CONFIG } from '@lib/brand'
 import { pageMetadata, serviceLocale } from '@lib/seo/pageMetadata.server'
 
 interface CommunityBoardPageProps {
@@ -52,6 +54,8 @@ export default async function CommunityBoardPage({
   if (isCommunityBoardWip(board)) {
     return <CommunityBoardWipScreen boardId={board} title={title} />
   }
+
+  if (board === 'marketplace' && BRAND_CONFIG.theme === 'ellieo') return <EllieoMarketListScreen />
 
   const list = <CommunityListScreen boardId={board} title={title} />
   return isMemberOnlyBoard(board) ? <MemberGate>{list}</MemberGate> : list

@@ -40,7 +40,8 @@ export const NYC_CATEGORIES = [
     id: 'marketplace',
     href: '/marketplace',
     postHref: '/marketplace/new',
-    available: false,
+    // Ellieo has the web marketplace (screens/ellieo/market); Misaeng web keeps "Coming soon"
+    available: BRAND_CONFIG.theme === 'ellieo',
   },
   {
     id: 'status',
@@ -103,9 +104,9 @@ export const NYC_WIP_COMMUNITY_BOARD_IDS = ['marketplace'] as const
 export type NycWipCommunityBoardId =
   (typeof NYC_WIP_COMMUNITY_BOARD_IDS)[number]
 
-export function isCommunityBoardWip(
-  id: string,
-): id is NycWipCommunityBoardId {
+/** Not a type guard: Ellieo has the marketplace, so 'marketplace' can't be narrowed away */
+export function isCommunityBoardWip(id: string): boolean {
+  if (id === 'marketplace' && BRAND_CONFIG.theme === 'ellieo') return false
   return (NYC_WIP_COMMUNITY_BOARD_IDS as readonly string[]).includes(id)
 }
 

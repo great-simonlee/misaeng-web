@@ -12,6 +12,8 @@ import {
 } from '@lib/constants/nyc'
 import { CommunityBoardWipScreen } from '@screens/nyc/CommunityBoardWipScreen'
 import { CommunityNewScreen } from '@screens/nyc/CommunityNewScreen'
+import { EllieoMarketSellScreen } from '@screens/ellieo/market/EllieoMarketSellScreen'
+import { BRAND_CONFIG } from '@lib/brand'
 
 interface CommunityEditPageProps {
   params: Promise<{ locale: string; city: string; board: string; id: string }>
@@ -35,6 +37,8 @@ export default async function CommunityEditPage({
   if (isCommunityBoardWip(board)) {
     return <CommunityBoardWipScreen boardId={board} title={title} />
   }
+
+  if (board === 'marketplace' && BRAND_CONFIG.theme === 'ellieo') return <EllieoMarketSellScreen editPostId={id} />
 
   return (
     <CommunityNewScreen
