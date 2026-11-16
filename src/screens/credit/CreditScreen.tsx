@@ -64,8 +64,8 @@ export function CreditScreen() {
   const comingSoonOptions = COMMUNITY_CREDIT_REDEEM_OPTIONS.filter((o) => o.comingSoon)
 
   return (
-    <div data-ui='doc' className='min-h-screen min-w-0 overflow-x-hidden bg-[#f4f5f7]'>
-      <header data-ui='doc-header' className='border-b border-[var(--border)] bg-white'>
+    <div className='min-h-screen min-w-0 overflow-x-hidden bg-[#f4f5f7]'>
+      <header className='border-b border-[var(--border)] bg-white'>
         <div className='mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8'>
           <p className='text-[11px] font-semibold tracking-[0.2em] text-[var(--muted)]'>
             {t('header.eyebrow', { brand: BRAND_CONFIG.name.toUpperCase() })}
@@ -89,7 +89,6 @@ export function CreditScreen() {
 
       <div className='mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8'>
         <nav
-          data-ui='doc-toc'
           aria-label={t('toc.aria')}
           className='sticky top-14 z-10 -mx-1 rounded-2xl border border-black/[0.06] bg-white/95 px-4 py-3 shadow-sm backdrop-blur-sm sm:top-16 sm:px-5'
         >
@@ -433,7 +432,7 @@ function Section({
   className?: string
 }) {
   return (
-    <section data-ui='doc-section' id={id} className={cn('mt-12 scroll-mt-24', className)}>
+    <section id={id} className={cn('mt-12 scroll-mt-24', className)}>
       <h2 className='text-[1.2rem] font-bold tracking-tight text-[var(--foreground)] sm:text-[1.35rem]'>
         {title}
       </h2>

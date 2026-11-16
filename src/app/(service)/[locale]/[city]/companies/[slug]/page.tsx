@@ -8,6 +8,7 @@ import { getT } from '@lib/i18n/server'
 import { shareMetadata } from '@lib/share/shareMetadata'
 import { getActiveCompanyBySlug } from '@lib/supabase/companies.server'
 import { CompanyDetailScreen } from '@screens/nyc/CompanyDetailScreen'
+import { EllieoCompanyDetailScreen } from '@screens/ellieo/EllieoCompanyDetailScreen'
 
 interface CompanyPageProps {
   params: Promise<{ locale: string; city: string; slug: string }>
@@ -34,7 +35,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
     <>
       <OpenInApp appPath={`company/${slug}`} />
       <MemberGate>
-        <CompanyDetailScreen slug={slug} />
+        {BRAND_CONFIG.theme === 'ellieo' ? <EllieoCompanyDetailScreen slug={slug} /> : <CompanyDetailScreen slug={slug} />}
       </MemberGate>
     </>
   )

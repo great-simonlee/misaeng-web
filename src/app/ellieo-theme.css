@@ -864,80 +864,10 @@
   display: none;
 }
 
-/* =====================================================================
-   Documents (points guide, terms, privacy): big title, TOC as surface chips, sections as cards
-   ===================================================================== */
-[data-brand='ellieo'] [data-ui='doc'] {
-  background: #fff;
-}
 
-[data-brand='ellieo'] [data-ui='doc'] > :is(article, div:not([data-ui='doc-header'])),
-[data-brand='ellieo'] [data-ui='doc-header'] > div {
-  max-width: 40rem;
-}
-
-[data-brand='ellieo'] [data-ui='doc-header'] {
-  border: 0;
-}
-
-[data-brand='ellieo'] [data-ui='doc'] h1 {
-  font-size: clamp(2rem, 1.6rem + 1.6vw, 2.5rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
-}
-
-[data-brand='ellieo'] [data-ui='doc-toc'] {
-  columns: auto;
-  border: 0;
-  box-shadow: none;
-  background: rgb(255 255 255 / 0.94);
-  padding-left: 0;
-  padding-right: 0;
-}
-
-[data-brand='ellieo'] [data-ui='doc-toc'] :is(ul, ol) {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.5rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 0.25rem;
-}
-
-[data-brand='ellieo'] [data-ui='doc-toc'] li {
-  flex-shrink: 0;
-  margin: 0;
-}
-
-[data-brand='ellieo'] [data-ui='doc-toc'] li > span {
-  display: none;
-}
-
-[data-brand='ellieo'] [data-ui='doc-toc'] a {
-  display: inline-flex;
-  height: 2.25rem;
-  align-items: center;
-  border-radius: 999px;
-  background: var(--surface);
-  padding: 0 0.95rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--foreground);
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-[data-brand='ellieo'] [data-ui='doc-section'] {
-  border-radius: 1.5rem;
-  background: #fff;
-  padding: 1.25rem;
-  box-shadow: 0 0 0 1px var(--border), var(--ellieo-card-shadow);
-  --tw-ring-color: transparent;
-}
-
-[data-brand='ellieo'] [data-ui='doc-section'] h2 {
-  font-size: 1.1875rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+/* Room for the pinned post action bar on phones */
+@media (max-width: 1023px) {
+  [data-brand='ellieo'] main:has([data-ui='post-action-bar']) {
+    padding-bottom: 3.5rem;
+  }
 }

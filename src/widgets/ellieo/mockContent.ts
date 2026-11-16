@@ -1,3 +1,4 @@
+import type { PublicPosting } from '@lib/company/postings'
 import type { NycCategoryId } from '@lib/constants/nyc'
 
 /**
@@ -246,4 +247,46 @@ export function getRoommateHighlights(): readonly EllieoRoommatePost[] {
 /** True when the list shown is sample data (labels the section so nobody mistakes it for real partners) */
 export function isMockList(list: readonly unknown[], real: readonly unknown[]): boolean {
   return list.length > 0 && list !== real
+}
+
+/**
+ * Design review only: a sample job posting for /{city}/companies/postings/mock (staging has no postings).
+ * Served only when NEXT_PUBLIC_ELLIEO_MOCK_CONTENT=1 (dev); never in production.
+ */
+export const MOCK_POSTING_ID = 'mock'
+
+export function getMockPosting(): PublicPosting | null {
+  if (!ELLIEO_MOCK_CONTENT) return null
+  return {
+    id: MOCK_POSTING_ID,
+    company: { id: 'mock-co', slug: 'qa-ellieo-test-co', name: '[QA] Ellieo Test Co', logoUrl: null, industry: 'tech' },
+    title: 'Software Engineer Intern, Summer 2027 (Sample)',
+    level: 'intern',
+    jobFunction: 'tech',
+    workArrangement: 'hybrid',
+    regions: ['New York, NY', 'Boston, MA'],
+    summary: {
+      overview: [
+        'Build features used by thousands of students on web and mobile.',
+        'Ship code with a mentor and a small product team every week.',
+        'Present your project to the whole company at the end of the summer.',
+        'Work across the stack: TypeScript, React, Node and Postgres.',
+      ],
+      qualifications: ['Pursuing a BS/MS in Computer Science or a related field', 'Comfortable with one modern programming language'],
+      preferred: [],
+      compensation: null,
+      benefits: [],
+      workType: 'Internship',
+      location: 'New York, NY',
+      applyNotes: [],
+      earlyApply: true,
+      alwaysOpen: false,
+      degree: 'both',
+    },
+    noSponsorship: false,
+    tags: ['intern'],
+    applyBy: null,
+    applyUrl: 'https://example.com/careers',
+    postedAt: Date.UTC(2026, 10, 10),
+  } as PublicPosting
 }

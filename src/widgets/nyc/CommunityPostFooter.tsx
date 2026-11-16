@@ -6,6 +6,8 @@ import { useCity } from '@hooks/useCity'
 import { hrefForCommunityPost } from '@lib/constants/cities'
 import { getCommunityAuthorDisplayName, sanitizeCommunityNickname } from '@lib/community/author'
 import { maskAnonymousDisplayName } from '@lib/community/anonymous'
+import { cn } from '@lib'
+import { BRAND_CONFIG } from '@lib/brand'
 import { useT } from '@lib/i18n/client'
 import { UserAvatar, AuthorBadges } from '@components'
 import type { CommunityPost } from '@/types/nyc'
@@ -14,6 +16,7 @@ import { CommunityPostReportAction } from '@widgets/nyc/CommunityPostReportActio
 import { CommunityBlockAction } from '@widgets/nyc/CommunityBlockAction'
 import { CopyLinkButton } from '@widgets/nyc/CopyLinkButton'
 import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
+import { EllieoPostActionBar } from '@widgets/ellieo/EllieoPostActionBar'
 
 type CommunityPostFooterProps = {
   post: CommunityPost
@@ -42,6 +45,7 @@ export function CommunityPostFooter({
   // 아바타 이니셜은 실제 닉네임으로만 (없거나 탈퇴한 회원이면 기본 프로필 아이콘)
   const avatarName = anonymous || post.authorDeleted ? null : sanitizeCommunityNickname(post.authorNickname, post.authorEmail)
   const photoURL = anonymous ? null : post.authorPhotoURL?.trim() || null
+  const ellieo = BRAND_CONFIG.theme === 'ellieo'
 
   return (
     <div data-ui='post-footer' className='rounded-2xl border border-black/[0.04] bg-[#f7f8fa] px-4 py-3.5 sm:px-5 sm:py-4'>
@@ -96,7 +100,8 @@ export function CommunityPostFooter({
         )}
       </div>
 
-      <div className='mt-3.5 flex flex-wrap items-center gap-2 border-t border-black/[0.05] pt-3.5'>
+      {/* Ellieo phones: the actions move to a slim bar pinned above the tab bar (EllieoPostActionBar) */}
+      <div className={cn('mt-3.5 flex flex-wrap items-center gap-2 border-t border-black/[0.05] pt-3.5', ellieo && 'max-lg:hidden')}>
         <PostLikeButton
           kind='community'
           id={post.id}
@@ -110,6 +115,7 @@ export function CommunityPostFooter({
         />
         <CopyLinkButton variant='pill' />
       </div>
+      {ellieo ? <EllieoPostActionBar post={post} boardId={boardId} loginNext={loginNext} /> : null}
     </div>
   )
 }

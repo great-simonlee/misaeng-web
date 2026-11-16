@@ -8,6 +8,8 @@ import { shareMetadata } from '@lib/share/shareMetadata'
 import { getPublicPosting } from '@lib/supabase/jobPostings.server'
 import { localizePosting } from '@lib/translations/postings'
 import { PostingShareScreen } from '@screens/nyc/PostingShareScreen'
+import { EllieoPostingScreen } from '@screens/ellieo/EllieoPostingScreen'
+import { getMockPosting, MOCK_POSTING_ID } from '@widgets/ellieo/mockContent'
 
 interface PostingPageProps {
   params: Promise<{ locale: string; city: string; id: string }>
@@ -36,11 +38,16 @@ export async function generateMetadata({ params }: PostingPageProps): Promise<Me
 
 export default async function PostingPage({ params }: PostingPageProps) {
   const { locale, id } = await params
-  const posting = await getPublicPosting(id).catch(() => null)
+  // Dev design review: /companies/postings/mock shows a sample (mockContent; never in production)
+  const posting = (id === MOCK_POSTING_ID ? getMockPosting() : null) ?? (await getPublicPosting(id).catch(() => null))
   return (
     <>
       <OpenInApp appPath={`posting/${id}`} />
-      <PostingShareScreen posting={posting ? localizePosting(posting, pageLocale(locale)) : null} />
+      {BRAND_CONFIG.theme === 'ellieo' ? (
+        <EllieoPostingScreen posting={posting ? localizePosting(posting, pageLocale(locale)) : null} />
+      ) : (
+        <PostingShareScreen posting={posting ? localizePosting(posting, pageLocale(locale)) : null} />
+      )}
     </>
   )
 }

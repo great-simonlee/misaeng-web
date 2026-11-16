@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import { CreditScreen } from '@screens/credit/CreditScreen'
+import { EllieoCreditScreen } from '@screens/ellieo/EllieoCreditScreen'
 import { BRAND_CONFIG } from '@lib/brand'
 import { isLocale } from '@lib/i18n/locales'
 import { getT } from '@lib/i18n/server'
@@ -21,5 +22,5 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default function NycCreditPage() {
-  return <CreditScreen />
+  return BRAND_CONFIG.theme === 'ellieo' ? <EllieoCreditScreen /> : <CreditScreen />
 }
