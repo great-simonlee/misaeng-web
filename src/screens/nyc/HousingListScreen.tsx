@@ -431,7 +431,7 @@ export function HousingListScreen() {
       aside={BRAND_CONFIG.theme === 'ellieo' ? <EllieoBoardRail /> : undefined}
     >
       <header data-ui='board-header' className='pt-5 sm:pt-8 lg:pt-10'>
-        <h1 data-ui='board-title' className={byBrand('font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]')}>
+        <h1 data-ui='board-title' className={byBrand('font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] ellieo-tab-title sm:text-[1.75rem] lg:text-[2rem]')}>
           {t('list.title')}
         </h1>
         <p data-ui='board-description' className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>

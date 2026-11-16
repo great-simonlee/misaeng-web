@@ -8,6 +8,7 @@ import { hrefForCommunityPost } from '@lib/constants/cities'
 import { communityBoardKey } from '@lib/constants/nyc'
 import {
   formatRoommateBudget,
+  formatRoommateDateShort,
   getRoommateFormConfigText,
   getRoommateLookingForLabel,
   getRoommateLookingForStyle,
@@ -17,6 +18,7 @@ import {
 } from '@lib/community/roommate'
 import { useFormat, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
+import { BRAND_CONFIG } from '@lib/brand'
 import type { CommunityPost } from '@/types/nyc'
 import { BoardMetaChip, BoardSurface } from '@widgets/nyc/BoardPageShell'
 import { CommunityPostFooter } from '@widgets/nyc/CommunityPostFooter'
@@ -84,7 +86,12 @@ export function RoommateDetailContent({
           : post.roommateMoveInDate
             ? (formText?.moveInStartLabel ?? t('roommate.detail.stay'))
             : (formText?.moveInEndLabel ?? t('roommate.detail.stay')),
-      value: dateLine,
+      // Ellieo: the label already says "Available from" / "Move-out date", so a single date shows as just the date
+      // (not "Available from · From 12/1")
+      value:
+        BRAND_CONFIG.theme === 'ellieo' && !(post.roommateMoveInDate && post.roommateMoveOutDate)
+          ? (formatRoommateDateShort(format, post.roommateMoveInDate || post.roommateMoveOutDate) ?? dateLine)
+          : dateLine,
     },
     location && {
       label:

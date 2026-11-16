@@ -8,20 +8,43 @@ import { cn } from '@lib'
 import { useT } from '@lib/i18n/client'
 import { ELLIEO_BOARDS } from '@widgets/ellieo/nav'
 
+/** Root list pages of the bottom-tab destinations (Housing · Visa · Jobs incl. its sub-tabs) */
+const TAB_PAGES = {
+  housing: ['/housing'],
+  visa: ['/status', '/cpt-opt', '/visa', '/green-card'],
+  jobs: ['/job-review', '/companies', '/companies/postings'],
+} as const
+
+export type EllieoTabPage = keyof typeof TAB_PAGES
+
+/**
+ * Which bottom-tab page this is (null elsewhere). Those pages show their title in the top bar on phones and
+ * skip the board chip row, which would only repeat the tab bar (user 11-16).
+ */
+export function useEllieoTabPage(): EllieoTabPage | null {
+  const pathname = usePathname()
+  const href = useCityPath()
+  for (const [key, paths] of Object.entries(TAB_PAGES) as [EllieoTabPage, readonly string[]][]) {
+    if (paths.some((path) => pathname === href(path))) return key
+  }
+  return null
+}
+
 /**
  * Board chips (line icon + label) under the top bar (home, board lists, housing list). Scrolls sideways on phones.
- * Renders nothing on detail, write, account and legal pages.
+ * Renders nothing on detail, write, account and legal pages, nor on the bottom-tab pages (Housing · Visa · Jobs).
  */
 export function EllieoBoardChips() {
   const pathname = usePathname()
   const href = useCityPath()
   const t = useT('nav')
+  const tabPage = useEllieoTabPage()
   const home = href()
   const boards = ELLIEO_BOARDS.filter((board) => board.available)
   const boardPaths = boards.map((board) => href(board.path))
   const onHome = pathname === home
   const onBoardList = boardPaths.includes(pathname)
-  if (!onHome && !onBoardList) return null
+  if (tabPage || (!onHome && !onBoardList)) return null
 
   return (
     <nav aria-label={t('ellieo.boardsAria')} className='w-full border-b border-[var(--border)] bg-white'>
