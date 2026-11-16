@@ -58,6 +58,7 @@ export function EllieoNavbar() {
   const [accountOpen, setAccountOpen] = useState(false)
   const accountRef = useRef<HTMLDivElement>(null)
   const tabPage = useEllieoTabPage()
+  const [tabBarCollapsed, setTabBarCollapsed] = useCollapseOnScroll()
   const cityPillRef = useRef<HTMLButtonElement>(null)
 
   const [navPath, setNavPath] = useState(pathname)
@@ -66,6 +67,7 @@ export function EllieoNavbar() {
     setAccountOpen(false)
     setCityOpen(false)
     setSheet(null)
+    setTabBarCollapsed(false)
   }
 
   useEffect(() => {
@@ -122,6 +124,10 @@ export function EllieoNavbar() {
     { key: 'visa', label: t('ellieo.short.status'), icon: PassportIcon, href: visaHref, active: visaActive, fillActive: false },
     { key: 'jobs', label: t('ellieo.tabs.jobs'), icon: BriefcaseIcon, href: jobsHref, active: isActive(jobsHref) || isActive(companiesHref), fillActive: false },
   ] as const
+  // Mini pill (collapsed tab bar): the current tab's icon, Home when no tab is active
+  const linkTabs = tabs.filter((tab) => 'href' in tab)
+  const miniTab = linkTabs.find((tab) => tab.active) ?? linkTabs[0]
+  const MiniTabIcon = miniTab.icon
   // Housing / Visa / Jobs pages: page title instead of the logo on phones and tablets (tab bar already says where you are)
   const pageTitle = tabPage ? tabs.find((tab) => tab.key === tabPage && 'label' in tab) : null
 
@@ -248,7 +254,15 @@ export function EllieoNavbar() {
       {/* Bottom tab bar: every width (a floating pill from 1024px) */}
       <nav
         aria-label={t('menuAria', { city: cityInfo.shortLabel })}
-        className='fixed inset-x-0 bottom-0 z-[10000] border-t border-[var(--border)] bg-white pb-[env(safe-area-inset-bottom)] lg:inset-x-auto lg:bottom-4 lg:left-1/2 lg:w-[27.5rem] lg:-translate-x-1/2 lg:rounded-full lg:border lg:pb-0 lg:shadow-[var(--shadow-lg)]'
+        aria-hidden={tabBarCollapsed || undefined}
+        inert={tabBarCollapsed || undefined}
+        className={cn(
+          'fixed inset-x-0 bottom-0 z-[10000] border-t border-[var(--border)] bg-white pb-[env(safe-area-inset-bottom)]',
+          'transition-[transform,opacity] duration-[350ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-opacity motion-reduce:duration-200',
+          tabBarCollapsed &&
+            'max-lg:pointer-events-none max-lg:translate-y-full max-lg:opacity-0 max-lg:motion-reduce:translate-y-0',
+          'lg:inset-x-auto lg:bottom-4 lg:left-1/2 lg:w-[27.5rem] lg:-translate-x-1/2 lg:rounded-full lg:border lg:pb-0 lg:shadow-[var(--shadow-lg)]',
+        )}
       >
         <ul className='mx-auto grid h-[4.25rem] max-w-[30rem] grid-cols-5 items-center px-2 lg:h-16'>
           {tabs.map((tab) => {
@@ -292,6 +306,38 @@ export function EllieoNavbar() {
           })}
         </ul>
       </nav>
+
+      {/* Phones/tablets, scrolling down: the tab bar shrinks to one mini pill (current tab + post), user 11-16 */}
+      <div
+        aria-hidden={!tabBarCollapsed || undefined}
+        inert={!tabBarCollapsed || undefined}
+        className={cn(
+          'fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-1/2 z-[10000] -ml-[4.25rem] flex h-[3.25rem] w-[8.5rem] items-center justify-center gap-2.5 rounded-full border border-[#E6EAF5] bg-white px-1.5 shadow-[0_10px_28px_-12px_rgb(20_18_31/0.35)] lg:hidden',
+          'transition-[transform,opacity] duration-[350ms] ease-[cubic-bezier(0.34,1.36,0.64,1)] motion-reduce:transition-opacity motion-reduce:duration-200',
+          tabBarCollapsed
+            ? 'translate-y-0 scale-100 opacity-100'
+            : 'pointer-events-none translate-y-4 scale-90 opacity-0 motion-reduce:translate-y-0 motion-reduce:scale-100',
+        )}
+      >
+        <button
+          type='button'
+          onClick={() => setTabBarCollapsed(false)}
+          aria-label={t('menuAria', { city: cityInfo.shortLabel })}
+          className='inline-flex size-10 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)] touch-manipulation transition active:scale-95'
+        >
+          <MiniTabIcon className='size-[22px]' strokeWidth={2.25} fill={miniTab.fillActive ? 'currentColor' : 'none'} />
+        </button>
+        <span aria-hidden className='h-6 w-px bg-[var(--border)]' />
+        <button
+          type='button'
+          onClick={() => setSheet('compose')}
+          aria-label={t('ellieo.tabs.post')}
+          aria-expanded={sheet === 'compose'}
+          className='inline-flex size-10 items-center justify-center rounded-full bg-[var(--brand)] text-white touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-95'
+        >
+          <PlusIcon className='size-5' strokeWidth={2.5} />
+        </button>
+      </div>
 
       <EllieoSheet
         open={sheet === 'compose'}
@@ -350,4 +396,43 @@ export function EllieoAvatar({ photoURL, name, size = 40 }: { photoURL?: string 
       )}
     </span>
   )
+}
+
+/**
+ * Phones/tablets: collapse the bottom tab bar into the mini pill while scrolling down, expand when scrolling up
+ * (> 8px) or near the top. Passive scroll listener + one rAF per frame; never collapses from 1024px up.
+ */
+function useCollapseOnScroll() {
+  const [collapsed, setCollapsed] = useState(false)
+
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1024px)')
+    let lastY = window.scrollY
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const y = window.scrollY
+      const delta = y - lastY
+      if (desktop.matches || y < 40) {
+        setCollapsed(false)
+        lastY = y
+      } else if (delta > 4) {
+        setCollapsed(true)
+        lastY = y
+      } else if (delta < -8) {
+        setCollapsed(false)
+        lastY = y
+      }
+    }
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(update)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (frame) window.cancelAnimationFrame(frame)
+    }
+  }, [])
+
+  return [collapsed, setCollapsed] as const
 }
