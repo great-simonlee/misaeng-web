@@ -8,6 +8,7 @@ import { cn } from '@lib'
 import {
   askMarketSeller,
   fetchMarketThread,
+  MarketRequestError,
   replyMarketThread,
   reportMarketThread,
   type MarketMessage,
@@ -106,6 +107,11 @@ export function MarketThread({ threadId }: { threadId: string }) {
       await reportMarketThread(threadId, reason)
       toast.success(t('ellieoMarket.ask.reported'))
     } catch (err) {
+      // Already reported (409 duplicate): same answer as a first report
+      if (err instanceof MarketRequestError && err.code === 'duplicate') {
+        toast.success(t('ellieoMarket.ask.reported'))
+        return
+      }
       toast.error(err instanceof Error ? err.message : t('ellieoMarket.form.errors.generic'))
     }
   }

@@ -223,13 +223,14 @@ function BuyerPanel({ post, signedIn }: { post: CommunityPost; signedIn: boolean
   const t = useT('community')
   const city = useCity()
   const href = useCityPath()
-  const [threads, setThreads] = useState<MarketThreadSummary[] | null>(signedIn ? null : [])
+  const [threads, setThreads] = useState<MarketThreadSummary[] | 'error' | null>(signedIn ? null : [])
 
   const loadThreads = useCallback(() => {
     if (!signedIn) return
+    setThreads(null)
     fetchMarketThreads('buying', post.id)
       .then(setThreads)
-      .catch(() => setThreads([]))
+      .catch(() => setThreads('error'))
   }, [post.id, signedIn])
 
   useEffect(() => {
@@ -250,6 +251,8 @@ function BuyerPanel({ post, signedIn }: { post: CommunityPost; signedIn: boolean
         <div className='flex justify-center py-6'>
           <EllieoDots />
         </div>
+      ) : threads === 'error' ? (
+        <LoadFailed onRetry={loadThreads} />
       ) : threads.length > 0 ? (
         <div className='mt-3'>
           <MarketThread threadId={threads[0].id} />
@@ -269,15 +272,20 @@ function OwnerPanel({ post, onChange }: { post: CommunityPost; onChange: (post: 
   const router = useRouter()
   const toast = useToast()
   const [busy, setBusy] = useState(false)
-  const [threads, setThreads] = useState<MarketThreadSummary[] | null>(null)
+  const [threads, setThreads] = useState<MarketThreadSummary[] | 'error' | null>(null)
   const [openId, setOpenId] = useState<string | null>(null)
   const format = useFormat()
 
-  useEffect(() => {
+  const loadThreads = useCallback(() => {
+    setThreads(null)
     fetchMarketThreads('selling', post.id)
       .then(setThreads)
-      .catch(() => setThreads([]))
+      .catch(() => setThreads('error'))
   }, [post.id])
+
+  useEffect(() => {
+    loadThreads()
+  }, [loadThreads])
 
   const changeStatus = async (status: MarketStatus) => {
     if (busy || status === (post.marketStatus ?? 'selling')) return
@@ -354,6 +362,8 @@ function OwnerPanel({ post, onChange }: { post: CommunityPost; onChange: (post: 
           <div className='flex justify-center py-6'>
             <EllieoDots />
           </div>
+        ) : threads === 'error' ? (
+          <LoadFailed onRetry={loadThreads} />
         ) : threads.length === 0 ? (
           <p className='mt-2 text-[14px] text-[var(--muted-foreground)]'>{t('ellieoMarket.ask.noThreads')}</p>
         ) : (
@@ -362,7 +372,13 @@ function OwnerPanel({ post, onChange }: { post: CommunityPost; onChange: (post: 
               <li key={thread.id} className='py-2'>
                 <button
                   type='button'
-                  onClick={() => setOpenId((id) => (id === thread.id ? null : thread.id))}
+                  onClick={() => {
+                    setOpenId((id) => (id === thread.id ? null : thread.id))
+                    // Opening the thread marks it read on the server; clear the badge here too
+                    setThreads((prev) =>
+                      Array.isArray(prev) ? prev.map((item) => (item.id === thread.id ? { ...item, unread: 0 } : item)) : prev,
+                    )
+                  }}
                   aria-expanded={openId === thread.id}
                   className='flex w-full items-center gap-3 py-1.5 text-left'
                 >
@@ -392,5 +408,21 @@ function OwnerPanel({ post, onChange }: { post: CommunityPost; onChange: (post: 
         )}
       </section>
     </>
+  )
+}
+
+function LoadFailed({ onRetry }: { onRetry: () => void }) {
+  const t = useT('community')
+  return (
+    <div role='alert' className='mt-3 flex items-center justify-between gap-3 rounded-[1rem] bg-[#fdecef] px-4 py-3'>
+      <p className='text-[14px] font-medium text-[var(--ellieo-danger)]'>{t('ellieoMarket.ask.loadFailed')}</p>
+      <button
+        type='button'
+        onClick={onRetry}
+        className='h-9 shrink-0 rounded-full bg-white px-4 text-[14px] font-semibold text-[var(--foreground)] shadow-[0_0_0_1px_var(--border)]'
+      >
+        {t('ellieoMarket.ask.retry')}
+      </button>
+    </div>
   )
 }

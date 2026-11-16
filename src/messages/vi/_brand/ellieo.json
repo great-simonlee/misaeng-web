@@ -95,7 +95,9 @@
         "reported": "Cảm ơn bạn — đội ngũ sẽ xem xét cuộc trò chuyện này.",
         "reportReason": "Vì sao bạn báo cáo cuộc trò chuyện này?",
         "open": "Mở",
-        "hide": "Ẩn"
+        "hide": "Ẩn",
+        "loadFailed": "Không tải được các cuộc trò chuyện.",
+        "retry": "Thử lại"
       },
       "form": {
         "newTitle": "Đăng bán",

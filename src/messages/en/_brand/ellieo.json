@@ -95,7 +95,9 @@
         "reported": "Thanks — our team will review this conversation.",
         "reportReason": "Why are you reporting this conversation?",
         "open": "Open",
-        "hide": "Hide"
+        "hide": "Hide",
+        "loadFailed": "We couldn't load the conversations.",
+        "retry": "Try again"
       },
       "form": {
         "newTitle": "Sell an item",
