@@ -25,3 +25,4 @@ create index if not exists visa_news_published_idx on public.visa_news (status, 
 
 alter table public.visa_news enable row level security;
 -- No policies: only the service role (misaeng-web, ellieo-erp) reads or writes.
+grant select, insert, update, delete on public.visa_news to service_role;

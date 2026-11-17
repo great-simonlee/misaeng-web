@@ -15,3 +15,4 @@ create table if not exists public.visa_bulletin (
 
 alter table public.visa_bulletin enable row level security;
 -- No policies: only the service role (misaeng-web, ellieo-erp) reads or writes.
+grant select, insert, update, delete on public.visa_bulletin to service_role;
