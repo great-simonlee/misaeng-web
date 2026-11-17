@@ -1,4 +1,5 @@
-import type { CommunityPost } from '@/types/nyc'
+import type { CommunityPost, FoodCategoryId } from '@/types/nyc'
+import { foodCategoriesOf } from '@lib/community/food'
 
 /*
  * 커뮤니티 목록 페이지 나누기 (앱이 ?limit= 을 보낼 때만, src/app/api/community/route.ts).
@@ -103,7 +104,10 @@ export function matchesListFilters(post: CommunityPost, board: string | undefine
     if (filters.category === 'free') {
       if ((post as { price?: number | null }).price !== 0) return false
     } else if (filters.category && post.marketCategory !== filters.category) return false
-  } else if (filters.category && post.foodCategory !== filters.category) return false
+  } else if (
+    filters.category &&
+    !foodCategoriesOf(post).includes(filters.category as FoodCategoryId)
+  ) return false
   if (filters.active && post.marketStatus === 'sold') return false
   if (filters.cuisine && cuisineIdOf(post) !== filters.cuisine) return false
   if (filters.type) {

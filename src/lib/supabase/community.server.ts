@@ -2,6 +2,7 @@ import { pickTranslationFields } from '@lib/translations/content'
 import { ApiMessageError } from '@lib/i18n/apiError'
 import {
   normalizeFoodCategory,
+  normalizeFoodCategories,
   normalizeFoodGalleryPhotos,
   normalizeFoodMenuItems,
   normalizeTipIncluded,
@@ -194,6 +195,7 @@ function normalizeCommunityPost(raw: unknown): CommunityPost | null {
     tipIncluded: normalizeTipIncluded(data.tipIncluded),
     waitMinutes: normalizeWaitMinutes(data.waitMinutes),
     foodCategory: normalizeFoodCategory(data.foodCategory),
+    foodCategories: normalizeFoodCategories(data.foodCategories, data.foodCategory),
     menuItems: normalizeFoodMenuItems(data.menuItems),
     galleryPhotos: normalizeFoodGalleryPhotos(data.galleryPhotos),
     placeId:

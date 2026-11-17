@@ -41,6 +41,7 @@ import {
 import {
   COMMUNITY_BODY_MAX,
   isFoodCategoryId,
+  normalizeFoodCategories,
   normalizeFoodGalleryPhotos,
   normalizeFoodMenuItems,
   normalizePartySize,
@@ -110,6 +111,7 @@ type UpdateBody = {
   tipIncluded?: boolean | null
   waitMinutes?: number | null
   foodCategory?: FoodCategoryId | null
+  foodCategories?: FoodCategoryId[] | null
   menuItems?: FoodMenuItem[] | null
   galleryPhotos?: FoodGalleryPhoto[] | null
   placeId?: string | null
@@ -358,6 +360,14 @@ export async function PATCH(request: Request, context: RouteContext) {
       ? body.foodCategory
       : existing.foodCategory
     : null
+  // 복수 카테고리: 보내면 그대로, 안 보내면(구버전 앱·웹) primary가 같을 때만 기존 목록 유지
+  const foodCategories = isFood
+    ? Array.isArray(body.foodCategories)
+      ? normalizeFoodCategories(body.foodCategories, foodCategory)
+      : foodCategory === existing.foodCategory
+        ? normalizeFoodCategories(existing.foodCategories, foodCategory)
+        : normalizeFoodCategories(null, foodCategory)
+    : []
 
   const cptOptType = isCptOpt
     ? isCptOptTypeId(body.cptOptType)
@@ -606,6 +616,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     tipIncluded: isFood ? tipIncluded : null,
     waitMinutes: isFood ? waitMinutes : null,
     foodCategory,
+    foodCategories,
     menuItems,
     galleryPhotos,
     placeId: isFood ? placeId : null,

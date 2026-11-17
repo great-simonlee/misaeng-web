@@ -13,7 +13,7 @@ import {
 import {
   formatFoodPartySpend,
   formatFoodWait,
-  getFoodCategory,
+  foodCategoriesOf,
   getFoodCuisineLabel,
   normalizeFoodCuisine,
   resolveCommunityThumbnail,
@@ -110,7 +110,7 @@ function FoodListingCard({
   const postHref = usePostHref(post)
   const anonymous = isAnonymousBoard(boardId) && post.showNickname !== true
   const thumbnail = resolveCommunityThumbnail(post)
-  const foodCategory = getFoodCategory(post.foodCategory)
+  const foodCategoryIds = foodCategoriesOf(post)
   const cuisineLabel = getFoodCuisineLabel(
     normalizeFoodCuisine(post.detail),
     tFood,
@@ -161,14 +161,17 @@ function FoodListingCard({
               {t('card.noPhoto')}
             </div>
           )}
-          {foodCategory ? (
-            <div className='absolute left-2.5 top-2.5'>
-              <FoodCategoryBadge
-                categoryId={foodCategory.id}
-                size='sm'
-                variant='solid'
-                className='shadow-[0_2px_8px_rgba(15,23,42,0.12)]'
-              />
+          {foodCategoryIds.length > 0 ? (
+            <div className='absolute left-2.5 top-2.5 flex gap-1'>
+              {foodCategoryIds.map((id) => (
+                <FoodCategoryBadge
+                  key={id}
+                  categoryId={id}
+                  size='sm'
+                  variant='solid'
+                  className='shadow-[0_2px_8px_rgba(15,23,42,0.12)]'
+                />
+              ))}
             </div>
           ) : null}
           <div className='absolute right-2.5 top-2.5 z-10'>

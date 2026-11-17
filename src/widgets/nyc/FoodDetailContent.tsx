@@ -10,6 +10,7 @@ import {
   formatUsd,
   getFoodCuisineLabel,
   getFoodMenuName,
+  foodCategoriesOf,
 } from '@lib/community/food'
 import { useFormat, useT } from '@lib/i18n/client'
 import { resolveFoodPlacePoint } from '@lib/community/foodMap'
@@ -140,11 +141,9 @@ export function FoodDetailContent({
 
       <div className='mt-4 px-1 sm:mt-6 sm:px-0'>
         <div className='flex flex-wrap items-center gap-1.5'>
-          <FoodCategoryBadge
-            categoryId={post.foodCategory}
-            variant='soft'
-            size='md'
-          />
+          {foodCategoriesOf(post).map((id) => (
+            <FoodCategoryBadge key={id} categoryId={id} variant='soft' size='md' />
+          ))}
           {cuisineLabel ? (
             <span className='inline-flex h-7 items-center rounded-full bg-[#f4f5f7] px-2.5 text-[12px] font-semibold leading-none tracking-tight text-[#4b5563] ring-1 ring-black/[0.05]'>
               {cuisineLabel}

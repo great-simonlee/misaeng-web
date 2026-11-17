@@ -55,6 +55,7 @@ import {
   getFoodCuisineLabel,
   normalizeFoodCuisine,
   type FoodCuisineId,
+  foodCategoriesOf,
 } from '@lib/community/food'
 import {
   communityBoardKey,
@@ -361,7 +362,7 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
     const q = query.trim().toLowerCase()
     let next = posts
     if (isFoodBoard && foodCategory !== 'all') {
-      next = next.filter((post) => post.foodCategory === foodCategory)
+      next = next.filter((post) => foodCategoriesOf(post).includes(foodCategory))
     }
     if (isFoodBoard && foodCuisine !== 'all') {
       next = next.filter((post) => normalizeFoodCuisine(post.detail) === foodCuisine)
@@ -457,7 +458,7 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
     for (const post of filteredPosts) byId.set(post.id, post)
     let merged = Array.from(byId.values())
     if (foodCategory !== 'all') {
-      merged = merged.filter((post) => post.foodCategory === foodCategory)
+      merged = merged.filter((post) => foodCategoriesOf(post).includes(foodCategory))
     }
     if (foodCuisine !== 'all') {
       merged = merged.filter((post) => normalizeFoodCuisine(post.detail) === foodCuisine)

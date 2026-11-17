@@ -373,6 +373,8 @@ export interface CommunityPost extends TranslationFields {
   waitMinutes: number | null
   /** 맛집: 맛집 | 가성비 | 느좋 | 카공 */
   foodCategory: FoodCategoryId | null
+  /** 맛집: 카테고리 1~2개 (첫 번째 = foodCategory). 1.0.7 이전 글에는 없음 */
+  foodCategories?: FoodCategoryId[]
   /** 맛집: 메뉴 사진 + 이름 + 한 줄 평 */
   menuItems: FoodMenuItem[]
   /** 맛집: 가게 내부·분위기 등 추가 사진 */

@@ -122,6 +122,35 @@ export function normalizeFoodCategory(raw: unknown): FoodCategoryId | null {
   return isFoodCategoryId(value) ? value : null
 }
 
+/** 맛집 카테고리 최대 선택 수 (1.0.7부터 복수 선택) */
+export const FOOD_CATEGORY_MAX = 2
+
+/**
+ * 맛집 카테고리 목록 — foodCategories(1.0.7+)가 있으면 그것, 없으면 [foodCategory].
+ * 중복·잘못된 값 제거, 최대 2개, primary(foodCategory)가 항상 첫 번째.
+ */
+export function normalizeFoodCategories(raw: unknown, primary?: unknown): FoodCategoryId[] {
+  const out: FoodCategoryId[] = []
+  const first = normalizeFoodCategory(primary)
+  if (first) out.push(first)
+  if (Array.isArray(raw)) {
+    for (const item of raw) {
+      const id = normalizeFoodCategory(item)
+      if (id && !out.includes(id)) out.push(id)
+    }
+  }
+  return out.slice(0, FOOD_CATEGORY_MAX)
+}
+
+/** 글의 맛집 카테고리 (구버전 글은 foodCategory 하나) */
+export function foodCategoriesOf(post: {
+  foodCategory?: FoodCategoryId | null
+  foodCategories?: FoodCategoryId[] | null
+}): FoodCategoryId[] {
+  if (Array.isArray(post.foodCategories) && post.foodCategories.length > 0) return post.foodCategories
+  return post.foodCategory ? [post.foodCategory] : []
+}
+
 /** 맛집: 음식 종류 (브런치·한식 등) */
 export type FoodCuisineId =
   | 'brunch'
@@ -201,7 +230,7 @@ export const FOOD_WAIT_MIN = 0
 export const FOOD_WAIT_MAX = 300
 export const FOOD_GALLERY_MAX = 4
 export const FOOD_MENU_MAX = 8
-export const FOOD_MENU_NAME_MAX = 20
+export const FOOD_MENU_NAME_MAX = 40
 export const FOOD_MENU_CAPTION_MAX = 120
 
 export type FoodCarouselSlide = {

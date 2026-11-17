@@ -75,6 +75,7 @@ import { anonBadgeKindFor, isHeldPost } from '@lib/community/heldPosts'
 import {
   COMMUNITY_BODY_MAX,
   isFoodCategoryId,
+  normalizeFoodCategories,
   normalizeFoodGalleryPhotos,
   normalizeFoodMenuItems,
   normalizePartySize,
@@ -273,6 +274,7 @@ type CreateBody = {
   tipIncluded?: boolean | null
   waitMinutes?: number | null
   foodCategory?: FoodCategoryId | null
+  foodCategories?: FoodCategoryId[] | null
   menuItems?: FoodMenuItem[] | null
   galleryPhotos?: FoodGalleryPhoto[] | null
   placeId?: string | null
@@ -742,6 +744,7 @@ export async function POST(request: Request) {
     tipIncluded: isFood ? tipIncluded : null,
     waitMinutes: isFood ? waitMinutes : null,
     foodCategory: isFood ? body!.foodCategory! : null,
+    foodCategories: isFood ? normalizeFoodCategories(body?.foodCategories, body?.foodCategory) : [],
     menuItems,
     galleryPhotos,
     placeId: isFood ? placeId : null,
