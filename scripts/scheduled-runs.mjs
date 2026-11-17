@@ -1,16 +1,17 @@
 #!/usr/bin/env node
 /**
  * Scheduled ERP runs (owner, 2026-11-17), driven from the misaeng.com server's crontab:
- *   postings   Mon / Wed / Fri — starts 10:00 New York time, app push at 11:00
- *   visa-news  Mon / Wed / Fri — starts 12:30 New York time, app push at 13:00
+ *   postings   Mon–Fri — starts 10:00 New York time, app push at 11:00
+ *   visa-news  Mon–Fri — starts 12:30 New York time; app push at 13:00 on Mon / Fri only (other days publish without a
+ *              push, and the next push includes what they published)
  * The work itself is in ellieo-erp (lib/scheduledRuns.js): this script starts today's run and calls its next step
  * until it is done, waiting what the ERP asks between steps (5 s between careers-site / Google requests, 30 s while a
  * Claude batch is running). Nothing new → the ERP sends no push.
  *
  * Crontab (server clock is UTC; the script itself checks New York time, so DST needs no edit). The minute field
  * below is written `*\/15` so it does not end this comment; in the crontab drop the backslash:
- *   *\/15 13-19 * * 1,3,5 cd ~/misaeng-web-v2 && flock -n /tmp/misaeng-postings.lock node scripts/scheduled-runs.mjs postings >> ~/scheduled-runs.log 2>&1
- *   *\/15 16-20 * * 1,3,5 cd ~/misaeng-web-v2 && flock -n /tmp/misaeng-visa-news.lock node scripts/scheduled-runs.mjs visa-news >> ~/scheduled-runs.log 2>&1
+ *   *\/15 13-19 * * 1-5 cd ~/misaeng-web-v2 && flock -n /tmp/misaeng-postings.lock node scripts/scheduled-runs.mjs postings >> ~/scheduled-runs.log 2>&1
+ *   *\/15 16-21 * * 1-5 cd ~/misaeng-web-v2 && flock -n /tmp/misaeng-visa-news.lock node scripts/scheduled-runs.mjs visa-news >> ~/scheduled-runs.log 2>&1
  * A call outside the job's window does nothing; a call while today's run is open picks it up again (e.g. after a
  * reboot); a call after today's run ended does nothing.
  *
@@ -27,10 +28,10 @@
 import { existsSync, readFileSync } from 'node:fs'
 
 const JOBS = {
-  postings: { start: [10, 0], notify: [11, 0], until: [14, 0] },
-  'visa-news': { start: [12, 30], notify: [13, 0], until: [16, 0] },
+  postings: { start: [10, 0], notify: [11, 0], until: [14, 0], pushDays: null },
+  'visa-news': { start: [12, 30], notify: [13, 0], until: [16, 0], pushDays: new Set(['Mon', 'Fri']) },
 }
-const DAYS = new Set(['Mon', 'Wed', 'Fri'])
+const DAYS = new Set(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
 const MAX_RUN_MS = 3.5 * 3_600_000
 const MAX_FAILURES = 10
 
@@ -112,9 +113,15 @@ async function main() {
   if (!now && !anyDay && (!DAYS.has(ny.day) || ny.minutes < toMin(plan.start) || ny.minutes >= toMin(plan.until))) return
 
   const notifyAt = now ? new Date().toISOString() : newYorkTime(ny.date, plan.notify)
-  const started = await call(base, secret, 'POST', { action: 'start', job, notifyAt })
+  // --now / --any-day test runs always push
+  const push = now || anyDay || !plan.pushDays || plan.pushDays.has(ny.day)
+  const started = await call(base, secret, 'POST', { action: 'start', job, notifyAt, push })
   if (!started.run) return // today's run already ended
-  log(started.started ? `started ${started.run.id}, push not before ${notifyAt}` : `continuing ${started.run.id} (${started.run.phase})`)
+  log(
+    started.started
+      ? `started ${started.run.id}, ${push ? `push not before ${notifyAt}` : 'no push today'}`
+      : `continuing ${started.run.id} (${started.run.phase})`,
+  )
 
   const begin = Date.now()
   let failures = 0
