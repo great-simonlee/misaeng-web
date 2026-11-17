@@ -23,6 +23,7 @@
  *   --any-day       ignore the day / time window but keep today's push time (a test run on another day; started after
  *                   the push time it pushes right away)
  *   --from=YYYY-MM-DD  do nothing before that New York date (crontab: start the schedule on a later day)
+ *   --again         start a new run even if one already ran today (with --now / --any-day, for a test)
  */
 
 import { existsSync, readFileSync } from 'node:fs'
@@ -38,6 +39,7 @@ const MAX_FAILURES = 10
 const job = process.argv[2]
 const now = process.argv.includes('--now')
 const anyDay = process.argv.includes('--any-day')
+const again = process.argv.includes('--again')
 const from = process.argv.find((a) => a.startsWith('--from='))?.slice(7) || ''
 if (!JOBS[job]) {
   console.error(`Usage: node scripts/scheduled-runs.mjs <${Object.keys(JOBS).join('|')}> [--now]`)
@@ -115,7 +117,7 @@ async function main() {
   const notifyAt = now ? new Date().toISOString() : newYorkTime(ny.date, plan.notify)
   // --now / --any-day test runs always push
   const push = now || anyDay || !plan.pushDays || plan.pushDays.has(ny.day)
-  const started = await call(base, secret, 'POST', { action: 'start', job, notifyAt, push })
+  const started = await call(base, secret, 'POST', { action: 'start', job, notifyAt, push, force: again })
   if (!started.run) return // today's run already ended
   log(
     started.started
