@@ -76,12 +76,19 @@ export function freshSummaryTranslations(
   return out
 }
 
+/**
+ * 베트남어 공고 번역은 잠시 멈췄다 (owner, 2026-11-17): Ellieo(vi)는 사용자가 늘 때까지 영어 요약을 보여 준다.
+ * 저장된 베트남어 번역은 지우지 않았다 — 다시 쓰려면 여기서 vi 를 빼고 ERP postingTranslations.mjs 의 vi 를 켠다.
+ */
+const POSTING_LOCALE_FALLBACK: Partial<Record<Locale, Locale>> = { vi: 'en' }
+
 /** 보는 언어의 요약으로 바꾸고, 저장된 다른 언어 번역은 응답에서 뺀다 */
 export function localizePosting(
   posting: PublicPosting & { summaryTranslations?: Partial<Record<Locale, PostingSummaryTranslation>> },
-  locale: Locale,
+  requested: Locale,
 ): PublicPosting & { i18n: ContentI18n } {
   const { summaryTranslations, ...rest } = posting
+  const locale = POSTING_LOCALE_FALLBACK[requested] ?? requested
   const base = { sourceLocale: POSTING_SOURCE_LOCALE, displayLocale: locale }
   if (locale === POSTING_SOURCE_LOCALE) return { ...rest, i18n: { ...base, state: 'original' } }
   const translation = summaryTranslations?.[locale]
