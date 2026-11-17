@@ -8,8 +8,10 @@ import { timingSafeEqual } from 'node:crypto'
 export function isVerificationInternalRequest(request: Request) {
   const secret = process.env.INTERNAL_VERIFICATION_SECRET?.trim()
   const given = request.headers.get('x-internal-secret')?.trim() || ''
-  if (!secret || secret.length < 16 || given.length !== secret.length) return false
-  return timingSafeEqual(Buffer.from(given), Buffer.from(secret))
+  if (!secret || secret.length < 16) return false
+  const a = Buffer.from(given)
+  const b = Buffer.from(secret)
+  return a.length === b.length && timingSafeEqual(a, b)
 }
 
 /** Reviewer identity passed by the ERP (already verified there with Firebase). Lower-cased email. */

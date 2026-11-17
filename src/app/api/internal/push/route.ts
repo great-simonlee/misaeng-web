@@ -36,7 +36,12 @@ function authorized(request: Request) {
   if (!given) return false
   return [process.env.INTERNAL_PUSH_SECRET, process.env.INTERNAL_POINTS_SECRET]
     .map((value) => value?.trim() || '')
-    .some((secret) => secret.length === given.length && timingSafeEqual(Buffer.from(given), Buffer.from(secret)))
+    .some((secret) => {
+      // Byte lengths: a non-ASCII header of the same string length made timingSafeEqual throw (500 instead of 401)
+      const a = Buffer.from(given)
+      const b = Buffer.from(secret)
+      return secret.length > 0 && a.length === b.length && timingSafeEqual(a, b)
+    })
 }
 
 export async function POST(request: Request) {

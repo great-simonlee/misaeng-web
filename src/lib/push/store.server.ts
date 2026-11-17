@@ -141,7 +141,8 @@ export async function listPushUserIds(): Promise<string[]> {
   const page = 1000
   for (let offset = 0; offset < 200_000; offset += page) {
     const rows = await rest<{ user_id: string }[]>(
-      `push_devices?select=user_id&user_id=not.is.null&order=user_id&limit=${page}&offset=${offset}`,
+      // user_id is not unique: order by token too, or rows shift between pages and users are skipped
+      `push_devices?select=user_id&user_id=not.is.null&order=user_id,token&limit=${page}&offset=${offset}`,
     ).catch(() => null)
     for (const row of rows ?? []) if (row.user_id) ids.add(row.user_id)
     if (!rows || rows.length < page) break

@@ -15,7 +15,7 @@ import { deletePushDevices, listPushDevices, usersWithTypeOff, type PushType } f
  * Runs after the response (`after()`), never throws, and never blocks the action that caused it.
  * `build` gets the translator for the device language (all namespaces; push texts are `api.push.*`).
  */
-export function notifyUsers(input: {
+type NotifyInput = {
   /** 'account' = notices about the user's own account (verification results): sent regardless of the type switches */
   type: PushType | 'account'
   userIds: string[]
@@ -26,69 +26,93 @@ export function notifyUsers(input: {
   inbox?: boolean
   /** Inbox keeps one row per threadId (replaced on each send) instead of one per notification. */
   replaceThread?: boolean
-}) {
+}
+
+export function notifyUsers(input: NotifyInput) {
   const userIds = [...new Set(input.userIds.map((id) => String(id || '').trim()).filter(Boolean))]
   if (userIds.length === 0) return
-
-  const run = async () => {
-    if (input.inbox !== false) await recordNotifications({ type: input.type, userIds, build: input.build, replaceThread: input.replaceThread })
-    const apns = isApnsConfigured()
-    const fcm = isFcmConfigured()
-    if (input.push === false || (!apns && !fcm)) return
-    try {
-      const [devices, off] = await Promise.all([
-        listPushDevices(userIds),
-        input.type === 'account' ? Promise.resolve(new Set<string>()) : usersWithTypeOff(userIds, input.type),
-      ])
-      const targets = devices.filter(
-        (d) => !off.has(d.user_id) && ((d.platform === 'ios' && apns) || (d.platform === 'android' && fcm)),
-      )
-      if (targets.length === 0) return
-
-      const byLocale = new Map<Locale, typeof targets>()
-      for (const device of targets) {
-        const locale = parseLocale(device.locale) ?? 'ko'
-        byLocale.set(locale, [...(byLocale.get(locale) ?? []), device])
-      }
-
-      // App icon number per user, counted after the inbox row above was written
-      const badges = new Map<string, number>()
-      await Promise.all(
-        [...new Set(targets.map((d) => d.user_id))].map(async (uid) => badges.set(uid, await appBadgeCount(uid))),
-      )
-
-      const dead: string[] = []
-      for (const [locale, group] of byLocale) {
-        const t = await getT(locale)
-        const base = input.build(t, locale)
-        for (const uid of new Set(group.map((d) => d.user_id))) {
-          const mine = group.filter((d) => d.user_id === uid)
-          const message = { ...base, badge: badges.get(uid) }
-          const ios = mine.filter((d) => d.platform === 'ios')
-          const android = mine.filter((d) => d.platform === 'android')
-          const [apnsResults, fcmResults] = await Promise.all([
-            ios.length ? sendApns(ios, message) : Promise.resolve([]),
-            android.length ? sendFcm(android, message).catch((error) => {
-              console.error('FCM send error:', error)
-              return []
-            }) : Promise.resolve([]),
-          ])
-          const results = [...apnsResults, ...fcmResults]
-          dead.push(...results.filter((r) => r.unregistered).map((r) => r.token))
-          const failed = results.filter((r) => !r.ok && !r.unregistered)
-          if (failed.length) console.error('Push send failed:', failed.map((r) => `${r.status} ${r.reason}`).join(', '))
-        }
-      }
-      await deletePushDevices(dead).catch(() => undefined)
-    } catch (error) {
-      console.error('Push notify error:', error)
-    }
-  }
-
+  const run = () => deliver(input, userIds)
   try {
     after(run)
   } catch {
     void run()
+  }
+}
+
+/**
+ * A broadcast to many users (digests, a new job review): one background job that sends `chunk` users at a time,
+ * one chunk after another (2026-11-17 review: 500-user chunks all at once made ~2 badge counts per user hit Supabase
+ * together, and a 500-id filter made a very long URL).
+ */
+export function notifyUsersInChunks(input: NotifyInput, chunk = 100) {
+  const userIds = [...new Set(input.userIds.map((id) => String(id || '').trim()).filter(Boolean))]
+  if (userIds.length === 0) return
+  const run = async () => {
+    for (let i = 0; i < userIds.length; i += chunk) {
+      // One chunk's failure (e.g. the inbox insert) never stops the rest
+      await deliver(input, userIds.slice(i, i + chunk)).catch((error) => console.error('Broadcast chunk error:', error))
+    }
+  }
+  try {
+    after(run)
+  } catch {
+    void run()
+  }
+}
+
+async function deliver(input: NotifyInput, userIds: string[]) {
+  if (input.inbox !== false) await recordNotifications({ type: input.type, userIds, build: input.build, replaceThread: input.replaceThread })
+  const apns = isApnsConfigured()
+  const fcm = isFcmConfigured()
+  if (input.push === false || (!apns && !fcm)) return
+  try {
+    const [devices, off] = await Promise.all([
+      listPushDevices(userIds),
+      input.type === 'account' ? Promise.resolve(new Set<string>()) : usersWithTypeOff(userIds, input.type),
+    ])
+    const targets = devices.filter(
+      (d) => !off.has(d.user_id) && ((d.platform === 'ios' && apns) || (d.platform === 'android' && fcm)),
+    )
+    if (targets.length === 0) return
+
+    const byLocale = new Map<Locale, typeof targets>()
+    for (const device of targets) {
+      const locale = parseLocale(device.locale) ?? 'ko'
+      byLocale.set(locale, [...(byLocale.get(locale) ?? []), device])
+    }
+
+    // App icon number per user, counted after the inbox row above was written; 20 users at a time
+    const badges = new Map<string, number>()
+    const uids = [...new Set(targets.map((d) => d.user_id))]
+    for (let i = 0; i < uids.length; i += 20) {
+      await Promise.all(uids.slice(i, i + 20).map(async (uid) => badges.set(uid, await appBadgeCount(uid))))
+    }
+
+    const dead: string[] = []
+    for (const [locale, group] of byLocale) {
+      const t = await getT(locale)
+      const base = input.build(t, locale)
+      for (const uid of new Set(group.map((d) => d.user_id))) {
+        const mine = group.filter((d) => d.user_id === uid)
+        const message = { ...base, badge: badges.get(uid) }
+        const ios = mine.filter((d) => d.platform === 'ios')
+        const android = mine.filter((d) => d.platform === 'android')
+        const [apnsResults, fcmResults] = await Promise.all([
+          ios.length ? sendApns(ios, message) : Promise.resolve([]),
+          android.length ? sendFcm(android, message).catch((error) => {
+            console.error('FCM send error:', error)
+            return []
+          }) : Promise.resolve([]),
+        ])
+        const results = [...apnsResults, ...fcmResults]
+        dead.push(...results.filter((r) => r.unregistered).map((r) => r.token))
+        const failed = results.filter((r) => !r.ok && !r.unregistered)
+        if (failed.length) console.error('Push send failed:', failed.map((r) => `${r.status} ${r.reason}`).join(', '))
+      }
+    }
+    await deletePushDevices(dead).catch(() => undefined)
+  } catch (error) {
+    console.error('Push notify error:', error)
   }
 }
 

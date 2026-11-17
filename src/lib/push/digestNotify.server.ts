@@ -1,6 +1,6 @@
 import { BRAND_CONFIG } from '@lib/brand'
 import type { Locale } from '@lib/i18n/locales'
-import { notifyUsers } from './notify.server'
+import { notifyUsersInChunks } from './notify.server'
 import { claimFirstTime } from './postEngagementNotify.server'
 import { listPushUserIds, type PushType } from './store.server'
 
@@ -13,8 +13,6 @@ import { listPushUserIds, type PushType } from './store.server'
  * The ERP sends the text in ko + en (vi devices get en). Once per dedupeKey (notification_dedupe), so a retried ERP
  * step never sends it twice. Data keys are `type` / `…Id` only (Android keeps just those when FCM shows the alert).
  */
-
-const CHUNK = 500
 
 export type DigestKind = 'postings_digest' | 'visa_news_digest' | 'visa_bulletin'
 
@@ -51,17 +49,16 @@ export async function broadcastDigest(kind: DigestKind, body: Record<string, unk
 
   const pick = (t: Text, locale: Locale) => (locale === 'ko' ? t.ko : t.en)
   const userIds = await listPushUserIds()
-  for (let i = 0; i < userIds.length; i += CHUNK) {
-    notifyUsers({
-      type: SWITCH[kind],
-      userIds: userIds.slice(i, i + CHUNK),
-      build: (_t, locale) => ({
-        title: pick(title, locale),
-        body: pick(message, locale),
-        data,
-        threadId: kind === 'postings_digest' ? 'postings-digest' : 'visa-news',
-      }),
-    })
-  }
+  // Sent in the background, 100 users at a time (`sent` means queued)
+  notifyUsersInChunks({
+    type: SWITCH[kind],
+    userIds,
+    build: (_t, locale) => ({
+      title: pick(title, locale),
+      body: pick(message, locale),
+      data,
+      threadId: kind === 'postings_digest' ? 'postings-digest' : 'visa-news',
+    }),
+  })
   return { sent: true, users: userIds.length }
 }

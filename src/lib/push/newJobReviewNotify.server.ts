@@ -1,6 +1,6 @@
 import { BRAND_CONFIG } from '@lib/brand'
 import type { CommunityPost } from '@/types/nyc'
-import { notifyUsers } from './notify.server'
+import { notifyUsersInChunks } from './notify.server'
 import { claimFirstTime } from './postEngagementNotify.server'
 import { listPushUserIds } from './store.server'
 
@@ -12,9 +12,6 @@ import { listPushUserIds } from './store.server'
  * edit / re-approval can never send it twice).
  */
 
-/** Users per notifyUsers call (one inbox insert each). */
-const CHUNK = 500
-
 export function notifyNewJobReview(post: Pick<CommunityPost, 'id' | 'categoryId' | 'authorUid'> & { pendingApproval?: boolean }) {
   // Only misaeng.com serves the app; an Ellieo-side review is not pushed to Misaeng app users.
   if (BRAND_CONFIG.id !== 'misaeng') return
@@ -23,19 +20,20 @@ export function notifyNewJobReview(post: Pick<CommunityPost, 'id' | 'categoryId'
 }
 
 async function run(post: Pick<CommunityPost, 'id' | 'authorUid'>) {
-  if (!(await claimFirstTime(`broadcast:job_review:${post.id}`))) return
   const author = post.authorUid?.trim() || ''
+  // One broadcast per author per day (2026-11-17 review: posting, deleting and posting again pushed everyone each time)
+  const day = new Date().toISOString().slice(0, 10)
+  if (author && !(await claimFirstTime(`broadcast:job_review_author:${author}:${day}`))) return
+  if (!(await claimFirstTime(`broadcast:job_review:${post.id}`))) return
   const userIds = (await listPushUserIds()).filter((uid) => uid !== author)
-  for (let i = 0; i < userIds.length; i += CHUNK) {
-    notifyUsers({
-      type: 'job_review',
-      userIds: userIds.slice(i, i + CHUNK),
-      build: (t) => ({
-        title: t('api.push.newJobReview.title'),
-        body: t('api.push.newJobReview.body'),
-        data: { type: 'new_job_review', postId: post.id, boardId: 'job-review', board: 'job-review' },
-        threadId: 'new-job-review',
-      }),
-    })
-  }
+  notifyUsersInChunks({
+    type: 'job_review',
+    userIds,
+    build: (t) => ({
+      title: t('api.push.newJobReview.title'),
+      body: t('api.push.newJobReview.body'),
+      data: { type: 'new_job_review', postId: post.id, boardId: 'job-review', board: 'job-review' },
+      threadId: 'new-job-review',
+    }),
+  })
 }
