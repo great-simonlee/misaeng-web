@@ -7,6 +7,7 @@ import { sendJobReviewTestPush } from '@lib/erp/notifyJobReview'
 import { sendStaffPush } from '@lib/support/staffPush.server'
 import { listCompanyFollowers } from '@lib/push/store.server'
 import { broadcastDigest, type DigestKind } from '@lib/push/digestNotify.server'
+import { isEmailConfigured, sendEmail } from '@lib/email/send.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -21,6 +22,8 @@ export const dynamic = 'force-dynamic'
  * { type: 'postings_digest' | 'visa_news_digest' | 'visa_bulletin', title: {ko,en}, body: {ko,en}, dedupeKey,
  *   postingId? / newsId? } — the ERP's scheduled runs (Mon / Wed / Fri) and a Visa Bulletin publish → every app user
  *   (lib/push/digestNotify.server.ts)
+ * { type: 'staff_email', to, subject, text, html } — a report mail from the ERP (scheduled runs) to a @misaeng.com
+ *   address only, through Resend (answers { sent })
  * { type: 'staff_alert', emails, title, body, data } — an ERP team alert (tour scheduled, new client, …) to the Misaeng
  *   ERP app; the ERP picks the recipients (internal staff only, never partners) and also sends it as Web Push
  */
@@ -39,6 +42,24 @@ function authorized(request: Request) {
 export async function POST(request: Request) {
   if (!authorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = ((await request.json().catch(() => null)) || {}) as Record<string, unknown>
+
+  if (body.type === 'staff_email') {
+    const to = String(body.to || '').trim().toLowerCase()
+    const subject = String(body.subject || '').replace(/\s+/g, ' ').trim().slice(0, 200)
+    const text = String(body.text || '').slice(0, 100_000)
+    const html = String(body.html || '').slice(0, 300_000)
+    // Internal mails only: never a member's address
+    if (!/^[a-z0-9._%+-]+@misaeng\.com$/.test(to) || !subject || !text) {
+      return NextResponse.json({ error: 'to (@misaeng.com), subject and text are required.' }, { status: 400 })
+    }
+    if (!isEmailConfigured()) return NextResponse.json({ sent: false, error: 'RESEND_API_KEY is not set.' })
+    try {
+      await sendEmail({ to, subject, text, html: html || `<pre>${text.replace(/</g, '&lt;')}</pre>`, brand: 'misaeng' })
+      return NextResponse.json({ sent: true })
+    } catch (error) {
+      return NextResponse.json({ sent: false, error: (error as Error)?.message || 'send failed' })
+    }
+  }
 
   if (body.type === 'staff_alert') {
     const emails = Array.isArray(body.emails) ? body.emails.filter((e): e is string => typeof e === 'string') : []
