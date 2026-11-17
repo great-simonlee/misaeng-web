@@ -70,3 +70,29 @@ export async function getPublishedVisaNews(id: string) {
     bodyEn: row.body_en,
   }
 }
+
+/* Visa Bulletin (supabase/visa_bulletin.sql) */
+
+type BulletinRow = {
+  month: string
+  final_action: Record<string, Record<string, string>>
+  dates_for_filing: Record<string, Record<string, string>>
+  source_url: string | null
+}
+
+/** The latest published month and the one before it (for the ▲▼ changes). */
+export async function getPublishedVisaBulletin() {
+  const rows = await pointsRest<BulletinRow[]>(
+    'visa_bulletin?status=eq.published&select=month,final_action,dates_for_filing,source_url&order=month.desc&limit=2',
+  )
+  const shape = (row?: BulletinRow) =>
+    row
+      ? {
+          month: row.month.slice(0, 7),
+          sourceUrl: row.source_url,
+          finalAction: row.final_action || {},
+          datesForFiling: row.dates_for_filing || {},
+        }
+      : null
+  return { current: shape(rows?.[0]), previous: shape(rows?.[1]) }
+}
