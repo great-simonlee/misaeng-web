@@ -6,6 +6,7 @@ import { notifyUsers } from '@lib/push/notify.server'
 import { sendJobReviewTestPush } from '@lib/erp/notifyJobReview'
 import { sendStaffPush } from '@lib/support/staffPush.server'
 import { listCompanyFollowers } from '@lib/push/store.server'
+import { broadcastDigest, type DigestKind } from '@lib/push/digestNotify.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -17,6 +18,9 @@ export const dynamic = 'force-dynamic'
  * { type: 'verification', uid, kind: 'instagram', result: 'approved' | 'rejected' } — a verification was reviewed
  * { type: 'job_review_test', email, source, orgId, target, post: { id, title, createdAt } } — admin test of the
  *   new-job-review push in the Misaeng ERP app, to that admin's own devices only (answers { devices, sent })
+ * { type: 'postings_digest' | 'visa_news_digest' | 'visa_bulletin', title: {ko,en}, body: {ko,en}, dedupeKey,
+ *   postingId? / newsId? } — the ERP's scheduled runs (Mon / Wed / Fri) and a Visa Bulletin publish → every app user
+ *   (lib/push/digestNotify.server.ts)
  * { type: 'staff_alert', emails, title, body, data } — an ERP team alert (tour scheduled, new client, …) to the Misaeng
  *   ERP app; the ERP picks the recipients (internal staff only, never partners) and also sends it as Web Push
  */
@@ -69,6 +73,11 @@ export async function POST(request: Request) {
       },
     })
     return NextResponse.json(result)
+  }
+
+  if (body.type === 'postings_digest' || body.type === 'visa_news_digest' || body.type === 'visa_bulletin') {
+    const result = await broadcastDigest(body.type as DigestKind, body)
+    return NextResponse.json(result, { status: 'error' in result ? 400 : 200 })
   }
 
   if (body.type === 'posting') {

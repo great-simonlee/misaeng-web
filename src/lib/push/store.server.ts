@@ -8,8 +8,21 @@ import type { ApnsEnvironment } from './apns.server'
 /**
  * post_recommend / post_save: someone recommended / saved my community post (columns added by supabase/post_saves.sql)
  * job_review: a new interview / job review was posted — to every app user (supabase/push_job_review.sql)
+ * posting: new job postings — since 2026-11-17 the Mon / Wed / Fri digest to every app user (was: followed companies)
+ * visa_news: visa news digest + Visa Bulletin — to every app user (supabase/push_visa_news.sql)
  */
-export const PUSH_TYPES = ['comment', 'reply', 'posting', 'credit', 'post_recommend', 'post_save', 'job_review'] as const
+export const PUSH_TYPES = [
+  'comment',
+  'reply',
+  'posting',
+  'credit',
+  'post_recommend',
+  'post_save',
+  'job_review',
+  'visa_news',
+] as const
+/** Columns before push_visa_news.sql, for databases where it has not run yet */
+const PRE_VISA_NEWS_TYPES: readonly PushType[] = ['comment', 'reply', 'posting', 'credit', 'post_recommend', 'post_save', 'job_review']
 /** Columns before push_job_review.sql, for databases where it has not run yet */
 const PRE_JOB_REVIEW_TYPES: readonly PushType[] = ['comment', 'reply', 'posting', 'credit', 'post_recommend', 'post_save']
 /** The columns of the original push.sql, for databases where post_saves.sql has not run yet */
@@ -33,6 +46,7 @@ const ALL_ON: PushPreferences = {
   post_recommend: true,
   post_save: true,
   job_review: true,
+  visa_news: true,
 }
 
 function config() {
@@ -168,14 +182,20 @@ export async function savePushPreferences(userId: string, patch: Partial<PushPre
   try {
     await save(next)
   } catch (error) {
-    // Unknown column (push_job_review.sql / post_saves.sql not run yet): save the switches the table has.
+    // Unknown column (push_visa_news.sql / push_job_review.sql / post_saves.sql not run yet): save the switches the
+    // table has.
     if (!unknownColumn(error)) throw error
-    try {
-      await save(Object.fromEntries(PRE_JOB_REVIEW_TYPES.map((type) => [type, next[type]])))
-    } catch (again) {
-      if (!unknownColumn(again)) throw again
-      await save(Object.fromEntries(LEGACY_PUSH_TYPES.map((type) => [type, next[type]])))
+    let saved = false
+    for (const types of [PRE_VISA_NEWS_TYPES, PRE_JOB_REVIEW_TYPES]) {
+      try {
+        await save(Object.fromEntries(types.map((type) => [type, next[type]])))
+        saved = true
+        break
+      } catch (again) {
+        if (!unknownColumn(again)) throw again
+      }
     }
+    if (!saved) await save(Object.fromEntries(LEGACY_PUSH_TYPES.map((type) => [type, next[type]])))
   }
   return next
 }

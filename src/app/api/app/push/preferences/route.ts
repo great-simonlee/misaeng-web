@@ -7,7 +7,7 @@ import { resolveAuthenticatedUser } from '../../../agent-auth/lib/authHelpers'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-/** GET → { comment, reply, posting, credit } */
+/** GET → { comment, reply, posting, credit, post_recommend, post_save, job_review, visa_news } (missing = on) */
 export async function GET(request: Request) {
   const t = await getRequestT(request, 'api')
   const user = await resolveAuthenticatedUser()
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   return NextResponse.json(await getPushPreferences(user.uid))
 }
 
-/** PUT { comment?, reply?, posting?, credit? } → the saved preferences */
+/** PUT { <any of the GET keys>? } → the saved preferences */
 export async function PUT(request: Request) {
   const t = await getRequestT(request, 'api')
   const user = await resolveAuthenticatedUser()
