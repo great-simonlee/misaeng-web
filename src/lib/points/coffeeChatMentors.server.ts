@@ -659,6 +659,19 @@ export async function deleteMentor(uid: string, options: { actorDeleted?: boolea
  *   * a card made in 멘토 설정: kept as is, only takes_questions turns on
  *   * an automatic card whose reviews all turned both off: deactivated
  */
+/** ERP (job review panel): the author's mentor row in short, or null when they aren't a mentor. */
+export async function mentorSummary(uid: string) {
+  const row = await getMentorRow(uid).catch(() => null)
+  if (!row) return null
+  return {
+    active: row.active,
+    takesCoffee: row.takes_coffee !== false,
+    takesQuestions: row.takes_questions !== false,
+    source: row.source ?? null,
+    consented: row.consent_version === COFFEE_CHAT_MENTOR_CONSENT_VERSION,
+  }
+}
+
 export async function syncAutoMentor(uid: string): Promise<void> {
   try {
     const [{ listStoredCommunityPostsByAuthor }, profile] = await Promise.all([
