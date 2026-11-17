@@ -17,7 +17,11 @@
  * Env (read from the environment, else .env.local / .env.production / .env in this folder):
  *   ELLIEO_ERP_BASE_URL (e.g. https://erp.ellieo.com), INTERNAL_POINTS_SECRET (or INTERNAL_PUSH_SECRET) — the same
  *   secret the ERP uses for misaeng-web's internal routes.
- * Options: --now (ignore the day / time window, push right away — for a manual run)
+ * Options:
+ *   --now           ignore the day / time window, push right away (manual run)
+ *   --any-day       ignore the day / time window but keep today's push time (a test run on another day; started after
+ *                   the push time it pushes right away)
+ *   --from=YYYY-MM-DD  do nothing before that New York date (crontab: start the schedule on a later day)
  */
 
 import { existsSync, readFileSync } from 'node:fs'
@@ -32,6 +36,8 @@ const MAX_FAILURES = 10
 
 const job = process.argv[2]
 const now = process.argv.includes('--now')
+const anyDay = process.argv.includes('--any-day')
+const from = process.argv.find((a) => a.startsWith('--from='))?.slice(7) || ''
 if (!JOBS[job]) {
   console.error(`Usage: node scripts/scheduled-runs.mjs <${Object.keys(JOBS).join('|')}> [--now]`)
   process.exit(2)
@@ -102,7 +108,8 @@ async function main() {
   const plan = JOBS[job]
   const ny = newYork()
   const toMin = ([h, m]) => h * 60 + m
-  if (!now && (!DAYS.has(ny.day) || ny.minutes < toMin(plan.start) || ny.minutes >= toMin(plan.until))) return
+  if (from && ny.date < from) return
+  if (!now && !anyDay && (!DAYS.has(ny.day) || ny.minutes < toMin(plan.start) || ny.minutes >= toMin(plan.until))) return
 
   const notifyAt = now ? new Date().toISOString() : newYorkTime(ny.date, plan.notify)
   const started = await call(base, secret, 'POST', { action: 'start', job, notifyAt })
