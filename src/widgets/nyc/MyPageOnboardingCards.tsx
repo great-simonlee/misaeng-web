@@ -102,3 +102,50 @@ export function ParentAccountCard() {
     </section>
   )
 }
+
+/**
+ * 새 채용 공고 알림 안내 (미생만, 2026-11-17):
+ * 평일 오후 1시 새 공고 푸시는 학교 인증 또는 직장 승인 회원에게만 간다 (postingAlerts.server.ts).
+ * 인증 전 회원에게 학교·직장 인증 버튼을, 직장 인증 확인 중이면 승인 대기 문구를 보여 준다.
+ */
+export function JobAlertVerifyCard({
+  workplacePending,
+  onVerifySchool,
+  onVerifyWorkplace,
+}: {
+  workplacePending: boolean
+  onVerifySchool: () => void
+  onVerifyWorkplace: () => void
+}) {
+  const t = useT('me.jobAlerts')
+  return (
+    <section className={`${card} px-5 py-4`}>
+      <p className='text-[15px] font-semibold tracking-tight text-[var(--foreground)]'>{t('title')}</p>
+      <p className='mt-1 text-[12.5px] leading-relaxed text-[var(--muted-foreground)]'>{t('body')}</p>
+      {workplacePending ? (
+        <p className='mt-2.5 rounded-xl bg-amber-50 px-3 py-2 text-[12px] font-medium leading-snug text-amber-800 ring-1 ring-amber-200/70'>
+          {t('pending')}
+        </p>
+      ) : null}
+      <div className='mt-3 flex gap-2'>
+        <button
+          type='button'
+          onClick={onVerifySchool}
+          className='h-10 flex-1 rounded-xl bg-[var(--brand)] px-3 text-[13px] font-semibold text-white touch-manipulation transition active:scale-[0.99]'
+        >
+          {t('verifySchool')}
+        </button>
+        {/* 직장 인증 확인 중이면 같은 요청을 다시 낼 수 없다 → 학교 인증만 */}
+        {workplacePending ? null : (
+          <button
+            type='button'
+            onClick={onVerifyWorkplace}
+            className='h-10 flex-1 rounded-xl bg-white px-3 text-[13px] font-semibold text-[var(--foreground)] ring-1 ring-black/[0.08] touch-manipulation transition active:scale-[0.99]'
+          >
+            {t('verifyWorkplace')}
+          </button>
+        )}
+      </div>
+    </section>
+  )
+}

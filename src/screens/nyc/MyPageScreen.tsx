@@ -32,7 +32,12 @@ import { ProfileCardAction } from '@widgets/nyc/ProfileCardAction'
 import { MyPageCreditSection } from '@widgets/nyc/MyPageCreditSection'
 import { MyPageReferralSection } from '@widgets/nyc/MyPageReferralSection'
 import { MyPageParentInviteSection } from '@widgets/nyc/MyPageParentInviteSection'
-import { JustVerifiedLine, ParentAccountCard, QuizCard } from '@widgets/nyc/MyPageOnboardingCards'
+import {
+  JobAlertVerifyCard,
+  JustVerifiedLine,
+  ParentAccountCard,
+  QuizCard,
+} from '@widgets/nyc/MyPageOnboardingCards'
 import { MISAENG_DESIGN } from '@lib/brand/design'
 import { MyPageReviewVerifications } from '@widgets/nyc/reviewDocs/MyPageReviewVerifications'
 import { MyPageBlockedUsersSection } from '@widgets/nyc/MyPageBlockedUsersSection'
@@ -173,6 +178,14 @@ export function MyPageScreen() {
     typeof profile?.workplaceReviewedAt === 'number' &&
     profile.workplaceReviewedAt > Date.now() - 3 * 24 * 60 * 60 * 1000
   const showAfterVerifyLine = !isParent && (justVerified || recentlyApproved)
+  // 프로필 카드: 실제로 끝낸 인증만 칩으로 (미생만)
+  const instagramPending =
+    profile?.instagram?.status === 'pending' && !profile.instagram.expired
+  const verifiedChips = [
+    profile?.schoolEmailVerified ? ('school' as const) : null,
+    workplaceStatus === 'approved' ? ('workplace' as const) : null,
+    profile?.instagramVerified && !instagramPending ? ('instagram' as const) : null,
+  ].filter((chip) => chip !== null)
 
   useEffect(() => {
     if (loading || sessionLoading) return
@@ -479,6 +492,22 @@ export function MyPageScreen() {
                     {affiliationLabel}
                   </p>
                 ) : null}
+                {MISAENG_DESIGN && verifiedChips.length > 0 ? (
+                  <ul
+                    aria-label={t('verifiedChips.ariaLabel')}
+                    className='mt-2.5 flex flex-wrap justify-center gap-1.5'
+                  >
+                    {verifiedChips.map((chip) => (
+                      <li
+                        key={chip}
+                        className='inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-100'
+                      >
+                        <CheckIcon />
+                        {t(`verifiedChips.${chip}`)}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
 
                 <MyPageCreditSection className='mt-3' />
               </div>
@@ -730,6 +759,15 @@ export function MyPageScreen() {
             ) : null}
 
             <MyPageBlockedUsersSection />
+
+            {/* 새 채용 공고 알림(평일 오후 1시)은 학교·직장 인증 회원만 받는다 (미생만) */}
+            {MISAENG_DESIGN && !isParent && !identityVerified ? (
+              <JobAlertVerifyCard
+                workplacePending={workplaceStatus === 'pending'}
+                onVerifySchool={() => setSchoolVerifyOpen(true)}
+                onVerifyWorkplace={() => setWorkplaceVerifyOpen(true)}
+              />
+            ) : null}
 
             {/* 학부모 계정은 학교·직장 인증이 없다 */}
             {!isParent ? (
@@ -1157,6 +1195,21 @@ function ChevronIcon({ className }: { className?: string }) {
       aria-hidden
     >
       <path strokeLinecap='round' strokeLinejoin='round' d='m9 6 6 6-6 6' />
+    </svg>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='2.6'
+      className='size-3'
+      aria-hidden
+    >
+      <path strokeLinecap='round' strokeLinejoin='round' d='m5 12.5 4.5 4.5L19 7.5' />
     </svg>
   )
 }

@@ -44,10 +44,23 @@ export function notifyUsers(input: NotifyInput) {
  * one chunk after another (2026-11-17 review: 500-user chunks all at once made ~2 badge counts per user hit Supabase
  * together, and a 500-id filter made a very long URL).
  */
-export function notifyUsersInChunks(input: NotifyInput, chunk = 100) {
-  const userIds = [...new Set(input.userIds.map((id) => String(id || '').trim()).filter(Boolean))]
-  if (userIds.length === 0) return
+export function notifyUsersInChunks(
+  input: NotifyInput & {
+    /** Narrows the users inside the background job (postings push: verified members), so the caller isn't held. */
+    audience?: (userIds: string[]) => Promise<string[]>
+  },
+  chunk = 100,
+) {
+  const candidates = [...new Set(input.userIds.map((id) => String(id || '').trim()).filter(Boolean))]
+  if (candidates.length === 0) return
   const run = async () => {
+    const userIds = input.audience
+      ? await input.audience(candidates).catch((error) => {
+          console.error('Broadcast audience error:', error)
+          return [] as string[]
+        })
+      : candidates
+    if (input.audience) console.log(`Broadcast ${input.type}: ${userIds.length} of ${candidates.length} users`)
     for (let i = 0; i < userIds.length; i += chunk) {
       // One chunk's failure (e.g. the inbox insert) never stops the rest
       await deliver(input, userIds.slice(i, i + chunk)).catch((error) => console.error('Broadcast chunk error:', error))

@@ -658,5 +658,18 @@
       "valid": ""
     },
     "toHome": "Explore Misaeng"
+  },
+  "jobAlerts": {
+    "title": "Verify to get new job alerts",
+    "body": "Verify your school or workplace and we will notify you of newly posted jobs on weekdays around 1 PM.",
+    "pending": "We are reviewing your workplace verification. Alerts start once it is approved.",
+    "verifySchool": "Verify school",
+    "verifyWorkplace": "Verify workplace"
+  },
+  "verifiedChips": {
+    "ariaLabel": "Completed verifications",
+    "school": "School verified",
+    "workplace": "Workplace verified",
+    "instagram": "Instagram verified"
   }
 }

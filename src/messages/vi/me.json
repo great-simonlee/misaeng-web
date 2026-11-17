@@ -625,5 +625,18 @@
       "valid": ""
     },
     "toHome": "Khám phá Misaeng"
+  },
+  "jobAlerts": {
+    "title": "Cần xác minh để nhận thông báo việc làm mới",
+    "body": "Xác minh trường học hoặc nơi làm việc, chúng tôi sẽ gửi thông báo về các tin tuyển dụng mới vào khoảng 1 giờ chiều các ngày trong tuần.",
+    "pending": "Chúng tôi đang xem xét xác minh nơi làm việc của bạn. Thông báo sẽ bắt đầu khi được duyệt.",
+    "verifySchool": "Xác minh trường học",
+    "verifyWorkplace": "Xác minh nơi làm việc"
+  },
+  "verifiedChips": {
+    "ariaLabel": "Các xác minh đã hoàn tất",
+    "school": "Đã xác minh trường",
+    "workplace": "Đã xác minh nơi làm việc",
+    "instagram": "Đã xác minh Instagram"
   }
 }

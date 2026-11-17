@@ -653,5 +653,18 @@
       "valid": ""
     },
     "toHome": "미생 둘러보기"
+  },
+  "jobAlerts": {
+    "title": "새 채용 공고 알림을 받으려면 인증이 필요해요",
+    "body": "학교 또는 직장 인증을 하면 평일 오후 1시쯤 새로 올라온 공고를 알림으로 보내드려요.",
+    "pending": "직장 인증을 확인하고 있어요. 승인되면 알림이 시작돼요.",
+    "verifySchool": "학교 인증하기",
+    "verifyWorkplace": "직장 인증하기"
+  },
+  "verifiedChips": {
+    "ariaLabel": "완료한 인증",
+    "school": "학교 인증",
+    "workplace": "직장 인증",
+    "instagram": "인스타그램 인증"
   }
 }
