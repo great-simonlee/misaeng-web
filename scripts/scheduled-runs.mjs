@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * Scheduled ERP runs (owner, 2026-11-17), driven from the misaeng.com server's crontab:
- *   postings   Mon–Fri — starts 10:00 New York time, app push at 11:00
- *   visa-news  Mon–Fri — starts 12:30 New York time; app push at 13:00 on Mon / Fri only (other days publish without a
+ *   postings   Mon–Fri — starts 10:00 New York time, app push at 13:00 (or when the run gets there, if later)
+ *   visa-news  Mon–Fri — starts 16:30 New York time; app push at 17:00 on Mon / Fri only (other days publish without a
  *              push, and the next push includes what they published)
  * The work itself is in ellieo-erp (lib/scheduledRuns.js): this script starts today's run and calls its next step
  * until it is done, waiting what the ERP asks between steps (5 s between careers-site / Google requests, 30 s while a
@@ -10,8 +10,8 @@
  *
  * Crontab (server clock is UTC; the script itself checks New York time, so DST needs no edit). The minute field
  * below is written `*\/15` so it does not end this comment; in the crontab drop the backslash:
- *   *\/15 13-19 * * 1-5 cd ~/misaeng-web-v2 && flock -n /tmp/misaeng-postings.lock node scripts/scheduled-runs.mjs postings >> ~/scheduled-runs.log 2>&1
- *   *\/15 16-21 * * 1-5 cd ~/misaeng-web-v2 && flock -n /tmp/misaeng-visa-news.lock node scripts/scheduled-runs.mjs visa-news >> ~/scheduled-runs.log 2>&1
+ *   *\/15 14-21 * * 1-5 cd ~/misaeng-web-v2 && flock -n /tmp/misaeng-postings.lock node scripts/scheduled-runs.mjs postings >> ~/scheduled-runs.log 2>&1
+ *   *\/15 20-23 * * 1-5 cd ~/misaeng-web-v2 && flock -n /tmp/misaeng-visa-news.lock node scripts/scheduled-runs.mjs visa-news >> ~/scheduled-runs.log 2>&1
  * A call outside the job's window does nothing; a call while today's run is open picks it up again (e.g. after a
  * reboot); a call after today's run ended does nothing.
  *
@@ -29,8 +29,8 @@
 import { existsSync, readFileSync } from 'node:fs'
 
 const JOBS = {
-  postings: { start: [10, 0], notify: [11, 0], until: [14, 0], pushDays: null },
-  'visa-news': { start: [12, 30], notify: [13, 0], until: [16, 0], pushDays: new Set(['Mon', 'Fri']) },
+  postings: { start: [10, 0], notify: [13, 0], until: [16, 0], pushDays: null },
+  'visa-news': { start: [16, 30], notify: [17, 0], until: [19, 0], pushDays: new Set(['Mon', 'Fri']) },
 }
 const DAYS = new Set(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
 const MAX_RUN_MS = 3.5 * 3_600_000

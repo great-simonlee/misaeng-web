@@ -7,8 +7,8 @@ import { listPushUserIds, type PushType } from './store.server'
 /*
  * Broadcasts written by the ERP's scheduled runs (ellieo-erp lib/scheduledRuns.js, owner 2026-11-17) and the Visa
  * Bulletin publish — to every Misaeng app user, only when there is something new:
- *   postings_digest  "12개 회사에서 새 채용 공고 18개가 올라왔어요 · …"  (switch `posting`, Mon / Wed / Fri 11:00)
- *   visa_news_digest "H-1B 추첨 등록 기간 발표 … 외 새 소식 2건"        (switch `visa_news`, Mon / Wed / Fri 13:00)
+ *   postings_digest  "12개 회사에서 새 채용 공고 18개가 올라왔어요 · …"  (switch `posting`, Mon–Fri 13:00)
+ *   visa_news_digest "H-1B 추첨 등록 기간 발표 … 외 새 소식 2건"        (switch `visa_news`, Mon / Fri 17:00)
  *   visa_bulletin    "3월 Visa Bulletin이 나왔어요 · EB-2 한국 2주 …"    (switch `visa_news`)
  * The ERP sends the text in ko + en (vi devices get en). Once per dedupeKey (notification_dedupe), so a retried ERP
  * step never sends it twice. Data keys are `type` / `…Id` only (Android keeps just those when FCM shows the alert).
