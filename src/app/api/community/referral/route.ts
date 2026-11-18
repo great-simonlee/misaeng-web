@@ -3,9 +3,11 @@ import { NextResponse } from 'next/server'
 import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import { BRAND_CONFIG } from '@lib/brand'
 import { buildReferralShareUrl } from '@lib/community/referral'
-import { COMMUNITY_CREDIT_REFERRAL_MAX } from '@lib/constants/communityCredit'
+import { COMMUNITY_CREDIT_REFERRAL_MAX, COMMUNITY_CREDIT_REFERRAL_POST } from '@lib/constants/communityCredit'
 import { apiErrorMessage } from '@lib/i18n/apiError'
 import { getRequestT } from '@lib/i18n/server'
+import { getPointsConfig, ruleAmount } from '@lib/points/config.server'
+import { isPointsLedgerActive } from '@lib/points/engine.server'
 import {
   bindUserReferrer,
   ensureUserReferralCode,
@@ -32,10 +34,15 @@ export async function GET(request: Request) {
 
   try {
     const code = await ensureUserReferralCode(user.uid)
-    const [profile, usedCount] = await Promise.all([
+    const [profile, usedCount, ledgerActive] = await Promise.all([
       getSupabaseProfile(user.uid),
       getReferralUseCount(user.uid),
+      isPointsLedgerActive(),
     ])
+    // the apps show this amount instead of a number built into the app, so it follows the points switch-over
+    const creditsPerUse = ledgerActive
+      ? ruleAmount(await getPointsConfig(), 'earn.referral')
+      : COMMUNITY_CREDIT_REFERRAL_POST
     // behind the AWS proxy request.url is the internal address, so shared links use the public site URL
     const origin = process.env.NODE_ENV === 'production' ? BRAND_CONFIG.siteUrl : new URL(request.url).origin
     return NextResponse.json({
@@ -44,6 +51,7 @@ export async function GET(request: Request) {
       referredByCode: profile?.referredByCode ?? null,
       usedCount,
       maxUses: COMMUNITY_CREDIT_REFERRAL_MAX,
+      creditsPerUse,
     })
   } catch (error) {
     return NextResponse.json(
