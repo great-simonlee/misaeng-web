@@ -8,6 +8,7 @@ export function premiumPayload(state: PremiumState, loggedIn: boolean) {
     plan: state.plan,
     source: state.source,
     until: state.until,
+    since: state.since,
     status: state.status,
     cancelAtPeriodEnd: state.cancelAtPeriodEnd,
     trialAvailable: loggedIn ? state.trialAvailable : true,

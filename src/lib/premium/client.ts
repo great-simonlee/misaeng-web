@@ -8,6 +8,7 @@ export type PremiumMe = {
   plan: PremiumPlanId | 'code' | 'gift' | 'staff' | null
   source: 'stripe' | 'apple' | 'google' | 'code' | 'gift' | 'staff' | null
   until: string | null
+  since: string | null
   status: 'trialing' | 'active' | 'past_due' | 'canceled' | 'expired' | null
   cancelAtPeriodEnd: boolean
   trialAvailable: boolean

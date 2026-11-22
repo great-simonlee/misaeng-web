@@ -19,6 +19,8 @@ export type PremiumState = {
   plan: PremiumPlan | 'staff' | null
   source: PremiumSource | null
   until: string | null
+  /** When the current Premium row started (code: the redeem day) — the apps draw a time-left bar. */
+  since: string | null
   status: PremiumStatus | null
   cancelAtPeriodEnd: boolean
   /** No subscription or grant ever: the 7-day trial is offered. */
@@ -37,6 +39,7 @@ const EMPTY: PremiumState = {
   plan: null,
   source: null,
   until: null,
+  since: null,
   status: null,
   cancelAtPeriodEnd: false,
   trialAvailable: true,
@@ -84,6 +87,7 @@ export async function getPremiumState(user: PremiumUser): Promise<PremiumState> 
         plan: active.plan,
         source: active.source,
         until: active.current_period_end,
+        since: active.created_at,
         status: active.status,
         cancelAtPeriodEnd: active.cancel_at_period_end,
         trialAvailable: false,
