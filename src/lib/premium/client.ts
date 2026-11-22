@@ -50,3 +50,8 @@ export function startCheckout(plan: PremiumPlanId, city: string, locale: string)
 export function openBillingPortal(city: string, locale: string) {
   return post<{ url: string }>('/api/premium/portal', { city, locale })
 }
+
+/** → until (ISO). Throws PremiumRequestError whose message is the server code (NOT_FOUND, USED_UP, …). */
+export function redeemPremiumCode(code: string) {
+  return post<{ ok: true; until: string | null }>('/api/premium/redeem', { code })
+}

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import type Stripe from 'stripe'
 
+import { sendRenewalNotice, sendTrialEndingNotice } from '@lib/premium/notices.server'
+import { handleChargeRefunded } from '@lib/premium/refunds.server'
 import { getStripe, syncSubscription } from '@lib/premium/stripe.server'
 
 export const runtime = 'nodejs'
@@ -10,7 +12,9 @@ export const dynamic = 'force-dynamic'
  * POST /api/stripe/webhook — Stripe events (signature checked with STRIPE_WEBHOOK_SECRET). Premium is granted only
  * here: every subscription change is re-read from Stripe and mirrored into premium_entitlements.
  * Events: checkout.session.completed, customer.subscription.created / updated / deleted, invoice.paid,
- * invoice.payment_failed.
+ * invoice.payment_failed; charge.refunded (a full refund ends Premium now); reminders:
+ * customer.subscription.trial_will_end (3 days before the trial ends) and invoice.upcoming (annual renewal, 7 days
+ * before — set in Stripe Dashboard → Billing → Subscriptions).
  */
 export async function POST(request: Request) {
   const stripe = getStripe()
@@ -57,6 +61,15 @@ export async function POST(request: Request) {
         await syncById(subId)
         break
       }
+      case 'charge.refunded':
+        await handleChargeRefunded(event.data.object as Stripe.Charge)
+        break
+      case 'customer.subscription.trial_will_end':
+        await sendTrialEndingNotice(event.data.object as Stripe.Subscription)
+        break
+      case 'invoice.upcoming':
+        await sendRenewalNotice(event.data.object as Stripe.Invoice)
+        break
       default:
         break
     }

@@ -43,13 +43,18 @@ export type EntitlementUpsert = {
 const COLUMNS =
   'id,user_uid,email,source,plan,status,current_period_end,cancel_at_period_end,external_id,customer_id,product_id,environment,created_at,updated_at'
 
+export function premiumDbConfigured() {
+  return Boolean(config())
+}
+
 function config() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
   return url && key ? { url, key } : null
 }
 
-async function rest(path: string, init: RequestInit & { prefer?: string } = {}) {
+/** Raw PostgREST call with the service role key (also used by codes / refunds). */
+export async function rest(path: string, init: RequestInit & { prefer?: string } = {}) {
   const c = config()
   if (!c) throw new Error('Supabase is not configured.')
   const headers: Record<string, string> = {

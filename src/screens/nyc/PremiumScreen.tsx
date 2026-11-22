@@ -150,6 +150,12 @@ export function PremiumScreen() {
               {busy ? t('cta.loading') : !me?.loggedIn ? t('cta.login') : trial ? t('cta.trial') : t('cta.start')}
             </button>
             {error ? <p className='text-center text-[13px] font-semibold text-[#DC2626]'>{error}</p> : null}
+            <Link
+              href={href('/premium/redeem')}
+              className='self-center text-[14px] font-bold text-[var(--brand)] underline-offset-2 hover:underline'
+            >
+              {t('redeem.link')}
+            </Link>
 
             <div className='rounded-2xl bg-[#FFF6EE] px-4 py-3.5 text-[12.5px] leading-relaxed text-[var(--muted-foreground)]'>
               <p>
@@ -158,6 +164,15 @@ export function PremiumScreen() {
                   : t('disclosure.noTrial', { price: PRICE[plan] })}
               </p>
               <p className='mt-1'>{t('disclosure.cancel')}</p>
+              <p className='mt-1'>
+                {rich(t('disclosureRefund'), {
+                  policy: (
+                    <Link href={href('/premium/policy')} className='font-semibold text-[var(--foreground)] underline underline-offset-2'>
+                      {t('policyLink')}
+                    </Link>
+                  ),
+                })}
+              </p>
               <p className='mt-1'>
                 {rich(t('disclosure.agree'), {
                   terms: (
@@ -176,7 +191,7 @@ export function PremiumScreen() {
           </section>
         )}
 
-        <Faq />
+        <Faq policyHref={href('/premium/policy')} />
       </div>
     </BoardPageShell>
   )
@@ -345,6 +360,9 @@ function ActiveCard({ me, busy, onManage }: { me: PremiumMe; busy: boolean; onMa
   const fmt = useFormat()
   const date = me.until ? fmt.date(me.until, { year: 'numeric', month: 'long', day: 'numeric' }) : null
   const staff = me.source === 'staff'
+  const granted = me.source === 'code' || me.source === 'gift'
+  const [openedAt] = useState(() => Date.now())
+  const daysLeft = me.until ? Math.max(0, Math.ceil((Date.parse(me.until) - openedAt) / 86_400_000)) : null
   return (
     <section className='premium-pop flex flex-col items-center gap-3 rounded-[30px] bg-[linear-gradient(140deg,#FFE3D3,#FFF6EE)] px-6 py-8 text-center'>
       <div className='premium-float'>
@@ -354,7 +372,15 @@ function ActiveCard({ me, busy, onManage }: { me: PremiumMe; busy: boolean; onMa
       <p className='text-[15px] font-bold text-[var(--brand)]'>
         {t('active.plan', { plan: staff ? t('active.staffPlan') : t(`plan.${me.plan ?? 'monthly'}`) })}
       </p>
-      {date ? (
+      {date && granted ? (
+        <>
+          <p className='text-[14px] text-[var(--muted-foreground)]'>
+            {t('active.codeUntil', { date })}
+            {daysLeft !== null ? ` · ${t('active.codeDaysLeft', { days: daysLeft })}` : ''}
+          </p>
+          <p className='max-w-[420px] text-[12.5px] text-[var(--muted)]'>{t('active.code')}</p>
+        </>
+      ) : date ? (
         <p className='text-[14px] text-[var(--muted-foreground)]'>
           {me.cancelAtPeriodEnd ? t('active.ends', { date }) : t('active.renews', { date })}
         </p>
@@ -414,13 +440,13 @@ function StatusBanner({ status, premium, companiesHref }: { status: 'success' | 
   )
 }
 
-function Faq() {
+function Faq({ policyHref }: { policyHref: string }) {
   const t = useT('premium')
   return (
     <section className='flex flex-col gap-3'>
       <h2 className='px-1 text-[22px] font-extrabold tracking-tight text-[var(--foreground)]'>{t('faq.title')}</h2>
       <div className='flex flex-col gap-2.5'>
-        {(['cancel', 'app', 'refund', 'data'] as const).map((k) => (
+        {(['cancel', 'app', 'refund', 'code', 'data'] as const).map((k) => (
           <details key={k} className='group rounded-[20px] bg-[#FAFAF9] px-5 py-4 open:bg-[#FFF6EE]'>
             <summary className='flex cursor-pointer list-none items-center justify-between gap-3 text-[15px] font-bold text-[var(--foreground)]'>
               {t(`faq.${k}.q`)}
@@ -432,6 +458,9 @@ function Faq() {
           </details>
         ))}
       </div>
+      <Link href={policyHref} className='px-1 text-[13px] font-semibold text-[var(--muted-foreground)] underline underline-offset-2'>
+        {t('policyLink')}
+      </Link>
     </section>
   )
 }

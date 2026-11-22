@@ -87,7 +87,10 @@
     "manage": "Manage subscription",
     "appStore": "Subscriptions bought in the app are managed in iPhone Settings → Apple Account → Subscriptions.",
     "staff": "Premium is open on this preview account.",
-    "staffPlan": "Preview"
+    "staffPlan": "Preview",
+    "codeUntil": "Free with a code until {date}",
+    "codeDaysLeft": "{days} days left",
+    "code": "Your code Premium ends on its own — no charge, nothing to cancel."
   },
   "status": {
     "successTitle": "Welcome! Premium is on",
@@ -108,11 +111,15 @@
     },
     "refund": {
       "q": "Can I get a refund?",
-      "a": "Cancel during the 7-day free trial and you won't be charged. For a refund after payment, email info@misaeng.com. In-app purchases follow Apple's and Google's refund policies."
+      "a": "Yes, within 7 days of your first payment (any plan, once per account) or of a yearly renewal — full amount. After 7 days there are no refunds, including partial refunds for unused time; canceling just stops the next renewal. In-app purchases are refunded by Apple or Google."
     },
     "data": {
       "q": "Where does the data come from?",
       "a": "H-1B (LCA) and green card (PERM) filings published by the U.S. Department of Labor's Office of Foreign Labor Certification. They are filings, not hires or approved visas."
+    },
+    "code": {
+      "q": "I have a code from my student association.",
+      "a": "Tap “Have a code?” on this page (web) and enter it — Premium opens for free, no card needed. The app shows the same Premium. One code at a time."
     }
   },
   "errors": {
@@ -127,5 +134,100 @@
     "code": "Pass",
     "gift": "Gift",
     "staff": "Preview"
-  }
+  },
+  "redeem": {
+    "link": "Have a code?",
+    "title": "Use a Premium code",
+    "sub": "Got a code from your student association or a Misaeng event? Enter it to open Premium for free — no card needed.",
+    "label": "Code",
+    "placeholder": "e.g. MSG-7KQ4-X9TP",
+    "submit": "Use code",
+    "loading": "Checking…",
+    "login": "Log in to use a code",
+    "successTitle": "Premium is on!",
+    "successBody": "Free Premium until {date}. It ends on its own — no charge.",
+    "goCompanies": "Browse companies",
+    "back": "See Premium benefits",
+    "rules": "One code per person at a time. Codes can't be used while you have a paid subscription. The app shows the same Premium after you use a code here.",
+    "errors": {
+      "INVALID": "Please check the code — letters and numbers only.",
+      "NOT_FOUND": "We couldn't find that code. Please check it and try again.",
+      "PAUSED": "This code is paused right now. Please ask the person who gave it to you.",
+      "CLOSED": "This code is no longer available.",
+      "REDEEM_ENDED": "The deadline for this code has passed.",
+      "USED_UP": "This code has reached its limit.",
+      "ALREADY_USED": "You've already used this code.",
+      "ALREADY_PREMIUM": "You already have Premium. You can use a code after your current Premium ends.",
+      "EXPIRED": "This code's Premium period has already ended.",
+      "TOO_MANY": "Too many tries. Please try again in an hour.",
+      "FAILED": "Something went wrong. Please try again."
+    }
+  },
+  "policyLink": "Subscription & refund policy",
+  "policy": {
+    "metaTitle": "Subscription & Refund Policy · Misaeng Premium",
+    "title": "Subscription & refund policy",
+    "updated": "Last updated: November 22, 2026",
+    "sections": [
+      {
+        "h": "Free trial",
+        "p": [
+          "New members get a 7-day free trial with a card on file. Nothing is charged during the trial.",
+          "We remind you 3 days before the trial ends. Cancel before it ends and you won't be charged."
+        ]
+      },
+      {
+        "h": "Auto-renewal and canceling",
+        "p": [
+          "Premium renews automatically at the same interval (monthly, every 3 months, or yearly) until you cancel.",
+          "Cancel anytime in “Manage subscription” on the Premium page. After canceling you keep Premium until the end of the period you already paid for, and you won't be charged again.",
+          "For yearly plans, we email you 7 days before each renewal."
+        ]
+      },
+      {
+        "h": "Refunds",
+        "p": [
+          "Within 7 days of your first payment, you can get a full refund for any plan (monthly, 3-month, or yearly). This is available once per account.",
+          "Within 7 days of a yearly renewal charge, you can get a full refund of that renewal.",
+          "After 7 days, payments are not refundable. We do not give partial or prorated refunds for unused time — for example, canceling 8 months into a yearly plan stops the next renewal and you keep Premium for the remaining 4 months, but no money is returned.",
+          "Double charges, payment errors, and long service outages on our side are always refunded in full.",
+          "When a refund is made, Premium ends immediately."
+        ]
+      },
+      {
+        "h": "How to request a refund",
+        "p": [
+          "Email info@misaeng.com from your Misaeng account email with the date of the charge. We reply within 2 business days, and refunds go back to your original payment method (usually 5–10 business days)."
+        ]
+      },
+      {
+        "h": "Purchases in the app",
+        "p": [
+          "Subscriptions bought through the App Store or Google Play are billed and refunded by Apple or Google under their policies. Apple: reportaproblem.apple.com. Google Play: within 48 hours in Google Play; after that, contact us and we apply the same rules as above."
+        ]
+      },
+      {
+        "h": "Premium codes and gifts",
+        "p": [
+          "Premium opened with a free code is not refundable and ends on its own without any charge. A gift paid by a parent can be refunded to the payer within 7 days if it has not been used yet."
+        ]
+      }
+    ],
+    "note": "This policy is part of our Terms of Use. If anything here conflicts with the law where you live, the law applies."
+  },
+  "notices": {
+    "trialSubject": "Your Misaeng Premium trial ends soon",
+    "trialTitle": "Your free trial ends in 3 days",
+    "trialLine": "On {date}, {price} will be charged and Premium will renew automatically.",
+    "trialPushTitle": "Free trial ends in 3 days",
+    "trialPushBody": "{price} will be charged on {date}. Cancel anytime before then.",
+    "renewalSubject": "Your yearly Misaeng Premium renews soon",
+    "renewalTitle": "Your yearly plan renews in 7 days",
+    "renewalLine": "On {date}, {price} will be charged for another year of Premium.",
+    "cancelLine": "Don't want to continue? Cancel in “Manage subscription” on the Premium page before that date.",
+    "refundLine": "Changed your mind after the charge? You can get a full refund within 7 days.",
+    "manage": "Manage subscription",
+    "footer": "Misaeng LLC · info@misaeng.com"
+  },
+  "disclosureRefund": "Full refund within 7 days of your first payment; no partial refunds after that. See the {policy}."
 }
