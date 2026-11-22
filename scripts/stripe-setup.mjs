@@ -59,32 +59,6 @@ for (const p of PRICES) {
   console.log(`${p.lookup} ${price.id} (new)`)
 }
 
-// Billing portal ("구독 관리" on /premium): cancel at period end, update card, invoices, switch between the 3 plans.
-const portals = await stripe.billingPortal.configurations.list({ limit: 10 })
-if (!portals.data.some((c) => c.metadata?.misaeng === 'premium')) {
-  const prices = await stripe.prices.list({ lookup_keys: PRICES.map((p) => p.lookup), active: true, limit: 10 })
-  const config = await stripe.billingPortal.configurations.create({
-    business_profile: {
-      headline: 'Misaeng Premium',
-      privacy_policy_url: 'https://misaeng.com/privacy',
-      terms_of_service_url: 'https://misaeng.com/terms',
-    },
-    features: {
-      customer_update: { enabled: true, allowed_updates: ['email'] },
-      invoice_history: { enabled: true },
-      payment_method_update: { enabled: true },
-      subscription_cancel: { enabled: true, mode: 'at_period_end' },
-      subscription_update: {
-        enabled: true,
-        default_allowed_updates: ['price'],
-        proration_behavior: 'create_prorations',
-        products: [{ product: product.id, prices: prices.data.map((p) => p.id) }],
-      },
-    },
-    default_return_url: 'https://misaeng.com/nyc/premium',
-    metadata: { misaeng: 'premium' },
-  })
-  console.log(`portal ${config.id} (new${config.is_default ? ', default' : ''})`)
-} else {
-  console.log('portal (kept)')
-}
+// Billing portal: configured once in the Stripe Dashboard (default configuration — cancel at period end, card,
+// invoices; plan switching OFF so nothing is ever prorated). Not created here on purpose.
+
