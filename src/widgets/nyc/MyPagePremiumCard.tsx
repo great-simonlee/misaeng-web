@@ -54,7 +54,7 @@ export function MyPagePremiumCard({ className }: { className?: string }) {
               <span className='rounded-full bg-[var(--brand)] px-2 py-0.5 text-[11px] font-bold text-white'>{t('myCard.on')}</span>
             ) : null}
           </span>
-          <span className='mt-0.5 block text-[13px] leading-snug text-[var(--muted-foreground)]'>{me ? status : ' '}</span>
+          <span className='mt-0.5 block break-keep text-[13px] leading-snug text-[var(--muted-foreground)]'>{me ? status : ' '}</span>
         </span>
         <span className='text-[var(--brand)]/60 transition group-hover:translate-x-0.5 group-hover:text-[var(--brand)]' aria-hidden>
           ›
