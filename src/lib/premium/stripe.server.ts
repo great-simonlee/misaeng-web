@@ -45,6 +45,17 @@ export async function priceIdFor(stripe: Stripe, plan: PaidPlan): Promise<string
   return id
 }
 
+/**
+ * Only Misaeng Premium prices count. The same Stripe account (Misaeng LLC) also carries the legacy Ellieo backend's
+ * payments (its own webhook → ellieo.com/v1/api/payment/webhook/stripe), and those must never grant or end Premium.
+ */
+export function isPremiumPrice(price: Stripe.Price | null | undefined): boolean {
+  if (!price) return false
+  return PAID_PLANS.some(
+    (plan) => price.lookup_key === LOOKUP_KEYS[plan] || process.env[`STRIPE_PRICE_${plan.toUpperCase()}`]?.trim() === price.id,
+  )
+}
+
 function planFromPrice(price: Stripe.Price | null | undefined): PremiumPlan {
   if (!price) return 'monthly'
   for (const plan of PAID_PLANS) {
@@ -82,8 +93,8 @@ function periodEnd(sub: Stripe.Subscription): string | null {
 /** Mirror one Stripe subscription into premium_entitlements (keyed by the subscription id). */
 export async function syncSubscription(sub: Stripe.Subscription, fallbackUid?: string | null, email?: string | null) {
   const uid = sub.metadata?.user_uid || fallbackUid
-  if (!uid) return
   const price = sub.items?.data?.[0]?.price
+  if (!uid || !isPremiumPrice(price)) return
   await upsertEntitlement({
     user_uid: uid,
     email: email ?? sub.metadata?.email ?? null,

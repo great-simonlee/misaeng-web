@@ -2,7 +2,7 @@ import type Stripe from 'stripe'
 
 import { invalidatePremium } from './access.server'
 import { rest, type PremiumEntitlement } from './entitlements.server'
-import { getStripe, syncSubscription } from './stripe.server'
+import { getStripe, isPremiumPrice, syncSubscription } from './stripe.server'
 
 /**
  * Web (Stripe) refunds from the ERP. Policy (owner, 11-22): always the FULL amount of one charge — never partial or
@@ -136,6 +136,8 @@ export async function getRefundQuote(entitlementId: string): Promise<RefundQuote
 /** Cancels a Stripe subscription right away and mirrors it (Premium off). Safe if already canceled. */
 async function endSubscriptionNow(stripe: Stripe, subscriptionId: string) {
   let sub = await stripe.subscriptions.retrieve(subscriptionId)
+  // Legacy Ellieo subscriptions on the same Stripe account are not ours to cancel.
+  if (!isPremiumPrice(sub.items?.data?.[0]?.price)) return
   if (sub.status !== 'canceled') sub = await stripe.subscriptions.cancel(subscriptionId, { prorate: false })
   await syncSubscription(sub)
 }
