@@ -1,7 +1,7 @@
 import { createPrivateKey, sign } from 'node:crypto'
 
 import { invalidatePremium } from './access.server'
-import { getEntitlementByExternalId, upsertEntitlement, type PremiumPlan, type PremiumStatus } from './entitlements.server'
+import { getEntitlementByExternalId, rest, upsertEntitlement, type PremiumPlan, type PremiumStatus } from './entitlements.server'
 
 /**
  * App Store subscriptions (Misaeng iOS, com.misaeng.nyc): products com.misaeng.nyc.premium.monthly / .season /
@@ -44,7 +44,7 @@ type AppleTransaction = {
   environment?: string
   revocationDate?: number
 }
-type AppleRenewal = { autoRenewStatus?: number; originalTransactionId?: string }
+type AppleRenewal = { autoRenewStatus?: number; originalTransactionId?: string; gracePeriodExpiresDate?: number }
 
 function config() {
   const keyId = process.env.APPLE_IAP_KEY_ID?.trim()
@@ -106,9 +106,50 @@ async function fetchStatuses(transactionId: string): Promise<{ env: AppleEnv; bo
     })
     if (res.ok) return { env, body: (await res.json()) as StatusResponse }
     if (res.status === 401) throw new AppleIapError('App Store API rejected the key.', 502)
-    // 404 / 400: not in this environment, try the next
+    // Only "not in this environment" moves on to the next one; a 429 / 5xx is temporary — throw so the app keeps the
+    // transaction unfinished and Apple retries the notification (instead of "not found" → purchase lost).
+    if (res.status !== 404 && res.status !== 400) {
+      throw new AppleIapError(`App Store API is unavailable (HTTP ${res.status}).`, 503)
+    }
   }
   return null
+}
+
+/**
+ * The appAccountToken the app puts on every purchase (premium_apple_accounts): one per Misaeng account, created on
+ * first use. Links a purchase to the account that made it, even if the app never got to report it.
+ */
+const tokenCache = new Map<string, string>()
+
+export async function appAccountTokenFor(uid: string): Promise<string | null> {
+  const cached = tokenCache.get(uid)
+  if (cached) return cached
+  const token = await loadAppAccountToken(uid)
+  if (token) tokenCache.set(uid, token)
+  return token
+}
+
+async function loadAppAccountToken(uid: string): Promise<string | null> {
+  const read = async () => {
+    const res = await rest(`premium_apple_accounts?select=token&user_uid=eq.${encodeURIComponent(uid)}&limit=1`)
+    if (!res.ok) return null
+    return ((await res.json()) as { token: string }[])[0]?.token ?? null
+  }
+  const existing = await read()
+  if (existing) return existing
+  await rest('premium_apple_accounts?on_conflict=user_uid', {
+    method: 'POST',
+    prefer: 'resolution=ignore-duplicates,return=minimal',
+    body: JSON.stringify({ user_uid: uid }),
+  })
+  return read()
+}
+
+async function ownerOfToken(token: string | undefined): Promise<string | null> {
+  if (!token || !/^[0-9a-f-]{36}$/i.test(token)) return null
+  const res = await rest(`premium_apple_accounts?select=user_uid&token=eq.${encodeURIComponent(token.toLowerCase())}&limit=1`)
+  if (!res.ok) return null
+  return ((await res.json()) as { user_uid: string }[])[0]?.user_uid ?? null
 }
 
 function statusFrom(code: number | undefined, tx: AppleTransaction): PremiumStatus {
@@ -148,19 +189,34 @@ export async function syncAppleSubscription(transactionId: string, uid: string |
     const originalId = tx.originalTransactionId || renewal.originalTransactionId
     if (!originalId) continue
     const existing = await getEntitlementByExternalId(`apple:${originalId}`)
-    // One App Store subscription belongs to one Misaeng account.
-    if (uid && existing && existing.user_uid !== uid) {
+    // Who made the latest purchase on this subscription (the app sets our appAccountToken on every purchase).
+    const buyer = await ownerOfToken(tx.appAccountToken)
+    // One App Store subscription belongs to one Misaeng account. It moves only when the latest purchase was made from
+    // the requesting account (e.g. the old account was deleted and this one bought again).
+    if (uid && buyer && buyer !== uid) {
       throw new AppleIapError('This App Store subscription is linked to another Misaeng account.', 409)
     }
-    ownerUid = uid ?? existing?.user_uid ?? null
+    if (uid && existing && existing.user_uid !== uid && buyer !== uid) {
+      throw new AppleIapError('This App Store subscription is linked to another Misaeng account.', 409)
+    }
+    // Server notification for a purchase the app never reported: the token says whose it is.
+    ownerUid = uid ?? existing?.user_uid ?? buyer ?? null
     if (!ownerUid) continue
+    const status = statusFrom(code, tx)
+    // Billing grace (status 4): Apple keeps access until gracePeriodExpiresDate; retry without grace (3): 3 days.
+    const periodEnd =
+      code === 4 && renewal.gracePeriodExpiresDate
+        ? renewal.gracePeriodExpiresDate
+        : code === 3 && tx.expiresDate
+          ? tx.expiresDate + 3 * 86_400_000
+          : tx.expiresDate
     await upsertEntitlement({
       user_uid: ownerUid,
       email: email ?? existing?.email ?? null,
       source: 'apple',
       plan: PRODUCT_PLANS[tx.productId!],
-      status: statusFrom(code, tx),
-      current_period_end: tx.expiresDate ? new Date(tx.expiresDate).toISOString() : null,
+      status,
+      current_period_end: periodEnd ? new Date(periodEnd).toISOString() : null,
       cancel_at_period_end: renewal.autoRenewStatus === 0,
       external_id: `apple:${originalId}`,
       product_id: tx.productId ?? null,

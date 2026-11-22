@@ -63,7 +63,7 @@ export function PremiumScreen() {
       let next = await load()
       if (alive) setStatus(checkout)
       // The webhook can land a few seconds after Stripe sends the member back: check again for a little while.
-      for (let i = 0; checkout === 'success' && alive && !next?.premium && i < 6; i += 1) {
+      for (let i = 0; checkout === 'success' && alive && !next?.premium && i < 15; i += 1) {
         await new Promise((resolve) => setTimeout(resolve, 2000))
         next = await load()
       }

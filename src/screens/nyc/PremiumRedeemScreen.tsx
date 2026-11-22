@@ -66,6 +66,11 @@ export function PremiumRedeemScreen() {
       const result = await redeemPremiumCode(code)
       setUntil(result.until)
     } catch (e) {
+      if (e instanceof PremiumRequestError && e.status === 401) {
+        // Session expired: log in again and come back with the code filled in.
+        router.push(cityLoginPath(city, `${pathname}?code=${encodeURIComponent(code.trim())}`))
+        return
+      }
       const key = e instanceof PremiumRequestError ? e.message : ''
       setError(t(`redeem.errors.${(ERROR_CODES as readonly string[]).includes(key) ? key : 'FAILED'}`))
     } finally {

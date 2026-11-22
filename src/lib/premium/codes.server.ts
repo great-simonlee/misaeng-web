@@ -114,26 +114,37 @@ async function json<T>(res: Response, what: string): Promise<T> {
 
 /* ───────────── Redeem (members) ───────────── */
 
-// Failed tries per member per hour (one server process on EC2, so memory is enough).
-const FAILED_LIMIT = 10
+// Wrong codes per hour: 10 per member and 30 per IP (throwaway accounts can't guess group codes quickly). One server
+// process on EC2, so memory is enough; old entries are dropped as the map grows.
+const HOUR = 3_600_000
+const LIMITS = { uid: 10, ip: 30 }
 const failures = new Map<string, number[]>()
 
-function tooManyFailures(uid: string) {
+function recent(key: string) {
   const now = Date.now()
-  const recent = (failures.get(uid) ?? []).filter((at) => now - at < 3_600_000)
-  failures.set(uid, recent)
-  return recent.length >= FAILED_LIMIT
+  const list = (failures.get(key) ?? []).filter((at) => now - at < HOUR)
+  if (list.length) failures.set(key, list)
+  else failures.delete(key)
+  return list.length
 }
 
-function recordFailure(uid: string) {
-  failures.set(uid, [...(failures.get(uid) ?? []), Date.now()])
+function tooManyFailures(uid: string, ip: string | null) {
+  return recent(`u:${uid}`) >= LIMITS.uid || (ip ? recent(`i:${ip}`) >= LIMITS.ip : false)
 }
 
-export async function redeemCode(input: { code: unknown; uid: string; email: string | null }) {
-  if (tooManyFailures(input.uid)) return { ok: false as const, error: 'TOO_MANY' as RedeemError }
+function recordFailure(uid: string, ip: string | null) {
+  if (failures.size > 20_000) {
+    for (const key of [...failures.keys()].slice(0, 10_000)) recent(key)
+  }
+  for (const key of [`u:${uid}`, ...(ip ? [`i:${ip}`] : [])]) failures.set(key, [...(failures.get(key) ?? []), Date.now()])
+}
+
+export async function redeemCode(input: { code: unknown; uid: string; email: string | null; ip?: string | null }) {
+  const ip = input.ip?.trim() || null
+  if (tooManyFailures(input.uid, ip)) return { ok: false as const, error: 'TOO_MANY' as RedeemError }
   const code = normalizeCode(input.code)
   if (code.length < 4 || code.length > 24) {
-    recordFailure(input.uid)
+    recordFailure(input.uid, ip)
     return { ok: false as const, error: 'INVALID' as RedeemError }
   }
   const res = await rest('rpc/redeem_premium_code', {
@@ -142,7 +153,7 @@ export async function redeemCode(input: { code: unknown; uid: string; email: str
   })
   const result = await json<{ ok: boolean; error?: RedeemError; ends_at?: string }>(res, 'Redeeming the code')
   if (!result.ok) {
-    if (result.error === 'NOT_FOUND') recordFailure(input.uid)
+    if (result.error === 'NOT_FOUND') recordFailure(input.uid, ip)
     return { ok: false as const, error: (result.error || 'NOT_FOUND') as RedeemError }
   }
   invalidatePremium(input.uid)
@@ -169,9 +180,21 @@ export type CreateBatchInput = {
   actor: string
 }
 
+/** A date-only "YYYY-MM-DD" means 11:59:59 PM New York time that day; anything else must be a full date-time. */
 function isoOrNull(value: unknown, field: string): string | null {
   if (value == null || value === '') return null
-  const ms = Date.parse(String(value))
+  const text = String(value).trim()
+  const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text)
+  if (day) {
+    const wallClock = Date.UTC(Number(day[1]), Number(day[2]) - 1, Number(day[3]), 23, 59, 59)
+    const name = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', timeZoneName: 'longOffset' })
+      .formatToParts(new Date(wallClock + 5 * 3_600_000))
+      .find((part) => part.type === 'timeZoneName')?.value
+    const m = /GMT([+-])(\d{2}):?(\d{2})?/.exec(name || '')
+    const offset = m ? (m[1] === '-' ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3] || 0)) : -300
+    return new Date(wallClock - offset * 60_000).toISOString()
+  }
+  const ms = Date.parse(text)
   if (!Number.isFinite(ms)) throw new CodeError('INVALID', `${field} is not a valid date.`)
   return new Date(ms).toISOString()
 }
@@ -194,15 +217,23 @@ export async function createBatch(input: CreateBatchInput) {
   }
   const redeemBy = isoOrNull(input.redeemBy, 'Redeem-by date')
   if (redeemBy && Date.parse(redeemBy) <= Date.now()) throw new CodeError('INVALID', 'Redeem-by date must be in the future.')
+  if (redeemBy && endsAt && Date.parse(redeemBy) > Date.parse(endsAt)) {
+    throw new CodeError('INVALID', 'Redeem-by date must be on or before the end date.')
+  }
 
   let codes: { code: string; max_uses: number }[]
   let maxRedemptions: number
   if (kind === 'group') {
     maxRedemptions = intIn(input.maxMembers, 1, MAX_GROUP_MEMBERS, 'Member limit')
-    const chosen = normalizeCode(input.code)
+    const raw = String(input.code ?? '').trim()
+    // Only English letters, digits, spaces and dashes (anything else would be silently dropped and make the code
+    // shorter / easier to guess), and not shaped like our random codes.
+    if (raw && !/^[A-Za-z0-9 -]+$/.test(raw)) throw new CodeError('INVALID', 'Use English letters and digits only.')
+    const chosen = normalizeCode(raw)
     if (chosen && !/^[A-Z0-9]{4,24}$/.test(chosen)) {
       throw new CodeError('INVALID', 'Code must be 4–24 letters or digits.')
     }
+    if (chosen.startsWith(RANDOM_PREFIX)) throw new CodeError('INVALID', 'Group codes cannot start with MSG.')
     codes = [{ code: chosen || randomCode(), max_uses: maxRedemptions }]
   } else {
     maxRedemptions = intIn(input.count, 1, MAX_SINGLE_CODES, 'Number of codes')
@@ -234,62 +265,75 @@ export async function createBatch(input: CreateBatchInput) {
         max_redemptions: maxRedemptions,
         note: String(input.note || '').trim().slice(0, 500) || null,
         created_by: input.actor,
+        // Paused until every code is saved: a half-made batch can never be redeemed.
+        status: 'paused',
       }),
     }),
     'Creating the batch',
   )
+  const discard = () => rest(`premium_code_batches?id=eq.${batch.id}`, { method: 'DELETE' }).catch(() => null)
 
   // Random collisions with older codes are astronomically unlikely (31^8); a failed chunk is retried with new codes.
-  for (let i = 0; i < codes.length; i += 200) {
-    let chunk = codes.slice(i, i + 200)
-    for (let attempt = 0; ; attempt += 1) {
-      const res = await rest('premium_codes', {
-        method: 'POST',
-        prefer: 'return=minimal',
-        body: JSON.stringify(chunk.map((c) => ({ ...c, batch_id: batch.id }))),
-      })
-      if (res.ok) break
-      if (res.status !== 409 || kind === 'group' || attempt >= 2) {
-        await rest(`premium_code_batches?id=eq.${batch.id}`, { method: 'DELETE' })
-        if (res.status === 409) throw new CodeError('CODE_TAKEN', 'This code is already used. Choose another one.', 409)
-        throw new CodeError('DB_ERROR', `Saving the codes failed (HTTP ${res.status}).`, 500)
+  try {
+    for (let i = 0; i < codes.length; i += 200) {
+      let chunk = codes.slice(i, i + 200)
+      for (let attempt = 0; ; attempt += 1) {
+        const res = await rest('premium_codes', {
+          method: 'POST',
+          prefer: 'return=minimal',
+          body: JSON.stringify(chunk.map((c) => ({ ...c, batch_id: batch.id }))),
+        })
+        if (res.ok) break
+        if (res.status !== 409 || kind === 'group' || attempt >= 2) {
+          if (res.status === 409) throw new CodeError('CODE_TAKEN', 'This code is already used. Choose another one.', 409)
+          throw new CodeError('DB_ERROR', `Saving the codes failed (HTTP ${res.status}).`, 500)
+        }
+        chunk = chunk.map((c) => ({ ...c, code: randomCode() }))
       }
-      chunk = chunk.map((c) => ({ ...c, code: randomCode() }))
     }
+    const [active] = await json<CodeBatch[]>(
+      await rest(`premium_code_batches?id=eq.${batch.id}`, {
+        method: 'PATCH',
+        prefer: 'return=representation',
+        body: JSON.stringify({ status: 'active', updated_at: new Date().toISOString() }),
+      }),
+      'Activating the batch',
+    )
+    return active ?? batch
+  } catch (error) {
+    await discard()
+    if (error instanceof CodeError) throw error
+    throw new CodeError('DB_ERROR', 'Saving the codes failed.', 500)
   }
-  return batch
 }
 
 export type BatchSummary = CodeBatch & { used: number; codeCount: number; activeMembers: number }
 
 export async function listBatches(): Promise<BatchSummary[]> {
-  const batches = await json<CodeBatch[]>(
-    await rest('premium_code_batches?select=*&order=created_at.desc&limit=500'),
-    'Loading code batches',
-  )
-  if (!batches.length) return []
-  const ids = batches.map((b) => b.id).join(',')
-  const [codes, redemptions] = await Promise.all([
-    json<{ batch_id: string; used_count: number }[]>(
-      await rest(`premium_codes?select=batch_id,used_count&batch_id=in.(${ids})&limit=100000`),
-      'Loading codes',
-    ),
-    json<{ batch_id: string; ends_at: string; revoked_at: string | null }[]>(
-      await rest(`premium_code_redemptions?select=batch_id,ends_at,revoked_at&batch_id=in.(${ids})&limit=100000`),
-      'Loading redemptions',
+  const [batches, stats] = await Promise.all([
+    allRows<CodeBatch>('premium_code_batches?select=*&order=created_at.desc,id.asc', 'Loading code batches'),
+    // Per-batch counts computed in the database (supabase/premium_fix_1122.sql): no row limits.
+    allRows<{ batch_id: string; code_count: number; used: number; active_members: number }>(
+      'premium_code_batch_stats?select=*',
+      'Loading code counts',
     ),
   ])
-  const now = Date.now()
+  const byBatch = new Map(stats.map((row) => [row.batch_id, row]))
   return batches.map((b) => {
-    const mine = codes.filter((c) => c.batch_id === b.id)
-    const members = redemptions.filter((r) => r.batch_id === b.id)
-    return {
-      ...b,
-      codeCount: mine.length,
-      used: members.length,
-      activeMembers: members.filter((r) => !r.revoked_at && Date.parse(r.ends_at) > now).length,
-    }
+    const row = byBatch.get(b.id)
+    return { ...b, codeCount: row?.code_count ?? 0, used: row?.used ?? 0, activeMembers: row?.active_members ?? 0 }
   })
+}
+
+/** Every row of a query, 1000 at a time (Supabase returns at most 1000 rows per request). */
+async function allRows<T>(path: string, what: string): Promise<T[]> {
+  const out: T[] = []
+  for (let offset = 0; offset < 20_000; offset += 1000) {
+    const page = await json<T[]>(await rest(`${path}&limit=1000&offset=${offset}`), what)
+    out.push(...page)
+    if (page.length < 1000) break
+  }
+  return out
 }
 
 export async function getBatch(id: string) {
@@ -299,12 +343,9 @@ export async function getBatch(id: string) {
   )
   if (!batch) throw new CodeError('NOT_FOUND', 'Batch not found.', 404)
   const [codes, redemptions] = await Promise.all([
-    json<PremiumCode[]>(
-      await rest(`premium_codes?select=*&batch_id=eq.${batch.id}&order=created_at.asc&limit=${MAX_SINGLE_CODES + 10}`),
-      'Loading codes',
-    ),
-    json<CodeRedemption[]>(
-      await rest(`premium_code_redemptions?select=*&batch_id=eq.${batch.id}&order=redeemed_at.desc&limit=10000`),
+    allRows<PremiumCode>(`premium_codes?select=*&batch_id=eq.${batch.id}&order=created_at.asc,id.asc`, 'Loading codes'),
+    allRows<CodeRedemption>(
+      `premium_code_redemptions?select=*&batch_id=eq.${batch.id}&order=redeemed_at.desc,id.asc`,
       'Loading redemptions',
     ),
   ])
@@ -322,17 +363,18 @@ export async function updateBatch(id: string, patch: { status?: unknown; redeemB
     if (!['active', 'paused', 'closed'].includes(String(patch.status))) throw new CodeError('INVALID', 'Unknown status.')
     body.status = patch.status
   }
+  // Closed is final: the PATCH only matches batches that are not closed.
   if (patch.redeemBy !== undefined) body.redeem_by = isoOrNull(patch.redeemBy, 'Redeem-by date')
   if (patch.note !== undefined) body.note = String(patch.note || '').trim().slice(0, 500) || null
   const rows = await json<CodeBatch[]>(
-    await rest(`premium_code_batches?id=eq.${encodeURIComponent(id)}`, {
+    await rest(`premium_code_batches?id=eq.${encodeURIComponent(id)}&status=neq.closed`, {
       method: 'PATCH',
       prefer: 'return=representation',
       body: JSON.stringify(body),
     }),
     'Updating the batch',
   )
-  if (!rows[0]) throw new CodeError('NOT_FOUND', 'Batch not found.', 404)
+  if (!rows[0]) throw new CodeError('NOT_FOUND', 'Batch not found, or it is closed (closed codes cannot be changed).', 404)
   return rows[0]
 }
 
@@ -350,27 +392,16 @@ export async function revokeCode(codeId: string) {
   return rows[0]
 }
 
-/** Ends one member's code Premium now (abuse, wrong person). */
+/** Ends one member's code Premium now (abuse, wrong person). One transaction; calling it again repairs / no-ops. */
 export async function revokeRedemption(redemptionId: string, actor: string) {
-  const now = new Date().toISOString()
-  const rows = await json<CodeRedemption[]>(
-    await rest(`premium_code_redemptions?id=eq.${encodeURIComponent(redemptionId)}&revoked_at=is.null`, {
-      method: 'PATCH',
-      prefer: 'return=representation',
-      body: JSON.stringify({ revoked_at: now, revoked_by: actor }),
-    }),
-    'Revoking the member',
-  )
-  const row = rows[0]
-  if (!row) throw new CodeError('NOT_FOUND', 'Redemption not found or already revoked.', 404)
-  await json<unknown[]>(
-    await rest(`premium_entitlements?external_id=eq.${encodeURIComponent(`code:${row.id}`)}`, {
-      method: 'PATCH',
-      prefer: 'return=representation',
-      body: JSON.stringify({ status: 'canceled', current_period_end: now, updated_at: now }),
+  const result = await json<{ ok: boolean; error?: string; user_uid?: string }>(
+    await rest('rpc/revoke_premium_redemption', {
+      method: 'POST',
+      body: JSON.stringify({ p_id: redemptionId, p_actor: actor }),
     }),
     'Ending the Premium',
   )
-  invalidatePremium(row.user_uid)
-  return row
+  if (!result.ok || !result.user_uid) throw new CodeError('NOT_FOUND', 'Redemption not found.', 404)
+  invalidatePremium(result.user_uid)
+  return { id: redemptionId, user_uid: result.user_uid }
 }

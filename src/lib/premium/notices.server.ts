@@ -37,12 +37,19 @@ function dateIn(locale: string, seconds: number) {
   }).format(new Date(seconds * 1000))
 }
 
-export async function sendTrialEndingNotice(sub: Stripe.Subscription) {
+export async function sendTrialEndingNotice(subscriptionId: string) {
+  const stripe = getStripe()
+  if (!stripe) return
+  // Re-read: a late or retried event must not remind someone who already canceled or whose trial already ended.
+  const sub = await stripe.subscriptions.retrieve(subscriptionId)
   const uid = sub.metadata?.user_uid
   const item = sub.items?.data?.[0]
-  if (!uid || !isPremiumPrice(item?.price) || sub.status !== 'trialing' || !sub.trial_end || sub.cancel_at_period_end) return
-  const amount = item?.price?.unit_amount ?? 0
-  const price = money(amount, item?.price?.currency)
+  if (!uid || !(await isPremiumPrice(item?.price)) || sub.status !== 'trialing' || !sub.trial_end || sub.cancel_at_period_end) return
+  // What will really be charged (discounts, tax), falling back to the list price.
+  const upcoming = await stripe.invoices
+    .retrieveUpcoming({ subscription: sub.id })
+    .catch(() => null)
+  const price = money(upcoming?.amount_due ?? item?.price?.unit_amount ?? 0, upcoming?.currency ?? item?.price?.currency)
   const { locale, email } = await recipient(uid, sub.metadata?.email)
   const date = dateIn(locale, sub.trial_end)
   const t = await getT(locale, 'premium')
@@ -87,7 +94,7 @@ export async function sendRenewalNotice(invoice: Stripe.Invoice) {
   const uid = sub.metadata?.user_uid
   const subPrice = sub.items?.data?.[0]?.price
   const annual = subPrice?.recurring?.interval === 'year'
-  if (!uid || !isPremiumPrice(subPrice) || !annual || sub.status !== 'active' || sub.cancel_at_period_end) return
+  if (!uid || !(await isPremiumPrice(subPrice)) || !annual || sub.status !== 'active' || sub.cancel_at_period_end) return
   const when = invoice.next_payment_attempt ?? invoice.period_end
   const { locale, email } = await recipient(uid, invoice.customer_email || sub.metadata?.email)
   if (!email || !isEmailConfigured() || !when) return

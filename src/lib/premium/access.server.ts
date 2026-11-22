@@ -8,8 +8,11 @@ import {
 
 /**
  * Who sees Premium content: emails in PREMIUM_PREVIEW_EMAILS (comma-separated, staff checking the screens), or a
- * premium_entitlements row (Stripe / App Store / Play / code / gift) that is trialing or active until a future
- * date, or past_due for at most 3 days (card retry window).
+ * premium_entitlements row (Stripe / App Store / Play / code / gift) that is trialing, active or past_due until
+ * current_period_end. For past_due the writers store the grace end there (Stripe: 3 days after the failed invoice;
+ * App Store: Apple's billing grace end), never the next period.
+ * Stripe rows from the other Stripe mode (test rows on the live server and the reverse) are ignored.
+ * If the database can't be read, nothing is cached and the state is marked `degraded` (checkout refuses then).
  */
 
 type PremiumUser = { uid?: string | null; email?: string | null } | null
@@ -28,9 +31,10 @@ export type PremiumState = {
   /** A Stripe customer exists (web "구독 관리" opens the billing portal). */
   manageable: boolean
   customerId: string | null
+  /** The database could not be read: the state is unknown (shown as free, never cached, checkout refuses). */
+  degraded?: boolean
 }
 
-const PAST_DUE_GRACE_MS = 3 * 86_400_000
 const CACHE_MS = 60_000
 const cache = new Map<string, { at: number; value: PremiumState }>()
 
@@ -56,9 +60,15 @@ function previewEmails() {
 
 export function isActiveEntitlement(row: PremiumEntitlement, now = Date.now()): boolean {
   const end = row.current_period_end ? Date.parse(row.current_period_end) : null
-  if (row.status === 'trialing' || row.status === 'active') return end === null || end > now
-  if (row.status === 'past_due') return end === null || end + PAST_DUE_GRACE_MS > now
+  if (row.status === 'trialing' || row.status === 'active' || row.status === 'past_due') return end === null || end > now
   return false
+}
+
+/** Stripe rows written in the other Stripe mode (sk_test vs sk_live) don't count on this server. */
+function sameStripeMode(row: PremiumEntitlement) {
+  if (row.source !== 'stripe' || !row.environment) return true
+  const live = process.env.STRIPE_SECRET_KEY?.trim().startsWith('sk_live') ?? false
+  return row.environment === (live ? 'live' : 'test')
 }
 
 /** Forget a user's cached state (after a webhook / App Store write). */
@@ -74,9 +84,19 @@ export async function getPremiumState(user: PremiumUser): Promise<PremiumState> 
   if (!uid) return staff ? { ...EMPTY, premium: true, plan: 'staff', source: 'staff' } : EMPTY
 
   const hit = cache.get(uid)
-  if (hit && Date.now() - hit.at < CACHE_MS) return staff ? { ...hit.value, premium: true } : hit.value
+  if (hit && Date.now() - hit.at < CACHE_MS) {
+    if (staff && !hit.value.premium) return { ...hit.value, premium: true, plan: 'staff', source: 'staff' }
+    return hit.value
+  }
 
-  const rows = await listEntitlements(uid).catch(() => [])
+  let rows: PremiumEntitlement[]
+  try {
+    rows = (await listEntitlements(uid)).filter(sameStripeMode)
+  } catch (error) {
+    console.error('[premium] reading entitlements failed', error)
+    const unknown: PremiumState = { ...EMPTY, trialAvailable: false, degraded: true }
+    return staff ? { ...unknown, premium: true, plan: 'staff', source: 'staff' } : unknown
+  }
   const active = rows
     .filter((row) => isActiveEntitlement(row))
     .sort((a, b) => Date.parse(b.current_period_end || '9999') - Date.parse(a.current_period_end || '9999'))[0]

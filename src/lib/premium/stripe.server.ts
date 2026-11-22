@@ -45,15 +45,34 @@ export async function priceIdFor(stripe: Stripe, plan: PaidPlan): Promise<string
   return id
 }
 
+let premiumProduct: string | null = null
+
+/** The "Misaeng Premium" product id: STRIPE_PREMIUM_PRODUCT, else the product of the premium_monthly price. */
+async function premiumProductId(stripe: Stripe): Promise<string | null> {
+  const fromEnv = process.env.STRIPE_PREMIUM_PRODUCT?.trim()
+  if (fromEnv) return fromEnv
+  if (premiumProduct) return premiumProduct
+  const prices = await stripe.prices.list({ lookup_keys: Object.values(LOOKUP_KEYS), limit: 3 })
+  const product = prices.data[0]?.product
+  premiumProduct = (typeof product === 'string' ? product : product?.id) ?? null
+  return premiumProduct
+}
+
 /**
- * Only Misaeng Premium prices count. The same Stripe account (Misaeng LLC) also carries the legacy Ellieo backend's
+ * Only Misaeng Premium counts. The same Stripe account (Misaeng LLC) also carries the legacy Ellieo backend's
  * payments (its own webhook → ellieo.com/v1/api/payment/webhook/stripe), and those must never grant or end Premium.
+ * Matched by the Premium product, so subscribers on an older (replaced) price still count.
  */
-export function isPremiumPrice(price: Stripe.Price | null | undefined): boolean {
+export async function isPremiumPrice(price: Stripe.Price | null | undefined): Promise<boolean> {
   if (!price) return false
-  return PAID_PLANS.some(
+  const byPrice = PAID_PLANS.some(
     (plan) => price.lookup_key === LOOKUP_KEYS[plan] || process.env[`STRIPE_PRICE_${plan.toUpperCase()}`]?.trim() === price.id,
   )
+  if (byPrice) return true
+  const stripe = getStripe()
+  if (!stripe) return false
+  const product = typeof price.product === 'string' ? price.product : price.product?.id
+  return Boolean(product && product === (await premiumProductId(stripe)))
 }
 
 function planFromPrice(price: Stripe.Price | null | undefined): PremiumPlan {
@@ -73,8 +92,8 @@ function statusFrom(status: Stripe.Subscription.Status): PremiumStatus {
     case 'active':
       return 'active'
     case 'past_due':
-    case 'unpaid':
       return 'past_due'
+    case 'unpaid': // retries ran out: no access
     case 'canceled':
       return 'canceled'
     default:
@@ -90,18 +109,35 @@ function periodEnd(sub: Stripe.Subscription): string | null {
   return seconds ? new Date(seconds * 1000).toISOString() : null
 }
 
+export const PAST_DUE_GRACE_DAYS = 3
+
+/**
+ * past_due: Stripe has already moved current_period_end to the END of the new period before charging, so access is
+ * kept only until 3 days after the unpaid invoice was created (never "next period + 3 days").
+ */
+async function pastDueGraceEnd(sub: Stripe.Subscription): Promise<string | null> {
+  const stripe = getStripe()
+  const ref = sub.latest_invoice
+  const invoice = typeof ref === 'string' ? (stripe ? await stripe.invoices.retrieve(ref) : null) : ref
+  const startSec = invoice?.created ?? Math.floor(Date.now() / 1000)
+  const graceEnd = new Date((startSec + PAST_DUE_GRACE_DAYS * 86_400) * 1000).toISOString()
+  const end = periodEnd(sub)
+  return end && Date.parse(end) < Date.parse(graceEnd) ? end : graceEnd
+}
+
 /** Mirror one Stripe subscription into premium_entitlements (keyed by the subscription id). */
 export async function syncSubscription(sub: Stripe.Subscription, fallbackUid?: string | null, email?: string | null) {
   const uid = sub.metadata?.user_uid || fallbackUid
   const price = sub.items?.data?.[0]?.price
-  if (!uid || !isPremiumPrice(price)) return
+  if (!uid || !(await isPremiumPrice(price))) return
+  const status = statusFrom(sub.status)
   await upsertEntitlement({
     user_uid: uid,
     email: email ?? sub.metadata?.email ?? null,
     source: 'stripe',
     plan: planFromPrice(price),
-    status: statusFrom(sub.status),
-    current_period_end: periodEnd(sub),
+    status,
+    current_period_end: status === 'past_due' ? await pastDueGraceEnd(sub) : periodEnd(sub),
     cancel_at_period_end: Boolean(sub.cancel_at_period_end),
     external_id: sub.id,
     customer_id: typeof sub.customer === 'string' ? sub.customer : sub.customer?.id ?? null,

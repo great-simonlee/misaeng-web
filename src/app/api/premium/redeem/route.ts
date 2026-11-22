@@ -17,11 +17,13 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: 'LOGIN_REQUIRED' }, { status: 401 })
   const body = (await request.json().catch(() => ({}))) as { code?: unknown }
 
-  // Staff preview accounts count as Premium only by email; let them test codes like members.
+  // Staff preview accounts count as Premium only by email; let them test codes like members. (The database function
+  // checks again inside its transaction — this is only the fast path.)
   const state = await getPremiumState({ uid: user.uid, email: null })
   if (state.premium) return NextResponse.json({ error: 'ALREADY_PREMIUM' }, { status: 409 })
+  const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0]?.trim() || request.headers.get('x-real-ip')
   try {
-    const result = await redeemCode({ code: body.code, uid: user.uid, email: user.email || null })
+    const result = await redeemCode({ code: body.code, uid: user.uid, email: user.email || null, ip })
     if (!result.ok) {
       const status = result.error === 'TOO_MANY' ? 429 : result.error === 'ALREADY_PREMIUM' ? 409 : 400
       return NextResponse.json({ error: result.error }, { status })

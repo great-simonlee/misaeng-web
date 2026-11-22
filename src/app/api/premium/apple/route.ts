@@ -32,7 +32,12 @@ export async function POST(request: Request) {
   try {
     await syncAppleSubscription(id, user.uid, user.email)
   } catch (error) {
-    if (error instanceof AppleIapError) return NextResponse.json({ error: error.message }, { status: error.status })
+    if (error instanceof AppleIapError) {
+      return NextResponse.json(
+        { error: error.message, ...(error.status === 409 ? { code: 'OTHER_ACCOUNT' } : {}) },
+        { status: error.status },
+      )
+    }
     console.error('[premium/apple]', error)
     return NextResponse.json({ error: 'Failed to verify the purchase.' }, { status: 500 })
   }

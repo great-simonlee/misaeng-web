@@ -66,13 +66,16 @@ export async function rest(path: string, init: RequestInit & { prefer?: string }
   return fetch(`${c.url}/rest/v1/${path}`, { ...init, headers, cache: 'no-store' })
 }
 
-/** Every row for a user, newest first. Empty when the table is missing (not set up yet). */
+/**
+ * Every row for a user, newest first. Empty when Supabase isn't configured; THROWS when the read fails, so a database
+ * hiccup never makes a paying member look free (and get offered a second trial).
+ */
 export async function listEntitlements(uid: string): Promise<PremiumEntitlement[]> {
   if (!config()) return []
   const res = await rest(
     `premium_entitlements?select=${COLUMNS}&user_uid=eq.${encodeURIComponent(uid)}&order=updated_at.desc`,
   )
-  if (!res.ok) return []
+  if (!res.ok) throw new Error(`Reading premium_entitlements failed (HTTP ${res.status}).`)
   return (await res.json()) as PremiumEntitlement[]
 }
 
