@@ -182,6 +182,11 @@
       "googlePlay": "Get it on Google Play",
       "notFoundTitle": "This posting isn't available",
       "notFoundDescription": "It may have closed or been taken down. Browse other postings instead."
+    },
+    "anyTime": "Any time",
+    "timing": {
+      "posted3d": "Posted in last 3 days",
+      "closing7d": "Closes within 7 days"
     }
   },
   "industries": {
@@ -212,5 +217,49 @@
     "nonprofit": "Nonprofit",
     "education": "Education",
     "other": "Other"
+  },
+  "sponsor": {
+    "title": "Visa & sponsorship",
+    "premium": "Premium",
+    "historyBoth": "Has filed for H-1B and green cards",
+    "historyH1b": "Has filed for H-1B",
+    "historyGreenCard": "Has filed for green cards",
+    "empty": "See visa info",
+    "hint": "Filings by year and base salary by role",
+    "hintLocked": "Premium members see filings by year and base salary by role",
+    "back": "Back to company",
+    "filingsTitle": "Filings",
+    "h1bTile": "H-1B filings",
+    "greenCardTile": "Green card filings",
+    "trendSince": "FY{from} → FY{to}",
+    "trendFlat": "No change",
+    "noRecord": "No filings found in official data for the last 3 years",
+    "rolesTitle": "Base salary by role",
+    "baseBasis": "Base salary",
+    "baseOnly": "Excludes bonus & stock",
+    "regionNY": "New York",
+    "regionMA": "Boston",
+    "regionALL": "All US",
+    "h1b": "H-1B",
+    "greenCard": "Green card",
+    "rolesHintH1b": "Big number is the median, below is the 25th–75th percentile",
+    "rolesHintGreenCard": "Pay band stated on the filings (green card filings state a range)",
+    "count": "{n} filings",
+    "range": "{low} – {high}",
+    "offeredRange": "Offered range",
+    "rolesEmpty": "No role in this area has 5 or more public filings",
+    "showAll": "Show all {n} roles",
+    "showLess": "Show less",
+    "searchRoles": "Search roles",
+    "searchEmpty": "No matching role",
+    "sourceLabel": "Based on official data",
+    "sourceBody": "U.S. Department of Labor (DOL) Office of Foreign Labor Certification (OFLC) public data · {coverage} · decisions through {through}",
+    "sourceCaveat": "Counts are applications the company filed (LCA for H-1B, PERM for green cards), not hires or approved visas. Base salary is the amount stated on the filing and excludes bonus and stock.",
+    "sheetTitle": "Visa & sponsorship is part of Premium",
+    "sheetVisa": "Each company's H-1B sponsorship, E-Verify and OPT·CPT",
+    "sheetFilings": "H-1B and green card filings over the last 3 years",
+    "sheetSalary": "Base salary by role and area (from H-1B filings)",
+    "sheetSource": "Compiled from official U.S. Department of Labor (DOL) public data.",
+    "soon": "Premium is coming soon"
   }
 }

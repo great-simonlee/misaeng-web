@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { LoadingState } from '@components'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
-import { cityFirst, fetchPostings, matchesKind, type PostingKind, type PublicPosting } from '@lib/company/postings'
+import { cityFirst, daysUntil, fetchPostings, matchesKind, type PostingKind, type PublicPosting } from '@lib/company/postings'
 import { BRAND_CONFIG } from '@lib/brand'
 import { JOB_FUNCTION_LABELS, JOB_FUNCTIONS, type JobFunction } from '@lib/constants/postingCopy'
 import { useT } from '@lib/i18n/client'
@@ -22,6 +22,19 @@ const PAGE_SIZE = 20
 
 const normalize = (value: string) => value.toLowerCase().replace(/\s+/g, '')
 
+/** 등록·마감 시점 필터: 최근 3일 등록 (72시간) / 마감 7일 이내 (뉴욕 날짜, 오늘 마감 포함) — apps PostingFilters와 같은 기준 */
+type Timing = 'all' | 'posted3d' | 'closing7d'
+const TIMINGS: Exclude<Timing, 'all'>[] = ['posted3d', 'closing7d']
+function matchesTiming(p: PublicPosting, timing: Timing, now: number) {
+  if (timing === 'posted3d') return p.postedAt > 0 && now - p.postedAt <= 3 * 86_400_000
+  if (timing === 'closing7d') {
+    if (!p.applyBy) return false
+    const days = daysUntil(p.applyBy)
+    return days >= 0 && days <= 7
+  }
+  return true
+}
+
 /** 승인된 인턴·신입 공고 전체 (/[city]/companies/postings) */
 export function PostingListScreen() {
   const city = useCity()
@@ -34,12 +47,13 @@ export function PostingListScreen() {
   const [region, setRegion] = useState('all')
   const [jobFunction, setJobFunction] = useState<'all' | JobFunction>('all')
   const [query, setQuery] = useState('')
+  const [timing, setTiming] = useState<Timing>('all')
   const [limit, setLimit] = useState(PAGE_SIZE)
 
   // 필터가 바뀌면 처음 PAGE_SIZE개부터 다시
   useEffect(() => {
     setLimit(PAGE_SIZE)
-  }, [kind, region, jobFunction, query])
+  }, [kind, region, jobFunction, query, timing])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -68,14 +82,24 @@ export function PostingListScreen() {
 
   const filtered = useMemo(() => {
     const key = normalize(query)
+    const now = Date.now()
     return postings.filter(
       (p) =>
         matchesKind(p, kind) &&
+        matchesTiming(p, timing, now) &&
         (region === 'all' || p.regions.includes(region)) &&
         (jobFunction === 'all' || p.jobFunction === jobFunction) &&
         (!key || normalize(`${p.company.name} ${p.title}`).includes(key)),
     )
-  }, [postings, kind, region, jobFunction, query])
+  }, [postings, kind, region, jobFunction, query, timing])
+
+  // 등록·마감 시점 칩 (해당 공고가 있는 것만)
+  const timings = useMemo(() => {
+    const now = Date.now()
+    return TIMINGS.map((id) => [id, postings.filter((p) => matchesTiming(p, id, now)).length] as const).filter(
+      ([id, count]) => count > 0 || timing === id,
+    )
+  }, [postings, timing])
 
   // 공고가 있는 직무만, 정해진 순서대로
   const functions = useMemo(
@@ -121,6 +145,21 @@ export function PostingListScreen() {
             <Chip key={id} label={label} count={count} active={kind === id} onClick={() => setKind(id)} />
           ))}
         </ChipScrollRow>
+        {timings.length ? (
+          <ChipScrollRow
+            leading={<Chip label={t('postings.anyTime')} active={timing === 'all'} onClick={() => setTiming('all')} />}
+          >
+            {timings.map(([id, count]) => (
+              <Chip
+                key={id}
+                label={t(`postings.timing.${id}`)}
+                count={count}
+                active={timing === id}
+                onClick={() => setTiming(id)}
+              />
+            ))}
+          </ChipScrollRow>
+        ) : null}
         {functions.length > 1 ? (
           <ChipScrollRow
             leading={

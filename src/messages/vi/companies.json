@@ -175,6 +175,11 @@
       "googlePlay": "Tải trên Google Play",
       "notFoundTitle": "Không tìm thấy tin tuyển dụng",
       "notFoundDescription": "Tin có thể đã hết hạn hoặc bị gỡ. Hãy xem các tin khác."
+    },
+    "anyTime": "Mọi thời điểm",
+    "timing": {
+      "posted3d": "Đăng trong 3 ngày qua",
+      "closing7d": "Hết hạn trong 7 ngày"
     }
   },
   "industries": {
@@ -205,5 +210,49 @@
     "nonprofit": "Phi lợi nhuận",
     "education": "Giáo dục",
     "other": "Khác"
+  },
+  "sponsor": {
+    "title": "Visa & bảo lãnh",
+    "premium": "Premium",
+    "historyBoth": "Đã nộp hồ sơ H-1B và thẻ xanh",
+    "historyH1b": "Đã nộp hồ sơ H-1B",
+    "historyGreenCard": "Đã nộp hồ sơ thẻ xanh",
+    "empty": "Xem thông tin visa",
+    "hint": "Số hồ sơ theo năm và lương cơ bản theo vị trí",
+    "hintLocked": "Thành viên Premium xem được số hồ sơ theo năm và lương cơ bản theo vị trí",
+    "back": "Quay lại công ty",
+    "filingsTitle": "Hồ sơ đã nộp",
+    "h1bTile": "Hồ sơ H-1B",
+    "greenCardTile": "Hồ sơ thẻ xanh",
+    "trendSince": "FY{from} → FY{to}",
+    "trendFlat": "Không đổi",
+    "noRecord": "Không tìm thấy hồ sơ trong dữ liệu chính thức 3 năm gần đây",
+    "rolesTitle": "Lương cơ bản theo vị trí",
+    "baseBasis": "Lương cơ bản",
+    "baseOnly": "Không gồm thưởng và cổ phiếu",
+    "regionNY": "New York",
+    "regionMA": "Boston",
+    "regionALL": "Toàn nước Mỹ",
+    "h1b": "H-1B",
+    "greenCard": "Thẻ xanh",
+    "rolesHintH1b": "Số lớn là trung vị, bên dưới là khoảng 25%–75%",
+    "rolesHintGreenCard": "Khoảng lương ghi trên hồ sơ (hồ sơ thẻ xanh ghi theo khoảng)",
+    "count": "{n} hồ sơ",
+    "range": "{low} – {high}",
+    "offeredRange": "Khoảng lương đề xuất",
+    "rolesEmpty": "Không có vị trí nào ở khu vực này có từ 5 hồ sơ công khai",
+    "showAll": "Xem tất cả {n} vị trí",
+    "showLess": "Thu gọn",
+    "searchRoles": "Tìm vị trí",
+    "searchEmpty": "Không có vị trí phù hợp",
+    "sourceLabel": "Theo dữ liệu chính thức",
+    "sourceBody": "Dữ liệu công khai của Bộ Lao động Hoa Kỳ (DOL), Văn phòng Chứng nhận Lao động Nước ngoài (OFLC) · {coverage} · quyết định đến {through}",
+    "sourceCaveat": "Số liệu là số hồ sơ công ty đã nộp (LCA cho H-1B, PERM cho thẻ xanh), không phải số người được tuyển hay visa được duyệt. Lương cơ bản là mức ghi trên hồ sơ, không gồm thưởng và cổ phiếu.",
+    "sheetTitle": "Thông tin visa & bảo lãnh dành cho Premium",
+    "sheetVisa": "Thông tin bảo lãnh H-1B, E-Verify, OPT·CPT của từng công ty",
+    "sheetFilings": "Số hồ sơ H-1B và thẻ xanh trong 3 năm gần đây",
+    "sheetSalary": "Lương cơ bản theo vị trí và khu vực (từ hồ sơ H-1B)",
+    "sheetSource": "Tổng hợp từ dữ liệu công khai chính thức của Bộ Lao động Hoa Kỳ (DOL).",
+    "soon": "Premium sắp ra mắt"
   }
 }

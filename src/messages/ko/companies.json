@@ -175,6 +175,11 @@
       "googlePlay": "Google Play에서 받기",
       "notFoundTitle": "공고를 찾을 수 없어요",
       "notFoundDescription": "마감됐거나 내려간 공고예요. 다른 공고를 둘러보세요."
+    },
+    "anyTime": "전체 기간",
+    "timing": {
+      "posted3d": "최근 3일 등록",
+      "closing7d": "마감 7일 이내"
     }
   },
   "industries": {
@@ -205,5 +210,49 @@
     "nonprofit": "비영리",
     "education": "교육",
     "other": "기타"
+  },
+  "sponsor": {
+    "title": "비자·스폰서 정보",
+    "premium": "Premium",
+    "historyBoth": "H-1B·그린카드 신청 이력이 있어요",
+    "historyH1b": "H-1B 신청 이력이 있어요",
+    "historyGreenCard": "그린카드 신청 이력이 있어요",
+    "empty": "비자 정보 보기",
+    "hint": "연도별 신청 건수와 직무별 기본급 보기",
+    "hintLocked": "Premium 회원은 연도별 신청 건수와 직무별 기본급을 볼 수 있어요",
+    "back": "회사로 돌아가기",
+    "filingsTitle": "신청 현황",
+    "h1bTile": "H-1B 신청",
+    "greenCardTile": "그린카드 신청",
+    "trendSince": "FY{from} → FY{to}",
+    "trendFlat": "변화 없음",
+    "noRecord": "최근 3년 공식 자료에서 신청 이력을 찾지 못했어요",
+    "rolesTitle": "직무별 기본급",
+    "baseBasis": "기본급 기준",
+    "baseOnly": "보너스·주식 제외",
+    "regionNY": "뉴욕",
+    "regionMA": "보스턴",
+    "regionALL": "미국 전체",
+    "h1b": "H-1B",
+    "greenCard": "그린카드",
+    "rolesHintH1b": "큰 숫자는 중간값, 아래는 하위 25%~상위 25%",
+    "rolesHintGreenCard": "신청서에 적힌 제시 연봉 범위 (그린카드는 범위로 적어요)",
+    "count": "{n}건",
+    "range": "{low} ~ {high}",
+    "offeredRange": "제시 범위",
+    "rolesEmpty": "이 지역에는 5건 이상 공개된 직무 자료가 없어요",
+    "showAll": "직무 {n}개 모두 보기",
+    "showLess": "접기",
+    "searchRoles": "직무 이름으로 찾기",
+    "searchEmpty": "찾는 직무가 없어요",
+    "sourceLabel": "공식 자료 기준",
+    "sourceBody": "미국 노동부(DOL) 외국인 노동허가국(OFLC) 공개 데이터 · {coverage} · {through} 결정분까지",
+    "sourceCaveat": "건수는 회사가 낸 신청서(H-1B는 LCA, 그린카드는 PERM) 수이며 실제 채용이나 비자 승인 수가 아니에요. 기본급은 신청서에 적힌 금액이며 보너스·주식은 포함되지 않아요.",
+    "sheetTitle": "비자·스폰서 정보는 Premium에서 볼 수 있어요",
+    "sheetVisa": "회사별 H-1B 스폰서, E-Verify, OPT·CPT 정보",
+    "sheetFilings": "최근 3년 H-1B·그린카드 신청 건수와 증감",
+    "sheetSalary": "직무·지역별 기본급 (H-1B 신청서 기준)",
+    "sheetSource": "미국 노동부(DOL) 공식 공개 자료를 정리해 보여드려요.",
+    "soon": "Premium은 곧 오픈해요"
   }
 }

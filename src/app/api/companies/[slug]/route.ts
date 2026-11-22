@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
+import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import { getRequestT } from '@lib/i18n/server'
+import { hasPremiumAccess } from '@lib/premium/access.server'
 import { resolveCityId } from '@lib/constants/cities'
 import {
   countReviewsByCompany,
@@ -45,11 +47,15 @@ export async function GET(request: Request, context: RouteContext) {
 
     const { searchParams } = new URL(request.url)
     const city = searchParams.get('city') ? resolveCityId(searchParams.get('city')) : undefined
-    const [companies, counts, industries] = await Promise.all([
+    const [companies, counts, industries, user] = await Promise.all([
       listActiveCompanies(),
       countReviewsByCompany(city),
       listIndustries(),
+      resolveAuthenticatedUser().catch(() => null),
     ])
+    // Visa & sponsorship is Premium: free members get visa null (apps and web hide it; the summary + lock come
+    // from /api/companies/{slug}/visa-sponsors).
+    const premium = hasPremiumAccess(user)
     const parent = companies.find((c) => c.id === company.parentCompanyId) ?? null
     const children = companies.filter((c) => c.parentCompanyId === company.id)
 
@@ -63,7 +69,8 @@ export async function GET(request: Request, context: RouteContext) {
         websiteDomain: company.websiteDomain,
         country: company.country,
         atsType: company.atsType,
-        visa: {
+        visaLocked: !premium,
+        visa: premium ? {
           h1bSponsor: company.h1bSponsor,
           eVerify: company.eVerify,
           optCpt: company.optCpt,
@@ -71,7 +78,7 @@ export async function GET(request: Request, context: RouteContext) {
           notice: company.visaNotice,
           sourceUrl: company.visaSourceUrl,
           checkedAt: company.visaCheckedAt,
-        },
+        } : null,
       },
       parent: parent ? summary(parent, counts, industries) : null,
       children: children.map((c) => summary(c, counts, industries)),

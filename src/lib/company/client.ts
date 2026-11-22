@@ -47,7 +47,9 @@ export type CompanyDetail = {
     websiteDomain: string | null
     country: string | null
     atsType: string
-    visa: CompanyVisaInfo
+    /** null for free members (visa & sponsorship is Premium). */
+    visa: CompanyVisaInfo | null
+    visaLocked?: boolean
   }
   parent: CompanySummary | null
   children: CompanySummary[]
@@ -133,4 +135,32 @@ export function trackCompanyClick(slug: string, kind: 'careers' | 'students') {
     body,
     keepalive: true,
   }).catch(() => undefined)
+}
+
+/** GET /api/companies/{slug}/visa-sponsors — DOL filing history (H-1B LCA / green card PERM). */
+export type VisaSponsorYear = { fy: number; h1b: number; greenCard: number }
+export type VisaSponsorRole = {
+  kind: 'h1b' | 'greenCard'
+  region: string
+  title: string
+  count: number
+  p25: number
+  median: number
+  p75: number
+}
+export type VisaSponsorData = {
+  summary: { h1b: boolean; greenCard: boolean }
+  locked: boolean
+  years: VisaSponsorYear[] | null
+  roles: VisaSponsorRole[] | null
+  source: { name: string; url: string; coverage: string; dataThrough: string }
+}
+
+/** null when the data is not loaded for this company (404) or the request failed. */
+export async function fetchVisaSponsors(slug: string): Promise<VisaSponsorData | null> {
+  try {
+    return await getJson<VisaSponsorData>(`/api/companies/${encodeURIComponent(slug)}/visa-sponsors`)
+  } catch {
+    return null
+  }
 }

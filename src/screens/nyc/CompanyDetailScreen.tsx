@@ -9,9 +9,11 @@ import { cn } from '@lib'
 import {
   fetchCompany,
   fetchCompanyReviews,
+  fetchVisaSponsors,
   trackCompanyClick,
   type CompanyDetail,
   type CompanyReview,
+  type VisaSponsorData,
 } from '@lib/company/client'
 import { getJobReviewTypeStyle, JOB_REVIEW_TYPES } from '@lib/community/jobReview'
 import { countryLabelKey } from '@lib/constants/company'
@@ -19,7 +21,7 @@ import { useFormat, useT } from '@lib/i18n/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CompanyHeroPanel, CompanyMark, IndustryTag } from '@widgets/nyc/CompanyBrand'
-import { CompanyVisaInfo } from '@widgets/nyc/CompanyVisaInfo'
+import { VisaSponsorEntry } from '@widgets/nyc/CompanyVisaSponsor'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { CompanyPostings } from '@widgets/nyc/PostingCard'
 import { AppHandoffButton } from '@components/AppHandoff'
@@ -58,6 +60,8 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
   const [reviewsError, setReviewsError] = useState('')
   const [type, setType] = useState<string>('all')
   const [includeSubsidiaries, setIncludeSubsidiaries] = useState(false)
+  /** DOL filing history (summary for everyone, figures for Premium); null when not loaded for this company */
+  const [sponsor, setSponsor] = useState<VisaSponsorData | null>(null)
 
   const loadCompany = useCallback(async () => {
     setLoading(true)
@@ -92,6 +96,16 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
   useEffect(() => {
     void loadReviews()
   }, [loadReviews])
+
+  useEffect(() => {
+    let alive = true
+    void fetchVisaSponsors(slug).then((data) => {
+      if (alive) setSponsor(data)
+    })
+    return () => {
+      alive = false
+    }
+  }, [slug])
 
   const typeCounts = useMemo(() => {
     const counts = new Map<string, number>()
@@ -243,19 +257,21 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
         </CompanyHeroPanel>
       </header>
 
-      {/* 모바일 순서: 공고 → 비자 정보 → 후기. 넓은 화면: 왼쪽 공고·후기, 오른쪽 비자 정보 */}
-      <div className='mt-8 grid gap-8 pb-20 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10'>
-        <div className='min-w-0 empty:hidden lg:col-start-1'>
+      {/* 비자·스폰서 정보 (Premium, 한 줄 요약 → /visa) → 공고 → 후기 */}
+      <div className='mx-auto mt-8 flex max-w-[860px] flex-col gap-8 pb-20'>
+        {company.visa || sponsor ? (
+          <VisaSponsorEntry
+            slug={company.slug}
+            sponsor={sponsor}
+            locked={company.visaLocked ?? sponsor?.locked ?? true}
+          />
+        ) : null}
+
+        <div className='min-w-0 empty:hidden'>
           <CompanyPostings companySlug={company.slug} companyName={company.name} />
         </div>
 
-        <aside className='lg:col-start-2 lg:row-span-2 lg:row-start-1'>
-          <div className='lg:sticky lg:top-24'>
-            <CompanyVisaInfo visa={company.visa} />
-          </div>
-        </aside>
-
-        <section className='min-w-0 lg:col-start-1'>
+        <section className='min-w-0'>
           <div className='flex items-center gap-3'>
             <h2 className='flex items-baseline gap-2 text-[17px] font-bold tracking-tight text-[var(--foreground)] sm:text-[19px]'>
               {t('detail.reviewsTitle')}
