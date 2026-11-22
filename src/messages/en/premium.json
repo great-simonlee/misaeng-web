@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "title": "Misaeng Premium",
+    "description": "See each company's H-1B and green card filings and base salary by role, from official U.S. Department of Labor data."
+  },
+  "hero": {
+    "badge": "Official U.S. Department of Labor data",
+    "title": "Misaeng Premium",
+    "promise": "Less visa worry, smarter about pay.",
+    "sub": "Before you apply, see how much a company sponsors visas and what it pays."
+  },
+  "benefits": {
+    "title": "What you get with Premium",
+    "visa": {
+      "title": "Visa & sponsorship history",
+      "body": "H-1B and green card filings for the last 3 years, and whether they're going up or down.",
+      "chip": "Official DOL data"
+    },
+    "salary": {
+      "title": "Base salary by role and area",
+      "body": "What a role actually pays in New York, Boston and across the US.",
+      "chip": "Excludes bonus & stock"
+    },
+    "policy": {
+      "title": "Visa policy at a glance",
+      "body": "H-1B sponsorship, E-Verify and OPT·CPT for each company.",
+      "chip": "212 companies"
+    },
+    "more": {
+      "title": "New Premium features included",
+      "body": "Premium features we add later come at no extra cost.",
+      "chip": "Always growing"
+    }
+  },
+  "preview": {
+    "title": "Here's how it looks",
+    "example": "Example · Google",
+    "h1b": "H-1B filings",
+    "greenCard": "Green card filings",
+    "role": "Software Engineer · New York",
+    "base": "Median base salary"
+  },
+  "plans": {
+    "title": "Pick a plan",
+    "annual": {
+      "name": "Annual",
+      "price": "$179.99",
+      "per": "/year",
+      "monthly": "$15/mo",
+      "badge": "50% off · BEST",
+      "was": "$359.88"
+    },
+    "season": {
+      "name": "3-month season pass",
+      "price": "$59.99",
+      "per": "/3 months",
+      "monthly": "$20/mo",
+      "badge": "33% off"
+    },
+    "monthly": {
+      "name": "Monthly",
+      "price": "$29.99",
+      "per": "/month",
+      "monthly": "Billed monthly"
+    }
+  },
+  "cta": {
+    "trial": "Start 7 days free",
+    "start": "Start Premium",
+    "login": "Log in to start",
+    "loading": "Opening checkout…"
+  },
+  "disclosure": {
+    "trial": "After your 7-day free trial ends on {date}, you'll be charged {price} and it renews automatically at the same interval. Cancel before the trial ends and you won't be charged.",
+    "noTrial": "You'll be charged {price} today and it renews automatically at the same interval.",
+    "cancel": "Cancel anytime; you keep Premium until the end of the paid period.",
+    "terms": "Terms of Use",
+    "privacy": "Privacy Policy",
+    "agree": "By paying you agree to the {terms} and {privacy}."
+  },
+  "active": {
+    "title": "You're on Premium",
+    "plan": "{plan} plan",
+    "until": "Until {date}",
+    "renews": "Renews on {date}",
+    "ends": "Ends on {date} (cancellation scheduled)",
+    "manage": "Manage subscription",
+    "appStore": "Subscriptions bought in the app are managed in iPhone Settings → Apple Account → Subscriptions.",
+    "staff": "Premium is open on this preview account.",
+    "staffPlan": "Preview"
+  },
+  "status": {
+    "successTitle": "Welcome! Premium is on",
+    "successBody": "You can now see all visa & sponsorship info on company pages. It may take a few seconds to show.",
+    "cancelTitle": "Checkout canceled",
+    "cancelBody": "No problem — you can start anytime.",
+    "goCompanies": "Browse companies"
+  },
+  "faq": {
+    "title": "FAQ",
+    "cancel": {
+      "q": "How do I cancel?",
+      "a": "If you paid on the web, cancel from “Manage subscription” on this page. If you paid in the app (App Store or Google Play), cancel in that store's subscriptions. You keep Premium until the paid period ends."
+    },
+    "app": {
+      "q": "How is paying in the app different?",
+      "a": "Same benefits. App store fees make the in-app price a little higher, so the web is cheaper. Wherever you pay, Premium opens on the web and in the app for the same account."
+    },
+    "refund": {
+      "q": "Can I get a refund?",
+      "a": "Cancel during the 7-day free trial and you won't be charged. For a refund after payment, email info@misaeng.com. In-app purchases follow Apple's and Google's refund policies."
+    },
+    "data": {
+      "q": "Where does the data come from?",
+      "a": "H-1B (LCA) and green card (PERM) filings published by the U.S. Department of Labor's Office of Foreign Labor Certification. They are filings, not hires or approved visas."
+    }
+  },
+  "errors": {
+    "notReady": "Checkout isn't ready yet. Please try again shortly.",
+    "failed": "Couldn't open checkout. Please try again.",
+    "already": "You're already on Premium."
+  },
+  "plan": {
+    "monthly": "Monthly",
+    "season": "3-month season pass",
+    "annual": "Annual",
+    "code": "Pass",
+    "gift": "Gift",
+    "staff": "Preview"
+  }
+}

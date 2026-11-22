@@ -23,7 +23,7 @@ export async function GET(_request: Request, context: RouteContext) {
   if (!data) return NextResponse.json({ error: 'Visa sponsor data is not loaded yet' }, { status: 404 })
 
   const user = await resolveAuthenticatedUser().catch(() => null)
-  const unlocked = hasPremiumAccess(user)
+  const unlocked = await hasPremiumAccess(user)
   return NextResponse.json({
     summary: {
       h1b: data.years.some((y) => y.h1b > 0),

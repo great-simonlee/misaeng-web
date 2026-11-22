@@ -260,6 +260,7 @@
     "sheetFilings": "H-1B and green card filings over the last 3 years",
     "sheetSalary": "Base salary by role and area (from H-1B filings)",
     "sheetSource": "Compiled from official U.S. Department of Labor (DOL) public data.",
-    "soon": "Premium is coming soon"
+    "soon": "Premium is coming soon",
+    "seePremium": "See Premium"
   }
 }

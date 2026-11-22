@@ -55,7 +55,7 @@ export async function GET(request: Request, context: RouteContext) {
     ])
     // Visa & sponsorship is Premium: free members get visa null (apps and web hide it; the summary + lock come
     // from /api/companies/{slug}/visa-sponsors).
-    const premium = hasPremiumAccess(user)
+    const premium = await hasPremiumAccess(user)
     const parent = companies.find((c) => c.id === company.parentCompanyId) ?? null
     const children = companies.filter((c) => c.parentCompanyId === company.id)
 

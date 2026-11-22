@@ -1,0 +1,52 @@
+/** Browser calls for Premium (web paywall + Premium sheet). Server routes: src/app/api/premium/*. */
+
+export type PremiumPlanId = 'monthly' | 'season' | 'annual'
+
+export type PremiumMe = {
+  loggedIn: boolean
+  premium: boolean
+  plan: PremiumPlanId | 'code' | 'gift' | 'staff' | null
+  source: 'stripe' | 'apple' | 'google' | 'code' | 'gift' | 'staff' | null
+  until: string | null
+  status: 'trialing' | 'active' | 'past_due' | 'canceled' | 'expired' | null
+  cancelAtPeriodEnd: boolean
+  trialAvailable: boolean
+  manageable: boolean
+}
+
+export class PremiumRequestError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
+    super(message)
+  }
+}
+
+async function post<T>(url: string, body: unknown): Promise<T> {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  const data = (await res.json().catch(() => ({}))) as T & { error?: string }
+  if (!res.ok) throw new PremiumRequestError(data.error || '', res.status)
+  return data
+}
+
+export async function fetchPremiumMe(): Promise<PremiumMe | null> {
+  try {
+    const res = await fetch('/api/premium/me', { cache: 'no-store' })
+    return res.ok ? ((await res.json()) as PremiumMe) : null
+  } catch {
+    return null
+  }
+}
+
+export function startCheckout(plan: PremiumPlanId, city: string, locale: string) {
+  return post<{ url: string }>('/api/premium/checkout', { plan, city, locale })
+}
+
+export function openBillingPortal(city: string, locale: string) {
+  return post<{ url: string }>('/api/premium/portal', { city, locale })
+}

@@ -98,9 +98,10 @@ export function VisaSponsorEntry({
   )
 }
 
-/** Free members: what Premium includes. Payments are not live yet, so the button only closes. */
+/** Free members: what Premium includes; the button opens the Premium page (plans + checkout). */
 export function VisaPremiumSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const t = useT('companies')
+  const href = useCityPath()
   return (
     <BottomSheet
       open={open}
@@ -108,13 +109,13 @@ export function VisaPremiumSheet({ open, onClose }: { open: boolean; onClose: ()
       title={t('sponsor.premium')}
       scrollable={false}
       footer={
-        <button
-          type='button'
+        <Link
+          href={href('/premium')}
           onClick={onClose}
-          className='h-12 w-full rounded-2xl bg-[var(--brand)] text-[15px] font-semibold text-white transition hover:bg-[var(--brand-hover)]'
+          className='flex h-12 w-full items-center justify-center rounded-2xl bg-[var(--brand)] text-[15px] font-semibold text-white transition hover:bg-[var(--brand-hover)]'
         >
-          {t('sponsor.soon')}
-        </button>
+          {t('sponsor.seePremium')}
+        </Link>
       }
     >
       <div className='px-1 pb-2'>

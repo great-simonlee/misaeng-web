@@ -22,6 +22,7 @@ export const NAMESPACES = [
   'legal',
   'consent',
   'api',
+  'premium',
 ] as const
 
 export type Namespace = (typeof NAMESPACES)[number]
