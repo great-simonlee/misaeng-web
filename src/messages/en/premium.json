@@ -26,6 +26,11 @@
       "body": "H-1B sponsorship, E-Verify and OPT·CPT for each company.",
       "chip": "212 companies"
     },
+    "alerts": {
+      "title": "New job alerts every weekday",
+      "body": "New postings around 1 PM every weekday. Free members get one weekly digest on Mondays.",
+      "chip": "App push"
+    },
     "more": {
       "title": "New Premium features included",
       "body": "Premium features we add later come at no extra cost.",

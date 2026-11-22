@@ -4,6 +4,14 @@ import { notifyUsersInChunks } from './notify.server'
 import { postingAlertUsers } from './postingAlerts.server'
 import { claimFirstTime } from './postEngagementNotify.server'
 import { listPushUserIds, type PushType } from './store.server'
+import {
+  SWITCH_NOTICE,
+  SWITCH_NOTICE_KEY,
+  alertTiersOn,
+  isNewYorkMonday,
+  listPremiumUids,
+  weeklyPostingsText,
+} from './alertTiers.server'
 
 /*
  * Broadcasts written by the ERP's scheduled runs (ellieo-erp lib/scheduledRuns.js, owner 2026-11-17) and the Visa
@@ -42,6 +50,21 @@ export async function broadcastDigest(kind: DigestKind, body: Record<string, unk
   if (!title || !message || !dedupeKey) return { error: 'title, body and dedupeKey are required.' }
   // Only misaeng.com serves the app
   if (BRAND_CONFIG.id !== 'misaeng') return { sent: false, users: 0 }
+  // Plan-based posting alerts (alertTiers.server.ts): read Premium members BEFORE claiming the dedupe key, so a read
+  // failure returns an error (the ERP retries) instead of a claimed-but-unsent push.
+  if (kind === 'postings_digest' && alertTiersOn()) {
+    let premium: Set<string>
+    let weekly: Awaited<ReturnType<typeof weeklyPostingsText>> = null
+    try {
+      premium = await listPremiumUids()
+      if (isNewYorkMonday()) weekly = await weeklyPostingsText()
+    } catch (error) {
+      console.error('[postings push] reading plans failed', error)
+      return { error: 'Could not read Premium members; try again.' }
+    }
+    if (!(await claimFirstTime(`broadcast:${kind}:${dedupeKey}`))) return { sent: false, users: 0, duplicate: true }
+    return sendTieredPostings(body, title, message, premium, weekly)
+  }
   if (!(await claimFirstTime(`broadcast:${kind}:${dedupeKey}`))) return { sent: false, users: 0, duplicate: true }
 
   const id = (key: string) => (typeof body[key] === 'string' ? (body[key] as string).trim().slice(0, 120) : '')
@@ -66,4 +89,69 @@ export async function broadcastDigest(kind: DigestKind, body: Record<string, unk
     }),
   })
   return { sent: true, users: userIds.length, ...(verifiedOnly ? { audience: 'verified' } : {}) }
+}
+
+/**
+ * PREMIUM_ALERT_TIERS=on: Premium members get today's push (verified or not); free verified members get nothing on
+ * Tue–Fri and, on Monday, one digest of the last 7 days instead. The first run after switching tells free members once.
+ */
+async function sendTieredPostings(
+  body: Record<string, unknown>,
+  title: Text,
+  message: Text,
+  premium: Set<string>,
+  weekly: Awaited<ReturnType<typeof weeklyPostingsText>>,
+) {
+  const pick = (t: Text, locale: Locale) => (locale === 'ko' ? t.ko : t.en)
+  const postingId = typeof body.postingId === 'string' ? body.postingId.trim().slice(0, 120) : ''
+  const userIds = await listPushUserIds()
+  const paid = userIds.filter((uid) => premium.has(uid))
+  const free = userIds.filter((uid) => !premium.has(uid))
+
+  if (paid.length) {
+    notifyUsersInChunks({
+      type: 'posting',
+      userIds: paid,
+      build: (_t, locale) => ({
+        title: pick(title, locale),
+        body: pick(message, locale),
+        data: { type: 'postings_digest', ...(postingId ? { postingId } : {}) },
+        threadId: 'postings-digest',
+      }),
+    })
+  }
+
+  let weeklySent = false
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date())
+  if (weekly && free.length && (await claimFirstTime(`broadcast:postings_weekly:${today}`))) {
+    weeklySent = true
+    notifyUsersInChunks({
+      type: 'posting',
+      userIds: free,
+      audience: postingAlertUsers,
+      build: (_t, locale) => ({
+        title: pick(weekly.title, locale),
+        body: pick(weekly.body, locale),
+        data: { type: 'postings_digest' },
+        threadId: 'postings-digest',
+      }),
+    })
+  }
+
+  let noticeSent = false
+  if (free.length && (await claimFirstTime(SWITCH_NOTICE_KEY))) {
+    noticeSent = true
+    notifyUsersInChunks({
+      type: 'posting',
+      userIds: free,
+      audience: postingAlertUsers,
+      build: (_t, locale) => ({
+        title: pick(SWITCH_NOTICE.title, locale),
+        body: pick(SWITCH_NOTICE.body, locale),
+        data: { type: 'postings_digest' },
+        threadId: 'postings-plan-notice',
+      }),
+    })
+  }
+  return { sent: true, users: userIds.length, premium: paid.length, weekly: weeklySent, notice: noticeSent }
 }

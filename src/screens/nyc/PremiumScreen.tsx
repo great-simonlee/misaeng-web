@@ -119,7 +119,8 @@ export function PremiumScreen() {
             <Benefit tone='peach' icon={<ChartIcon />} k='visa' />
             <Benefit tone='mint' icon={<CoinIcon />} k='salary' />
             <Benefit tone='sky' icon={<ShieldIcon />} k='policy' />
-            <Benefit tone='lilac' icon={<SparkleIcon />} k='more' />
+            <Benefit tone='lilac' icon={<BellIcon />} k='alerts' />
+            <Benefit tone='peach' icon={<SparkleIcon />} k='more' className='sm:col-span-2' />
           </div>
         </section>
 
@@ -233,12 +234,22 @@ const TONES = {
   lilac: { bg: 'bg-[#F3EEFF]', blob: 'bg-[#DDD2FF]', ink: 'text-[#7C3AED]' },
 } as const
 
-function Benefit({ tone, icon, k }: { tone: keyof typeof TONES; icon: ReactNode; k: 'visa' | 'salary' | 'policy' | 'more' }) {
+function Benefit({
+  tone,
+  icon,
+  k,
+  className = '',
+}: {
+  tone: keyof typeof TONES
+  icon: ReactNode
+  k: 'visa' | 'salary' | 'policy' | 'alerts' | 'more'
+  className?: string
+}) {
   const t = useT('premium')
   const c = TONES[tone]
   return (
     <div
-      className={`premium-lift flex gap-4 rounded-[26px] ${c.bg} p-5 transition duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_-18px_rgba(15,23,42,0.35)] motion-reduce:hover:translate-y-0`}
+      className={`premium-lift flex gap-4 rounded-[26px] ${c.bg} p-5 ${className} transition duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_-18px_rgba(15,23,42,0.35)] motion-reduce:hover:translate-y-0`}
     >
       <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] ${c.blob} ${c.ink}`}>{icon}</div>
       <div className='min-w-0'>
@@ -505,6 +516,7 @@ const icon = (path: ReactNode) => (
 const ChartIcon = () => icon(<><path d='M4 20h16' /><rect x='6' y='11' width='3' height='7' rx='1' /><rect x='11' y='7' width='3' height='11' rx='1' /><rect x='16' y='4' width='3' height='14' rx='1' /></>)
 const CoinIcon = () => icon(<><circle cx='12' cy='12' r='8.5' /><path d='M14.6 9.2c-.5-.9-1.5-1.4-2.6-1.4-1.5 0-2.6.8-2.6 2s1.1 1.7 2.6 2.1 2.7.9 2.7 2.2-1.2 2.1-2.7 2.1c-1.2 0-2.3-.6-2.8-1.5M12 6.5v11' /></>)
 const ShieldIcon = () => icon(<><path d='M12 3l7 3v5.5c0 4.3-3 7.7-7 9.5-4-1.8-7-5.2-7-9.5V6z' /><path d='M8.8 12.2l2.2 2.2 4.4-4.6' /></>)
+const BellIcon = () => icon(<><path d='M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9z' /><path d='M10 19a2 2 0 0 0 4 0' /></>)
 const SparkleIcon = () => icon(<><path d='M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z' /><path d='M18.5 16l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z' /></>)
 const ShieldMini = () => (
   <svg viewBox='0 0 24 24' className='h-3.5 w-3.5' fill='currentColor' aria-hidden>
