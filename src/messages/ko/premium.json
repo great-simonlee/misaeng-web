@@ -229,5 +229,10 @@
     "manage": "구독 관리",
     "footer": "Misaeng LLC · info@misaeng.com"
   },
-  "disclosureRefund": "첫 결제 후 7일 이내에는 전액 환불되고, 그 뒤에는 부분 환불을 포함해 환불되지 않아요. 자세한 내용은 {policy}을 확인해 주세요."
+  "disclosureRefund": "첫 결제 후 7일 이내에는 전액 환불되고, 그 뒤에는 부분 환불을 포함해 환불되지 않아요. 자세한 내용은 {policy}을 확인해 주세요.",
+  "myCard": {
+    "title": "미생 Premium",
+    "on": "이용 중",
+    "pitch": "회사별 비자·스폰서 이력과 직무별 기본급"
+  }
 }

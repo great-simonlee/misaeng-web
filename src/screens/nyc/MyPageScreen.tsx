@@ -30,6 +30,7 @@ import { ProfileVerificationSection } from '@widgets/nyc/ProfileVerificationSect
 import { MyPageSkeleton } from '@widgets/nyc/MyPageSkeleton'
 import { ProfileCardAction } from '@widgets/nyc/ProfileCardAction'
 import { MyPageCreditSection } from '@widgets/nyc/MyPageCreditSection'
+import { MyPagePremiumCard } from '@widgets/nyc/MyPagePremiumCard'
 import { MyPageReferralSection } from '@widgets/nyc/MyPageReferralSection'
 import { MyPageParentInviteSection } from '@widgets/nyc/MyPageParentInviteSection'
 import {
@@ -531,6 +532,8 @@ export function MyPageScreen() {
 
             </div>
           </aside>
+
+            <MyPagePremiumCard className='mt-4' />
 
             <LogoutSection
               onLogout={() => void handleLogout()}

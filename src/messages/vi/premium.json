@@ -229,5 +229,10 @@
     "manage": "Manage subscription",
     "footer": "Misaeng LLC · info@misaeng.com"
   },
-  "disclosureRefund": "Full refund within 7 days of your first payment; no partial refunds after that. See the {policy}."
+  "disclosureRefund": "Full refund within 7 days of your first payment; no partial refunds after that. See the {policy}.",
+  "myCard": {
+    "title": "Misaeng Premium",
+    "on": "ON",
+    "pitch": "Visa & sponsorship history and base salary by role"
+  }
 }
