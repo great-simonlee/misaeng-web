@@ -95,7 +95,9 @@
     "staffPlan": "미리보기",
     "codeUntil": "이용권으로 {date}까지 무료",
     "codeDaysLeft": "{days}일 남음",
-    "code": "이용권은 기간이 끝나면 자동으로 종료돼요. 결제도, 해지할 것도 없어요."
+    "code": "이용권은 기간이 끝나면 자동으로 종료돼요. 결제도, 해지할 것도 없어요.",
+    "manageBilling": "결제 수단 관리",
+    "pastDue": "결제가 실패했어요. ‘구독 관리’에서 카드를 바꾸지 않으면 곧 Premium이 종료돼요."
   },
   "status": {
     "successTitle": "환영해요! Premium이 열렸어요",
@@ -130,7 +132,10 @@
   "errors": {
     "notReady": "결제 준비 중이에요. 잠시 후 다시 시도해 주세요.",
     "failed": "결제 페이지를 열지 못했어요. 다시 시도해 주세요.",
-    "already": "이미 Premium을 이용 중이에요."
+    "already": "이미 Premium을 이용 중이에요.",
+    "paymentIssue": "지난 결제가 실패한 구독이 있어요. 아래 ‘결제 수단 관리’에서 카드를 바꿔 주세요.",
+    "stateUnavailable": "Premium 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.",
+    "retry": "다시 시도"
   },
   "plan": {
     "monthly": "월간",

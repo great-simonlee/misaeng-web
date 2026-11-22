@@ -13,6 +13,8 @@ export type PremiumMe = {
   cancelAtPeriodEnd: boolean
   trialAvailable: boolean
   manageable: boolean
+  /** The server couldn't read the member's Premium (503): show "try again", never plans or a login button. */
+  degraded?: boolean
 }
 
 export class PremiumRequestError extends Error {
@@ -38,6 +40,9 @@ async function post<T>(url: string, body: unknown): Promise<T> {
 export async function fetchPremiumMe(): Promise<PremiumMe | null> {
   try {
     const res = await fetch('/api/premium/me', { cache: 'no-store' })
+    if (res.status === 503) {
+      return { loggedIn: true, premium: false, plan: null, source: null, until: null, since: null, status: null, cancelAtPeriodEnd: false, trialAvailable: false, manageable: false, degraded: true }
+    }
     return res.ok ? ((await res.json()) as PremiumMe) : null
   } catch {
     return null

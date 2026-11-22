@@ -41,5 +41,8 @@ export async function POST(request: Request) {
     console.error('[premium/apple]', error)
     return NextResponse.json({ error: 'Failed to verify the purchase.' }, { status: 500 })
   }
-  return NextResponse.json(premiumPayload(await getPremiumState(user), true))
+  const state = await getPremiumState(user)
+  // Saved, but the state can't be read right now: 503 keeps the transaction for a retry (the save is idempotent).
+  if (state.degraded) return NextResponse.json({ error: 'Try again in a moment.' }, { status: 503 })
+  return NextResponse.json(premiumPayload(state, true))
 }

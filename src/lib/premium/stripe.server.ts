@@ -133,7 +133,7 @@ export async function syncSubscription(sub: Stripe.Subscription, fallbackUid?: s
   const status = statusFrom(sub.status)
   await upsertEntitlement({
     user_uid: uid,
-    email: email ?? sub.metadata?.email ?? null,
+    email: email || sub.metadata?.email || null,
     source: 'stripe',
     plan: planFromPrice(price),
     status,

@@ -85,9 +85,18 @@ export function PremiumScreen() {
       window.location.assign(url)
     } catch (e) {
       setBusy(false)
-      const code = e instanceof PremiumRequestError ? e.status : 0
-      setError(code === 503 ? t('errors.notReady') : code === 409 ? t('errors.already') : t('errors.failed'))
-      if (code === 409) void load()
+      const status = e instanceof PremiumRequestError ? e.status : 0
+      const reason = e instanceof PremiumRequestError ? e.message : ''
+      setError(
+        status === 503
+          ? t('errors.notReady')
+          : reason === 'PAYMENT_ISSUE'
+            ? t('errors.paymentIssue')
+            : status === 409
+              ? t('errors.already')
+              : t('errors.failed'),
+      )
+      if (status === 409) void load()
     }
   }
 
@@ -130,6 +139,20 @@ export function PremiumScreen() {
           <div className='py-10'>
             <LoadingState label='' />
           </div>
+        ) : me?.degraded ? (
+          <section className='flex flex-col items-center gap-3 rounded-[24px] bg-[#FAFAF9] px-6 py-8 text-center'>
+            <p className='text-[15px] font-bold text-[var(--foreground)]'>{t('errors.stateUnavailable')}</p>
+            <button
+              type='button'
+              onClick={() => {
+                setLoading(true)
+                void load()
+              }}
+              className='h-11 rounded-full bg-white px-5 text-[14px] font-bold text-[var(--foreground)] shadow-sm'
+            >
+              {t('errors.retry')}
+            </button>
+          </section>
         ) : me?.premium ? (
           <ActiveCard me={me} busy={busy} onManage={manage} />
         ) : (
@@ -151,6 +174,16 @@ export function PremiumScreen() {
               {busy ? t('cta.loading') : !me?.loggedIn ? t('cta.login') : trial ? t('cta.trial') : t('cta.start')}
             </button>
             {error ? <p className='text-center text-[13px] font-semibold text-[#DC2626]'>{error}</p> : null}
+            {me?.manageable ? (
+              <button
+                type='button'
+                onClick={manage}
+                disabled={busy}
+                className='self-center text-[14px] font-bold text-[var(--foreground)] underline underline-offset-2 disabled:opacity-60'
+              >
+                {t('active.manageBilling')}
+              </button>
+            ) : null}
             <Link
               href={href('/premium/redeem')}
               className='self-center text-[14px] font-bold text-[var(--brand)] underline-offset-2 hover:underline'
@@ -383,6 +416,11 @@ function ActiveCard({ me, busy, onManage }: { me: PremiumMe; busy: boolean; onMa
       <p className='text-[15px] font-bold text-[var(--brand)]'>
         {t('active.plan', { plan: staff ? t('active.staffPlan') : t(`plan.${me.plan ?? 'monthly'}`) })}
       </p>
+      {me.status === 'past_due' ? (
+        <p className='max-w-[420px] rounded-2xl bg-[#FEF2F2] px-4 py-2.5 text-[13px] font-semibold text-[#B91C1C]'>
+          {t('active.pastDue')}
+        </p>
+      ) : null}
       {date && granted ? (
         <>
           <p className='text-[14px] text-[var(--muted-foreground)]'>

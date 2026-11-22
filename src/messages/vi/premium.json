@@ -95,7 +95,9 @@
     "staffPlan": "Preview",
     "codeUntil": "Free with a code until {date}",
     "codeDaysLeft": "{days} days left",
-    "code": "Your code Premium ends on its own — no charge, nothing to cancel."
+    "code": "Your code Premium ends on its own — no charge, nothing to cancel.",
+    "manageBilling": "Manage billing",
+    "pastDue": "Your last payment failed. Update your card in “Manage subscription” or Premium will end soon."
   },
   "status": {
     "successTitle": "Welcome! Premium is on",
@@ -130,7 +132,10 @@
   "errors": {
     "notReady": "Checkout isn't ready yet. Please try again shortly.",
     "failed": "Couldn't open checkout. Please try again.",
-    "already": "You're already on Premium."
+    "already": "You're already on Premium.",
+    "paymentIssue": "A recent payment for your subscription failed. Update your card in “Manage billing” below.",
+    "stateUnavailable": "We couldn’t load your Premium status. Please try again in a moment.",
+    "retry": "Try again"
   },
   "plan": {
     "monthly": "Monthly",

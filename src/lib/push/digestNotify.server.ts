@@ -50,20 +50,20 @@ export async function broadcastDigest(kind: DigestKind, body: Record<string, unk
   if (!title || !message || !dedupeKey) return { error: 'title, body and dedupeKey are required.' }
   // Only misaeng.com serves the app
   if (BRAND_CONFIG.id !== 'misaeng') return { sent: false, users: 0 }
-  // Plan-based posting alerts (alertTiers.server.ts): read Premium members BEFORE claiming the dedupe key, so a read
-  // failure returns an error (the ERP retries) instead of a claimed-but-unsent push.
+  // Plan-based posting alerts (alertTiers.server.ts). If the Premium list can't be read, today's push goes out the old
+  // way (every verified member) rather than not at all — paying members must never miss it.
   if (kind === 'postings_digest' && alertTiersOn()) {
-    let premium: Set<string>
-    let weekly: Awaited<ReturnType<typeof weeklyPostingsText>> = null
+    let tiers: { premium: Set<string>; weekly: Awaited<ReturnType<typeof weeklyPostingsText>> } | null = null
     try {
-      premium = await listPremiumUids()
-      if (isNewYorkMonday()) weekly = await weeklyPostingsText()
+      const premium = await listPremiumUids()
+      tiers = { premium, weekly: isNewYorkMonday() ? await weeklyPostingsText() : null }
     } catch (error) {
-      console.error('[postings push] reading plans failed', error)
-      return { error: 'Could not read Premium members; try again.' }
+      console.error('[postings push] reading plans failed — sending to every verified member today', error)
     }
-    if (!(await claimFirstTime(`broadcast:${kind}:${dedupeKey}`))) return { sent: false, users: 0, duplicate: true }
-    return sendTieredPostings(body, title, message, premium, weekly)
+    if (tiers) {
+      if (!(await claimFirstTime(`broadcast:${kind}:${dedupeKey}`))) return { sent: false, users: 0, duplicate: true }
+      return sendTieredPostings(body, title, message, tiers.premium, tiers.weekly)
+    }
   }
   if (!(await claimFirstTime(`broadcast:${kind}:${dedupeKey}`))) return { sent: false, users: 0, duplicate: true }
 

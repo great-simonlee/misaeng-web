@@ -65,7 +65,7 @@ export function isActiveEntitlement(row: PremiumEntitlement, now = Date.now()): 
 }
 
 /** Stripe rows written in the other Stripe mode (sk_test vs sk_live) don't count on this server. */
-function sameStripeMode(row: PremiumEntitlement) {
+export function sameStripeMode(row: PremiumEntitlement) {
   if (row.source !== 'stripe' || !row.environment) return true
   const live = process.env.STRIPE_SECRET_KEY?.trim().startsWith('sk_live') ?? false
   return row.environment === (live ? 'live' : 'test')

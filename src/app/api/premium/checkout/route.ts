@@ -64,7 +64,9 @@ export async function POST(request: Request) {
   const subs = await stripe.subscriptions.list({ customer, status: 'all', limit: 20 })
   for (const sub of subs.data) {
     if (LIVE_STATUSES.has(sub.status) && (await isPremiumPrice(sub.items?.data?.[0]?.price))) {
-      return NextResponse.json({ error: 'Already Premium.' }, { status: 409 })
+      // A failed payment (past_due / unpaid / incomplete): fix the card in the billing portal, never a 2nd subscription.
+      const paymentIssue = sub.status === 'past_due' || sub.status === 'unpaid' || sub.status === 'incomplete'
+      return NextResponse.json({ error: paymentIssue ? 'PAYMENT_ISSUE' : 'Already Premium.' }, { status: 409 })
     }
   }
   const open = await stripe.checkout.sessions.list({ customer, status: 'open', limit: 10 })

@@ -1,6 +1,6 @@
 import type Stripe from 'stripe'
 
-import { invalidatePremium, isActiveEntitlement } from './access.server'
+import { invalidatePremium, isActiveEntitlement, sameStripeMode } from './access.server'
 import { listEntitlements, rest, type PremiumEntitlement } from './entitlements.server'
 import { getStripe, isPremiumPrice, syncSubscription } from './stripe.server'
 
@@ -261,7 +261,7 @@ export async function refundSubscription(input: { entitlementId: string; reason:
         reason: reason === 'billing_error' ? 'duplicate' : 'requested_by_customer',
         metadata: { user_uid: quote.userUid, reason, actor: input.actor },
       },
-      { idempotencyKey: `premium-refund-${target.chargeId}` },
+      { idempotencyKey: `premium-refund-${reason}-${target.chargeId}` },
     )
     refundIds.push(refund.id)
     await recordRefund({
@@ -299,7 +299,7 @@ export async function refundSubscription(input: { entitlementId: string; reason:
 
 /** Subscription id of a charge (re-read with the SDK's pinned API version: webhook payloads lack charge.invoice). */
 async function subscriptionOfCharge(stripe: Stripe, chargeId: string) {
-  const charge = await stripe.charges.retrieve(chargeId)
+  const charge = await stripe.charges.retrieve(chargeId, { expand: ['refunds'] })
   const invoiceRef = (charge as Stripe.Charge & { invoice?: string | Stripe.Invoice | null }).invoice
   const invoiceId = typeof invoiceRef === 'string' ? invoiceRef : invoiceRef?.id
   if (!invoiceId) return { charge, subId: null, invoiceId: null }
@@ -351,25 +351,52 @@ export async function handleChargeDisputed(dispute: Stripe.Dispute) {
 
 /**
  * Backstop for two checkouts finished side by side (two tabs, a double click): if the member already has another live
- * Premium subscription, this NEW one is canceled at once and anything it charged is refunded in full.
+ * Premium (an OLDER live Stripe subscription in this Stripe mode, or App Store / code Premium), this NEW subscription
+ * is canceled at once and everything it charged is refunded in full. Errors propagate (webhook 500 → Stripe retries;
+ * refund and cancel are both safe to repeat), so a member is never left charged without Premium.
  */
 export async function endDuplicateSubscription(sub: Stripe.Subscription, uid: string) {
   const stripe = getStripe()
   if (!stripe || !['trialing', 'active', 'past_due'].includes(sub.status)) return
-  const rows = await listEntitlements(uid)
-  const other = rows.find((row) => row.external_id !== sub.id && isActiveEntitlement(row))
-  if (!other) return
-  console.warn('[premium] duplicate subscription — canceling the new one', sub.id, 'kept', other.external_id)
+  const rows = (await listEntitlements(uid)).filter(sameStripeMode)
+  let keep: PremiumEntitlement | null = null
+  for (const row of rows) {
+    if (row.external_id === sub.id || !isActiveEntitlement(row)) continue
+    if (row.source !== 'stripe') {
+      keep = row
+      break
+    }
+    // Only an older subscription that Stripe still shows live wins (two events at once never cancel both).
+    const other = await stripe.subscriptions.retrieve(row.external_id).catch(() => null)
+    if (other && ['trialing', 'active', 'past_due'].includes(other.status) && other.created < sub.created) {
+      keep = row
+      break
+    }
+  }
+  if (!keep) return
+  console.warn('[premium] duplicate subscription — canceling the new one', sub.id, 'kept', keep.external_id)
   const customer = typeof sub.customer === 'string' ? sub.customer : sub.customer.id
   for (const invoice of await paidInvoices(stripe, customer)) {
     const chargeId = chargeOf(invoice)
     if (subscriptionOf(invoice) !== sub.id || !chargeId) continue
-    await stripe.refunds
-      .create(
-        { charge: chargeId, reason: 'duplicate', metadata: { user_uid: uid, reason: 'duplicate_checkout' } },
-        { idempotencyKey: `premium-refund-${chargeId}` },
-      )
-      .catch((error) => console.error('[premium] refunding a duplicate failed', chargeId, error))
+    const charge = await stripe.charges.retrieve(chargeId)
+    if (charge.refunded) continue
+    const refund = await stripe.refunds.create(
+      { charge: chargeId, reason: 'duplicate', metadata: { user_uid: uid, reason: 'duplicate_checkout' } },
+      { idempotencyKey: `premium-refund-duplicate-${chargeId}` },
+    )
+    await recordRefund({
+      userUid: uid,
+      subscriptionId: sub.id,
+      invoiceId: invoice.id,
+      chargeId,
+      refundId: refund.id,
+      amount: charge.amount - charge.amount_refunded,
+      currency: charge.currency,
+      reason: 'billing_error',
+      note: 'Duplicate checkout (automatic)',
+      actor: 'system',
+    })
   }
   await endSubscriptionNow(stripe, sub.id)
   invalidatePremium(uid)

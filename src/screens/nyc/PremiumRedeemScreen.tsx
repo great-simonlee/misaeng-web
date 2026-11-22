@@ -104,6 +104,10 @@ export function PremiumRedeemScreen() {
               <div className='py-6'>
                 <LoadingState label='' />
               </div>
+            ) : me?.degraded ? (
+              <p className='rounded-2xl bg-white/80 px-4 py-3.5 text-[14px] font-semibold text-[var(--foreground)]'>
+                {t('errors.stateUnavailable')}
+              </p>
             ) : me?.premium && me.source !== 'staff' ? (
               <p className='rounded-2xl bg-white/80 px-4 py-3.5 text-[14px] font-semibold text-[var(--foreground)]'>
                 {t('redeem.errors.ALREADY_PREMIUM')}

@@ -26,16 +26,17 @@ export function isNewYorkMonday(now = new Date()) {
 export async function listPremiumUids(): Promise<Set<string>> {
   const out = new Set<string>()
   const nowIso = new Date().toISOString()
+  const liveMode = process.env.STRIPE_SECRET_KEY?.trim().startsWith('sk_live') ? 'live' : 'test'
   for (let offset = 0; offset < 100_000; offset += 1000) {
     const res = await premiumRest(
-      `premium_entitlements?select=user_uid&status=in.(trialing,active,past_due)` +
+      `premium_entitlements?select=user_uid,source,environment&status=in.(trialing,active,past_due)` +
         `&or=(current_period_end.is.null,current_period_end.gt.${encodeURIComponent(nowIso)})` +
         `&order=user_uid&limit=1000&offset=${offset}`
     )
     // Fail loudly: sending a paid member nothing (or a free member everything) must not happen silently.
     if (!res.ok) throw new Error(`Reading Premium members failed (HTTP ${res.status}).`)
-    const rows = (await res.json()) as { user_uid: string }[]
-    for (const row of rows) out.add(row.user_uid)
+    const rows = (await res.json()) as { user_uid: string; source: string; environment: string | null }[]
+    for (const row of rows) if (row.source !== 'stripe' || !row.environment || row.environment === liveMode) out.add(row.user_uid)
     if (rows.length < 1000) break
   }
   return out
