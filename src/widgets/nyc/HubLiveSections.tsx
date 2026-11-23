@@ -28,9 +28,9 @@ const CARD = 'rounded-[1.5rem] bg-white ring-1 ring-[var(--card-ring)] shadow-[0
 /** Phones: a horizontal snap row; sm+: a grid */
 const PHOTO_ROW_BASE =
   '-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden'
-/** Desktop columns follow the item count so 1–3 items fill the row instead of leaving a hole */
-const photoRow = (count: number) =>
-  cn(PHOTO_ROW_BASE, count >= 4 ? 'lg:grid-cols-4' : count === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4')
+/** Home photo rows: always 4 columns on desktop (owner 11-23) */
+const photoRow = () =>
+  cn(PHOTO_ROW_BASE, 'lg:grid-cols-4')
 const PHOTO_ITEM = 'w-[78%] shrink-0 snap-start sm:w-auto'
 
 export function HubLiveSections() {
@@ -115,7 +115,7 @@ export function HubLiveSections() {
           {housing == null ? (
             <PhotoSkeleton />
           ) : (
-            <div className={photoRow(housing.length)}>
+            <div className={photoRow()}>
               {housing.map((listing) => (
                 <div key={listing.id} className={PHOTO_ITEM}>
                   <HousingTile listing={listing} />
@@ -131,7 +131,7 @@ export function HubLiveSections() {
           {market == null ? (
             <PhotoSkeleton />
           ) : (
-            <div className={photoRow(market.length)}>
+            <div className={photoRow()}>
               {market.map((post) => (
                 <div key={post.id} className={PHOTO_ITEM}>
                   <MarketPostCard post={post} />
@@ -144,7 +144,7 @@ export function HubLiveSections() {
 
       {food && food.length > 0 ? (
         <Section kicker={t('live.kickerFood')} title={t('live.food')} more={href('/food')} moreLabel={t('live.seeAll')}>
-          <div className={photoRow(food.length)}>
+          <div className={photoRow()}>
             {food.map((post) => (
               <div key={post.id} className={PHOTO_ITEM}>
                 <FoodTile post={post} />
@@ -349,7 +349,7 @@ function ListSkeleton({ rows }: { rows: number }) {
 
 function PhotoSkeleton() {
   return (
-    <div className={photoRow(4)} aria-hidden>
+    <div className={photoRow()} aria-hidden>
       {Array.from({ length: 4 }, (_, i) => (
         <div key={i} className={cn(PHOTO_ITEM, CARD, 'overflow-hidden')}>
           <div className='aspect-[4/3] animate-pulse bg-[#f1f2f4]' />
