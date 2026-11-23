@@ -38,7 +38,8 @@ import { revokeAppleTokens, type AppleRevokeOutcome } from './appleRevoke.server
  *  2. nickname index, referral code index, avatar files
  *  3. verification documents (deleteAllVerificationFilesForUser), push devices / preferences / company follows,
  *     in-app notifications, saved posts, open coffee chats + coffee chat mentor card (points tables only), reporter email on reports they made,
- *     중고거래 inquiry threads they're in (as seller or buyer) with their messages
+ *     중고거래 inquiry threads they're in (as seller or buyer) with their messages, web (Stripe) Premium subscriptions
+ *     canceled right away (no proration)
  *  4. roommate/sublet posts (personal housing info) and 중고거래 listings are deleted with their uploaded photos; other posts and every
  *     comment are kept for the threads but anonymized ("Deleted user", no photo/badges — render-time too)
  *  5. Sign in with Apple tokens revoked (when Apple keys are configured), Ellieo user/deletion + auth/logout
@@ -337,6 +338,12 @@ export async function deleteMisaengAccount(input: {
   await step(report, 'reviewQuestions', async () => {
     const { cleanupQuestionsForDeletedUser } = await import('@lib/points/reviewQuestions.server')
     return cleanupQuestionsForDeletedUser(uid)
+  })
+  // Web Premium: stop billing a deleted account (App Store subscriptions are canceled by the member in Apple settings)
+  await step(report, 'premium', async () => {
+    const { cancelStripeSubscriptionsForUser } = await import('@lib/premium/refunds.server')
+    const canceled = await cancelStripeSubscriptionsForUser(uid)
+    return canceled ? `canceled ${canceled}` : 'ok'
   })
   await step(report, 'reports', () => forgetReporterEmail(uid))
   await step(report, 'marketplaceInquiries', async () => {

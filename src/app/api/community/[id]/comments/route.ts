@@ -105,7 +105,7 @@ export async function GET(request: Request, context: RouteContext) {
     const locale = await getRequestLocale(request)
     // isMine: 앱이 내 댓글(수정·삭제)과 남의 댓글(신고·차단)을 구분하는 값. 익명 댓글의 작성자 uid는 내보내지 않는다
     return NextResponse.json({
-      comments: localizeComments(comments, locale, { viewerUid: user?.uid }).map((item) => ({
+      comments: localizeComments(comments, locale, { viewerUid: user?.uid, anonymous: isAnonymous }).map((item) => ({
         ...hideCommentAuthorEmail(item, user?.uid),
         isMine: Boolean(user?.uid && item.authorUid === user.uid),
       })),

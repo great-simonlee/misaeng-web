@@ -1,4 +1,6 @@
 import { BRAND } from '@lib/brand'
+import { tempNicknameFor } from '@lib/community/author'
+import { isAnonymousBoard } from '@lib/constants/nyc'
 import type { Locale } from '@lib/i18n/locales'
 import type { CommunityComment, CommunityPost, HousingListing } from '@/types/nyc'
 
@@ -47,10 +49,23 @@ function localize<T extends object>(
   kind: ContentKind,
   locale: Locale,
   includeOriginal: boolean,
+  anonymous = false,
 ): WithI18n<T> {
   const localized = localizeContent(item as T & Record<string, unknown>, kind, locale, { includeOriginal }) as WithI18n<T>
-  if ((item as { authorDeleted?: boolean }).authorDeleted !== true) return localized
-  return { ...localized, authorNickname: deletedUserLabel(locale), authorPhotoURL: null }
+  if ((item as { authorDeleted?: boolean }).authorDeleted === true) {
+    return { ...localized, authorNickname: deletedUserLabel(locale), authorPhotoURL: null }
+  }
+  // 닉네임 없는 회원: 이메일 아이디를 임시 이름으로 (andy42680, 도메인 없이). 익명으로 보일 글·댓글은 건드리지 않는다
+  if ((kind === 'post' || kind === 'comment') && !anonymous) {
+    const temp = tempNicknameFor(item as { authorNickname?: string | null; authorEmail?: string | null })
+    if (temp) return { ...localized, authorNickname: temp, authorNicknameTemporary: true }
+  }
+  return localized
+}
+
+/** 질문·자유 글 중 닉네임을 공개하지 않은 글 (작성자 이름을 만들지 않는다) */
+function isAnonymousPost(post: CommunityPost) {
+  return isAnonymousBoard(post.categoryId) && post.showNickname !== true
 }
 
 /** misaeng 한국어 목록에서 숨길 글인가 */
@@ -63,7 +78,7 @@ export function localizePosts<T extends CommunityPost>(
   locale: Locale,
   { hidePending = true }: { hidePending?: boolean } = {},
 ): WithI18n<T>[] {
-  const out = posts.map((post) => localize(post, 'post', locale, false))
+  const out = posts.map((post) => localize(post, 'post', locale, false, isAnonymousPost(post)))
   return hidePending ? out.filter((post) => !hiddenUntilTranslated(post)) : out
 }
 
@@ -73,8 +88,9 @@ export function localizePost<T extends CommunityPost>(
   locale: Locale,
   { viewerUid }: { viewerUid?: string | null } = {},
 ): WithI18n<T> {
-  if (viewerUid && post.authorUid === viewerUid) return localize(post, 'post', sourceLocaleOf(post), false)
-  return localize(post, 'post', locale, true)
+  const anonymous = isAnonymousPost(post)
+  if (viewerUid && post.authorUid === viewerUid) return localize(post, 'post', sourceLocaleOf(post), false, anonymous)
+  return localize(post, 'post', locale, true, anonymous)
 }
 
 /** 접근 제어(applyReviewBodyAccess 등)를 마친 뒤 마지막에 부른다 */
@@ -90,12 +106,12 @@ export function finalizePost<T extends object>(post: T): T {
 export function localizeComments<T extends CommunityComment>(
   comments: T[],
   locale: Locale,
-  { viewerUid }: { viewerUid?: string | null } = {},
+  { viewerUid, anonymous = false }: { viewerUid?: string | null; anonymous?: boolean } = {},
 ): WithI18n<T>[] {
   return comments.map((comment) =>
     viewerUid && comment.authorUid === viewerUid
-      ? localize(comment, 'comment', sourceLocaleOf(comment), false)
-      : localize(comment, 'comment', locale, true),
+      ? localize(comment, 'comment', sourceLocaleOf(comment), false, anonymous)
+      : localize(comment, 'comment', locale, true, anonymous),
   )
 }
 

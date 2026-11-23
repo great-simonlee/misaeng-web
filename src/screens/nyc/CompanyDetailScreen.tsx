@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { LoadingState } from '@components'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
+import { byBrand } from '@lib/brand/design'
 import {
   fetchCompany,
   fetchCompanyReviews,
@@ -152,6 +153,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
   }
 
   const { company, parent, children } = detail
+  const hasVisa = Boolean(company.visa || sponsor)
 
   return (
     <BoardPageShell width='wide'>
@@ -258,158 +260,168 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
       </header>
 
       {/* 비자·스폰서 정보 (Premium, 한 줄 요약 → /visa) → 공고 → 후기 */}
-      <div className='mx-auto mt-8 flex max-w-[860px] flex-col gap-8 pb-20'>
-        {company.visa || sponsor ? (
-          <VisaSponsorEntry
-            slug={company.slug}
-            sponsor={sponsor}
-            locked={company.visaLocked ?? sponsor?.locked ?? true}
-          />
+      {/* Misaeng: the body spans the hero's width — main column + a sticky visa card on desktop (owner 11-23 review) */}
+      <div
+        className={byBrand(
+          cn('mt-8 grid gap-8 pb-20', hasVisa && 'lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start'),
+          'mx-auto mt-8 flex max-w-[860px] flex-col gap-8 pb-20',
+        )}
+      >
+        {hasVisa ? (
+          <aside className={byBrand('min-w-0 lg:sticky lg:top-24 lg:order-2', 'contents')}>
+            <VisaSponsorEntry
+              slug={company.slug}
+              sponsor={sponsor}
+              locked={company.visaLocked ?? sponsor?.locked ?? true}
+            />
+          </aside>
         ) : null}
 
-        <div className='min-w-0 empty:hidden'>
-          <CompanyPostings companySlug={company.slug} companyName={company.name} />
-        </div>
+        <div className={byBrand('flex min-w-0 flex-col gap-8 lg:order-1', 'contents')}>
+          <div className='min-w-0 empty:hidden'>
+            <CompanyPostings companySlug={company.slug} companyName={company.name} />
+          </div>
 
-        <section className='min-w-0'>
-          <div className='flex items-center gap-3'>
-            <h2 className='flex items-baseline gap-2 text-[17px] font-bold tracking-tight text-[var(--foreground)] sm:text-[19px]'>
-              {t('detail.reviewsTitle')}
-              {!reviewsLoading ? (
-                <span className='text-[14px] font-semibold tabular-nums text-[var(--muted)]'>
-                  {reviews.length}
-                </span>
+          <section className='min-w-0'>
+            <div className='flex items-center gap-3'>
+              <h2 className='flex items-baseline gap-2 text-[17px] font-bold tracking-tight text-[var(--foreground)] sm:text-[19px]'>
+                {t('detail.reviewsTitle')}
+                {!reviewsLoading ? (
+                  <span className='text-[14px] font-semibold tabular-nums text-[var(--muted)]'>
+                    {reviews.length}
+                  </span>
+                ) : null}
+              </h2>
+              <span
+                aria-hidden
+                className='h-px flex-1 bg-gradient-to-r from-black/10 to-transparent'
+              />
+              {children.length ? (
+                <label className='inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-[12px] font-medium text-[var(--muted)] sm:text-[13px]'>
+                  <input
+                    type='checkbox'
+                    checked={includeSubsidiaries}
+                    onChange={(e) => setIncludeSubsidiaries(e.target.checked)}
+                    className='accent-[var(--brand)]'
+                  />
+                  {t('detail.includeSubsidiaries')}
+                </label>
               ) : null}
-            </h2>
-            <span
-              aria-hidden
-              className='h-px flex-1 bg-gradient-to-r from-black/10 to-transparent'
-            />
-            {children.length ? (
-              <label className='inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-[12px] font-medium text-[var(--muted)] sm:text-[13px]'>
-                <input
-                  type='checkbox'
-                  checked={includeSubsidiaries}
-                  onChange={(e) => setIncludeSubsidiaries(e.target.checked)}
-                  className='accent-[var(--brand)]'
-                />
-                {t('detail.includeSubsidiaries')}
-              </label>
+            </div>
+
+            {presentTypes.length > 1 ? (
+              <ChipScrollRow
+                className='mt-4'
+                leading={
+                  <TypeChip
+                    label={t('detail.allTypes')}
+                    count={reviews.length}
+                    active={type === 'all'}
+                    onClick={() => setType('all')}
+                  />
+                }
+              >
+                {presentTypes.map((item) => (
+                  <TypeChip
+                    key={item.id}
+                    label={tRoot(`reviews.jobReview.types.${item.id}.label`)}
+                    count={typeCounts.get(item.id) ?? 0}
+                    active={type === item.id}
+                    onClick={() => setType(item.id)}
+                  />
+                ))}
+              </ChipScrollRow>
             ) : null}
-          </div>
 
-          {presentTypes.length > 1 ? (
-            <ChipScrollRow
-              className='mt-4'
-              leading={
-                <TypeChip
-                  label={t('detail.allTypes')}
-                  count={reviews.length}
-                  active={type === 'all'}
-                  onClick={() => setType('all')}
+            <div className='mt-4'>
+              {reviewsLoading ? (
+                <div className='py-12'>
+                  <LoadingState />
+                </div>
+              ) : reviewsError ? (
+                <EmptyState
+                  title={t('detail.reviewsError')}
+                  description={reviewsError}
+                  onAction={() => void loadReviews()}
+                  actionLabel={t('common.retry')}
                 />
-              }
-            >
-              {presentTypes.map((item) => (
-                <TypeChip
-                  key={item.id}
-                  label={tRoot(`reviews.jobReview.types.${item.id}.label`)}
-                  count={typeCounts.get(item.id) ?? 0}
-                  active={type === item.id}
-                  onClick={() => setType(item.id)}
+              ) : visibleReviews.length === 0 ? (
+                <EmptyState
+                  title={t('detail.reviewsEmpty')}
+                  description={company.name}
+                  actionHref={href('/job-review/new')}
+                  actionLabel={t('detail.writeReview')}
                 />
-              ))}
-            </ChipScrollRow>
-          ) : null}
-
-          <div className='mt-4'>
-            {reviewsLoading ? (
-              <div className='py-12'>
-                <LoadingState />
-              </div>
-            ) : reviewsError ? (
-              <EmptyState
-                title={t('detail.reviewsError')}
-                description={reviewsError}
-                onAction={() => void loadReviews()}
-                actionLabel={t('common.retry')}
-              />
-            ) : visibleReviews.length === 0 ? (
-              <EmptyState
-                title={t('detail.reviewsEmpty')}
-                description={company.name}
-                actionHref={href('/job-review/new')}
-                actionLabel={t('detail.writeReview')}
-              />
-            ) : (
-              <ul className='flex flex-col gap-3'>
-                {visibleReviews.map(({ meta }, i) => {
-                  const style = getJobReviewTypeStyle(meta.jobReviewType)
-                  return (
-                    <li
-                      key={meta.id}
-                      className='motion-safe:animate-[sheetUp_480ms_cubic-bezier(0.22,1,0.36,1)_both]'
-                      style={{ animationDelay: `${Math.min(i, 10) * 40}ms` }}
-                    >
-                      <Link
-                        href={`${href(`/job-review/${meta.id}`)}?${new URLSearchParams({ company: company.slug, companyName: company.name })}`}
-                        className='group flex items-center gap-4 rounded-[1.25rem] bg-white p-4 ring-1 ring-black/[0.06] touch-manipulation transition duration-200 hover:shadow-[0_6px_18px_-8px_rgba(15,23,42,0.16)] hover:ring-black/[0.12] active:scale-[0.995] sm:p-5'
+              ) : (
+                <ul className='flex flex-col gap-3'>
+                  {visibleReviews.map(({ meta }, i) => {
+                    const style = getJobReviewTypeStyle(meta.jobReviewType)
+                    return (
+                      <li
+                        key={meta.id}
+                        className='motion-safe:animate-[sheetUp_480ms_cubic-bezier(0.22,1,0.36,1)_both]'
+                        style={{ animationDelay: `${Math.min(i, 10) * 40}ms` }}
                       >
-                        <div className='min-w-0 flex-1'>
-                          <div className='flex flex-wrap items-center gap-1.5'>
-                            {meta.jobReviewType || meta.typeLabel ? (
-                              <span
-                                className={cn(
-                                  'rounded-md px-2 py-[3px] text-[11px] font-semibold leading-none ring-1',
-                                  style.badge
-                                )}
-                              >
-                                {meta.jobReviewType
-                                  ? tRoot(`reviews.jobReview.types.${meta.jobReviewType}.label`)
-                                  : meta.typeLabel}
-                              </span>
-                            ) : null}
-                            {meta.companyText && meta.companyText !== company.name ? (
-                              <span className='rounded-md bg-white px-2 py-[3px] text-[11px] font-semibold leading-none text-[var(--muted-foreground)] shadow-[0_1px_2px_rgba(15,23,42,0.06)] ring-1 ring-black/[0.07]'>
-                                {meta.companyText}
-                              </span>
-                            ) : null}
-                          </div>
-                          <h3 className='mt-2.5 line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-[var(--foreground)] sm:text-[16px]'>
-                            {meta.title}
-                          </h3>
-                          <p className='mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-[var(--muted)]'>
-                            {meta.authorNickname ? (
-                              <span className='inline-flex items-center gap-1.5 font-medium text-[var(--muted-foreground)]'>
+                        <Link
+                          href={`${href(`/job-review/${meta.id}`)}?${new URLSearchParams({ company: company.slug, companyName: company.name })}`}
+                          className='group flex items-center gap-4 rounded-[1.25rem] bg-white p-4 ring-1 ring-black/[0.06] touch-manipulation transition duration-200 hover:shadow-[0_6px_18px_-8px_rgba(15,23,42,0.16)] hover:ring-black/[0.12] active:scale-[0.995] sm:p-5'
+                        >
+                          <div className='min-w-0 flex-1'>
+                            <div className='flex flex-wrap items-center gap-1.5'>
+                              {meta.jobReviewType || meta.typeLabel ? (
                                 <span
-                                  aria-hidden
-                                  className='inline-flex size-5 items-center justify-center rounded-full bg-[var(--brand-light)] text-[10px] font-bold text-[var(--brand)]'
+                                  className={cn(
+                                    'rounded-md px-2 py-[3px] text-[11px] font-semibold leading-none ring-1',
+                                    style.badge
+                                  )}
                                 >
-                                  {Array.from(meta.authorNickname)[0]?.toUpperCase()}
+                                  {meta.jobReviewType
+                                    ? tRoot(`reviews.jobReview.types.${meta.jobReviewType}.label`)
+                                    : meta.typeLabel}
                                 </span>
-                                {meta.authorNickname}
+                              ) : null}
+                              {meta.companyText && meta.companyText !== company.name ? (
+                                <span className='rounded-md bg-white px-2 py-[3px] text-[11px] font-semibold leading-none text-[var(--muted-foreground)] shadow-[0_1px_2px_rgba(15,23,42,0.06)] ring-1 ring-black/[0.07]'>
+                                  {meta.companyText}
+                                </span>
+                              ) : null}
+                            </div>
+                            <h3 className='mt-2.5 line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-[var(--foreground)] sm:text-[16px]'>
+                              {meta.title}
+                            </h3>
+                            <p className='mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-[var(--muted)]'>
+                              {meta.authorNickname ? (
+                                <span className='inline-flex items-center gap-1.5 font-medium text-[var(--muted-foreground)]'>
+                                  <span
+                                    aria-hidden
+                                    className='inline-flex size-5 items-center justify-center rounded-full bg-[var(--brand-light)] text-[10px] font-bold text-[var(--brand)]'
+                                  >
+                                    {Array.from(meta.authorNickname)[0]?.toUpperCase()}
+                                  </span>
+                                  {meta.authorNickname}
+                                </span>
+                              ) : null}
+                              {formatDate(meta.createdAt) ? (
+                                <span>{formatDate(meta.createdAt)}</span>
+                              ) : null}
+                              <span className='inline-flex items-center gap-1'>
+                                <EyeIcon className='size-3.5' />
+                                {meta.viewCount}
                               </span>
-                            ) : null}
-                            {formatDate(meta.createdAt) ? (
-                              <span>{formatDate(meta.createdAt)}</span>
-                            ) : null}
-                            <span className='inline-flex items-center gap-1'>
-                              <EyeIcon className='size-3.5' />
-                              {meta.viewCount}
-                            </span>
-                          </p>
-                        </div>
-                        <span className='inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f3f4f6] text-[var(--muted)] transition group-hover:bg-[var(--foreground)] group-hover:text-white'>
-                          <ArrowIcon className='size-3.5' />
-                        </span>
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </div>
-        </section>
+                            </p>
+                          </div>
+                          <span className='inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f3f4f6] text-[var(--muted)] transition group-hover:bg-[var(--foreground)] group-hover:text-white'>
+                            <ArrowIcon className='size-3.5' />
+                          </span>
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </div>
+          </section>
+        </div>
       </div>
     </BoardPageShell>
   )

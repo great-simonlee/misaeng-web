@@ -261,6 +261,7 @@
     "sheetSalary": "Base salary by role and area (from H-1B filings)",
     "sheetSource": "Compiled from official U.S. Department of Labor (DOL) public data.",
     "soon": "Premium is coming soon",
-    "seePremium": "See Premium"
+    "seePremium": "See Premium",
+    "sample": "Sample view"
   }
 }

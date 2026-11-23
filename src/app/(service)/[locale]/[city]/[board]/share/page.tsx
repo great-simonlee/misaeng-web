@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { cityPageTitle } from '@lib/i18n/cityMetadata.server'
 import { notFound } from 'next/navigation'
 
 import { isCityId } from '@lib/constants/cities'
@@ -13,10 +14,13 @@ interface JobReviewSharePageProps {
 export async function generateMetadata({
   params,
 }: JobReviewSharePageProps): Promise<Metadata> {
-  const { locale } = await params
+  const { locale, city } = await params
   if (!isLocale(locale)) return {}
   const t = await getT(locale, 'community')
-  return { description: t('share.metaDescription') }
+  return {
+    title: await cityPageTitle(locale, city, t('categories.job-review.title')),
+    description: t('share.metaDescription'),
+  }
 }
 
 /** 현직자 초대용 — 가입 없이 면접·취업 후기 남기기 (/[city]/job-review/share) */

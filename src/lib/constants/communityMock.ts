@@ -12,6 +12,12 @@ const MINUTE = 60 * 1000
 const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 
+/**
+ * Sample posts/comments are for local design work only. Off unless NEXT_PUBLIC_COMMUNITY_MOCKS=on, so an empty board
+ * never shows made-up posts to real users (production showed them on empty boards and food-map pins until 11-23).
+ */
+export const COMMUNITY_MOCKS_ENABLED = process.env.NEXT_PUBLIC_COMMUNITY_MOCKS === 'on'
+
 /** OPT·비자·영주권·취업 후기 목데이터 표시용 접두어 */
 export const MOCK_COMMUNITY_POST_PREFIX = '[테스트 데이터]'
 
@@ -790,6 +796,7 @@ export function listMockCommunityPosts(
   boardId?: NycCommunityBoardId,
   city?: CityId,
 ): CommunityPost[] {
+  if (!COMMUNITY_MOCKS_ENABLED) return []
   const items = COMMUNITY_MOCK_POSTS.filter((item) => {
     if (boardId && item.categoryId !== boardId) return false
     if (!city) return true
@@ -805,6 +812,7 @@ export function listMockCommunityPosts(
 }
 
 export function getMockCommunityPost(id: string): CommunityPost | null {
+  if (!COMMUNITY_MOCKS_ENABLED) return null
   return COMMUNITY_MOCK_POSTS.find((item) => item.id === id) ?? null
 }
 

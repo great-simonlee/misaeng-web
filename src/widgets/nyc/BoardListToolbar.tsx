@@ -5,12 +5,16 @@ import type { ReactNode } from 'react'
 
 import { useT } from '@lib/i18n/client'
 import { cn } from '@lib'
-import { byBrand } from '@lib/brand/design'
+import { byBrand, MISAENG_DESIGN } from '@lib/brand/design'
 
 type BoardListToolbarProps = {
   breadcrumbLabel: string
   /** 보드 한 줄 소개 */
   intro?: string
+  /** Right under the title row (e.g. 하우징 렌트 / 룸메이트 switch) */
+  belowTitle?: ReactNode
+  /** Misaeng desktop: filters live in the right rail */
+  filterInRail?: boolean
   writeHref: string
   writeLabel: string
   onFilterClick?: () => void
@@ -25,6 +29,8 @@ type BoardListToolbarProps = {
 export function BoardListToolbar({
   breadcrumbLabel,
   intro,
+  belowTitle,
+  filterInRail = false,
   writeHref,
   writeLabel,
   onFilterClick,
@@ -54,6 +60,7 @@ export function BoardListToolbar({
                     : t('toolbar.filter')
                 }
                 className={cn(
+                  filterInRail && MISAENG_DESIGN && 'lg:hidden',
                   'relative inline-flex h-9 w-9 items-center justify-center rounded-full border bg-white text-[13px] font-medium touch-manipulation transition sm:h-9 sm:w-auto sm:gap-1.5 sm:px-3.5',
                   filterCount > 0
                     ? 'border-[var(--brand)]/30 text-[var(--brand)]'
@@ -71,9 +78,10 @@ export function BoardListToolbar({
             ) : null}
 
             {showWrite ? (
+              // Misaeng desktop: the right rail has the write card, so the header button is phone/tablet only (owner 11-23)
               <Link
                 href={writeHref}
-                className='inline-flex h-9 max-w-[10rem] items-center gap-1.5 rounded-full bg-[var(--brand)] px-3.5 text-[13px] font-semibold leading-none text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] hover:shadow-[0_6px_18px_rgb(var(--brand-rgb)/0.34)] active:scale-[0.98] sm:max-w-none sm:px-4'
+                className={cn(MISAENG_DESIGN && 'lg:hidden', 'inline-flex h-9 max-w-[10rem] items-center gap-1.5 rounded-full bg-[var(--brand)] px-3.5 text-[13px] font-semibold leading-none text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] hover:shadow-[0_6px_18px_rgb(var(--brand-rgb)/0.34)] active:scale-[0.98] sm:max-w-none sm:px-4')}
               >
                 <WriteIcon className='size-3.5 shrink-0' />
                 <span className='truncate'>{writeLabel}</span>
@@ -82,6 +90,8 @@ export function BoardListToolbar({
           </div>
         )}
       </div>
+
+      {belowTitle}
 
       {intro ? (
         <p className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>

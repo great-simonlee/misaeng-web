@@ -7,11 +7,6 @@ import {
   getHousingPriceBounds,
   getHousingPricePresetId,
   getHousingPricePresets,
-  getListingArea,
-  getListingUnitType,
-  housingMatchesPerk,
-  housingMatchesPrice,
-  housingMatchesRoomType,
   HOUSING_AMENITY_PERKS,
   HOUSING_BENEFIT_PERKS,
   HOUSING_LISTING_KINDS,
@@ -26,7 +21,9 @@ import { useCity } from '@hooks/useCity'
 import { BRAND_CONFIG } from '@lib/brand'
 import { getCity } from '@lib/constants/cities'
 import { orderHousingAreas } from '@lib/housing/areas'
-import { fetchHousingListings } from '@lib/housing/fetchListings'
+import { fetchHousingPage } from '@lib/housing/fetchListings'
+import { housingFilterToParams } from '@lib/housing/listFilter'
+import { usePagedList } from '@hooks/usePagedList'
 import { useT } from '@lib/i18n/client'
 import type { Translate } from '@lib/i18n/translate'
 import { cn } from '@lib'
@@ -39,13 +36,19 @@ import type {
 import { HousingPostCard } from '@widgets/nyc/HousingPostCard'
 import { HousingPostCardSkeletonGrid } from '@widgets/nyc/HousingPostCardSkeleton'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
+import { CommunityBoardRail, RailChip, RailChipGroup, RailFilterCard } from '@widgets/nyc/CommunityBoardRail'
+import { HousingSegmentTabs } from '@widgets/nyc/HousingSegmentTabs'
 import { EmptyState } from '@widgets/nyc/EmptyState'
-import { byBrand } from '@lib/brand/design'
+import { PagedListFooter } from '@widgets/nyc/PagedListFooter'
+import { byBrand, MISAENG_DESIGN } from '@lib/brand/design'
 
 type UnitTypeFilter = 'all' | HousingUnitType
 type RoomTypeFilter = 'all' | HousingRoomType
 type NeighborhoodFilter = 'all' | string
 type ListingKindFilter = 'all' | HousingListingKind
+
+/** Listings per page (owner 11-23 infinite scroll) */
+const HOUSING_PAGE_SIZE = 24
 
 function formatMoney(value: number) {
   return value.toLocaleString('en-US')
@@ -77,6 +80,8 @@ function defaultPriceRange(kind: ListingKindFilter) {
 
 export function HousingListScreen() {
   const t = useT('housing')
+  const tCommunity = useT('community')
+  const tCommon = useT('common')
   const city = useCity()
   const [listingKind, setListingKind] = useState<ListingKindFilter>('all')
   const [unitType, setUnitType] = useState<UnitTypeFilter>('all')
@@ -90,8 +95,6 @@ export function HousingListScreen() {
     getHousingPriceBounds('unit').max,
   )
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [posts, setPosts] = useState<HousingListing[]>([])
-  const [loading, setLoading] = useState(true)
 
   const [draftListingKind, setDraftListingKind] =
     useState<ListingKindFilter>('all')
@@ -164,58 +167,27 @@ export function HousingListScreen() {
     }
   }, [])
 
-  useEffect(() => {
-    let cancelled = false
-    void fetchHousingListings(city).then((listings) => {
-      if (cancelled) return
-      setPosts(listings)
-      setLoading(false)
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [city])
-
+  /*
+   * Pages from GET /api/housing?limit= (owner 11-23): the server applies these filters (src/lib/housing/listFilter.ts)
+   * and sends 24 listings at a time; the next page loads when the bottom of the grid comes near.
+   */
+  const listFilter = useMemo(
+    () => ({ kind: listingKind, unit: unitType, room: roomType, area: neighborhood, perks, min: priceMin, max: priceMax }),
+    [listingKind, unitType, roomType, neighborhood, perks, priceMin, priceMax],
+  )
+  const paged = usePagedList<HousingListing>(JSON.stringify([city, listFilter]), (cursor, signal) =>
+    fetchHousingPage({ city, limit: HOUSING_PAGE_SIZE, cursor, filter: housingFilterToParams(listFilter), signal }).then((page) => ({
+      items: page.listings,
+      nextCursor: page.nextCursor,
+      total: page.total,
+      meta: page.areaCounts,
+    })),
+  )
+  const filteredPosts = paged.items
+  const loading = paged.loading
   const refreshListings = useCallback(async () => {
-    const listings = await fetchHousingListings(city)
-    setPosts(listings)
-    setLoading(false)
-  }, [city])
-
-  const filteredPosts = useMemo(() => {
-    return posts.filter((listing) => {
-      const matchUnit =
-        listingKind !== 'unit' ||
-        unitType === 'all' ||
-        getListingUnitType(listing) === unitType
-      const matchRoom =
-        listingKind !== 'room' ||
-        roomType === 'all' ||
-        housingMatchesRoomType(listing, roomType)
-      const matchArea =
-        neighborhood === 'all' || getListingArea(listing) === neighborhood
-      const matchPerks =
-        perks.length === 0 ||
-        perks.every((perk) => housingMatchesPerk(listing, perk))
-      const matchPrice = housingMatchesPrice(
-        listing,
-        listingKind,
-        priceMin,
-        priceMax,
-        roomType,
-      )
-      return matchUnit && matchRoom && matchArea && matchPerks && matchPrice
-    })
-  }, [
-    posts,
-    listingKind,
-    unitType,
-    roomType,
-    neighborhood,
-    perks,
-    priceMin,
-    priceMax,
-  ])
+    await paged.reload()
+  }, [paged])
 
   const activeFilterCount = useMemo(() => {
     let count = 0
@@ -237,13 +209,9 @@ export function HousingListScreen() {
   ])
 
   const neighborhoodOptions = useMemo(() => {
-    const counts: Record<string, number> = {}
-    for (const listing of posts) {
-      counts[getListingArea(listing)] =
-        (counts[getListingArea(listing)] ?? 0) + 1
-    }
+    const counts = (paged.meta as Record<string, number> | undefined) ?? {}
     return { ordered: orderHousingAreas(city, counts), counts }
-  }, [posts, city])
+  }, [paged.meta, city])
 
   const summaryLabel = useMemo(() => {
     const parts: string[] = []
@@ -269,10 +237,10 @@ export function HousingListScreen() {
       }
     }
     if (parts.length === 0) {
-      return t('list.summaryAll', { count: filteredPosts.length })
+      return t('list.summaryAll', { count: paged.total })
     }
     return t('list.summaryFiltered', {
-      count: filteredPosts.length,
+      count: paged.total,
       filters: parts.join(' · '),
     })
   }, [
@@ -284,7 +252,7 @@ export function HousingListScreen() {
     perks,
     priceMin,
     priceMax,
-    filteredPosts.length,
+    paged.total,
   ])
 
   function applyListingKind(
@@ -367,33 +335,31 @@ export function HousingListScreen() {
     )
   }
 
-  const draftResultCount = useMemo(() => {
-    return posts.filter((listing) => {
-      const matchUnit =
-        draftListingKind !== 'unit' ||
-        draftUnitType === 'all' ||
-        getListingUnitType(listing) === draftUnitType
-      const matchRoom =
-        draftListingKind !== 'room' ||
-        draftRoomType === 'all' ||
-        housingMatchesRoomType(listing, draftRoomType)
-      const matchArea =
-        draftNeighborhood === 'all' ||
-        getListingArea(listing) === draftNeighborhood
-      const matchPerks =
-        draftPerks.length === 0 ||
-        draftPerks.every((perk) => housingMatchesPerk(listing, perk))
-      const matchPrice = housingMatchesPrice(
-        listing,
-        draftListingKind,
-        draftPriceMin,
-        draftPriceMax,
-        draftRoomType,
-      )
-      return matchUnit && matchRoom && matchArea && matchPerks && matchPrice
-    }).length
+  const [draftResultCount, setDraftResultCount] = useState(0)
+  useEffect(() => {
+    if (!filtersOpen) return
+    const abort = new AbortController()
+    const timer = window.setTimeout(() => {
+      const draft = {
+        kind: draftListingKind,
+        unit: draftUnitType,
+        room: draftRoomType,
+        area: draftNeighborhood,
+        perks: draftPerks,
+        min: draftPriceMin,
+        max: draftPriceMax,
+      }
+      void fetchHousingPage({ city, limit: 1, filter: housingFilterToParams(draft), signal: abort.signal })
+        .then((page) => setDraftResultCount(page.total))
+        .catch(() => {})
+    }, 200)
+    return () => {
+      window.clearTimeout(timer)
+      abort.abort()
+    }
   }, [
-    posts,
+    filtersOpen,
+    city,
     draftListingKind,
     draftUnitType,
     draftRoomType,
@@ -424,11 +390,62 @@ export function HousingListScreen() {
 
   return (
     <PullToRefresh onRefresh={refreshListings} className='flex flex-1 flex-col'>
-    <BoardPageShell width='wide' className='flex flex-1 flex-col'>
-      <header className='pt-5 sm:pt-8 lg:pt-10'>
+    <BoardPageShell
+      width='wide'
+      className='flex flex-1 flex-col'
+      // 다른 게시판 + 앱 카드 (웹에서는 매물을 올리지 않아서 글쓰기 카드는 없음)
+      rail={
+        <CommunityBoardRail
+          boardId='housing'
+          boardTitle={t('list.title')}
+          writeHref=''
+          writeLabel=''
+          showWrite={false}
+          beforeBoards={
+            // 매물 찾기: the quick filters next to the list on desktop (owner 11-23); the full sheet stays one click away
+            <RailFilterCard
+              title={tCommunity('rail.housingFilterTitle')}
+              count={paged.total}
+              action={
+                <button
+                  type='button'
+                  onClick={openFilters}
+                  className='flex h-10 w-full items-center justify-center gap-1.5 rounded-full bg-[var(--foreground)] text-[13.5px] font-semibold text-white transition hover:bg-black'
+                >
+                  <FiltersIcon className='size-3.5' />
+                  {tCommunity('rail.moreFilters')}
+                  {activeFilterCount > 0 ? ` · ${activeFilterCount}` : ''}
+                </button>
+              }
+            >
+              <HousingSegmentTabs active='rent' className='mt-3 flex w-full [&>a]:flex-1 [&>a]:justify-center' />
+              {pricePresets.length ? (
+              <RailChipGroup label={tCommunity('rail.price')}>
+                {pricePresets.map((preset) => (
+                  <RailChip key={preset.id} active={activePricePreset === preset.id} onClick={() => toggleQuickPrice(preset.min, preset.max)}>
+                    {listingKind === 'all' ? preset.label : formatPriceRangeLabel(t, listingKind, preset.min, preset.max)}
+                  </RailChip>
+                ))}
+              </RailChipGroup>
+              ) : null}
+              <RailChipGroup label={tCommunity('rail.perks')}>
+                {HOUSING_PERKS.map((perk) => (
+                  <RailChip key={perk.id} active={perks.includes(perk.id)} onClick={() => toggleQuickPerk(perk.id)}>
+                    {t(`perks.${perk.id}`)}
+                  </RailChip>
+                ))}
+              </RailChipGroup>
+            </RailFilterCard>
+          }
+        />
+      }
+    >
+      <header className={byBrand('pt-4 sm:pt-5 lg:pt-6', 'pt-5 sm:pt-8 lg:pt-10')}>
         <h1 className={byBrand('font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]')}>
           {t('list.title')}
         </h1>
+        {/* Misaeng desktop: the 렌트 / 룸메이트 switch is at the top of 매물 찾기 in the right rail */}
+        {MISAENG_DESIGN ? <HousingSegmentTabs active='rent' className='mt-4 lg:hidden' /> : null}
         <p className='mt-3 max-w-2xl text-[13px] leading-[1.45] text-[var(--muted)] sm:mt-3.5 sm:text-[14px] sm:leading-relaxed lg:text-[15px]'>
           {t('list.subtitle', {
             brand: BRAND_CONFIG.name,
@@ -436,8 +453,8 @@ export function HousingListScreen() {
           })}
         </p>
 
-        {/* 필터 + 빠른 태그 (예전 디자인) */}
-        <div className='mt-4 flex items-center gap-2 sm:mt-5 sm:gap-2.5'>
+        {/* 필터 + 빠른 태그 (예전 디자인). Misaeng desktop: in the right rail instead */}
+        <div className={cn('mt-4 flex items-center gap-2 sm:mt-5 sm:gap-2.5', MISAENG_DESIGN && 'lg:hidden')}>
           <button
             type='button'
             onClick={openFilters}
@@ -552,6 +569,12 @@ export function HousingListScreen() {
             <Skeleton className='mb-3.5 h-3.5 w-36' />
             <HousingPostCardSkeletonGrid />
           </>
+        ) : paged.total === 0 && activeFilterCount === 0 ? (
+          // No listings in this city at all: not a filter problem, so no "reset filters" button
+          <EmptyState
+            title={t('list.emptyCity.title', { city: getCity(city).name })}
+            description={t('list.emptyCity.description')}
+          />
         ) : filteredPosts.length === 0 ? (
           <EmptyState
             title={t('list.empty.title')}
@@ -564,7 +587,7 @@ export function HousingListScreen() {
             <p className='mb-3.5 text-[12px] font-medium text-[var(--muted)] sm:mb-4 sm:text-[13px]'>
               {summaryLabel}
             </p>
-            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5'>
+            <div className={cn('grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:gap-5', !MISAENG_DESIGN && 'lg:grid-cols-4')}>
               {filteredPosts.map((listing) => (
                 <HousingPostCard
                   key={listing.id}
@@ -575,6 +598,15 @@ export function HousingListScreen() {
                 />
               ))}
             </div>
+            <PagedListFooter
+              sentinelRef={paged.sentinelRef}
+              hasMore={paged.hasMore}
+              loadingMore={paged.loadingMore}
+              failed={Boolean(paged.error)}
+              onRetry={paged.retry}
+              retryLabel={tCommon('actions.retry')}
+              failedLabel={tCommon('errors.generic')}
+            />
           </>
         )}
       </section>

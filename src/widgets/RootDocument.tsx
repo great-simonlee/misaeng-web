@@ -11,6 +11,7 @@ import type { MessageTree } from '@lib/i18n/translate'
 import { pretendard } from '@lib/fonts/pretendard'
 import { SiteFooter } from '@widgets/SiteFooter'
 import { PreferredLocaleSync } from '@widgets/PreferredLocaleSync'
+import { ProfileSetupPrompt } from '@widgets/ProfileSetupPrompt'
 import { SiteHeader } from '@widgets/SiteHeader'
 import { SiteMain } from '@widgets/SiteMain'
 
@@ -34,6 +35,7 @@ export function RootDocument({
         <ConsentLocaleProvider>
           <ToastProvider>
             {service ? <PreferredLocaleSync /> : null}
+            {service && BRAND === 'misaeng' ? <ProfileSetupPrompt /> : null}
             <SiteHeader />
 
             <SiteMain>

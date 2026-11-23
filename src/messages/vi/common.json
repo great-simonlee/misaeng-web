@@ -1,7 +1,43 @@
 {
   "meta": {
     "title": "{brand} | Cộng đồng du học sinh & người đi làm quốc tế tại New York",
-    "description": "Review về nhà ở, ăn uống, CPT/OPT, visa và phỏng vấn xin việc từ những người đang học tập và làm việc tại New York."
+    "description": "Review về nhà ở, ăn uống, CPT/OPT, visa và phỏng vấn xin việc từ những người đang học tập và làm việc tại New York.",
+    "cities": {
+      "nyc": "New York",
+      "boston": "Boston",
+      "dc": "Washington DC"
+    },
+    "page": "{page} · {city} | {brand}",
+    "pageOnly": "{page} | {brand}",
+    "hubTitle": "{brand} {city} | Cộng đồng du học sinh & người đi làm quốc tế tại {city}",
+    "pages": {
+      "housing": "Nhà ở",
+      "housingNew": "Đăng tin nhà",
+      "companies": "Trang tuyển dụng công ty",
+      "postings": "Tin tuyển dụng",
+      "companyVisa": "{company} · visa & bảo lãnh",
+      "credit": "Điểm Misaeng",
+      "influencers": "Influencer đối tác",
+      "partners": "Hội sinh viên đối tác",
+      "login": "Đăng nhập",
+      "me": "Trang của tôi",
+      "myPosts": "Bài viết của tôi",
+      "myLikes": "Bài đã lưu",
+      "inquiries": "Yêu cầu của tôi",
+      "quiz": "Quiz Misaeng",
+      "terms": "Điều khoản sử dụng",
+      "privacy": "Chính sách quyền riêng tư",
+      "write": "Viết bài · {board}",
+      "edit": "Sửa bài · {board}",
+      "marketInbox": "Marketplace messages"
+    },
+    "descriptions": {
+      "housing": "Xem tin nhà ở tại {city} với bản đồ và hình ảnh.",
+      "companies": "Trang tuyển dụng và thông tin visa của các công ty được quan tâm tại {city}.",
+      "postings": "Tin tuyển dụng mới tốt nghiệp và thực tập tại {city}, cập nhật mỗi ngày.",
+      "influencers": "Gặp gỡ các influencer hợp tác với Misaeng.",
+      "partners": "Gặp gỡ các hội sinh viên và câu lạc bộ hợp tác với Misaeng."
+    }
   },
   "language": {
     "label": "Ngôn ngữ",
@@ -258,5 +294,12 @@
       "openInApp": "Mở trong ứng dụng",
       "getApp": "Tải ứng dụng"
     }
+  },
+  "profilePrompt": {
+    "title": "Finish your profile",
+    "body": "You haven't set your name, gender and nickname yet. Your nickname is shown on your posts and comments.",
+    "current": "Right now you show as {name}",
+    "later": "Later",
+    "setup": "Set up now"
   }
 }

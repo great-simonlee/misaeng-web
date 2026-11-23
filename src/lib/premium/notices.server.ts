@@ -3,14 +3,14 @@ import type Stripe from 'stripe'
 import { isEmailConfigured, noticeEmail, sendEmail } from '@lib/email/send.server'
 import { parseLocale } from '@lib/i18n/locales'
 import { getT } from '@lib/i18n/server'
-import { notifyUsers } from '@lib/push/notify.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 
 import { getStripe, isPremiumPrice } from './stripe.server'
 
 /**
  * Reminders before money moves (refund policy 11-22), from Stripe webhooks:
- * - customer.subscription.trial_will_end (Stripe sends it 3 days before the trial ends) → push + email
+ * - customer.subscription.trial_will_end (Stripe sends it 3 days before the trial ends) → email (no app push: owner
+ *   11-23 — the email before a charge is enough)
  * - invoice.upcoming for an ANNUAL plan (Stripe Dashboard → Billing → Subscriptions → "Upcoming renewal events" = 7
  *   days) → email. Monthly / 3-month renewals get no reminder.
  * Both say the price, the date, how to cancel, and the 7-day refund rule.
@@ -54,17 +54,6 @@ export async function sendTrialEndingNotice(subscriptionId: string) {
   const date = dateIn(locale, sub.trial_end)
   const t = await getT(locale, 'premium')
   const url = `${siteUrl()}/${locale}/nyc/premium`
-
-  notifyUsers({
-    type: 'account',
-    userIds: [uid],
-    inbox: false,
-    build: (tt) => ({
-      title: tt('premium.notices.trialPushTitle'),
-      body: tt('premium.notices.trialPushBody', { date, price }),
-      data: { type: 'premium', url },
-    }),
-  })
 
   if (!email || !isEmailConfigured()) return
   const mail = noticeEmail({

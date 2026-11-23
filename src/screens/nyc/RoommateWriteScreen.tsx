@@ -46,7 +46,7 @@ import {
   communityBoardKey,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
-import { useT } from '@lib/i18n/client'
+import { useFormat, useT } from '@lib/i18n/client'
 import { WriteGuideButton } from '@widgets/nyc/WriteGuideButton'
 import { cn } from '@lib'
 import {
@@ -60,7 +60,17 @@ import {
 import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SortablePhotoGrid } from '@widgets/nyc/SortablePhotoGrid'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
+import { MISAENG_DESIGN } from '@lib/brand/design'
 import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
+import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
+import {
+  WriteAsideCard,
+  WriteColumns,
+  WritePageHeader,
+  WriteStepCard,
+  WriteSubmitCard,
+  writeSubmitClass,
+} from '@widgets/nyc/WriteFormLayout'
 import { RoommatePostCard, type RoommateCardPost } from '@widgets/nyc/RoommatePostCard'
 
 type RoommateWriteDraft = {
@@ -88,6 +98,8 @@ export function RoommateWriteScreen({
   editPostId,
 }: RoommateWriteScreenProps) {
   const t = useT('housing')
+  const tCommon = useT('common')
+  const fmt = useFormat()
   const tCommunity = useT('community')
   const city = useCity()
   const href = useCityPath()
@@ -505,7 +517,7 @@ export function RoommateWriteScreen({
     !user
   ) {
     return (
-      <BoardPageShell width='narrow'>
+      <BoardPageShell width='narrow' rail={null}>
         <LoadingState
           fullPage
           label={
@@ -532,43 +544,9 @@ export function RoommateWriteScreen({
     'roommate.write.onePostNotice',
   ).split('{limit}')
 
-  return (
-    <BoardPageShell width='narrow'>
-      <div className='pb-16 pt-4 sm:pt-6'>
-        <BoardBackLink
-          href={
-            isEdit && editPostId
-              ? href(`/${boardId}/${editPostId}`)
-              : href(`/${boardId}`)
-          }
-          label={
-            isEdit
-              ? t('roommate.write.backToPost')
-              : t('roommate.write.backToList', { board: title })
-          }
-          className='mb-5'
-        />
-
-        {isEdit ? (
-          <UpdateHero title={postTitle} lookingFor={lookingFor} />
-        ) : (
-          <CreateHero />
-        )}
-
-        <WriteGuideButton onClick={orientation.show} />
-
-        {!isEdit ? (
-          <div className='mt-4 rounded-xl bg-brand-soft px-4 py-3 text-[13px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--brand)]/15'>
-            {onePostBefore}
-            <strong className='text-[var(--foreground)]'>
-              {t('roommate.write.onePostLimit')}
-            </strong>
-            {onePostAfter}
-          </div>
-        ) : null}
-
-        {/* 브라우저 기본 말풍선 대신 칸 아래 문구로 안내 (handleSubmit에서 모두 검사) */}
-        <form noValidate onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
+  // Same step sections in both layouts (Misaeng cards / classic list)
+  const formSections = (
+    <>
           <CreateSection step={1} title={t('roommate.write.steps.type')}>
             <div id='roommate-field-type' className='grid scroll-mt-24 grid-cols-2 gap-2'>
               {ROOMMATE_INTENT_OPTIONS.map((option) => {
@@ -879,6 +857,155 @@ export function RoommateWriteScreen({
             <FieldError message={fieldErrors.body} />
           </CreateSection>
 
+    </>
+  )
+
+  if (MISAENG_DESIGN) {
+    // 물건 올리기 layout (owner 11-23): step cards left, type/notice/preview + submit right; no generic rail
+    const missing = [
+      !lookingFor ? t('roommate.write.steps.type') : null,
+      !postTitle.trim() ? t('roommate.write.fields.title') : null,
+      formConfig?.locationRequired && !location.trim() ? formConfig.locationLabel : null,
+      formConfig?.budgetRequired && !budgetMax.trim() ? formConfig.budgetLabel : null,
+      formConfig?.moveInStartRequired && !moveInDate.trim() ? formConfig.moveInStartLabel : null,
+      formConfig?.moveInEndRequired && !moveOutDate.trim() ? formConfig.moveInEndLabel : null,
+      !htmlToPlainText(contentHtml) ? t('roommate.write.steps.details') : null,
+    ].filter((item): item is string => Boolean(item))
+    const primary = (
+      <button
+        type='submit'
+        disabled={submitting || !lookingFor}
+        className={writeSubmitClass}
+      >
+        {submitting
+          ? isEdit
+            ? t('roommate.write.saving')
+            : t('new.submitting')
+          : isEdit
+            ? t('roommate.write.saveEdit')
+            : !lookingFor
+              ? t('roommate.write.errors.typeRequired')
+              : t('roommate.write.submit')}
+      </button>
+    )
+    return (
+      <BoardPageShell width='wide' rail={null}>
+        <WritePageHeader
+          back={
+            <BoardBackLink
+              href={isEdit && editPostId ? href(`/${boardId}/${editPostId}`) : href(`/${boardId}`)}
+              label={isEdit ? t('roommate.write.backToPost') : t('roommate.write.backToList', { board: title })}
+              className='mb-4'
+            />
+          }
+          title={isEdit ? t('roommate.write.updateHero.title') : t('roommate.write.createHero.title')}
+          intro={
+            <>
+              <p>{isEdit ? t('roommate.write.updateHero.description') : t('roommate.write.createHero.description')}</p>
+              {!isEdit ? <p className='mt-0.5'>{t('roommate.write.createHero.photoTip')}</p> : null}
+            </>
+          }
+        />
+        <form noValidate onSubmit={(e) => void handleSubmit(e)}>
+          <WriteColumns
+            main={
+              <>
+                {formSections}
+              </>
+            }
+            aside={
+              <>
+                {!isEdit ? (
+                  <WriteAsideCard>
+                    <p className='text-[13px] leading-relaxed text-[var(--muted-foreground)]'>
+                      {onePostBefore}
+                      <strong className='text-[var(--foreground)]'>{t('roommate.write.onePostLimit')}</strong>
+                      {onePostAfter}
+                    </p>
+                  </WriteAsideCard>
+                ) : null}
+                {previewPost ? (
+                  <WriteAsideCard title={t('roommate.write.previewTitle')}>
+                    <RoommatePostCard post={previewPost} preview />
+                  </WriteAsideCard>
+                ) : null}
+                <CommunityWritingGuidelines />
+                <WriteSubmitCard
+                  missing={missing}
+                  submit={primary}
+                  extra={
+                    <>
+                      {!isEdit ? (
+                        <button
+                          type='button'
+                          onClick={handleSaveDraft}
+                          disabled={submitting}
+                          className='inline-flex h-11 w-full items-center justify-center rounded-full bg-white text-[14px] font-semibold text-[var(--foreground)] ring-1 ring-black/[0.08] transition hover:bg-[#f7f8fa] disabled:opacity-50'
+                        >
+                          {tCommon('ui.draft.save')}
+                        </button>
+                      ) : null}
+                      {draftSavedAt && !isEdit ? (
+                        <p className='text-center text-[12px] text-[var(--muted)]'>{tCommon('ui.draft.savedAt', { time: fmt.relative(draftSavedAt) })}</p>
+                      ) : null}
+                      <WriteGuideButton onClick={orientation.show} />
+                    </>
+                  }
+                />
+              </>
+            }
+          />
+        </form>
+        <RoommateWriteOrientationModal
+          open={orientation.open}
+          agreeing={orientation.agreeing}
+          error={orientation.error}
+          onClose={() => void orientation.agree()}
+          readOnly={orientation.readOnly}
+          listHref={href(`/${boardId}`)}
+        />
+      </BoardPageShell>
+    )
+  }
+
+  return (
+    <BoardPageShell width='narrow' rail={null}>
+      <div className='pb-16 pt-4 sm:pt-6'>
+        <BoardBackLink
+          href={
+            isEdit && editPostId
+              ? href(`/${boardId}/${editPostId}`)
+              : href(`/${boardId}`)
+          }
+          label={
+            isEdit
+              ? t('roommate.write.backToPost')
+              : t('roommate.write.backToList', { board: title })
+          }
+          className='mb-5'
+        />
+
+        {isEdit ? (
+          <UpdateHero title={postTitle} lookingFor={lookingFor} />
+        ) : (
+          <CreateHero />
+        )}
+
+        <WriteGuideButton onClick={orientation.show} />
+
+        {!isEdit ? (
+          <div className='mt-4 rounded-xl bg-brand-soft px-4 py-3 text-[13px] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--brand)]/15'>
+            {onePostBefore}
+            <strong className='text-[var(--foreground)]'>
+              {t('roommate.write.onePostLimit')}
+            </strong>
+            {onePostAfter}
+          </div>
+        ) : null}
+
+        {/* 브라우저 기본 말풍선 대신 칸 아래 문구로 안내 (handleSubmit에서 모두 검사) */}
+        <form noValidate onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
+          {formSections}
           {previewPost ? (
             <section>
               <h2 className='mb-2.5 text-[13px] font-semibold text-[var(--muted)]'>
@@ -1015,6 +1142,13 @@ function CreateSection({
   description?: string
   children: ReactNode
 }) {
+  if (MISAENG_DESIGN) {
+    return (
+      <WriteStepCard step={step} title={title} description={description}>
+        {children}
+      </WriteStepCard>
+    )
+  }
   return (
     <section>
       <div className='mb-3 flex items-start gap-3'>

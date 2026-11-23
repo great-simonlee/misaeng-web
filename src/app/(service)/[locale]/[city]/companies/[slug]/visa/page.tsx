@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { cityPageTitle, pageName } from '@lib/i18n/cityMetadata.server'
 
 import { MemberGate } from '@components/MemberGate'
 import { OpenInApp } from '@components/OpenInApp'
@@ -14,10 +15,11 @@ interface CompanyVisaPageProps {
 
 // Premium page: no figures in the metadata, just the company name.
 export async function generateMetadata({ params }: CompanyVisaPageProps): Promise<Metadata> {
-  const { locale, slug } = await params
+  const { locale, city, slug } = await params
   const t = await getT(isLocale(locale) ? locale : BRAND_CONFIG.serviceDefaultLocale, 'companies')
   const company = await getActiveCompanyBySlug(slug).catch(() => null)
   return {
+    title: await cityPageTitle(locale, city, company ? await pageName(locale, 'companyVisa', { company: company.name }) : await pageName(locale, 'companies')),
     description: company
       ? `${company.name} · ${t('sponsor.title')}`
       : t('meta.listDescription'),

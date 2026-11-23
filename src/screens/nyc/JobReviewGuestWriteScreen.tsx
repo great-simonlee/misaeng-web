@@ -38,6 +38,8 @@ import {
 } from '@lib/community/jobReview'
 import { BRAND_CONFIG } from '@lib/brand'
 import { useFormat, useT } from '@lib/i18n/client'
+import { MISAENG_DESIGN } from '@lib/brand/design'
+import { WriteColumns, WriteStepCard, WriteSubmitCard, writeSubmitClass } from '@widgets/nyc/WriteFormLayout'
 import { isAccountSuspended } from '@lib/community/schoolGate'
 import {
   clearWriteDraft,
@@ -113,6 +115,7 @@ export function JobReviewGuestWriteScreen() {
   const { success, error: toastError } = useToast()
   const t = useT('reviews')
   const tCommunity = useT('community')
+  const tCommon = useT('common')
   const format = useFormat()
   const { locale } = useConsentLocale()
 
@@ -436,50 +439,9 @@ export function JobReviewGuestWriteScreen() {
   }
 
   const listHref = href(`/${BOARD_ID}`)
-
-  return (
-    <BoardPageShell width='narrow'>
-      <div className='pb-16 pt-4 sm:pt-6'>
-        <BoardBackLink
-          href={listHref}
-          label={t('guest.backToList')}
-          className='mb-5'
-        />
-
-        {phase === 'choose' ? (
-          <ChoosePhase
-            canUseGoogle={canUseGoogle}
-            acceptedTerms={acceptedTerms}
-            showTermsError={showTermsError}
-            signingIn={signingIn || loading}
-            onTermsChange={(next) => {
-              setAcceptedTerms(next)
-              if (next) setShowTermsError(false)
-            }}
-            onGoogleCredential={(credential) =>
-              void handleGoogleCredential(credential, 'write')
-            }
-            onGoogleError={toastError}
-            onGuest={() => {
-              setMode('guest')
-              setPhase('write')
-            }}
-          />
-        ) : null}
-
-        {phase === 'write' && !draftHydrated ? (
-          <LoadingState label={t('guest.checkingDraft')} />
-        ) : null}
-
-        {phase === 'write' && draftHydrated ? (
-          <>
-            <WriteHero mode={mode} writeLabel={tCommunity(communityBoardKey(BOARD_ID, 'writeLabel'))} />
-            <form
-              onSubmit={(e) => void handleSubmit(e)}
-              onFocus={handleSectionFocus}
-              className='mt-6 space-y-8'
-            >
-              <AutosaveNotice savedAt={draftSavedAt} />
+  // Same step sections in both layouts
+  const guestSections = (
+    <>
               <CreateSection
                 step={1}
                 title={t('guest.authorSection')}
@@ -671,6 +633,153 @@ export function JobReviewGuestWriteScreen() {
                 />
               </CreateSection>
 
+    </>
+  )
+
+  return (
+    <BoardPageShell width={MISAENG_DESIGN ? 'wide' : 'narrow'} rail={MISAENG_DESIGN ? null : undefined}>
+      <div className={MISAENG_DESIGN ? 'pb-16 pt-4 sm:pt-5 lg:pt-6' : 'pb-16 pt-4 sm:pt-6'}>
+        <BoardBackLink
+          href={listHref}
+          label={t('guest.backToList')}
+          className='mb-5'
+        />
+
+        {phase === 'choose' ? (
+          <div className={MISAENG_DESIGN ? 'max-w-2xl' : undefined}>
+          <ChoosePhase
+            canUseGoogle={canUseGoogle}
+            acceptedTerms={acceptedTerms}
+            showTermsError={showTermsError}
+            signingIn={signingIn || loading}
+            onTermsChange={(next) => {
+              setAcceptedTerms(next)
+              if (next) setShowTermsError(false)
+            }}
+            onGoogleCredential={(credential) =>
+              void handleGoogleCredential(credential, 'write')
+            }
+            onGoogleError={toastError}
+            onGuest={() => {
+              setMode('guest')
+              setPhase('write')
+            }}
+          />
+          </div>
+        ) : null}
+
+        {phase === 'write' && !draftHydrated ? (
+          <LoadingState label={t('guest.checkingDraft')} />
+        ) : null}
+
+        {phase === 'write' && draftHydrated ? (
+          <>
+            <WriteHero mode={mode} writeLabel={tCommunity(communityBoardKey(BOARD_ID, 'writeLabel'))} />
+            {MISAENG_DESIGN ? (
+            <form onSubmit={(e) => void handleSubmit(e)} onFocus={handleSectionFocus}>
+              <WriteColumns
+                main={
+                  <>
+                    {guestSections}
+                  </>
+                }
+                aside={
+                  <>
+                    <div className='rounded-[1.375rem] bg-white p-5 ring-1 ring-[var(--card-ring)] [&>section]:space-y-3'>
+              <section className='space-y-3'>
+                <CommunityWritingGuidelines />
+                <label className='flex cursor-pointer items-start gap-3 px-1'>
+                  <input
+                    type='checkbox'
+                    checked={guidelinesAccepted}
+                    onChange={(e) => setGuidelinesAccepted(e.target.checked)}
+                    className='mt-0.5 size-4 shrink-0 accent-[var(--brand)]'
+                  />
+                  <span className='text-[13px] leading-relaxed text-[var(--foreground)]'>
+                    {t('guest.guidelinesAgree')}
+                    <span className='text-[var(--brand)]'> *</span>
+                  </span>
+                </label>
+              </section>
+                    </div>
+
+              <CreditPreview timelineCount={timeline.filter(isJobReviewTimelineEntryComplete).length} mode={mode} />
+
+                    <WriteSubmitCard
+                      missing={[
+                        !jobReviewType ? t('jobReview.write.typeSection') : null,
+                        !postTitle.trim() ? t('write.titleLabel') : null,
+                        !jobReviewOutcome ? t('jobReview.write.outcomeSection') : null,
+                        !sourceComplete ? t('jobReview.write.sourceSection') : null,
+                      ].filter((item): item is string => Boolean(item))}
+                      submit={
+                <button
+                  type='submit'
+                  disabled={
+                    submitting || !postTitle.trim() || !jobReviewType || !jobReviewOutcome || !sourceComplete
+                  }
+                  className={writeSubmitClass}
+                >
+                  {submitting
+                    ? t('write.submitting')
+                    : !jobReviewType
+                      ? t('write.selectTypeFirst')
+                      : !jobReviewOutcome
+                        ? t('jobReview.write.errors.outcomeRequired')
+                        : !sourceComplete
+                          ? t('jobReview.write.selectSourceFirst')
+                          : mode === 'member'
+                        ? t('write.submit')
+                        : t('guest.submitGuest')}
+                </button>
+                      }
+                      extra={
+                        <>
+                          <button
+                            type='button'
+                            onClick={handleSaveDraft}
+                            disabled={submitting}
+                            className='inline-flex h-11 w-full items-center justify-center rounded-full bg-white text-[14px] font-semibold text-[var(--foreground)] ring-1 ring-black/[0.08] transition hover:bg-[#f7f8fa] disabled:opacity-50'
+                          >
+                            {tCommon('ui.draft.save')}
+                          </button>
+              <AutosaveNotice savedAt={draftSavedAt} />
+
+              <p className='text-center text-[12px] text-[var(--muted)]'>
+                {mode === 'guest' ? (
+                  <>
+                    {t('guest.footnoteBefore')}{' '}
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setPhase('choose')
+                        if (typeof window !== 'undefined') window.scrollTo({ top: 0 })
+                      }}
+                      className='font-medium text-[var(--brand)] underline-offset-2 hover:underline'
+                    >
+                      {t('guest.footnoteLink')}
+                    </button>
+                    {t('guest.footnoteAfter')}
+                  </>
+                ) : (
+                  t('guest.footnoteMember')
+                )}
+              </p>
+                        </>
+                      }
+                    />
+                  </>
+                }
+              />
+            </form>
+            ) : (
+            <form
+              onSubmit={(e) => void handleSubmit(e)}
+              onFocus={handleSectionFocus}
+              className='mt-6 space-y-8'
+            >
+              <AutosaveNotice savedAt={draftSavedAt} />
+              {guestSections}
               <section className='space-y-3'>
                 <CommunityWritingGuidelines />
                 <label className='flex cursor-pointer items-start gap-3 px-1'>
@@ -736,10 +845,12 @@ export function JobReviewGuestWriteScreen() {
                 )}
               </p>
             </form>
+            )}
           </>
         ) : null}
 
         {phase === 'done' && result ? (
+          <div className={MISAENG_DESIGN ? 'max-w-2xl' : undefined}>
           <DonePhase
             post={result.post}
             credit={result.credit}
@@ -761,6 +872,7 @@ export function JobReviewGuestWriteScreen() {
             }
             onGoogleError={toastError}
           />
+          </div>
         ) : null}
       </div>
     </BoardPageShell>
@@ -1136,6 +1248,15 @@ function CreateSection({
   description?: string
   children: ReactNode
 }) {
+  if (MISAENG_DESIGN) {
+    return (
+      <div data-autosave-section={`step-${step}`}>
+        <WriteStepCard step={step} title={title} description={description}>
+          {children}
+        </WriteStepCard>
+      </div>
+    )
+  }
   return (
     <section data-autosave-section={`step-${step}`}>
       <div className='mb-3 flex items-start gap-3'>

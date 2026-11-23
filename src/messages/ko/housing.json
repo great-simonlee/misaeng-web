@@ -248,6 +248,10 @@
       "description": "필터를 바꿔 다시 검색해 보세요.",
       "action": "필터 초기화"
     },
+    "emptyCity": {
+      "title": "아직 {city} 매물이 없어요",
+      "description": "새 매물이 올라오면 여기에서 바로 볼 수 있어요. 조금만 기다려 주세요."
+    },
     "sheet": {
       "clearAll": "전체 해제",
       "showResults_other": "매물 {count}개 보기",
@@ -291,7 +295,13 @@
       "descriptionPlaceholder": "계약 조건, 편의시설, 추천 대상 등"
     },
     "submitting": "등록 중…",
-    "submit": "게시하기"
+    "submit": "게시하기",
+    "sections": {
+      "location": "위치",
+      "price": "가격 · 방",
+      "dates": "입주 기간",
+      "details": "연락처 · 설명"
+    }
   },
   "roommate": {
     "intents": {
@@ -550,5 +560,10 @@
       "success": "상단에 올렸어요 · {date}까지",
       "failed": "상단에 올리지 못했어요. 잠시 후 다시 시도해 주세요."
     }
+  },
+  "segments": {
+    "rent": "렌트",
+    "roommate": "룸메이트·서블렛",
+    "aria": "하우징 종류"
   }
 }

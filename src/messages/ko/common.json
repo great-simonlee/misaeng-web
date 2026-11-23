@@ -1,7 +1,43 @@
 {
   "meta": {
     "title": "{brand} | 뉴욕 유학생·직장인 커뮤니티",
-    "description": "뉴욕에서 공부하고 일하는 사람들을 위한 하우징·맛집·CPT/OPT·비자·취업 후기 커뮤니티예요."
+    "description": "뉴욕에서 공부하고 일하는 사람들을 위한 하우징·맛집·CPT/OPT·비자·취업 후기 커뮤니티예요.",
+    "cities": {
+      "nyc": "뉴욕",
+      "boston": "보스턴",
+      "dc": "워싱턴 DC"
+    },
+    "page": "{page} · {city} | {brand}",
+    "pageOnly": "{page} | {brand}",
+    "hubTitle": "{brand} {city} | {city} 유학생·직장인 커뮤니티",
+    "pages": {
+      "housing": "하우징",
+      "housingNew": "매물 올리기",
+      "companies": "회사별 채용 페이지",
+      "postings": "채용 공고",
+      "companyVisa": "{company} 비자·스폰서 정보",
+      "credit": "미생 포인트",
+      "influencers": "협력 인플루언서",
+      "partners": "파트너 학생회",
+      "login": "로그인",
+      "me": "마이페이지",
+      "myPosts": "내가 쓴 글",
+      "myLikes": "저장한 글",
+      "inquiries": "내 문의",
+      "quiz": "미생 퀴즈",
+      "terms": "이용약관",
+      "privacy": "개인정보처리방침",
+      "write": "{board} 글쓰기",
+      "edit": "{board} 글 수정",
+      "marketInbox": "중고거래 문의"
+    },
+    "descriptions": {
+      "housing": "{city} 하우징 매물을 지도와 사진으로 확인해 보세요.",
+      "companies": "{city} 유학생·직장인이 많이 찾는 회사의 채용 페이지와 비자 정보를 모았어요.",
+      "postings": "{city} 신입·인턴 채용 공고를 매일 모아서 보여드려요.",
+      "influencers": "미생과 함께하는 인플루언서를 소개해요.",
+      "partners": "미생과 함께하는 한인 학생회와 동아리를 소개해요."
+    }
   },
   "language": {
     "label": "언어",
@@ -258,5 +294,12 @@
       "openInApp": "앱에서 보기",
       "getApp": "앱 받기"
     }
+  },
+  "profilePrompt": {
+    "title": "프로필을 완성해 주세요",
+    "body": "이름, 성별, 닉네임을 아직 설정하지 않았어요. 닉네임은 글과 댓글에 작성자로 보여요.",
+    "current": "지금은 {name}(으)로 보여요",
+    "later": "나중에",
+    "setup": "지금 설정하기"
   }
 }

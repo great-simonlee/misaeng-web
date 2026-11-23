@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useWindowedList } from '@hooks/usePagedList'
 import {
   useCallback,
   useEffect,
@@ -140,6 +141,19 @@ export function CompanyListScreen() {
       ? groupByIndustry(rest, industryOptions, industryLabel)
       : groupByInitial(rest)
   }, [filtered, sort, industryOptions, industryLabel])
+  // Companies appear CARD_STEP at a time, more when the bottom comes near (owner 11-23 infinite scroll)
+  const groupCardTotal = groups.reduce((sum, group) => sum + group.items.length, 0)
+  const shownCards = useWindowedList(groupCardTotal, CARD_STEP, JSON.stringify(groups.map((group) => [group.key, group.items.length])))
+  const visibleGroups = useMemo(() => {
+    let budget = shownCards.count
+    const out: typeof groups = []
+    for (const group of groups) {
+      if (budget <= 0) break
+      out.push(group.items.length <= budget ? group : { ...group, items: group.items.slice(0, budget) })
+      budget -= group.items.length
+    }
+    return out
+  }, [groups, shownCards.count])
   const hrefFor = (slug: string) => href(`/companies/${slug}`)
 
   return (
@@ -164,7 +178,7 @@ export function CompanyListScreen() {
           <div className='relative'>
             <div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
               <div className='min-w-0'>
-                <h1 className={byBrand('font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'text-[1.4rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.6rem]')}>
+                <h1 className={byBrand('font-bold leading-[1.1] tracking-[-0.035em] text-white text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'text-[1.4rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.6rem]')}>
                   {t('list.title')}
                 </h1>
                 <p className='mt-1.5 text-[13px] leading-relaxed text-white/55 sm:text-[14px]'>
@@ -329,7 +343,7 @@ export function CompanyListScreen() {
                   <SectionTitle>{t('list.allCompaniesTitle')}</SectionTitle>
                 ) : null}
                 <div className='flex flex-col gap-7'>
-                  {groups.map(({ key, label, items }, gi) =>
+                  {visibleGroups.map(({ key, label, items }, gi) =>
                     sort === 'industry' ? (
                       <div key={key}>
                         <div className='mb-3 flex items-center gap-2.5'>
@@ -376,6 +390,7 @@ export function CompanyListScreen() {
                       </div>
                     )
                   )}
+                  {shownCards.hasMore ? <div ref={shownCards.sentinelRef} className='h-10' aria-hidden /> : null}
                 </div>
               </div>
             ) : null}
@@ -433,6 +448,9 @@ function SortToggle({ value, onChange }: { value: SortMode; onChange: (next: Sor
     </div>
   )
 }
+
+/** Company cards per scroll step */
+const CARD_STEP = 36
 
 function CompanyCardGrid({
   companies,

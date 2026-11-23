@@ -1,7 +1,43 @@
 {
   "meta": {
     "title": "{brand} | Community for International Students & Professionals in New York",
-    "description": "Housing, food, CPT/OPT, visa and job interview reviews from people who study and work in New York."
+    "description": "Housing, food, CPT/OPT, visa and job interview reviews from people who study and work in New York.",
+    "cities": {
+      "nyc": "New York",
+      "boston": "Boston",
+      "dc": "Washington DC"
+    },
+    "page": "{page} · {city} | {brand}",
+    "pageOnly": "{page} | {brand}",
+    "hubTitle": "{brand} {city} | Community for International Students & Professionals in {city}",
+    "pages": {
+      "housing": "Housing",
+      "housingNew": "Post a listing",
+      "companies": "Company career pages",
+      "postings": "Job postings",
+      "companyVisa": "{company} visa & sponsorship",
+      "credit": "Misaeng Points",
+      "influencers": "Partner influencers",
+      "partners": "Partner student groups",
+      "login": "Sign in",
+      "me": "My page",
+      "myPosts": "My posts",
+      "myLikes": "Saved posts",
+      "inquiries": "My inquiries",
+      "quiz": "Misaeng quiz",
+      "terms": "Terms of Use",
+      "privacy": "Privacy Policy",
+      "write": "Write in {board}",
+      "edit": "Edit post · {board}",
+      "marketInbox": "Marketplace messages"
+    },
+    "descriptions": {
+      "housing": "Browse housing listings in {city} with maps and photos.",
+      "companies": "Career pages and visa info for companies students and professionals in {city} look for.",
+      "postings": "New grad and intern job postings for {city}, collected every day.",
+      "influencers": "Meet the influencers who partner with Misaeng.",
+      "partners": "Meet the Korean student associations and clubs that partner with Misaeng."
+    }
   },
   "language": {
     "label": "Language",
@@ -258,5 +294,12 @@
       "openInApp": "Open in app",
       "getApp": "Get the app"
     }
+  },
+  "profilePrompt": {
+    "title": "Finish your profile",
+    "body": "You haven't set your name, gender and nickname yet. Your nickname is shown on your posts and comments.",
+    "current": "Right now you show as {name}",
+    "later": "Later",
+    "setup": "Set up now"
   }
 }

@@ -12,6 +12,7 @@ import { cityLoginPath } from '@lib/constants/cities'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { useFormat, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
+import { byBrand } from '@lib/brand/design'
 import { fetchThread, sendReply, type SupportConversation, type SupportMessage } from '@lib/support/client'
 
 /** One 문의/건의 thread: the messages and a reply box (not realtime; refreshed on open and every 30 s). */
@@ -69,7 +70,7 @@ export function MyInquiryThreadScreen({ id }: { id: string }) {
   if (loading || !user || (!conversation && !failed)) return <LoadingState fullPage />
 
   return (
-    <div className='relative flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
+    <div className={byBrand('relative flex flex-1 flex-col bg-white', 'relative flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]')}>
       <div className={cn('mx-auto flex w-full max-w-3xl flex-1 flex-col pb-14 pt-8 sm:pb-16 sm:pt-10', NYC_PAGE_SHELL_CLASS)}>
         <Link href={href('/me/inquiries')} className='text-[13px] font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)]'>
           ← {t('support.back')}

@@ -253,6 +253,10 @@
       "description": "Try changing your filters and search again.",
       "action": "Reset filters"
     },
+    "emptyCity": {
+      "title": "No listings in {city} yet",
+      "description": "New listings will show up here as soon as they're posted. Check back soon."
+    },
     "sheet": {
       "clearAll": "Clear all",
       "showResults_one": "Show {count} listing",
@@ -297,7 +301,13 @@
       "descriptionPlaceholder": "Lease terms, amenities, who it's a good fit for, etc."
     },
     "submitting": "Posting…",
-    "submit": "Post"
+    "submit": "Post",
+    "sections": {
+      "location": "Location",
+      "price": "Price & rooms",
+      "dates": "Move-in dates",
+      "details": "Contact & details"
+    }
   },
   "roommate": {
     "intents": {
@@ -562,5 +572,10 @@
       "success": "Pinned to the top · until {date}",
       "failed": "Couldn't pin the post. Please try again in a moment."
     }
+  },
+  "segments": {
+    "rent": "Rent",
+    "roommate": "Roommates & sublets",
+    "aria": "Housing type"
   }
 }

@@ -28,6 +28,7 @@ import {
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { useT } from '@lib/i18n/client'
+import { MISAENG_DESIGN } from '@lib/brand/design'
 import type { CommunityPost } from '@/types/nyc'
 import {
   BoardBackLink,
@@ -44,6 +45,7 @@ import { TranslationNotice, useTranslatedContent } from '@widgets/TranslationNot
 import { FoodDetailContent } from '@widgets/nyc/FoodDetailContent'
 import { CptOptDetailContent } from '@widgets/nyc/CptOptDetailContent'
 import { JobReviewDetailContent } from '@widgets/nyc/JobReviewDetailContent'
+import { MarketDetailContent } from '@widgets/nyc/MarketListing'
 import { RoommateDetailContent } from '@widgets/nyc/RoommateDetailContent'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { ReviewVerificationEntry } from '@widgets/nyc/reviewDocs/ReviewVerificationEntry'
@@ -162,8 +164,14 @@ export function CommunityDetailScreen({
     }
   }
 
-  // 면접·취업 후기는 회사 페이지와 같은 넓은 폭
-  const shellWidth = boardId === 'job-review' ? 'wide' : 'narrow'
+  // Misaeng: one reading width for every post type (owner 11-23 web review). Ellieo: 면접·취업 후기는 회사 페이지와 같은 넓은 폭
+  // 중고거래 상세: a product page at the navbar width (owner 11-23)
+  const isMarketDetail = boardId === 'marketplace' && MISAENG_DESIGN
+  const shellWidth = isMarketDetail
+    ? 'wide'
+    : MISAENG_DESIGN
+    ? boardId === 'food' ? 'narrow' : 'medium'
+    : boardId === 'job-review' ? 'wide' : 'narrow'
 
   if (loading) {
     return (
@@ -319,6 +327,22 @@ export function CommunityDetailScreen({
               isAuthor={isAuthor}
               onDelete={() => void handleDelete()}
             />
+          ) : isMarketDetail ? (
+            <MarketDetailContent
+              post={post}
+              isAuthor={isAuthor}
+              onDelete={() => void handleDelete()}
+              translationNotice={post.i18n && post.i18n.state !== 'original' ? translationNotice : null}
+              contentLang={translated.lang}
+              comments={
+                <CommunityCommentsSection
+                  postId={post.id}
+                  boardId={boardId}
+                  anonymousBoard={anonymousBoard}
+                  loginNext={hrefForCommunityPost(post, city)}
+                />
+              }
+            />
           ) : isRoommate ? (
             <RoommateDetailContent
               post={post}
@@ -392,21 +416,26 @@ export function CommunityDetailScreen({
                   isAuthor={isAuthor}
                   loginNext={hrefForCommunityPost(post, city)}
                   onDelete={() => void handleDelete()}
+                  inset
                 />
               </BoardSurface>
             </>
           )}
 
-          {isAuthor && (isCptOpt || isJobReview) ? (
+          {/* Misaeng job reviews show this inside the author's panel (JobReviewDetailContent) */}
+          {isAuthor && (isCptOpt || (isJobReview && !MISAENG_DESIGN)) ? (
             <ReviewVerificationEntry postId={post.id} className='mt-4' />
           ) : null}
 
-          <CommunityCommentsSection
-            postId={post.id}
-            boardId={boardId}
-            anonymousBoard={anonymousBoard}
-            loginNext={hrefForCommunityPost(post, city)}
-          />
+          {/* 중고거래 puts comments inside its left column */}
+          {isMarketDetail ? null : (
+            <CommunityCommentsSection
+              postId={post.id}
+              boardId={boardId}
+              anonymousBoard={anonymousBoard}
+              loginNext={hrefForCommunityPost(post, city)}
+            />
+          )}
         </div>
       </BoardPageShell>
     </PullToRefresh>

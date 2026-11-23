@@ -8,6 +8,7 @@ import { LoadingState } from '@components'
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
+import { MISAENG_DESIGN, byBrand } from '@lib/brand/design'
 import { cityLoginPath } from '@lib/constants/cities'
 import { useT } from '@lib/i18n/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
@@ -120,7 +121,16 @@ export function OnboardingQuizScreen() {
 
   const shell = (body: React.ReactNode) => (
     <BoardPageShell width='narrow'>
-      <div className='mx-auto max-w-md px-1 pb-16 pt-6'>{body}</div>
+      {MISAENG_DESIGN ? (
+        // Misaeng: the quiz sits in one white card (wider column, progress header on top)
+        <div className='max-w-2xl pb-16 pt-4 sm:pt-5 lg:pt-6'>
+          <div className='rounded-[28px] bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_14px_36px_-18px_rgba(15,23,42,0.22)] ring-1 ring-black/[0.04] sm:p-8'>
+            {body}
+          </div>
+        </div>
+      ) : (
+        <div className='mx-auto max-w-md px-1 pb-16 pt-6'>{body}</div>
+      )}
     </BoardPageShell>
   )
 
@@ -161,21 +171,32 @@ export function OnboardingQuizScreen() {
 
   return shell(
     <div>
-      <div className='flex items-center justify-between text-[12px] font-medium text-[var(--muted)]'>
+      <div
+        className={byBrand(
+          'flex items-center justify-between text-[13px] font-semibold text-[var(--foreground)]',
+          'flex items-center justify-between text-[12px] font-medium text-[var(--muted)]',
+        )}
+      >
         <span>{t('title')}</span>
-        <span>
+        <span
+          className={byBrand(
+            'rounded-full bg-[var(--brand)]/[0.08] px-2.5 py-0.5 text-[12px] font-bold tabular-nums text-[var(--brand)]',
+            '',
+          )}
+        >
           {index + 1} / {quiz.total}
         </span>
       </div>
-      <div className='mt-2 h-1.5 overflow-hidden rounded-full bg-black/[0.06]'>
+      <div className={byBrand('mt-3 h-2 overflow-hidden rounded-full bg-black/[0.06]', 'mt-2 h-1.5 overflow-hidden rounded-full bg-black/[0.06]')}>
         <div className='h-full rounded-full bg-[var(--brand)] transition-all' style={{ width: `${progress}%` }} />
       </div>
-      {!quiz.completed && index === 0 && !feedback ? (
+      {/* No reward line when this account has nothing to earn ("0P를 드려요" read oddly) */}
+      {!quiz.completed && index === 0 && !feedback && quiz.rewardPoints > 0 ? (
         <p className='mt-4 rounded-xl bg-[var(--brand)]/[0.07] px-3.5 py-2.5 text-[12.5px] text-[var(--foreground)]'>
           {t('intro', { amount: quiz.rewardPoints, total: quiz.total })}
         </p>
       ) : null}
-      <h1 className='mt-5 text-[1.15rem] font-semibold leading-snug tracking-tight text-[var(--foreground)]'>{current.question}</h1>
+      <h1 className={byBrand('mt-6 text-[1.3rem] font-bold leading-snug tracking-[-0.025em] text-[var(--foreground)] sm:text-[1.45rem]', 'mt-5 text-[1.15rem] font-semibold leading-snug tracking-tight text-[var(--foreground)]')}>{current.question}</h1>
       <div className='mt-5 space-y-2.5'>
         {current.options.map((option) => {
           const picked = feedback?.optionId === option.id

@@ -1,31 +1,31 @@
 import type { LegalDocument } from '@lib/constants/legalDocument'
 
-/** Misaeng NYC · Ellieo Terms of Use — English controls; other languages are convenience translations */
+/** Misaeng · Ellieo Terms of Use (apps + misaeng.com) — English controls; Korean and Vietnamese are convenience translations */
 export const NYC_TERMS_OF_USE: LegalDocument = {
   eyebrow: 'LEGAL',
   title: 'Terms of Use',
   titleKo: '이용약관',
-  version: '2026-12-15',
-  lastUpdated: 'November 15, 2026',
-  lastUpdatedKo: '2026년 11월 15일',
-  effectiveDate: 'December 15, 2026',
-  effectiveDateKo: '2026년 12월 15일',
+  version: '2026-11-23',
+  lastUpdated: 'November 23, 2026',
+  lastUpdatedKo: '2026년 11월 23일',
+  effectiveDate: 'November 23, 2026',
+  effectiveDateKo: '2026년 11월 23일',
   contactEmail: 'info@misaeng.com',
   companyName: 'Misaeng LLC',
   companyAddress:
     '45 Rockefeller Plaza, Fl 20, New York, NY 10111, United States',
   languageNotice: {
-    en: 'The English version of these Terms is the official and controlling version. Versions in other languages (Korean, Vietnamese, Japanese, Simplified Chinese, Traditional Chinese, and Indonesian) are reference translations provided for convenience only. If there is any conflict or inconsistency between the English version and any translation, the English version prevails.',
-    ko: '본 약관의 영문본이 공식·기준 문서입니다. 다른 언어(한국어, 베트남어, 일본어, 중국어 간체·번체, 인도네시아어) 번역본은 이해를 돕기 위한 참고용이며, 영문본과 번역본에 차이·불일치가 있을 경우 영문본이 우선합니다.',
+    en: 'The English version of these Terms is the official and controlling version. Korean and Vietnamese translations are provided for convenience only; a paragraph that has not yet been translated is shown in English. If there is any conflict or inconsistency between the English version and a translation, the English version prevails.',
+    ko: '본 약관의 영문본이 공식·기준 문서이며, 한국어·베트남어 번역본은 이해를 돕기 위한 참고용입니다(아직 번역되지 않은 문단은 영어로 표시됩니다). 영문본과 번역본에 차이·불일치가 있을 경우 영문본이 우선합니다.',
   },
   intro: [
     {
-      en: 'These Terms of Use (the “Terms”) govern your access to and use of the websites and related online services operated by Misaeng LLC (“Company,” “we,” “us,” or “Misaeng”), including the New York City community platform for international students and professionals known as “Misaeng NYC” and its multilingual edition “Ellieo” (collectively, the “Services”). Misaeng NYC and Ellieo share one account system and the same community Content, so one account works on both, and these Terms apply to both.',
-      ko: '본 이용약관(이하 “본 약관”)은 Misaeng LLC(이하 “회사”, “당사”, “Misaeng”)가 운영하는 웹사이트 및 관련 온라인 서비스, 특히 New York City 지역 유학생·직장인을 위한 커뮤니티 플랫폼 “Misaeng NYC”와 그 다국어 서비스 “Ellieo”(이하 통칭 “서비스”)의 이용 조건과 회사와 이용자 간의 권리·의무를 정합니다. Misaeng NYC와 Ellieo는 하나의 계정 체계와 같은 커뮤니티 게시물을 공유하므로 하나의 계정으로 두 서비스를 모두 이용할 수 있으며, 본 약관은 두 서비스 모두에 적용됩니다.',
+      en: 'These Terms of Use (the “Terms”) govern your access to and use of the Misaeng mobile apps for iOS and Android, the misaeng.com websites (including our New York and Boston communities), and related online services operated by Misaeng LLC (“Company,” “we,” “us,” or “Misaeng”), including the community platform for international students and professionals known as “Misaeng” and its multilingual edition “Ellieo” (collectively, the “Services”). Misaeng and Ellieo share one account system and the same community Content, so one account works on both, and these Terms apply to both.',
+      ko: '본 이용약관(이하 “본 약관”)은 Misaeng LLC(이하 “회사”, “당사”, “Misaeng”)가 운영하는 iOS·Android용 미생 모바일 앱, misaeng.com 웹사이트(뉴욕·보스턴 커뮤니티 포함) 및 관련 온라인 서비스, 특히 유학생·직장인을 위한 커뮤니티 플랫폼 “미생(Misaeng)”과 그 다국어 서비스 “Ellieo”(이하 통칭 “서비스”)의 이용 조건과 회사와 이용자 간의 권리·의무를 정합니다. 미생과 Ellieo는 하나의 계정 체계와 같은 커뮤니티 게시물을 공유하므로 하나의 계정으로 두 서비스를 모두 이용할 수 있으며, 본 약관은 두 서비스 모두에 적용됩니다.',
     },
     {
-      en: 'By accessing, browsing, registering for, posting on, commenting on, contacting us through, applying for credits in connection with, or otherwise using the Services, you acknowledge that you have read, understood, and agree to be bound by these Terms. If you do not agree, do not use the Services.',
-      ko: '서비스에 접속·열람·가입·게시·댓글·문의·크레딧 신청 등 일체의 이용 행위를 하는 경우, 이용자는 본 약관을 읽고 이해하였으며 이에 동의한 것으로 간주됩니다. 동의하지 않는 경우 서비스를 이용하지 마십시오.',
+      en: 'By accessing, browsing, registering for, posting on, commenting on, contacting us through, using Misaeng Points or Premium in, or otherwise using the Services, you acknowledge that you have read, understood, and agree to be bound by these Terms. If you do not agree, do not use the Services.',
+      ko: '서비스에 접속·열람·가입·게시·댓글·문의·미생 포인트 또는 Premium 이용 등 일체의 이용 행위를 하는 경우, 이용자는 본 약관을 읽고 이해하였으며 이에 동의한 것으로 간주됩니다. 동의하지 않는 경우 서비스를 이용하지 마십시오.',
     },
   ],
   sections: [
@@ -75,8 +75,16 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
               ko: '“학교 이메일 인증”이란 특정 기능(글·댓글 작성 등)을 이용하기 위해 회사가 요청할 수 있는 학교(또는 인정 기관) 이메일 기반 확인 절차를 말합니다.',
             },
             {
-              en: '“Community Credits” means in-Service reward units that the Company may award, deduct, or expire under its policies. Credits are not cash, securities, or redeemable monetary assets.',
-              ko: '“커뮤니티 크레딧”이란 회사가 정책에 따라 적립·차감·소멸시킬 수 있는 서비스 내 보상 단위로, 현금·유가증권·환금성 자산이 아닙니다.',
+              en: '“Misaeng Points” means in-Service reward units that the Company may award, deduct, or expire under its policies (see Section 13). Points are not cash, securities, or redeemable monetary assets.',
+              ko: '“미생 포인트”란 회사가 정책에 따라 적립·차감·소멸시킬 수 있는 서비스 내 보상 단위로(제13조 참고), 현금·유가증권·환금성 자산이 아닙니다.',
+            },
+            {
+              en: '“Premium” or “Misaeng Premium” means the optional paid subscription described in Section 14.',
+              ko: '“Premium” 또는 “미생 Premium”이란 제14조에 따른 선택형 유료 구독을 말합니다.',
+            },
+            {
+              en: '“Coffee Chats” and “Career Questions” mean the features through which Members request short conversations with, or send questions to, Members who have set up a mentor profile (see Section 4).',
+              ko: '“커피챗” 및 “커리어 질문”이란 회원이 멘토 프로필을 설정한 다른 회원에게 짧은 대화를 신청하거나 질문을 보내는 기능을 말합니다(제4조 참고).',
             },
             {
               en: '“Third-Party Services” means services or infrastructure provided by parties other than the Company, such as Google sign-in, maps/place search, email, hosting, and analytics tools.',
@@ -100,8 +108,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
           type: 'ul',
           items: [
             {
-              en: 'You must be of legal age to form a binding contract under the laws of your place of residence (generally 18 years or older). Minors may not register or use posting features without the consent of a legal guardian where required.',
-              ko: '이용자는 자신이 거주하는 국가·주의 법령상 계약을 체결할 수 있는 법정 연령(일반적으로 만 18세 이상)이어야 합니다. 미성년자는 법정대리인의 동의 없이 회원 가입 및 게시 기능을 이용할 수 없습니다.',
+              en: 'You must be at least 18 years old and of legal age to form a binding contract where you live. The Services are not intended for anyone under 18, and we will close accounts we learn belong to someone under 18. Parent accounts are for adult parents or guardians of a Member.',
+              ko: '이용자는 만 18세 이상이며 거주지 법령상 계약을 체결할 수 있는 연령이어야 합니다. 서비스는 만 18세 미만을 대상으로 하지 않으며, 만 18세 미만의 계정임을 알게 되면 해당 계정을 해지합니다. 학부모 계정은 회원의 성인 부모 또는 보호자를 위한 계정입니다.',
             },
             {
               en: 'The Company may impose reasonable requirements for certain features, including School Email Verification, identity or affiliation checks, and operational review.',
@@ -126,8 +134,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
       blocks: [
         {
           type: 'p',
-          en: 'Some features (including posting, commenting, saves/likes, My Page, and credits) may require Member login and/or additional verification.',
-          ko: '일부 기능(글 작성, 댓글, 찜, 마이페이지, 크레딧 등)은 회원 로그인 및/또는 추가 인증이 필요할 수 있습니다.',
+          en: 'Some features (including posting, commenting, saves/likes, My Page, Misaeng Points, Coffee Chats, Career Questions, and Premium) may require Member login and/or additional verification.',
+          ko: '일부 기능(글 작성, 댓글, 찜, 마이페이지, 미생 포인트, 커피챗, 커리어 질문, Premium 등)은 회원 로그인 및/또는 추가 인증이 필요할 수 있습니다.',
         },
         {
           type: 'ul',
@@ -228,8 +236,20 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
               ko: '마이페이지: 내 글, 찜, 프로필·설정 관련 기능',
             },
             {
-              en: 'Community Credits: earning credits through activity and applying for rewards under Company policies',
-              ko: '커뮤니티 크레딧: 활동에 따른 적립 및 회사가 정한 보상·신청 절차',
+              en: 'Misaeng Points: earning points through activity and using them for features and rewards under Company policies (see Section 13)',
+              ko: '미생 포인트: 활동에 따른 적립과 회사가 정한 기능·보상에의 사용(제13조 참고)',
+            },
+            {
+              en: 'Coffee Chats and Career Questions: requesting short conversations with, or asking questions of, Members who have set up a mentor profile',
+              ko: '커피챗·커리어 질문: 멘토 프로필을 설정한 회원에게 짧은 대화를 신청하거나 질문하기',
+            },
+            {
+              en: 'Misaeng Premium: an optional paid subscription with additional information features such as visa sponsorship history by company and base salary by role (see Section 14)',
+              ko: '미생 Premium: 회사별 비자 스폰서 이력, 직무별 기본급 등 추가 정보 기능을 제공하는 선택형 유료 구독(제14조 참고)',
+            },
+            {
+              en: 'Notifications: push notifications and in-app alerts for new job postings, visa news, comments, messages, and similar, which you can manage in settings',
+              ko: '알림: 새 채용 공고, 비자 뉴스, 댓글, 메시지 등에 관한 푸시·앱 내 알림(설정에서 관리 가능)',
             },
             {
               en: 'Informational pages such as partners, influencers, and professional services',
@@ -244,6 +264,11 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
               ko: '고객 문의(이메일, 문의 페이지, 소셜 채널 등)',
             },
           ],
+        },
+        {
+          type: 'p',
+          en: '4.1 Coffee Chats and Career Questions. These features connect Members with other Members who have set up a mentor profile, which may require school or workplace verification. Mentors share their personal experience, not professional, legal, immigration, or tax advice. The Company does not guarantee any outcome (such as a job offer or visa result), is not a party to any arrangement between Members, and does not verify every statement a mentor makes. Do not request or offer money, gifts, or other payment for a Coffee Chat or Career Question outside the Services, and keep conversations respectful. A LinkedIn profile link you choose to share is shown only to the other person after a request is accepted. Requests may expire, and points used for a Career Question are handled as described in Section 13.',
+          ko: '4.1 커피챗 및 커리어 질문. 이 기능은 회원과 멘토 프로필을 설정한 다른 회원(학교·직장 인증이 필요할 수 있음)을 연결합니다. 멘토는 개인 경험을 나누는 것이며 전문적인 법률·이민·세무 자문을 제공하는 것이 아닙니다. 회사는 취업·비자 결과 등 어떤 결과도 보장하지 않으며, 회원 간 약속의 당사자가 아니고, 멘토의 모든 발언을 확인하지 않습니다. 서비스 밖에서 커피챗·커리어 질문의 대가로 금전·선물 등을 요구하거나 제안하지 말고, 서로 존중하며 대화해 주세요. 이용자가 공유하기로 한 LinkedIn 프로필 링크는 신청이 수락된 뒤 상대방에게만 표시됩니다. 신청은 기한이 지나면 만료될 수 있으며, 커리어 질문에 사용한 포인트는 제13조에 따라 처리됩니다.',
         },
         {
           type: 'note',
@@ -369,8 +394,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
               ko: '타인의 개인정보·민감정보를 동의 없이 수집·저장·공개',
             },
             {
-              en: 'Abusing reporting, blocking, verification, or credit systems',
-              ko: '신고·차단·인증·크레딧 제도를 악의적으로 남용하는 행위',
+              en: 'Abusing reporting, blocking, verification, Misaeng Points, Coffee Chat, or Premium systems (including sharing or reselling Premium access or codes)',
+              ko: '신고·차단·인증·미생 포인트·커피챗·Premium 제도를 악의적으로 남용하는 행위(Premium 이용 권한이나 코드를 공유·재판매하는 행위 포함)',
             },
             {
               en: 'Posting Content that infringes the intellectual property of the Company or any third party',
@@ -640,13 +665,13 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
         },
         {
           type: 'p',
-          en: '10.7 Reports, blocks, and enforcement. You can report a listing or an inquiry conversation and block another User. When you report a conversation, its most recent messages are sent to the Company with your report for review. Blocking a User stops messages in both directions and removes the conversation from your list. The Company may, at its discretion and without prior notice, remove or hide listings, close conversations, limit Marketplace features, or suspend or terminate accounts that violate these Terms or that it reasonably believes create a risk of fraud or harm, and may cooperate with law enforcement (see Section 17).',
-          ko: '10.7 신고, 차단 및 조치. 이용자는 등록 글이나 문의 대화를 신고하고 다른 이용자를 차단할 수 있습니다. 대화를 신고하면 그 대화의 최근 메시지가 신고 내용과 함께 회사에 전달되어 검토됩니다. 이용자를 차단하면 서로 메시지를 보낼 수 없고 해당 대화는 목록에서 사라집니다. 회사는 본 약관을 위반하거나 사기·피해 위험이 있다고 합리적으로 판단되는 등록 글을 재량에 따라 사전 통지 없이 삭제·숨김 처리하거나, 대화를 닫거나, 중고거래 기능을 제한하거나, 계정을 이용 정지·해지할 수 있으며, 수사기관에 협조할 수 있습니다(제17조 참고).',
+          en: '10.7 Reports, blocks, and enforcement. You can report a listing or an inquiry conversation and block another User. When you report a conversation, its most recent messages are sent to the Company with your report for review. Blocking a User stops messages in both directions and removes the conversation from your list. The Company may, at its discretion and without prior notice, remove or hide listings, close conversations, limit Marketplace features, or suspend or terminate accounts that violate these Terms or that it reasonably believes create a risk of fraud or harm, and may cooperate with law enforcement (see Section 18).',
+          ko: '10.7 신고, 차단 및 조치. 이용자는 등록 글이나 문의 대화를 신고하고 다른 이용자를 차단할 수 있습니다. 대화를 신고하면 그 대화의 최근 메시지가 신고 내용과 함께 회사에 전달되어 검토됩니다. 이용자를 차단하면 서로 메시지를 보낼 수 없고 해당 대화는 목록에서 사라집니다. 회사는 본 약관을 위반하거나 사기·피해 위험이 있다고 합리적으로 판단되는 등록 글을 재량에 따라 사전 통지 없이 삭제·숨김 처리하거나, 대화를 닫거나, 중고거래 기능을 제한하거나, 계정을 이용 정지·해지할 수 있으며, 수사기관에 협조할 수 있습니다(제18조 참고).',
         },
         {
           type: 'note',
-          en: 'The Company does not screen Users or listings in advance and does not mediate, refund, or compensate for transactions between Users. To the maximum extent permitted by law, the Company is not liable for any loss, injury, or damage arising from items, listings, meetups, payments, or other dealings between Users (see Sections 19 and 20).',
-          ko: '회사는 이용자나 등록 글을 사전에 심사하지 않으며, 이용자 간 거래를 중재·환불·보상하지 않습니다. 관련 법령이 허용하는 최대 범위에서, 회사는 이용자 간의 물품·등록 글·만남·결제 및 기타 거래로 인해 발생한 손실·상해·손해에 대해 책임지지 않습니다(제19조 및 제20조 참고).',
+          en: 'The Company does not screen Users or listings in advance and does not mediate, refund, or compensate for transactions between Users. To the maximum extent permitted by law, the Company is not liable for any loss, injury, or damage arising from items, listings, meetups, payments, or other dealings between Users (see Sections 20 and 21).',
+          ko: '회사는 이용자나 등록 글을 사전에 심사하지 않으며, 이용자 간 거래를 중재·환불·보상하지 않습니다. 관련 법령이 허용하는 최대 범위에서, 회사는 이용자 간의 물품·등록 글·만남·결제 및 기타 거래로 인해 발생한 손실·상해·손해에 대해 책임지지 않습니다(제20조 및 제21조 참고).',
         },
       ],
     },
@@ -701,50 +726,101 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
               ko: '회사는 게시된 후기·절차 설명의 완전성·최신성·정확성을 보증하지 않습니다.',
             },
             {
-              en: 'Coffee chats, mentoring, or advisory connections that may be offered through credit rewards do not, unless expressly stated otherwise, mean the Company is substituting for licensed professional advice or guaranteeing outcomes.',
-              ko: '크레딧 보상으로 제공될 수 있는 커피챗·멘토링·자문 연계 또한, 별도 고지가 없는 한 회사의 전문 자격 대행이나 결과 보장을 의미하지 않습니다.',
+              en: 'Coffee Chats, Career Questions, mentoring, or advisory connections (including those offered as Misaeng Points rewards) do not, unless expressly stated otherwise, mean the Company is substituting for licensed professional advice or guaranteeing outcomes.',
+              ko: '커피챗·커리어 질문·멘토링·자문 연계(미생 포인트 보상으로 제공되는 것 포함) 또한, 별도 고지가 없는 한 회사의 전문 자격 대행이나 결과 보장을 의미하지 않습니다.',
             },
           ],
         },
       ],
     },
     {
-      id: 'credits',
-      title: '13. Community Credits',
-      titleKo: '13. 커뮤니티 크레딧',
+      id: 'points',
+      title: '13. Misaeng Points',
+      titleKo: '13. 미생 포인트',
       blocks: [
         {
           type: 'p',
-          en: 'Community Credits are a rewards program to encourage engagement. The Company may award, adjust, reclaim, or expire credits under its policies, limits, and calculation methods.',
-          ko: '커뮤니티 크레딧은 서비스 활성화를 위한 리워드 프로그램으로, 회사의 정책·한도·산정 방식에 따라 부여·조정·회수·소멸될 수 있습니다.',
+          en: 'Misaeng Points are an in-Service rewards program. You may earn points through activity (for example reviews, comments, the onboarding quiz, and inviting friends or parents) and use them for features and rewards the Company offers, such as Career Questions, boosting a roommate listing, or reward applications. The Company may award, adjust, reclaim, or expire points under its policies, limits, and calculation methods, which are described in the Misaeng Points guide in the Services.',
+          ko: '미생 포인트는 서비스 내 보상 프로그램입니다. 후기·댓글 작성, 온보딩 퀴즈, 친구·부모님 초대 등 활동으로 포인트를 적립하고, 커리어 질문, 룸메이트 글 끌어올리기, 보상 신청 등 회사가 제공하는 기능·보상에 사용할 수 있습니다. 회사는 서비스 내 미생 포인트 가이드에 안내된 정책·한도·산정 방식에 따라 포인트를 부여·조정·회수·소멸시킬 수 있습니다.',
         },
         {
           type: 'ul',
           items: [
             {
-              en: 'Credits cannot be redeemed for cash or withdrawn, and may not be inherited, transferred, or pledged except where the Company expressly allows.',
-              ko: '크레딧은 현금으로 환전·인출할 수 없으며, 상속·양도·담보 제공이 금지될 수 있습니다(회사가 명시적으로 허용한 경우 제외).',
+              en: 'Points have no cash value. They cannot be bought, sold, refunded, withdrawn, exchanged for money, inherited, transferred, or pledged, except where the Company expressly allows.',
+              ko: '포인트는 현금 가치가 없으며, 회사가 명시적으로 허용한 경우를 제외하고 구매·판매·환불·인출·현금 교환·상속·양도·담보 제공을 할 수 없습니다.',
             },
             {
-              en: 'If fraudulent earning is found (multiple accounts, fake posts, manipulated engagement, etc.), credits and related rewards may be canceled and accounts sanctioned.',
-              ko: '부정 적립(다중 계정, 허위 게시, 조작된 참여 등)이 확인되면 크레딧 및 관련 보상이 취소되고 계정이 제재될 수 있습니다.',
+              en: 'Points used for a feature (for example a Career Question) may be returned if the request expires or is declined, as shown in the Services when you use them.',
+              ko: '기능(예: 커리어 질문)에 사용한 포인트는 요청이 만료되거나 거절되면 사용 시 서비스에 안내된 대로 돌려받을 수 있습니다.',
             },
             {
-              en: 'Reward applications and fulfillment may be delayed, changed, or declined due to inventory, scheduling, partner constraints, or operating policy.',
-              ko: '보상 신청·이행은 재고·일정·파트너 사정·운영 정책에 따라 지연·변경·거절될 수 있습니다.',
+              en: 'If fraudulent earning is found (multiple accounts, fake posts, manipulated engagement, etc.), points and related rewards may be canceled and accounts sanctioned.',
+              ko: '부정 적립(다중 계정, 허위 게시, 조작된 참여 등)이 확인되면 포인트 및 관련 보상이 취소되고 계정이 제재될 수 있습니다.',
             },
             {
-              en: 'If the Services end or the program changes, unused credits may create no compensation obligation.',
-              ko: '서비스 종료 또는 프로그램 변경 시 미사용 크레딧에 대한 보상 의무가 발생하지 않을 수 있습니다.',
+              en: 'Reward applications and fulfillment may be delayed, changed, or declined due to scheduling, partner constraints, or operating policy.',
+              ko: '보상 신청·이행은 일정·파트너 사정·운영 정책에 따라 지연·변경·거절될 수 있습니다.',
+            },
+            {
+              en: 'Unused points are lost when you delete your account, and if the Services end or the program changes, unused points create no compensation obligation.',
+              ko: '계정을 삭제하면 남은 포인트는 사라지며, 서비스 종료 또는 프로그램 변경 시 미사용 포인트에 대한 보상 의무가 발생하지 않습니다.',
             },
           ],
         },
       ],
     },
     {
+      id: 'premium',
+      title: '14. Misaeng Premium (Paid Subscription)',
+      titleKo: '14. 미생 Premium(유료 구독)',
+      blocks: [
+        {
+          type: 'p',
+          en: '14.1 What Premium is. Premium is an optional paid subscription that adds information features to the Services, such as visa sponsorship history by company, base salary by role and area, company visa policies, and more frequent new-job alerts. The features included are described on the Premium page at the time of purchase and may be improved or changed over time. Premium information is drawn from public sources (such as U.S. Department of Labor data) and is provided for general information only, not as legal, immigration, or career advice (see Section 12).',
+          ko: '14.1 Premium이란. Premium은 회사별 비자 스폰서 이력, 직무·지역별 기본급, 회사 비자 정책, 더 잦은 새 채용 공고 알림 등 정보 기능을 추가하는 선택형 유료 구독입니다. 포함되는 기능은 구매 시점의 Premium 페이지에 안내되며, 이후 개선·변경될 수 있습니다. Premium 정보는 미국 노동부 자료 등 공개 자료를 바탕으로 한 일반 정보이며, 법률·이민·진로 자문이 아닙니다(제12조 참고).',
+        },
+        {
+          type: 'p',
+          en: '14.2 Plans, prices, and payment. Premium is offered as a monthly, 3-month, or yearly plan at the prices shown before you buy, plus any applicable tax. If you buy on the web, payment is processed by Stripe, Inc. If you buy in the iOS app, payment is processed by Apple through your Apple ID under Apple’s terms. Prices in the app may differ from prices on the web.',
+          ko: '14.2 요금제, 가격, 결제. Premium은 월간, 3개월, 연간 요금제로 제공되며, 가격(해당 세금 별도)은 결제 전에 표시됩니다. 웹에서 구매하면 Stripe, Inc.가 결제를 처리하고, iOS 앱에서 구매하면 Apple이 Apple ID를 통해 Apple 약관에 따라 결제를 처리합니다. 앱 내 가격은 웹 가격과 다를 수 있습니다.',
+        },
+        {
+          type: 'p',
+          en: '14.3 Free trial. Eligible new subscribers may receive a 7-day free trial, once per account. Unless you cancel before the trial ends, you will be charged the plan price when it ends. On the web we remind you by email before the first charge.',
+          ko: '14.3 무료 체험. 대상 신규 구독자는 계정당 1회 7일 무료 체험을 받을 수 있습니다. 체험이 끝나기 전에 해지하지 않으면 체험 종료 시 요금제 가격이 결제됩니다. 웹에서는 첫 결제 전에 이메일로 미리 알려 드립니다.',
+        },
+        {
+          type: 'p',
+          en: '14.4 Automatic renewal. YOUR SUBSCRIPTION RENEWS AUTOMATICALLY at the end of each period (every month, every 3 months, or every year) at the same price and for the same period, and you authorize us (or Apple) to charge your payment method on each renewal, until you cancel. We will tell you in advance before a yearly plan renews and before any price change takes effect; a price change applies from your next renewal, and you can cancel before then.',
+          ko: '14.4 자동 갱신. 구독은 해지할 때까지 매 기간(매월, 3개월마다, 또는 매년)이 끝날 때 같은 가격과 기간으로 자동 갱신되며, 이용자는 갱신 시마다 회사(또는 Apple)가 결제 수단에 요금을 청구하는 것에 동의합니다. 연간 요금제 갱신 전과 가격 변경 전에는 미리 알려 드리며, 변경된 가격은 다음 갱신부터 적용되고 그 전에 해지할 수 있습니다.',
+        },
+        {
+          type: 'p',
+          en: '14.5 How to cancel. You can cancel at any time. Web: “Manage subscription” on the Premium page or My Page. iOS app purchases: iPhone Settings > Apple ID > Subscriptions. Canceling stops the next renewal; you keep Premium until the end of the period you already paid for.',
+          ko: '14.5 해지 방법. 언제든 해지할 수 있습니다. 웹: Premium 페이지 또는 마이페이지의 ‘구독 관리’. iOS 앱 구매: iPhone 설정 > Apple ID > 구독. 해지하면 다음 갱신이 멈추며, 이미 결제한 기간이 끝날 때까지 Premium을 이용할 수 있습니다.',
+        },
+        {
+          type: 'p',
+          en: '14.6 Refunds. Refunds for web purchases follow our Subscription & Refund Policy at misaeng.com/premium/policy, which is part of these Terms. In short: a full refund within 7 days of your first payment (once per account) or of a yearly renewal, and no partial refunds after that. Purchases made through the App Store are refunded by Apple under its policies.',
+          ko: '14.6 환불. 웹 구매의 환불은 본 약관의 일부인 구독·환불 정책(misaeng.com/premium/policy)을 따릅니다. 요약하면, 첫 결제 후 7일 이내(계정당 1회) 또는 연간 요금제 갱신 후 7일 이내에는 전액 환불되며, 그 이후에는 부분 환불이 없습니다. App Store에서 구매한 경우 Apple이 Apple 정책에 따라 환불합니다.',
+        },
+        {
+          type: 'p',
+          en: '14.7 Premium codes. Premium codes (for example from a student council or a Misaeng event) can be redeemed only on the website, one at a time, and not while you have a paid subscription. Codes have no cash value, cannot be sold or transferred, and are not refundable. Access from a code ends automatically at the end of its period, and no payment is taken.',
+          ko: '14.7 Premium 코드. Premium 코드(예: 학생회나 미생 이벤트에서 받은 코드)는 웹사이트에서만 한 번에 하나씩 사용할 수 있으며, 유료 구독 중에는 사용할 수 없습니다. 코드는 현금 가치가 없고 판매·양도할 수 없으며 환불되지 않습니다. 코드로 받은 이용 기간은 끝나면 자동으로 종료되며 결제가 이루어지지 않습니다.',
+        },
+        {
+          type: 'p',
+          en: '14.8 Your account. Premium is personal to your account and may not be shared. Premium bought on the web, in the app, or with a code works on the same account across the website and apps. If you delete your account, web subscriptions are canceled at that time without a refund for the remaining period (unless the refund policy applies); App Store subscriptions must be canceled by you in your Apple ID settings. If your account is terminated for violating these Terms, Premium ends without a refund to the extent permitted by law.',
+          ko: '14.8 계정. Premium은 본인 계정 전용이며 공유할 수 없습니다. 웹·앱·코드로 이용하는 Premium은 같은 계정이면 웹사이트와 앱에서 모두 적용됩니다. 계정을 삭제하면 웹 구독은 그 시점에 해지되며 남은 기간은 환불되지 않습니다(환불 정책이 적용되는 경우 제외). App Store 구독은 이용자가 Apple ID 설정에서 직접 해지해야 합니다. 본 약관 위반으로 계정이 해지되면, 법령이 허용하는 범위에서 Premium은 환불 없이 종료됩니다.',
+        },
+      ],
+    },
+    {
       id: 'ip',
-      title: '14. Company Intellectual Property',
-      titleKo: '14. 회사의 지식재산권',
+      title: '15. Company Intellectual Property',
+      titleKo: '15. 회사의 지식재산권',
       blocks: [
         {
           type: 'p',
@@ -760,8 +836,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'third-party',
-      title: '15. Third-Party Services and Links',
-      titleKo: '15. 제3자 서비스 및 링크',
+      title: '16. Third-Party Services and Links',
+      titleKo: '16. 제3자 서비스 및 링크',
       blocks: [
         {
           type: 'p',
@@ -772,8 +848,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'copyright',
-      title: '16. Copyright Complaints and DMCA Designated Agent',
-      titleKo: '16. 저작권 침해 신고 및 DMCA Designated Agent',
+      title: '17. Copyright Complaints and DMCA Designated Agent',
+      titleKo: '17. 저작권 침해 신고 및 DMCA Designated Agent',
       blocks: [
         {
           type: 'p',
@@ -845,8 +921,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'moderation',
-      title: '17. Reports, Monitoring, and Enforcement',
-      titleKo: '17. 신고, 모니터링 및 조치',
+      title: '18. Reports, Monitoring, and Enforcement',
+      titleKo: '18. 신고, 모니터링 및 조치',
       blocks: [
         {
           type: 'p',
@@ -879,8 +955,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'availability',
-      title: '18. Availability, Changes, and Interruptions',
-      titleKo: '18. 서비스 제공, 변경 및 중단',
+      title: '19. Availability, Changes, and Interruptions',
+      titleKo: '19. 서비스 제공, 변경 및 중단',
       blocks: [
         {
           type: 'p',
@@ -891,8 +967,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'disclaimers',
-      title: '19. Disclaimer of Warranties',
-      titleKo: '19. 보증의 부인',
+      title: '20. Disclaimer of Warranties',
+      titleKo: '20. 보증의 부인',
       blocks: [
         {
           type: 'p',
@@ -903,8 +979,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'liability',
-      title: '20. Limitation of Liability',
-      titleKo: '20. 책임의 제한',
+      title: '21. Limitation of Liability',
+      titleKo: '21. 책임의 제한',
       blocks: [
         {
           type: 'p',
@@ -920,8 +996,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'indemnity',
-      title: '21. Indemnification',
-      titleKo: '21. 면책(Indemnification)',
+      title: '22. Indemnification',
+      titleKo: '22. 면책(Indemnification)',
       blocks: [
         {
           type: 'p',
@@ -932,15 +1008,15 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'termination',
-      title: '22. Suspension and Termination',
-      titleKo: '22. 이용 제한 및 해지',
+      title: '23. Suspension and Termination',
+      titleKo: '23. 이용 제한 및 해지',
       blocks: [
         {
           type: 'ul',
           items: [
             {
-              en: 'You may stop using the Services at any time and may request account deletion through available procedures.',
-              ko: '이용자는 언제든지 서비스 이용을 중단하고, 제공되는 절차에 따라 계정 삭제를 요청할 수 있습니다.',
+              en: 'You may stop using the Services at any time and delete your account yourself in the app (Profile > Delete account) or on the website (My Page). Deletion is described in the Privacy Policy. Deleting your account cancels web Premium subscriptions; App Store subscriptions must be canceled in your Apple ID settings.',
+              ko: '이용자는 언제든지 서비스 이용을 중단하고, 앱(프로필 > 회원 탈퇴) 또는 웹사이트(마이페이지)에서 직접 계정을 삭제할 수 있습니다. 삭제되는 정보는 개인정보처리방침에 안내되어 있습니다. 계정을 삭제하면 웹 Premium 구독은 해지되며, App Store 구독은 Apple ID 설정에서 직접 해지해야 합니다.',
             },
             {
               en: 'The Company may restrict use or terminate accounts, with notice before or after the action as appropriate, for Terms or policy violations, prolonged inactivity, legal risk, or Service shutdown.',
@@ -956,73 +1032,73 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
     },
     {
       id: 'changes',
-      title: '23. Changes to These Terms',
-      titleKo: '23. 약관의 변경',
+      title: '24. Changes to These Terms',
+      titleKo: '24. 약관의 변경',
       blocks: [
         {
           type: 'p',
-          en: 'We may revise these Terms from time to time. Material changes will be communicated through on-Service notice, email, or other reasonable means. Continued use after the stated effective date constitutes acceptance of the revised Terms. If you do not agree, you must stop using the Services.',
-          ko: '회사는 필요 시 본 약관을 개정할 수 있습니다. 중요한 변경은 서비스 내 공지, 이메일 또는 기타 합리적인 방법으로 고지하며, 고지한 효력 발생일 이후 서비스를 계속 이용하면 변경에 동의한 것으로 봅니다. 변경에 동의하지 않으면 이용을 중단해야 합니다.',
+          en: 'We may revise these Terms from time to time. For new Users, these Terms take effect when you accept them. For existing Members, we ask you to review and accept material changes the next time you open the Services (in the app or on the website), and we may also notify you by email; the revised Terms apply from your acceptance. If you do not agree, you must stop using the Services, and you may delete your account.',
+          ko: '회사는 필요 시 본 약관을 개정할 수 있습니다. 신규 이용자에게는 동의한 시점부터 적용됩니다. 기존 회원에게는 중요한 변경이 있으면 다음에 서비스(앱 또는 웹사이트)를 열 때 변경 내용을 확인하고 동의하도록 안내하며, 이메일로도 알릴 수 있습니다. 개정 약관은 동의한 시점부터 적용됩니다. 동의하지 않으면 서비스 이용을 중단해야 하며, 계정을 삭제할 수 있습니다.',
         },
       ],
     },
     {
       id: 'governing-law',
-      title: '24. Governing Law; Informal Resolution; Arbitration; Class-Action Waiver',
-      titleKo: '24. 준거법, 사전 협의, 중재, 집단소송 포기',
+      title: '25. Governing Law; Informal Resolution; Arbitration; Class-Action Waiver',
+      titleKo: '25. 준거법, 사전 협의, 중재, 집단소송 포기',
       emphasized: true,
       blocks: [
         {
           type: 'note',
-          en: 'IMPORTANT — PLEASE READ. This Section includes a binding individual arbitration agreement and a class-action waiver that affect your legal rights. You may opt out within 30 days as described in Section 24.7.',
-          ko: '중요 — 꼭 읽어 주세요. 본 조에는 법적 권리에 영향을 미치는 구속력 있는 개별 중재 합의 및 집단소송 포기 조항이 포함됩니다. 24.7에 따라 30일 이내 옵트아웃할 수 있습니다.',
+          en: 'IMPORTANT — PLEASE READ. This Section includes a binding individual arbitration agreement and a class-action waiver that affect your legal rights. You may opt out within 30 days as described in Section 25.7.',
+          ko: '중요 — 꼭 읽어 주세요. 본 조에는 법적 권리에 영향을 미치는 구속력 있는 개별 중재 합의 및 집단소송 포기 조항이 포함됩니다. 25.7에 따라 30일 이내 옵트아웃할 수 있습니다.',
         },
         {
           type: 'p',
-          en: '24.1 Governing law. These Terms and disputes relating to the Services are governed by the laws of the State of New York, United States, without regard to conflict-of-law principles, except that the Federal Arbitration Act governs the interpretation and enforcement of the arbitration agreement below to the fullest extent permitted.',
-          ko: '24.1 준거법. 본 약관 및 서비스 관련 분쟁에는 미국 뉴욕주 법률(법 충돌 원칙 제외)이 적용됩니다. 다만 아래 중재 합의의 해석·집행에는 허용되는 최대 범위에서 Federal Arbitration Act가 적용됩니다.',
+          en: '25.1 Governing law. These Terms and disputes relating to the Services are governed by the laws of the State of New York, United States, without regard to conflict-of-law principles, except that the Federal Arbitration Act governs the interpretation and enforcement of the arbitration agreement below to the fullest extent permitted.',
+          ko: '25.1 준거법. 본 약관 및 서비스 관련 분쟁에는 미국 뉴욕주 법률(법 충돌 원칙 제외)이 적용됩니다. 다만 아래 중재 합의의 해석·집행에는 허용되는 최대 범위에서 Federal Arbitration Act가 적용됩니다.',
         },
         {
           type: 'p',
-          en: '24.2 Informal resolution first. Before starting arbitration or a lawsuit that is not subject to arbitration, you and the Company agree to try to resolve the dispute informally for at least thirty (30) days after written notice to info@misaeng.com (include your name, the email on your account, a description of the dispute, and the relief sought).',
-          ko: '24.2 사전 협의. 중재 또는 중재 대상이 아닌 소송을 시작하기 전에, 귀하와 회사는 info@misaeng.com 으로 서면 통지(이름, 계정 이메일, 분쟁 내용, 구하는 구제) 후 최소 30일간 성실한 비공식 해결을 시도하기로 합니다.',
+          en: '25.2 Informal resolution first. Before starting arbitration or a lawsuit that is not subject to arbitration, you and the Company agree to try to resolve the dispute informally for at least thirty (30) days after written notice to info@misaeng.com (include your name, the email on your account, a description of the dispute, and the relief sought).',
+          ko: '25.2 사전 협의. 중재 또는 중재 대상이 아닌 소송을 시작하기 전에, 귀하와 회사는 info@misaeng.com 으로 서면 통지(이름, 계정 이메일, 분쟁 내용, 구하는 구제) 후 최소 30일간 성실한 비공식 해결을 시도하기로 합니다.',
         },
         {
           type: 'p',
-          en: '24.3 Binding individual arbitration. Except for the carve-outs below, you and the Company agree that any dispute, claim, or controversy arising out of or relating to these Terms or the Services will be resolved by binding individual arbitration administered by the American Arbitration Association (“AAA”) under its Consumer Arbitration Rules (or other AAA rules the AAA determines apply). The arbitration will be conducted in English. Hearings may be held in New York County, New York, or by video/phone as the arbitrator allows. Judgment on the award may be entered in any court of competent jurisdiction.',
-          ko: '24.3 구속력 있는 개별 중재. 아래 예외를 제외하고, 본 약관 또는 서비스에서 비롯되거나 이와 관련된 모든 분쟁·청구·쟁점은 American Arbitration Association(AAA)의 Consumer Arbitration Rules(또는 AAA가 적용한다고 정하는 규칙)에 따른 구속력 있는 개별 중재로 해결합니다. 중재는 영어로 진행되며, 심리는 뉴욕주 New York County 또는 중재인이 허용하는 화상/전화로 진행될 수 있습니다. 중재판정은 관할 법원에 집행판결을 구할 수 있습니다.',
+          en: '25.3 Binding individual arbitration. Except for the carve-outs below, you and the Company agree that any dispute, claim, or controversy arising out of or relating to these Terms or the Services will be resolved by binding individual arbitration administered by the American Arbitration Association (“AAA”) under its Consumer Arbitration Rules (or other AAA rules the AAA determines apply). The arbitration will be conducted in English. Hearings may be held in New York County, New York, or by video/phone as the arbitrator allows. Judgment on the award may be entered in any court of competent jurisdiction.',
+          ko: '25.3 구속력 있는 개별 중재. 아래 예외를 제외하고, 본 약관 또는 서비스에서 비롯되거나 이와 관련된 모든 분쟁·청구·쟁점은 American Arbitration Association(AAA)의 Consumer Arbitration Rules(또는 AAA가 적용한다고 정하는 규칙)에 따른 구속력 있는 개별 중재로 해결합니다. 중재는 영어로 진행되며, 심리는 뉴욕주 New York County 또는 중재인이 허용하는 화상/전화로 진행될 수 있습니다. 중재판정은 관할 법원에 집행판결을 구할 수 있습니다.',
         },
         {
           type: 'p',
-          en: '24.4 Class-action and representative-action waiver. YOU AND THE COMPANY AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN AN INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, COLLECTIVE, CONSOLIDATED, PRIVATE ATTORNEY GENERAL, OR REPRESENTATIVE PROCEEDING. The arbitrator may not consolidate more than one person’s claims or otherwise preside over any form of representative proceeding, unless both parties agree in writing after the dispute arises.',
-          ko: '24.4 집단·대표소송 포기. 귀하와 회사는 상대방에 대한 청구를 오직 개인 자격으로만 제기할 수 있으며, 집단·집합·병합·사인검찰(private attorney general)·대표 소송의 원고 또는 구성원으로서 제기할 수 없습니다. 분쟁 발생 후 양 당사자가 서면 합의하지 않는 한, 중재인은 복수 개인의 청구를 병합하거나 대표 절차를 주재할 수 없습니다.',
+          en: '25.4 Class-action and representative-action waiver. YOU AND THE COMPANY AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN AN INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, COLLECTIVE, CONSOLIDATED, PRIVATE ATTORNEY GENERAL, OR REPRESENTATIVE PROCEEDING. The arbitrator may not consolidate more than one person’s claims or otherwise preside over any form of representative proceeding, unless both parties agree in writing after the dispute arises.',
+          ko: '25.4 집단·대표소송 포기. 귀하와 회사는 상대방에 대한 청구를 오직 개인 자격으로만 제기할 수 있으며, 집단·집합·병합·사인검찰(private attorney general)·대표 소송의 원고 또는 구성원으로서 제기할 수 없습니다. 분쟁 발생 후 양 당사자가 서면 합의하지 않는 한, 중재인은 복수 개인의 청구를 병합하거나 대표 절차를 주재할 수 없습니다.',
         },
         {
           type: 'p',
-          en: '24.5 Carve-outs. This arbitration agreement does not require arbitration of: (a) individual claims in small-claims court within that court’s jurisdiction; (b) claims for injunctive or other equitable relief to stop unauthorized use or infringement of intellectual property; or (c) claims that applicable law prohibits from being subject to pre-dispute arbitration (including certain rights that cannot be waived). Disputes about whether a claim is arbitrable are for the arbitrator to decide, except that a court may decide gateway issues of enforceability of this Section’s class waiver if required by controlling law.',
-          ko: '24.5 예외. 다음에는 본 중재 합의가 강제 중재를 요구하지 않습니다: (a) 소액재판소 관할 내 개인 청구; (b) 지식재산의 무단 이용·침해를 막기 위한 금지명령 등 형평법상 구제; (c) 적용법이 사전 중재 합의 대상에서 금지하는 청구(포기할 수 없는 권리 포함). 청구의 중재 가능성에 관한 분쟁은 원칙적으로 중재인이 판단하되, 통제법상 요구되는 경우 본 조의 집단소송 포기 집행 가능성 등 gateway 쟁점은 법원이 판단할 수 있습니다.',
+          en: '25.5 Carve-outs. This arbitration agreement does not require arbitration of: (a) individual claims in small-claims court within that court’s jurisdiction; (b) claims for injunctive or other equitable relief to stop unauthorized use or infringement of intellectual property; or (c) claims that applicable law prohibits from being subject to pre-dispute arbitration (including certain rights that cannot be waived). Disputes about whether a claim is arbitrable are for the arbitrator to decide, except that a court may decide gateway issues of enforceability of this Section’s class waiver if required by controlling law.',
+          ko: '25.5 예외. 다음에는 본 중재 합의가 강제 중재를 요구하지 않습니다: (a) 소액재판소 관할 내 개인 청구; (b) 지식재산의 무단 이용·침해를 막기 위한 금지명령 등 형평법상 구제; (c) 적용법이 사전 중재 합의 대상에서 금지하는 청구(포기할 수 없는 권리 포함). 청구의 중재 가능성에 관한 분쟁은 원칙적으로 중재인이 판단하되, 통제법상 요구되는 경우 본 조의 집단소송 포기 집행 가능성 등 gateway 쟁점은 법원이 판단할 수 있습니다.',
         },
         {
           type: 'p',
-          en: '24.6 Licensed real-estate matters. Separate brokerage agreements, agency disclosures, or New York Department of State / licensing procedures may provide additional or different dispute paths for a specific licensed transaction. Those documents control that brokerage relationship. This Section still applies to platform/community disputes that are not governed by such separate brokerage paperwork, to the extent permitted by law.',
-          ko: '24.6 면허 부동산 사항. 개별 중개 계약, 대리관계 공시, 또는 뉴욕주 Department of State/라이선스 절차가 특정 면허 거래에 대해 추가·다른 분쟁 경로를 둘 수 있으며, 해당 중개 관계에는 그 서류가 우선합니다. 법이 허용하는 범위에서, 그러한 별도 중개 서류가 규율하지 않는 플랫폼·커뮤니티 분쟁에는 본 조가 계속 적용됩니다.',
+          en: '25.6 Licensed real-estate matters. Separate brokerage agreements, agency disclosures, or New York Department of State / licensing procedures may provide additional or different dispute paths for a specific licensed transaction. Those documents control that brokerage relationship. This Section still applies to platform/community disputes that are not governed by such separate brokerage paperwork, to the extent permitted by law.',
+          ko: '25.6 면허 부동산 사항. 개별 중개 계약, 대리관계 공시, 또는 뉴욕주 Department of State/라이선스 절차가 특정 면허 거래에 대해 추가·다른 분쟁 경로를 둘 수 있으며, 해당 중개 관계에는 그 서류가 우선합니다. 법이 허용하는 범위에서, 그러한 별도 중개 서류가 규율하지 않는 플랫폼·커뮤니티 분쟁에는 본 조가 계속 적용됩니다.',
         },
         {
           type: 'p',
-          en: '24.7 30-day opt-out. You may opt out of this arbitration agreement by emailing info@misaeng.com with subject line “Arbitration Opt-Out” within thirty (30) days after you first accept these Terms (or after this arbitration section first becomes applicable to you). Include your full name and account email. Opting out does not affect other Terms.',
-          ko: '24.7 30일 옵트아웃. 본 약관에 처음 동의한 날(또는 본 중재 조항이 처음 적용된 날)부터 30일 이내에 제목 “Arbitration Opt-Out”으로 info@misaeng.com 에 이메일하면 본 중재 합의에서 옵트아웃할 수 있습니다. 성명과 계정 이메일을 포함하세요. 옵트아웃은 나머지 약관에 영향을 주지 않습니다.',
+          en: '25.7 30-day opt-out. You may opt out of this arbitration agreement by emailing info@misaeng.com with subject line “Arbitration Opt-Out” within thirty (30) days after you first accept these Terms (or after this arbitration section first becomes applicable to you). Include your full name and account email. Opting out does not affect other Terms.',
+          ko: '25.7 30일 옵트아웃. 본 약관에 처음 동의한 날(또는 본 중재 조항이 처음 적용된 날)부터 30일 이내에 제목 “Arbitration Opt-Out”으로 info@misaeng.com 에 이메일하면 본 중재 합의에서 옵트아웃할 수 있습니다. 성명과 계정 이메일을 포함하세요. 옵트아웃은 나머지 약관에 영향을 주지 않습니다.',
         },
         {
           type: 'p',
-          en: '24.8 Court venue if arbitration does not apply. If a claim is not subject to arbitration, exclusive venue lies in the state or federal courts located in New York County, New York, subject to any non-waivable consumer protections.',
-          ko: '24.8 중재가 적용되지 않는 경우의 관할. 청구가 중재 대상이 아니면, 소비자의 강행법상 권리를 침해하지 않는 범위에서 뉴욕주 New York County 소재 주·연방 법원이 배타적 관할입니다.',
+          en: '25.8 Court venue if arbitration does not apply. If a claim is not subject to arbitration, exclusive venue lies in the state or federal courts located in New York County, New York, subject to any non-waivable consumer protections.',
+          ko: '25.8 중재가 적용되지 않는 경우의 관할. 청구가 중재 대상이 아니면, 소비자의 강행법상 권리를 침해하지 않는 범위에서 뉴욕주 New York County 소재 주·연방 법원이 배타적 관할입니다.',
         },
       ],
     },
     {
       id: 'misc',
-      title: '25. Miscellaneous',
-      titleKo: '25. 기타',
+      title: '26. Miscellaneous',
+      titleKo: '26. 기타',
       blocks: [
         {
           type: 'ul',
@@ -1047,14 +1123,26 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
               en: 'Personal information is handled under the Privacy Policy.',
               ko: '개인정보 처리에 관한 사항은 「개인정보처리방침(Privacy Policy)」이 적용됩니다.',
             },
+            {
+              en: 'The Subscription & Refund Policy (misaeng.com/premium/policy) is part of these Terms.',
+              ko: '구독·환불 정책(misaeng.com/premium/policy)은 본 약관의 일부입니다.',
+            },
+            {
+              en: 'If you downloaded the app from the Apple App Store: these Terms are between you and the Company only, not Apple; the Company, not Apple, is solely responsible for the app and its content, maintenance, support, warranty (to the extent not disclaimed), and any claims relating to the app (including product liability, legal or regulatory compliance, and intellectual property claims); Apple has no obligation to provide maintenance or support; your license to use the app is non-transferable and limited to Apple-branded devices you own or control as permitted by the App Store Usage Rules; you represent that you are not located in a country subject to a U.S. Government embargo or designated as a “terrorist supporting” country and are not on any U.S. Government list of prohibited or restricted parties; and Apple and its subsidiaries are third-party beneficiaries of these Terms and may enforce them against you.',
+              ko: 'Apple App Store에서 앱을 내려받은 경우: 본 약관은 Apple이 아닌 이용자와 회사 사이의 계약입니다. 앱과 그 콘텐츠, 유지보수, 지원, (면책되지 않는 범위의) 보증, 앱 관련 청구(제조물 책임, 법규 준수, 지식재산 침해 청구 포함)에 대한 책임은 Apple이 아닌 회사에 있습니다. Apple은 유지보수·지원 의무가 없습니다. 앱 이용 권한은 양도할 수 없으며, App Store 이용 규칙에 따라 이용자가 소유·관리하는 Apple 기기로 한정됩니다. 이용자는 미국 정부의 금수 조치 대상국이나 “테러 지원국”으로 지정된 국가에 있지 않고, 미국 정부의 거래 금지·제한 명단에 없음을 진술합니다. Apple과 그 자회사는 본 약관의 제3자 수익자로서 본 약관을 이용자에게 집행할 수 있습니다.',
+            },
+            {
+              en: 'If you downloaded the app from Google Play, Google’s terms for Google Play also apply to your use of Google Play, and Google is not a party to these Terms.',
+              ko: 'Google Play에서 앱을 내려받은 경우, Google Play 이용에는 Google Play 약관도 적용되며, Google은 본 약관의 당사자가 아닙니다.',
+            },
           ],
         },
       ],
     },
     {
       id: 'contact',
-      title: '26. Contact',
-      titleKo: '26. 문의',
+      title: '27. Contact',
+      titleKo: '27. 문의',
       blocks: [
         {
           type: 'p',

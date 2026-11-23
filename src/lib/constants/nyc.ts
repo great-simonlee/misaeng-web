@@ -38,7 +38,7 @@ export const NYC_CATEGORIES = [
     id: 'marketplace',
     href: '/marketplace',
     postHref: '/marketplace/new',
-    available: false,
+    available: true,
   },
   {
     id: 'status',
@@ -95,7 +95,7 @@ export function getCityCategories(city: CityId) {
   }))
 }
 
-/** 목록·글쓰기 UI 대신 준비 중 안내를 보여줄 보드 */
+/** 목록·글쓰기 UI 대신 준비 중 안내를 보여줄 보드 (미생 중고거래는 웹에서도 열려 있다: owner 11-23, Ellieo만 준비 중) */
 export const NYC_WIP_COMMUNITY_BOARD_IDS = ['marketplace'] as const
 
 export type NycWipCommunityBoardId =
@@ -106,6 +106,7 @@ export function isCommunityBoardWip(
 ): id is NycWipCommunityBoardId {
   return (NYC_WIP_COMMUNITY_BOARD_IDS as readonly string[]).includes(id)
 }
+
 
 /**
  * 게시판별 글쓰기·목록 설정 (구조 정보만).

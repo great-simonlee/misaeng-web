@@ -18,6 +18,7 @@ import {
   type PremiumPlanId,
 } from '@lib/premium/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
+import { byBrand } from '@lib/brand/design'
 
 /**
  * /premium — the web paywall (Stripe). Benefits first and big, then the plan picker (annual preselected), the
@@ -117,14 +118,14 @@ export function PremiumScreen() {
   return (
     <BoardPageShell width='wide'>
       <style>{KEYFRAMES}</style>
-      <div className='mx-auto flex w-full max-w-[880px] flex-col gap-10 pb-20 pt-4'>
+      <div className={byBrand('flex w-full flex-col gap-10 pb-20 pt-4 sm:pt-5 lg:pt-6', 'mx-auto flex w-full max-w-[880px] flex-col gap-10 pb-20 pt-4')}>
         {status ? <StatusBanner status={status} premium={Boolean(me?.premium)} companiesHref={href('/companies')} /> : null}
 
         <Hero />
 
         <section className='flex flex-col gap-4'>
           <h2 className='px-1 text-[22px] font-extrabold tracking-tight text-[var(--foreground)]'>{t('benefits.title')}</h2>
-          <div className='grid gap-4 sm:grid-cols-2'>
+          <div className={byBrand('grid gap-4 sm:grid-cols-2 lg:grid-cols-3', 'grid gap-4 sm:grid-cols-2')}>
             <Benefit tone='peach' icon={<ChartIcon />} k='visa' />
             <Benefit tone='mint' icon={<CoinIcon />} k='salary' />
             <Benefit tone='sky' icon={<ShieldIcon />} k='policy' />
@@ -133,7 +134,10 @@ export function PremiumScreen() {
           </div>
         </section>
 
-        <Preview />
+        <div className={byBrand('grid gap-10 lg:grid-cols-2 lg:gap-8', 'flex flex-col gap-10')}>
+          <Compare />
+          <Preview />
+        </div>
 
         {loading ? (
           <div className='py-10'>
@@ -260,7 +264,7 @@ function Hero() {
   )
 }
 
-const TONES = {
+export const TONES = {
   peach: { bg: 'bg-[#FFF1E8]', blob: 'bg-[#FFD9C4]', ink: 'text-[#E2400F]' },
   mint: { bg: 'bg-[#EAF8F1]', blob: 'bg-[#C8EEDB]', ink: 'text-[#05875F]' },
   sky: { bg: 'bg-[#EBF4FF]', blob: 'bg-[#CFE3FF]', ink: 'text-[#2563EB]' },
@@ -296,16 +300,95 @@ function Benefit({
   )
 }
 
+/** Free vs Premium (owner 11-23, same rows as the app). Alert rows follow lib/push/alertTiers.server.ts. */
+const COMPARE_ROWS = [
+  ['community', 'yes', 'yes'],
+  ['jobAlerts', 'weekly', 'daily'],
+  ['visaNews', 'monFri', 'monFri'],
+  ['visa', 'no', 'yes'],
+  ['salary', 'no', 'yes'],
+  ['policy', 'no', 'yes'],
+] as const
+
+function Compare() {
+  const t = useT('premium')
+  const cell = (value: (typeof COMPARE_ROWS)[number][1 | 2], premium: boolean) => {
+    if (value === 'yes')
+      return (
+        <span
+          role='img'
+          aria-label={t('compare.included')}
+          className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-white ${premium ? 'bg-[var(--brand)]' : 'bg-[#059669]'}`}
+        >
+          <svg viewBox='0 0 24 24' className='h-3.5 w-3.5' fill='none' stroke='currentColor' strokeWidth='3.2' strokeLinecap='round' strokeLinejoin='round' aria-hidden>
+            <path d='M5 12.5l4.5 4.5L19 7.5' />
+          </svg>
+        </span>
+      )
+    if (value === 'no')
+      return (
+        <svg role='img' aria-label={t('compare.locked')} viewBox='0 0 24 24' className='h-4 w-4 text-[#C5C8CE]' fill='currentColor'>
+          <path d='M7 10V7.5a5 5 0 0 1 10 0V10h.5A1.5 1.5 0 0 1 19 11.5v8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19.5v-8A1.5 1.5 0 0 1 6.5 10zm2 0h6V7.5a3 3 0 0 0-6 0z' />
+        </svg>
+      )
+    return (
+      <span className={`text-[13.5px] leading-snug ${premium ? 'font-extrabold text-[var(--brand)]' : 'font-semibold text-[var(--muted-foreground)]'}`}>
+        {t(`compare.values.${value}`)}
+      </span>
+    )
+  }
+  const grid = 'grid grid-cols-[minmax(0,1fr)_88px_88px] items-center gap-2 sm:grid-cols-[minmax(0,1fr)_140px_140px]'
+  return (
+    <section className='flex flex-col gap-4'>
+      <h2 className='px-1 text-[22px] font-extrabold tracking-tight text-[var(--foreground)]'>{t('compare.title')}</h2>
+      <div className='relative overflow-hidden rounded-[26px] bg-white px-5 shadow-[0_12px_32px_-20px_rgba(246,67,16,0.35)] ring-1 ring-[#F1E7E1] sm:px-7'>
+        {/* Premium column band, top to bottom */}
+        <div aria-hidden className='absolute inset-y-2 right-3 w-[96px] rounded-[18px] bg-[#FFF4EE] sm:right-5 sm:w-[150px]' />
+        <div role='table' aria-label={t('compare.title')} className='relative'>
+          <div role='row' className={`${grid} py-4 text-center`}>
+            <span role='columnheader' />
+            <span role='columnheader' className='text-[13px] font-bold text-[var(--muted-foreground)]'>{t('compare.free')}</span>
+            <span role='columnheader' className='text-[13px] font-extrabold text-[var(--brand)]'>{t('compare.premium')}</span>
+          </div>
+          {COMPARE_ROWS.map(([id, free, premium]) => (
+            <div key={id} role='row' className={`${grid} border-t border-[#F0F1F3] py-3.5 text-center`}>
+              <span role='rowheader' className='text-left text-[14.5px] font-semibold text-[var(--foreground)]'>{t(`compare.rows.${id}`)}</span>
+              <span role='cell' className='flex justify-center'>{cell(free, false)}</span>
+              <span role='cell' className='flex justify-center'>{cell(premium, true)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <p className='px-1 text-[12.5px] text-[var(--muted-foreground)]'>{t('compare.note')}</p>
+    </section>
+  )
+}
+
+const YEARS = [2024, 2025, 2026]
+
 /** A mini, static copy of the app's 신청 현황 tiles and one salary row (labelled as an example). */
 function Preview() {
   const t = useT('premium')
   const tile = (label: string, values: number[], color: string, soft: string) => {
     const peak = Math.max(...values, 1)
+    const first = values[0] ?? 0
+    const last = values.at(-1) ?? 0
+    // Same as the app tile: change since the first year (FY2024 → FY2026)
+    const pct = first > 0 ? Math.round(((last - first) / first) * 100) : null
     return (
       <div className='flex-1 rounded-[20px] bg-white p-4 shadow-[0_8px_24px_-16px_rgba(15,23,42,0.3)]'>
         <p className='text-[12px] font-semibold text-[var(--muted-foreground)]'>{label}</p>
-        <p className='mt-1 text-[22px] font-black tabular-nums text-[var(--foreground)]'>{values.at(-1)!.toLocaleString()}</p>
-        <div className='mt-3 flex h-16 items-end gap-2'>
+        <p className='mt-1 text-[22px] font-black tabular-nums text-[var(--foreground)]'>{last.toLocaleString()}</p>
+        <p className='mt-0.5 whitespace-nowrap text-[11px]'>
+          {pct != null ? (
+            <span className={`font-bold ${pct > 0 ? 'text-[#059669]' : pct < 0 ? 'text-[#d97706]' : 'text-[var(--muted)]'}`}>
+              {pct > 0 ? '▲' : pct < 0 ? '▼' : ''} {Math.abs(pct)}%
+            </span>
+          ) : null}
+          <span className='ml-1.5 text-[var(--muted)] sm:hidden'>FY{String(YEARS[0]).slice(2)} → FY{String(YEARS.at(-1)).slice(2)}</span>
+          <span className='ml-1.5 hidden text-[var(--muted)] sm:inline'>FY{YEARS[0]} → FY{YEARS.at(-1)}</span>
+        </p>
+        <div className='mt-3 flex items-end gap-2'>
           {values.map((v, i) => (
             <div key={i} className='flex flex-1 flex-col items-center gap-1'>
               <span className='text-[9.5px] tabular-nums text-[var(--muted)]'>{v.toLocaleString()}</span>
@@ -313,13 +396,9 @@ function Preview() {
                 className='w-full rounded-md'
                 style={{ height: `${Math.max(4, (v / peak) * 44)}px`, background: i === values.length - 1 ? color : soft }}
               />
+              <span className='text-[9.5px] text-[var(--muted)]'>FY{String(YEARS[i]).slice(2)}</span>
             </div>
           ))}
-        </div>
-        <div className='mt-1 flex justify-between px-1 text-[9.5px] text-[var(--muted)]'>
-          <span>FY24</span>
-          <span>FY25</span>
-          <span>FY26</span>
         </div>
       </div>
     )
@@ -332,8 +411,8 @@ function Preview() {
       </div>
       <div className='rounded-[28px] bg-[linear-gradient(160deg,#FFF6EE,#FFFDFB)] p-4 sm:p-5'>
         <div className='flex gap-3'>
-          {tile(t('preview.h1b'), [9087, 8945, 9157], '#059669', '#C5E9DA')}
-          {tile(t('preview.greenCard'), [1618, 3, 3], '#F64310', '#FFD3C2')}
+          {tile(t('preview.h1b'), [1974, 2350, 2350], '#059669', '#C5E9DA')}
+          {tile(t('preview.greenCard'), [91, 584, 638], '#F64310', '#FFD3C2')}
         </div>
         <div className='mt-3 flex items-center justify-between rounded-[18px] bg-white px-4 py-3 shadow-[0_8px_24px_-18px_rgba(15,23,42,0.3)]'>
           <div>
@@ -517,7 +596,7 @@ function Faq({ policyHref }: { policyHref: string }) {
 /* ───────────────────────── Illustrations ───────────────────────── */
 
 /** A little passport with a face, cheeks and a sparkle. */
-function Mascot({ small = false }: { small?: boolean }) {
+export function Mascot({ small = false }: { small?: boolean }) {
   const size = small ? 96 : 150
   return (
     <svg width={size} height={size} viewBox='0 0 160 160' aria-hidden>
@@ -551,10 +630,10 @@ const icon = (path: ReactNode) => (
     {path}
   </svg>
 )
-const ChartIcon = () => icon(<><path d='M4 20h16' /><rect x='6' y='11' width='3' height='7' rx='1' /><rect x='11' y='7' width='3' height='11' rx='1' /><rect x='16' y='4' width='3' height='14' rx='1' /></>)
-const CoinIcon = () => icon(<><circle cx='12' cy='12' r='8.5' /><path d='M14.6 9.2c-.5-.9-1.5-1.4-2.6-1.4-1.5 0-2.6.8-2.6 2s1.1 1.7 2.6 2.1 2.7.9 2.7 2.2-1.2 2.1-2.7 2.1c-1.2 0-2.3-.6-2.8-1.5M12 6.5v11' /></>)
-const ShieldIcon = () => icon(<><path d='M12 3l7 3v5.5c0 4.3-3 7.7-7 9.5-4-1.8-7-5.2-7-9.5V6z' /><path d='M8.8 12.2l2.2 2.2 4.4-4.6' /></>)
-const BellIcon = () => icon(<><path d='M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9z' /><path d='M10 19a2 2 0 0 0 4 0' /></>)
+export const ChartIcon = () => icon(<><path d='M4 20h16' /><rect x='6' y='11' width='3' height='7' rx='1' /><rect x='11' y='7' width='3' height='11' rx='1' /><rect x='16' y='4' width='3' height='14' rx='1' /></>)
+export const CoinIcon = () => icon(<><circle cx='12' cy='12' r='8.5' /><path d='M14.6 9.2c-.5-.9-1.5-1.4-2.6-1.4-1.5 0-2.6.8-2.6 2s1.1 1.7 2.6 2.1 2.7.9 2.7 2.2-1.2 2.1-2.7 2.1c-1.2 0-2.3-.6-2.8-1.5M12 6.5v11' /></>)
+export const ShieldIcon = () => icon(<><path d='M12 3l7 3v5.5c0 4.3-3 7.7-7 9.5-4-1.8-7-5.2-7-9.5V6z' /><path d='M8.8 12.2l2.2 2.2 4.4-4.6' /></>)
+export const BellIcon = () => icon(<><path d='M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9z' /><path d='M10 19a2 2 0 0 0 4 0' /></>)
 const SparkleIcon = () => icon(<><path d='M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z' /><path d='M18.5 16l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z' /></>)
 const ShieldMini = () => (
   <svg viewBox='0 0 24 24' className='h-3.5 w-3.5' fill='currentColor' aria-hidden>
@@ -562,7 +641,7 @@ const ShieldMini = () => (
   </svg>
 )
 
-const KEYFRAMES = `
+export const KEYFRAMES = `
 @media (prefers-reduced-motion: no-preference) {
   @keyframes premium-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
   @keyframes premium-twinkle { 0%,100% { opacity: 1; transform: scale(1) } 50% { opacity: .45; transform: scale(.8) } }

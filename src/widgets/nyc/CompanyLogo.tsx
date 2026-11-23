@@ -21,7 +21,8 @@ export function CompanyLogo({
       />
     )
   }
-  const initial = Array.from(name.trim())[0]?.toUpperCase() || '?'
+  // First letter or digit (skip brackets etc.: "[QA] Co" → Q)
+  const initial = Array.from(name.trim()).find((ch) => /[\p{L}\p{N}]/u.test(ch))?.toUpperCase() || '?'
   return (
     <span
       aria-hidden

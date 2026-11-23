@@ -1,27 +1,27 @@
 import type { LegalDocument } from '@lib/constants/legalDocument'
 
-/** Misaeng NYC Privacy Policy — English controls; Korean is a convenience translation */
+/** Misaeng · Ellieo Privacy Policy (apps + misaeng.com) — English controls; Korean and Vietnamese are convenience translations */
 export const NYC_PRIVACY_POLICY: LegalDocument = {
   eyebrow: 'LEGAL',
   title: 'Privacy Policy',
   titleKo: '개인정보처리방침',
-  version: '2026-12-15',
-  lastUpdated: 'November 15, 2026',
-  lastUpdatedKo: '2026년 11월 15일',
-  effectiveDate: 'December 15, 2026',
-  effectiveDateKo: '2026년 12월 15일',
+  version: '2026-11-23',
+  lastUpdated: 'November 23, 2026',
+  lastUpdatedKo: '2026년 11월 23일',
+  effectiveDate: 'November 23, 2026',
+  effectiveDateKo: '2026년 11월 23일',
   contactEmail: 'info@misaeng.com',
   companyName: 'Misaeng LLC',
   companyAddress:
     '45 Rockefeller Plaza, Fl 20, New York, NY 10111, United States',
   languageNotice: {
-    en: 'The English version of this Privacy Policy is the official and controlling version. Versions in other languages (Korean, Vietnamese, Japanese, Simplified Chinese, Traditional Chinese, and Indonesian) are reference translations provided for convenience only. If there is any conflict or inconsistency between the English version and any translation, the English version prevails.',
-    ko: '본 개인정보처리방침의 영문본이 공식·기준 문서입니다. 다른 언어(한국어, 베트남어, 일본어, 중국어 간체·번체, 인도네시아어) 번역본은 이해를 돕기 위한 참고용이며, 영문본과 번역본에 차이·불일치가 있을 경우 영문본이 우선합니다.',
+    en: 'The English version of this Privacy Policy is the official and controlling version. Korean and Vietnamese translations are provided for convenience only; a paragraph that has not yet been translated is shown in English. If there is any conflict or inconsistency between the English version and a translation, the English version prevails.',
+    ko: '본 개인정보처리방침의 영문본이 공식·기준 문서이며, 한국어·베트남어 번역본은 이해를 돕기 위한 참고용입니다(아직 번역되지 않은 문단은 영어로 표시됩니다). 영문본과 번역본에 차이·불일치가 있을 경우 영문본이 우선합니다.',
   },
   intro: [
     {
-      en: 'Misaeng LLC (“Company,” “we,” “us,” or “Misaeng”) provides this Privacy Policy (the “Policy”) to explain how we collect, use, store, and share personal information in connection with the Misaeng NYC website, its multilingual edition Ellieo, and related services (the “Services”). Misaeng NYC and Ellieo share one account system and one database, so this Policy applies to both.',
-      ko: 'Misaeng LLC(이하 “회사”, “당사”, “Misaeng”)는 Misaeng NYC 웹사이트, 그 다국어 서비스 Ellieo 및 관련 서비스(이하 “서비스”)를 제공하면서 이용자의 개인정보를 소중히 다루기 위해 본 개인정보처리방침(이하 “본 방침”)을 공개합니다. Misaeng NYC와 Ellieo는 하나의 계정 체계와 데이터베이스를 공유하므로 본 방침은 두 서비스 모두에 적용됩니다.',
+      en: 'Misaeng LLC (“Company,” “we,” “us,” or “Misaeng”) provides this Privacy Policy (the “Policy”) to explain how we collect, use, store, and share personal information in connection with the Misaeng mobile apps for iOS and Android, the misaeng.com websites (including our New York and Boston communities), the multilingual edition Ellieo, and related services (the “Services”). Misaeng and Ellieo share one account system and one database, so this Policy applies to both.',
+      ko: 'Misaeng LLC(이하 “회사”, “당사”, “Misaeng”)는 iOS·Android용 미생 모바일 앱, misaeng.com 웹사이트(뉴욕·보스턴 커뮤니티 포함), 다국어 서비스 Ellieo 및 관련 서비스(이하 “서비스”)를 제공하면서 이용자의 개인정보를 소중히 다루기 위해 본 개인정보처리방침(이하 “본 방침”)을 공개합니다. 미생과 Ellieo는 하나의 계정 체계와 데이터베이스를 공유하므로 본 방침은 두 서비스 모두에 적용됩니다.',
     },
     {
       en: 'This Policy describes what information we collect, how we use it, what choices and rights you may have, and how to contact us. In some cases, continued use of the Services may be treated as acceptance of the processing described here. If you do not agree, please stop using the Services.',
@@ -69,8 +69,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
       blocks: [
         {
           type: 'p',
-          en: 'This Policy applies to Misaeng NYC and directly connected pages and features operated by the Company, including Community Boards, Housing, login, My Page, credits, inquiries, and partner information pages.',
-          ko: '본 방침은 회사가 운영하는 Misaeng NYC 및 이와 직접 연결된 페이지·기능(커뮤니티 게시판, 하우징, 로그인, 마이페이지, 크레딧, 문의, 파트너 안내 등)에 적용됩니다.',
+          en: 'This Policy applies to the Misaeng mobile apps for iOS and Android, the misaeng.com websites (including our New York and Boston communities), and our related services, including Community Boards, Housing, the Marketplace, Coffee Chats, Career Questions, Premium, login, My Page, Misaeng Points, inquiries, and notifications.',
+          ko: '본 방침은 iOS·Android용 미생 모바일 앱, misaeng.com 웹사이트(뉴욕·보스턴 커뮤니티 포함) 및 관련 서비스(커뮤니티 게시판, 하우징, 중고거래, 커피챗, 커리어 질문, Premium, 로그인, 마이페이지, 미생 포인트, 문의, 알림 등)에 적용됩니다.',
         },
         {
           type: 'ul',
@@ -110,8 +110,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
           type: 'ul',
           items: [
             {
-              en: 'Account and profile: email address, display name/nickname, profile photo, bio, and preference settings, including your preferred language',
-              ko: '계정·프로필: 이메일 주소, 표시 이름/닉네임, 프로필 사진, 자기소개, 선호 설정(선호 언어 포함)',
+              en: 'Account and profile: email address, password (stored only in hashed form), display name/nickname, profile photo, bio, and preference settings, including your preferred language. Optional profile details you choose to add: MBTI, gender, and occupation',
+              ko: '계정·프로필: 이메일 주소, 비밀번호(해시 형태로만 저장), 표시 이름/닉네임, 프로필 사진, 자기소개, 선호 설정(선호 언어 포함). 이용자가 선택해 추가하는 프로필 정보: MBTI, 성별, 직업',
             },
             {
               en: 'Verification-related: school (or recognized institution) email, verification status, school name/identifier, and confirmation details submitted during verification',
@@ -142,8 +142,24 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '중고거래 등록 글 및 문의 메시지: 물품 정보, 사진, 가격, 받는 결제 방법, 거래 지역 ZIP 코드, 구매자·판매자 간 메시지(제5조 참고)',
             },
             {
-              en: 'Credit and reward applications: application details, contact information, and scheduling information as needed',
-              ko: '크레딧·보상 신청: 신청 내용, 연락용 정보, 일정 조율에 필요한 정보',
+              en: 'Misaeng Points: points earned and spent, the activity that earned them (for example a review, a quiz, or an invite), and reward applications with the contact and scheduling details needed to fulfill them',
+              ko: '미생 포인트: 적립·사용 내역, 적립의 근거가 된 활동(예: 후기, 퀴즈, 초대), 보상 신청 내용과 이행에 필요한 연락·일정 정보',
+            },
+            {
+              en: 'Sign-in: if you use Sign in with Apple or Google sign-in, the identifier and email address that provider shares with us (Apple may share a private relay email address), and, for Sign in with Apple, a token we use to revoke the connection when you delete your account',
+              ko: '로그인: Apple로 로그인 또는 Google 로그인을 사용하면 해당 제공자가 전달하는 식별자와 이메일 주소(Apple은 비공개 릴레이 이메일일 수 있음), Apple로 로그인의 경우 계정 삭제 시 연결을 해제하는 데 쓰는 토큰',
+            },
+            {
+              en: 'Instagram verification (optional): your Instagram handle and verification status if you choose to verify it; only the fact that it is verified is shown to others',
+              ko: '인스타그램 인증(선택): 인증을 선택한 경우 인스타그램 아이디와 인증 상태. 다른 이용자에게는 인증 여부만 표시됩니다',
+            },
+            {
+              en: 'Coffee Chats and Career Questions: your mentor card (for example your workplace, role, and topics), the times you are available, requests, questions and answers, their status, and the LinkedIn profile URL you choose to share, which is shown to the other person only after a request is accepted',
+              ko: '커피챗·커리어 질문: 멘토 카드(예: 직장, 직무, 주제), 가능한 시간, 신청·질문·답변 내용과 진행 상태, 이용자가 공유하기로 한 LinkedIn 프로필 주소(신청이 수락된 뒤 상대방에게만 표시)',
+            },
+            {
+              en: 'Notifications: your device push token, device platform, app language, and alert settings (for example new job postings, visa news, comments, messages, company follows, and the boards you choose to get new-post alerts for), so that we can deliver alerts through Apple Push Notification service and Firebase Cloud Messaging',
+              ko: '알림: 기기 푸시 토큰, 기기 종류, 앱 언어, 알림 설정(예: 새 채용 공고, 비자 뉴스, 댓글, 메시지, 관심 회사, 새 글 알림을 켠 게시판). Apple Push Notification service와 Firebase Cloud Messaging으로 알림을 보내는 데 사용합니다',
             },
             {
               en: 'Marketing/partnership inquiries: name, contact details, company/channel information, and message content',
@@ -168,8 +184,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '이용 기록: 열람한 페이지·게시물, 검색어(해당 기능 사용 시), 클릭·스크롤 등 대략적 상호작용, 세션 정보',
             },
             {
-              en: 'Cookies and similar technologies: cookies, local storage, pixels, and similar tools used for login persistence, preferences, security, and traffic analysis',
-              ko: '쿠키 및 유사 기술: 로그인 유지, 선호 설정, 보안, 트래픽 분석에 사용되는 쿠키·로컬 스토리지·픽셀 등',
+              en: 'Cookies and similar technologies: cookies and local storage used for login persistence, preferences, and security. We do not use third-party advertising or analytics trackers; we keep only first-party, aggregated usage counts (for example how often a map is opened) to improve the Services',
+              ko: '쿠키 및 유사 기술: 로그인 유지, 선호 설정, 보안에 사용되는 쿠키·로컬 스토리지. 회사는 제3자 광고·분석 추적 도구를 사용하지 않으며, 서비스 개선을 위해 지도 열람 횟수 등 집계된 자체 이용 통계만 보관합니다',
             },
             {
               en: 'Approximate location: region inferred from IP (precise GPS is not necessarily required by default)',
@@ -186,8 +202,12 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
           type: 'ul',
           items: [
             {
-              en: 'From social/OAuth login providers (for example Google): identifiers, email, and basic profile information within the scope you authorize',
-              ko: '소셜/OAuth 로그인 제공자(예: Google)로부터 이용자가 허용한 범위의 식별자·이메일·프로필 기본 정보',
+              en: 'From sign-in providers (Apple and Google): identifiers, email, and basic profile information within the scope you authorize',
+              ko: '로그인 제공자(Apple, Google)로부터 이용자가 허용한 범위의 식별자·이메일·프로필 기본 정보',
+            },
+            {
+              en: 'From payment processors (Stripe and Apple): the status of your Premium purchase or subscription, as described in Section 3.4',
+              ko: '결제 처리자(Stripe, Apple)로부터 Premium 구매·구독 상태(제3.4조 참고)',
             },
             {
               en: 'From maps/place APIs: place metadata returned in response to your searches, used to provide Service features',
@@ -196,6 +216,32 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
             {
               en: 'From partners, agencies, or security vendors: limited information for fraud detection and support',
               ko: '파트너·대행사·보안 벤더가 부정행위 탐지·지원을 위해 제공하는 제한적 정보',
+            },
+          ],
+        },
+        {
+          type: 'p',
+          en: '3.4 Premium and payments',
+          ko: '3.4 Premium 및 결제',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Web purchases: payment is processed by Stripe, Inc. We receive your plan, subscription status, trial and renewal dates, the brand and last four digits of your card, and Stripe customer and subscription IDs. We never receive or store your full card number.',
+              ko: '웹 결제: Stripe, Inc.가 결제를 처리합니다. 회사는 요금제, 구독 상태, 체험·갱신 날짜, 카드사와 카드 끝 4자리, Stripe 고객·구독 ID를 받으며, 카드 번호 전체는 받거나 저장하지 않습니다.',
+            },
+            {
+              en: 'iOS app purchases: payment is processed by Apple. Apple sends us the transaction and subscription status for your account; we do not receive your payment details.',
+              ko: 'iOS 앱 결제: Apple이 결제를 처리하며, 이용자 계정의 거래·구독 상태만 회사에 전달합니다. 회사는 결제 정보를 받지 않습니다.',
+            },
+            {
+              en: 'Premium codes: the code you redeem, when you redeemed it, and when the access ends.',
+              ko: 'Premium 코드: 사용한 코드, 사용 시각, 이용 종료일.',
+            },
+            {
+              en: 'We use this information to provide Premium on the website and in the apps, send trial-ending and renewal reminders, handle cancellations and refunds, and prevent fraud. Payment records are kept for as long as tax and accounting laws require (generally up to 7 years).',
+              ko: '회사는 이 정보를 웹사이트와 앱에서 Premium 제공, 체험 종료·갱신 안내, 해지·환불 처리, 부정 이용 방지에 사용합니다. 결제 기록은 세무·회계 법령이 요구하는 기간(일반적으로 최대 7년) 동안 보관합니다.',
             },
           ],
         },
@@ -242,6 +288,11 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
           type: 'p',
           en: 'Anonymous posts and comments on the Q&A/Free board created after this feature was introduced (November 2026) show the kind of the author’s verification badge — “Student,” “Workplace verified,” or “Parent.” They never show the author’s nickname or school name. Anonymous posts and comments created before this change remain fully anonymous.',
           ko: '이 기능이 도입된 뒤(2026년 11월) 질문·자유 게시판에 작성되는 익명 글·댓글에는 작성자의 인증 배지 종류(“학생”, “직장인 인증”, “학부모”)가 표시됩니다. 작성자의 닉네임이나 학교 이름은 표시되지 않습니다. 이 변경 전에 작성된 익명 글·댓글은 완전한 익명으로 남습니다.',
+        },
+        {
+          type: 'p',
+          en: 'If you have not set a nickname, the part of your email address before the “@” (for example, “andy42680” for andy42680@gmail.com) is shown as a temporary nickname next to your non-anonymous posts and comments until you set one. The domain after the “@” is never shown. You can set or change your nickname at any time in your profile.',
+          ko: '닉네임을 설정하지 않은 경우, 닉네임을 정할 때까지 익명이 아닌 글·댓글에 이메일 주소의 “@” 앞부분(예: andy42680@gmail.com의 “andy42680”)이 임시 닉네임으로 표시됩니다. “@” 뒤의 도메인은 표시되지 않습니다. 닉네임은 프로필에서 언제든 설정하거나 바꿀 수 있습니다.',
         },
       ],
     },
@@ -370,8 +421,20 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '중고거래 운영: 등록 글과 대략적인 거래 지역 표시, 문의 메시지·알림 전달, 사기·부정이용 신고 조사(제5조 참고)',
             },
             {
-              en: 'Calculating Community Credits, preventing fraudulent earning, and processing reward applications',
-              ko: '커뮤니티 크레딧 산정·부정 적립 방지·보상 신청 처리',
+              en: 'Running Misaeng Points: calculating points, preventing fraudulent earning, and processing reward applications',
+              ko: '미생 포인트 운영: 포인트 산정, 부정 적립 방지, 보상 신청 처리',
+            },
+            {
+              en: 'Providing Premium, processing payments, cancellations, and refunds, and sending subscription reminders (see Section 3.4)',
+              ko: 'Premium 제공, 결제·해지·환불 처리, 구독 안내 발송(제3.4조 참고)',
+            },
+            {
+              en: 'Matching Coffee Chat and Career Question requests with mentors and delivering their messages',
+              ko: '커피챗·커리어 질문 신청을 멘토와 연결하고 메시지 전달',
+            },
+            {
+              en: 'Sending the notifications you have turned on (for example new job postings, visa news, comments, and messages)',
+              ko: '이용자가 켠 알림(예: 새 채용 공고, 비자 뉴스, 댓글, 메시지) 발송',
             },
             {
               en: 'Customer support, responding to inquiries, and communicating notices or policy changes',
@@ -382,8 +445,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '스팸·사기·괴롭힘·보안 위협 탐지 및 대응, 약관 집행',
             },
             {
-              en: 'Improving Service quality, analyzing errors, and measuring usability and performance within a reasonable scope',
-              ko: '서비스 품질 개선, 오류 분석, 사용성·성능 측정(합리적 범위의 분석)',
+              en: 'Improving Service quality, analyzing errors, and measuring usability and performance using first-party, aggregated usage counts',
+              ko: '서비스 품질 개선, 오류 분석, 자체 집계 이용 통계를 통한 사용성·성능 측정',
             },
             {
               en: 'Complying with legal obligations, handling disputes, and protecting rights',
@@ -449,8 +512,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
           type: 'ul',
           items: [
             {
-              en: 'Service providers (hosting, databases, email delivery, customer support, security/monitoring, analytics, maps/place APIs, login providers, and similar) — only as needed to perform their work and under contractual protections',
-              ko: '서비스 제공 업체(호스팅, 데이터베이스, 이메일 발송, 고객지원, 보안·모니터링, 분석, 지도/장소 API, 로그인 제공자 등) — 업무 수행에 필요한 범위, 계약상 보호조치 하에',
+              en: 'Service providers that process information on our behalf, only as needed to perform their work and under contractual protections (listed below)',
+              ko: '회사를 대신해 정보를 처리하는 서비스 제공 업체 — 업무 수행에 필요한 범위에서, 계약상 보호조치 하에(아래 목록 참고)',
             },
             {
               en: 'AI translation provider: to translate posts, comments, and listings, the text of that Content (not your account details such as email address) is processed by an AI service provider, currently Anthropic, PBC (United States). We use settings under which this text is not used to train the provider’s models, and we do not send Content that we identify as containing private contact details for translation',
@@ -479,6 +542,60 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
             {
               en: 'Consent-based: partnerships or events you separately agree to',
               ko: '동의 기반: 이용자가 별도 동의한 제휴·이벤트',
+            },
+          ],
+        },
+        {
+          type: 'p',
+          en: 'Service providers we currently use (name, location, what they do):',
+          ko: '현재 이용하는 서비스 제공 업체(이름, 소재지, 처리 업무):',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Supabase, Inc. (United States): database, sign-in, and file storage (account, profile, posts, photos, verification documents). Kept for as long as described in Section 10.',
+              ko: 'Supabase, Inc.(미국): 데이터베이스, 로그인, 파일 저장(계정, 프로필, 게시물, 사진, 인증 서류). 보관 기간은 제10조와 같습니다.',
+            },
+            {
+              en: 'Amazon Web Services, Inc. (United States): servers that run the misaeng.com website and the shared Misaeng/Ellieo account service, including server logs.',
+              ko: 'Amazon Web Services, Inc.(미국): misaeng.com 웹사이트와 미생·Ellieo 공용 계정 서비스를 운영하는 서버(서버 로그 포함).',
+            },
+            {
+              en: 'Vercel Inc. (United States): hosting for our internal administration tools that staff use to review reports, verifications, and support requests.',
+              ko: 'Vercel Inc.(미국): 신고·인증·문의 검토에 쓰는 내부 관리 도구의 호스팅.',
+            },
+            {
+              en: 'Resend (Plus Five Five, Inc., United States): sending emails such as sign-up codes, verification codes, notices, and subscription reminders (email address and message content).',
+              ko: 'Resend(Plus Five Five, Inc., 미국): 가입 코드, 인증 코드, 공지, 구독 안내 등 이메일 발송(이메일 주소와 메일 내용).',
+            },
+            {
+              en: 'EmailJS (United States): delivering school-registration request forms to our team (the details you enter in that form).',
+              ko: 'EmailJS(미국): 학교 등록 요청 양식을 회사 담당자에게 전달(양식에 입력한 내용).',
+            },
+            {
+              en: 'Apple Inc. (United States): Sign in with Apple, Apple Push Notification service (device token and notification content), App Store purchases, and, on iOS, geocoding of a Marketplace ZIP code.',
+              ko: 'Apple Inc.(미국): Apple로 로그인, Apple Push Notification service(기기 토큰과 알림 내용), App Store 결제, iOS의 중고거래 ZIP 코드 지오코딩.',
+            },
+            {
+              en: 'Google LLC (United States): Google sign-in, Firebase Cloud Messaging for Android notifications (device token and notification content), and Google Maps Platform for place search and maps (search text and approximate locations, not your account details).',
+              ko: 'Google LLC(미국): Google 로그인, Android 알림용 Firebase Cloud Messaging(기기 토큰과 알림 내용), 장소 검색·지도를 위한 Google Maps Platform(검색어와 대략적인 위치, 계정 정보 제외).',
+            },
+            {
+              en: 'Stripe, Inc. (United States): web payments for Premium (see Section 3.4).',
+              ko: 'Stripe, Inc.(미국): Premium 웹 결제(제3.4조 참고).',
+            },
+            {
+              en: 'Anthropic, PBC (United States): AI translation and summaries of posts, listings, job postings, and visa news (Content text only, as described above).',
+              ko: 'Anthropic, PBC(미국): 게시물·매물·채용 공고·비자 뉴스의 AI 번역·요약(위에 설명한 대로 콘텐츠 텍스트만).',
+            },
+            {
+              en: 'OpenStreetMap Foundation (United Kingdom), Nominatim service: looking up the approximate center of a Marketplace ZIP code (the ZIP code only).',
+              ko: 'OpenStreetMap Foundation(영국) Nominatim 서비스: 중고거래 ZIP 코드의 대략적인 중심 좌표 조회(ZIP 코드만).',
+            },
+            {
+              en: 'CARTO (United States/Spain): map tiles on the website (your browser requests map images, which shares your IP address with CARTO).',
+              ko: 'CARTO(미국/스페인): 웹사이트의 지도 이미지(브라우저가 지도 이미지를 요청하면서 IP 주소가 CARTO에 전달됨).',
             },
           ],
         },
@@ -537,8 +654,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
           type: 'ul',
           items: [
             {
-              en: 'Account information: while the account is active and for a reasonable period after a deletion request',
-              ko: '계정 정보: 계정 유지 기간 및 삭제 요청 후 처리에 필요한 기간',
+              en: 'Account information: while your account is active. When you delete your account it is handled as described below',
+              ko: '계정 정보: 계정이 유지되는 동안. 계정을 삭제하면 아래 “계정 삭제”에 따라 처리합니다',
             },
             {
               en: 'Posts and comments, and their translations: until User deletion or operational removal (translations are deleted with the original); backups, logs, and report records may follow different shorter or longer cycles',
@@ -561,8 +678,12 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '문의·신고: 처리 완료 후 분쟁·법령 대응에 필요한 기간',
             },
             {
-              en: 'Credit and reward records: for a period needed to operate the program and prevent abuse',
-              ko: '크레딧·보상 관련 기록: 프로그램 운영·부정 방지에 필요한 기간',
+              en: 'Misaeng Points records: for a period needed to operate the program and prevent abuse; your balance is deleted with your account',
+              ko: '미생 포인트 기록: 프로그램 운영·부정 방지에 필요한 기간. 잔액은 계정과 함께 삭제됩니다',
+            },
+            {
+              en: 'Premium and payment records: subscription and entitlement records while you have Premium, and payment, refund, and tax records for as long as tax and accounting laws require (generally up to 7 years), including after you delete your account',
+              ko: 'Premium·결제 기록: 구독·이용 권한 기록은 Premium을 이용하는 동안, 결제·환불·세무 기록은 계정 삭제 후에도 세무·회계 법령이 요구하는 기간(일반적으로 최대 7년) 동안',
             },
             {
               en: 'Marketplace listings and inquiry conversations: listings (with their photos and translations) until you delete them or they are removed; inquiry conversations, including closed ones, for as long as needed to show them to their participants, handle reports and disputes, and prevent fraud (see Section 5); when you delete your account, both are deleted as described in Section 5',
@@ -573,6 +694,11 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '면허 부동산 거래 기록: 뉴욕주 면허 중개 활동과 관련된 기록(문의 로그, 대리·보수 공시, 쇼잉·신청 기록 등)은 일반적으로 최소 3년간, 또는 뉴욕주 Department of State·브로커리지 정책·기타 적용법이 더 긴 기간을 요구하면 그 기간 동안 보관합니다',
             },
           ],
+        },
+        {
+          type: 'p',
+          en: 'Account deletion. You can delete your account at any time in the app (Profile > Delete account) or on the website (My Page). When you do, we immediately clear your profile and delete your verification information and documents, push tokens and alert settings, notifications, saved posts, your mentor card, roommate/sublet posts, Marketplace listings (with their photos), and Marketplace conversations you are part of. Open Coffee Chats and pending Career Questions are canceled (points on hold are released). Your other posts and comments stay so that discussions remain readable, but they are shown as “Deleted user” without your name, photo, or badges. Web (Stripe) Premium subscriptions are canceled at the same time; App Store subscriptions are not canceled automatically, so cancel them first in iPhone Settings > Apple ID > Subscriptions. If you used Sign in with Apple, we revoke the connection with Apple. Your Misaeng account and the Ellieo account that shares it are deleted together. Copies in backups are overwritten within 30 days. We keep a minimal record that the account was deleted, the versions of the Terms and Privacy Policy you accepted, and records we must keep by law (such as payment and tax records).',
+          ko: '계정 삭제. 앱(프로필 > 회원 탈퇴) 또는 웹사이트(마이페이지)에서 언제든 계정을 삭제할 수 있습니다. 삭제하면 프로필을 즉시 비우고, 인증 정보와 서류, 푸시 토큰과 알림 설정, 알림, 저장한 글, 멘토 카드, 룸메이트·서블렛 글, 중고거래 등록 글(사진 포함), 참여한 중고거래 대화를 삭제합니다. 진행 중인 커피챗과 답변 대기 중인 커리어 질문은 취소되며(보류된 포인트는 해제) 그 밖의 게시글과 댓글은 대화 흐름을 위해 남지만 이름·사진·배지 없이 “탈퇴한 회원”으로 표시됩니다. 웹(Stripe) Premium 구독은 함께 해지되며, App Store 구독은 자동으로 해지되지 않으므로 먼저 iPhone 설정 > Apple ID > 구독에서 해지해 주세요. Apple로 로그인을 사용했다면 Apple과의 연결을 해제합니다. 미생 계정과 같은 계정을 쓰는 Ellieo 계정도 함께 삭제됩니다. 백업 사본은 30일 이내에 덮어써집니다. 계정이 삭제되었다는 최소한의 기록, 동의한 이용약관·개인정보처리방침 버전, 결제·세무 기록 등 법령상 보관 의무가 있는 기록은 보관합니다.',
         },
         {
           type: 'p',
@@ -605,20 +731,25 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
       blocks: [
         {
           type: 'p',
-          en: 'We operate primarily from the United States. Depending on cloud and vendor infrastructure, your information may be transferred to, stored in, or processed in countries other than your country of residence. Where required by applicable law, we work to implement appropriate safeguards (such as contractual clauses). For example, Content sent for translation is processed by our AI translation provider in the United States (see Section 8).',
-          ko: '회사는 미국을 중심으로 서비스를 운영하며, 클라우드·벤더 인프라의 위치에 따라 이용자 정보가 이용자 거주국 외로 이전·저장·처리될 수 있습니다. 이 경우 회사는 적용 법령이 요구하는 범위에서 적절한 보호장치(계약 조항 등)를 마련하기 위해 노력합니다. 예를 들어 번역을 위해 보내는 게시물 텍스트는 미국에 있는 AI 번역 제공자가 처리합니다(제8조 참고).',
+          en: 'We operate primarily from the United States. Your information is transferred to, stored in, and processed in the United States and in the other countries of the service providers listed in Section 8. Where required by applicable law, we work to implement appropriate safeguards (such as contractual clauses). For example, Content sent for translation is processed by our AI translation provider in the United States (see Section 8).',
+          ko: '회사는 미국을 중심으로 서비스를 운영하며, 이용자 정보는 미국 및 제8조에 기재된 서비스 제공 업체의 소재국으로 이전·저장·처리됩니다. 이 경우 회사는 적용 법령이 요구하는 범위에서 적절한 보호장치(계약 조항 등)를 마련하기 위해 노력합니다. 예를 들어 번역을 위해 보내는 게시물 텍스트는 미국에 있는 AI 번역 제공자가 처리합니다(제8조 참고).',
+        },
+        {
+          type: 'note',
+          en: 'Notice for users in the Republic of Korea. To provide the Services, the personal information described in Section 3 (account and profile, verification, posts and messages, Premium status, device and push tokens, and usage logs) is transferred over the network to, and stored in, the United States and the other countries of the service providers listed in Section 8, when you use the Services, for the purposes in Section 6, and kept for the periods in Section 10. You may refuse this transfer by not using the Services or by deleting your account; in that case you cannot use the Services. Contact: info@misaeng.com.',
+          ko: '대한민국 이용자 안내(국외 이전). 회사는 서비스 제공을 위해 제3조의 개인정보(계정·프로필, 인증, 게시물·메시지, Premium 상태, 기기·푸시 토큰, 이용 기록)를 이용자가 서비스를 이용하는 시점에 네트워크를 통해 미국 및 제8조에 기재된 서비스 제공 업체(이전받는 자)의 소재국으로 이전·보관합니다. 이전 목적은 제6조, 보유 기간은 제10조와 같습니다. 국외 이전을 원하지 않으면 서비스를 이용하지 않거나 계정을 삭제할 수 있으나, 이 경우 서비스를 이용할 수 없습니다. 문의: info@misaeng.com',
         },
       ],
     },
     {
       id: 'children',
-      title: '13. Children’s Privacy',
-      titleKo: '13. 아동의 개인정보',
+      title: '13. Age Requirement',
+      titleKo: '13. 이용 연령',
       blocks: [
         {
           type: 'p',
-          en: 'The Services are not directed to children under 13 (or under a higher age if required by your local law), and we do not knowingly collect their personal information. If we learn that such information was collected, we will take reasonable steps to delete it. Guardians may contact info@misaeng.com.',
-          ko: '서비스는 만 13세 미만(또는 거주지 법령상 더 높은 연령 기준이 적용되는 경우 그 연령 미만)의 아동을 대상으로 하지 않으며, 그러한 아동의 개인정보를 고의로 수집하지 않습니다. 해당 정보가 수집된 사실을 인지하면 삭제하기 위해 합리적인 조치를 취합니다. 보호자는 info@misaeng.com 으로 연락해 주세요.',
+          en: 'The Services are intended for adults aged 18 or older. We do not knowingly collect personal information from anyone under 18; if we learn that we have, we will delete it and close the account. Parent accounts are for adult parents or guardians. Parents or guardians may contact info@misaeng.com.',
+          ko: '서비스는 만 18세 이상 성인을 대상으로 합니다. 회사는 만 18세 미만의 개인정보를 알면서 수집하지 않으며, 수집된 사실을 알게 되면 삭제하고 계정을 해지합니다. 학부모 계정은 성인인 부모 또는 보호자를 위한 계정입니다. 부모 또는 보호자는 info@misaeng.com 으로 연락해 주세요.',
         },
       ],
     },
@@ -660,8 +791,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '마케팅 수신 거부',
             },
             {
-              en: 'Request account deletion',
-              ko: '계정 삭제 요청',
+              en: 'Delete your account yourself in the app or on the website (see Section 10), or ask us to delete it',
+              ko: '앱 또는 웹사이트에서 직접 계정 삭제(제10조 참고) 또는 회사에 삭제 요청',
             },
           ],
         },
@@ -754,8 +885,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
       blocks: [
         {
           type: 'p',
-          en: 'We may update this Policy as Services, laws, or operations change. When we do, we will revise the “Last updated” date above and, for material changes, provide notice through the Services, email, or other reasonable means. Continued use after the effective date may be treated as acceptance of the updated Policy.',
-          ko: '회사는 서비스·법령·운영 환경 변화에 따라 본 방침을 개정할 수 있습니다. 변경 시 상단의 “최종 업데이트” 일자를 수정하고, 중요한 변경은 서비스 내 공지 또는 이메일 등 합리적인 방법으로 안내합니다. 변경 효력 발생 이후 서비스를 계속 이용하면 개정 방침에 동의한 것으로 볼 수 있습니다.',
+          en: 'We may update this Policy as Services, laws, or operations change. When we do, we will revise the “Last updated” date above. For material changes, we ask existing Members to review and accept the updated Policy the next time they open the Services (in the app or on the website), and we may also notify you by email. For new Users, this Policy applies from when you accept it.',
+          ko: '회사는 서비스·법령·운영 환경 변화에 따라 본 방침을 개정할 수 있습니다. 변경 시 상단의 “최종 업데이트” 일자를 수정합니다. 중요한 변경이 있으면 기존 회원이 다음에 서비스(앱 또는 웹사이트)를 열 때 개정 방침을 확인하고 동의하도록 안내하며, 이메일로도 알릴 수 있습니다. 신규 이용자에게는 동의한 시점부터 적용됩니다.',
         },
       ],
     },
@@ -766,8 +897,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
       blocks: [
         {
           type: 'p',
-          en: 'For privacy questions, rights requests, or children’s information deletion requests, contact:',
-          ko: '개인정보 처리, 권리 행사, 아동 정보 삭제 요청 등은 아래로 연락해 주세요.',
+          en: 'For privacy questions, rights requests, or requests about information of someone under 18, contact:',
+          ko: '개인정보 처리, 권리 행사, 만 18세 미만 정보 관련 요청 등은 아래로 연락해 주세요.',
         },
         {
           type: 'ul',

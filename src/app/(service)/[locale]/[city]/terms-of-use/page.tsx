@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { namedCityPageMetadata } from '@lib/i18n/cityMetadata.server'
 
 import { TermsOfUseScreen } from '@screens/nyc/TermsOfUseScreen'
 import { BRAND_CONFIG } from '@lib/brand'
@@ -17,11 +18,12 @@ function resolveLocale(locale: string): Locale {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params
+  const { locale, city } = await params
   const t = await getT(resolveLocale(locale), 'legal')
-  return {
+  return namedCityPageMetadata(locale, city, 'terms', {
+    withoutCity: true,
     description: t('meta.termsDescription', { brand: BRAND_CONFIG.name }),
-  }
+  })
 }
 
 export default async function NycTermsOfUsePage({ params }: Props) {

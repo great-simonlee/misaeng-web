@@ -100,7 +100,8 @@
   },
   "credit": {
     "monthsFree_other": "Miễn phí {count} tháng",
-    "dollarCredit": "Ưu đãi ${amount}"
+    "dollarCredit": "Ưu đãi ${amount}",
+    "monthsFree_one": "{count} month free"
   },
   "amenityFee": {
     "unknown": "Chưa rõ",
@@ -142,7 +143,9 @@
     "moveInTbd": "Chưa xác định",
     "composition": {
       "male_other": "{count} nam",
-      "female_other": "{count} nữ"
+      "female_other": "{count} nữ",
+      "male_one": "{count} man",
+      "female_one": "{count} woman"
     },
     "loadingLabel": "Đang tải tin đăng",
     "loadingDescription": "Đang tải tin đăng…"
@@ -209,7 +212,15 @@
       "outdoorPatio": "Patio",
       "flexWallAllowed": "Được phép",
       "flexWallNotAllowed": "Không được phép"
-    }
+    },
+    "appInquiry": "Inquire in the app",
+    "appInquiryTitle": "Chat with us in the Misaeng app",
+    "appInquiryBody": "Live chat with our housing team is in the Misaeng app. Install it and tap Inquire on this listing.",
+    "appStore": "Download on the App Store",
+    "googlePlay": "Get it on Google Play",
+    "orKakao": "Can't install the app? Ask us on KakaoTalk or by email.",
+    "emailInquiryShort": "Email us",
+    "close": "Close"
   },
   "listingKinds": {
     "unit": {
@@ -240,6 +251,10 @@
       "description": "Hãy thử đổi bộ lọc và tìm lại.",
       "action": "Đặt lại bộ lọc"
     },
+    "emptyCity": {
+      "title": "Chưa có tin nhà ở {city}",
+      "description": "Tin mới sẽ hiện ở đây ngay khi được đăng. Hãy quay lại sau nhé."
+    },
     "sheet": {
       "clearAll": "Xóa tất cả",
       "showResults_other": "Xem {count} tin đăng",
@@ -252,8 +267,11 @@
       "roomRent": "Tiền thuê hàng tháng mỗi phòng",
       "benefits": "Ưu đãi",
       "amenities": "Tiện ích",
-      "area": "Khu vực"
-    }
+      "area": "Khu vực",
+      "showResults_one": "Show {count} listing"
+    },
+    "summaryAll_one": "{count} listing",
+    "summaryFiltered_one": "{filters} · {count} listing"
   },
   "new": {
     "errors": {
@@ -283,7 +301,13 @@
       "descriptionPlaceholder": "Điều kiện lease, tiện ích, phù hợp với ai, v.v."
     },
     "submitting": "Đang đăng…",
-    "submit": "Đăng"
+    "submit": "Đăng",
+    "sections": {
+      "location": "Vị trí",
+      "price": "Giá & phòng",
+      "dates": "Thời gian ở",
+      "details": "Liên hệ & mô tả"
+    }
   },
   "roommate": {
     "intents": {
@@ -374,9 +398,12 @@
       "until": "Đến {date}",
       "stay": {
         "weeks_other": "{count} tuần",
-        "months_other": "{count} tháng"
+        "months_other": "{count} tháng",
+        "weeks_one": "{count} week",
+        "months_one": "{count} month"
       },
-      "photoCount_other": "{count} ảnh"
+      "photoCount_other": "{count} ảnh",
+      "photoCount_one": "{count} photo"
     },
     "list": {
       "budgetPresets": {
@@ -410,7 +437,10 @@
       },
       "moveIn": "Thời gian vào ở",
       "moveInLater": "Từ {month} trở đi",
-      "moveInHint": "Phòng đã có thể vào ở được tính vào tháng này."
+      "moveInHint": "Phòng đã có thể vào ở được tính vào tháng này.",
+      "summaryAll_one": "{count} post",
+      "summaryFiltered_one": "{filters} · {count} post",
+      "showResults_one": "Show {count} post"
     },
     "write": {
       "errors": {
@@ -542,5 +572,10 @@
       "success": "Đã ghim lên đầu · đến {date}",
       "failed": "Không thể ghim bài. Vui lòng thử lại sau."
     }
+  },
+  "segments": {
+    "rent": "Rent",
+    "roommate": "Roommates & sublets",
+    "aria": "Housing type"
   }
 }

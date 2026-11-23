@@ -2,12 +2,17 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { cn } from '@lib'
-import { byBrand } from '@lib/brand/design'
+import { byBrand, MISAENG_DESIGN } from '@lib/brand/design'
+import { CommunityBoardRail } from '@widgets/nyc/CommunityBoardRail'
 
 type BoardPageShellProps = {
   children: ReactNode
-  /** 좁은 커뮤니티 피드 vs 넓은 하우징 그리드 */
-  width?: 'narrow' | 'wide'
+  /** 좁은 커뮤니티 피드 vs 넓은 하우징 그리드 (medium: 커뮤니티 상세, 미생만) */
+  width?: 'narrow' | 'medium' | 'wide'
+  /** 데스크톱 오른쪽 레일 (lg 이상, 미생만). 생략하면 narrow/medium 페이지는 기본 레일(다른 게시판 + 앱), null이면 레일 없음 */
+  rail?: ReactNode
+  /** 기본 레일의 "다른 게시판"에서 뺄 게시판 */
+  railBoardId?: string
   className?: string
 }
 
@@ -15,16 +20,45 @@ type BoardPageShellProps = {
 export function BoardPageShell({
   children,
   width = 'narrow',
+  rail,
+  railBoardId,
   className,
 }: BoardPageShellProps) {
+  const canvas = byBrand('relative min-h-screen bg-[var(--canvas)]', 'relative min-h-screen bg-white')
+  // Misaeng: every page body has the navbar's width and edges (owner 11-23). Narrow/medium pages (post details, write
+  // screens, notices) read best as a column, so the spare width goes to a right rail (other boards + app) instead of
+  // stretching text; wide pages use the full width. `rail={null}` opts out (the column then spans the nav width).
+  if (MISAENG_DESIGN) {
+    const sideRail =
+      rail !== undefined
+        ? rail
+        : width === 'wide'
+          ? null
+          : <CommunityBoardRail boardId={railBoardId ?? ''} boardTitle='' writeHref='' writeLabel='' showWrite={false} />
+    if (sideRail) {
+      return (
+        <div className={cn(canvas, className)}>
+          <div className={cn(NAV_WIDTH, 'relative lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-10')}>
+            <div className='min-w-0'>{children}</div>
+            <aside className='hidden lg:block'>
+              <div className='sticky top-[5.5rem] flex flex-col gap-4 pb-10 pt-6'>{sideRail}</div>
+            </aside>
+          </div>
+        </div>
+      )
+    }
+    return (
+      <div className={cn(canvas, className)}>
+        <div className={cn(NAV_WIDTH, 'relative')}>{children}</div>
+      </div>
+    )
+  }
   return (
-    <div className={cn(byBrand('relative min-h-screen bg-[var(--canvas)]', 'relative min-h-screen bg-white'), className)}>
+    <div className={cn(canvas, className)}>
       <div
         className={cn(
           'relative mx-auto w-full',
-          width === 'wide'
-            ? 'max-w-7xl px-4 sm:px-6 lg:px-8'
-            : 'max-w-2xl px-4 sm:px-5',
+          width === 'wide' ? 'max-w-7xl px-4 sm:px-6 lg:px-8' : 'max-w-2xl px-4 sm:px-5',
         )}
       >
         {children}
@@ -32,6 +66,9 @@ export function BoardPageShell({
     </div>
   )
 }
+
+/** The navbar's content box (NycNavbar): every Misaeng page body uses it so edges line up with the logo */
+export const NAV_WIDTH = 'mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'
 
 type BoardSurfaceProps = {
   children: ReactNode

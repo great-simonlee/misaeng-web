@@ -34,6 +34,7 @@ import { translateStatusEmployerLocation } from '@lib/constants/statusEmployer'
 import { useFormat, useT } from '@lib/i18n/client'
 import type { Translate } from '@lib/i18n/translate'
 import { cn } from '@lib'
+import { byBrand } from '@lib/brand/design'
 import type { PostLikeEntry } from '@lib/utils/postLikes'
 import type { CommunityPost, HousingPost } from '@/types/nyc'
 import {
@@ -174,10 +175,10 @@ export function MyLikesScreen() {
   }
 
   return (
-    <div className='relative flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
+    <div className={byBrand('relative flex flex-1 flex-col bg-white', 'relative flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]')}>
       <div
         className={cn(
-          'flex flex-1 flex-col pb-14 pt-8 sm:pb-16 sm:pt-10 lg:pb-20 lg:pt-12',
+          byBrand('flex flex-1 flex-col pb-14 pt-4 sm:pt-5 lg:pt-6 sm:pb-16 lg:pb-20', 'flex flex-1 flex-col pb-14 pt-8 sm:pb-16 sm:pt-10 lg:pb-20 lg:pt-12'),
           NYC_PAGE_SHELL_CLASS,
         )}
       >

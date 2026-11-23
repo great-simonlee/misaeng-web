@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { LoadingState } from '@components'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { cn } from '@lib'
+import { useWindowedList } from '@hooks/usePagedList'
 import { cityFirst, daysUntil, fetchPostings, matchesKind, type PostingKind, type PublicPosting } from '@lib/company/postings'
 import { BRAND_CONFIG } from '@lib/brand'
 import { JOB_FUNCTION_LABELS, JOB_FUNCTIONS, type JobFunction } from '@lib/constants/postingCopy'
@@ -48,12 +49,6 @@ export function PostingListScreen() {
   const [jobFunction, setJobFunction] = useState<'all' | JobFunction>('all')
   const [query, setQuery] = useState('')
   const [timing, setTiming] = useState<Timing>('all')
-  const [limit, setLimit] = useState(PAGE_SIZE)
-
-  // 필터가 바뀌면 처음 PAGE_SIZE개부터 다시
-  useEffect(() => {
-    setLimit(PAGE_SIZE)
-  }, [kind, region, jobFunction, query, timing])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -92,6 +87,7 @@ export function PostingListScreen() {
         (!key || normalize(`${p.company.name} ${p.title}`).includes(key)),
     )
   }, [postings, kind, region, jobFunction, query, timing])
+  const shown = useWindowedList(filtered.length, PAGE_SIZE, JSON.stringify([kind, region, jobFunction, query, timing]))
 
   // 등록·마감 시점 칩 (해당 공고가 있는 것만)
   const timings = useMemo(() => {
@@ -123,7 +119,7 @@ export function PostingListScreen() {
           <span aria-hidden>‹</span> {t('postings.backToCompanies')}
         </Link>
         <CompanyHeroPanel className='mt-3'>
-          <h1 className={byBrand('font-bold leading-[1.1] tracking-[-0.035em] text-[var(--foreground)] text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'text-[1.4rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.6rem]')}>
+          <h1 className={byBrand('font-bold leading-[1.1] tracking-[-0.035em] text-white text-[1.75rem] sm:text-[2.1rem] lg:text-[2.5rem]', 'text-[1.4rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.6rem]')}>
             {t('postings.listTitle')}
           </h1>
           <p className='mt-1.5 text-[13px] leading-relaxed text-white/55 sm:text-[14px]'>{t('postings.listIntro', { brand: BRAND_CONFIG.name })}</p>
@@ -213,18 +209,9 @@ export function PostingListScreen() {
         ) : (
           <>
             <p className='mb-3 text-[13px] font-medium text-[var(--muted)]'>{t('postings.resultCount', { count: filtered.length })}</p>
-            <PostingRows postings={filtered.slice(0, limit)} showCompany />
-            {filtered.length > limit ? (
-              <div className='mt-4 flex justify-center'>
-                <button
-                  type='button'
-                  onClick={() => setLimit((n) => n + PAGE_SIZE)}
-                  className='inline-flex h-10 items-center rounded-full bg-[#f3f4f6] px-5 text-[13px] font-semibold text-[var(--muted-foreground)] transition hover:bg-[#e9ebee] hover:text-[var(--foreground)]'
-                >
-                  {t('postings.loadMore', { count: filtered.length - limit })}
-                </button>
-              </div>
-            ) : null}
+            <PostingRows postings={filtered.slice(0, shown.count)} showCompany />
+            {/* Next PAGE_SIZE rows when the bottom comes near (owner 11-23 infinite scroll) */}
+            {shown.hasMore ? <div ref={shown.sentinelRef} className='h-10' aria-hidden /> : null}
           </>
         )}
       </div>

@@ -28,6 +28,7 @@ import { useFormat, useT } from '@lib/i18n/client'
 import type { Translate, TranslateParams } from '@lib/i18n/translate'
 import { cn } from '@lib'
 import { MISAENG_DESIGN } from '@lib/brand/design'
+import { NAV_WIDTH } from '@widgets/nyc/BoardPageShell'
 
 const TOC = ['redeem', 'process', 'earn', 'principles', 'limits', 'faq'] as const
 
@@ -65,9 +66,9 @@ export function CreditScreen() {
   const comingSoonOptions = COMMUNITY_CREDIT_REDEEM_OPTIONS.filter((o) => o.comingSoon)
 
   return (
-    <div className='min-h-screen min-w-0 overflow-x-hidden bg-[#f4f5f7]'>
+    <div className={cn('min-h-screen min-w-0 overflow-x-hidden', MISAENG_DESIGN ? 'bg-white' : 'bg-[#f4f5f7]')}>
       <header className='border-b border-[var(--border)] bg-white'>
-        <div className='mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8'>
+        <div className={MISAENG_DESIGN ? cn(NAV_WIDTH, 'pb-8 pt-4 sm:pt-5 lg:pt-6') : 'mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8'}>
           <p className='text-[11px] font-semibold tracking-[0.2em] text-[var(--muted)]'>
             {t('header.eyebrow', { brand: BRAND_CONFIG.name.toUpperCase() })}
           </p>
@@ -88,10 +89,13 @@ export function CreditScreen() {
         </div>
       </header>
 
-      <div className='mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8'>
+      <div className={MISAENG_DESIGN ? cn(NAV_WIDTH, 'py-8 sm:py-10 lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:items-start lg:gap-10') : 'mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8'}>
         <nav
           aria-label={t('toc.aria')}
-          className='sticky top-14 z-10 -mx-1 rounded-2xl border border-black/[0.06] bg-white/95 px-4 py-3 shadow-sm backdrop-blur-sm sm:top-16 sm:px-5'
+          className={cn(
+            'sticky top-14 z-10 -mx-1 rounded-2xl border border-black/[0.06] bg-white/95 px-4 py-3 shadow-sm backdrop-blur-sm sm:top-16 sm:px-5',
+            MISAENG_DESIGN && 'lg:order-2 lg:top-24 lg:mx-0 lg:[&_ul]:flex-col',
+          )}
         >
           <ul className='flex flex-wrap gap-x-1 gap-y-1'>
             {TOC.map((id) => (
@@ -106,6 +110,8 @@ export function CreditScreen() {
             ))}
           </ul>
         </nav>
+
+        <div className='min-w-0'>
 
         {/* ── 보상 신청 (맨 앞) ── */}
         <Section
@@ -414,6 +420,7 @@ export function CreditScreen() {
             </Link>
           </div>
         </footer>
+        </div>
       </div>
     </div>
   )

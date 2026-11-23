@@ -184,6 +184,21 @@ export async function getRefundQuote(entitlementId: string): Promise<RefundQuote
   }
 }
 
+/**
+ * Account deletion: ends every live web (Stripe) Premium subscription of this member right away, with no proration,
+ * so a deleted account is never charged again. App Store subscriptions can't be canceled by us (the delete screen tells
+ * the member to cancel in Apple settings). Safe to repeat.
+ */
+export async function cancelStripeSubscriptionsForUser(uid: string): Promise<number> {
+  const stripe = getStripe()
+  if (!stripe) return 0
+  const rows = (await listEntitlements(uid)).filter(
+    (row) => row.source === 'stripe' && sameStripeMode(row) && row.status !== 'canceled' && row.status !== 'expired',
+  )
+  for (const row of rows) await endSubscriptionNow(stripe, row.external_id)
+  return rows.length
+}
+
 /** Cancels a Premium subscription right away and mirrors it (Premium off). Safe to repeat. */
 async function endSubscriptionNow(stripe: Stripe, subscriptionId: string) {
   let sub = await stripe.subscriptions.retrieve(subscriptionId)

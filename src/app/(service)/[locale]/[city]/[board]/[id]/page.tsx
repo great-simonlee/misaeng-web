@@ -5,6 +5,7 @@ import { MemberGate } from '@components/MemberGate'
 import { OpenInApp } from '@components/OpenInApp'
 import { isCityId } from '@lib/constants/cities'
 import { isLocale } from '@lib/i18n/locales'
+import { cityPageMetadata, cityPageTitle, metadataLocale } from '@lib/i18n/cityMetadata.server'
 import { getT } from '@lib/i18n/server'
 import { localePath } from '@lib/i18n/paths'
 import {
@@ -29,14 +30,31 @@ interface CommunityDetailPageProps {
 }
 
 // 회원 전용 게시판(비자·면접/취업 후기)을 공유한 링크: "미생에서 … 공유했어요" 제목 + 통일 이미지, 본문은 넣지 않는다.
+// 탭 제목: 회원 전용 게시판은 게시판 이름만, 공개 게시판은 글 제목 (11-23).
 export async function generateMetadata({ params }: CommunityDetailPageProps): Promise<Metadata> {
   const { locale, city, board, id } = await params
-  if (board === 'marketplace') return marketplaceMetadata(locale, city, id)
-  if (!isCommunityBoardId(board) || !isMemberOnlyBoard(board)) return {}
-  return shareMetadata(board === 'job-review' ? 'review' : 'visa', locale, {
-    path: `/${city}/${board}/${id}`,
-    memberOnly: true,
-  })
+  if (!isCommunityBoardId(board)) return {}
+  const category = getNycCategory(board)
+  if (!category) return {}
+  const boardName = (await getT(metadataLocale(locale), 'community'))(`categories.${category.id}.title`)
+  if (isMemberOnlyBoard(board)) {
+    return {
+      ...(await shareMetadata(board === 'job-review' ? 'review' : 'visa', locale, {
+        path: `/${city}/${board}/${id}`,
+        memberOnly: true,
+      })),
+      title: await cityPageTitle(locale, city, boardName),
+    }
+  }
+  const stored = await getStoredCommunityPost(id).catch(() => null)
+  const visible =
+    stored && stored.categoryId === board && stored.status !== 'closed' && !isModerationHidden(stored) && !isHeldPost(stored)
+  const postTitle = visible ? localizePost(stored, metadataLocale(locale)).title?.trim() : ''
+  const page = postTitle ? `${postTitle} · ${boardName}` : boardName
+  if (board === 'marketplace') {
+    return { ...(await marketplaceMetadata(locale, city, id)), title: await cityPageTitle(locale, city, page) }
+  }
+  return cityPageMetadata({ locale, city, page })
 }
 
 // 중고거래 글 공유: 제목 = 물건 이름, 설명 = "$80 · 10111 근처", 이미지는 미생 공식 공유 이미지 (shareMetadata)
@@ -78,7 +96,8 @@ export default async function CommunityDetailPage({
   const t = await getT(locale, 'community')
   const title = t(`categories.${category.id}.title`)
 
-  if (isCommunityBoardWip(board)) {
+  // 미생: 중고거래 목록·상세는 웹에서도 보여 준다 (쓰기·수정만 준비 중 화면). Ellieo는 그대로 준비 중
+  if (isCommunityBoardWip(board) && (board !== 'marketplace' || BRAND_CONFIG.id !== 'misaeng')) {
     // 중고거래 is app-only for now: a shared listing link still offers to open the listing in the app
     // (misaeng-app AppRouter marketplace/<id>).
     return (

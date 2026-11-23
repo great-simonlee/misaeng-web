@@ -13,6 +13,7 @@ import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { useFormat, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import { MyPageSkeleton } from '@widgets/nyc/MyPageSkeleton'
+import { byBrand } from '@lib/brand/design'
 
 type ReviewRequest = {
   id: string
@@ -129,8 +130,8 @@ export function CreditReviewsScreen() {
   }
 
   return (
-    <div className='min-h-screen bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_50%)]'>
-      <div className={cn('pb-16 pt-8 sm:pt-10', NYC_PAGE_SHELL_CLASS)}>
+    <div className={byBrand('min-h-screen bg-white', 'min-h-screen bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_50%)]')}>
+      <div className={cn('pb-16', byBrand('pt-4 sm:pt-5 lg:pt-6', 'pt-8 sm:pt-10'), NYC_PAGE_SHELL_CLASS)}>
         <p className='text-[11px] font-medium tracking-[0.18em] text-[var(--muted)]'>
           TEAM
         </p>

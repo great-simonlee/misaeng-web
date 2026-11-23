@@ -17,16 +17,18 @@ import { useT } from '@lib/i18n/client'
 import { LanguageMenu } from '@widgets/LanguageMenu'
 import { CitySelectModal } from '@widgets/nyc/CitySelectModal'
 import { AppHandoffButton } from '@components/AppHandoff'
-import { byBrand } from '@lib/brand/design'
+import { marketUnreadCount } from '@lib/marketplace/inquiries.client'
+import { byBrand, MISAENG_DESIGN } from '@lib/brand/design'
 
 /** 문구: nav.links.<key> */
 const NAV_LINKS = [
-  { path: '/housing', key: 'housing' },
+  // 하우징 includes 룸메이트·서블렛 on Misaeng (owner 11-23, like the app's Housing tab)
+  { path: '/housing', key: 'housing', also: ['/roommate'] },
   { path: '/food', key: 'food' },
   { path: '/marketplace', key: 'marketplace' },
   { path: '/status', key: 'status' },
   { path: '/job-review', key: 'jobReview' },
-  { path: '/roommate', key: 'roommate' },
+  { path: '/roommate', key: 'roommate', ellieoOnly: true },
   { path: '/anonymous', key: 'anonymous' },
 ] as const
 
@@ -40,6 +42,9 @@ const ACCOUNT_LINKS = [
     match: 'prefix' as const,
   },
 ] as const
+
+/** 중고거래 대화 on the web (Misaeng only, owner 11-23) */
+const MARKET_INBOX_LINK = { path: '/me/market', key: 'marketInbox', match: 'prefix' as const }
 
 /** Shown when the 문의/건의 switch is on (support settings inquiry.enabled). */
 const INQUIRY_LINK = { path: '/me/inquiries', key: 'inquiries', match: 'prefix' as const }
@@ -72,13 +77,32 @@ export function NycNavbar() {
   const { user, loading, avatarURL, displayName, avatarName, isMisaengUser } = useAuth()
   const t = useT('nav')
   const tCommon = useT('common')
-  const navLinks = NAV_LINKS.map((item) => ({
+  const navLinks = NAV_LINKS.filter((item) => !('ellieoOnly' in item && item.ellieoOnly && MISAENG_DESIGN)).map((item) => ({
     ...item,
     label: t(`links.${item.key}`),
     href: href(item.path),
+    also: 'also' in item && MISAENG_DESIGN ? item.also.map((path) => href(path)) : [],
   }))
   const supportConfig = useSupportConfig()
-  const baseAccountLinks = supportConfig?.inquiries ? [...ACCOUNT_LINKS, INQUIRY_LINK] : [...ACCOUNT_LINKS]
+  const baseAccountLinks = [
+    ...ACCOUNT_LINKS,
+    ...(MISAENG_DESIGN ? [MARKET_INBOX_LINK] : []),
+    ...(supportConfig?.inquiries ? [INQUIRY_LINK] : []),
+  ]
+  // 중고거래 안 읽은 메시지: avatar dot + count on the menu row (checked on each page and every minute)
+  const [marketUnread, setMarketUnread] = useState(0)
+  useEffect(() => {
+    if (!user || !MISAENG_DESIGN) return
+    let alive = true
+    const check = () => void marketUnreadCount().then((n) => alive && setMarketUnread(n)).catch(() => {})
+    const first = window.setTimeout(check, 0)
+    const timer = window.setInterval(check, 60000)
+    return () => {
+      alive = false
+      window.clearTimeout(first)
+      window.clearInterval(timer)
+    }
+  }, [user, pathname])
   const accountMenuLinks = (
     isMisaengUser
       ? [...baseAccountLinks, ...TEAM_ACCOUNT_LINKS]
@@ -182,7 +206,7 @@ export function NycNavbar() {
         }}
         className='hidden min-w-[12.5rem] rounded-xl border border-[var(--border)] bg-white py-1 shadow-[0_8px_30px_rgba(15,23,42,0.12)] xl:block'
       >
-        {accountMenuLinks.map(({ href, label, match }) => (
+        {accountMenuLinks.map(({ href, label, match, key }) => (
           <Link
             key={href}
             href={href}
@@ -196,6 +220,7 @@ export function NycNavbar() {
             )}
           >
             {label}
+            {key === 'marketInbox' && marketUnread > 0 ? <UnreadPill count={marketUnread} /> : null}
           </Link>
         ))}
       </div>,
@@ -242,14 +267,14 @@ export function NycNavbar() {
                 >
                   {t('communityHome')}
                 </Link>
-                {navLinks.map(({ href: itemHref, label }) => (
+                {navLinks.map(({ href: itemHref, label, also }) => (
                   <Link
                     key={itemHref}
                     href={itemHref}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
                       'flex h-11 items-center rounded-xl px-3 text-[15px] font-medium touch-manipulation active:bg-[var(--surface)]',
-                      isActive(itemHref)
+                      (isActive(itemHref) || also.some(isActive))
                         ? 'bg-brand/[0.08] font-semibold text-brand'
                         : 'text-[var(--foreground)]',
                     )}
@@ -266,7 +291,7 @@ export function NycNavbar() {
 
               <div className='mx-1 mt-2 border-t border-[var(--border)] pt-2'>
                 {!loading && user ? (
-                  accountMenuLinks.map(({ href, label, match }) => (
+                  accountMenuLinks.map(({ href, label, match, key }) => (
                     <Link
                       key={href}
                       href={href}
@@ -279,6 +304,7 @@ export function NycNavbar() {
                       )}
                     >
                       {label}
+                      {key === 'marketInbox' && marketUnread > 0 ? <UnreadPill count={marketUnread} /> : null}
                     </Link>
                   ))
                 ) : (
@@ -328,7 +354,15 @@ export function NycNavbar() {
                 priority
               />
               {/* Misaeng logo is a USPTO registered mark */}
-              <sup className='ml-0.5 self-start text-[9px] font-semibold text-[var(--muted)]'>®</sup>
+              <sup
+                className={byBrand(
+                  // tucked against the wordmark's top-right instead of floating above it
+                  'ml-px self-start text-[8px] font-semibold leading-none text-[var(--muted)] [vertical-align:0] mt-[3px] sm:mt-[5px] sm:text-[9px]',
+                  'ml-0.5 self-start text-[9px] font-semibold text-[var(--muted)]',
+                )}
+              >
+                ®
+              </sup>
             </Link>
             <span className='h-5 w-px bg-black/10' aria-hidden />
             <button
@@ -349,14 +383,14 @@ export function NycNavbar() {
             className={byBrand('hidden min-w-0 items-center justify-center gap-0.5 self-stretch overflow-hidden xl:flex', 'hidden min-w-0 items-center justify-center gap-4 overflow-hidden xl:flex 2xl:gap-6')}
             aria-label={t('menuAria', { city: cityInfo.shortLabel })}
           >
-            {navLinks.map(({ href: itemHref, label }) => (
+            {navLinks.map(({ href: itemHref, label, also }) => (
               <Link
                 key={itemHref}
                 href={itemHref}
                 className={cn(
                   // Tabs: the current board is bold with a brand underline on the header's bottom edge; others tint on hover
                   byBrand('relative inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full px-2.5 text-[13px] transition-colors 2xl:px-3.5 2xl:text-sm', 'shrink-0 whitespace-nowrap text-[13px] transition-colors 2xl:text-sm'),
-                  isActive(itemHref)
+                  (isActive(itemHref) || also.some(isActive))
                     ? byBrand('font-semibold text-[var(--foreground)] after:absolute after:inset-x-2.5 after:-bottom-[14px] after:h-[2px] after:rounded-full after:bg-[var(--brand)] 2xl:after:inset-x-3.5', 'font-semibold text-[var(--foreground)]')
                     : byBrand('font-medium text-[var(--muted-foreground)] hover:bg-black/[0.04] hover:text-[var(--foreground)]', 'font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)]'),
                 )}
@@ -441,11 +475,14 @@ export function NycNavbar() {
                       accountOpen ? t('closeAccountMenu') : t('openAccountMenu')
                     }
                   >
-                    <ProfileAvatar
-                      photoURL={avatarURL}
-                      displayName={displayName}
-                      avatarName={avatarName}
-                    />
+                    <span className='relative'>
+                      <ProfileAvatar
+                        photoURL={avatarURL}
+                        displayName={displayName}
+                        avatarName={avatarName}
+                      />
+                      {marketUnread > 0 ? <span className='absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-[var(--brand)] ring-2 ring-white' aria-hidden /> : null}
+                    </span>
                     <span className='inline-flex size-7 items-center justify-center text-[var(--muted-foreground)]'>
                       {accountOpen ? <CloseIcon /> : <MenuIcon />}
                     </span>
@@ -552,5 +589,13 @@ function ProfileAvatar({
           : undefined
       }
     />
+  )
+}
+
+function UnreadPill({ count }: { count: number }) {
+  return (
+    <span className='ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--brand)] px-1.5 text-[11px] font-bold text-white'>
+      {count > 99 ? '99+' : count}
+    </span>
   )
 }

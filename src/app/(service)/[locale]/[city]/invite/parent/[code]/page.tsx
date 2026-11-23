@@ -21,6 +21,7 @@ export async function generateMetadata({ params }: ParentInvitePageProps): Promi
       path: `/${city}/invite/parent/${code}`,
       description: t('share.parentInviteDescription'),
     })),
+    title: t('share.parentInvite'),
     robots: { index: false, follow: false },
   }
 }

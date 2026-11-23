@@ -35,6 +35,9 @@ import {
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
 import { useFormat, useT } from '@lib/i18n/client'
+import { MISAENG_DESIGN } from '@lib/brand/design'
+import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
+import { WriteAsideCard, WriteColumns, WritePageHeader, WriteStepCard, WriteSubmitCard, writeSubmitClass } from '@widgets/nyc/WriteFormLayout'
 import { WriteGuideButton } from '@widgets/nyc/WriteGuideButton'
 import { BoardBackLink, BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
@@ -62,6 +65,7 @@ export function AnonymousWriteScreen({
   editPostId,
 }: AnonymousWriteScreenProps) {
   const t = useT('community')
+  const tCommon = useT('common')
   const fmt = useFormat()
   const city = useCity()
   const href = useCityPath()
@@ -235,7 +239,7 @@ export function AnonymousWriteScreen({
 
   if (loading || loadingEdit || !draftHydrated || !isAuthenticated || !user) {
     return (
-      <BoardPageShell width='narrow'>
+      <BoardPageShell width='narrow' rail={null}>
         <LoadingState
           fullPage
           label={
@@ -254,8 +258,160 @@ export function AnonymousWriteScreen({
     return <SchoolVerificationRequired nextPath={loginNext} boardId={boardId} />
   }
 
+  if (MISAENG_DESIGN) {
+    // 물건 올리기 layout (owner 11-23): topic/title/body cards left; who it shows as + guidelines + submit right
+    const missing = [
+      !postTitle.trim() ? t('write.titleLabel') : null,
+      !htmlToPlainText(contentHtml) ? t('write.bodyLabel') : null,
+    ].filter((item): item is string => Boolean(item))
+    return (
+      <BoardPageShell width='wide' rail={null}>
+        <WritePageHeader
+          back={
+            <BoardBackLink
+              href={isEdit && editPostId ? href(`/${boardId}/${editPostId}`) : href(`/${boardId}`)}
+              label={isEdit ? t('write.backToPost') : t('detail.backToList', { board: title })}
+              className='mb-4'
+            />
+          }
+          title={isEdit ? t('write.editTitle', { board: title }) : t('anonymousWrite.createTitle')}
+          intro={isEdit ? postTitle : t('anonymousWrite.createDescription')}
+        />
+        <form onSubmit={(e) => void handleSubmit(e)}>
+          <WriteColumns
+            main={
+              <>
+                <WriteStepCard step={1} title={t('anonymousWrite.topicTitle')} description={t('anonymousWrite.topicDescription')}>
+            <div
+              className='flex flex-wrap gap-1.5'
+              aria-label={t('anonymousWrite.topicAria')}
+            >
+              <BoardQuickChip
+                label={t('list.none')}
+                active={!topic}
+                onClick={() => setTopic('')}
+              />
+              {ANONYMOUS_TOPICS.map((item) => (
+                <BoardQuickChip
+                  key={item}
+                  label={topicLabel(item)}
+                  active={topic === item}
+                  onClick={() => setTopic(item)}
+                />
+              ))}
+            </div>
+                </WriteStepCard>
+                <WriteStepCard
+                  step={2}
+                  title={t('write.titleLabel')}
+                  description={t('anonymousWrite.titleDescription')}
+                  trailing={`${postTitle.length}/${ANONYMOUS_TITLE_MAX}`}
+                >
+            <input
+              required
+              value={postTitle}
+              maxLength={ANONYMOUS_TITLE_MAX}
+              onChange={(e) =>
+                setPostTitle(e.target.value.slice(0, ANONYMOUS_TITLE_MAX))
+              }
+              className={inputClass}
+              placeholder={t(communityBoardKey(boardId, 'titlePlaceholder'))}
+            />
+                </WriteStepCard>
+                <WriteStepCard step={3} title={t('write.bodyLabel')} description={t('anonymousWrite.bodyDescription')}>
+            <TipTapEditor
+              value={contentHtml}
+              onChange={setContentHtml}
+              placeholder={t(communityBoardKey(boardId, 'descriptionPlaceholder'))}
+              minHeightClassName='min-h-[200px]'
+              contentClassName='!text-[13px] !leading-[1.65]'
+              simpleToolbar
+              maxLength={COMMUNITY_BODY_MAX}
+            />
+                </WriteStepCard>
+              </>
+            }
+            aside={
+              <>
+                <WriteAsideCard title={t('anonymousWrite.authorLabel')}>
+            {/* Who the post shows as: anonymous (default) or the writer's nickname with their verification marks */}
+            <div className='mt-4 flex items-center gap-3'>
+              <span className='text-[13px] font-medium text-[var(--muted-foreground)]'>{t('anonymousWrite.authorLabel')}</span>
+              <div className='inline-flex rounded-full bg-black/[0.05] p-0.5' role='radiogroup' aria-label={t('anonymousWrite.authorLabel')}>
+                {([false, true] as const).map((value) => (
+                  <button
+                    key={String(value)}
+                    type='button'
+                    role='radio'
+                    aria-checked={showNickname === value}
+                    onClick={() => setShowNickname(value)}
+                    className={`h-8 rounded-full px-3.5 text-[13px] font-semibold transition ${
+                      showNickname === value ? 'bg-white text-[var(--foreground)] shadow-sm' : 'text-[var(--muted-foreground)]'
+                    }`}
+                  >
+                    {t(value ? 'anonymousWrite.authorNickname' : 'anonymousWrite.authorAnonymous')}
+                  </button>
+                ))}
+              </div>
+            </div>
+                </WriteAsideCard>
+                <CommunityWritingGuidelines anonymous className='rounded-[1.375rem] p-5' />
+                <WriteSubmitCard
+                  missing={missing}
+                  submit={isEdit ? (
+            <button
+              type='submit'
+              disabled={submitting || !postTitle.trim()}
+              className={writeSubmitClass}
+            >
+              {submitting ? t('comments.saving') : t('comments.saveEdit')}
+            </button>
+                  ) : (
+              <button
+                type='submit'
+                disabled={submitting || !postTitle.trim()}
+                className={writeSubmitClass}
+              >
+                {submitting ? t('comments.submitting') : t('write.submit')}
+              </button>
+                  )}
+                  extra={
+                    <>
+                      {!isEdit ? (
+                        <button
+                          type='button'
+                          onClick={handleSaveDraft}
+                          disabled={submitting}
+                          className='inline-flex h-11 w-full items-center justify-center rounded-full bg-white text-[14px] font-semibold text-[var(--foreground)] ring-1 ring-black/[0.08] transition hover:bg-[#f7f8fa] disabled:opacity-50'
+                        >
+                          {tCommon('ui.draft.save')}
+                        </button>
+                      ) : null}
+                      {draftSavedAt && !isEdit ? (
+                        <p className='text-center text-[12px] text-[var(--muted)]'>{tCommon('ui.draft.savedAt', { time: fmt.relative(draftSavedAt) })}</p>
+                      ) : null}
+                      <WriteGuideButton onClick={orientation.show} />
+                    </>
+                  }
+                />
+              </>
+            }
+          />
+        </form>
+        <AnonymousWriteOrientationModal
+          open={orientation.open}
+          agreeing={orientation.agreeing}
+          error={orientation.error}
+          onClose={() => void orientation.agree()}
+          readOnly={orientation.readOnly}
+          listHref={href(`/${boardId}`)}
+        />
+      </BoardPageShell>
+    )
+  }
+
   return (
-    <BoardPageShell width='narrow'>
+    <BoardPageShell width='narrow' rail={null}>
       <div className='pb-16 pt-4 sm:pt-6'>
         <BoardBackLink
           href={

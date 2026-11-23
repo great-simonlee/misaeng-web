@@ -178,7 +178,8 @@
       "authorBody": "Khi có mốc ngày mới, bạn chỉ cần thêm một mục ở màn hình cập nhật. Sau khi lưu, bài viết sẽ lên đầu danh sách.",
       "addEntry": "Thêm mục mới",
       "timelineTitle_other": "{count} mục tiến trình",
-      "tipsTitle": "Cần lưu ý"
+      "tipsTitle": "Cần lưu ý",
+      "timelineTitle_one": "{count} progress entry"
     },
     "write": {
       "errors": {
@@ -417,7 +418,8 @@
       "emptyTitle": "Chưa có giai đoạn tuyển dụng nào",
       "emptyBody": "Tiến trình theo ngày của bạn, như ứng tuyển, phỏng vấn và kết quả, sẽ được xếp tại đây theo Bước 1, Bước 2, v.v.",
       "emptyCta": "Thêm giai đoạn tuyển dụng",
-      "tipsTitle": "Gửi người ứng tuyển sau"
+      "tipsTitle": "Gửi người ứng tuyển sau",
+      "timelineTitle_one": "{count} hiring stage"
     },
     "timeline": {
       "editingDescription": "Sửa Giai đoạn, Nền tảng, Hồ sơ, Phỏng vấn hoặc Kết quả, rồi nhấn \"Sửa xong\".",
@@ -564,7 +566,8 @@
     "untitled": "Chưa có tiêu đề",
     "existingCount_other": "Đã có {count} mục",
     "restoredAutosave": "Chúng tôi đã khôi phục các chỉnh sửa được tự động lưu trước khi bạn gửi",
-    "draftEmpty": "Chưa có gì để lưu"
+    "draftEmpty": "Chưa có gì để lưu",
+    "existingCount_one": "{count} entry so far"
   },
   "timeline": {
     "addedTitle_other": "Đã thêm {count} mục",
@@ -595,7 +598,9 @@
     "incompleteEmpty": "Thêm ngày và một mục đã chọn hoặc ghi chú giai đoạn",
     "incompleteDate": "Vui lòng thêm cả ngày và chi tiết",
     "quickInput": "Điền nhanh",
-    "removeField": "Bỏ"
+    "removeField": "Bỏ",
+    "addedTitle_one": "{count} entry added",
+    "savedTitle_one": "{count} saved entry"
   },
   "guest": {
     "signedIn": "Bạn đã đăng nhập. Review của bạn sẽ được đăng thẳng vào tài khoản này",
@@ -666,7 +671,8 @@
       "member": "Bạn sẽ nhận {credit} điểm",
       "memberWithBonus": "Bạn sẽ nhận {credit} điểm (+{bonus} bài viết đầu tiên)",
       "guest": "{credit} điểm khi bạn đăng ký",
-      "guestWithBonus": "{credit} điểm khi bạn đăng ký (+{bonus} bài viết đầu tiên)"
+      "guestWithBonus": "{credit} điểm khi bạn đăng ký (+{bonus} bài viết đầu tiên)",
+      "count_one": "{count} hiring stage added so far"
     },
     "done": {
       "eyebrow": "Đã đăng",
@@ -692,7 +698,10 @@
       "linkedReviewPending": "Review của bạn đã được liên kết với tài khoản. Điểm sẽ được cộng sau khi đội ngũ xét duyệt",
       "pendingReview": "Đăng ký để nhận điểm cho review này",
       "pendingReviewNote": "Điểm cho review được cộng sau khi đội ngũ xét duyệt bài viết. Đăng ký bằng tài khoản Google trùng với email trong review để tự động liên kết.",
-      "signupPitch1Review": "Review bạn vừa viết sẽ được liên kết với tài khoản ngay, và điểm được cộng sau khi xét duyệt"
+      "signupPitch1Review": "Review bạn vừa viết sẽ được liên kết với tài khoản ngay, và điểm được cộng sau khi xét duyệt",
+      "body_one": "\"{title}\" is now on the Interview & job reviews board. Its {count} hiring stage will help people coming after you.",
+      "breakdown_one": "{count} hiring stage = {credit} points. Sign up with the Google account that matches the email in your review, and it links automatically.",
+      "breakdownWithBonus_one": "{count} hiring stage = {credit} points + {bonus} first post bonus. Sign up with the Google account that matches the email in your review, and it links automatically."
     }
   },
   "contactSource": {

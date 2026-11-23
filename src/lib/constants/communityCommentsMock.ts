@@ -1,3 +1,4 @@
+import { COMMUNITY_MOCKS_ENABLED } from '@lib/constants/communityMock'
 import type {
   CommunityComment,
   CommunityCommentThread,
@@ -83,6 +84,7 @@ export const COMMUNITY_MOCK_COMMENTS: CommunityComment[] = [
 export function listMockCommunityComments(
   postId: string,
 ): CommunityComment[] {
+  if (!COMMUNITY_MOCKS_ENABLED) return []
   return COMMUNITY_MOCK_COMMENTS.filter(
     (item) => item.postId === postId && item.status === 'open',
   ).sort((a, b) => a.createdAt - b.createdAt)

@@ -25,7 +25,8 @@
     "badRequest": "Yêu cầu không hợp lệ.",
     "postNotFound": "Không tìm thấy bài viết này.",
     "accountSuspended": "Tài khoản này đang bị tạm khóa.",
-    "identityVerificationRequired": "Để viết bài và bình luận, vui lòng xác minh trường học hoặc nơi làm việc trước."
+    "identityVerificationRequired": "Để viết bài và bình luận, vui lòng xác minh trường học hoặc nơi làm việc trước.",
+    "requestFailed": "Couldn't complete the request. Please try again."
   },
   "auth": {
     "ellieoUnavailable": "Hiện không thể kết nối với máy chủ đăng nhập. Vui lòng thử lại sau ít phút.",
@@ -61,7 +62,12 @@
     "codeCooldown": "Vui lòng đợi một chút rồi thử lại.",
     "emailNotConfirmed": "Hãy xác minh email để đăng nhập. Nhập mã đã gửi qua email.",
     "authUnavailable": "Hiện không kết nối được máy chủ đăng nhập. Vui lòng thử lại sau.",
-    "emailUnavailable": "Hiện không gửi được email. Vui lòng thử lại sau."
+    "emailUnavailable": "Hiện không gửi được email. Vui lòng thử lại sau.",
+    "appleIdTokenRequired": "Apple sign-in token is missing.",
+    "appleLoginFailed": "Couldn't sign in with Apple. Please try again.",
+    "appleSignupFailed": "Couldn't sign up with Apple. Please try again.",
+    "consentRequired": "Please agree to the Terms of Use and Privacy Policy to sign up.",
+    "refreshTokenRequired": "Refresh token is missing."
   },
   "profile": {
     "nickname": {
@@ -415,6 +421,47 @@
     "newJobReview": {
       "title": "Misaeng · Review phỏng vấn & việc làm",
       "body": "Có review phỏng vấn & việc làm mới!\nHãy hỏi tác giả bất cứ điều gì bạn muốn biết."
+    },
+    "comment": {
+      "title": "New comment",
+      "body": "{name}: {preview}",
+      "onPost": "New comment on \"{title}\""
+    },
+    "reply": {
+      "title": "New reply",
+      "body": "{name} replied to your comment: {preview}"
+    },
+    "posting": {
+      "title": "New posting at {company}",
+      "body": "{title}"
+    },
+    "credit": {
+      "title": "+{amount} Misaeng Points",
+      "body": "{label} · Balance {balance}"
+    },
+    "anonymous": "Anonymous",
+    "someone": "Someone",
+    "newBoardPost": {
+      "food": {
+        "title": "Misaeng · Food",
+        "body": "A new food post is up."
+      },
+      "roommate": {
+        "title": "Misaeng · Roommates & sublets",
+        "body": "A new roommate / sublet post is up."
+      },
+      "status": {
+        "title": "Misaeng · CPT·OPT·Visa·Green card",
+        "body": "A new visa / green card review is up."
+      },
+      "jobReview": {
+        "title": "Misaeng · Interview & job reviews",
+        "body": "A new interview / job review is up. Ask the author your questions!"
+      },
+      "anonymous": {
+        "title": "Misaeng · Q&A",
+        "body": "A new post is up."
+      }
     }
   },
   "reviewDocs": {
@@ -549,7 +596,12 @@
   "support": {
     "push": {
       "feedbackShippedTitle": "Góp ý của bạn đã được áp dụng 🎉",
-      "feedbackShippedBody": "\"{title}\" — xem trong Trò chuyện với thành viên Misaeng."
+      "feedbackShippedBody": "\"{title}\" — xem trong Trò chuyện với thành viên Misaeng.",
+      "housingTitle": "Reply from {name}",
+      "inquiryTitle": "Your inquiry got a reply",
+      "reportResolvedTitle": "We handled your report",
+      "reportResolvedBody": "We reviewed it and took action. Thanks for keeping Misaeng safe.",
+      "reportDismissedBody": "We reviewed it and it doesn't break our rules. Thanks for letting us know."
     },
     "ellieoEmail": {
       "housingSubject": "[Ellieo] Có phản hồi mới cho yêu cầu nhà ở của bạn",
@@ -560,6 +612,27 @@
       "inquiryLine": "Đội ngũ Ellieo đã trả lời \"{title}\".",
       "openWeb": "Xem phản hồi",
       "footer": "Đây là địa chỉ chỉ gửi. Vui lòng trả lời trên ellieo.com."
+    },
+    "disabled": "We can't take inquiries right now. Please try again later.",
+    "emptyMessage": "Please enter a message.",
+    "tooLong": "Messages can be up to 2,000 characters.",
+    "tooMany": "You're sending messages too quickly. Please wait a moment.",
+    "titleRequired": "Please enter a subject.",
+    "notFound": "We couldn't find this conversation.",
+    "verifyRequired": "Housing inquiries are available after school or work email verification.",
+    "profileInvalid": "Please check the required housing details.",
+    "failed": "We couldn't process your inquiry. Please try again later.",
+    "notConfigured": "Inquiries are not set up yet.",
+    "email": {
+      "housingSubject": "[Misaeng] New reply to your housing inquiry",
+      "housingTitle": "New reply to your housing inquiry",
+      "housingLine": "Open the Misaeng app to read and reply.",
+      "inquirySubject": "[Misaeng] Your inquiry got a reply",
+      "inquiryTitle": "Your inquiry got a reply",
+      "inquiryLine": "The Misaeng team replied to \"{title}\".",
+      "openApp": "Open in the Misaeng app",
+      "openWeb": "View reply",
+      "footer": "This is a send-only address. Please reply in the Misaeng app or website."
     }
   },
   "companies": {

@@ -138,6 +138,83 @@ export function VisaPremiumSheet({ open, onClose }: { open: boolean; onClose: ()
   )
 }
 
+const SAMPLE_YEARS: VisaSponsorYear[] = [
+  { fy: 2024, h1b: 1974, greenCard: 91 },
+  { fy: 2025, h1b: 2350, greenCard: 584 },
+  { fy: 2026, h1b: 2350, greenCard: 638 },
+]
+const SAMPLE_ROLES = [
+  ['Software Engineer', 412, 186000, 177000, 209000],
+  ['Data Scientist', 128, 168000, 152000, 190000],
+  ['Product Manager', 64, 172000, 160000, 198000],
+] as const
+
+/**
+ * The visa page for free members (Misaeng): a dimmed sample of what Premium shows, with the
+ * Premium card on top. Sample numbers only — never this company's real figures.
+ */
+export function VisaSponsorLocked() {
+  const t = useT('companies')
+  const href = useCityPath()
+  return (
+    <div className='relative'>
+      <div aria-hidden className='pointer-events-none select-none blur-[3px] [mask-image:linear-gradient(to_bottom,black_55%,transparent)]'>
+        <div className='flex flex-col gap-3 opacity-70'>
+          <SponsorSectionTitle title={t('sponsor.filingsTitle')} premium />
+          <div className='grid grid-cols-2 gap-2.5 sm:gap-3'>
+            <StatTile label={t('sponsor.h1bTile')} years={SAMPLE_YEARS} pick={(y) => y.h1b} tone='#059669' />
+            <StatTile label={t('sponsor.greenCardTile')} years={SAMPLE_YEARS} pick={(y) => y.greenCard} tone='var(--brand)' />
+          </div>
+          <div className='mt-6'>
+            <SponsorSectionTitle title={t('sponsor.rolesTitle')} />
+          </div>
+          <ul className={cn(CARD, 'divide-y divide-black/[0.06] px-4 sm:px-5')}>
+            {SAMPLE_ROLES.map(([title, count, median, low, high]) => (
+              <li key={title} className='flex items-center gap-3 py-3'>
+                <div className='min-w-0 flex-1'>
+                  <p className='text-[15px] font-medium text-[var(--foreground)]'>{title}</p>
+                  <p className='mt-0.5 text-[12px] text-[var(--muted)]'>{t('sponsor.count', { count, n: count.toLocaleString() })}</p>
+                </div>
+                <div className='shrink-0 text-right tabular-nums'>
+                  <p className='text-[16px] font-bold text-[var(--foreground)]'>{money(median)}</p>
+                  <p className='mt-0.5 text-[12px] text-[var(--muted)]'>{t('sponsor.range', { low: money(low), high: money(high) })}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className='absolute inset-x-0 top-10 flex justify-center px-2 sm:top-16'>
+        <div className='w-full max-w-[440px] rounded-[26px] bg-white p-6 text-center shadow-[0_24px_60px_-24px_rgba(15,23,42,0.35)] ring-1 ring-black/[0.06] sm:p-7'>
+          <span className='mx-auto inline-flex size-12 items-center justify-center rounded-2xl bg-[rgb(var(--brand-rgb)/0.1)] text-[var(--brand)]'>
+            <LockIcon className='size-5' />
+          </span>
+          <p className='mt-4 text-[19px] font-bold leading-snug tracking-tight text-[var(--foreground)]'>{t('sponsor.sheetTitle')}</p>
+          <ul className='mt-4 flex flex-col gap-2 text-left'>
+            {(['sheetVisa', 'sheetFilings', 'sheetSalary'] as const).map((key) => (
+              <li key={key} className='flex items-start gap-2.5 text-[14px] text-[var(--foreground)]'>
+                <span aria-hidden className='mt-px font-bold text-[#059669]'>✓</span>
+                {t(`sponsor.${key}`)}
+              </li>
+            ))}
+          </ul>
+          <Link
+            href={href('/premium')}
+            className='mt-6 flex h-12 w-full items-center justify-center rounded-2xl bg-[var(--brand)] text-[15px] font-bold text-white shadow-[0_10px_24px_-12px_rgba(246,67,16,0.7)] transition hover:bg-[var(--brand-hover)]'
+          >
+            {t('sponsor.seePremium')}
+          </Link>
+          <p className='mt-3 text-[12px] text-[var(--muted)]'>{t('sponsor.sheetSource')}</p>
+        </div>
+      </div>
+      <span className='absolute right-1 top-0 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-[var(--muted)] ring-1 ring-black/[0.06]'>
+        {t('sponsor.sample')}
+      </span>
+    </div>
+  )
+}
+
 /** The visa page body for Premium: filings (two tiles), base salary by role, source note. */
 export function VisaSponsorView({ sponsor }: { sponsor: VisaSponsorData }) {
   const t = useT('companies')

@@ -25,6 +25,7 @@ import { LanguagePicker } from '@widgets/LanguagePicker'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { getVerifiedSchool, resolveSchoolFromEmail } from '@lib/constants/schools'
 import { cn } from '@lib'
+import { byBrand } from '@lib/brand/design'
 import { getErrorMessage, useToast } from '@hooks/useToast'
 import { ProfileVerificationSection } from '@widgets/nyc/ProfileVerificationSection'
 import { MyPageSkeleton } from '@widgets/nyc/MyPageSkeleton'
@@ -425,10 +426,10 @@ export function MyPageScreen() {
   }
 
   return (
-    <div className='flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
+    <div className={byBrand('flex flex-1 flex-col bg-white', 'flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]')}>
       <div
         className={cn(
-          'flex flex-1 flex-col pb-14 pt-8 sm:pb-16 sm:pt-10 lg:pb-20 lg:pt-12',
+          byBrand('flex flex-1 flex-col pb-14 pt-4 sm:pt-5 lg:pt-6 sm:pb-16 lg:pb-20', 'flex flex-1 flex-col pb-14 pt-8 sm:pb-16 sm:pt-10 lg:pb-20 lg:pt-12'),
           NYC_PAGE_SHELL_CLASS,
         )}
       >

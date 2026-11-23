@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { cityPageTitle, pageName } from '@lib/i18n/cityMetadata.server'
 
 import { MemberGate } from '@components/MemberGate'
 import { OpenInApp } from '@components/OpenInApp'
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: PostingsPageProps): Promise<M
   const { locale, city } = await params
   const t = await getT(isLocale(locale) ? locale : BRAND_CONFIG.serviceDefaultLocale, 'companies')
   const share = await shareMetadata('postings', locale, { path: `/${city}/companies/postings`, memberOnly: true })
-  return { ...share, description: t('meta.postingsDescription', { brand: BRAND_CONFIG.name }) }
+  return { ...share, title: await cityPageTitle(locale, city, await pageName(locale, 'postings')), description: t('meta.postingsDescription', { brand: BRAND_CONFIG.name }) }
 }
 
 export default function PostingsPage() {

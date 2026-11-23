@@ -13,6 +13,7 @@ import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { useFormat, useT } from '@lib/i18n/client'
 import { cn } from '@lib'
 import { listInquiries, startInquiry, useSupportConfig, type SupportConversation } from '@lib/support/client'
+import { byBrand } from '@lib/brand/design'
 
 /** My → 문의/건의하기: board-style threads with the Misaeng team (same data as the app). */
 export function MyInquiriesScreen() {
@@ -64,8 +65,8 @@ export function MyInquiriesScreen() {
   if (loading || !user || !config) return <LoadingState fullPage />
 
   return (
-    <div className='relative flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'>
-      <div className={cn('mx-auto flex w-full max-w-3xl flex-1 flex-col pb-14 pt-8 sm:pb-16 sm:pt-10', NYC_PAGE_SHELL_CLASS)}>
+    <div className={byBrand('relative flex flex-1 flex-col bg-white', 'relative flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]')}>
+      <div className={cn('mx-auto flex w-full max-w-3xl flex-1 flex-col pb-14 sm:pb-16', byBrand('pt-4 sm:pt-5 lg:pt-6', 'pt-8 sm:pt-10'), NYC_PAGE_SHELL_CLASS)}>
         <p className='text-[11px] font-medium tracking-[0.18em] text-[var(--muted)]'>ACCOUNT</p>
         <h1 className='mt-1.5 text-[1.5rem] font-semibold tracking-[-0.03em] text-[var(--foreground)] lg:text-[1.75rem]'>
           {t('support.title')}

@@ -1,5 +1,9 @@
 import type { CommunityPost, FoodCategoryId } from '@/types/nyc'
+import { normalizeCptOptType } from '@lib/community/cptOpt'
 import { foodCategoriesOf } from '@lib/community/food'
+import { normalizeJobReviewType } from '@lib/community/jobReview'
+import { resolvePostCity } from '@lib/constants/cities'
+import { matchesEmployerFilter, type EmployerFilter } from '@lib/constants/statusEmployer'
 
 /*
  * 커뮤니티 목록 페이지 나누기 (앱이 ?limit= 을 보낼 때만, src/app/api/community/route.ts).
@@ -82,6 +86,19 @@ export type ListFilters = {
   school?: string
   /** 예전 앱의 판매완료 숨기기 (이제 중고거래 목록은 늘 판매완료를 뺀다) */
   active?: boolean
+  /** 웹 목록 (owner 11-23 페이지 나누기): 검색어 — 게시판마다 웹 목록이 보던 칸에서 찾는다 */
+  q?: string
+  /** 중고거래: 가격 범위 (달러), 무료나눔만 */
+  minPrice?: number
+  maxPrice?: number
+  free?: boolean
+  /** 비자: 글의 도시 (목록 city 와 별개) */
+  postCity?: string
+  /** 면접·취업: 회사 이름 일부 또는 회사 분류 */
+  employer?: string
+  employerCategory?: string
+  /** newest (기본) | oldest — 보내면 서버가 웹 목록과 같은 순서로 정렬한다 */
+  sort?: 'newest' | 'oldest'
 }
 
 export function readListFilters(params: URLSearchParams): ListFilters {
@@ -93,7 +110,47 @@ export function readListFilters(params: URLSearchParams): ListFilters {
     type: get('type'),
     school: get('school'),
     active: params.get('active') === '1',
+    q: get('q')?.slice(0, 80),
+    minPrice: priceParam(params.get('min')),
+    maxPrice: priceParam(params.get('max')),
+    free: params.get('free') === '1',
+    postCity: get('postCity'),
+    employer: get('employer')?.slice(0, 80),
+    employerCategory: get('employerCategory'),
+    sort: get('sort') === 'oldest' ? 'oldest' : get('sort') === 'newest' ? 'newest' : undefined,
   }
+}
+
+function priceParam(value: string | null) {
+  if (value == null || value.trim() === '') return undefined
+  const n = Math.floor(Number(value))
+  return Number.isFinite(n) && n >= 0 ? n : undefined
+}
+
+/** 검색어가 찾는 칸: 웹 목록이 클라이언트에서 찾던 것과 같다 (CommunityListScreen 예전 필터) */
+function keywordHaystack(post: CommunityPost, board: string | undefined) {
+  const parts: (string | null | undefined)[] = [post.title, post.description, post.location, post.detail]
+  if (board === 'status') {
+    parts.push(post.authorSchoolName, post.cptOptTips)
+    for (const entry of post.cptOptTimeline ?? []) {
+      parts.push(entry.stageLabel ?? '', entry.prepared, entry.submitted, entry.resultReceived, entry.nextStep)
+    }
+  }
+  if (board === 'job-review') {
+    parts.push(post.jobReviewTips, post.jobReviewIndustry)
+    for (const entry of post.jobReviewTimeline ?? []) {
+      parts.push(entry.stageLabel, entry.platform, entry.documentsSubmitted, entry.interviewRound, entry.stageReviewHtml, entry.outcome)
+    }
+  }
+  return parts.filter(Boolean).join(' ').toLowerCase()
+}
+
+/** 웹 목록 정렬 (sort 를 보냈을 때만): 비자·면접 후기는 고친 시각, 나머지는 쓴 시각 */
+export function sortForList<T extends CommunityPost>(posts: T[], board: string | undefined, sort: ListFilters['sort']): T[] {
+  if (!sort) return posts
+  const updated = board === 'status' || board === 'job-review'
+  const time = (post: T) => (updated ? post.updatedAt || post.createdAt : post.createdAt)
+  return [...posts].sort((a, b) => (sort === 'oldest' ? time(a) - time(b) : time(b) - time(a)))
 }
 
 export function matchesListFilters(post: CommunityPost, board: string | undefined, filters: ListFilters): boolean {
@@ -111,10 +168,32 @@ export function matchesListFilters(post: CommunityPost, board: string | undefine
   if (filters.active && post.marketStatus === 'sold') return false
   if (filters.cuisine && cuisineIdOf(post) !== filters.cuisine) return false
   if (filters.type) {
-    const type = board === 'roommate' ? roommateTypeOf(post) : statusTypeOf(post)
-    if (type !== filters.type) return false
+    const matches =
+      board === 'roommate'
+        ? roommateTypeOf(post) === filters.type
+        : board === 'job-review'
+          ? normalizeJobReviewType(post.jobReviewType, post.detail) === filters.type
+          : statusTypeOf(post) === filters.type || normalizeCptOptType(post.cptOptType, post.detail) === filters.type
+    if (!matches) return false
   }
   if (filters.school && post.authorSchoolId !== filters.school) return false
+  if (board === 'marketplace') {
+    const price = typeof post.price === 'number' ? post.price : null
+    if (filters.free && price !== 0) return false
+    if (filters.minPrice != null && (price == null || price < filters.minPrice)) return false
+    if (filters.maxPrice != null && (price == null || price > filters.maxPrice)) return false
+  }
+  if (filters.postCity && resolvePostCity(post.city) !== filters.postCity) return false
+  if (filters.employer || filters.employerCategory) {
+    const employer: EmployerFilter = filters.employerCategory
+      ? { mode: 'category', name: '', category: filters.employerCategory }
+      : { mode: 'name', name: filters.employer ?? '', category: '' }
+    if (!matchesEmployerFilter(post.location, employer)) return false
+  }
+  if (filters.q) {
+    const q = filters.q.toLowerCase()
+    if (!keywordHaystack(post, board).includes(q)) return false
+  }
   return true
 }
 

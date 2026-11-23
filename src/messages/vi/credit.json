@@ -31,7 +31,9 @@
     "includes": "Bao gồm",
     "excludes": "Không bao gồm",
     "monthlyCap_other": "{count} lần mỗi tháng",
-    "foodEquivalent_other": "≈ {count} review ăn uống"
+    "foodEquivalent_other": "≈ {count} review ăn uống",
+    "monthlyCap_one": "{count} time a month",
+    "foodEquivalent_one": "≈ {count} food review"
   },
   "process": {
     "title": "Cách đăng ký",
@@ -67,7 +69,8 @@
     "oncePerAccount": "Thưởng một lần: mỗi tài khoản một lần",
     "optionCap": "{label}: {cap} mỗi tháng · {duration}",
     "times_other": "{count} lần",
-    "recentActivity": "Bạn nên có ít nhất một hoạt động trong {days} ngày gần nhất trước khi đăng ký"
+    "recentActivity": "Bạn nên có ít nhất một hoạt động trong {days} ngày gần nhất trước khi đăng ký",
+    "times_one": "once"
   },
   "faqSection": {
     "title": "Câu hỏi thường gặp",
@@ -402,21 +405,27 @@
       "unit": "bài viết",
       "toCoffeeChat_other": "{count} bài viết",
       "toLawyer_other": "{count} bài viết",
-      "note": "Cách kiếm dễ nhất"
+      "note": "Cách kiếm dễ nhất",
+      "toCoffeeChat_one": "{count} post",
+      "toLawyer_one": "{count} post"
     },
     "timeline": {
       "activity": "Review OPT, visa & việc làm",
       "unit": "bước timeline",
       "toCoffeeChat_other": "{count} bài viết (đạt tối đa)",
       "toLawyer_other": "{count} bài viết (đạt tối đa)",
-      "note": "+{entry} mỗi bước · tự động tối đa {postMax} · +{reviewBonus} khi được xét duyệt"
+      "note": "+{entry} mỗi bước · tự động tối đa {postMax} · +{reviewBonus} khi được xét duyệt",
+      "toCoffeeChat_one": "{count} post (maxed out)",
+      "toLawyer_one": "{count} post (maxed out)"
     },
     "comment": {
       "activity": "Bình luận & trả lời",
       "unit": "bình luận",
       "toCoffeeChat_other": "{count} ngày (tối đa {commentCap}/ngày)",
       "toLawyer_other": "{count} ngày (tối đa {commentCap}/ngày)",
-      "note": "Kiếm thêm · không tính bình luận trong bài viết của bạn"
+      "note": "Kiếm thêm · không tính bình luận trong bài viết của bạn",
+      "toCoffeeChat_one": "{count} day ({commentCap}/day cap)",
+      "toLawyer_one": "{count} day ({commentCap}/day cap)"
     }
   },
   "ledger": {

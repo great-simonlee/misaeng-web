@@ -145,6 +145,41 @@ export async function fetchCommunityPosts(
     .map((post) => sanitizeAnonymousCommunityPost(post))
 }
 
+/** 한 페이지 (?limit=&cursor=&view=list + 필터, 서버가 필터·정렬·자르기를 한다). 웹 목록의 무한 스크롤용. */
+export type CommunityPage = {
+  posts: CommunityPost[]
+  nextCursor: string | null
+  total: number
+  /** 룸메이트: 동네별 글 수 (칩) */
+  roommateAreas?: Record<string, number>
+}
+
+export async function fetchCommunityPage(input: {
+  boardId: NycCommunityBoardId
+  city: CityId
+  limit: number
+  cursor?: string | null
+  filters?: Record<string, string | number | boolean | null | undefined>
+  signal?: AbortSignal
+}): Promise<CommunityPage> {
+  const params = new URLSearchParams({ board: input.boardId, limit: String(input.limit), view: 'list' })
+  if (!isSharedCommunityBoard(input.boardId)) params.set('city', input.city)
+  if (input.cursor) params.set('cursor', input.cursor)
+  for (const [key, value] of Object.entries(input.filters ?? {})) {
+    if (value === undefined || value === null || value === '' || value === false) continue
+    params.set(key, value === true ? '1' : String(value))
+  }
+  const res = await fetch(`/api/community?${params.toString()}`, { cache: 'no-store', signal: input.signal })
+  if (!res.ok) throw new Error('community page failed')
+  const data = (await res.json()) as Partial<CommunityPage>
+  return {
+    posts: (Array.isArray(data.posts) ? data.posts : []).map(withLocalCounts),
+    nextCursor: data.nextCursor ?? null,
+    total: typeof data.total === 'number' ? data.total : 0,
+    roommateAreas: data.roommateAreas,
+  }
+}
+
 /** 보는 사람이 차단한 작성자의 글 (GET /api/community/{id} → 403 BLOCKED_USER) */
 export class CommunityBlockedPostError extends Error {
   constructor(message: string) {

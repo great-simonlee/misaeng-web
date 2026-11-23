@@ -8,6 +8,8 @@ import { getCommunityAuthorDisplayName, sanitizeCommunityNickname } from '@lib/c
 import { maskAnonymousDisplayName } from '@lib/community/anonymous'
 import { useT } from '@lib/i18n/client'
 import { UserAvatar, AuthorBadges } from '@components'
+import { cn } from '@lib'
+import { MISAENG_DESIGN } from '@lib/brand/design'
 import type { CommunityPost } from '@/types/nyc'
 import { CommunityEngagementBar } from '@widgets/nyc/CommunityEngagementBar'
 import { CommunityPostReportAction } from '@widgets/nyc/CommunityPostReportAction'
@@ -23,6 +25,8 @@ type CommunityPostFooterProps = {
   loginNext: string
   editLabel?: string
   onDelete?: () => void
+  /** Inside the post card (Misaeng): no gray box, same side padding as the body above */
+  inset?: boolean
 }
 
 export function CommunityPostFooter({
@@ -33,6 +37,7 @@ export function CommunityPostFooter({
   loginNext,
   editLabel,
   onDelete,
+  inset = false,
 }: CommunityPostFooterProps) {
   const t = useT('community')
   const city = useCity()
@@ -40,11 +45,20 @@ export function CommunityPostFooter({
     ? maskAnonymousDisplayName(t('author.anonymous'))
     : getCommunityAuthorDisplayName(post, null, t)
   // 아바타 이니셜은 실제 닉네임으로만 (없거나 탈퇴한 회원이면 기본 프로필 아이콘)
-  const avatarName = anonymous || post.authorDeleted ? null : sanitizeCommunityNickname(post.authorNickname, post.authorEmail)
+  const avatarName =
+    anonymous || post.authorDeleted
+      ? null
+      : sanitizeCommunityNickname(post.authorNickname, post.authorEmail)
   const photoURL = anonymous ? null : post.authorPhotoURL?.trim() || null
 
   return (
-    <div className='rounded-2xl border border-black/[0.04] bg-[#f7f8fa] px-4 py-3.5 sm:px-5 sm:py-4'>
+    <div
+      className={cn(
+        inset && MISAENG_DESIGN
+          ? 'border-t border-black/[0.05] px-5 py-4 sm:px-8 sm:py-5'
+          : 'rounded-2xl border border-black/[0.04] bg-[#f7f8fa] px-4 py-3.5 sm:px-5 sm:py-4'
+      )}
+    >
       <div className='flex items-center justify-between gap-3'>
         <div className='flex min-w-0 items-center gap-3'>
           {!anonymous ? (
@@ -60,7 +74,13 @@ export function CommunityPostFooter({
               {authorName}
             </p>
             {!anonymous ? (
-              <AuthorBadges schoolId={post.authorSchoolId} workplaceVerified={post.authorWorkplaceVerified} instagramVerified={post.authorInstagramVerified} parent={post.authorParent} size='author' />
+              <AuthorBadges
+                schoolId={post.authorSchoolId}
+                workplaceVerified={post.authorWorkplaceVerified}
+                instagramVerified={post.authorInstagramVerified}
+                parent={post.authorParent}
+                size='author'
+              />
             ) : post.anonBadgeKind ? (
               // 1.0.7부터 새 익명 글: 배지 종류만
               <AuthorBadges anonKind={post.anonBadgeKind} size='author' />
@@ -86,31 +106,15 @@ export function CommunityPostFooter({
           </div>
         ) : (
           <div className='flex shrink-0 items-center gap-3'>
-            <CommunityPostReportAction
-              postId={post.id}
-              boardId={boardId}
-              loginNext={loginNext}
-            />
-            <CommunityBlockAction
-              postId={post.id}
-              onBlocked={() => window.location.reload()}
-            />
+            <CommunityPostReportAction postId={post.id} boardId={boardId} loginNext={loginNext} />
+            <CommunityBlockAction postId={post.id} onBlocked={() => window.location.reload()} />
           </div>
         )}
       </div>
 
       <div className='mt-3.5 flex flex-wrap items-center gap-2 border-t border-black/[0.05] pt-3.5'>
-        <PostLikeButton
-          kind='community'
-          id={post.id}
-          boardId={boardId}
-          variant='pill'
-        />
-        <CommunityEngagementBar
-          postId={post.id}
-          boardId={boardId}
-          loginNext={loginNext}
-        />
+        <PostLikeButton kind='community' id={post.id} boardId={boardId} variant='pill' />
+        <CommunityEngagementBar postId={post.id} boardId={boardId} loginNext={loginNext} />
         <CopyLinkButton variant='pill' />
       </div>
     </div>

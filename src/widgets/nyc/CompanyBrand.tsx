@@ -43,7 +43,8 @@ export function CompanyMark({
       <CompanyLogo name={company.name} logoUrl={company.logoUrl} className={cn('p-1', className)} />
     )
   }
-  const initial = Array.from(company.name.trim())[0]?.toUpperCase() || '?'
+  // First letter or digit: "[QA] Test Co" shows Q, not [
+  const initial = company.name.match(/[\p{L}\p{N}]/u)?.[0]?.toUpperCase() || '?'
   return (
     <span
       aria-hidden

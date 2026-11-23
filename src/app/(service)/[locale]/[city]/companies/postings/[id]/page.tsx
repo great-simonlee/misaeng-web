@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { cityPageTitle, pageName } from '@lib/i18n/cityMetadata.server'
 
 import { OpenInApp } from '@components/OpenInApp'
 import { BRAND_CONFIG } from '@lib/brand'
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: PostingPageProps): Promise<Me
   const path = `/${city}/companies/postings/${id}`
   if (!posting) {
     const share = await shareMetadata('postings', locale, { path })
-    return { ...share, description: t('meta.postingsDescription', { brand: BRAND_CONFIG.name }) }
+    return { ...share, title: await cityPageTitle(locale, city, await pageName(locale, 'postings')), description: t('meta.postingsDescription', { brand: BRAND_CONFIG.name }) }
   }
   const { summary, title, company } = localizePosting(posting, pageLocale(locale))
   const share = await shareMetadata('posting', locale, {
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: PostingPageProps): Promise<Me
     title: `${company.name} · ${title}`,
     logoUrl: company.logoUrl,
   })
-  return { ...share, description: summary.overview[0] || t('meta.postingsDescription', { brand: BRAND_CONFIG.name }) }
+  return { ...share, title: await cityPageTitle(locale, city, `${company.name} · ${title}`), description: summary.overview[0] || t('meta.postingsDescription', { brand: BRAND_CONFIG.name }) }
 }
 
 export default async function PostingPage({ params }: PostingPageProps) {

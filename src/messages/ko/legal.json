@@ -11,6 +11,13 @@
     "note": "참고.",
     "back": "← {city|으로/로} 돌아가기",
     "privacyPolicy": "개인정보처리방침",
-    "termsOfUse": "이용약관"
+    "termsOfUse": "이용약관",
+    "viewEnglish": "영문(정본) 보기",
+    "viewTranslation": "한국어로 보기",
+    "controllingShort": "영문본이 정본이에요",
+    "contents": "목차",
+    "backToTop": "맨 위로",
+    "effectivePill": "시행일 {date}",
+    "updatedLine": "최종 업데이트 {date} · 버전 {version}"
   }
 }

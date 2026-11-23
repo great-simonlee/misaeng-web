@@ -7,6 +7,7 @@ import { getCity } from '@lib/constants/cities'
 import { communityBoardKey, type NycCommunityBoardId } from '@lib/constants/nyc'
 import { useT } from '@lib/i18n/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
+import { CommunityBoardRail } from '@widgets/nyc/CommunityBoardRail'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 
 interface CommunityBoardWipScreenProps {
@@ -33,7 +34,9 @@ export function CommunityBoardWipScreen({
       : [otherBoards.slice(0, linkAt), otherBoards.slice(linkAt + '{link}'.length)]
 
   return (
-    <BoardPageShell>
+    <BoardPageShell
+      rail={<CommunityBoardRail boardId={boardId} boardTitle={title} writeHref={href()} writeLabel='' showWrite={false} />}
+    >
       <header className='pt-5 sm:pt-8 lg:pt-10'>
         <h1 className='text-[1.5rem] font-semibold leading-none tracking-[-0.04em] text-[var(--foreground)] sm:text-[1.75rem] lg:text-[2rem]'>
           {title}

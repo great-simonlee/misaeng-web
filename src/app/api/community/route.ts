@@ -45,12 +45,21 @@ import {
 } from '@lib/constants/cities'
 import {
   matchesListFilters,
+  sortForList,
   pageAfter,
   pageLimit,
   readListFilters,
   toListPost,
   type ListFilters,
 } from '@lib/community/listPage'
+import {
+  matchesFilters as matchesRoommateFilters,
+  moveInMonthsFrom,
+  readRoommateFilters,
+  sortPosts as sortRoommatePosts,
+  type Filters as RoommateFilters,
+} from '@lib/community/roommateList'
+import { getRoommateAreaGroups, roommateLocationInArea, roommateToday } from '@lib/community/roommate'
 import {
   isAnonymousBoard,
   isCommunityBoardId,
@@ -102,7 +111,7 @@ import {
 } from '@lib/supabase/community.server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import { notifyJobReviewCreated } from '@lib/erp/notifyJobReview'
-import { notifyNewJobReview } from '@lib/push/newJobReviewNotify.server'
+import { notifyNewBoardPost } from '@lib/push/boardAlerts.server'
 import { syncAutoMentor } from '@lib/points/coffeeChatMentors.server'
 import { COFFEE_CHAT_MENTOR_CONSENT_VERSION } from '@lib/points/defaults'
 import { notifyBoardPostCreated } from '@lib/erp/notifyBoardPost'
@@ -203,6 +212,7 @@ export async function GET(request: Request) {
           cursor: searchParams.get('cursor'),
           filters: readListFilters(searchParams),
           light: searchParams.get('view') === 'list',
+          roommate: board === 'roommate' ? readRoommateFilters(searchParams) : null,
         }),
       )
     }
@@ -809,12 +819,13 @@ export async function POST(request: Request) {
       console.error('Community credit award (post) error:', creditError)
     }
     if (isJobReview && jobReviewSource) after(() => notifyJobReviewCreated(saved, jobReviewSource))
-    if (isJobReview) after(() => notifyNewJobReview(saved))
     if (isJobReview && saved.jobReviewMentorConsent && saved.authorUid) {
       const authorUid = saved.authorUid
       after(() => syncAutoMentor(authorUid))
     }
     after(() => notifyBoardPostCreated(saved))
+    // 새 글 알림: only users who turned this board on (default off, owner 11-23)
+    after(() => notifyNewBoardPost(saved))
     return NextResponse.json({
       post: sanitizeAnonymousCommunityPost(saved, user.uid),
     })
@@ -842,8 +853,10 @@ async function communityListPage(input: {
   cursor: string | null
   filters: ListFilters
   light: boolean
+  /** Web 룸메이트 list (owner 11-23): its own filters and sort (src/lib/community/roommateList.ts) */
+  roommate?: RoommateFilters | null
 }) {
-  const { board, city, locale, user, limit, cursor, filters, light } = input
+  const { board, city, locale, user, limit, cursor, filters, light, roommate } = input
   const status = board != null && isStatusCommunityBoard(board)
   const [raw, blocked, reported] = await Promise.all([
     listStoredCommunityPostsRaw(board, city),
@@ -863,7 +876,27 @@ async function communityListPage(input: {
           return ua < ub ? 1 : -1
         })
       : visible
-  const matching = ordered.filter((post) => matchesListFilters(post, board, filters))
+  let roommateAreas: Record<string, number> | undefined
+  let filtered: CommunityPost[]
+  if (roommate) {
+    const today = roommateToday()
+    const ctx = { city: city ?? 'nyc', today, months: moveInMonthsFrom(today) }
+    const withBoost = visible.map((post) => (boosts?.get(post.id) ? { ...post, boostedUntil: boosts.get(post.id) } : post))
+    filtered = sortRoommatePosts(withBoost.filter((post) => matchesRoommateFilters(post, roommate, ctx)), roommate.sort, today)
+    // 동네 칩 숫자: 필터와 상관없이 이 도시 전체 글 기준 (화면이 예전에 하던 것과 같다)
+    roommateAreas = Object.fromEntries(
+      getRoommateAreaGroups(ctx.city).map((group) => [
+        group.id,
+        visible.filter((post) => roommateLocationInArea(post.location, ctx.city, group.id)).length,
+      ]),
+    )
+  } else {
+    filtered = sortForList(ordered.filter((post) => matchesListFilters(post, board, filters)), board, filters.sort)
+  }
+  // Posts still waiting for a translation into this locale are dropped by localizePosts below — drop them before
+  // paging too, so total and the page sizes match what is actually shown
+  const shownIds = new Set(localizePosts(filtered, locale).map((post) => post.id))
+  const matching = filtered.filter((post) => shownIds.has(post.id))
   const { page, nextCursor } = pageAfter(matching, cursor, limit)
   const enriched = status ? page : await enrichCommunityListPosts(page, board)
   const offerVerified = board === 'job-review' ? await getOfferVerifiedPostIds(enriched) : null
@@ -882,5 +915,11 @@ async function communityListPage(input: {
         }, {}),
       }
     : undefined
-  return { posts, nextCursor, total: matching.length, ...(facets ? { facets } : {}) }
+  return {
+    posts,
+    nextCursor,
+    total: matching.length,
+    ...(facets ? { facets } : {}),
+    ...(roommateAreas ? { roommateAreas } : {}),
+  }
 }

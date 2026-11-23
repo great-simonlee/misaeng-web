@@ -10,20 +10,18 @@ import { useT } from '@lib/i18n/client'
 import { AppDownloadPrompt } from '@widgets/nyc/AppDownloadPrompt'
 import Link from 'next/link'
 import { HeroAppCard } from '@widgets/nyc/HeroAppCard'
+import { HubLiveSections } from '@widgets/nyc/HubLiveSections'
 import { NycHubScreenClassic } from '@screens/nyc/NycHubScreenClassic'
 // import { FirebaseConfigBanner } from '@widgets/nyc/FirebaseConfigBanner'
-import { MagazinePreviewSection } from '@widgets/nyc/MagazinePreviewSection'
 import { PartnerSchoolsMarquee } from '@widgets/nyc/PartnerSchoolsMarquee'
-import { PartnerInfluencersSection } from '@widgets/nyc/PartnerInfluencersSection'
-import { ProfessionalsSection } from '@widgets/nyc/ProfessionalsSection'
 
-/** The boards on the hub, in the app's home order (중고거래 is app-only for now). */
+/** The boards on the hub, in the app's home order (중고거래: list on the web, posting in the app). */
 const HUB_BOARDS = [
   { path: '/housing', label: 'housing' },
   { path: '/job-review', label: 'jobReview' },
   { path: '/status', label: 'status' },
   { path: '/food', label: 'food' },
-  { path: '/roommate', label: 'roommate' },
+  { path: '/marketplace', label: 'marketplace' },
   { path: '/anonymous', label: 'anonymous' },
 ] as const
 
@@ -106,17 +104,12 @@ function MisaengHubScreen() {
       {/* Partners */}
       <section className='mx-auto max-w-7xl px-5 pt-8 sm:px-6 sm:pt-10 lg:px-8'>
         <PartnerSchoolsMarquee />
-        <PartnerInfluencersSection />
+        {/* 인플루언서 줄은 아직 모집 중 자리 표시뿐이라 숨긴다 (owner 11-23, /influencers 페이지는 그대로) */}
       </section>
 
       <main className='mx-auto max-w-7xl space-y-10 px-5 pb-16 pt-6 sm:px-6 sm:pt-10 lg:px-8'>
-        {/* 매거진·전문가 예시는 뉴욕 내용이라 뉴욕에서만 보여 준다 */}
-        {cityInfo.id === 'nyc' ? (
-          <>
-            <MagazinePreviewSection />
-            <ProfessionalsSection />
-          </>
-        ) : null}
+        {/* 실제 글로 채운다 (owner 11-23: 매거진·전문가 예시는 숨김, 모든 도시) */}
+        <HubLiveSections />
       </main>
     </div>
   )

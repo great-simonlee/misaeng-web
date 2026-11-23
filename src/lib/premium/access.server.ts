@@ -1,3 +1,4 @@
+import { BRAND_CONFIG } from '@lib/brand'
 import {
   listEntitlements,
   type PremiumEntitlement,
@@ -33,6 +34,37 @@ export type PremiumState = {
   customerId: string | null
   /** The database could not be read: the state is unknown (shown as free, never cached, checkout refuses). */
   degraded?: boolean
+}
+
+/**
+ * Launch gift (owner 2026-11-23): every signed-in Misaeng member — existing and new — has Premium free until the end of
+ * 2026-12-31 New York time, with no card or checkout. Shown to the apps as a pass (source 'code', the "N일 남음" bar).
+ * Real subscriptions/codes still win when they exist. The App Store review account is left out so App Review can test
+ * the in-app purchase (PREMIUM_LAUNCH_EXCLUDE_EMAILS adds more, comma-separated).
+ */
+export const LAUNCH_FREE_SINCE = '2026-11-23T05:00:00.000Z'
+export const LAUNCH_FREE_UNTIL = '2027-01-01T04:59:59.000Z'
+
+function launchExcluded(email: string | undefined) {
+  const list = ['simon+appreview@misaeng.com', ...(process.env.PREMIUM_LAUNCH_EXCLUDE_EMAILS || '').split(',')]
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean)
+  return Boolean(email && list.includes(email))
+}
+
+function withLaunchGift(value: PremiumState, uid: string, email: string | undefined): PremiumState {
+  if (value.premium || !uid || BRAND_CONFIG.id !== 'misaeng' || launchExcluded(email)) return value
+  if (Date.now() >= Date.parse(LAUNCH_FREE_UNTIL)) return value
+  return {
+    ...value,
+    premium: true,
+    plan: 'code',
+    source: 'code',
+    until: LAUNCH_FREE_UNTIL,
+    since: LAUNCH_FREE_SINCE,
+    status: 'active',
+    cancelAtPeriodEnd: false,
+  }
 }
 
 const CACHE_MS = 60_000
@@ -86,7 +118,7 @@ export async function getPremiumState(user: PremiumUser): Promise<PremiumState> 
   const hit = cache.get(uid)
   if (hit && Date.now() - hit.at < CACHE_MS) {
     if (staff && !hit.value.premium) return { ...hit.value, premium: true, plan: 'staff', source: 'staff' }
-    return hit.value
+    return withLaunchGift(hit.value, uid, email)
   }
 
   let rows: PremiumEntitlement[]
@@ -122,7 +154,7 @@ export async function getPremiumState(user: PremiumUser): Promise<PremiumState> 
       }
   cache.set(uid, { at: Date.now(), value })
   if (staff && !value.premium) return { ...value, premium: true, plan: 'staff', source: 'staff' }
-  return value
+  return withLaunchGift(value, uid, email)
 }
 
 export async function hasPremiumAccess(user: PremiumUser): Promise<boolean> {

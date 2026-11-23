@@ -54,6 +54,9 @@ import {
 import { AccountSuspendedNotice } from '@widgets/nyc/AccountSuspendedNotice'
 import { SchoolVerificationRequired } from '@widgets/nyc/SchoolVerificationRequired'
 import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
+import { MISAENG_DESIGN } from '@lib/brand/design'
+import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
+import { WriteAsideCard, WriteColumns, WritePageHeader, WriteStepCard, WriteSubmitCard, writeSubmitClass } from '@widgets/nyc/WriteFormLayout'
 import { ContactSourcePicker } from '@widgets/nyc/ContactSourcePicker'
 import { isContactSourceComplete } from '@lib/community/contactSources'
 
@@ -87,6 +90,8 @@ export function CptOptWriteScreen({
     useRequireAuth(loginNext)
   const { error: toastError, success } = useToast()
   const t = useT('reviews')
+  const tCommon = useT('common')
+  const fmt = useFormat()
   const tCommunity = useT('community')
   const format = useFormat()
   const router = useRouter()
@@ -295,7 +300,7 @@ export function CptOptWriteScreen({
 
   if (loading || !isAuthenticated || !draftHydrated) {
     return (
-      <BoardPageShell width='narrow'>
+      <BoardPageShell width='narrow' rail={null}>
         <LoadingState fullPage label={t('write.checkingLogin')} />
       </BoardPageShell>
     )
@@ -311,40 +316,15 @@ export function CptOptWriteScreen({
 
   if (loadingEdit) {
     return (
-      <BoardPageShell width='narrow'>
+      <BoardPageShell width='narrow' rail={null}>
         <LoadingState fullPage label={t('write.loadingPost')} />
       </BoardPageShell>
     )
   }
 
-  return (
-    <BoardPageShell width='narrow'>
-      <div className='pb-16 pt-4 sm:pt-6'>
-        <BoardBackLink
-          href={
-            isEdit && editPostId
-              ? href(`/${boardId}/${editPostId}`)
-              : href(`/${boardId}`)
-          }
-          label={isEdit ? t('write.backToPost') : t('write.boardList', { board: title })}
-          className='mb-5'
-        />
-
-        {isEdit ? (
-          <UpdateHero
-            title={postTitle}
-            cptOptType={cptOptType}
-            recordCount={existingTimelineIds.length}
-          />
-        ) : (
-          <CreateHero writeLabel={tCommunity(communityBoardKey(boardId, 'writeLabel'))} />
-        )}
-
-        <WriteGuideButton onClick={orientation.show} />
-
-        <form onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
-          {isEdit ? (
-            <>
+  // Same sections in both layouts
+  const editSections = (
+    <>
               <section>
                 <CptOptTimelineEditor
                   value={timeline}
@@ -355,6 +335,7 @@ export function CptOptWriteScreen({
                 />
               </section>
 
+              {MISAENG_DESIGN ? null : (
               <section className='rounded-2xl p-4 ring-1 ring-black/[0.06] sm:p-5'>
                 <p className='text-[14px] font-semibold text-[var(--foreground)]'>
                   {t('jobReview.write.sourceSection')}
@@ -372,6 +353,7 @@ export function CptOptWriteScreen({
                   }}
                 />
               </section>
+              )}
 
               <section className='overflow-hidden rounded-2xl ring-1 ring-black/[0.06]'>
                 <button
@@ -425,19 +407,10 @@ export function CptOptWriteScreen({
                 ) : null}
               </section>
 
-              <button
-                type='submit'
-                disabled={submitting || !postTitle.trim() || !cptOptType || !sourceComplete}
-                className='inline-flex h-12 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[15px] font-semibold text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-50'
-              >
-                {submitting ? t('write.updating') : t('cptOpt.write.updateSubmit')}
-              </button>
-              <p className='text-center text-[12px] leading-relaxed text-[var(--muted)]'>
-                {t('write.updateFootnote')}
-              </p>
-            </>
-          ) : (
-            <>
+    </>
+  )
+  const createSections = (
+    <>
               <CreateSection step={1} title={t('cptOpt.write.typeSection')}>
                 <CptOptTypePicker
                   value={cptOptType}
@@ -486,6 +459,8 @@ export function CptOptWriteScreen({
                 />
               </CreateSection>
 
+              {/* Misaeng: 연락 경로 is in the right column */}
+              {MISAENG_DESIGN ? null : (
               <CreateSection
                 step={5}
                 title={t('jobReview.write.sourceSection')}
@@ -500,7 +475,161 @@ export function CptOptWriteScreen({
                   }}
                 />
               </CreateSection>
+              )}
 
+    </>
+  )
+
+  if (MISAENG_DESIGN) {
+    // 물건 올리기 layout (owner 11-23): step cards left, submit + footnote + guide right; no generic rail
+    const missing = [
+      !cptOptType ? t('cptOpt.write.typeSection') : null,
+      !postTitle.trim() ? t('write.titleLabel') : null,
+      !sourceComplete ? t('jobReview.write.sourceSection') : null,
+    ].filter((item): item is string => Boolean(item))
+    const submit = isEdit ? (
+              <button
+                type='submit'
+                disabled={submitting || !postTitle.trim() || !cptOptType || !sourceComplete}
+                className={writeSubmitClass}
+              >
+                {submitting ? t('write.updating') : t('cptOpt.write.updateSubmit')}
+              </button>
+    ) : (
+                <button
+                  type='submit'
+                  disabled={submitting || !postTitle.trim() || !cptOptType || !sourceComplete}
+                  className={writeSubmitClass}
+                >
+                  {submitting
+                    ? t('write.submitting')
+                    : !cptOptType
+                      ? t('write.selectTypeFirst')
+                      : !sourceComplete
+                        ? t('jobReview.write.selectSourceFirst')
+                        : t('write.submit')}
+                </button>
+    )
+    return (
+      <BoardPageShell width='wide' rail={null}>
+        <WritePageHeader
+          back={
+            <BoardBackLink
+              href={isEdit && editPostId ? href(`/${boardId}/${editPostId}`) : href(`/${boardId}`)}
+              label={isEdit ? t('write.backToPost') : t('write.boardList', { board: title })}
+              className='mb-4'
+            />
+          }
+          title={tCommunity(communityBoardKey(boardId, 'writeLabel'))}
+          intro={isEdit ? undefined : t('cptOpt.write.createIntro')}
+        >
+          {isEdit ? (
+            <div className='mt-4 max-w-3xl'>
+              <UpdateHero title={postTitle} cptOptType={cptOptType} recordCount={existingTimelineIds.length} />
+            </div>
+          ) : null}
+        </WritePageHeader>
+        <form onSubmit={(e) => void handleSubmit(e)}>
+          <WriteColumns
+            main={isEdit ? <div className='flex flex-col gap-4'>{editSections}</div> : <>{createSections}</>}
+            aside={
+              <>
+                <WriteAsideCard title={<>{t('jobReview.write.sourceSection')}<span className='text-[var(--brand)]'> *</span></>}>
+                  <p className='-mt-1.5 mb-3 text-[12px] text-[var(--muted)]'>{t('jobReview.write.sourceSectionDescription')}</p>
+                  <ContactSourcePicker
+                    source={jobReviewSource}
+                    orgId={jobReviewSourceOrgId}
+                    onChange={({ source, orgId }) => {
+                      setJobReviewSource(source)
+                      setJobReviewSourceOrgId(orgId)
+                    }}
+                  />
+                </WriteAsideCard>
+                <CommunityWritingGuidelines />
+                <WriteSubmitCard
+                missing={missing}
+                submit={submit}
+                extra={
+                  <>
+                    {!isEdit ? (
+                      <button
+                        type='button'
+                        onClick={handleSaveDraft}
+                        disabled={submitting}
+                        className='inline-flex h-11 w-full items-center justify-center rounded-full bg-white text-[14px] font-semibold text-[var(--foreground)] ring-1 ring-black/[0.08] transition hover:bg-[#f7f8fa] disabled:opacity-50'
+                      >
+                        {tCommon('ui.draft.save')}
+                      </button>
+                    ) : null}
+                    {draftSavedAt && !isEdit ? (
+                      <p className='text-center text-[12px] text-[var(--muted)]'>{tCommon('ui.draft.savedAt', { time: fmt.relative(draftSavedAt) })}</p>
+                    ) : null}
+                    <p className='text-[12px] leading-relaxed text-[var(--muted)]'>
+                      {isEdit ? t('write.updateFootnote') : t('cptOpt.write.createFootnote')}
+                    </p>
+                    <WriteGuideButton onClick={orientation.show} />
+                  </>
+                }
+              />
+              </>
+            }
+          />
+        </form>
+        <CptOptWriteOrientationModal
+          open={orientation.open}
+          agreeing={orientation.agreeing}
+          error={orientation.error}
+          onClose={() => void orientation.agree()}
+          readOnly={orientation.readOnly}
+          listHref={href(`/${boardId}`)}
+        />
+      </BoardPageShell>
+    )
+  }
+
+  return (
+    <BoardPageShell width='narrow' rail={null}>
+      <div className='pb-16 pt-4 sm:pt-6'>
+        <BoardBackLink
+          href={
+            isEdit && editPostId
+              ? href(`/${boardId}/${editPostId}`)
+              : href(`/${boardId}`)
+          }
+          label={isEdit ? t('write.backToPost') : t('write.boardList', { board: title })}
+          className='mb-5'
+        />
+
+        {isEdit ? (
+          <UpdateHero
+            title={postTitle}
+            cptOptType={cptOptType}
+            recordCount={existingTimelineIds.length}
+          />
+        ) : (
+          <CreateHero writeLabel={tCommunity(communityBoardKey(boardId, 'writeLabel'))} />
+        )}
+
+        <WriteGuideButton onClick={orientation.show} />
+
+        <form onSubmit={(e) => void handleSubmit(e)} className='mt-6 space-y-8'>
+          {isEdit ? (
+            <>
+              {editSections}
+              <button
+                type='submit'
+                disabled={submitting || !postTitle.trim() || !cptOptType || !sourceComplete}
+                className='inline-flex h-12 w-full items-center justify-center rounded-full bg-[var(--brand)] text-[15px] font-semibold text-white shadow-[0_4px_14px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)] disabled:opacity-50'
+              >
+                {submitting ? t('write.updating') : t('cptOpt.write.updateSubmit')}
+              </button>
+              <p className='text-center text-[12px] leading-relaxed text-[var(--muted)]'>
+                {t('write.updateFootnote')}
+              </p>
+            </>
+          ) : (
+            <>
+              {createSections}
               <WriteDraftActions
                 onSave={handleSaveDraft}
                 savedAt={draftSavedAt}
@@ -619,6 +748,13 @@ function CreateSection({
   description?: string
   children: ReactNode
 }) {
+  if (MISAENG_DESIGN) {
+    return (
+      <WriteStepCard step={step} title={title} description={description}>
+        {children}
+      </WriteStepCard>
+    )
+  }
   return (
     <section>
       <div className='mb-3 flex items-start gap-3'>

@@ -322,6 +322,8 @@ export interface CommunityPost extends TranslationFields {
   marketPayments?: string[] | null
   /** 프로필 닉네임 (작성 시점 스냅샷) */
   authorNickname: string | null
+  /** 응답에만: 닉네임이 없어 이메일 아이디로 채운 임시 이름 (localize.server.ts) */
+  authorNicknameTemporary?: boolean
   /** 프로필 사진 URL (작성 시점 스냅샷) */
   authorPhotoURL: string | null
   authorSchoolId: string | null
@@ -562,6 +564,8 @@ export interface CommunityComment extends TranslationFields {
   authorUid: string
   authorEmail: string
   authorNickname: string | null
+  /** 응답에만: 이메일 아이디로 채운 임시 이름 */
+  authorNicknameTemporary?: boolean
   authorPhotoURL: string | null
   authorSchoolId: string | null
   /** 작성자 인증 배지 (응답에만 있음) */

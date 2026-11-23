@@ -37,7 +37,11 @@
     "peopleTotalWithTip_other": "{count} người · tổng ${amount} · đã gồm tip",
     "peopleTotalWithoutTip_other": "{count} người · tổng ${amount} · chưa gồm tip",
     "tipIncluded": "Đã gồm tip",
-    "tipExcluded": "Chưa gồm tip"
+    "tipExcluded": "Chưa gồm tip",
+    "people_one": "{count} person",
+    "peopleTotal_one": "{count} person · ${amount} total",
+    "peopleTotalWithTip_one": "{count} person · ${amount} total · tip included",
+    "peopleTotalWithoutTip_one": "{count} person · ${amount} total · tip not included"
   },
   "wait": {
     "none": "Không phải chờ",
@@ -64,7 +68,8 @@
     "close": "Đóng",
     "viewReview": "Xem review",
     "placeMapLabel": "Bản đồ {name}",
-    "directions": "Chỉ đường"
+    "directions": "Chỉ đường",
+    "reviewCount_one": "{count} review"
   },
   "detail": {
     "menu": "Menu",
@@ -85,7 +90,8 @@
     "viewMenuPhoto": "Xem ảnh menu",
     "interiorAndVibe": "Bên trong · Không gian",
     "viewVibePhoto": "Xem ảnh không gian",
-    "review": "Review"
+    "review": "Review",
+    "views_one": "{views} view"
   },
   "placeSearch": {
     "errors": {
@@ -110,7 +116,9 @@
     "checking": "Đang kiểm tra các nhà hàng tại vị trí này…",
     "existing_other": "Đã có {count} nhà hàng tại đây · Chọn bên dưới hoặc nhập tên mới",
     "none": "Chưa có nhà hàng nào tại đây. Hãy nhập tên mới.",
-    "hint": "Tên này sẽ hiển thị trên trang danh sách và trang chi tiết"
+    "hint": "Tên này sẽ hiển thị trên trang danh sách và trang chi tiết",
+    "reviewCount_one": "{count} review",
+    "existing_one": "{count} restaurant already listed here · Pick it below or enter a new one"
   },
   "card": {
     "comments": "Bình luận",

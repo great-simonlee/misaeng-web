@@ -256,3 +256,61 @@ export async function deletePushDataForUser(userId: string) {
     }
   }
 }
+
+// MARK: 새 글 알림 (push_board_alerts, supabase/push_new_post_alerts.sql) — a row = that board is ON, default off
+
+/** Boards with a new-post alert; mirrors BOARD_ALERT_BOARDS in boardAlerts.server.ts (kept here to avoid a cycle) */
+const ALERT_BOARDS = ['food', 'roommate', 'status', 'job-review', 'anonymous'] as const
+export type BoardAlerts = Record<(typeof ALERT_BOARDS)[number], boolean>
+
+const ALL_BOARDS_OFF = (): BoardAlerts =>
+  Object.fromEntries(ALERT_BOARDS.map((board) => [board, false])) as BoardAlerts
+
+/** The viewer's switches. Missing table (SQL not run) = all off. */
+export async function getBoardAlerts(userId: string): Promise<BoardAlerts> {
+  const out = ALL_BOARDS_OFF()
+  const rows = await rest<{ board: string }[]>(
+    `push_board_alerts?user_id=eq.${encodeURIComponent(userId)}&select=board`,
+  ).catch(() => null)
+  for (const row of rows ?? []) if (row.board in out) out[row.board as keyof BoardAlerts] = true
+  return out
+}
+
+/** Turns the given boards on / off; unknown keys are ignored. Returns the saved switches. */
+export async function saveBoardAlerts(userId: string, patch: unknown): Promise<BoardAlerts> {
+  if (!patch || typeof patch !== 'object') return getBoardAlerts(userId)
+  const entries = Object.entries(patch as Record<string, unknown>).filter(
+    (entry): entry is [keyof BoardAlerts, boolean] =>
+      (ALERT_BOARDS as readonly string[]).includes(entry[0]) && typeof entry[1] === 'boolean',
+  )
+  const on = entries.filter(([, value]) => value).map(([board]) => board)
+  const off = entries.filter(([, value]) => !value).map(([board]) => board)
+  if (on.length) {
+    await rest('push_board_alerts?on_conflict=user_id,board', {
+      method: 'POST',
+      prefer: 'resolution=ignore-duplicates,return=minimal',
+      body: JSON.stringify(on.map((board) => ({ user_id: userId, board }))),
+    })
+  }
+  if (off.length) {
+    await rest(`push_board_alerts?user_id=eq.${encodeURIComponent(userId)}&board=in.${encodeURIComponent(inList(off))}`, {
+      method: 'DELETE',
+      prefer: 'return=minimal',
+    })
+  }
+  return getBoardAlerts(userId)
+}
+
+/** Everyone who turned `board` on (the broadcast audience). Missing table → nobody. */
+export async function boardAlertSubscribers(board: string): Promise<string[]> {
+  const ids: string[] = []
+  const page = 1000
+  for (let offset = 0; offset < 200_000; offset += page) {
+    const rows = await rest<{ user_id: string }[]>(
+      `push_board_alerts?board=eq.${encodeURIComponent(board)}&select=user_id&order=user_id&limit=${page}&offset=${offset}`,
+    ).catch(() => null)
+    for (const row of rows ?? []) if (row.user_id) ids.push(row.user_id)
+    if (!rows || rows.length < page) break
+  }
+  return ids
+}

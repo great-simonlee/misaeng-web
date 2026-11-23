@@ -440,6 +440,28 @@
     "newJobReview": {
       "title": "Misaeng · Interview & Job Reviews",
       "body": "A new interview & job review is up!\nAsk the author anything you want to know."
+    },
+    "newBoardPost": {
+      "food": {
+        "title": "Misaeng · Food",
+        "body": "A new food post is up."
+      },
+      "roommate": {
+        "title": "Misaeng · Roommates & sublets",
+        "body": "A new roommate / sublet post is up."
+      },
+      "status": {
+        "title": "Misaeng · CPT·OPT·Visa·Green card",
+        "body": "A new visa / green card review is up."
+      },
+      "jobReview": {
+        "title": "Misaeng · Interview & job reviews",
+        "body": "A new interview / job review is up. Ask the author your questions!"
+      },
+      "anonymous": {
+        "title": "Misaeng · Q&A",
+        "body": "A new post is up."
+      }
     }
   },
   "reviewDocs": {

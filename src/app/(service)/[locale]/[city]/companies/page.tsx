@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { namedCityPageMetadata } from '@lib/i18n/cityMetadata.server'
 
 import { MemberGate } from '@components/MemberGate'
 import { BRAND_CONFIG } from '@lib/brand'
@@ -11,9 +12,9 @@ interface CompaniesPageProps {
 }
 
 export async function generateMetadata({ params }: CompaniesPageProps): Promise<Metadata> {
-  const { locale } = await params
+  const { locale, city } = await params
   const t = await getT(isLocale(locale) ? locale : BRAND_CONFIG.serviceDefaultLocale, 'companies')
-  return { description: t('meta.listDescription') }
+  return namedCityPageMetadata(locale, city, 'companies', { description: t('meta.listDescription') })
 }
 
 export default function CompaniesPage() {

@@ -37,9 +37,30 @@
       "chip": "Always growing"
     }
   },
+  "compare": {
+    "title": "Free vs Premium",
+    "free": "Free",
+    "premium": "Premium",
+    "rows": {
+      "community": "Community, reviews, housing",
+      "jobAlerts": "New job alerts",
+      "visaNews": "Visa news alerts",
+      "visa": "Visa sponsorship history",
+      "salary": "Base salary by role",
+      "policy": "Company visa policy"
+    },
+    "values": {
+      "weekly": "Mondays",
+      "daily": "Every weekday",
+      "monFri": "Mon & Fri"
+    },
+    "note": "Free job alerts go to school or workplace verified members",
+    "locked": "Locked",
+    "included": "Included"
+  },
   "preview": {
     "title": "Here's how it looks",
-    "example": "Example · Google",
+    "example": "Example",
     "h1b": "H-1B filings",
     "greenCard": "Green card filings",
     "role": "Software Engineer · New York",
@@ -110,7 +131,7 @@
     "title": "FAQ",
     "cancel": {
       "q": "How do I cancel?",
-      "a": "If you paid on the web, cancel from “Manage subscription” on this page. If you paid in the app (App Store or Google Play), cancel in that store's subscriptions. You keep Premium until the paid period ends."
+      "a": "If you paid on the web, cancel from “Manage subscription” on this page. If you paid in the iPhone app (App Store), cancel in iPhone Settings > Apple ID > Subscriptions. You keep Premium until the paid period ends."
     },
     "app": {
       "q": "How is paying in the app different?",
@@ -118,7 +139,7 @@
     },
     "refund": {
       "q": "Can I get a refund?",
-      "a": "Yes, within 7 days of your first payment (any plan, once per account) or of a yearly renewal — full amount. After 7 days there are no refunds, including partial refunds for unused time; canceling just stops the next renewal. In-app purchases are refunded by Apple or Google."
+      "a": "Yes, within 7 days of your first payment (any plan, once per account) or of a yearly renewal — full amount. After 7 days there are no refunds, including partial refunds for unused time; canceling just stops the next renewal. Purchases in the iPhone app (App Store) are refunded by Apple."
     },
     "data": {
       "q": "Where does the data come from?",
@@ -171,7 +192,12 @@
       "EXPIRED": "This code's Premium period has already ended.",
       "TOO_MANY": "Too many tries. Please try again in an hour.",
       "FAILED": "Something went wrong. Please try again."
-    }
+    },
+    "unlocksTitle": "What your code unlocks",
+    "noCard": "No card · No auto-charge",
+    "until": "Until {date}",
+    "successUnlocked": "Unlocked now",
+    "successNote": "It ends on its own when the period is over, and you're never charged."
   },
   "policyLink": "Subscription & refund policy",
   "policy": {
@@ -213,17 +239,18 @@
       {
         "h": "Purchases in the app",
         "p": [
-          "Subscriptions bought through the App Store or Google Play are billed and refunded by Apple or Google under their policies. Apple: reportaproblem.apple.com. Google Play: within 48 hours in Google Play; after that, contact us and we apply the same rules as above."
+          "Subscriptions bought in the iPhone app (App Store) are billed and refunded by Apple under its policies. Request a refund at reportaproblem.apple.com."
         ]
       },
       {
-        "h": "Premium codes and gifts",
+        "h": "Premium codes",
         "p": [
-          "Premium opened with a free code is not refundable and ends on its own without any charge. A gift paid by a parent can be refunded to the payer within 7 days if it has not been used yet."
+          "Premium opened with a free code is not refundable and ends on its own without any charge."
         ]
       }
     ],
-    "note": "This policy is part of our Terms of Use. If anything here conflicts with the law where you live, the law applies."
+    "note": "This policy is part of our Terms of Use. If anything here conflicts with the law where you live, the law applies.",
+    "contents": "Contents"
   },
   "notices": {
     "trialSubject": "Your Misaeng Premium trial ends soon",

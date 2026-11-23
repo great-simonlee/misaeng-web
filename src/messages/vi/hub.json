@@ -171,5 +171,35 @@
     "downloadAndroid": "Tải miễn phí trên Google Play",
     "continueWeb": "Không, tiếp tục trên web"
   },
-  "heroCta": "Xem nhà cho thuê"
+  "heroCta": "Xem nhà cho thuê",
+  "live": {
+    "title": "Latest on Misaeng",
+    "jobReviews": "Latest interview & job reviews",
+    "postings": "New job postings",
+    "housing": "Housing",
+    "seeAll": "See all",
+    "premiumEyebrow": "Misaeng Premium",
+    "premiumTitle": "Visa sponsorship and base salary at a glance",
+    "premiumBody": "H-1B and green card trends by company, base salary by role, and new job alerts every weekday.",
+    "premiumCta": "Explore Premium",
+    "emptyHousing": "No listings in this city yet.",
+    "emptyReviews": "No reviews yet. Be the first to share one.",
+    "write": "Write",
+    "reviewsLogin": "Sign in to read interview and job reviews.",
+    "login": "Sign in",
+    "kickerCareer": "CAREER",
+    "kickerJobs": "JOBS",
+    "kickerHousing": "HOUSING",
+    "kickerMarket": "MARKET",
+    "kickerFood": "FOOD",
+    "market": "New on the marketplace",
+    "food": "Popular places",
+    "housingTitle": "New listings",
+    "launchBadge": "Launch gift",
+    "launchTitle": "Misaeng Premium is free until Dec 31",
+    "launchBody": "See visa sponsorship history by company and base salary by role right now.",
+    "launchCta": "See Premium",
+    "reviewsLockedTitle": "Interview & job reviews",
+    "views": "{count} views"
+  }
 }

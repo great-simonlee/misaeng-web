@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { cn } from '@lib'
+import { byBrand } from '@lib/brand/design'
 
 interface EmptyStateProps {
   title: string
@@ -22,14 +23,22 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'rounded-[1.25rem] bg-white px-6 py-14 text-center shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_28px_rgba(15,23,42,0.045)] ring-1 ring-black/[0.03] sm:px-8 sm:py-16',
+        byBrand(
+          'rounded-[1.375rem] bg-white px-6 py-14 text-center shadow-[0_1px_2px_rgba(15,23,42,0.04)] ring-1 ring-[var(--card-ring)] sm:px-8 sm:py-16',
+          'rounded-[1.25rem] bg-white px-6 py-14 text-center shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_28px_rgba(15,23,42,0.045)] ring-1 ring-black/[0.03] sm:px-8 sm:py-16',
+        ),
         className,
       )}
     >
-      <div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-[#f4f5f7] text-[var(--muted)]'>
-        <EmptyIcon className='size-5' />
+      <div
+        className={byBrand(
+          'relative mx-auto mb-5 flex size-16 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(150deg,#FFE3D3,#FFF6EE)] text-[var(--brand)]',
+          'mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-[#f4f5f7] text-[var(--muted)]',
+        )}
+      >
+        <EmptyIcon className={byBrand('size-7', 'size-5')} />
       </div>
-      <h3 className='text-[1.05rem] font-semibold tracking-tight text-[var(--foreground)] sm:text-[1.125rem]'>
+      <h3 className={byBrand('text-[1.1rem] font-bold tracking-[-0.02em] text-[var(--foreground)] sm:text-[1.2rem]', 'text-[1.05rem] font-semibold tracking-tight text-[var(--foreground)] sm:text-[1.125rem]')}>
         {title}
       </h3>
       <p className='mx-auto mt-2 max-w-sm text-[13px] leading-relaxed text-[var(--muted)] sm:text-[14px]'>
@@ -38,7 +47,10 @@ export function EmptyState({
       {actionHref && actionLabel ? (
         <Link
           href={actionHref}
-          className='mt-7 inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand)] px-6 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)]'
+          className={byBrand(
+            'mt-7 inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand)] px-6 text-[14px] font-semibold text-white shadow-[0_6px_16px_rgb(var(--brand-rgb)/0.28)] touch-manipulation transition hover:bg-[var(--brand-hover)]',
+            'mt-7 inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand)] px-6 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)]',
+          )}
         >
           {actionLabel}
         </Link>

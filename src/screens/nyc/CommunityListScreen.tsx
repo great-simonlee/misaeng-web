@@ -17,7 +17,9 @@ import { BottomSheet, BottomSheetSelect, LoadingState, PullToRefresh } from '@co
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
+import { useDebounced, usePagedList } from '@hooks/usePagedList'
 import {
+  fetchCommunityPage,
   fetchCommunityPosts,
   localizeCommunityError,
 } from '@lib/community/client'
@@ -25,7 +27,6 @@ import {
   CITY_IDS,
   cityLoginPath,
   getCity,
-  resolvePostCity,
   type CityId,
 } from '@lib/constants/cities'
 import { useEnabledSchools } from '@hooks/useVerifiedSchools'
@@ -39,14 +40,10 @@ import {
 } from '@lib/community/schoolGate'
 import {
   CPT_OPT_TYPES,
-  getCptOptListTimestamp,
-  normalizeCptOptType,
   type CptOptTypeId,
 } from '@lib/community/cptOpt'
 import {
   JOB_REVIEW_TYPES,
-  getJobReviewListTimestamp,
-  normalizeJobReviewType,
   type JobReviewTypeId,
 } from '@lib/community/jobReview'
 import {
@@ -62,11 +59,9 @@ import {
   isAnonymousBoard,
   type NycCommunityBoardId,
 } from '@lib/constants/nyc'
-import { listMockCommunityPosts } from '@lib/constants/communityMock'
 import {
   EMPTY_EMPLOYER_FILTER,
   isEmployerFilterActive,
-  matchesEmployerFilter,
   STATUS_EMPLOYER_OPTIONS,
   STATUS_EMPLOYER_OTHER_VALUE,
   translateStatusEmployerOption,
@@ -81,9 +76,18 @@ import {
 } from '@widgets/nyc/AnonymousBoardNoticeModal'
 import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
+import { CommunityBoardRail, RailChip, RailChipGroup, RailFilterCard, SisterBoardChips } from '@widgets/nyc/CommunityBoardRail'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CommunityPostCard } from '@widgets/nyc/CommunityPostCard'
 import { CompanyDirectoryBanner } from '@widgets/nyc/CompanyDirectoryBanner'
+import { MarketAppBanner } from '@widgets/nyc/MarketAppBanner'
+import { PagedListFooter } from '@widgets/nyc/PagedListFooter'
+import {
+  EMPTY_MARKET_FILTER,
+  MarketPostCard,
+  MarketSearchPanel,
+  type MarketFilter,
+} from '@widgets/nyc/MarketListing'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { RoommateListScreen } from '@screens/nyc/RoommateListScreen'
@@ -256,16 +260,22 @@ export function CommunityListScreen({ boardId, title }: CommunityListScreenProps
   return <CommunityBoardListScreen boardId={boardId} title={title} />
 }
 
+/** Posts per page (owner 11-23 infinite scroll). Local dev only: ?pageSize=2 to try the scrolling with little data */
+const PAGE_SIZE = 24
+function pageSizeFor() {
+  if (process.env.NODE_ENV !== 'development' || typeof window === 'undefined') return PAGE_SIZE
+  const n = Number(new URLSearchParams(window.location.search).get('pageSize'))
+  return Number.isInteger(n) && n > 0 ? n : PAGE_SIZE
+}
+
 function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) {
   const city = useCity()
   const href = useCityPath()
   const t = useT('community')
+  const tFood = useT('food')
   const tRoot = useT()
   const { user, profile, loading: authLoading } = useAuth()
   const { error: toastError } = useToast()
-  const [posts, setPosts] = useState<CommunityPost[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -296,10 +306,7 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
   const [mapFabHidden, setMapFabHidden] = useState(false)
 
   useEffect(() => {
-    if (!isFoodBoard) {
-      setMapFabHidden(false)
-      return
-    }
+    if (!isFoodBoard) return
 
     const footer = document.querySelector('footer')
     if (!footer) return
@@ -319,152 +326,112 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
     return () => observer.disconnect()
   }, [isFoodBoard])
 
-  const loadPosts = useCallback(
-    async (opts?: { silent?: boolean }) => {
-      if (!opts?.silent) {
-        setLoading(true)
-        setError(null)
-      }
-      try {
-        const data = await fetchCommunityPosts(boardId, city)
-        setPosts(data)
-        setError(null)
-      } catch (err) {
-        const msg = getErrorMessage(
-          localizeCommunityError(err, t),
-          t('list.loadFailed'),
-        )
-        setError(msg)
-        if (!opts?.silent) toastError(msg)
-        throw err
-      } finally {
-        setLoading(false)
-      }
-    },
-    [boardId, city, t, toastError]
+  // 중고거래 검색 (keyword · category · price) — right rail on desktop, above the list on phones (owner 11-23)
+  const [marketFilter, setMarketFilter] = useState<MarketFilter>(EMPTY_MARKET_FILTER)
+  const isMarketList = boardId === 'marketplace'
+  const keyword = useDebounced(((isMarketList && marketFilter.q) || query).trim(), 300)
+  const marketMin = useDebounced(marketFilter.min, 300)
+  const marketMax = useDebounced(marketFilter.max, 300)
+
+  /*
+   * Pages from the server (owner 11-23): every filter is applied there before paging (src/lib/community/listPage.ts),
+   * 24 posts at a time, the next page when the bottom of the list comes near.
+   */
+  const serverFilters = useMemo(
+    () => ({
+      q: keyword || undefined,
+      sort,
+      ...(isFoodBoard
+        ? { category: foodCategory !== 'all' ? foodCategory : undefined, cuisine: foodCuisine !== 'all' ? foodCuisine : undefined }
+        : {}),
+      ...(isCptOptBoard
+        ? {
+            type: cptOptType !== 'all' ? cptOptType : undefined,
+            postCity: statusCity !== 'all' ? statusCity : undefined,
+            school: statusSchool !== 'all' ? statusSchool : undefined,
+          }
+        : {}),
+      ...(isJobReviewBoard
+        ? {
+            type: jobReviewType !== 'all' ? jobReviewType : undefined,
+            employer: jobReviewEmployer.mode === 'name' ? jobReviewEmployer.name.trim() || undefined : undefined,
+            employerCategory: jobReviewEmployer.mode === 'category' ? jobReviewEmployer.category || undefined : undefined,
+          }
+        : {}),
+      ...(isMarketList
+        ? {
+            category: marketFilter.category !== 'all' ? marketFilter.category : undefined,
+            free: marketFilter.freeOnly,
+            min: marketFilter.freeOnly ? undefined : marketMin || undefined,
+            max: marketFilter.freeOnly ? undefined : marketMax || undefined,
+          }
+        : {}),
+    }),
+    [
+      keyword,
+      sort,
+      isFoodBoard,
+      foodCategory,
+      foodCuisine,
+      isCptOptBoard,
+      cptOptType,
+      statusCity,
+      statusSchool,
+      isJobReviewBoard,
+      jobReviewType,
+      jobReviewEmployer,
+      isMarketList,
+      marketFilter.category,
+      marketFilter.freeOnly,
+      marketMin,
+      marketMax,
+    ],
   )
-
-  useEffect(() => {
-    let cancelled = false
-    void loadPosts().catch(() => {
-      if (cancelled) return
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [loadPosts])
-
+  const filtersActive = Object.entries(serverFilters).some(([k, v]) => k !== 'sort' && v !== undefined && v !== false && v !== '')
+  const paged = usePagedList<CommunityPost>(
+    JSON.stringify([boardId, city, serverFilters]),
+    (cursor, signal) =>
+      fetchCommunityPage({ boardId, city, limit: pageSizeFor(), cursor, filters: serverFilters, signal }).then((page) => ({
+        items: page.posts,
+        nextCursor: page.nextCursor,
+        total: page.total,
+      })),
+  )
+  const filteredPosts = paged.items
+  const loading = paged.loading
+  const error = paged.error ? getErrorMessage(localizeCommunityError(paged.error, t), t('list.loadFailed')) : null
+  // Nothing on the board at all (vs. nothing for these filters)
+  const boardEmpty = !loading && paged.total === 0 && !filtersActive
   const refreshPosts = useCallback(async () => {
-    await loadPosts({ silent: true })
-  }, [loadPosts])
+    await paged.reload()
+  }, [paged])
+  useEffect(() => {
+    if (paged.error && paged.items.length === 0) toastError(t('list.loadFailed'))
+  }, [paged.error, paged.items.length, t, toastError])
 
-  const filteredPosts = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    let next = posts
-    if (isFoodBoard && foodCategory !== 'all') {
-      next = next.filter((post) => foodCategoriesOf(post).includes(foodCategory))
+  /** 지도: the whole board's pins, loaded only when the map is opened (the list pages, the map doesn't) */
+  const [mapAll, setMapAll] = useState<CommunityPost[] | null>(null)
+  useEffect(() => {
+    if (!isFoodBoard || viewMode !== 'map' || mapAll) return
+    let alive = true
+    void fetchCommunityPosts(boardId, city)
+      .then((all) => alive && setMapAll(all))
+      .catch(() => alive && setMapAll([]))
+    return () => {
+      alive = false
     }
-    if (isFoodBoard && foodCuisine !== 'all') {
-      next = next.filter((post) => normalizeFoodCuisine(post.detail) === foodCuisine)
-    }
-    if (isCptOptBoard && cptOptType !== 'all') {
-      next = next.filter((post) => normalizeCptOptType(post.cptOptType, post.detail) === cptOptType)
-    }
-    if (isCptOptBoard && statusCity !== 'all') {
-      next = next.filter((post) => resolvePostCity(post.city) === statusCity)
-    }
-    if (isCptOptBoard && statusSchool !== 'all') {
-      next = next.filter((post) => post.authorSchoolId === statusSchool)
-    }
-    if (isJobReviewBoard && jobReviewType !== 'all') {
-      next = next.filter(
-        (post) => normalizeJobReviewType(post.jobReviewType, post.detail) === jobReviewType
-      )
-    }
-    if (isJobReviewBoard && isEmployerFilterActive(jobReviewEmployer)) {
-      next = next.filter((post) => matchesEmployerFilter(post.location, jobReviewEmployer))
-    }
-    if (!isFoodBoard && q) {
-      next = next.filter((post) => {
-        const haystack = [
-          post.title,
-          post.description,
-          post.location,
-          post.detail,
-          ...(isCptOptBoard
-            ? [
-                post.authorSchoolName,
-                post.cptOptTips,
-                ...(post.cptOptTimeline ?? []).flatMap((entry) => [
-                  entry.stageLabel ?? '',
-                  entry.prepared,
-                  entry.submitted,
-                  entry.resultReceived,
-                  entry.nextStep,
-                ]),
-              ]
-            : []),
-          ...(isJobReviewBoard
-            ? [
-                post.jobReviewTips,
-                post.jobReviewIndustry,
-                ...(post.jobReviewTimeline ?? []).flatMap((entry) => [
-                  entry.stageLabel,
-                  entry.platform,
-                  entry.documentsSubmitted,
-                  entry.interviewRound,
-                  entry.stageReviewHtml,
-                  entry.outcome,
-                ]),
-              ]
-            : []),
-        ]
-          .join(' ')
-          .toLowerCase()
-        return haystack.includes(q)
-      })
-    }
-    const getSortTime = (post: CommunityPost) =>
-      isCptOptBoard
-        ? getCptOptListTimestamp(post)
-        : isJobReviewBoard
-          ? getJobReviewListTimestamp(post)
-          : post.createdAt
-    return [...next].sort((a, b) =>
-      sort === 'newest' ? getSortTime(b) - getSortTime(a) : getSortTime(a) - getSortTime(b)
-    )
-  }, [
-    posts,
-    query,
-    sort,
-    foodCategory,
-    foodCuisine,
-    cptOptType,
-    statusCity,
-    statusSchool,
-    jobReviewType,
-    jobReviewEmployer,
-    isFoodBoard,
-    isCptOptBoard,
-    isJobReviewBoard,
-  ])
-
-  /** 지도: 실데이터 + 복수 후기 목데이터(같은 placeId)를 합쳐 핀 데모 */
+  }, [isFoodBoard, viewMode, mapAll, boardId, city])
   const mapPosts = useMemo(() => {
     if (!isFoodBoard) return filteredPosts
-    const mocks = listMockCommunityPosts('food', city)
-    const byId = new Map<string, CommunityPost>()
-    for (const post of mocks) byId.set(post.id, post)
-    for (const post of filteredPosts) byId.set(post.id, post)
-    let merged = Array.from(byId.values())
+    let merged = mapAll ?? filteredPosts
     if (foodCategory !== 'all') {
       merged = merged.filter((post) => foodCategoriesOf(post).includes(foodCategory))
     }
     if (foodCuisine !== 'all') {
       merged = merged.filter((post) => normalizeFoodCuisine(post.detail) === foodCuisine)
     }
-    return merged.sort((a, b) => b.createdAt - a.createdAt)
-  }, [city, filteredPosts, foodCategory, foodCuisine, isFoodBoard])
+    return [...merged].sort((a, b) => b.createdAt - a.createdAt)
+  }, [filteredPosts, mapAll, foodCategory, foodCuisine, isFoodBoard])
 
   const activeFilterCount =
     (query.trim() ? 1 : 0) +
@@ -499,6 +466,17 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
       setJobReviewEmployer(draftJobReviewEmployer)
     }
     setFiltersOpen(false)
+  }
+
+  /** Right-rail filters change the list right away (no draft/apply step) */
+  function resetLiveFilters() {
+    setQuery('')
+    setSort('newest')
+    setCptOptType('all')
+    setStatusCity('all')
+    setStatusSchool('all')
+    setJobReviewType('all')
+    setJobReviewEmployer(EMPTY_EMPLOYER_FILTER)
   }
 
   function clearFilters() {
@@ -540,12 +518,15 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
   const showParentBanner =
     MISAENG_DESIGN && boardId === 'anonymous' && isIdentityVerified(profile) && !isParentAccount(profile)
   const showWriteCta = !authLoading && Boolean(user) && !suspended
+  // 중고거래: 휴대폰에서는 앱 다운로드 안내 카드도 (MarketAppBanner, owner 11-23)
+  const isMarketBoard = boardId === 'marketplace'
+  const gridBoard = isFoodBoard || isMarketBoard
 
   const listSection = (
     <section className={cn('pt-4 sm:pt-5', isFoodBoard ? 'pb-20 sm:pb-24' : 'pb-14 sm:pb-16')}>
       {loading && <LoadingState className='py-20' label={t('detail.loading')} />}
 
-      {!loading && error && (
+      {!loading && error && filteredPosts.length === 0 && (
         <EmptyState
           title={t('list.loadFailed')}
           description={error}
@@ -557,12 +538,12 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
       {!loading && !error && filteredPosts.length === 0 && (
         <EmptyState
           title={
-            posts.length === 0
+            boardEmpty
               ? t('list.emptyTitle', { board: title })
               : t('list.noMatchTitle')
           }
           description={
-            posts.length === 0
+            boardEmpty
               ? canWrite
                 ? t('list.emptyCanWrite')
                 : user
@@ -576,29 +557,172 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
                     ? t('list.noMatchJobReview')
                     : t('list.noMatchDefault')
           }
-          actionHref={posts.length === 0 ? postHref : undefined}
-          actionLabel={posts.length === 0 ? writeCtaLabel : undefined}
+          actionHref={boardEmpty ? postHref : undefined}
+          actionLabel={boardEmpty ? writeCtaLabel : undefined}
         />
       )}
+      {/* Empty board on a phone (no rail): point to the boards that have posts */}
+      {MISAENG_DESIGN && !isFoodBoard && !loading && !error && boardEmpty ? (
+        <SisterBoardChips boardId={boardId} className='lg:hidden' />
+      ) : null}
 
       {!loading && filteredPosts.length > 0 && (
         <div
           className={
             isFoodBoard
-              ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-5'
-              : 'flex flex-col gap-4 sm:gap-5'
+              ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 lg:gap-5'
+              : isMarketBoard && MISAENG_DESIGN
+                ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4'
+                : 'flex flex-col gap-4 sm:gap-5'
           }
         >
-          {filteredPosts.map((post) => (
-            <CommunityPostCard key={post.id} post={post} boardId={boardId} />
-          ))}
+          {filteredPosts.map((post) =>
+            isMarketBoard && MISAENG_DESIGN ? (
+              <MarketPostCard key={post.id} post={post} />
+            ) : (
+              <CommunityPostCard key={post.id} post={post} boardId={boardId} />
+            ),
+          )}
         </div>
       )}
+      {!loading && filteredPosts.length > 0 ? (
+        <PagedListFooter
+          sentinelRef={paged.sentinelRef}
+          hasMore={paged.hasMore}
+          loadingMore={paged.loadingMore}
+          failed={Boolean(paged.error)}
+          onRetry={paged.retry}
+          retryLabel={t('list.retry')}
+          failedLabel={t('list.loadFailed')}
+        />
+      ) : null}
     </section>
   )
 
   return (
-    <BoardPageShell width={isFoodBoard ? 'wide' : 'narrow'}>
+    <BoardPageShell
+      width={gridBoard ? 'wide' : 'narrow'}
+      rail={
+        <CommunityBoardRail
+          boardId={boardId}
+          boardTitle={title}
+          writeHref={postHref}
+          writeLabel={writeCtaLabel}
+          showWrite={!authLoading && !suspended}
+          beforeBoards={
+            isMarketBoard ? (
+              <MarketSearchPanel filter={marketFilter} onChange={setMarketFilter} resultCount={paged.total} />
+            ) : isCptOptBoard || isJobReviewBoard || isAnonymous ? (
+              <RailFilterCard
+                title={t('rail.boardFilterTitle')}
+                count={paged.total}
+                action={
+                  isJobReviewBoard ? (
+                    <button
+                      type='button'
+                      onClick={openFilters}
+                      className='flex h-10 w-full items-center justify-center gap-1.5 rounded-full bg-[var(--foreground)] text-[13.5px] font-semibold text-white transition hover:bg-black'
+                    >
+                      {t('rail.moreFilters')}
+                      {isEmployerFilterActive(jobReviewEmployer) ? ' · 1' : ''}
+                    </button>
+                  ) : activeFilterCount > 0 ? (
+                    <button type='button' onClick={resetLiveFilters} className='text-[13px] font-semibold text-[var(--brand)]'>
+                      {t('market.reset')}
+                    </button>
+                  ) : null
+                }
+              >
+                <label className='relative mt-3 block'>
+                  <span className='sr-only'>{t('rail.search')}</span>
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value.slice(0, 60))}
+                    placeholder={t('list.searchPlaceholder')}
+                    className='h-10 w-full rounded-xl bg-[#f4f5f7] px-3 text-[13.5px] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:bg-white focus:ring-2 focus:ring-[var(--brand)]'
+                  />
+                </label>
+                {isCptOptBoard ? (
+                  <>
+                    <RailChipGroup label={t('list.filterType')}>
+                      <RailChip active={cptOptType === 'all'} onClick={() => setCptOptType('all')}>{t('list.all')}</RailChip>
+                      {CPT_OPT_TYPES.map((item) => (
+                        <RailChip key={item.id} active={cptOptType === item.id} onClick={() => setCptOptType(item.id)}>
+                          {tRoot(`reviews.cptOpt.types.${item.id}.label`)}
+                        </RailChip>
+                      ))}
+                    </RailChipGroup>
+                    <RailChipGroup label={t('list.filterCity')}>
+                      <RailChip active={statusCity === 'all'} onClick={() => setStatusCity('all')}>{t('list.all')}</RailChip>
+                      {CITY_IDS.map((id) => (
+                        <RailChip key={id} active={statusCity === id} onClick={() => setStatusCity(id)}>
+                          {getCity(id).shortLabel}
+                        </RailChip>
+                      ))}
+                    </RailChipGroup>
+                    {enabledSchools.length ? (
+                      <RailChipGroup label={t('list.filterSchool')}>
+                        <RailChip active={statusSchool === 'all'} onClick={() => setStatusSchool('all')}>{t('list.all')}</RailChip>
+                        {enabledSchools.map((school) => (
+                          <RailChip key={school.id} active={statusSchool === school.id} onClick={() => setStatusSchool(school.id)}>
+                            {school.shortName}
+                          </RailChip>
+                        ))}
+                      </RailChipGroup>
+                    ) : null}
+                  </>
+                ) : null}
+                {isJobReviewBoard ? (
+                  <RailChipGroup label={t('list.filterType')}>
+                    <RailChip active={jobReviewType === 'all'} onClick={() => setJobReviewType('all')}>{t('list.all')}</RailChip>
+                    {JOB_REVIEW_TYPES.map((item) => (
+                      <RailChip key={item.id} active={jobReviewType === item.id} onClick={() => setJobReviewType(item.id)}>
+                        {tRoot(`reviews.jobReview.types.${item.id}.label`)}
+                      </RailChip>
+                    ))}
+                  </RailChipGroup>
+                ) : null}
+                <RailChipGroup label={t('rail.sort')}>
+                  {(isCptOptBoard || isJobReviewBoard
+                    ? [
+                        { id: 'newest' as const, label: t('list.sortRecentlyUpdated') },
+                        { id: 'oldest' as const, label: t('list.sortLeastRecentlyUpdated') },
+                      ]
+                    : [
+                        { id: 'newest' as const, label: t('list.sortNewest') },
+                        { id: 'oldest' as const, label: t('list.sortOldest') },
+                      ]
+                  ).map((option) => (
+                    <RailChip key={option.id} active={sort === option.id} onClick={() => setSort(option.id)}>
+                      {option.label}
+                    </RailChip>
+                  ))}
+                </RailChipGroup>
+              </RailFilterCard>
+            ) : isFoodBoard ? (
+              <RailFilterCard title={t('rail.foodFilterTitle')} count={paged.total}>
+                <RailChipGroup label={t('rail.vibe')}>
+                  <RailChip active={foodCategory === 'all'} onClick={() => setFoodCategory('all')}>{t('list.all')}</RailChip>
+                  {FOOD_CATEGORIES.map((cat) => (
+                    <RailChip key={cat.id} active={foodCategory === cat.id} onClick={() => setFoodCategory(cat.id)}>
+                      {tFood(`categories.${cat.id}`)}
+                    </RailChip>
+                  ))}
+                </RailChipGroup>
+                <RailChipGroup label={t('rail.cuisine')}>
+                  <RailChip active={foodCuisine === 'all'} onClick={() => setFoodCuisine('all')}>{t('list.allCuisines')}</RailChip>
+                  {FOOD_CUISINES.map((cuisine) => (
+                    <RailChip key={cuisine.id} active={foodCuisine === cuisine.id} onClick={() => setFoodCuisine(cuisine.id)}>
+                      {getFoodCuisineLabel(cuisine.id, tFood) ?? cuisine.label}
+                    </RailChip>
+                  ))}
+                </RailChipGroup>
+              </RailFilterCard>
+            ) : null
+          }
+        />
+      }
+    >
       <BoardListToolbar
         breadcrumbLabel={title}
         intro={t(communityBoardKey(boardId, 'listIntro'), {
@@ -607,11 +731,16 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
         writeHref={postHref}
         writeLabel={identityVerified ? writeLabel : verifyCta}
         showWrite={showWriteCta}
-        showFilter={!isFoodBoard}
+        showFilter={!isFoodBoard && !isMarketBoard}
+        filterInRail={isCptOptBoard || isJobReviewBoard || isAnonymous}
         onFilterClick={isFoodBoard ? undefined : openFilters}
         filterCount={isFoodBoard ? 0 : activeFilterCount}
       >
         {boardId === 'job-review' ? <CompanyDirectoryBanner /> : null}
+        {isMarketBoard ? <MarketAppBanner /> : null}
+        {isMarketBoard ? (
+          <MarketSearchPanel filter={marketFilter} onChange={setMarketFilter} resultCount={paged.total} className='mt-4 lg:hidden' />
+        ) : null}
         {showParentBanner ? (
           <Link
             href={`${href('/me')}#parent-invite`}
@@ -627,12 +756,15 @@ function CommunityBoardListScreen({ boardId, title }: CommunityListScreenProps) 
       </BoardListToolbar>
 
       {isFoodBoard ? (
+        // Misaeng desktop: the same chips live in the right rail (맛집 찾기)
+        <div className={MISAENG_DESIGN ? 'lg:hidden' : undefined}>
         <FoodCategoryStickyBar
           foodCategory={foodCategory}
           setFoodCategory={setFoodCategory}
           foodCuisine={foodCuisine}
           setFoodCuisine={setFoodCuisine}
         />
+        </div>
       ) : null}
 
       {isFoodBoard && viewMode === 'map' ? (

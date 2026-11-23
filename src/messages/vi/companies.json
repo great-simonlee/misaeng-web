@@ -35,7 +35,9 @@
     "noMatchTitle": "Không có công ty nào phù hợp",
     "noMatchDescription": "Hãy thử tên hoặc ngành khác.",
     "featuredTitle": "Công ty nổi bật",
-    "allCompaniesTitle": "Tất cả công ty"
+    "allCompaniesTitle": "Tất cả công ty",
+    "resultCount_one": "{count} company",
+    "reviewCount_one": "{count} review"
   },
   "detail": {
     "backToList": "Tất cả công ty",
@@ -180,7 +182,12 @@
     "timing": {
       "posted3d": "Đăng trong 3 ngày qua",
       "closing7d": "Hết hạn trong 7 ngày"
-    }
+    },
+    "postingCount_one": "{count} job",
+    "daysLeft_one": "{count} day left",
+    "regionsMore_one": "{regions} + {count} more",
+    "showMorePostings_one": "Show {count} more job",
+    "resultCount_one": "{count} job"
   },
   "industries": {
     "tech": "Công nghệ",
@@ -254,6 +261,7 @@
     "sheetSalary": "Lương cơ bản theo vị trí và khu vực (từ hồ sơ H-1B)",
     "sheetSource": "Tổng hợp từ dữ liệu công khai chính thức của Bộ Lao động Hoa Kỳ (DOL).",
     "soon": "Premium sắp ra mắt",
-    "seePremium": "See Premium"
+    "seePremium": "See Premium",
+    "sample": "Sample view"
   }
 }

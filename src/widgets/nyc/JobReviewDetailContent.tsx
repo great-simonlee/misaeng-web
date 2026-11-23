@@ -27,6 +27,8 @@ import { ReviewAppActions } from '@widgets/nyc/ReviewAppActions'
 import { TimelineAccordion } from '@widgets/nyc/TimelineAccordion'
 import { TimelineFieldGrid } from '@widgets/nyc/TimelineFieldGrid'
 import type { NycCommunityBoardId } from '@lib/constants/nyc'
+import { MISAENG_DESIGN } from '@lib/brand/design'
+import { ReviewVerificationEntry } from '@widgets/nyc/reviewDocs/ReviewVerificationEntry'
 
 type JobReviewDetailContentProps = {
   post: CommunityPost
@@ -50,6 +52,7 @@ export function JobReviewDetailContent({
 }: JobReviewDetailContentProps) {
   const city = useCity()
   const t = useT('reviews')
+  const tCommunity = useT('community')
   const locale = useLocale()
   const format = useFormat()
   const tipsHtml = (() => {
@@ -104,9 +107,32 @@ export function JobReviewDetailContent({
     }
   })
 
+  // Misaeng (owner 11-23 web review): the post first; the author's tools sit in one panel at the end
+  const ownerPanel = isAuthor && MISAENG_DESIGN ? (
+    <section className='mt-8'>
+      <SectionLabel>{tCommunity('detail.ownerPanelTitle')}</SectionLabel>
+      <div className='mt-4 flex flex-col gap-3'>
+        <BoardSurface className='flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5'>
+          <div>
+            <p className='text-[14px] font-semibold text-[var(--foreground)]'>{t('jobReview.detail.authorTitle')}</p>
+            <p className='mt-0.5 text-[12.5px] leading-relaxed text-[var(--muted)]'>{t('jobReview.detail.authorBody')}</p>
+          </div>
+          <Link
+            href={hrefForCommunityPost(post, city, 'edit')}
+            className='inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-[var(--brand)] px-4 text-[13px] font-semibold text-white touch-manipulation transition hover:bg-[var(--brand-hover)]'
+          >
+            {t('jobReview.detail.addEntry')}
+          </Link>
+        </BoardSurface>
+        <CreditReviewRequestCard post={post} boardId={boardId} isAuthor={isAuthor} />
+        <ReviewVerificationEntry postId={post.id} />
+      </div>
+    </section>
+  ) : null
+
   return (
     <article>
-      {isAuthor ? (
+      {isAuthor && !MISAENG_DESIGN ? (
         <div className='mb-5 px-1 sm:px-0'>
           <BoardSurface className='flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5'>
             <div>
@@ -127,7 +153,7 @@ export function JobReviewDetailContent({
         </div>
       ) : null}
 
-      {isAuthor ? (
+      {isAuthor && !MISAENG_DESIGN ? (
         <div className='mb-5 px-1 sm:px-0'>
           <CreditReviewRequestCard
             post={post}
@@ -220,13 +246,22 @@ export function JobReviewDetailContent({
         <section className='mt-8'>
           <SectionLabel>{t('jobReview.detail.tipsTitle')}</SectionLabel>
           <BoardSurface className='mt-4 overflow-hidden'>
-            <div className='flex gap-3 bg-[#fffbeb] p-4 sm:p-5'>
-              <span
-                className='inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#fef3c7] text-[15px]'
-                aria-hidden
-              >
-                ⚠️
-              </span>
+            <div className={MISAENG_DESIGN ? 'flex gap-3 bg-[linear-gradient(150deg,#FFF4EE,#FFFFFF_75%)] p-4 sm:p-5' : 'flex gap-3 bg-[#fffbeb] p-4 sm:p-5'}>
+              {MISAENG_DESIGN ? (
+                // A tip, not a warning: brand light bulb
+                <span className='inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#FFE3D3] text-[var(--brand)]' aria-hidden>
+                  <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' className='size-4'>
+                    <path d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V16h5v-.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z' />
+                  </svg>
+                </span>
+              ) : (
+                <span
+                  className='inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#fef3c7] text-[15px]'
+                  aria-hidden
+                >
+                  ⚠️
+                </span>
+              )}
               <div className='min-w-0 flex-1'>
                 <CommunityRichBody
                   html={tipsHtml}
@@ -252,6 +287,8 @@ export function JobReviewDetailContent({
           onDelete={onDelete}
         />
       </div>
+
+      {ownerPanel}
     </article>
   )
 }

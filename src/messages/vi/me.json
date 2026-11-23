@@ -317,7 +317,10 @@
       "spend": "Đã dùng",
       "restore": "Được hoàn lại",
       "other": "Khác"
-    }
+    },
+    "pillAria_one": "{count} Misaeng Point, view history",
+    "optionMeta_one": "{duration} · {count} time a month",
+    "needMore_one": "You need {count} more point"
   },
   "referral": {
     "linkCopied": "Đã sao chép link giới thiệu",
@@ -339,7 +342,8 @@
     "boundTo": "Đã liên kết với mã giới thiệu {code}.",
     "codePlaceholder": "Mã giới thiệu 8 ký tự",
     "binding": "Đang liên kết…",
-    "bind": "Liên kết"
+    "bind": "Liên kết",
+    "creditsAmount_one": "{count} point"
   },
   "posts": {
     "loadFailed": "Không thể tải bài viết của bạn",
@@ -368,7 +372,8 @@
     "loading": "Đang tải bài viết…",
     "thisCategory": "danh mục này",
     "viewBoard": "Xem {board}",
-    "viewDetail": "Xem chi tiết"
+    "viewDetail": "Xem chi tiết",
+    "count_one": "{count} post"
   },
   "likes": {
     "title": "Bài viết đã thích",
@@ -638,5 +643,33 @@
     "school": "Đã xác minh trường",
     "workplace": "Đã xác minh nơi làm việc",
     "instagram": "Đã xác minh Instagram"
+  },
+  "support": {
+    "title": "Questions & suggestions",
+    "intro": "Leave a question or a suggestion. The Misaeng team will read it and reply.",
+    "new": "New question / suggestion",
+    "question": "Question",
+    "suggestion": "Suggestion",
+    "subject": "Subject",
+    "message": "Write your message",
+    "submit": "Submit",
+    "submitted": "Sent. We'll let you know when we reply.",
+    "empty": "No questions or suggestions yet",
+    "status": {
+      "open": "Waiting",
+      "waiting_user": "Answered",
+      "closed": "Closed"
+    },
+    "reply": "Reply",
+    "replyPlaceholder": "Write a reply",
+    "send": "Send",
+    "staff": "Misaeng team",
+    "closedNotice": "This is closed. Send a reply to open it again.",
+    "redacted": "Sensitive numbers were hidden.",
+    "replyHint": "We'll email you when we reply. In the Misaeng app you get a notification.",
+    "back": "Back to list",
+    "loginRequired": "Please log in first.",
+    "notFound": "We couldn't find this conversation.",
+    "unavailable": "We can't take inquiries right now. Please email info@misaeng.com."
   }
 }

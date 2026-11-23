@@ -11,22 +11,28 @@ import {
 import { useAuth } from '@hooks/useAuth'
 import { useCity, useCityPath } from '@hooks/useCity'
 import { getErrorMessage, useToast } from '@hooks/useToast'
-import { fetchCommunityPosts, localizeCommunityError } from '@lib/community/client'
+import { useDebounced, usePagedList } from '@hooks/usePagedList'
+import { fetchCommunityPage, localizeCommunityError } from '@lib/community/client'
+import {
+  BUDGET_BOUNDS,
+  BUDGET_PRESETS,
+  BUDGET_STEP,
+  DEFAULT_FILTERS,
+  SORT_OPTIONS,
+  budgetFiltered,
+  moveInMonthsFrom,
+  roommateFilterParams,
+  type Filters,
+  type SortOption,
+} from '@lib/community/roommateList'
 import { cityLoginPath, getCity } from '@lib/constants/cities'
 import { useFormat, useT } from '@lib/i18n/client'
 import {
-  ROOMMATE_BUDGET_MAX,
   ROOMMATE_INTENT_OPTIONS,
   ROOMMATE_LOOKING_FOR_OPTIONS,
   formatRoommateBudget,
   getRoommateAreaGroups,
-  getRoommateTimeline,
-  isRoommateBoostActive,
-  normalizeRoommateLookingFor,
-  roommateLocationInArea,
-  roommateMatchesIntent,
   roommateToday,
-  type RoommateIntent,
   type RoommateLookingFor,
 } from '@lib/community/roommate'
 import {
@@ -38,137 +44,29 @@ import { communityBoardKey } from '@lib/constants/nyc'
 import { cn } from '@lib'
 import type { CommunityPost } from '@/types/nyc'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
+import { CommunityBoardRail, RailChip, RailChipGroup, RailFilterCard, SisterBoardChips } from '@widgets/nyc/CommunityBoardRail'
+import { MISAENG_DESIGN } from '@lib/brand/design'
 import { BoardListToolbar, BoardQuickChip } from '@widgets/nyc/BoardListToolbar'
+import { HousingSegmentTabs } from '@widgets/nyc/HousingSegmentTabs'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { EmptyState } from '@widgets/nyc/EmptyState'
+import { PagedListFooter } from '@widgets/nyc/PagedListFooter'
 import { RoommatePostCard } from '@widgets/nyc/RoommatePostCard'
 
 const BOARD_ID = 'roommate' as const
-const BUDGET_STEP = 100
-/** 슬라이더 끝값. 오른쪽 끝(max)은 "그 이상 전부"로 본다 */
-const BUDGET_BOUNDS = { min: 0, max: Math.min(5000, ROOMMATE_BUDGET_MAX) }
-/** 입주 시기 칩: 이번 달 + 다음 N달, 그 뒤는 "이후" 하나로 */
-const MOVE_IN_MONTHS = 4
-
-/** 라벨: housing `roommate.list.budgetPresets.<id>` */
-const BUDGET_PRESETS = [
-  { id: 'under-1500', min: 0, max: 1500 },
-  { id: '1500-2000', min: 1500, max: 2000 },
-  { id: '2000-2500', min: 2000, max: 2500 },
-  { id: '2500-plus', min: 2500, max: BUDGET_BOUNDS.max },
-] as const
-
-/** 라벨: housing `roommate.list.sortOptions.<id>` */
-const SORT_OPTIONS = ['newest', 'moveInSoon', 'priceLow', 'priceHigh'] as const
-type SortOption = (typeof SORT_OPTIONS)[number]
-
-type Filters = {
-  intent: 'all' | RoommateIntent
-  lookingFor: 'all' | RoommateLookingFor
-  /** 'all' | 동네 묶음 id (ROOMMATE_AREA_GROUPS) */
-  area: string
-  /** 'all' | 'YYYY-MM' | 'later' */
-  moveIn: string
-  budgetMin: number
-  budgetMax: number
-  query: string
-  sort: SortOption
+function activeFilterCountOf(filters: Filters) {
+  return (
+    (filters.intent !== 'all' || filters.lookingFor !== 'all' ? 1 : 0) +
+    (filters.area !== 'all' ? 1 : 0) +
+    (filters.moveIn !== 'all' ? 1 : 0) +
+    (budgetFiltered(filters) ? 1 : 0) +
+    (filters.query.trim() ? 1 : 0) +
+    (filters.sort !== 'newest' ? 1 : 0)
+  )
 }
 
-const DEFAULT_FILTERS: Filters = {
-  intent: 'all',
-  lookingFor: 'all',
-  area: 'all',
-  moveIn: 'all',
-  budgetMin: BUDGET_BOUNDS.min,
-  budgetMax: BUDGET_BOUNDS.max,
-  query: '',
-  sort: 'newest',
-}
-
-function budgetFiltered(filters: Filters) {
-  return filters.budgetMin > BUDGET_BOUNDS.min || filters.budgetMax < BUDGET_BOUNDS.max
-}
-
-/** 입주일이 속한 달 'YYYY-MM'. 이미 입주 가능하면 이번 달 */
-function moveInMonthOf(post: CommunityPost, today: string) {
-  const start = post.roommateMoveInDate?.trim()
-  if (!start) return null
-  return (start < today ? today : start).slice(0, 7)
-}
-
-function matchesFilters(
-  post: CommunityPost,
-  filters: Filters,
-  ctx: { city: string; today: string; months: string[] },
-) {
-  const type = normalizeRoommateLookingFor(post.roommateLookingFor, post.detail)
-  if (filters.lookingFor !== 'all' && type !== filters.lookingFor) return false
-  if (
-    filters.lookingFor === 'all' &&
-    filters.intent !== 'all' &&
-    !roommateMatchesIntent(type, filters.intent)
-  ) {
-    return false
-  }
-  if (
-    filters.area !== 'all' &&
-    !roommateLocationInArea(post.location, ctx.city, filters.area)
-  ) {
-    return false
-  }
-  if (filters.moveIn !== 'all') {
-    const month = moveInMonthOf(post, ctx.today)
-    if (!month) return false
-    if (filters.moveIn === 'later') {
-      if (month <= ctx.months[ctx.months.length - 1]) return false
-    } else if (month !== filters.moveIn) {
-      return false
-    }
-  }
-  if (budgetFiltered(filters)) {
-    const budget = post.roommateBudgetMax
-    if (budget == null) return false
-    if (budget < filters.budgetMin) return false
-    // 오른쪽 끝이면 상한 없음 ($5,000 넘는 글도 포함)
-    if (filters.budgetMax < BUDGET_BOUNDS.max && budget > filters.budgetMax) return false
-  }
-  const q = filters.query.trim().toLowerCase()
-  if (q) {
-    const haystack = [post.title, post.description, post.location]
-      .join(' ')
-      .toLowerCase()
-    if (!haystack.includes(q)) return false
-  }
-  return true
-}
-
-/**
- * 정렬: 상단 노출 중인 글이 항상 먼저, 기간이 지난 글은 항상 뒤로.
- * 그 안에서 고른 정렬 (값이 없는 글은 뒤로).
- */
-function sortPosts(posts: CommunityPost[], sort: SortOption, today: string) {
-  const now = Date.now()
-  const rank = (post: CommunityPost) =>
-    isRoommateBoostActive(post, now) ? 0 : getRoommateTimeline(post, today).ended ? 2 : 1
-  const compareOptional = (a: number | string | null, b: number | string | null, dir: 1 | -1) => {
-    if (a == null && b == null) return 0
-    if (a == null) return 1
-    if (b == null) return -1
-    return a < b ? -dir : a > b ? dir : 0
-  }
-  return [...posts].sort((a, b) => {
-    const byRank = rank(a) - rank(b)
-    if (byRank !== 0) return byRank
-    let result = 0
-    if (sort === 'priceLow') result = compareOptional(a.roommateBudgetMax, b.roommateBudgetMax, 1)
-    else if (sort === 'priceHigh') result = compareOptional(a.roommateBudgetMax, b.roommateBudgetMax, -1)
-    else if (sort === 'moveInSoon') {
-      result = compareOptional(a.roommateMoveInDate || null, b.roommateMoveInDate || null, 1)
-    }
-    return result !== 0 ? result : b.createdAt - a.createdAt
-  })
-}
+/** Posts per page (owner 11-23 infinite scroll) */
+const PAGE_SIZE = 24
 
 export function RoommateListScreen() {
   const t = useT('housing')
@@ -179,93 +77,65 @@ export function RoommateListScreen() {
   const { user, profile, loading: authLoading } = useAuth()
   const { error: toastError } = useToast()
 
-  const [posts, setPosts] = useState<CommunityPost[]>([])
-  const [loading, setLoading] = useState(true)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS)
   const [draft, setDraft] = useState<Filters>(DEFAULT_FILTERS)
+  const query = useDebounced(filters.query, 300)
 
-  const loadPosts = useCallback(
-    async (opts?: { silent?: boolean }) => {
-      if (!opts?.silent) setLoading(true)
-      try {
-        const data = await fetchCommunityPosts(BOARD_ID, city)
-        setPosts(data)
-      } catch (err) {
-        if (!opts?.silent) {
-          toastError(getErrorMessage(localizeCommunityError(err, tCommunity), t('roommate.list.loadFailed')))
-        }
-        throw err
-      } finally {
-        setLoading(false)
-      }
-    },
-    [city, toastError, t, tCommunity],
+  /*
+   * Pages from the server (owner 11-23): filters and sort run there (src/lib/community/roommateList.ts), 24 posts at
+   * a time, the next page when the bottom of the list comes near.
+   */
+  const serverFilters = useMemo(() => roommateFilterParams({ ...filters, query }), [filters, query])
+  const paged = usePagedList<CommunityPost>(JSON.stringify([city, serverFilters]), (cursor, signal) =>
+    fetchCommunityPage({ boardId: BOARD_ID, city, limit: PAGE_SIZE, cursor, filters: serverFilters, signal }).then((page) => ({
+      items: page.posts,
+      nextCursor: page.nextCursor,
+      total: page.total,
+      meta: page.roommateAreas,
+    })),
   )
-
+  const loading = paged.loading
   useEffect(() => {
-    let cancelled = false
-    void loadPosts().catch(() => {
-      if (cancelled) return
-    })
-    return () => {
-      cancelled = true
+    if (paged.error && paged.items.length === 0) {
+      toastError(getErrorMessage(localizeCommunityError(paged.error, tCommunity), t('roommate.list.loadFailed')))
     }
-  }, [loadPosts])
-
+  }, [paged.error, paged.items.length, t, tCommunity, toastError])
   const refreshPosts = useCallback(async () => {
-    await loadPosts({ silent: true })
-  }, [loadPosts])
+    await paged.reload()
+  }, [paged])
 
   const today = roommateToday()
   /** 이번 달부터 MOVE_IN_MONTHS개의 'YYYY-MM' */
-  const moveInMonths = useMemo(() => {
-    const [year, month] = today.split('-').map(Number)
-    return Array.from({ length: MOVE_IN_MONTHS }, (_, index) => {
-      const date = new Date(year, month - 1 + index, 1)
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-    })
-  }, [today])
-  const filterCtx = useMemo(
-    () => ({ city, today, months: moveInMonths }),
-    [city, today, moveInMonths],
-  )
+  const moveInMonths = useMemo(() => moveInMonthsFrom(today), [today])
   const areaGroups = getRoommateAreaGroups(city)
 
-  const filteredPosts = useMemo(
-    () =>
-      sortPosts(
-        posts.filter((post) => matchesFilters(post, filters, filterCtx)),
-        filters.sort,
-        today,
-      ),
-    [posts, filters, filterCtx, today],
-  )
+  const filteredPosts = paged.items
+  const boardEmpty = paged.total === 0 && activeFilterCountOf(filters) === 0
 
-  const draftResultCount = useMemo(
-    () => posts.filter((post) => matchesFilters(post, draft, filterCtx)).length,
-    [posts, draft, filterCtx],
-  )
-
-  /** 동네별 글 수 (필터 칩 옆 숫자) */
-  const areaCounts = useMemo(() => {
-    const counts = new Map<string, number>()
-    for (const group of areaGroups) {
-      counts.set(
-        group.id,
-        posts.filter((post) => roommateLocationInArea(post.location, city, group.id)).length,
-      )
+  // 필터 시트의 "N개 보기": the server counts with the draft filters while the sheet is open
+  const [draftResultCount, setDraftResultCount] = useState(0)
+  useEffect(() => {
+    if (!filtersOpen) return
+    const abort = new AbortController()
+    const timer = window.setTimeout(() => {
+      void fetchCommunityPage({ boardId: BOARD_ID, city, limit: 1, filters: roommateFilterParams(draft), signal: abort.signal })
+        .then((page) => setDraftResultCount(page.total))
+        .catch(() => {})
+    }, 200)
+    return () => {
+      window.clearTimeout(timer)
+      abort.abort()
     }
-    return counts
-  }, [areaGroups, posts, city])
+  }, [filtersOpen, draft, city])
 
-  const activeFilterCount =
-    (filters.intent !== 'all' || filters.lookingFor !== 'all' ? 1 : 0) +
-    (filters.area !== 'all' ? 1 : 0) +
-    (filters.moveIn !== 'all' ? 1 : 0) +
-    (budgetFiltered(filters) ? 1 : 0) +
-    (filters.query.trim() ? 1 : 0) +
-    (filters.sort !== 'newest' ? 1 : 0)
+  /** 동네별 글 수 (필터 칩 옆 숫자): from the server, over the whole board */
+  const areaCounts = useMemo(
+    () => new Map(Object.entries((paged.meta as Record<string, number> | undefined) ?? {})),
+    [paged.meta],
+  )
+
+  const activeFilterCount = activeFilterCountOf(filters)
 
   const activeBudgetPreset = BUDGET_PRESETS.find(
     (preset) => preset.min === filters.budgetMin && preset.max === filters.budgetMax,
@@ -309,10 +179,10 @@ export function RoommateListScreen() {
     }
     if (filters.query.trim()) parts.push(`"${filters.query.trim()}"`)
     if (parts.length === 0) {
-      return t('roommate.list.summaryAll', { count: filteredPosts.length })
+      return t('roommate.list.summaryAll', { count: paged.total })
     }
     return t('roommate.list.summaryFiltered', {
-      count: filteredPosts.length,
+      count: paged.total,
       filters: parts.join(' · '),
     })
   })()
@@ -381,16 +251,71 @@ export function RoommateListScreen() {
 
   return (
     <PullToRefresh onRefresh={refreshPosts} className='flex flex-1 flex-col'>
-      <BoardPageShell width='narrow' className='flex flex-1 flex-col'>
+      <BoardPageShell
+        width='narrow'
+        className='flex flex-1 flex-col'
+        rail={
+          <CommunityBoardRail
+            boardId={BOARD_ID}
+            boardTitle={tCommunity(`categories.${BOARD_ID}.title`)}
+            writeHref={postHref}
+            writeLabel={writeCtaLabel}
+            showWrite={!authLoading && !suspended}
+            beforeBoards={
+              // 렌트 / 룸메이트 switch + the quick filters next to the list on desktop (owner 11-23); full sheet one click away
+              <RailFilterCard
+                title={t('list.title')}
+                count={paged.total}
+                action={
+                  <button
+                    type='button'
+                    onClick={openFilters}
+                    className='flex h-10 w-full items-center justify-center gap-1.5 rounded-full bg-[var(--foreground)] text-[13.5px] font-semibold text-white transition hover:bg-black'
+                  >
+                    {tCommunity('rail.moreFilters')}
+                    {activeFilterCount > 0 ? ` · ${activeFilterCount}` : ''}
+                  </button>
+                }
+              >
+                <HousingSegmentTabs active='roommate' className='mt-3 flex w-full [&>a]:flex-1 [&>a]:justify-center' />
+                <RailChipGroup label={t('roommate.list.category')}>
+                  <RailChip
+                    active={filters.lookingFor === 'all' && filters.intent === 'all'}
+                    onClick={() => updateFilters({ lookingFor: 'all', intent: 'all' })}
+                  >
+                    {t('list.sheet.all')}
+                  </RailChip>
+                  {ROOMMATE_LOOKING_FOR_OPTIONS.map((option) => (
+                    <RailChip key={option.id} active={filters.lookingFor === option.id} onClick={() => toggleQuickLookingFor(option.id)}>
+                      {t(`roommate.lookingFor.${option.id}.shortLabel`)}
+                    </RailChip>
+                  ))}
+                </RailChipGroup>
+                <RailChipGroup label={t('roommate.list.monthlyBudget')}>
+                  {BUDGET_PRESETS.map((preset) => (
+                    <RailChip key={preset.id} active={activeBudgetPreset === preset.id} onClick={() => toggleQuickBudget(preset.min, preset.max)}>
+                      {t(`roommate.list.budgetPresets.${preset.id}`)}
+                    </RailChip>
+                  ))}
+                </RailChipGroup>
+              </RailFilterCard>
+            }
+          />
+        }
+      >
         <BoardListToolbar
-          breadcrumbLabel={t('roommate.list.breadcrumb')}
+          breadcrumbLabel={MISAENG_DESIGN ? t('list.title') : t('roommate.list.breadcrumb')}
+          belowTitle={MISAENG_DESIGN ? <HousingSegmentTabs active='roommate' className='mt-4 lg:hidden' /> : undefined}
           intro={tCommunity(communityBoardKey(BOARD_ID, 'listIntro'), { city: getCity(city).name })}
           writeHref={postHref}
           writeLabel={authLoading ? tCommunity(communityBoardKey(BOARD_ID, 'writeLabel')) : writeCtaLabel}
           onFilterClick={openFilters}
           filterCount={activeFilterCount}
+          filterInRail
           showWrite={!authLoading && !suspended}
         >
+          {/* Misaeng desktop: these chips live in the right rail */}
+          <div className={MISAENG_DESIGN ? 'lg:hidden' : undefined}>
           <ChipScrollRow ariaLabel={t('list.quickFilters')}>
             <BoardQuickChip
               label={t('list.sheet.all')}
@@ -414,6 +339,7 @@ export function RoommateListScreen() {
               />
             ))}
           </ChipScrollRow>
+          </div>
         </BoardListToolbar>
 
         <section className='flex-1 pb-14 pt-4 sm:pb-16 sm:pt-5'>
@@ -428,14 +354,15 @@ export function RoommateListScreen() {
               ))}
             </div>
           ) : filteredPosts.length === 0 ? (
+            <>
             <EmptyState
               title={
-                posts.length === 0
+                boardEmpty
                   ? t('roommate.list.empty.noPostsTitle')
                   : t('roommate.list.empty.noMatchTitle')
               }
               description={
-                posts.length === 0
+                boardEmpty
                   ? canWrite
                     ? t('roommate.list.empty.firstPost')
                     : user
@@ -443,12 +370,14 @@ export function RoommateListScreen() {
                       : t('roommate.list.empty.loginToPost')
                   : t('list.empty.description')
               }
-              actionHref={posts.length === 0 ? postHref : undefined}
+              actionHref={boardEmpty ? postHref : undefined}
               actionLabel={
-                posts.length === 0 ? writeCtaLabel : t('list.empty.action')
+                boardEmpty ? writeCtaLabel : t('list.empty.action')
               }
-              onAction={posts.length === 0 ? undefined : clearAllFilters}
+              onAction={boardEmpty ? undefined : clearAllFilters}
             />
+            {MISAENG_DESIGN && boardEmpty ? <SisterBoardChips boardId={BOARD_ID} className='lg:hidden' /> : null}
+            </>
           ) : (
             <>
               <div className='mb-3.5 flex items-center justify-between gap-3 sm:mb-4'>
@@ -485,6 +414,15 @@ export function RoommateListScreen() {
                   <RoommatePostCard key={post.id} post={post} />
                 ))}
               </div>
+              <PagedListFooter
+                sentinelRef={paged.sentinelRef}
+                hasMore={paged.hasMore}
+                loadingMore={paged.loadingMore}
+                failed={Boolean(paged.error)}
+                onRetry={paged.retry}
+                retryLabel={tCommunity('list.retry')}
+                failedLabel={t('roommate.list.loadFailed')}
+              />
             </>
           )}
         </section>

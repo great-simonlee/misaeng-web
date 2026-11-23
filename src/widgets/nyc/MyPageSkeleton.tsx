@@ -4,6 +4,7 @@ import { Skeleton, SkeletonCircle } from '@components/Skeleton'
 import { useT } from '@lib/i18n/client'
 import { NYC_PAGE_SHELL_CLASS } from '@lib/constants/nyc'
 import { cn } from '@lib'
+import { byBrand } from '@lib/brand/design'
 
 type Props = {
   className?: string
@@ -14,7 +15,7 @@ export function MyPageSkeleton({ className }: Props) {
   return (
     <div
       className={cn(
-        'flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]',
+        byBrand('flex flex-1 flex-col bg-white', 'flex flex-1 flex-col bg-[linear-gradient(180deg,#f4f5f7_0%,#ffffff_55%,#ffffff_100%)]'),
         className,
       )}
       role='status'

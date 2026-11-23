@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { cityPageTitle, pageName } from '@lib/i18n/cityMetadata.server'
 
 import { MemberGate } from '@components/MemberGate'
 import { OpenInApp } from '@components/OpenInApp'
@@ -13,7 +14,7 @@ interface CompanyPageProps {
   params: Promise<{ locale: string; city: string; slug: string }>
 }
 
-// 탭 제목은 모든 페이지에서 사이트 기본값 그대로 둔다 (src/app/layout.tsx).
+// 탭 제목: 회사명 · 도시 | 미생 (11-23, 페이지마다 제목).
 // 검색엔진용 설명에는 회사명만 쓰고, 후기 본문은 넣지 않는다.
 export async function generateMetadata({ params }: CompanyPageProps): Promise<Metadata> {
   const { locale, city, slug } = await params
@@ -21,9 +22,10 @@ export async function generateMetadata({ params }: CompanyPageProps): Promise<Me
   const company = await getActiveCompanyBySlug(slug).catch(() => null)
   // shared link preview: "미생에서 회사를 공유했어요" (members only, no review text)
   const share = await shareMetadata('company', locale, { path: `/${city}/companies/${slug}`, memberOnly: true })
-  if (!company) return { ...share, description: t('meta.listDescription') }
+  if (!company) return { ...share, title: await cityPageTitle(locale, city, await pageName(locale, 'companies')), description: t('meta.listDescription') }
   return {
     ...share,
+    title: await cityPageTitle(locale, city, company.name),
     description: t('meta.companyDescription', { name: company.name, brand: BRAND_CONFIG.name }),
   }
 }

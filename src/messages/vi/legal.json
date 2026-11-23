@@ -11,6 +11,13 @@
     "note": "Lưu ý.",
     "back": "← Quay lại {city}",
     "privacyPolicy": "Chính sách quyền riêng tư",
-    "termsOfUse": "Điều khoản sử dụng"
+    "termsOfUse": "Điều khoản sử dụng",
+    "viewEnglish": "Xem bản tiếng Anh (bản chính thức)",
+    "viewTranslation": "Xem bản dịch",
+    "controllingShort": "Bản tiếng Anh là bản chính thức",
+    "contents": "Mục lục",
+    "backToTop": "Lên đầu trang",
+    "effectivePill": "Hiệu lực từ {date}",
+    "updatedLine": "Cập nhật lần cuối {date} · Phiên bản {version}"
   }
 }

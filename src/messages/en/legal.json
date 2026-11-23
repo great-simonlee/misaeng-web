@@ -11,6 +11,13 @@
     "note": "Note.",
     "back": "← Back to {city}",
     "privacyPolicy": "Privacy Policy",
-    "termsOfUse": "Terms of Use"
+    "termsOfUse": "Terms of Use",
+    "viewEnglish": "View English (controlling)",
+    "viewTranslation": "View translation",
+    "controllingShort": "English is the controlling version",
+    "contents": "Contents",
+    "backToTop": "Back to top",
+    "effectivePill": "Effective {date}",
+    "updatedLine": "Last updated {date} · Version {version}"
   }
 }

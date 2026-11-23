@@ -31,8 +31,28 @@ export function sanitizeCommunityNickname(
 }
 
 /**
+ * 닉네임이 없는 회원(가입 때 프로필을 건너뛴 경우)의 임시 표시명 (owner 11-23): 이메일 아이디(@ 앞) 그대로.
+ * 예: andy42680@gmail.com → andy42680. 도메인(@ 뒤)은 절대 내보내지 않는다. 서버가 채운 값에는
+ * authorNicknameTemporary: true 가 붙고, 아래 표시명 함수는 이 값만 "이메일 아이디는 숨김" 규칙에서 예외로 둔다.
+ */
+export function emailLocalNickname(email: string | null | undefined): string | null {
+  if (!email?.includes('@')) return null
+  return email.split('@')[0]?.trim() || null
+}
+
+/** 닉네임이 비었거나 쓸 수 없는 값이면 이메일 아이디 임시 이름, 아니면 null (그대로 둔다) */
+export function tempNicknameFor(author: { authorNickname?: string | null; authorEmail?: string | null }): string | null {
+  if (sanitizeCommunityNickname(author.authorNickname, author.authorEmail)) return null
+  return emailLocalNickname(author.authorEmail)
+}
+
+type TempFlag = { authorNicknameTemporary?: boolean | null; authorNickname?: string | null }
+const temporaryName = (item: TempFlag) =>
+  item.authorNicknameTemporary === true ? item.authorNickname?.trim() || null : null
+
+/**
  * 커뮤니티 작성자 표시명.
- * 닉네임만 사용하고, 이메일 아이디(@ 앞부분)는 절대 노출하지 않는다.
+ * 닉네임만 사용하고, 이메일 아이디(@ 앞부분)는 노출하지 않는다 — 서버가 임시 이름으로 채운 값(authorNicknameTemporary)만 예외.
  */
 export function getCommunityAuthorDisplayName(
   post: AuthorFields,
@@ -40,6 +60,7 @@ export function getCommunityAuthorDisplayName(
   t: Translate,
 ): string {
   return (
+    temporaryName(post as TempFlag) ||
     sanitizeCommunityNickname(post.authorNickname, post.authorEmail) ||
     sanitizeCommunityNickname(fallbackNickname, post.authorEmail) ||
     memberLabel(t)
@@ -53,6 +74,7 @@ export function getCommentAuthorDisplayName(
   t: Translate,
 ): string {
   return (
+    temporaryName(comment as TempFlag) ||
     sanitizeCommunityNickname(comment.authorNickname, comment.authorEmail) ||
     sanitizeCommunityNickname(fallbackNickname, comment.authorEmail) ||
     memberLabel(t)

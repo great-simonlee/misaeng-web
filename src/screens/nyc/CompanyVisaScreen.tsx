@@ -11,10 +11,12 @@ import {
   type CompanyDetail,
   type VisaSponsorData,
 } from '@lib/company/client'
+import { MISAENG_DESIGN } from '@lib/brand/design'
 import { useT } from '@lib/i18n/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
+import { CompanyHeroPanel, CompanyMark, IndustryTag } from '@widgets/nyc/CompanyBrand'
 import { CompanyVisaInfo } from '@widgets/nyc/CompanyVisaInfo'
-import { VisaSponsorEntry, VisaSponsorView } from '@widgets/nyc/CompanyVisaSponsor'
+import { VisaSponsorEntry, VisaSponsorLocked, VisaSponsorView } from '@widgets/nyc/CompanyVisaSponsor'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 
 /** /companies/{slug}/visa — the company's visa facts and DOL filing history (Premium). */
@@ -65,30 +67,65 @@ export function CompanyVisaScreen({ slug }: { slug: string }) {
 
   const { company } = detail
   const locked = company.visaLocked ?? sponsor?.locked ?? true
+  const body = (
+    <div className='mt-6 flex flex-col gap-8'>
+      {locked ? (
+        // Misaeng: a dimmed sample + Premium card. Ellieo: the same summary row + Premium sheet as the company page
+        MISAENG_DESIGN ? <VisaSponsorLocked /> : <VisaSponsorEntry slug={slug} sponsor={sponsor} locked />
+      ) : (
+        <>
+          {company.visa ? <CompanyVisaInfo visa={company.visa} /> : null}
+          {sponsor ? <VisaSponsorView sponsor={sponsor} /> : null}
+        </>
+      )}
+    </div>
+  )
+  const back = (
+    <Link
+      href={href(`/companies/${slug}`)}
+      className='flex w-fit items-center gap-1 text-[12px] font-medium text-[var(--muted)] hover:text-[var(--foreground)] sm:text-[13px]'
+    >
+      <span aria-hidden>‹</span> {t('sponsor.back')}
+    </Link>
+  )
+
+  if (MISAENG_DESIGN) {
+    // Same company header as the detail page (owner 11-23 review: the page was a title and one row)
+    return (
+      <BoardPageShell width='wide'>
+        <div className='pb-20 pt-4 sm:pt-5 lg:pt-6'>
+          {back}
+          <CompanyHeroPanel className='mt-3'>
+            <div className='flex min-w-0 items-center gap-4 sm:gap-5'>
+              <CompanyMark
+                company={company}
+                className='size-14 rounded-2xl text-[22px] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] sm:size-16 sm:text-[26px]'
+              />
+              <div className='min-w-0'>
+                <p className='truncate text-[13px] font-medium text-white/55'>{company.name}</p>
+                <h1 className='mt-0.5 text-[1.5rem] font-bold leading-tight tracking-[-0.035em] text-white sm:text-[1.9rem]'>
+                  {t('sponsor.title')}
+                </h1>
+                <div className='mt-2'>
+                  <IndustryTag label={company.industryLabel} industry={company.industry} tone='dark' />
+                </div>
+              </div>
+            </div>
+          </CompanyHeroPanel>
+          {body}
+        </div>
+      </BoardPageShell>
+    )
+  }
+
   return (
     <BoardPageShell width='wide'>
       <div className='mx-auto max-w-[860px] pb-20 pt-4 sm:pt-5 lg:pt-6'>
-        <Link
-          href={href(`/companies/${slug}`)}
-          className='flex w-fit items-center gap-1 text-[12px] font-medium text-[var(--muted)] hover:text-[var(--foreground)] sm:text-[13px]'
-        >
-          <span aria-hidden>‹</span> {t('sponsor.back')}
-        </Link>
+        {back}
         <h1 className='mt-3 text-[1.5rem] font-semibold leading-tight tracking-[-0.035em] text-[var(--foreground)] sm:text-[1.9rem]'>
           {company.name} · {t('sponsor.title')}
         </h1>
-
-        <div className='mt-6 flex flex-col gap-8'>
-          {locked ? (
-            // Free members (or a direct link): the same summary row + Premium sheet as the company page
-            <VisaSponsorEntry slug={slug} sponsor={sponsor} locked />
-          ) : (
-            <>
-              {company.visa ? <CompanyVisaInfo visa={company.visa} /> : null}
-              {sponsor ? <VisaSponsorView sponsor={sponsor} /> : null}
-            </>
-          )}
-        </div>
+        {body}
       </div>
     </BoardPageShell>
   )

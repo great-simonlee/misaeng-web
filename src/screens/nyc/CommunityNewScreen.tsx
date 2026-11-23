@@ -13,7 +13,7 @@ import { useCity, useCityPath } from '@hooks/useCity'
 import { moveArrayItem, useDragReorder } from '@hooks/useDragReorder'
 import { useRequireAuth } from '@hooks/useRequireAuth'
 import { getErrorMessage, useToast } from '@hooks/useToast'
-import { cityLoginPath, hrefForCommunityPost } from '@lib/constants/cities'
+import { cityLoginPath, getCity, hrefForCommunityPost } from '@lib/constants/cities'
 import {
   createCommunityPostRequest,
   fetchCommunityPost,
@@ -73,6 +73,14 @@ import {
 } from '@widgets/nyc/BoardPageShell'
 import { AnonymousTopicSelect } from '@widgets/nyc/AnonymousTopicSelect'
 import { CommunityWritingGuidelines } from '@widgets/nyc/CommunityWritingGuidelines'
+import {
+  WriteColumns,
+  WritePageHeader,
+  WriteStepCard,
+  WriteSubmitCard,
+  writeCardStackClass,
+  writeSubmitClass,
+} from '@widgets/nyc/WriteFormLayout'
 import { FoodCategoryIcon } from '@widgets/nyc/FoodCategoryBadge'
 import { PlaceSearchField } from '@widgets/nyc/PlaceSearchField'
 import { RestaurantNameField } from '@widgets/nyc/RestaurantNameField'
@@ -83,6 +91,7 @@ import { JobReviewWriteScreen } from '@screens/nyc/JobReviewWriteScreen'
 import { AnonymousWriteScreen } from '@screens/nyc/AnonymousWriteScreen'
 import { RoommateWriteScreen } from '@screens/nyc/RoommateWriteScreen'
 import { WriteDraftActions } from '@widgets/nyc/WriteDraftActions'
+import { byBrand, MISAENG_DESIGN } from '@lib/brand/design'
 
 interface CommunityNewScreenProps {
   boardId: NycCommunityBoardId
@@ -170,6 +179,7 @@ function CommunityBoardNewScreen({
 }: CommunityNewScreenProps) {
   const t = useT('community')
   const tFood = useT('food')
+  const tCommon = useT('common')
   const fmt = useFormat()
   const city = useCity()
   const href = useCityPath()
@@ -780,7 +790,7 @@ function CommunityBoardNewScreen({
 
   if (loading || loadingEdit || !isAuthenticated || !user || !draftHydrated) {
     return (
-      <BoardPageShell width='narrow'>
+      <BoardPageShell width='narrow' rail={null}>
         <LoadingState
           fullPage
           label={
@@ -801,9 +811,720 @@ function CommunityBoardNewScreen({
     return <SchoolVerificationRequired nextPath={loginNext} boardId={boardId} />
   }
 
+  if (isFood && MISAENG_DESIGN) {
+    // 물건 올리기 layout (owner 11-23): the same sections as numbered cards on the left, guidelines + submit on the right
+    const missing = [
+      !selectedPlace?.placeId ? t('write.food.whereTitle') : null,
+      !postTitle.trim() ? t('write.food.nameLabel') : null,
+      !foodCategory ? t('write.food.categoryTitle') : null,
+      !foodCuisine ? t('write.food.cuisineTitle') : null,
+    ].filter((item): item is string => Boolean(item))
+    const foodSubmit = isEdit ? (
+              <button
+                type='submit'
+                disabled={
+                  submitting ||
+                  !postTitle.trim() ||
+                  !selectedPlace?.placeId ||
+                  selectedPlace.latitude == null ||
+                  selectedPlace.longitude == null ||
+                  !foodCategory ||
+                  !foodCuisine
+                }
+                className={writeSubmitClass}
+              >
+                {submitting ? t('comments.saving') : t('comments.saveEdit')}
+              </button>
+    ) : (
+                <button
+                  type='submit'
+                  disabled={
+                    submitting ||
+                    !postTitle.trim() ||
+                    !selectedPlace?.placeId ||
+                    selectedPlace.latitude == null ||
+                    selectedPlace.longitude == null ||
+                    !foodCategory ||
+                    !foodCuisine
+                  }
+                  className={writeSubmitClass}
+                >
+                  {submitting
+                    ? t('comments.submitting')
+                    : !postTitle.trim()
+                      ? t('write.food.errors.nameRequired')
+                      : !selectedPlace
+                        ? t('write.food.selectAddress')
+                        : selectedPlace.latitude == null ||
+                            selectedPlace.longitude == null
+                          ? t('write.food.checkingCoordinates')
+                          : !foodCategory
+                            ? t('write.food.errors.categoryRequired')
+                            : !foodCuisine
+                              ? t('write.food.selectCuisine')
+                              : t('write.food.submit')}
+                </button>
+    )
+    return (
+      <BoardPageShell width='wide' rail={null}>
+        <WritePageHeader
+          back={
+            <BoardBackLink
+              href={isEdit && editPostId ? href(`/${boardId}/${editPostId}`) : href(`/${boardId}`)}
+              label={isEdit ? t('write.backToPost') : t('detail.backToList', { board: title })}
+              className='mb-4'
+            />
+          }
+          title={isEdit ? t('write.editTitle', { board: title }) : t('write.newTitle', { board: title })}
+          intro={t(communityBoardKey(boardId, 'listIntro'), { city: getCity(city).name })}
+        />
+        <form onSubmit={handleSubmit}>
+          <WriteColumns
+            main={
+              <div className={writeCardStackClass}>
+          <section>
+            <h2 className='text-[1.25rem] font-semibold tracking-[-0.03em] text-[var(--foreground)]'>
+              {t('write.food.whereTitle')}
+            </h2>
+            <p className='mt-1 text-[13px] text-[var(--muted)]'>
+              {t('write.food.whereDescription')}
+            </p>
+            <PlaceSearchField
+              mode='address'
+              value={selectedPlace}
+              onChange={(place) => {
+                setSelectedPlace(place)
+              }}
+              className='mt-3'
+            />
+          </section>
+
+          <section className='mt-6'>
+            <Field label={t('write.food.nameLabel')} required>
+              <RestaurantNameField
+                value={postTitle}
+                onChange={setPostTitle}
+                latitude={selectedPlace?.latitude ?? null}
+                longitude={selectedPlace?.longitude ?? null}
+                placeId={selectedPlace?.placeId ?? null}
+                inputClassName={inputClass}
+                placeholder={boardText('titlePlaceholder')}
+              />
+            </Field>
+          </section>
+
+          <section className='mt-8'>
+            <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
+              {t('write.food.categoryTitle')}
+            </h2>
+            <div className='mt-2.5 flex flex-wrap gap-2'>
+              {getFoodComposeCategories(foodCategory).map((cat) => {
+                const active = foodCategory === cat.id
+                return (
+                  <button
+                    key={cat.id}
+                    type='button'
+                    onClick={() => setFoodCategory(cat.id)}
+                    className={cn(
+                      'inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium touch-manipulation transition',
+                      active
+                        ? cat.solidClass
+                        : 'bg-white text-[var(--foreground)] ring-1 ring-black/[0.08] hover:ring-black/15',
+                    )}
+                  >
+                    <FoodCategoryIcon
+                      categoryId={cat.id}
+                      className='size-3.5 opacity-90'
+                    />
+                    {tFood(`categories.${cat.id}`)}
+                  </button>
+                )
+              })}
+            </div>
+          </section>
+
+          <section className='mt-8'>
+            <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
+              {t('write.food.cuisineTitle')}
+            </h2>
+            <div className='mt-2.5 flex flex-wrap gap-2'>
+              {FOOD_CUISINES.map((cuisine) => {
+                const active = foodCuisine === cuisine.id
+                return (
+                  <button
+                    key={cuisine.id}
+                    type='button'
+                    onClick={() => setFoodCuisine(cuisine.id)}
+                    className={cn(
+                      'inline-flex h-9 items-center rounded-full px-3.5 text-[13px] font-medium touch-manipulation transition',
+                      active
+                        ? 'bg-[var(--foreground)] text-white'
+                        : 'bg-white text-[var(--foreground)] ring-1 ring-black/[0.08] hover:ring-black/15',
+                    )}
+                  >
+                    {getFoodCuisineLabel(cuisine.id, tFood) ?? cuisine.label}
+                  </button>
+                )
+              })}
+            </div>
+          </section>
+
+          <section className='mt-8'>
+            <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
+              {t('write.food.visitTitle')}
+            </h2>
+            <div className='mt-2.5 overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.06]'>
+              <VisitIntField
+                label={t('write.food.partySize')}
+                hint={t('write.food.partySizeHint', { max: FOOD_PARTY_MAX })}
+                unit={t('write.food.partySizeUnit')}
+                value={partySize}
+                min={FOOD_PARTY_MIN}
+                max={FOOD_PARTY_MAX}
+                onChange={setPartySize}
+              />
+              <div className='mx-4 border-t border-black/[0.05]' />
+              <div className='flex items-center justify-between gap-2.5 px-4 py-3.5'>
+                <div className='min-w-0 shrink'>
+                  <p className='text-[14px] font-semibold tracking-tight text-[var(--foreground)]'>
+                    {t('write.food.totalSpend')}
+                  </p>
+                  <p className='mt-0.5 text-[11px] text-[var(--muted)]'>
+                    {t('write.food.totalSpendHint', {
+                      max: fmt.usd(FOOD_SPEND_MAX),
+                    })}
+                  </p>
+                </div>
+
+                <div className='flex shrink-0 items-center gap-1.5'>
+                  <div
+                    role='group'
+                    aria-label={t('write.food.tipAria')}
+                    className='inline-flex h-9 items-center rounded-full bg-[#f1f2f4] p-0.5 ring-1 ring-black/[0.04]'
+                  >
+                    {(
+                      [
+                        { value: true, label: t('write.food.tipIncluded') },
+                        { value: false, label: t('write.food.tipExcluded') },
+                      ] as const
+                    ).map((option) => {
+                      const active = tipIncluded === option.value
+                      return (
+                        <button
+                          key={option.label}
+                          type='button'
+                          onClick={() => setTipIncluded(option.value)}
+                          className={cn(
+                            'h-8 min-w-[3.25rem] rounded-full px-2 text-[11px] font-semibold tracking-tight touch-manipulation transition',
+                            active
+                              ? 'bg-white text-[var(--foreground)] shadow-[0_1px_3px_rgba(15,23,42,0.12)]'
+                              : 'text-[var(--muted)]',
+                          )}
+                        >
+                          {option.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  <label className='flex h-11 min-w-[5.5rem] cursor-text items-center justify-center rounded-xl bg-[#f8f8f9] px-3 ring-1 ring-black/[0.05] transition focus-within:ring-[var(--brand)]/40'>
+                    <span className='mr-1 text-[14px] font-semibold text-[var(--muted)]'>
+                      $
+                    </span>
+                    <input
+                      required
+                      type='text'
+                      inputMode='numeric'
+                      pattern='[0-9]*'
+                      autoComplete='off'
+                      enterKeyHint='done'
+                      placeholder='0'
+                      value={totalSpend}
+                      onChange={(e) =>
+                        setTotalSpend(
+                          sanitizeFoodIntInput(
+                            e.target.value,
+                            FOOD_SPEND_MIN,
+                            FOOD_SPEND_MAX,
+                          ),
+                        )
+                      }
+                      onBlur={() => {
+                        if (totalSpend === '') return
+                        const parsed = parseFoodInt(
+                          totalSpend,
+                          FOOD_SPEND_MIN,
+                          FOOD_SPEND_MAX,
+                        )
+                        if (parsed != null) setTotalSpend(String(parsed))
+                        else setTotalSpend(String(FOOD_SPEND_MIN))
+                      }}
+                      className='w-14 bg-transparent text-center text-[18px] font-semibold tabular-nums tracking-tight text-[var(--foreground)] outline-none'
+                      aria-label={t('write.food.totalSpend')}
+                    />
+                  </label>
+                </div>
+              </div>
+              <div className='mx-4 border-t border-black/[0.05]' />
+              <VisitIntField
+                label={t('write.food.wait')}
+                hint={t('write.food.waitHint', { max: FOOD_WAIT_MAX })}
+                unit={t('write.food.waitUnit')}
+                value={waitMinutes}
+                min={FOOD_WAIT_MIN}
+                max={FOOD_WAIT_MAX}
+                onChange={setWaitMinutes}
+                placeholder='0'
+              />
+            </div>
+          </section>
+
+          <section className='mt-8'>
+            <div className='flex items-end justify-between gap-3'>
+              <div>
+                <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
+                  {t('write.food.galleryTitle')}
+                </h2>
+                <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
+                  {t('write.food.galleryDescription', { max: FOOD_GALLERY_MAX })}
+                </p>
+              </div>
+              <p className='shrink-0 pb-0.5 text-[12px] font-medium tabular-nums text-[var(--muted)]'>
+                {galleryDrafts.length}/{FOOD_GALLERY_MAX}
+              </p>
+            </div>
+
+            <input
+              ref={galleryFileInputRef}
+              type='file'
+              accept={IMAGE_LIBRARY_ACCEPT}
+              multiple
+              className='hidden'
+              onChange={(e) => void handleGalleryFilesSelected(e.target.files)}
+            />
+
+            {galleryDrafts.length === 0 && galleryPendingCount === 0 ? (
+              <button
+                type='button'
+                disabled={!canAddGallery}
+                onClick={openGalleryPicker}
+                className='mt-3 flex w-full items-center gap-3 rounded-2xl bg-white px-3.5 py-3.5 text-left ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-brand-soft hover:ring-[var(--brand)]/30 disabled:opacity-60'
+              >
+                <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-[var(--brand)]'>
+                  <PlusIcon className='size-3.5' />
+                </span>
+                <span className='min-w-0 flex-1'>
+                  <span className='block text-[13px] font-semibold text-[var(--foreground)]'>
+                    {t('write.food.galleryPick')}
+                  </span>
+                  <span className='mt-0.5 block text-[11px] text-[var(--muted)]'>
+                    {t('write.food.galleryPickHint', { max: FOOD_GALLERY_MAX })}
+                  </span>
+                </span>
+              </button>
+            ) : (
+              <div className='mt-3 grid grid-cols-4 gap-2'>
+                {galleryDrafts.map((item) => (
+                  <div
+                    key={item.key}
+                    className='relative aspect-square overflow-hidden rounded-xl bg-[#e8eaee] ring-1 ring-black/[0.06]'
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.imageUrl}
+                      alt=''
+                      className='h-full w-full object-cover'
+                    />
+                    <button
+                      type='button'
+                      onClick={() => removeGalleryRow(item.key)}
+                      className='absolute right-1 top-1 inline-flex h-6 items-center rounded-full bg-black/55 px-2 text-[10px] font-semibold text-white touch-manipulation backdrop-blur-sm'
+                    >
+                      {t('detail.delete')}
+                    </button>
+                  </div>
+                ))}
+
+                {Array.from({ length: galleryPendingCount }, (_, index) => (
+                  <div
+                    key={`gallery-pending-${index}`}
+                    className='flex aspect-square items-center justify-center rounded-xl bg-[#f3f4f6] ring-1 ring-dashed ring-black/[0.1]'
+                    aria-hidden
+                  >
+                    <span className='text-[11px] font-medium text-[var(--muted)]'>
+                      …
+                    </span>
+                  </div>
+                ))}
+
+                {galleryDrafts.length + galleryPendingCount <
+                FOOD_GALLERY_MAX ? (
+                  <button
+                    type='button'
+                    disabled={!canAddGallery}
+                    onClick={openGalleryPicker}
+                    className='flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-white text-[var(--brand)] ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-brand-soft hover:ring-[var(--brand)]/30 disabled:opacity-60'
+                    aria-label={t('write.food.galleryAddMoreAria', {
+                      count: galleryRemaining,
+                    })}
+                  >
+                    <PlusIcon className='size-4' />
+                    <span className='text-[10px] font-semibold tabular-nums text-[var(--muted)]'>
+                      {t('write.food.galleryAddMore', { count: galleryRemaining })}
+                    </span>
+                  </button>
+                ) : null}
+              </div>
+            )}
+
+            {galleryUploading ? (
+              <p className='mt-2 text-[11px] font-medium text-[var(--muted)]'>
+                {t('write.food.uploading')}
+              </p>
+            ) : null}
+          </section>
+
+          <section className='mt-8'>
+            <div className='flex items-end justify-between gap-3'>
+              <div>
+                <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
+                  {t('write.food.menuTitle')}
+                </h2>
+                <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
+                  {t('write.food.menuDescription')}
+                </p>
+              </div>
+              <p className='shrink-0 pb-0.5 text-[12px] font-medium tabular-nums text-[var(--muted)]'>
+                {menuDrafts.length}/{FOOD_MENU_MAX}
+              </p>
+            </div>
+
+            <div className='mt-3 rounded-xl bg-brand-soft px-3.5 py-2.5 ring-1 ring-[var(--brand)]/15'>
+              <p className='text-[12px] font-semibold text-[var(--brand)]'>
+                {t('write.food.coverNoticeTitle')}
+              </p>
+              <p className='mt-0.5 text-[11px] leading-relaxed text-[var(--muted)]'>
+                {t('write.food.coverNoticeBody')}
+              </p>
+            </div>
+
+            <input
+              ref={menuFileInputRef}
+              type='file'
+              accept={IMAGE_LIBRARY_ACCEPT}
+              multiple
+              className='hidden'
+              onChange={(e) => void handleMenuFilesSelected(e.target.files)}
+            />
+
+            {menuDrafts.length === 0 && menuPendingCount === 0 ? (
+              <button
+                type='button'
+                disabled={!canAddMenu}
+                onClick={openMenuPicker}
+                className='mt-3 flex w-full items-center gap-3 rounded-2xl bg-white px-3.5 py-3.5 text-left ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-brand-soft hover:ring-[var(--brand)]/30 disabled:opacity-60'
+              >
+                <span className='inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-[var(--brand)]'>
+                  <PlusIcon className='size-3.5' />
+                </span>
+                <span className='min-w-0 flex-1'>
+                  <span className='block text-[13px] font-semibold text-[var(--foreground)]'>
+                    {t('write.food.menuPick')}
+                  </span>
+                  <span className='mt-0.5 block text-[11px] text-[var(--muted)]'>
+                    {t('write.food.menuPickHint', { max: FOOD_MENU_MAX })}
+                  </span>
+                </span>
+              </button>
+            ) : null}
+
+            {menuDrafts.length > 1 ? (
+              <p id='menu-reorder-hint' className='mt-2 text-[11px] text-[var(--muted)]'>
+                {t('write.food.reorderHint')}
+              </p>
+            ) : null}
+            <p className='sr-only' aria-live='polite'>
+              {menuOrderMessage}
+            </p>
+
+            {menuDrafts.length > 0 || menuPendingCount > 0 ? (
+              <div className='mt-3 space-y-2.5'>
+                {menuDrafts.map((item, index) => {
+                  const isCover = index === 0
+                  const canReorder = menuDrafts.length > 1
+                  const isDragging = menuReorder.draggingKey === item.key
+                  const isLast = index === menuDrafts.length - 1
+                  const missingName =
+                    Boolean(item.imageUrl) && !item.name.trim()
+                  const missingCaption =
+                    Boolean(item.imageUrl) && !item.caption.trim()
+                  return (
+                    <div
+                      key={item.key}
+                      id={`menu-card-${item.key}`}
+                      ref={menuReorder.itemRef(item.key)}
+                      className={cn(
+                        'relative rounded-2xl bg-white p-3 ring-1',
+                        isCover ? 'ring-[var(--brand)]/25' : 'ring-black/[0.06]',
+                        // 끄는 카드는 떠오르고, 나머지는 부드럽게 비켜난다
+                        isDragging
+                          ? 'z-10 shadow-[0_18px_36px_-12px_rgba(0,0,0,0.22)] ring-[var(--brand)]/40'
+                          : menuReorder.draggingKey
+                            ? 'transition-transform duration-200 ease-[cubic-bezier(0.2,0,0,1)] motion-reduce:transition-none'
+                            : null,
+                      )}
+                    >
+                      <div className='mb-2.5 flex items-center justify-between gap-2'>
+                        <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
+                          {canReorder ? (
+                            <button
+                              type='button'
+                              {...menuReorder.getHandleProps(item.key, index)}
+                              aria-label={t('write.food.reorderHandleAria', { n: index + 1 })}
+                              aria-describedby='menu-reorder-hint'
+                              className={cn(
+                                '-ml-1 inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-[var(--muted)] outline-none transition hover:bg-black/[0.04] hover:text-[var(--foreground)] focus-visible:ring-2 focus-visible:ring-[var(--brand)]/40',
+                                isDragging ? 'cursor-grabbing bg-black/[0.04] text-[var(--foreground)]' : 'cursor-grab',
+                              )}
+                            >
+                              <GripIcon className='size-4' />
+                            </button>
+                          ) : null}
+                          <p className='text-[12px] font-semibold text-[var(--muted)]'>
+                            {t('write.food.menuNumber', { n: index + 1 })}
+                          </p>
+                          {isCover ? (
+                            <span className='inline-flex rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-semibold text-[var(--brand)] ring-1 ring-[var(--brand)]/15'>
+                              {t('write.food.coverPhoto')}
+                            </span>
+                          ) : null}
+                        </div>
+                        <div className='flex shrink-0 items-center gap-0.5'>
+                          {canReorder ? (
+                            <>
+                              {!isCover ? (
+                                <button
+                                  type='button'
+                                  onClick={() => menuReorder.move(index, 0)}
+                                  className='mr-1 rounded-full px-2 py-1 text-[11px] font-medium text-[var(--muted)] touch-manipulation transition hover:bg-brand-soft hover:text-[var(--brand)]'
+                                >
+                                  {t('write.food.makeCover')}
+                                </button>
+                              ) : null}
+                              <button
+                                type='button'
+                                disabled={isCover}
+                                onClick={() => menuReorder.move(index, index - 1)}
+                                aria-label={t('write.food.moveUpAria', { n: index + 1 })}
+                                title={t('write.food.moveUp')}
+                                className='inline-flex size-7 items-center justify-center rounded-full text-[var(--muted)] touch-manipulation transition hover:bg-black/[0.04] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30'
+                              >
+                                <ChevronIcon direction='up' className='size-3.5' />
+                              </button>
+                              <button
+                                type='button'
+                                disabled={isLast}
+                                onClick={() => menuReorder.move(index, index + 1)}
+                                aria-label={t('write.food.moveDownAria', { n: index + 1 })}
+                                title={t('write.food.moveDown')}
+                                className='mr-1 inline-flex size-7 items-center justify-center rounded-full text-[var(--muted)] touch-manipulation transition hover:bg-black/[0.04] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30'
+                              >
+                                <ChevronIcon direction='down' className='size-3.5' />
+                              </button>
+                            </>
+                          ) : null}
+                          <button
+                            type='button'
+                            onClick={() => removeMenuRow(item.key)}
+                            className='text-[11px] font-medium text-[var(--muted)] touch-manipulation hover:text-red-600'
+                          >
+                            {t('detail.delete')}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className='grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]'>
+                        <div className='relative min-w-0'>
+                          <PhotoUploadZone
+                            compact
+                            className='min-w-0'
+                            src={item.imageUrl || null}
+                            onUploaded={(url) =>
+                              updateMenuRow(item.key, { imageUrl: url })
+                            }
+                            emptyLabel={t('write.food.photo')}
+                            emptyHint=''
+                            aspectClassName='aspect-square'
+                          />
+                          {isCover && item.imageUrl ? (
+                            <span className='pointer-events-none absolute left-1.5 top-1.5 rounded-full bg-black/55 px-1.5 py-0.5 text-[9px] font-semibold text-white backdrop-blur-sm'>
+                              {t('write.food.cover')}
+                            </span>
+                          ) : null}
+                        </div>
+                        <div className='flex min-h-0 min-w-0 flex-col gap-2'>
+                          <div className='relative'>
+                            <input
+                              ref={(el) => {
+                                nameRefs.current[item.key] = el
+                              }}
+                              type='text'
+                              value={item.name}
+                              onChange={(e) =>
+                                updateMenuRow(item.key, {
+                                  name: e.target.value.slice(
+                                    0,
+                                    FOOD_MENU_NAME_MAX,
+                                  ),
+                                })
+                              }
+                              maxLength={FOOD_MENU_NAME_MAX}
+                              placeholder={t('write.food.menuNamePlaceholder')}
+                              className={cn(
+                                'w-full rounded-xl bg-[#f8f8f9] px-3 py-2.5 pr-12 text-[13px] font-semibold outline-none ring-1 transition placeholder:font-normal placeholder:text-[var(--muted)] sm:text-[14px]',
+                                missingName
+                                  ? 'ring-red-300 focus:ring-red-400'
+                                  : 'ring-black/[0.05] focus:ring-[var(--brand)]/35',
+                              )}
+                              aria-label={t('write.food.menuNameAria', { n: index + 1 })}
+                            />
+                            <span className='pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] tabular-nums text-[var(--muted)]'>
+                              {item.name.length}/{FOOD_MENU_NAME_MAX}
+                            </span>
+                          </div>
+                          <div className='relative min-h-0 flex-1'>
+                            <textarea
+                              ref={(el) => {
+                                captionRefs.current[item.key] = el
+                              }}
+                              value={item.caption}
+                              onChange={(e) =>
+                                updateMenuRow(item.key, {
+                                  caption: e.target.value.slice(
+                                    0,
+                                    FOOD_MENU_CAPTION_MAX,
+                                  ),
+                                })
+                              }
+                              maxLength={FOOD_MENU_CAPTION_MAX}
+                              placeholder={t('write.food.menuCaptionPlaceholder')}
+                              className={cn(
+                                'h-[4.75rem] w-full resize-none rounded-xl bg-[#f8f8f9] px-3 py-2.5 pb-6 text-[13px] leading-relaxed outline-none ring-1 transition placeholder:text-[var(--muted)] sm:h-[5.25rem] sm:text-[14px]',
+                                missingCaption
+                                  ? 'ring-red-300 focus:ring-red-400'
+                                  : 'ring-black/[0.05] focus:ring-[var(--brand)]/35',
+                              )}
+                              aria-label={t('write.food.menuCaptionAria', { n: index + 1 })}
+                            />
+                            <span className='pointer-events-none absolute bottom-2 right-2.5 text-[10px] tabular-nums text-[var(--muted)]'>
+                              {item.caption.length}/{FOOD_MENU_CAPTION_MAX}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      {missingName || missingCaption ? (
+                        <p className='mt-2 text-[11px] font-medium text-red-600'>
+                          {missingName && missingCaption
+                            ? t('write.food.missingNameAndCaption')
+                            : missingName
+                              ? t('write.food.missingName')
+                              : t('write.food.missingCaption')}
+                        </p>
+                      ) : null}
+                    </div>
+                  )
+                })}
+
+                {Array.from({ length: menuPendingCount }, (_, index) => (
+                  <div
+                    key={`menu-pending-${index}`}
+                    className='flex h-[7.5rem] items-center justify-center rounded-2xl bg-[#f3f4f6] ring-1 ring-dashed ring-black/[0.1]'
+                    aria-hidden
+                  >
+                    <span className='text-[12px] font-medium text-[var(--muted)]'>
+                      {t('write.food.uploading')}
+                    </span>
+                  </div>
+                ))}
+
+                {menuDrafts.length + menuPendingCount < FOOD_MENU_MAX ? (
+                  <button
+                    type='button'
+                    disabled={!canAddMenu}
+                    onClick={openMenuPicker}
+                    className='flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-3.5 py-3 text-[13px] font-semibold text-[var(--foreground)] ring-1 ring-dashed ring-black/[0.12] touch-manipulation transition hover:bg-brand-soft hover:ring-[var(--brand)]/30 disabled:opacity-60'
+                  >
+                    <PlusIcon className='size-3.5 text-[var(--brand)]' />
+                    {menuUploading
+                      ? t('write.food.uploading')
+                      : t('write.food.menuAddMore', { count: menuRemaining })}
+                  </button>
+                ) : (
+                  <p className='rounded-2xl bg-[#f3f4f6] px-4 py-2.5 text-center text-[12px] font-medium text-[var(--muted)]'>
+                    {t('write.food.menuMaxReached', { max: FOOD_MENU_MAX })}
+                  </p>
+                )}
+              </div>
+            ) : null}
+          </section>
+
+          <section className='mt-8'>
+            <div>
+              <h2 className='text-[15px] font-semibold text-[var(--foreground)]'>
+                {t('write.bodyLabel')}
+              </h2>
+              <p className='mt-0.5 text-[12px] text-[var(--muted)]'>
+                {t('write.food.bodyDescription')}
+              </p>
+            </div>
+            <div className='mt-3'>
+              <TipTapEditor
+                value={contentHtml}
+                onChange={setContentHtml}
+                placeholder={boardText('descriptionPlaceholder')}
+                minHeightClassName='min-h-[200px]'
+                maxLength={COMMUNITY_BODY_MAX}
+              />
+            </div>
+          </section>
+
+              </div>
+            }
+            aside={
+              <>
+                <CommunityWritingGuidelines className='rounded-[1.375rem] p-5' />
+                <WriteSubmitCard
+                  missing={missing}
+                  submit={foodSubmit}
+                  extra={
+                    !isEdit ? (
+                      <>
+                        <button
+                          type='button'
+                          onClick={handleSaveDraft}
+                          disabled={submitting}
+                          className='inline-flex h-11 w-full items-center justify-center rounded-full bg-white text-[14px] font-semibold text-[var(--foreground)] ring-1 ring-black/[0.08] transition hover:bg-[#f7f8fa] disabled:opacity-50'
+                        >
+                          {tCommon('ui.draft.save')}
+                        </button>
+                        {draftSavedAt ? (
+                          <p className='text-center text-[12px] text-[var(--muted)]'>{tCommon('ui.draft.savedAt', { time: fmt.relative(draftSavedAt) })}</p>
+                        ) : null}
+                      </>
+                    ) : undefined
+                  }
+                />
+              </>
+            }
+          />
+        </form>
+      </BoardPageShell>
+    )
+  }
+
   if (isFood) {
     return (
-      <BoardPageShell width='narrow'>
+      <BoardPageShell width='narrow' rail={null}>
         <form
           onSubmit={handleSubmit}
           className='relative pb-8 pt-4 sm:pt-6'
@@ -1489,9 +2210,112 @@ function CommunityBoardNewScreen({
     )
   }
 
+  if (MISAENG_DESIGN) {
+    // 물건 올리기 layout (owner 11-23): step cards left, guidelines + submit right; no generic rail
+    const missing = [
+      !postTitle.trim() ? t('write.titleLabel') : null,
+      !htmlToPlainText(contentHtml) ? t('write.bodyLabel') : null,
+    ].filter((item): item is string => Boolean(item))
+    const hasDetail = Boolean(meta.detailInput && meta.hasDetail)
+    return (
+      <BoardPageShell width='wide' rail={null}>
+        <WritePageHeader
+          back={
+            <BoardBackLink
+              href={isEdit && editPostId ? href(`/${boardId}/${editPostId}`) : href(`/${boardId}`)}
+              label={isEdit ? t('write.backToPost') : t('detail.backToList', { board: title })}
+              className='mb-4'
+            />
+          }
+          title={isEdit ? t('write.editTitle', { board: title }) : t('write.newTitle', { board: title })}
+          intro={t(communityBoardKey(boardId, 'listIntro'), { city: getCity(city).name })}
+        />
+        <form onSubmit={handleSubmit}>
+          <WriteColumns
+            main={
+              <>
+                <WriteStepCard
+                  step={1}
+                  title={t('write.titleLabel')}
+                  trailing={anonymousBoard ? `${postTitle.length}/${ANONYMOUS_TITLE_MAX}` : undefined}
+                >
+                  <input
+                    required
+                    value={postTitle}
+                    maxLength={anonymousBoard ? ANONYMOUS_TITLE_MAX : undefined}
+                    onChange={(e) =>
+                      setPostTitle(anonymousBoard ? e.target.value.slice(0, ANONYMOUS_TITLE_MAX) : e.target.value)
+                    }
+                    aria-label={t('write.titleLabel')}
+                    className={cn(inputClass, 'mt-0 h-12 rounded-2xl')}
+                    placeholder={boardText('titlePlaceholder')}
+                  />
+                </WriteStepCard>
+                <WriteStepCard step={2} title={boardText('locationLabel')}>
+                  <div className={cn('grid gap-4', hasDetail ? 'sm:grid-cols-2' : null)}>
+                    {anonymousBoard ? (
+                      <AnonymousTopicSelect value={location} onChange={setLocation} placeholder={boardText('locationPlaceholder')} />
+                    ) : (
+                      <input
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                        aria-label={boardText('locationLabel')}
+                        className={cn(inputClass, 'mt-0 h-12 rounded-2xl')}
+                        placeholder={boardText('locationPlaceholder')}
+                      />
+                    )}
+                    {hasDetail ? (
+                      <Field label={boardText('detailLabel')}>
+                        <input
+                          type={meta.detailInput === 'number' ? 'number' : (meta.detailInput ?? undefined)}
+                          min={meta.detailInput === 'number' ? 0 : undefined}
+                          value={detail}
+                          onChange={(e) => setDetail(e.target.value)}
+                          className={inputClass}
+                          placeholder={meta.hasDetailPlaceholder ? boardText('detailPlaceholder') : ''}
+                        />
+                      </Field>
+                    ) : null}
+                  </div>
+                </WriteStepCard>
+                <WriteStepCard step={3} title={`${t('write.bodyLabel')} *`}>
+                  <TipTapEditor
+                    value={contentHtml}
+                    onChange={setContentHtml}
+                    placeholder={boardText('descriptionPlaceholder')}
+                    maxLength={COMMUNITY_BODY_MAX}
+                  />
+                </WriteStepCard>
+              </>
+            }
+            aside={
+              <>
+                <CommunityWritingGuidelines anonymous={anonymousBoard} className='rounded-[1.375rem] p-5' />
+                <WriteSubmitCard
+                  missing={missing}
+                  submit={
+                    <button type='submit' disabled={submitting} className={writeSubmitClass}>
+                      {submitting
+                        ? isEdit
+                          ? t('comments.saving')
+                          : t('comments.submitting')
+                        : isEdit
+                          ? t('comments.saveEdit')
+                          : t('write.publish')}
+                    </button>
+                  }
+                />
+              </>
+            }
+          />
+        </form>
+      </BoardPageShell>
+    )
+  }
+
   return (
-    <BoardPageShell width='narrow'>
-      <div className='pb-16 pt-4 sm:pt-6'>
+    <BoardPageShell width='narrow' rail={null}>
+      <div className={byBrand('pb-16 pt-4 sm:pt-5 lg:pt-6', 'pb-16 pt-4 sm:pt-6')}>
         <BoardBackLink
             href={
               isEdit && editPostId
