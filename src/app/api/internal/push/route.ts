@@ -6,17 +6,21 @@ import { notifyUsers } from '@lib/push/notify.server'
 import { sendJobReviewTestPush } from '@lib/erp/notifyJobReview'
 import { sendStaffPush } from '@lib/support/staffPush.server'
 import { listCompanyFollowers } from '@lib/push/store.server'
+import { broadcastDigest, type DigestKind } from '@lib/push/digestNotify.server'
+import { alertUsers } from '@lib/push/alertsAccess.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 /**
  * Pushes triggered by ellieo-erp (server to server). Header `x-internal-secret: $INTERNAL_PUSH_SECRET`.
- * { type: 'posting', postingId }                         — a posting was approved → followers of its company
+ * { type: 'posting', postingId }                         — a posting was approved → its company's followers (verified only)
  * { type: 'credit', uid, amount, balance, reason?, label? } — credits awarded by an admin
  * { type: 'verification', uid, kind: 'instagram', result: 'approved' | 'rejected' } — a verification was reviewed
  * { type: 'job_review_test', email, source, orgId, target, post: { id, title, createdAt } } — admin test of the
  *   new-job-review push in the Misaeng ERP app, to that admin's own devices only (answers { devices, sent })
+ * { type: 'postings_digest' | 'visa_news_digest' | 'visa_bulletin', title: {en,vi?}, body: {en,vi?}, dedupeKey,
+ *   postingId? | newsId? } — the ERP's scheduled alerts, to verified members only (lib/push/digestNotify.server.ts)
  * { type: 'staff_alert', emails, title, body, data } — an ERP team alert (tour scheduled, new client, …) to the Misaeng
  *   ERP app; the ERP picks the recipients (internal staff only, never partners) and also sends it as Web Push
  */
@@ -35,6 +39,11 @@ function authorized(request: Request) {
 export async function POST(request: Request) {
   if (!authorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = ((await request.json().catch(() => null)) || {}) as Record<string, unknown>
+
+  if (body.type === 'postings_digest' || body.type === 'visa_news_digest' || body.type === 'visa_bulletin') {
+    const result = await broadcastDigest(body.type as DigestKind, body)
+    return NextResponse.json(result, { status: 'error' in result ? 400 : 200 })
+  }
 
   if (body.type === 'staff_alert') {
     const emails = Array.isArray(body.emails) ? body.emails.filter((e): e is string => typeof e === 'string') : []
@@ -81,7 +90,8 @@ export async function POST(request: Request) {
       posting = (await listPublicPostings()).find((p) => p.id === postingId)
     }
     if (!posting) return NextResponse.json({ sent: false, reason: 'not public' })
-    const followers = await listCompanyFollowers(posting.company.id)
+    // Job alerts are for verified members only (alertsAccess.server.ts)
+    const followers = await alertUsers(await listCompanyFollowers(posting.company.id))
     notifyUsers({
       type: 'posting',
       userIds: followers,
