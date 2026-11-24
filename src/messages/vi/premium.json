@@ -112,6 +112,7 @@
     "ends": "Ends on {date} (cancellation scheduled)",
     "manage": "Manage subscription",
     "appStore": "Subscriptions bought in the app are managed in iPhone Settings → Apple Account → Subscriptions.",
+    "googlePlay": "Subscriptions bought in the Android app are managed in the Play Store → Payments & subscriptions on your Android device.",
     "staff": "Premium is open on this preview account.",
     "staffPlan": "Preview",
     "codeUntil": "Free with a code until {date}",

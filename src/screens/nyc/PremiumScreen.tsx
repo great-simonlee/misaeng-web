@@ -525,6 +525,7 @@ function ActiveCard({ me, busy, onManage }: { me: PremiumMe; busy: boolean; onMa
         </button>
       ) : null}
       {me.source === 'apple' ? <p className='max-w-[420px] text-[12.5px] text-[var(--muted)]'>{t('active.appStore')}</p> : null}
+      {me.source === 'google' ? <p className='max-w-[420px] text-[12.5px] text-[var(--muted)]'>{t('active.googlePlay')}</p> : null}
     </section>
   )
 }

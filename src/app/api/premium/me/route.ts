@@ -4,7 +4,7 @@ import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import { getRequestBearerToken } from '../../agent-auth/lib/ellieoServer'
 import { getPremiumState } from '@lib/premium/access.server'
 import { appAccountTokenFor } from '@lib/premium/apple.server'
-import { androidBillingEnabled, googleAccountIdFor } from '@lib/premium/google.server'
+import { androidBillingEnabled, googleAccountIdFor, rememberGoogleAccount } from '@lib/premium/google.server'
 import { premiumPayload } from '@lib/premium/payload.server'
 
 export const runtime = 'nodejs'
@@ -29,6 +29,9 @@ export async function GET() {
     user ? appAccountTokenFor(user.uid).catch(() => null) : null,
     androidBillingEnabled(),
   ])
+  // Link the googleAccountId below to this account, so a Play purchase it makes can be matched without the app.
+  // Not awaited: the response never waits on (or fails because of) this write.
+  if (user) void rememberGoogleAccount(user.uid).catch(() => undefined)
   return NextResponse.json({
     ...premiumPayload(state, Boolean(user)),
     appAccountToken,

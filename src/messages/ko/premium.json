@@ -112,6 +112,7 @@
     "ends": "{date}에 끝나요 (해지 예약됨)",
     "manage": "구독 관리",
     "appStore": "앱스토어에서 결제한 구독은 iPhone 설정 → Apple 계정 → 구독에서 관리해요.",
+    "googlePlay": "Android 앱(Google Play)에서 결제한 구독은 Android 기기의 Play 스토어 → 결제 및 정기 결제에서 관리해요.",
     "staff": "미리보기 계정이라 Premium이 열려 있어요.",
     "staffPlan": "미리보기",
     "codeUntil": "이용권으로 {date}까지 무료",

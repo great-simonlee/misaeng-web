@@ -3,6 +3,7 @@ import { createHash, createSign } from 'node:crypto'
 import { invalidatePremium } from './access.server'
 import {
   getEntitlementByExternalId,
+  rest,
   upsertEntitlement,
   type PremiumEntitlement,
   type PremiumPlan,
@@ -75,6 +76,33 @@ export function googleAccountIdFor(uid: string) {
   return createHash('sha256').update(`${salt}:${uid}`).digest('hex')
 }
 
+/**
+ * premium_google_accounts (supabase/premium_google_accounts.sql): obfuscated account id → Misaeng uid, saved when
+ * /api/premium/me hands the id to the app, so a notification can find the owner of a purchase the app never reported.
+ * Before the table exists both helpers just do nothing (the old behavior: the app has to report the purchase).
+ */
+const linkedAccounts = new Set<string>()
+
+export async function rememberGoogleAccount(uid: string) {
+  if (linkedAccounts.has(uid)) return
+  // Keyed by uid: if the id ever changes (new GOOGLE_PLAY_ACCOUNT_SALT) the row is updated, not refused
+  const res = await rest('premium_google_accounts?on_conflict=user_uid', {
+    method: 'POST',
+    prefer: 'resolution=merge-duplicates,return=minimal',
+    body: JSON.stringify({ account_id: googleAccountIdFor(uid), user_uid: uid }),
+  }).catch(() => null)
+  if (res?.ok) linkedAccounts.add(uid)
+}
+
+async function ownerOfGoogleAccount(accountId: string | undefined): Promise<string | null> {
+  if (!accountId || !/^[0-9a-f]{64}$/.test(accountId)) return null
+  const res = await rest(`premium_google_accounts?select=user_uid&account_id=eq.${accountId}&limit=1`).catch(() => null)
+  if (!res?.ok) return null
+  const uid = ((await res.json()) as { user_uid: string }[])[0]?.user_uid ?? null
+  // The id is a hash of the uid: only trust a row that still matches it
+  return uid && googleAccountIdFor(uid) === accountId ? uid : null
+}
+
 let cachedToken: { value: string; exp: number } | null = null
 
 async function accessToken(): Promise<string> {
@@ -114,10 +142,12 @@ type LineItem = {
   expiryTime?: string
   autoRenewingPlan?: { autoRenewEnabled?: boolean }
   offerDetails?: { basePlanId?: string; offerId?: string }
-  offerPhase?: { freeTrial?: object }
+  /** Which phase the current period is in (freeTrial / introductoryPrice / basePrice / prorationPeriod). */
+  offerPhase?: { freeTrial?: object; basePrice?: object; introductoryPrice?: object; prorationPeriod?: object }
 }
 export type GoogleSubscription = {
   subscriptionState?: string
+  startTime?: string
   acknowledgementState?: string
   latestOrderId?: string
   linkedPurchaseToken?: string
@@ -148,11 +178,22 @@ async function acknowledge(productId: string, purchaseToken: string) {
   if (!res.ok && res.status !== 400) throw new GooglePlayError(`Acknowledging the purchase failed (HTTP ${res.status}).`, 503)
 }
 
+/**
+ * The free trial is running now. offerDetails.offerId stays "trial7" for the whole subscription, so it alone would keep
+ * the row 'trialing' forever; use offerPhase, and only without it fall back to the trial offer within 7 days of start.
+ */
+function inFreeTrial(sub: GoogleSubscription, item: LineItem) {
+  if (item.offerPhase) return Boolean(item.offerPhase.freeTrial)
+  if (!/trial/i.test(item.offerDetails?.offerId ?? '')) return false
+  const start = sub.startTime ? Date.parse(sub.startTime) : NaN
+  return Number.isFinite(start) && Date.now() < start + 7 * 24 * 60 * 60 * 1000
+}
+
 function statusFrom(sub: GoogleSubscription, item: LineItem): PremiumStatus | null {
   switch (sub.subscriptionState) {
     case 'SUBSCRIPTION_STATE_ACTIVE':
     case 'SUBSCRIPTION_STATE_CANCELED': // auto-renew off: access until expiryTime
-      return item.offerPhase?.freeTrial || /trial/i.test(item.offerDetails?.offerId ?? '') ? 'trialing' : 'active'
+      return inFreeTrial(sub, item) ? 'trialing' : 'active'
     case 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD':
     case 'SUBSCRIPTION_STATE_ON_HOLD':
       return 'past_due'
@@ -166,7 +207,8 @@ function statusFrom(sub: GoogleSubscription, item: LineItem): PremiumStatus | nu
 
 /**
  * Read a purchase token from Google and mirror it into premium_entitlements. `uid` = the account that reported it
- * (app); null = a server notification (the row's owner is kept; unknown tokens are ignored).
+ * (app); null = a server notification (the row's owner is kept; an unreported token goes to the account named by
+ * its obfuscated account id via premium_google_accounts, otherwise it is ignored).
  */
 export async function syncGoogleSubscription(purchaseToken: string, uid: string | null, email?: string | null) {
   const sub = await fetchSubscription(purchaseToken)
@@ -185,7 +227,8 @@ export async function syncGoogleSubscription(purchaseToken: string, uid: string 
   if (uid && existing && existing.user_uid !== uid && !(buyer && buyer === googleAccountIdFor(uid))) {
     throw new GooglePlayError('This Google Play subscription is linked to another Misaeng account.', 409)
   }
-  const ownerUid = uid ?? existing?.user_uid ?? null
+  // A notification for a purchase the app never reported: the account id on the purchase names its owner
+  const ownerUid = uid ?? existing?.user_uid ?? (await ownerOfGoogleAccount(buyer))
   if (!ownerUid) return null
 
   const status = statusFrom(sub, item)
