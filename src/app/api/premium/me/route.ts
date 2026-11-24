@@ -4,6 +4,7 @@ import { resolveAuthenticatedUser } from '../../agent-auth/lib/authHelpers'
 import { getRequestBearerToken } from '../../agent-auth/lib/ellieoServer'
 import { getPremiumState } from '@lib/premium/access.server'
 import { appAccountTokenFor } from '@lib/premium/apple.server'
+import { androidBillingEnabled, googleAccountIdFor } from '@lib/premium/google.server'
 import { premiumPayload } from '@lib/premium/payload.server'
 
 export const runtime = 'nodejs'
@@ -11,7 +12,8 @@ export const dynamic = 'force-dynamic'
 
 /**
  * GET /api/premium/me — this member's Premium state (logged out → premium false, loggedIn false), plus the
- * appAccountToken the iOS app puts on purchases. 503 when the state can't be read (the apps then show no buy button,
+ * appAccountToken the iOS app puts on purchases, and for Android whether Google Play purchases are open
+ * (androidBilling) plus the obfuscated account id the app puts on them (googleAccountId). 503 when the state can't be read (the apps then show no buy button,
  * so someone who already has Premium is never offered a second subscription).
  */
 export async function GET() {
@@ -23,6 +25,15 @@ export async function GET() {
   }
   const state = await getPremiumState(user)
   if (state.degraded) return NextResponse.json({ error: 'Try again in a moment.' }, { status: 503 })
-  const appAccountToken = user ? await appAccountTokenFor(user.uid).catch(() => null) : null
-  return NextResponse.json({ ...premiumPayload(state, Boolean(user)), appAccountToken })
+  const [appAccountToken, androidBilling] = await Promise.all([
+    user ? appAccountTokenFor(user.uid).catch(() => null) : null,
+    androidBillingEnabled(),
+  ])
+  return NextResponse.json({
+    ...premiumPayload(state, Boolean(user)),
+    appAccountToken,
+    // Android: show the Google Play paywall (off until the team opens it) and the id to put on purchases
+    androidBilling,
+    googleAccountId: user ? googleAccountIdFor(user.uid) : null,
+  })
 }

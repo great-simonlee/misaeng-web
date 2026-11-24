@@ -115,6 +115,8 @@ export type PointSettings = {
   'review_qna.enabled': boolean
   /** Washington DC city site (web /dc and the app city list). Off until the team opens it. */
   'cities.dc.enabled': boolean
+  /** Misaeng Premium purchases in the Android app (Google Play Billing). Off until the team opens it. */
+  'premium.android_billing': boolean
 }
 
 export type PointSettingKey = keyof PointSettings
@@ -127,6 +129,7 @@ export const POINT_SETTING_DEFAULTS: PointSettings = {
   'coffee_chat.enabled': false,
   'review_qna.enabled': false,
   'cities.dc.enabled': false,
+  'premium.android_billing': false,
 }
 
 export const POINT_SETTING_KEYS = Object.keys(POINT_SETTING_DEFAULTS) as PointSettingKey[]
