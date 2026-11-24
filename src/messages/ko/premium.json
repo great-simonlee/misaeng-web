@@ -119,7 +119,10 @@
     "codeDaysLeft": "{days}일 남음",
     "code": "이용권은 기간이 끝나면 자동으로 종료돼요. 결제도, 해지할 것도 없어요.",
     "manageBilling": "결제 수단 관리",
-    "pastDue": "결제가 실패했어요. ‘구독 관리’에서 카드를 바꾸지 않으면 곧 Premium이 종료돼요."
+    "pastDue": "결제가 실패했어요. ‘구독 관리’에서 카드를 바꾸지 않으면 곧 Premium이 종료돼요.",
+    "paidByParent": "부모님이 결제한 프리미엄",
+    "nextCharge": "다음 결제일 {date}",
+    "paidByParentNamed": "부모님({name})이 결제한 프리미엄"
   },
   "status": {
     "successTitle": "환영해요! Premium이 열렸어요",
@@ -272,5 +275,20 @@
     "title": "미생 Premium",
     "on": "이용 중",
     "pitch": "회사별 비자·스폰서 이력과 직무별 기본급"
+  },
+  "parent": {
+    "title": "자녀에게 프리미엄 선물하기",
+    "body": "학부모 계정은 연결된 자녀의 프리미엄을 결제해요. 결제는 내 카드로, 프리미엄은 자녀 계정에 적용돼요.",
+    "noChild": "먼저 자녀와 연결해 주세요",
+    "linkChild": "자녀 연결하기",
+    "childFallback": "자녀",
+    "buy": "프리미엄 결제하기",
+    "manage": "자녀 · 구독 관리",
+    "unavailable": "자녀 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.",
+    "blocked": {
+      "OWN_SUBSCRIPTION": "자녀가 직접 구독 중이에요",
+      "OTHER_PARENT": "다른 부모님이 결제 중이에요",
+      "ALREADY_PAID_BY_YOU": "이미 결제 중이에요"
+    }
   }
 }

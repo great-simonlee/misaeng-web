@@ -26,6 +26,7 @@ import { VisaSponsorEntry } from '@widgets/nyc/CompanyVisaSponsor'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { CompanyPostings } from '@widgets/nyc/PostingCard'
 import { AppHandoffButton } from '@components/AppHandoff'
+import { useTrackView } from '@lib/analytics/useTrackView'
 
 const PRIMARY_LINK =
   'inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-[var(--brand)] px-5 text-[14px] font-semibold text-white shadow-[0_8px_24px_-8px_rgb(var(--brand-rgb)/0.7)] touch-manipulation transition hover:bg-[var(--brand-hover)] active:scale-[0.98]'
@@ -54,6 +55,7 @@ export function CompanyDetailScreen({ slug }: { slug: string }) {
   }
   const [detail, setDetail] = useState<CompanyDetail | null>(null)
   const [reviews, setReviews] = useState<CompanyReview[]>([])
+  useTrackView('company_viewed', detail ? slug : null, { company_id: slug })
   const [loading, setLoading] = useState(true)
   const [reviewsLoading, setReviewsLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)

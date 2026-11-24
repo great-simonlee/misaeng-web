@@ -671,5 +671,149 @@
     "loginRequired": "Please log in first.",
     "notFound": "We couldn't find this conversation.",
     "unavailable": "We can't take inquiries right now. Please email info@misaeng.com."
+  },
+  "family": {
+    "metaTitle": "Con · Phụ huynh",
+    "back": "Trang của tôi",
+    "titleParent": "Con",
+    "titleMember": "Phụ huynh",
+    "introParent": "Thanh toán và quản lý Premium cho con đã liên kết. Bài viết, bình luận và hoạt động của con không bao giờ hiển thị với bạn.",
+    "introMember": "Xem yêu cầu liên kết của phụ huynh và quản lý phụ huynh đã liên kết.",
+    "loadFailed": "Không tải được.",
+    "retry": "Thử lại",
+    "actionFailed": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "working": "Đang xử lý…",
+    "childFallback": "Con",
+    "parentFallback": "Phụ huynh",
+    "checkout": {
+      "successTitle": "Thanh toán thành công",
+      "successBody": "Premium của con sẽ bật trong giây lát — xem bên dưới.",
+      "cancelTitle": "Đã hủy thanh toán",
+      "cancelBody": "Chưa bị trừ tiền. Bạn có thể thanh toán bất cứ lúc nào."
+    },
+    "pass": {
+      "title": "Premium của bạn · ưu đãi phụ huynh",
+      "body": "Cảm ơn bạn đã mua Premium cho con — bạn cũng có Premium {days} ngày, đến {date}."
+    },
+    "children": {
+      "title": "Con đã liên kết",
+      "empty": "Chưa có con nào được liên kết. Gửi yêu cầu đến email của con bên dưới, hoặc dùng liên kết mời con gửi.",
+      "buy": "Mua Premium",
+      "manage": "Quản lý gói",
+      "unlink": "Hủy liên kết",
+      "manageIn": {
+        "apple": "Gói App Store — quản lý trong Cài đặt iPhone > Tài khoản Apple > Đăng ký.",
+        "google": "Gói Google Play — quản lý trong Play Store > Thanh toán và gói thuê bao."
+      }
+    },
+    "plan": {
+      "monthly": "Hằng tháng",
+      "season": "3 tháng",
+      "annual": "Hằng năm"
+    },
+    "status": {
+      "none": "Chưa có Premium",
+      "pastDue": "Có vấn đề thanh toán · kiểm tra thẻ trong Quản lý gói",
+      "mine": "Bạn trả · {plan} · thanh toán tiếp {date}",
+      "mineTrial": "Đang dùng thử · {plan} · thanh toán đầu {date}",
+      "mineEnds": "Bạn đã trả · {plan} · kết thúc {date} (tắt gia hạn)",
+      "otherParent": "Phụ huynh khác đang trả · đến {date}",
+      "own": "Con tự đăng ký",
+      "free": "Premium miễn phí · đến {date}"
+    },
+    "blocked": {
+      "OWN_SUBSCRIPTION": "Con đã tự đăng ký nên bạn không thể mua.",
+      "OTHER_PARENT": "Phụ huynh khác đã thanh toán.",
+      "ALREADY_PAID_BY_YOU": "Bạn đã thanh toán."
+    },
+    "buy": {
+      "title": "Premium cho {name}",
+      "pay": "Thanh toán {price}",
+      "payer": "Thẻ của bạn bị trừ tiền; Premium áp dụng cho tài khoản của con.",
+      "renew": "Gói tự động gia hạn cùng giá và thời hạn cho đến khi bạn hủy. Chúng tôi nhắc trước mỗi lần gia hạn qua email và thông báo; bạn có thể hủy bất cứ lúc nào bằng “Quản lý gói”.",
+      "pass": "Tài khoản của bạn cũng có Premium 14 ngày kể từ ngày thanh toán (hoặc bắt đầu dùng thử).",
+      "digest": "Trong 14 ngày sau khi thanh toán, mỗi sáng chúng tôi gửi số tin tuyển dụng và tin visa mới trên Misaeng (không bao giờ là hoạt động của con). Bạn có thể tắt.",
+      "refund": "Hoàn tiền toàn bộ trong 7 ngày sau lần thanh toán đầu, về thẻ đã thanh toán. {policy}"
+    },
+    "add": {
+      "title": "Liên kết con",
+      "body": "Nhập email trường hoặc email cá nhân của con để gửi yêu cầu liên kết. Chỉ liên kết khi con chấp nhận. Yêu cầu có hiệu lực 14 ngày.",
+      "placeholder": "child@school.edu",
+      "send": "Gửi yêu cầu",
+      "sent": "Đã gửi yêu cầu liên kết."
+    },
+    "pending": {
+      "waiting": "Đang chờ · đến {date}",
+      "cancel": "Hủy",
+      "canceled": "Đã hủy yêu cầu."
+    },
+    "digest": {
+      "title": "Thông báo",
+      "label": "Bản tin phụ huynh",
+      "hint": "Trong 14 ngày sau khi bạn trả Premium cho con, khoảng 9 giờ sáng giờ Hàn Quốc, qua thông báo và email: số tin mới trên Misaeng."
+    },
+    "unlink": {
+      "title": "Hủy liên kết với {name}?",
+      "keep": "Giữ",
+      "confirm": "Hủy liên kết",
+      "done": "Đã hủy liên kết.",
+      "parentBody": "Nếu hủy liên kết, Premium bạn đã trả vẫn dùng được trên tài khoản của con đến hết thời gian đã thanh toán, và gia hạn tự động dừng.",
+      "childBody": "Nếu hủy liên kết, Premium do phụ huynh trả vẫn dùng được đến hết thời gian đã thanh toán, và gia hạn tự động dừng. Phụ huynh sẽ được thông báo.",
+      "apple": "Misaeng không thể hủy gói App Store. Sau khi hủy liên kết, hãy tự hủy trong Cài đặt iPhone > Tài khoản Apple > Đăng ký.",
+      "appleToast": "Hãy hủy gói App Store trong Cài đặt iPhone."
+    },
+    "incoming": {
+      "title": "Yêu cầu liên kết",
+      "line": "{name} muốn liên kết làm phụ huynh của bạn",
+      "privacy": "Nếu chấp nhận, phụ huynh chỉ thấy biệt danh và trạng thái Premium (gói, ngày thanh toán tiếp) — không thấy bài viết, bình luận hay hoạt động.",
+      "until": "Trả lời trước {date}",
+      "accept": "Chấp nhận",
+      "decline": "Từ chối",
+      "accepted": "Đã liên kết với phụ huynh.",
+      "declined": "Đã từ chối yêu cầu."
+    },
+    "parents": {
+      "title": "Phụ huynh đã liên kết",
+      "empty": "Chưa có phụ huynh nào. Phụ huynh có thể gửi yêu cầu đến email của bạn hoặc tham gia bằng liên kết mời bạn gửi.",
+      "since": "Liên kết từ {date}",
+      "paying": "đang trả Premium",
+      "sees": "Phụ huynh chỉ thấy biệt danh và trạng thái Premium của bạn."
+    },
+    "entry": {
+      "parentLinked": "{count} con đã liên kết",
+      "parentEmpty": "Liên kết con",
+      "parentHint": "Mua và quản lý Premium, yêu cầu liên kết",
+      "incoming": "{count} yêu cầu liên kết",
+      "memberLinked": "{count} phụ huynh đã liên kết",
+      "memberHint": "Xem yêu cầu, hủy liên kết"
+    }
+  },
+  "familyAccept": {
+    "metaTitle": "Yêu cầu liên kết phụ huynh",
+    "parentFallback": "Phụ huynh",
+    "title": "{name} muốn liên kết làm phụ huynh của bạn",
+    "body": "{name} muốn liên kết tài khoản phụ huynh Misaeng với tài khoản của bạn.",
+    "sees": "Phụ huynh chỉ thấy biệt danh và trạng thái Premium (gói, ngày thanh toán tiếp).",
+    "notSees": "Bài viết, bình luận và hoạt động của bạn không bao giờ hiển thị.",
+    "unlink": "Bạn có thể hủy liên kết bất cứ lúc nào trong Trang của tôi > Phụ huynh.",
+    "until": "Trả lời trước {date}",
+    "accept": "Chấp nhận",
+    "decline": "Từ chối",
+    "login": "Đăng nhập để trả lời",
+    "loginHint": "Chưa là thành viên? Hãy đăng ký rồi mở lại liên kết này. Đăng nhập bằng email nhận được yêu cầu (hoặc tài khoản đã xác minh email trường đó).",
+    "acceptedTitle": "Đã liên kết với {name}",
+    "acceptedBody": "Xem trong Trang của tôi > Phụ huynh; bạn có thể hủy liên kết bất cứ lúc nào.",
+    "openFamily": "Xem phụ huynh",
+    "declinedTitle": "Đã từ chối yêu cầu",
+    "declinedBody": "Tài khoản của bạn không được liên kết.",
+    "closed": {
+      "accepted": "Đã chấp nhận",
+      "expired": "Yêu cầu đã hết hạn",
+      "other": "Yêu cầu đã đóng"
+    },
+    "closedBody": "Hãy nhờ phụ huynh gửi yêu cầu mới nếu cần.",
+    "missingTitle": "Không tìm thấy yêu cầu",
+    "missingBody": "Vui lòng kiểm tra liên kết.",
+    "failed": "Đã xảy ra lỗi. Vui lòng thử lại."
   }
 }

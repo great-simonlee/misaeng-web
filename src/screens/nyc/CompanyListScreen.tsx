@@ -35,6 +35,7 @@ import {
 } from '@widgets/nyc/CompanyBrand'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { byBrand } from '@lib/brand/design'
+import { track } from '@lib/analytics/client'
 
 export function CompanyListScreen() {
   const city = useCity()
@@ -117,6 +118,14 @@ export function CompanyListScreen() {
       ),
     [companies, industry, query]
   )
+
+  // search_performed once typing pauses (1.2 s), with how many companies matched
+  useEffect(() => {
+    const q = query.trim()
+    if (q.length < 2) return
+    const timer = setTimeout(() => track('search_performed', { board: 'companies', query: q, result_count: filtered.length }), 1200)
+    return () => clearTimeout(timer)
+  }, [query, filtered.length])
 
   const totalReviews = useMemo(
     () => companies.reduce((sum, c) => sum + c.reviewCount, 0),

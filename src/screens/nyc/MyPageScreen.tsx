@@ -34,6 +34,7 @@ import { MyPageCreditSection } from '@widgets/nyc/MyPageCreditSection'
 import { MyPagePremiumCard } from '@widgets/nyc/MyPagePremiumCard'
 import { MyPageReferralSection } from '@widgets/nyc/MyPageReferralSection'
 import { MyPageParentInviteSection } from '@widgets/nyc/MyPageParentInviteSection'
+import { MyPageFamilySection } from '@widgets/nyc/MyPageFamilySection'
 import {
   JobAlertVerifyCard,
   JustVerifiedLine,
@@ -753,6 +754,9 @@ export function MyPageScreen() {
             ) : null}
 
             {MISAENG_DESIGN && isParent ? <ParentAccountCard /> : null}
+
+            {/* 1.0.9 (미생만): 학부모 → 자녀 (연결·프리미엄 결제), 회원 → 부모님 (요청 수락·연결 끊기) */}
+            {MISAENG_DESIGN ? <MyPageFamilySection isParent={isParent} /> : null}
 
             <MyPageReferralSection />
 

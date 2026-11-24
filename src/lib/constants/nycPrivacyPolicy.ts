@@ -5,11 +5,11 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
   eyebrow: 'LEGAL',
   title: 'Privacy Policy',
   titleKo: '개인정보처리방침',
-  version: '2026-11-23',
-  lastUpdated: 'November 23, 2026',
-  lastUpdatedKo: '2026년 11월 23일',
-  effectiveDate: 'November 23, 2026',
-  effectiveDateKo: '2026년 11월 23일',
+  version: '2026-11-24',
+  lastUpdated: 'November 24, 2026',
+  lastUpdatedKo: '2026년 11월 24일',
+  effectiveDate: 'November 24, 2026',
+  effectiveDateKo: '2026년 11월 24일',
   contactEmail: 'info@misaeng.com',
   companyName: 'Misaeng LLC',
   companyAddress:
@@ -130,6 +130,14 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '학부모 계정: 학생의 부모님 초대 링크로 가입하면 초대한 학생과 연결된 학부모 계정이 됩니다. 연결 정보(누가 누구를 초대했는지, 가입 시각)를 보관하며, 관리자가 볼 수 있고 부정 사용 방지와 초대 보상 지급에 사용합니다. 학부모 계정은 학교·직장 인증을 하지 않습니다',
             },
             {
+              en: 'Linked parent and child accounts: a parent account can link with a child either through the child’s invite link or by entering the child’s school or personal email, which sends a link request the child must accept. We store the email you entered and the request (who asked, when, and whether it was accepted); if the request is not accepted, the email is deleted within 14 days. While accounts are linked, the parent sees only the child’s nickname, profile photo, and Premium status (plan, status, and next charge or end date), and the child sees the parent’s nickname. A parent never sees the child’s posts, comments, messages, searches, or other activity. Either side can unlink at any time; we keep a record of the link and when it ended',
+              ko: '연결된 학부모·자녀 계정: 학부모 계정은 자녀의 초대 링크로, 또는 자녀의 학교·개인 이메일을 입력해 연결 요청을 보내고 자녀가 수락하는 방식으로 자녀와 연결될 수 있습니다. 입력한 이메일과 요청 정보(누가, 언제 요청했는지와 수락 여부)를 보관하며, 수락되지 않은 요청의 이메일은 14일 이내에 삭제합니다. 연결되어 있는 동안 학부모는 자녀의 닉네임, 프로필 사진, Premium 상태(요금제, 상태, 다음 결제일 또는 종료일)만 볼 수 있고, 자녀는 학부모의 닉네임을 볼 수 있습니다. 학부모는 자녀의 게시글, 댓글, 메시지, 검색 등 활동을 볼 수 없습니다. 양쪽 모두 언제든 연결을 끊을 수 있으며, 연결 기록과 종료 시각은 보관합니다',
+            },
+            {
+              en: 'Parent-paid Premium: when a parent pays for a child’s Premium, we record the parent as the payer and the child as the member who receives Premium, and use this to send the parent renewal and trial reminders, handle cancellations and refunds (refunds go to the parent’s payment method), give the parent the 14-day Premium included with the purchase, and stop automatic renewal if the accounts are unlinked. For 14 days after the purchase we may send the parent a short daily update by push and email with platform-wide counts only (for example the number of new job postings and visa news that day) — never anything about the child’s activity. The parent can turn these updates off in settings or with the link in each email',
+              ko: '학부모가 결제한 Premium: 학부모가 자녀의 Premium을 결제하면 학부모를 결제자로, 자녀를 Premium을 받는 회원으로 기록하며, 이를 학부모에게 갱신·무료 체험 종료 안내 발송, 해지·환불 처리(환불은 학부모의 결제 수단으로), 결제에 포함된 학부모의 14일 Premium 제공, 계정 연결이 끊긴 경우 자동 갱신 중지에 사용합니다. 결제 후 14일 동안 학부모에게 서비스 전체의 집계 수치(예: 그날의 새 채용 공고·비자 소식 수)만 담은 짧은 소식을 푸시와 이메일로 매일 보낼 수 있으며, 자녀의 활동에 관한 내용은 절대 포함하지 않습니다. 학부모는 설정이나 각 이메일의 링크로 이 소식을 끌 수 있습니다',
+            },
+            {
               en: 'Posts and communications: post titles, body text, images/attachments, comments, report reasons and details, inquiry messages, and feedback, together with the language they were written in and their translations',
               ko: '게시·소통: 게시글 제목·본문·이미지·첨부, 댓글, 신고 사유·내용, 문의 메시지, 피드백 및 작성 언어와 번역문',
             },
@@ -180,12 +188,12 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '로그·기기 정보: IP 주소, 브라우저 유형·언어, 운영체제, 디바이스 식별에 준하는 정보, 접속 일시, 참조 URL, 오류 로그',
             },
             {
-              en: 'Usage data: pages or posts viewed, search queries (when used), approximate interactions such as clicks/scrolls, and session information',
-              ko: '이용 기록: 열람한 페이지·게시물, 검색어(해당 기능 사용 시), 클릭·스크롤 등 대략적 상호작용, 세션 정보',
+              en: 'Usage data (in-app and on the website): the screens and pages you open and how long they stay open; the posts, listings, reviews, companies, and job postings you view, save, or ask about; what you write (we record that you posted or commented, not the text); searches and filters you use; notifications you open; purchases and points activity; the app version, platform, and language; and a random ID for your app install or browser and the current session. We do not record the content of messages, photos, or verification documents, and we do not use the advertising identifier (IDFA/AAID)',
+              ko: '이용 기록(앱·웹사이트): 연 화면·페이지와 머문 시간, 열람·저장·문의한 게시물·매물·후기·회사·채용 공고, 글쓰기(글·댓글을 썼다는 사실만 기록하고 내용은 기록하지 않음), 검색어와 필터, 열어 본 알림, 결제·포인트 이용, 앱 버전·플랫폼·언어, 앱 설치 또는 브라우저마다 만드는 임의 ID와 세션 정보. 메시지 내용, 사진, 인증 서류는 기록하지 않으며 광고 식별자(IDFA/AAID)를 사용하지 않습니다',
             },
             {
-              en: 'Cookies and similar technologies: cookies and local storage used for login persistence, preferences, and security. We do not use third-party advertising or analytics trackers; we keep only first-party, aggregated usage counts (for example how often a map is opened) to improve the Services',
-              ko: '쿠키 및 유사 기술: 로그인 유지, 선호 설정, 보안에 사용되는 쿠키·로컬 스토리지. 회사는 제3자 광고·분석 추적 도구를 사용하지 않으며, 서비스 개선을 위해 지도 열람 횟수 등 집계된 자체 이용 통계만 보관합니다',
+              en: 'Cookies and similar technologies: cookies and local storage used for login persistence, preferences, security, and our own usage analytics (a first-party cookie holding a random browser ID, and where you arrived from, such as a campaign or invite link). We do not use third-party advertising or analytics trackers, and usage data is not sold or shared for advertising',
+              ko: '쿠키 및 유사 기술: 로그인 유지, 선호 설정, 보안, 자체 이용 분석에 사용되는 쿠키·로컬 스토리지(임의의 브라우저 ID와 유입 경로(캠페인·초대 링크 등)를 담은 자사 쿠키). 회사는 제3자 광고·분석 추적 도구를 사용하지 않으며, 이용 기록을 판매하거나 광고 목적으로 공유하지 않습니다',
             },
             {
               en: 'Approximate location: region inferred from IP (precise GPS is not necessarily required by default)',
@@ -234,6 +242,10 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
             {
               en: 'iOS app purchases: payment is processed by Apple. Apple sends us the transaction and subscription status for your account; we do not receive your payment details.',
               ko: 'iOS 앱 결제: Apple이 결제를 처리하며, 이용자 계정의 거래·구독 상태만 회사에 전달합니다. 회사는 결제 정보를 받지 않습니다.',
+            },
+            {
+              en: 'Android app purchases: payment is processed by Google Play. Google sends us the purchase and subscription status for your account; we do not receive your payment details.',
+              ko: 'Android 앱 결제: Google Play가 결제를 처리하며, 이용자 계정의 구매·구독 상태만 회사에 전달합니다. 회사는 결제 정보를 받지 않습니다.',
             },
             {
               en: 'Premium codes: the code you redeem, when you redeemed it, and when the access ends.',
@@ -445,8 +457,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '스팸·사기·괴롭힘·보안 위협 탐지 및 대응, 약관 집행',
             },
             {
-              en: 'Improving Service quality, analyzing errors, and measuring usability and performance using first-party, aggregated usage counts',
-              ko: '서비스 품질 개선, 오류 분석, 자체 집계 이용 통계를 통한 사용성·성능 측정',
+              en: 'Improving Service quality, analyzing errors, and measuring usability and performance with our own usage analytics (for example how many members are active each week, which features and posts are used, and where sign-ups come from). For housing inquiries, our staff may see which listings you viewed so they can answer you; this view is limited to authorized administrators and every access is logged',
+              ko: '서비스 품질 개선, 오류 분석, 자체 이용 분석을 통한 사용성·성능 측정(예: 주간 활동 회원 수, 많이 쓰는 기능·게시물, 가입 유입 경로). 하우징 문의에 답하기 위해 담당 직원이 이용자가 본 매물을 확인할 수 있으며, 이 화면은 권한 있는 관리자만 볼 수 있고 모든 열람이 기록됩니다',
             },
             {
               en: 'Complying with legal obligations, handling disputes, and protecting rights',
@@ -628,8 +640,8 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
               ko: '기능: 언어·UI 선호, 최근 이용 맥락 기억',
             },
             {
-              en: 'Analytics: aggregated visit counts, page performance, and error rates when used for improvement',
-              ko: '분석: 방문 수, 페이지 성과, 오류율 등 집계·개선 목적(사용되는 경우)',
+              en: 'Analytics: our own usage analytics (a first-party cookie with a random browser ID, kept for up to 13 months, and the campaign or invite link you arrived from, kept for 30 days). Nothing is sent to analytics or advertising companies',
+              ko: '분석: 자체 이용 분석(임의의 브라우저 ID를 담은 자사 쿠키 최대 13개월, 유입 캠페인·초대 링크 정보 30일). 분석·광고 업체로는 아무것도 보내지 않습니다',
             },
           ],
         },
@@ -654,6 +666,10 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
           type: 'ul',
           items: [
             {
+              en: 'Usage data (analytics): raw usage events for up to 13 months, then only aggregated counts that do not identify you; the text of searches is removed after 90 days. When you delete your account, your usage events lose their link to you 30 days later',
+              ko: '이용 기록(분석): 원본 이용 기록은 최대 13개월 보관한 뒤 개인을 식별할 수 없는 집계 수치만 남기며, 검색어 원문은 90일 후 삭제합니다. 계정을 삭제하면 30일 후 이용 기록과 이용자의 연결을 끊습니다',
+            },
+            {
               en: 'Account information: while your account is active. When you delete your account it is handled as described below',
               ko: '계정 정보: 계정이 유지되는 동안. 계정을 삭제하면 아래 “계정 삭제”에 따라 처리합니다',
             },
@@ -672,6 +688,10 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
             {
               en: 'Parent account links: for as long as both accounts exist, and for a reasonable period afterward where needed for abuse prevention and reward records',
               ko: '학부모 계정 연결 정보: 두 계정이 유지되는 동안, 그리고 부정 방지·보상 기록에 필요한 경우 그 후 합리적인 기간',
+            },
+            {
+              en: 'Parent link requests by email: the entered email is deleted within 14 days if the request is not accepted (and when it is accepted, since the accounts are then linked); the rest of the request record is kept with the link records',
+              ko: '이메일 연결 요청: 입력한 이메일은 요청이 수락되지 않으면 14일 이내에(수락되면 계정이 연결되므로 그때) 삭제하며, 나머지 요청 기록은 연결 정보와 함께 보관합니다',
             },
             {
               en: 'Inquiries and reports: for a period needed after handling for disputes and legal compliance',

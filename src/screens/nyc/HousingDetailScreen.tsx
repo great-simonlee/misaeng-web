@@ -72,6 +72,7 @@ import {
   BoardSurface,
 } from '@widgets/nyc/BoardPageShell'
 import { HousingPricePair, LoadingState, PullToRefresh, SchoolBadge } from '@components'
+import { useTrackView } from '@lib/analytics/useTrackView'
 
 interface HousingDetailScreenProps {
   postId: string
@@ -93,6 +94,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
     listing: HousingListing | null
   } | null>(null)
   const listing = fetched?.id === postId ? fetched.listing : null
+  useTrackView('post_viewed', listing ? postId : null, { post_id: postId, post_type: 'housing', board: 'housing' })
   const loadingLive = fetched?.id !== postId
   const [userRoomKey, setUserRoomKey] = useState<{
     postId: string

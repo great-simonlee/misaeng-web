@@ -2,6 +2,7 @@ import { after } from 'next/server'
 
 import { getEllieoBaseUrl } from '@/app/api/agent-auth/lib/ellieoServer'
 import { forgetReporterEmail } from '@lib/community/reports.server'
+import { pointsRest, PointsStoreError } from '@lib/points/rest.server'
 import { deleteNotificationsForUser } from '@lib/push/inbox.server'
 import { deletePushDataForUser } from '@lib/push/store.server'
 import { isSupabaseStorageConfigured } from '@lib/supabase/avatar.server'
@@ -328,6 +329,17 @@ export async function deleteMisaengAccount(input: {
   await step(report, 'push', () => deletePushDataForUser(uid))
   await step(report, 'notifications', () => deleteNotificationsForUser(uid))
   await step(report, 'saves', () => deletePostSavesForUser(uid))
+  // analytics events lose the account id after the 30-day grace (supabase/analytics.sql analytics_nightly)
+  await step(report, 'analytics', async () => {
+    await pointsRest('analytics_deletions?on_conflict=uid', {
+      method: 'POST',
+      body: JSON.stringify({ uid }),
+      prefer: 'resolution=ignore-duplicates,return=minimal',
+    }).catch((error) => {
+      if (error instanceof PointsStoreError && error.setupRequired) return
+      throw error
+    })
+  })
   await step(report, 'coffeeChats', async () => {
     const { getPointsEngineState } = await import('@lib/points/engine.server')
     if (!(await getPointsEngineState()).tablesReady) return 'skipped'
@@ -344,6 +356,11 @@ export async function deleteMisaengAccount(input: {
     const { cancelStripeSubscriptionsForUser } = await import('@lib/premium/refunds.server')
     const canceled = await cancelStripeSubscriptionsForUser(uid)
     return canceled ? `canceled ${canceled}` : 'ok'
+  })
+  // Parent ↔ child links end like an unlink (the child keeps the paid period, auto-renew stops); email requests deleted
+  await step(report, 'family', async () => {
+    const { endFamilyForDeletedAccount } = await import('@lib/family/family.server')
+    return endFamilyForDeletedAccount(uid)
   })
   await step(report, 'reports', () => forgetReporterEmail(uid))
   await step(report, 'marketplaceInquiries', async () => {

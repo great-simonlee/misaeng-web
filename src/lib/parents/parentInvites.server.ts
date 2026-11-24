@@ -9,6 +9,7 @@ import { notifyPointsEarned } from '@lib/points/notify.server'
 import { enc, pointsRest, PointsStoreError } from '@lib/points/rest.server'
 import { notifyUsers } from '@lib/push/notify.server'
 import { getSupabaseProfile, upsertSupabaseProfile } from '@lib/supabase/profile.server'
+import { activeLink, createLink, linksOf } from '@lib/family/store.server'
 
 /**
  * 학부모 초대 (1.0.7, supabase/release_1_0_7.sql `parent_invites`).
@@ -156,9 +157,16 @@ async function getRow(code: string) {
   return rows[0] ?? null
 }
 
-/** 학부모 슬롯을 차지하는 초대: 가입함(전환 제외) + 아직 유효한 링크 */
-function usedSlots(rows: Row[], now = Date.now()) {
-  return rows.filter((r) => r.status === 'joined' || (r.status === 'open' && !isExpired(r, now))).length
+/**
+ * 학부모 슬롯: 아직 유효한 초대 링크 + 지금 연결된 부모 (parent_links, 초대·이메일 모두 — 연결을 끊은 부모는 빠진다).
+ * parent_links.sql 전에는 가입한 초대(전환 제외)를 센다.
+ */
+async function usedSlots(uid: string, rows: Row[], now = Date.now()) {
+  const open = rows.filter((r) => r.status === 'open' && !isExpired(r, now)).length
+  const linked = await linksOf({ childUid: uid, activeOnly: true })
+    .then((links) => links.length)
+    .catch(() => rows.filter((r) => r.status === 'joined').length)
+  return open + linked
 }
 
 export type ParentInviteEligibility = { eligible: boolean; reason: 'not_verified' | 'parent' | 'suspended' | null }
@@ -194,7 +202,8 @@ export async function getParentInviteSummary(uid: string, origin: string): Promi
   return {
     ...eligibility,
     max,
-    remaining: eligibility.eligible ? Math.max(0, max - usedSlots(rows)) : 0,
+    // Parents linked by email count toward the same cap; unlinked parents free their slot
+    remaining: eligibility.eligible ? Math.max(0, max - (await usedSlots(uid, rows))) : 0,
     rewardPoints: reward,
     delayDays,
     invites: await shape(visible, origin, reward),
@@ -209,7 +218,9 @@ export async function createParentInvite(uid: string, input: { city?: string | n
   if (!eligibility.eligible) throw new ParentInviteError('VERIFICATION_REQUIRED', 'parents.verifyFirst', 403)
   const { reward, max } = await rules()
   const rows = await rowsForStudent(uid)
-  if (usedSlots(rows) >= max) throw new ParentInviteError('PARENT_INVITE_LIMIT', 'parents.limit', 409, { max })
+  if ((await usedSlots(uid, rows)) >= max) {
+    throw new ParentInviteError('PARENT_INVITE_LIMIT', 'parents.limit', 409, { max })
+  }
 
   const now = Date.now()
   for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -296,12 +307,20 @@ export async function acceptParentInvite(uid: string, code: string) {
   if (isExpired(row)) throw new ParentInviteError('EXPIRED', 'parents.inviteExpired', 410)
   if (row.student_uid === uid) throw new ParentInviteError('OWN_INVITE', 'parents.ownInvite', 400)
   if (profile?.status === 'suspended') throw new ParentInviteError('ACCOUNT_SUSPENDED', 'common.accountSuspended', 403)
-  if (isParentAccount(profile)) throw new ParentInviteError('ALREADY_PARENT', 'parents.alreadyParent', 409)
-  const ownInvites = await rowsForStudent(uid)
+  // 1.0.9: an existing parent account may accept another child's invite (one parent → many children). Already linked
+  // to this student (e.g. by email) → no second link and no second reward.
+  const alreadyParent = isParentAccount(profile)
+  if (alreadyParent && (await activeLink(uid, row.student_uid).catch(() => null))) {
+    throw new ParentInviteError('ALREADY_LINKED', 'parents.alreadyLinked', 409)
+  }
+  const ownInvites = alreadyParent ? [] : await rowsForStudent(uid)
   if (
-    profile?.schoolEmailVerified ||
+    !alreadyParent &&
+    (profile?.schoolEmailVerified ||
     (profile?.workplaceStatus && profile.workplaceStatus !== 'none') ||
-    ownInvites.some((r) => r.status !== 'revoked')
+    ownInvites.some((r) => r.status !== 'revoked') ||
+      // linked as someone's child (1.0.9 email links)
+      (await linksOf({ childUid: uid, activeOnly: true }).catch(() => [])).length > 0)
   ) {
     throw new ParentInviteError('PARENT_ACCOUNT_INELIGIBLE', 'parents.accountIneligible', 409)
   }
@@ -310,7 +329,10 @@ export async function acceptParentInvite(uid: string, code: string) {
     throw new ParentInviteError('REVOKED', 'parents.inviteRevoked', 410)
   }
 
-  const { delayDays, reward } = await rules()
+  const { delayDays, reward: baseReward, max } = await rules()
+  // 1.0.9: unlinking frees a parent slot, but a student earns the invite reward at most `max` times (no re-invite farming)
+  const rewarded = (await rowsForStudent(row.student_uid)).filter((r) => r.reward_status === 'scheduled' || r.reward_status === 'paid')
+  const reward = rewarded.length >= max ? 0 : baseReward
   const now = Date.now()
   const updated = await rest<Row[]>(`parent_invites?code=eq.${enc(row.code)}&status=eq.open`, {
     method: 'PATCH',
@@ -324,7 +346,7 @@ export async function acceptParentInvite(uid: string, code: string) {
       reward_amount: reward,
     }),
   }).catch((error) => {
-    // parent_uid unique: 다른 초대로 이미 연결된 계정
+    // parent_uid unique (parent_links.sql 전): 다른 초대로 이미 연결된 계정
     if (error instanceof PointsStoreError && error.code === '23505') {
       throw new ParentInviteError('ALREADY_PARENT', 'parents.alreadyParent', 409)
     }
@@ -332,11 +354,18 @@ export async function acceptParentInvite(uid: string, code: string) {
   })
   if (!updated.length) throw new ParentInviteError('ALREADY_USED', 'parents.inviteUsed', 409)
 
-  await upsertSupabaseProfile(uid, {
-    accountType: 'parent',
-    invitedByUid: row.student_uid,
-    parentInviteCode: row.code,
-    parentLinkedAt: now,
+  // The first link stays on the profile (invitedByUid: /api/app/me `parent`, ERP); every link is a parent_links row.
+  if (!alreadyParent || !profile?.invitedByUid) {
+    await upsertSupabaseProfile(uid, {
+      accountType: 'parent',
+      invitedByUid: row.student_uid,
+      parentInviteCode: row.code,
+      parentLinkedAt: now,
+    })
+  }
+  await createLink({ parentUid: uid, childUid: row.student_uid, source: 'invite', inviteCode: row.code }).catch((error) => {
+    // Before parent_links.sql the invite row + profile are the link (backfilled when the SQL runs)
+    console.error('[parent invite] parent_links insert failed', error)
   })
 
   // 학생에게: "부모님이 가입했어요 · 3일 후 30P"
@@ -345,7 +374,7 @@ export async function acceptParentInvite(uid: string, code: string) {
     userIds: [row.student_uid],
     build: (t) => ({
       title: t('api.push.parents.joined.title'),
-      body: t('api.push.parents.joined.body', { days: delayDays, amount: reward }),
+      body: reward > 0 ? t('api.push.parents.joined.body', { days: delayDays, amount: reward }) : t('api.push.parents.joined.bodyNoReward'),
       data: { type: 'parent_joined', code: row.code },
       threadId: 'parent-invite',
     }),
@@ -475,5 +504,8 @@ export async function convertParentToMember(uid: string) {
   })
   // invitedByUid는 기록으로 남긴다 (ERP에서 누가 초대했는지 보인다)
   await upsertSupabaseProfile(uid, { accountType: 'member', parentConvertedAt: Date.now() })
+  // 1.0.9: 연결 끊기와 같다 — 자녀는 결제 기간 유지, 자동 갱신 중지, 열린 이메일 요청 취소
+  const { endFamilyForConvertedParent } = await import('@lib/family/family.server')
+  await endFamilyForConvertedParent(uid).catch((error) => console.error('[parent convert] ending links failed', error))
   return { ok: true as const }
 }

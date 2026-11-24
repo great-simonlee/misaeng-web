@@ -19,6 +19,10 @@ import {
 } from '@lib/premium/client'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { byBrand } from '@lib/brand/design'
+import { track } from '@lib/analytics/client'
+import { useAuth } from '@hooks/useAuth'
+import { fetchFamily, type FamilyChild, type FamilyOverview } from '@lib/family/client'
+import { BuySheet } from '@screens/nyc/FamilyScreen'
 
 /**
  * /premium — the web paywall (Stripe). Benefits first and big, then the plan picker (annual preselected), the
@@ -40,6 +44,9 @@ export function PremiumScreen() {
   const href = useCityPath()
   const pathname = usePathname()
   const router = useRouter()
+  const { profile } = useAuth()
+  // 1.0.9: parent accounts never buy for themselves — they choose a linked child first (ParentPaywall)
+  const isParent = profile?.accountType === 'parent'
   const [me, setMe] = useState<PremiumMe | null>(null)
   const [loading, setLoading] = useState(true)
   const [plan, setPlan] = useState<PremiumPlanId>('annual')
@@ -63,11 +70,13 @@ export function PremiumScreen() {
     void (async () => {
       let next = await load()
       if (alive) setStatus(checkout)
+      track('paywall_viewed', { from: checkout ? 'checkout_return' : 'premium_page' })
       // The webhook can land a few seconds after Stripe sends the member back: check again for a little while.
       for (let i = 0; checkout === 'success' && alive && !next?.premium && i < 15; i += 1) {
         await new Promise((resolve) => setTimeout(resolve, 2000))
         next = await load()
       }
+      if (checkout === 'success' && next?.premium) track('purchase_completed', { product: 'premium', plan: next.plan ?? undefined, source: 'stripe' })
     })()
     return () => {
       alive = false
@@ -157,6 +166,11 @@ export function PremiumScreen() {
               {t('errors.retry')}
             </button>
           </section>
+        ) : isParent && me?.loggedIn ? (
+          <>
+            {me.premium ? <ActiveCard me={me} busy={busy} onManage={manage} /> : null}
+            <ParentPaywall />
+          </>
         ) : me?.premium ? (
           <ActiveCard me={me} busy={busy} onManage={manage} />
         ) : (
@@ -500,7 +514,12 @@ function ActiveCard({ me, busy, onManage }: { me: PremiumMe; busy: boolean; onMa
           {t('active.pastDue')}
         </p>
       ) : null}
-      {date && granted ? (
+      {me.paidByParent ? (
+        <p className='max-w-[420px] text-[14px] text-[var(--muted-foreground)]'>
+          {me.paidByParent.nickname ? t('active.paidByParentNamed', { name: me.paidByParent.nickname }) : t('active.paidByParent')}
+          {date ? ` · ${t('active.nextCharge', { date })}` : ''}
+        </p>
+      ) : date && granted ? (
         <>
           <p className='text-[14px] text-[var(--muted-foreground)]'>
             {t('active.codeUntil', { date })}
@@ -514,7 +533,7 @@ function ActiveCard({ me, busy, onManage }: { me: PremiumMe; busy: boolean; onMa
         </p>
       ) : null}
       {staff ? <p className='text-[13px] text-[var(--muted)]'>{t('active.staff')}</p> : null}
-      {me.source === 'stripe' && me.manageable ? (
+      {me.source === 'stripe' && me.manageable && !me.paidByParent ? (
         <button
           type='button'
           onClick={onManage}
@@ -524,8 +543,73 @@ function ActiveCard({ me, busy, onManage }: { me: PremiumMe; busy: boolean; onMa
           {t('active.manage')}
         </button>
       ) : null}
-      {me.source === 'apple' ? <p className='max-w-[420px] text-[12.5px] text-[var(--muted)]'>{t('active.appStore')}</p> : null}
-      {me.source === 'google' ? <p className='max-w-[420px] text-[12.5px] text-[var(--muted)]'>{t('active.googlePlay')}</p> : null}
+      {me.source === 'apple' && !me.paidByParent ? <p className='max-w-[420px] text-[12.5px] text-[var(--muted)]'>{t('active.appStore')}</p> : null}
+      {me.source === 'google' && !me.paidByParent ? <p className='max-w-[420px] text-[12.5px] text-[var(--muted)]'>{t('active.googlePlay')}</p> : null}
+    </section>
+  )
+}
+
+/** Parent accounts: Premium is bought for a linked child (one subscription per child, on the parent's card). */
+function ParentPaywall() {
+  const t = useT('premium')
+  const href = useCityPath()
+  const [family, setFamily] = useState<FamilyOverview | null>(null)
+  const [failed, setFailed] = useState(false)
+  const [buyFor, setBuyFor] = useState<FamilyChild | null>(null)
+
+  useEffect(() => {
+    let alive = true
+    fetchFamily()
+      .then((value) => alive && setFamily(value))
+      .catch(() => alive && setFailed(true))
+    return () => {
+      alive = false
+    }
+  }, [])
+
+  if (failed) return <p className='rounded-[24px] bg-[#FAFAF9] px-6 py-6 text-center text-[14px] text-[var(--muted-foreground)]'>{t('parent.unavailable')}</p>
+  if (!family) {
+    return (
+      <div className='py-10'>
+        <LoadingState label='' />
+      </div>
+    )
+  }
+  return (
+    <section className='flex flex-col gap-4'>
+      <h2 className='px-1 text-[22px] font-extrabold tracking-tight text-[var(--foreground)]'>{t('parent.title')}</h2>
+      <p className='px-1 text-[14px] leading-relaxed text-[var(--muted-foreground)]'>{t('parent.body')}</p>
+      {family.children.length === 0 ? (
+        <div className='flex flex-col items-center gap-3 rounded-[24px] bg-[#FFF6EE] px-6 py-7 text-center'>
+          <p className='text-[15px] font-bold text-[var(--foreground)]'>{t('parent.noChild')}</p>
+          <Link href={href('/me/family')} className='h-11 rounded-full bg-[var(--brand)] px-5 text-[14px] font-bold leading-[44px] text-white'>
+            {t('parent.linkChild')}
+          </Link>
+        </div>
+      ) : (
+        <div className='grid gap-3 sm:grid-cols-2'>
+          {family.children.map((child) => (
+            <div key={child.uid} className='flex flex-col gap-2 rounded-[24px] bg-[#FFF6EE] px-5 py-5'>
+              <p className='text-[16px] font-extrabold text-[var(--foreground)]'>{child.nickname || t('parent.childFallback')}</p>
+              {child.canBuy ? (
+                <button
+                  type='button'
+                  onClick={() => setBuyFor(child)}
+                  className='premium-press h-12 rounded-2xl bg-[var(--brand)] text-[15px] font-extrabold text-white'
+                >
+                  {t('parent.buy')}
+                </button>
+              ) : (
+                <p className='text-[13px] text-[var(--muted-foreground)]'>{t(`parent.blocked.${child.buyBlockedReason ?? 'ALREADY_PAID_BY_YOU'}`)}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      <Link href={href('/me/family')} className='self-center text-[14px] font-bold text-[var(--brand)] underline-offset-2 hover:underline'>
+        {t('parent.manage')}
+      </Link>
+      <BuySheet child={buyFor} onClose={() => setBuyFor(null)} />
     </section>
   )
 }

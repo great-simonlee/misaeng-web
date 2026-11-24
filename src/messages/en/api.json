@@ -434,7 +434,8 @@
     "parents": {
       "joined": {
         "title": "Your parent joined Misaeng",
-        "body": "Your {amount}P invite reward arrives in {days} days."
+        "body": "Your {amount}P invite reward arrives in {days} days.",
+        "bodyNoReward": "Your accounts are now linked."
       }
     },
     "newJobReview": {
@@ -461,6 +462,39 @@
       "anonymous": {
         "title": "Misaeng · Q&A",
         "body": "A new post is up."
+      }
+    },
+    "family": {
+      "request": {
+        "title": "Your parent wants to link accounts",
+        "body": "{name} asked to link as your parent. You can accept or decline."
+      },
+      "linked": {
+        "title": "Linked with your child",
+        "body": "{name} accepted your link request."
+      },
+      "unlinked": {
+        "title": "Accounts unlinked",
+        "parentBody": "You are no longer linked with {name}.",
+        "childBody": "You are no longer linked with {name}."
+      },
+      "appleCancel": {
+        "title": "Cancel the App Store subscription yourself",
+        "body": "You are no longer linked with {name}. To stop the next charge, cancel the subscription in iPhone Settings."
+      },
+      "renewal": {
+        "title": "Your child’s Premium renews soon",
+        "body": "{name}’s Premium renews on {date} for {price}."
+      },
+      "trial": {
+        "title": "Your child’s free trial ends soon",
+        "body": "The first Premium charge for {name} ({price}) is on {date}."
+      },
+      "digest": {
+        "title": "Today on Misaeng",
+        "body": "{postings} new job postings and {visaNews} new visa updates today.",
+        "lastTitle": "Your last Misaeng update",
+        "lastBody": "{postings} new job postings and {visaNews} visa updates today. Your child keeps receiving alerts."
       }
     }
   },
@@ -654,11 +688,105 @@
     "accountIneligible": "Accounts with a school/workplace verification or their own parent invites cannot become parent accounts. Please sign up with a new account.",
     "agreementRequired": "Please confirm the account link notice.",
     "failed": "Could not process the parent invite. Please try again.",
-    "notParent": "This is not a parent account."
+    "notParent": "This is not a parent account.",
+    "alreadyLinked": "This parent account is already linked to this student."
   },
   "quiz": {
     "parentNotAllowed": "The quiz is not available for parent accounts.",
     "verifyFirst": "Verify your school or workplace to take the quiz.",
     "failed": "Could not save the quiz result. Please try again."
+  },
+  "family": {
+    "notReady": "Linking family accounts is not ready yet. Please try again later.",
+    "failed": "Something went wrong. Please try again.",
+    "notParent": "Only a parent account can do this.",
+    "notLinked": "This member is not linked to you.",
+    "invalidEmail": "Check the email address.",
+    "ownEmail": "You can’t use your own email. Enter your child’s school or personal email.",
+    "tooManyPending": "You can have up to {max} pending requests.",
+    "dailyLimit": "You can send up to {max} requests a day. Please try again tomorrow.",
+    "alreadyLinked": "This child is already linked to you.",
+    "requestNotFound": "This link request was not found.",
+    "emailMismatch": "This account doesn’t use the email the request was sent to. Sign in with that email, or verify that school email, then open the request again.",
+    "requestExpired": "This request has expired. Ask your parent to send a new one.",
+    "requestClosed": "This request can no longer be accepted.",
+    "childIsParent": "A parent account can’t be linked as a child.",
+    "parentLimit": "You can link up to {max} parents.",
+    "chooseChild": "Parent accounts pay for a child’s Premium, not their own. Choose a child first.",
+    "blocked": {
+      "OWN_SUBSCRIPTION": "Your child already has their own Premium subscription.",
+      "OTHER_PARENT": "Another parent already pays for this child’s Premium.",
+      "ALREADY_PAID_BY_YOU": "You already pay for this child’s Premium.",
+      "IN_APP_LIMIT": "In the app you can pay for one child’s subscription. Please pay for other children on the web."
+    }
+  },
+  "familyMail": {
+    "footer": "Misaeng LLC · info@misaeng.com",
+    "someone": "Someone",
+    "child": "your child",
+    "parent": "your parent",
+    "open": "Open Misaeng",
+    "manage": "Manage subscription",
+    "refundLine": "Within 7 days of the first charge you can get a full refund (Subscription & Refund Policy).",
+    "request": {
+      "subject": "{name} wants to link as your parent on Misaeng",
+      "title": "{name} wants to link as your parent",
+      "line1": "{name} would like to link their Misaeng parent account with yours.",
+      "line2": "Once linked, your parent sees only your nickname and your Premium status (plan and next charge date) — never your posts, comments or activity.",
+      "line3": "Not a Misaeng member yet? Sign up, then open this link again to accept. The request is valid for 14 days, and nothing is linked until you accept.",
+      "button": "View the request"
+    },
+    "linked": {
+      "subject": "You are now linked with {name}",
+      "title": "You are now linked with {name}",
+      "line1": "{name} accepted your link request.",
+      "line2": "You can now buy or manage their Premium under “Children” on My Page."
+    },
+    "unlinked": {
+      "subject": "You are no longer linked with {name}",
+      "title": "You are no longer linked with {name}",
+      "parentLine": "You are no longer linked with {name}.",
+      "childLine": "You are no longer linked with {name}.",
+      "renewalStopped": "The Premium you paid for your child will not renew. Your child keeps it until the end of the period already paid.",
+      "childKeeps": "The Premium your parent paid for stays on until the end of the period already paid."
+    },
+    "appleCancel": {
+      "subject": "Please cancel the App Store subscription yourself",
+      "title": "App Store subscriptions must be canceled by you",
+      "line1": "You are no longer linked with {name}. Your child keeps Premium until {date}.",
+      "line2": "Misaeng can’t cancel an App Store subscription for you. To stop the next charge, cancel it yourself.",
+      "line3": "How: iPhone Settings > your name (Apple Account) > Subscriptions > Misaeng Premium > Cancel Subscription"
+    },
+    "renewal": {
+      "subject": "{name}’s Misaeng Premium renews soon",
+      "title": "Your child’s Premium renews on {date}",
+      "line": "{name}’s Premium ({plan}) renews automatically on {date} for {price}."
+    },
+    "trial": {
+      "subject": "{name}’s Premium free trial ends soon",
+      "title": "The first charge is on {date}",
+      "line": "When {name}’s free trial ends on {date}, {price} ({plan}) will be charged and the subscription renews automatically."
+    },
+    "cancel": {
+      "stripe": "To stop it, cancel before then in Misaeng My Page > Children > “Manage subscription”.",
+      "apple": "To stop it, cancel before then in iPhone Settings > your name (Apple Account) > Subscriptions.",
+      "google": "To stop it, cancel before then in the Google Play app > Profile > Payments & subscriptions > Subscriptions."
+    },
+    "plan": {
+      "monthly": "monthly",
+      "season": "3 months",
+      "annual": "yearly"
+    },
+    "digest": {
+      "subject": "Today on Misaeng (day {day})",
+      "lastSubject": "Your last Misaeng update",
+      "title": "New on Misaeng today",
+      "postings": "New job postings: {count}",
+      "visaNews": "New visa updates: {count}",
+      "note": "For 14 days after you paid for your child’s Premium, we send the number of new updates across Misaeng each morning. We never share your child’s activity.",
+      "last": "This is the last update. Your child keeps receiving Premium alerts.",
+      "unsubscribe": "To stop these updates: {url}",
+      "button": "Browse Misaeng"
+    }
   }
 }

@@ -119,7 +119,10 @@
     "codeDaysLeft": "{days} days left",
     "code": "Your code Premium ends on its own — no charge, nothing to cancel.",
     "manageBilling": "Manage billing",
-    "pastDue": "Your last payment failed. Update your card in “Manage subscription” or Premium will end soon."
+    "pastDue": "Your last payment failed. Update your card in “Manage subscription” or Premium will end soon.",
+    "paidByParent": "Premium paid by your parent",
+    "nextCharge": "next charge {date}",
+    "paidByParentNamed": "Premium paid by your parent ({name})"
   },
   "status": {
     "successTitle": "Welcome! Premium is on",
@@ -272,5 +275,20 @@
     "title": "Misaeng Premium",
     "on": "ON",
     "pitch": "Visa & sponsorship history and base salary by role"
+  },
+  "parent": {
+    "title": "Give your child Premium",
+    "body": "Parent accounts pay for a linked child’s Premium: your card is charged and Premium goes to your child’s account.",
+    "noChild": "Link your child first",
+    "linkChild": "Link a child",
+    "childFallback": "Your child",
+    "buy": "Buy Premium",
+    "manage": "Children · manage subscriptions",
+    "unavailable": "Could not load your children. Please try again later.",
+    "blocked": {
+      "OWN_SUBSCRIPTION": "Your child has their own subscription",
+      "OTHER_PARENT": "Another parent pays",
+      "ALREADY_PAID_BY_YOU": "You already pay"
+    }
   }
 }

@@ -13,6 +13,8 @@ export type PremiumMe = {
   cancelAtPeriodEnd: boolean
   trialAvailable: boolean
   manageable: boolean
+  /** A parent pays for this member's Premium (child view): no buy / cancel buttons. */
+  paidByParent?: { nickname: string | null } | null
   /** The server couldn't read the member's Premium (503): show "try again", never plans or a login button. */
   degraded?: boolean
 }

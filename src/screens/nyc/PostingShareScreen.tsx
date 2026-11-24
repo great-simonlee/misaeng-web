@@ -10,6 +10,7 @@ import { CompanyMark } from '@widgets/nyc/CompanyBrand'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { MisaengStoreButtons } from '@widgets/nyc/MisaengStoreButtons'
 import { PostingChips } from '@widgets/nyc/PostingCard'
+import { useTrackView } from '@lib/analytics/useTrackView'
 
 /** 공유 링크에서 바로 보이는 "어떤 일을 하나요" 줄 수. 나머지는 흐리게 가리고 앱으로 보낸다. */
 const TEASER_LINES = 3
@@ -21,6 +22,7 @@ const TEASER_LINES = 3
  */
 export function PostingShareScreen({ posting }: { posting: PublicPosting | null }) {
   const href = useCityPath()
+  useTrackView('job_viewed', posting?.id, { job_id: posting?.id, company_id: posting?.company.slug })
   const t = useT('companies')
 
   return (

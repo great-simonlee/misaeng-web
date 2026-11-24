@@ -1,6 +1,7 @@
 import { createPrivateKey, sign } from 'node:crypto'
 
 import { invalidatePremium } from './access.server'
+import { beneficiaryOfAppleToken, type Beneficiary } from './beneficiary.server'
 import { getEntitlementByExternalId, rest, upsertEntitlement, type PremiumPlan, type PremiumStatus } from './entitlements.server'
 
 /**
@@ -189,18 +190,36 @@ export async function syncAppleSubscription(transactionId: string, uid: string |
     const originalId = tx.originalTransactionId || renewal.originalTransactionId
     if (!originalId) continue
     const existing = await getEntitlementByExternalId(`apple:${originalId}`)
-    // Who made the latest purchase on this subscription (the app sets our appAccountToken on every purchase).
-    const buyer = await ownerOfToken(tx.appAccountToken)
+    // Who made the latest purchase on this subscription (the app sets our appAccountToken on every purchase). A
+    // beneficiary token (parent buying for a child) names the child as owner and the parent as payer.
+    const selfBuyer = await ownerOfToken(tx.appAccountToken)
+    const buyer: Beneficiary | { userUid: string; payerUid: null } | null = selfBuyer
+      ? { userUid: selfBuyer, payerUid: null }
+      : await beneficiaryOfAppleToken(tx.appAccountToken)
+    // The reporting account may be the owner, or the parent who paid (purchase / restore on the parent's phone).
+    const mayReport = (b: { userUid: string; payerUid: string | null }) => b.userUid === uid || b.payerUid === uid
     // One App Store subscription belongs to one Misaeng account. It moves only when the latest purchase was made from
     // the requesting account (e.g. the old account was deleted and this one bought again).
-    if (uid && buyer && buyer !== uid) {
+    if (uid && buyer && !mayReport(buyer)) {
       throw new AppleIapError('This App Store subscription is linked to another Misaeng account.', 409)
     }
-    if (uid && existing && existing.user_uid !== uid && buyer !== uid) {
+    if (uid && existing && existing.user_uid !== uid && existing.payer_uid !== uid && !(buyer && mayReport(buyer))) {
       throw new AppleIapError('This App Store subscription is linked to another Misaeng account.', 409)
     }
-    // Server notification for a purchase the app never reported: the token says whose it is.
-    ownerUid = uid ?? existing?.user_uid ?? buyer ?? null
+    let payerUid: string | null | undefined
+    if (buyer?.payerUid) {
+      ownerUid = buyer.userUid
+      payerUid = buyer.payerUid
+    } else if (uid && !buyer && existing?.payer_uid === uid) {
+      // The parent restored an older parent-paid purchase: it stays the child's.
+      ownerUid = existing.user_uid
+      payerUid = uid
+    } else {
+      // Server notification for a purchase the app never reported: the token says whose it is.
+      ownerUid = uid ?? existing?.user_uid ?? buyer?.userUid ?? null
+      // The member bought it themselves this time: no longer parent-paid.
+      payerUid = buyer && existing?.payer_uid ? null : undefined
+    }
     if (!ownerUid) continue
     const status = statusFrom(code, tx)
     // Billing grace (status 4): Apple keeps access until gracePeriodExpiresDate; retry without grace (3): 3 days.
@@ -212,7 +231,9 @@ export async function syncAppleSubscription(transactionId: string, uid: string |
           : tx.expiresDate
     await upsertEntitlement({
       user_uid: ownerUid,
-      email: email ?? existing?.email ?? null,
+      ...(payerUid !== undefined ? { payer_uid: payerUid } : {}),
+      // A parent's purchase: the row keeps the child's email, never the reporting parent's.
+      email: (payerUid ? null : email) ?? existing?.email ?? null,
       source: 'apple',
       plan: PRODUCT_PLANS[tx.productId!],
       status,
@@ -224,6 +245,8 @@ export async function syncAppleSubscription(transactionId: string, uid: string |
       raw: { status: code, transactionId: tx.transactionId, appAccountToken: tx.appAccountToken ?? null },
     })
     invalidatePremium(ownerUid)
+    if (payerUid) invalidatePremium(payerUid)
+    if (existing?.payer_uid) invalidatePremium(existing.payer_uid)
   }
   return ownerUid
 }

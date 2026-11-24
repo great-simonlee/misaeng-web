@@ -131,9 +131,13 @@ export async function syncSubscription(sub: Stripe.Subscription, fallbackUid?: s
   const price = sub.items?.data?.[0]?.price
   if (!uid || !(await isPremiumPrice(price))) return
   const status = statusFrom(sub.status)
+  // Parent-paid (checkout forUid): metadata payer_uid = the parent; the row belongs to the child (user_uid) and keeps
+  // the child's email (the checkout email is the parent's).
+  const payer = sub.metadata?.payer_uid?.trim() || null
   await upsertEntitlement({
     user_uid: uid,
-    email: email || sub.metadata?.email || null,
+    ...(payer ? { payer_uid: payer } : {}),
+    email: payer ? sub.metadata?.email || null : email || sub.metadata?.email || null,
     source: 'stripe',
     plan: planFromPrice(price),
     status,
@@ -146,4 +150,5 @@ export async function syncSubscription(sub: Stripe.Subscription, fallbackUid?: s
     raw: { status: sub.status, price: price?.id, lookup_key: price?.lookup_key ?? null },
   })
   invalidatePremium(uid)
+  if (payer) invalidatePremium(payer)
 }

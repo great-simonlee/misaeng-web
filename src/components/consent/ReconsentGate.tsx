@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@hooks/useAuth'
 import { isCityId } from '@lib/constants/cities'
 import type { ConsentStatus } from '@lib/consent/types'
+import { setAnalyticsConsent } from '@lib/analytics/client'
 
 import { useConsentLocale } from './ConsentLocaleProvider'
 import { ReconsentModal } from './ReconsentModal'
@@ -31,6 +32,13 @@ export function ReconsentGate({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<ConsentStatus | null>(null)
   const skip = isPassthroughPath(pathname)
   const blocking = Boolean(user && !skip && status?.required)
+
+  // Analytics: signed-out visitors yes; members only once they have accepted the current Privacy Policy
+  useEffect(() => {
+    if (loading || sessionLoading) return
+    if (!user) setAnalyticsConsent(true)
+    else if (status) setAnalyticsConsent(!status.required)
+  }, [loading, sessionLoading, user, status])
 
   useEffect(() => {
     if (loading || sessionLoading || !user || skip) return
@@ -106,6 +114,7 @@ export function ReconsentGate({ children }: { children: React.ReactNode }) {
     setStatus((prev) =>
       prev ? { ...prev, required: false, reason: 'none' } : prev,
     )
+    setAnalyticsConsent(true)
   }, [locale, status])
 
   return (

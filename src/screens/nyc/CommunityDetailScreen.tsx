@@ -49,6 +49,8 @@ import { MarketDetailContent } from '@widgets/nyc/MarketListing'
 import { RoommateDetailContent } from '@widgets/nyc/RoommateDetailContent'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { ReviewVerificationEntry } from '@widgets/nyc/reviewDocs/ReviewVerificationEntry'
+import { analyticsPostType } from '@lib/analytics/postType'
+import { useTrackView } from '@lib/analytics/useTrackView'
 
 interface CommunityDetailScreenProps {
   boardId: NycCommunityBoardId
@@ -83,6 +85,12 @@ export function CommunityDetailScreen({
   const post = translated.item
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  useTrackView('post_viewed', storedPost?.id, {
+    post_id: storedPost?.id,
+    post_type: analyticsPostType(boardId),
+    board: boardId,
+    from: fromCompany ? 'company' : undefined,
+  })
   // 내가 차단한 사용자의 글
   const [blocked, setBlocked] = useState(false)
 

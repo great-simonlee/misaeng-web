@@ -119,7 +119,10 @@
     "codeDaysLeft": "{days} days left",
     "code": "Your code Premium ends on its own — no charge, nothing to cancel.",
     "manageBilling": "Manage billing",
-    "pastDue": "Your last payment failed. Update your card in “Manage subscription” or Premium will end soon."
+    "pastDue": "Your last payment failed. Update your card in “Manage subscription” or Premium will end soon.",
+    "paidByParent": "Premium do phụ huynh trả",
+    "nextCharge": "thanh toán tiếp {date}",
+    "paidByParentNamed": "Premium do phụ huynh ({name}) trả"
   },
   "status": {
     "successTitle": "Welcome! Premium is on",
@@ -272,5 +275,20 @@
     "title": "Misaeng Premium",
     "on": "ON",
     "pitch": "Visa & sponsorship history and base salary by role"
+  },
+  "parent": {
+    "title": "Tặng Premium cho con",
+    "body": "Tài khoản phụ huynh trả Premium cho con đã liên kết: thẻ của bạn bị trừ tiền và Premium áp dụng cho tài khoản của con.",
+    "noChild": "Hãy liên kết với con trước",
+    "linkChild": "Liên kết con",
+    "childFallback": "Con",
+    "buy": "Mua Premium",
+    "manage": "Con · quản lý gói",
+    "unavailable": "Không tải được thông tin con. Vui lòng thử lại sau.",
+    "blocked": {
+      "OWN_SUBSCRIPTION": "Con đã tự đăng ký",
+      "OTHER_PARENT": "Phụ huynh khác đang trả",
+      "ALREADY_PAID_BY_YOU": "Bạn đã thanh toán"
+    }
   }
 }

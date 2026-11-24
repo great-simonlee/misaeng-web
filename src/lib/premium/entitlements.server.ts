@@ -21,6 +21,8 @@ export type PremiumEntitlement = {
   customer_id: string | null
   product_id: string | null
   environment: string | null
+  /** The parent who pays for this member's Premium (supabase/parent_links.sql); null = the member paid themselves. */
+  payer_uid?: string | null
   created_at: string
   updated_at: string
 }
@@ -37,11 +39,35 @@ export type EntitlementUpsert = {
   customer_id?: string | null
   product_id?: string | null
   environment?: string | null
+  /** Only sent for parent-paid rows (so self purchases keep saving before parent_links.sql ran). */
+  payer_uid?: string | null
   raw?: unknown
 }
 
-const COLUMNS =
+const BASE_COLUMNS =
   'id,user_uid,email,source,plan,status,current_period_end,cancel_at_period_end,external_id,customer_id,product_id,environment,created_at,updated_at'
+const COLUMNS = `${BASE_COLUMNS},payer_uid`
+
+/**
+ * payer_uid arrives with supabase/parent_links.sql. Until it ran, reads fall back to the old columns (re-checked every
+ * 5 minutes) so Premium never looks "unknown" because of a migration order.
+ */
+let noPayerColumnUntil = 0
+export function payerColumnReady() {
+  return Date.now() >= noPayerColumnUntil
+}
+
+/** premium_entitlements rows (all columns, payer_uid once parent_links.sql ran) for a PostgREST filter. */
+export async function selectRows(filter: string): Promise<Response> {
+  if (payerColumnReady()) {
+    const res = await rest(`premium_entitlements?select=${COLUMNS}&${filter}`)
+    if (res.ok || res.status !== 400) return res
+    const body = await res.clone().text().catch(() => '')
+    if (!body.includes('payer_uid')) return res
+    noPayerColumnUntil = Date.now() + 5 * 60_000
+  }
+  return rest(`premium_entitlements?select=${BASE_COLUMNS}&${filter.replace(/,payer_uid\.eq\.[^,)&]*/g, '')}`)
+}
 
 export function premiumDbConfigured() {
   return Boolean(config())
@@ -72,18 +98,32 @@ export async function rest(path: string, init: RequestInit & { prefer?: string }
  */
 export async function listEntitlements(uid: string): Promise<PremiumEntitlement[]> {
   if (!config()) return []
-  const res = await rest(
-    `premium_entitlements?select=${COLUMNS}&user_uid=eq.${encodeURIComponent(uid)}&order=updated_at.desc`,
-  )
+  const res = await selectRows(`user_uid=eq.${encodeURIComponent(uid)}&order=updated_at.desc`)
   if (!res.ok) throw new Error(`Reading premium_entitlements failed (HTTP ${res.status}).`)
   return (await res.json()) as PremiumEntitlement[]
 }
 
+/** Rows this member pays for as a parent (user_uid = a child). Empty before parent_links.sql ran. Throws on errors. */
+export async function listPaidByPayer(payerUid: string): Promise<PremiumEntitlement[]> {
+  if (!config() || !payerColumnReady()) return []
+  const res = await rest(
+    `premium_entitlements?select=${COLUMNS}&payer_uid=eq.${encodeURIComponent(payerUid)}&order=updated_at.desc`,
+  )
+  if (res.status === 400) return []
+  if (!res.ok) throw new Error(`Reading premium_entitlements failed (HTTP ${res.status}).`)
+  return (await res.json()) as PremiumEntitlement[]
+}
+
+export async function getEntitlementById(id: string): Promise<PremiumEntitlement | null> {
+  if (!config() || !/^[0-9a-f-]{36}$/i.test(id)) return null
+  const res = await selectRows(`id=eq.${encodeURIComponent(id)}&limit=1`)
+  if (!res.ok) return null
+  return ((await res.json()) as PremiumEntitlement[])[0] ?? null
+}
+
 export async function getEntitlementByExternalId(externalId: string): Promise<PremiumEntitlement | null> {
   if (!config()) return null
-  const res = await rest(
-    `premium_entitlements?select=${COLUMNS}&external_id=eq.${encodeURIComponent(externalId)}&limit=1`,
-  )
+  const res = await selectRows(`external_id=eq.${encodeURIComponent(externalId)}&limit=1`)
   if (!res.ok) return null
   const rows = (await res.json()) as PremiumEntitlement[]
   return rows[0] ?? null

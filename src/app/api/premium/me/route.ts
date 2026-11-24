@@ -6,6 +6,7 @@ import { getPremiumState } from '@lib/premium/access.server'
 import { appAccountTokenFor } from '@lib/premium/apple.server'
 import { androidBillingEnabled, googleAccountIdFor, rememberGoogleAccount } from '@lib/premium/google.server'
 import { premiumPayload } from '@lib/premium/payload.server'
+import { nicknameOf } from '@lib/family/store.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -15,6 +16,8 @@ export const dynamic = 'force-dynamic'
  * appAccountToken the iOS app puts on purchases, and for Android whether Google Play purchases are open
  * (androidBilling) plus the obfuscated account id the app puts on them (googleAccountId). 503 when the state can't be read (the apps then show no buy button,
  * so someone who already has Premium is never offered a second subscription).
+ * 1.0.9: paidByParent {nickname} | null (child view: "부모님이 결제한 프리미엄"); a parent's 14-day pass comes as a
+ * source 'code' pass (until = start + 14 days) so older apps show it.
  */
 export async function GET() {
   const user = await resolveAuthenticatedUser().catch(() => null)
@@ -32,8 +35,12 @@ export async function GET() {
   // Link the googleAccountId below to this account, so a Play purchase it makes can be matched without the app.
   // Not awaited: the response never waits on (or fails because of) this write.
   if (user) void rememberGoogleAccount(user.uid).catch(() => undefined)
+  // A child whose Premium a parent pays: who (nickname only; the parent's uid is never sent)
+  const paidByParent =
+    state.premium && state.payerUid ? { nickname: (await nicknameOf(state.payerUid).catch(() => null)) ?? null } : null
   return NextResponse.json({
     ...premiumPayload(state, Boolean(user)),
+    paidByParent,
     appAccountToken,
     // Android: show the Google Play paywall (off until the team opens it) and the id to put on purchases
     androidBilling,

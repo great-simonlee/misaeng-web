@@ -415,7 +415,8 @@
     "parents": {
       "joined": {
         "title": "Phụ huynh của bạn đã tham gia Misaeng",
-        "body": "Phần thưởng mời {amount}P sẽ được trả sau {days} ngày."
+        "body": "Phần thưởng mời {amount}P sẽ được trả sau {days} ngày.",
+        "bodyNoReward": "Tài khoản của bạn đã được liên kết."
       }
     },
     "newJobReview": {
@@ -461,6 +462,39 @@
       "anonymous": {
         "title": "Misaeng · Q&A",
         "body": "A new post is up."
+      }
+    },
+    "family": {
+      "request": {
+        "title": "Phụ huynh muốn liên kết tài khoản",
+        "body": "{name} muốn liên kết làm phụ huynh của bạn. Bạn có thể chấp nhận hoặc từ chối."
+      },
+      "linked": {
+        "title": "Đã liên kết với con",
+        "body": "{name} đã chấp nhận yêu cầu liên kết."
+      },
+      "unlinked": {
+        "title": "Đã hủy liên kết",
+        "parentBody": "Bạn không còn liên kết với {name}.",
+        "childBody": "Bạn không còn liên kết với {name}."
+      },
+      "appleCancel": {
+        "title": "Hãy tự hủy gói App Store",
+        "body": "Bạn không còn liên kết với {name}. Để dừng lần thanh toán tiếp theo, hãy hủy gói trong Cài đặt iPhone."
+      },
+      "renewal": {
+        "title": "Premium của con sắp gia hạn",
+        "body": "Premium của {name} gia hạn vào {date} với giá {price}."
+      },
+      "trial": {
+        "title": "Dùng thử của con sắp kết thúc",
+        "body": "Lần thanh toán Premium đầu tiên cho {name} ({price}) vào {date}."
+      },
+      "digest": {
+        "title": "Hôm nay trên Misaeng",
+        "body": "Hôm nay có {postings} tin tuyển dụng mới và {visaNews} tin visa mới.",
+        "lastTitle": "Bản tin Misaeng cuối cùng",
+        "lastBody": "Hôm nay có {postings} tin tuyển dụng và {visaNews} tin visa mới. Con vẫn tiếp tục nhận thông báo."
       }
     }
   },
@@ -654,11 +688,105 @@
     "accountIneligible": "Tài khoản đã xác minh trường/nơi làm việc hoặc đã mời phụ huynh không thể trở thành tài khoản phụ huynh. Hãy đăng ký tài khoản mới.",
     "agreementRequired": "Vui lòng xác nhận thông báo liên kết tài khoản.",
     "failed": "Không thể xử lý lời mời phụ huynh. Vui lòng thử lại.",
-    "notParent": "Đây không phải tài khoản phụ huynh."
+    "notParent": "Đây không phải tài khoản phụ huynh.",
+    "alreadyLinked": "Tài khoản phụ huynh này đã được liên kết với học sinh này."
   },
   "quiz": {
     "parentNotAllowed": "Tài khoản phụ huynh không tham gia bài quiz.",
     "verifyFirst": "Hãy xác minh trường hoặc nơi làm việc để làm quiz.",
     "failed": "Không thể lưu kết quả quiz. Vui lòng thử lại."
+  },
+  "family": {
+    "notReady": "Tính năng liên kết gia đình chưa sẵn sàng. Vui lòng thử lại sau.",
+    "failed": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "notParent": "Chỉ tài khoản phụ huynh mới làm được việc này.",
+    "notLinked": "Thành viên này chưa được liên kết với bạn.",
+    "invalidEmail": "Vui lòng kiểm tra địa chỉ email.",
+    "ownEmail": "Bạn không thể dùng email của chính mình. Hãy nhập email trường hoặc email cá nhân của con.",
+    "tooManyPending": "Bạn có thể có tối đa {max} yêu cầu đang chờ.",
+    "dailyLimit": "Bạn có thể gửi tối đa {max} yêu cầu mỗi ngày. Vui lòng thử lại vào ngày mai.",
+    "alreadyLinked": "Con đã được liên kết với bạn.",
+    "requestNotFound": "Không tìm thấy yêu cầu liên kết.",
+    "emailMismatch": "Tài khoản này không dùng email nhận được yêu cầu. Hãy đăng nhập bằng email đó hoặc xác minh email trường đó rồi mở lại yêu cầu.",
+    "requestExpired": "Yêu cầu đã hết hạn. Hãy nhờ phụ huynh gửi lại.",
+    "requestClosed": "Yêu cầu này không còn chấp nhận được.",
+    "childIsParent": "Tài khoản phụ huynh không thể được liên kết làm con.",
+    "parentLimit": "Bạn có thể liên kết tối đa {max} phụ huynh.",
+    "chooseChild": "Tài khoản phụ huynh thanh toán Premium cho con, không phải cho chính mình. Hãy chọn con trước.",
+    "blocked": {
+      "OWN_SUBSCRIPTION": "Con đã tự đăng ký Premium.",
+      "OTHER_PARENT": "Một phụ huynh khác đã thanh toán Premium cho con.",
+      "ALREADY_PAID_BY_YOU": "Bạn đã thanh toán Premium cho con.",
+      "IN_APP_LIMIT": "Trong ứng dụng bạn chỉ thanh toán được cho một con. Hãy thanh toán cho các con khác trên web."
+    }
+  },
+  "familyMail": {
+    "footer": "Misaeng LLC · info@misaeng.com",
+    "someone": "Ai đó",
+    "child": "con bạn",
+    "parent": "phụ huynh",
+    "open": "Mở Misaeng",
+    "manage": "Quản lý gói",
+    "refundLine": "Trong vòng 7 ngày sau lần thanh toán đầu tiên, bạn được hoàn tiền toàn bộ (Chính sách gói & hoàn tiền).",
+    "request": {
+      "subject": "{name} muốn liên kết làm phụ huynh của bạn trên Misaeng",
+      "title": "{name} muốn liên kết làm phụ huynh của bạn",
+      "line1": "{name} muốn liên kết tài khoản phụ huynh Misaeng với tài khoản của bạn.",
+      "line2": "Sau khi liên kết, phụ huynh chỉ thấy biệt danh và trạng thái Premium (gói, ngày thanh toán tiếp theo) — không bao giờ thấy bài viết, bình luận hay hoạt động của bạn.",
+      "line3": "Chưa là thành viên Misaeng? Hãy đăng ký rồi mở lại liên kết này để chấp nhận. Yêu cầu có hiệu lực 14 ngày và chỉ liên kết khi bạn chấp nhận.",
+      "button": "Xem yêu cầu"
+    },
+    "linked": {
+      "subject": "Đã liên kết với {name}",
+      "title": "Đã liên kết với {name}",
+      "line1": "{name} đã chấp nhận yêu cầu liên kết.",
+      "line2": "Giờ bạn có thể mua hoặc quản lý Premium của con trong mục “Con” ở Trang của tôi."
+    },
+    "unlinked": {
+      "subject": "Bạn không còn liên kết với {name}",
+      "title": "Bạn không còn liên kết với {name}",
+      "parentLine": "Bạn không còn liên kết với {name}.",
+      "childLine": "Bạn không còn liên kết với {name}.",
+      "renewalStopped": "Premium bạn trả cho con sẽ không gia hạn. Con vẫn dùng đến hết thời gian đã thanh toán.",
+      "childKeeps": "Premium do phụ huynh trả vẫn dùng được đến hết thời gian đã thanh toán."
+    },
+    "appleCancel": {
+      "subject": "Hãy tự hủy gói App Store",
+      "title": "Gói App Store phải do bạn tự hủy",
+      "line1": "Bạn không còn liên kết với {name}. Con vẫn dùng Premium đến {date}.",
+      "line2": "Misaeng không thể hủy gói App Store thay bạn. Để dừng lần thanh toán tiếp theo, hãy tự hủy.",
+      "line3": "Cách hủy: Cài đặt iPhone > tên của bạn (Tài khoản Apple) > Đăng ký > Misaeng Premium > Hủy đăng ký"
+    },
+    "renewal": {
+      "subject": "Premium Misaeng của {name} sắp gia hạn",
+      "title": "Premium của con gia hạn vào {date}",
+      "line": "Premium ({plan}) của {name} tự động gia hạn vào {date} với giá {price}."
+    },
+    "trial": {
+      "subject": "Dùng thử Premium của {name} sắp kết thúc",
+      "title": "Lần thanh toán đầu tiên vào {date}",
+      "line": "Khi dùng thử của {name} kết thúc vào {date}, {price} ({plan}) sẽ được thanh toán và gói tự động gia hạn."
+    },
+    "cancel": {
+      "stripe": "Để dừng, hãy hủy trước ngày đó tại Misaeng Trang của tôi > Con > “Quản lý gói”.",
+      "apple": "Để dừng, hãy hủy trước ngày đó trong Cài đặt iPhone > tên của bạn (Tài khoản Apple) > Đăng ký.",
+      "google": "Để dừng, hãy hủy trước ngày đó trong ứng dụng Google Play > Hồ sơ > Thanh toán và gói thuê bao > Gói thuê bao."
+    },
+    "plan": {
+      "monthly": "hằng tháng",
+      "season": "3 tháng",
+      "annual": "hằng năm"
+    },
+    "digest": {
+      "subject": "Hôm nay trên Misaeng (ngày {day})",
+      "lastSubject": "Bản tin Misaeng cuối cùng",
+      "title": "Tin mới trên Misaeng hôm nay",
+      "postings": "Tin tuyển dụng mới: {count}",
+      "visaNews": "Tin visa mới: {count}",
+      "note": "Trong 14 ngày sau khi bạn trả Premium cho con, mỗi sáng chúng tôi gửi số tin mới trên toàn Misaeng. Chúng tôi không bao giờ chia sẻ hoạt động của con.",
+      "last": "Đây là bản tin cuối cùng. Con vẫn tiếp tục nhận thông báo Premium.",
+      "unsubscribe": "Để ngừng nhận: {url}",
+      "button": "Xem Misaeng"
+    }
   }
 }

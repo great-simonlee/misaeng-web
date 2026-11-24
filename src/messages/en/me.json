@@ -671,5 +671,149 @@
     "school": "School verified",
     "workplace": "Workplace verified",
     "instagram": "Instagram verified"
+  },
+  "family": {
+    "metaTitle": "Children · Parents",
+    "back": "My Page",
+    "titleParent": "Children",
+    "titleMember": "Parents",
+    "introParent": "Pay for and manage your linked children’s Premium. Their posts, comments and activity are never shown to you.",
+    "introMember": "Review parent link requests and manage linked parents.",
+    "loadFailed": "Could not load.",
+    "retry": "Try again",
+    "actionFailed": "Something went wrong. Please try again.",
+    "working": "Working…",
+    "childFallback": "Your child",
+    "parentFallback": "Your parent",
+    "checkout": {
+      "successTitle": "Payment complete",
+      "successBody": "Your child’s Premium turns on in a moment — check it below.",
+      "cancelTitle": "Payment canceled",
+      "cancelBody": "Nothing was charged. You can pay any time."
+    },
+    "pass": {
+      "title": "Your Premium · parent perk",
+      "body": "Thanks for getting Premium for your child — you have Premium too for {days} days, until {date}."
+    },
+    "children": {
+      "title": "Linked children",
+      "empty": "No children linked yet. Send a link request to your child’s email below, or use the invite link your child sent you.",
+      "buy": "Buy Premium",
+      "manage": "Manage subscription",
+      "unlink": "Unlink",
+      "manageIn": {
+        "apple": "App Store subscription — manage it in iPhone Settings > Apple Account > Subscriptions.",
+        "google": "Google Play subscription — manage it in Play Store > Payments & subscriptions."
+      }
+    },
+    "plan": {
+      "monthly": "Monthly",
+      "season": "3 months",
+      "annual": "Yearly"
+    },
+    "status": {
+      "none": "Not Premium",
+      "pastDue": "Payment problem · check your card in Manage subscription",
+      "mine": "You pay · {plan} · next charge {date}",
+      "mineTrial": "Free trial · {plan} · first charge {date}",
+      "mineEnds": "You paid · {plan} · ends {date} (auto-renew off)",
+      "otherParent": "Another parent pays · until {date}",
+      "own": "Your child has their own subscription",
+      "free": "Free Premium · until {date}"
+    },
+    "blocked": {
+      "OWN_SUBSCRIPTION": "Your child has their own subscription, so you can’t buy one.",
+      "OTHER_PARENT": "Another parent already pays.",
+      "ALREADY_PAID_BY_YOU": "You already pay."
+    },
+    "buy": {
+      "title": "Premium for {name}",
+      "pay": "Pay {price}",
+      "payer": "Your card is charged; Premium goes to your child’s account.",
+      "renew": "It renews automatically at the same price and period until you cancel. We remind you by email and notification before each renewal, and you can cancel any time with “Manage subscription” here.",
+      "pass": "Your own account also gets Premium for 14 days from the payment (or free-trial start).",
+      "digest": "For 14 days after the payment we send you a short morning update with the number of new job postings and visa updates on Misaeng (never your child’s activity). You can turn it off.",
+      "refund": "Full refund within 7 days of the first charge, back to the card that paid. {policy}"
+    },
+    "add": {
+      "title": "Link a child",
+      "body": "Enter your child’s school or personal email to send a link request. You are linked only after your child accepts. Requests are valid for 14 days.",
+      "placeholder": "child@school.edu",
+      "send": "Send request",
+      "sent": "Link request sent."
+    },
+    "pending": {
+      "waiting": "Waiting · until {date}",
+      "cancel": "Cancel",
+      "canceled": "Request canceled."
+    },
+    "digest": {
+      "title": "Notifications",
+      "label": "Parent updates",
+      "hint": "For 14 days after you pay for your child’s Premium, around 9:00 AM Korea time, by push and email: counts of new updates on Misaeng."
+    },
+    "unlink": {
+      "title": "Unlink {name}?",
+      "keep": "Keep",
+      "confirm": "Unlink",
+      "done": "Unlinked.",
+      "parentBody": "If you unlink, the Premium you paid for stays on your child’s account until the end of the period already paid, and auto-renew stops. To link again you need a new request.",
+      "childBody": "If you unlink, the Premium your parent paid for stays until the end of the period already paid, and auto-renew stops. Your parent is notified.",
+      "apple": "Misaeng can’t cancel App Store subscriptions. After unlinking, cancel it yourself in iPhone Settings > Apple Account > Subscriptions.",
+      "appleToast": "Please cancel the App Store subscription in iPhone Settings."
+    },
+    "incoming": {
+      "title": "Link requests",
+      "line": "{name} asked to link as your parent",
+      "privacy": "If you accept, your parent sees only your nickname and Premium status (plan and next charge date) — never your posts, comments or activity.",
+      "until": "Reply by {date}",
+      "accept": "Accept",
+      "decline": "Decline",
+      "accepted": "Linked with your parent.",
+      "declined": "Request declined."
+    },
+    "parents": {
+      "title": "Linked parents",
+      "empty": "No parents linked. Parents can send a request to your school or personal email, or join with an invite link you send.",
+      "since": "Linked since {date}",
+      "paying": "pays for your Premium",
+      "sees": "Parents see only your nickname and Premium status."
+    },
+    "entry": {
+      "parentLinked": "{count} linked children",
+      "parentEmpty": "Link a child",
+      "parentHint": "Buy and manage Premium, link requests",
+      "incoming": "{count} parent link requests",
+      "memberLinked": "{count} linked parents",
+      "memberHint": "Review requests, unlink"
+    }
+  },
+  "familyAccept": {
+    "metaTitle": "Parent link request",
+    "parentFallback": "Your parent",
+    "title": "{name} asked to link as your parent",
+    "body": "{name} would like to link their Misaeng parent account with yours.",
+    "sees": "Your parent sees only your nickname and Premium status (plan and next charge date).",
+    "notSees": "Your posts, comments and activity are never shown.",
+    "unlink": "You can unlink any time in My Page > Parents.",
+    "until": "Reply by {date}",
+    "accept": "Accept",
+    "decline": "Decline",
+    "login": "Sign in to reply",
+    "loginHint": "Not a member yet? Sign up, then open this link again. Sign in with the email this was sent to (or an account that verified that school email).",
+    "acceptedTitle": "Linked with {name}",
+    "acceptedBody": "See it in My Page > Parents; you can unlink any time.",
+    "openFamily": "View parents",
+    "declinedTitle": "Request declined",
+    "declinedBody": "Your account was not linked.",
+    "closed": {
+      "accepted": "Already accepted",
+      "expired": "This request has expired",
+      "other": "This request is closed"
+    },
+    "closedBody": "Ask your parent to send a new request if needed.",
+    "missingTitle": "Request not found",
+    "missingBody": "Please check the link.",
+    "failed": "Something went wrong. Please try again."
   }
 }

@@ -1,5 +1,7 @@
 /** 중고거래 문의 on the web (same API and threads as the app: src/app/api/marketplace/inquiries). */
 
+import { track } from '@lib/analytics/client'
+
 export type MarketThread = {
   id: string
   postId: string
@@ -39,8 +41,11 @@ export const openMarketThread = (id: string) =>
   call<{ thread: MarketThread; messages: MarketMessage[] }>(`/api/marketplace/inquiries/${encodeURIComponent(id)}`)
 
 /** First message to a seller: opens the thread (or reuses the buyer's open one) */
-export const sendFirstInquiry = (postId: string, body: string) =>
-  call<{ inquiryId: string }>('/api/marketplace/inquiries', { method: 'POST', body: JSON.stringify({ postId, body }) })
+export const sendFirstInquiry = async (postId: string, body: string) => {
+  const result = await call<{ inquiryId: string }>('/api/marketplace/inquiries', { method: 'POST', body: JSON.stringify({ postId, body }) })
+  track('listing_inquiry_sent', { listing_id: postId, listing_type: 'market' })
+  return result
+}
 
 export const replyInMarketThread = (id: string, body: string) =>
   call<{ ok: true }>(`/api/marketplace/inquiries/${encodeURIComponent(id)}`, { method: 'POST', body: JSON.stringify({ body }) })

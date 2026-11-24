@@ -23,6 +23,7 @@ import { parseLocale, type Locale } from '@lib/i18n/locales'
 import { syncPostLikesWithAccount } from '@lib/utils/postLikes'
 import type { AuthUser } from '@/types/auth'
 import type { NycUserProfile } from '@/types/nyc'
+import { track } from '@lib/analytics/client'
 
 interface AuthContextValue {
   user: AuthUser | null
@@ -355,6 +356,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     await loadSession()
+    track('login_completed', { method: 'email' })
   }, [loadSession, t])
 
   const signUpEmailFn = useCallback(async (
@@ -415,6 +417,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const verifyEmailFn = useCallback(async (email: string, code: string) => {
     await postEmailStep({ mode: 'verify', email, code }, t('errors.signUpFailed'))
     await loadSession()
+    track('signup_completed', { method: 'email' })
   }, [loadSession, postEmailStep, t])
 
   const resendCodeFn = useCallback(async (email: string) => {
@@ -466,6 +469,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       await loadSession()
+      // The sign-up screen passes consent; the login screen doesn't
+      track(params.consent ? 'signup_completed' : 'login_completed', { method: 'google' })
     },
     [loadSession, t],
   )

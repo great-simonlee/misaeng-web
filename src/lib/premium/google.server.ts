@@ -1,6 +1,7 @@
 import { createHash, createSign } from 'node:crypto'
 
 import { invalidatePremium } from './access.server'
+import { beneficiaryOfGoogleAccount } from './beneficiary.server'
 import {
   getEntitlementByExternalId,
   rest,
@@ -220,22 +221,44 @@ export async function syncGoogleSubscription(purchaseToken: string, uid: string 
   const externalId = `google:${purchaseToken}`
   const existing = await getEntitlementByExternalId(externalId)
   const buyer = sub.externalAccountIdentifiers?.obfuscatedExternalAccountId
+  // A parent buying for a linked child puts the beneficiary id on the purchase: owner = child, payer = parent.
+  const beneficiary = buyer && (!uid || buyer !== googleAccountIdFor(uid)) ? await beneficiaryOfGoogleAccount(buyer) : null
+  const reportedByPayer = Boolean(uid && beneficiary && beneficiary.payerUid === uid)
   // One Play subscription belongs to one Misaeng account: refuse a token bought from another account.
-  if (uid && buyer && buyer !== googleAccountIdFor(uid)) {
+  if (uid && buyer && buyer !== googleAccountIdFor(uid) && !reportedByPayer) {
     throw new GooglePlayError('This Google Play subscription is linked to another Misaeng account.', 409)
   }
-  if (uid && existing && existing.user_uid !== uid && !(buyer && buyer === googleAccountIdFor(uid))) {
+  if (
+    uid &&
+    existing &&
+    existing.user_uid !== uid &&
+    existing.payer_uid !== uid &&
+    !(buyer && buyer === googleAccountIdFor(uid)) &&
+    !reportedByPayer
+  ) {
     throw new GooglePlayError('This Google Play subscription is linked to another Misaeng account.', 409)
   }
   // A notification for a purchase the app never reported: the account id on the purchase names its owner
-  const ownerUid = uid ?? existing?.user_uid ?? (await ownerOfGoogleAccount(buyer))
+  let ownerUid: string | null
+  let payerUid: string | null | undefined
+  if (beneficiary) {
+    ownerUid = beneficiary.userUid
+    payerUid = beneficiary.payerUid
+  } else if (uid && !buyer && existing?.payer_uid === uid) {
+    ownerUid = existing.user_uid
+    payerUid = uid
+  } else {
+    ownerUid = uid ?? existing?.user_uid ?? (await ownerOfGoogleAccount(buyer))
+    payerUid = undefined
+  }
   if (!ownerUid) return null
 
   const status = statusFrom(sub, item)
   if (!status) return ownerUid
   await upsertEntitlement({
     user_uid: ownerUid,
-    email: email ?? existing?.email ?? null,
+    ...(payerUid !== undefined ? { payer_uid: payerUid } : {}),
+    email: (payerUid ? null : email) ?? existing?.email ?? null,
     source: 'google',
     plan,
     status,
@@ -257,12 +280,14 @@ export async function syncGoogleSubscription(purchaseToken: string, uid: string 
     await acknowledge(GOOGLE_PRODUCT_ID, purchaseToken)
   }
   invalidatePremium(ownerUid)
+  if (payerUid) invalidatePremium(payerUid)
   return ownerUid
 }
 
 async function endRow(row: PremiumEntitlement, status: PremiumStatus) {
   await upsertEntitlement({
     user_uid: row.user_uid,
+    ...(row.payer_uid ? { payer_uid: row.payer_uid } : {}),
     email: row.email,
     source: row.source,
     plan: row.plan,
@@ -281,4 +306,19 @@ export async function revokeGooglePurchase(purchaseToken: string) {
   if (!row) return
   await endRow(row, 'canceled')
   invalidatePremium(row.user_uid)
+  if (row.payer_uid) invalidatePremium(row.payer_uid)
+}
+
+/**
+ * Stop auto-renew of a Play subscription (parent ↔ child unlink, decision 9): purchases.subscriptions.cancel — the
+ * member keeps access until the end of the paid period. Then re-reads the token so the row shows cancel_at_period_end.
+ */
+export async function cancelGoogleRenewal(purchaseToken: string) {
+  const token = await accessToken()
+  const res = await fetch(
+    `${API}/${packageName()}/purchases/subscriptions/${encodeURIComponent(GOOGLE_PRODUCT_ID)}/tokens/${encodeURIComponent(purchaseToken)}:cancel`,
+    { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: '{}', cache: 'no-store' },
+  )
+  if (!res.ok) throw new GooglePlayError(`Canceling the Play subscription failed (HTTP ${res.status}).`, res.status >= 500 ? 503 : 502)
+  await syncGoogleSubscription(purchaseToken, null).catch((error) => console.error('[google] re-sync after cancel', error))
 }

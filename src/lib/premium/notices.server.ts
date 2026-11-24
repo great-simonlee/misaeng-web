@@ -14,6 +14,9 @@ import { getStripe, isPremiumPrice } from './stripe.server'
  * - invoice.upcoming for an ANNUAL plan (Stripe Dashboard → Billing → Subscriptions → "Upcoming renewal events" = 7
  *   days) → email. Monthly / 3-month renewals get no reminder.
  * Both say the price, the date, how to cancel, and the 7-day refund rule.
+ * Parent-paid subscriptions (metadata payer_uid) are skipped here: their reminders go to the PAYING parent from the
+ * daily family job with the parent lead times (annual / 3-month 7 days, monthly 3 days, trial 2 days) —
+ * src/lib/family/daily.server.ts + sendRenewalMail in src/lib/family/mail.server.ts.
  */
 
 const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://misaeng.com').replace(/\/+$/, '')
@@ -44,6 +47,7 @@ export async function sendTrialEndingNotice(subscriptionId: string) {
   const sub = await stripe.subscriptions.retrieve(subscriptionId)
   const uid = sub.metadata?.user_uid
   const item = sub.items?.data?.[0]
+  if (sub.metadata?.payer_uid) return
   if (!uid || !(await isPremiumPrice(item?.price)) || sub.status !== 'trialing' || !sub.trial_end || sub.cancel_at_period_end) return
   // What will really be charged (discounts, tax), falling back to the list price.
   const upcoming = await stripe.invoices
@@ -81,6 +85,7 @@ export async function sendRenewalNotice(invoice: Stripe.Invoice) {
   if (!subId) return
   const sub = await stripe.subscriptions.retrieve(subId)
   const uid = sub.metadata?.user_uid
+  if (sub.metadata?.payer_uid) return
   const subPrice = sub.items?.data?.[0]?.price
   const annual = subPrice?.recurring?.interval === 'year'
   if (!uid || !(await isPremiumPrice(subPrice)) || !annual || sub.status !== 'active' || sub.cancel_at_period_end) return

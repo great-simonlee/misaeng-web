@@ -4,6 +4,7 @@ import { AuthProvider } from '@hooks/useAuth'
 import { ToastProvider } from '@hooks/useToast'
 import { ConsentLocaleProvider } from '@components/consent/ConsentLocaleProvider'
 import { ReconsentGate } from '@components/consent/ReconsentGate'
+import { AnalyticsTracker } from '@components/analytics/AnalyticsTracker'
 import { BRAND } from '@lib/brand'
 import { LocaleProvider } from '@lib/i18n/client'
 import type { Locale } from '@lib/i18n/locales'
@@ -39,6 +40,7 @@ export function RootDocument({
             <SiteHeader />
 
             <SiteMain>
+              {BRAND === 'misaeng' ? <AnalyticsTracker /> : null}
               <ReconsentGate>{children}</ReconsentGate>
             </SiteMain>
 

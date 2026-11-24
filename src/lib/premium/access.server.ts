@@ -1,6 +1,7 @@
 import { BRAND_CONFIG } from '@lib/brand'
 import {
   listEntitlements,
+  listPaidByPayer,
   type PremiumEntitlement,
   type PremiumPlan,
   type PremiumSource,
@@ -32,6 +33,13 @@ export type PremiumState = {
   /** A Stripe customer exists (web "구독 관리" opens the billing portal). */
   manageable: boolean
   customerId: string | null
+  /**
+   * Internal only (never sent to the apps): the parent paying for the Premium shown (state of a child), else null.
+   * paidByParent in /api/premium/me is derived from it.
+   */
+  payerUid?: string | null
+  /** A parent's own 14-day pass from a subscription they bought for a child (shown as a 'code' pass). */
+  parentPass?: { since: string; until: string } | null
   /** The database could not be read: the state is unknown (shown as free, never cached, checkout refuses). */
   degraded?: boolean
 }
@@ -53,8 +61,11 @@ function launchExcluded(email: string | undefined) {
 }
 
 function withLaunchGift(value: PremiumState, uid: string, email: string | undefined): PremiumState {
-  if (value.premium || !uid || BRAND_CONFIG.id !== 'misaeng' || launchExcluded(email)) return value
+  // A parent pass that ends before the launch gift: show the (longer) launch gift instead.
+  const passOnly = Boolean(value.premium && value.parentPass && value.until === value.parentPass.until)
+  if ((value.premium && !passOnly) || !uid || BRAND_CONFIG.id !== 'misaeng' || launchExcluded(email)) return value
   if (Date.now() >= Date.parse(LAUNCH_FREE_UNTIL)) return value
+  if (passOnly && Date.parse(value.until!) >= Date.parse(LAUNCH_FREE_UNTIL)) return value
   return {
     ...value,
     premium: true,
@@ -81,6 +92,48 @@ const EMPTY: PremiumState = {
   trialAvailable: true,
   manageable: false,
   customerId: null,
+  payerUid: null,
+  parentPass: null,
+}
+
+/** Paid sources (decision 5: these block a parent purchase; codes / gifts / launch gift don't). */
+export const PAID_SOURCES = new Set(['stripe', 'apple', 'google'])
+export const PARENT_PASS_DAYS = 14
+const DAY_MS = 86_400_000
+
+/**
+ * Parent pass (owner decision 6): a parent who pays for a child gets Premium for 14 days from the subscription start
+ * (trial start included). Refunded / revoked subscriptions don't count (Stripe: a premium_refunds row; Apple / Google:
+ * status 'canceled' — their refund and revoke path). Returns the latest pass that is still running.
+ */
+export function parentPassFrom(
+  paid: PremiumEntitlement[],
+  refundedSubscriptionIds: Set<string>,
+  now = Date.now(),
+): { since: string; until: string } | null {
+  let best: { since: string; until: string } | null = null
+  for (const row of paid) {
+    if (!PAID_SOURCES.has(row.source) || !sameStripeMode(row)) continue
+    const start = Date.parse(row.created_at)
+    const end = start + PARENT_PASS_DAYS * DAY_MS
+    if (!Number.isFinite(start) || end <= now) continue
+    if (refundedSubscriptionIds.has(row.external_id) || refundedSubscriptionIds.has(row.id)) continue
+    if (row.source !== 'stripe' && row.status === 'canceled') continue
+    if (row.source === 'stripe' && row.status === 'canceled' && row.current_period_end && Date.parse(row.current_period_end) <= start + DAY_MS) continue
+    if (!best || end > Date.parse(best.until)) best = { since: new Date(start).toISOString(), until: new Date(end).toISOString() }
+  }
+  return best
+}
+
+async function refundedIds(rows: PremiumEntitlement[]): Promise<Set<string>> {
+  const stripeRows = rows.filter((r) => r.source === 'stripe')
+  if (!stripeRows.length) return new Set()
+  const { rest } = await import('./entitlements.server')
+  const ids = stripeRows.map((r) => encodeURIComponent(r.external_id)).join(',')
+  const res = await rest(`premium_refunds?select=subscription_id,entitlement_id&subscription_id=in.(${ids})`).catch(() => null)
+  if (!res?.ok) return new Set()
+  const list = (await res.json()) as { subscription_id: string | null; entitlement_id: string | null }[]
+  return new Set(list.flatMap((r) => [r.subscription_id, r.entitlement_id].filter((v): v is string => Boolean(v))))
 }
 
 function previewEmails() {
@@ -122,8 +175,12 @@ export async function getPremiumState(user: PremiumUser): Promise<PremiumState> 
   }
 
   let rows: PremiumEntitlement[]
+  let paid: PremiumEntitlement[]
   try {
-    rows = (await listEntitlements(uid)).filter(sameStripeMode)
+    ;[rows, paid] = await Promise.all([
+      listEntitlements(uid).then((list) => list.filter(sameStripeMode)),
+      listPaidByPayer(uid).then((list) => list.filter(sameStripeMode)),
+    ])
   } catch (error) {
     console.error('[premium] reading entitlements failed', error)
     const unknown: PremiumState = { ...EMPTY, trialAvailable: false, degraded: true }
@@ -132,7 +189,12 @@ export async function getPremiumState(user: PremiumUser): Promise<PremiumState> 
   const active = rows
     .filter((row) => isActiveEntitlement(row))
     .sort((a, b) => Date.parse(b.current_period_end || '9999') - Date.parse(a.current_period_end || '9999'))[0]
-  const stripe = rows.find((row) => row.source === 'stripe' && row.customer_id)
+  // The Stripe customer this member manages: their own subscriptions, or the ones they pay for as a parent (one
+  // customer per payer). A parent-paid row on a child's account is the PARENT's customer — never the child's.
+  const stripe =
+    rows.find((row) => row.source === 'stripe' && row.customer_id && !row.payer_uid) ??
+    paid.find((row) => row.source === 'stripe' && row.customer_id)
+  const pass = paid.length ? parentPassFrom(paid, await refundedIds(paid)) : null
   const value: PremiumState = active
     ? {
         premium: true,
@@ -145,13 +207,30 @@ export async function getPremiumState(user: PremiumUser): Promise<PremiumState> 
         trialAvailable: false,
         manageable: Boolean(stripe),
         customerId: stripe?.customer_id ?? null,
+        payerUid: active.payer_uid ?? null,
+        parentPass: pass,
       }
-    : {
-        ...EMPTY,
-        trialAvailable: rows.length === 0,
-        manageable: Boolean(stripe),
-        customerId: stripe?.customer_id ?? null,
-      }
+    : pass
+      ? {
+          // Shaped like a code pass so apps that don't know parent passes show "N일 남음".
+          ...EMPTY,
+          premium: true,
+          plan: 'code',
+          source: 'code',
+          until: pass.until,
+          since: pass.since,
+          status: 'active',
+          trialAvailable: false,
+          manageable: Boolean(stripe),
+          customerId: stripe?.customer_id ?? null,
+          parentPass: pass,
+        }
+      : {
+          ...EMPTY,
+          trialAvailable: rows.length === 0,
+          manageable: Boolean(stripe),
+          customerId: stripe?.customer_id ?? null,
+        }
   cache.set(uid, { at: Date.now(), value })
   if (staff && !value.premium) return { ...value, premium: true, plan: 'staff', source: 'staff' }
   return withLaunchGift(value, uid, email)

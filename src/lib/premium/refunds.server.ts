@@ -1,7 +1,7 @@
 import type Stripe from 'stripe'
 
 import { invalidatePremium, isActiveEntitlement, sameStripeMode } from './access.server'
-import { listEntitlements, rest, type PremiumEntitlement } from './entitlements.server'
+import { listEntitlements, payerColumnReady, rest, selectRows, type PremiumEntitlement } from './entitlements.server'
 import { getStripe, isPremiumPrice, syncSubscription } from './stripe.server'
 
 /**
@@ -138,7 +138,9 @@ export async function getRefundQuote(entitlementId: string): Promise<RefundQuote
 
   // Policy window: the customer's first paid charge (if it is this subscription's), else this subscription's latest
   // annual renewal.
-  const firstInvoice = all[0] ?? null
+  // A parent's Stripe customer pays for several children (one subscription each): each child's subscription has its
+  // own "first charge" (the policy refund is once per child account).
+  const firstInvoice = (row.payer_uid ? mine[0] : all[0]) ?? null
   const firstStart = firstInvoice && subscriptionOf(firstInvoice) === row.external_id ? paidAtOf(firstInvoice) : null
   // A renewal = a later cycle charge of an annual subscription (the first charge after the trial is also a "cycle"
   // invoice, so it never counts as a renewal).
@@ -192,8 +194,10 @@ export async function getRefundQuote(entitlementId: string): Promise<RefundQuote
 export async function cancelStripeSubscriptionsForUser(uid: string): Promise<number> {
   const stripe = getStripe()
   if (!stripe) return 0
+  // Parent-paid subscriptions are not canceled here: account deletion ends the family links like an unlink
+  // (auto-renew stops, the paid period stays — src/lib/family/family.server.ts endFamilyForDeletedAccount).
   const rows = (await listEntitlements(uid)).filter(
-    (row) => row.source === 'stripe' && sameStripeMode(row) && row.status !== 'canceled' && row.status !== 'expired',
+    (row) => row.source === 'stripe' && sameStripeMode(row) && row.status !== 'canceled' && row.status !== 'expired' && !row.payer_uid,
   )
   for (const row of rows) await endSubscriptionNow(stripe, row.external_id)
   return rows.length
@@ -375,8 +379,11 @@ export async function endDuplicateSubscription(sub: Stripe.Subscription, uid: st
   if (!stripe || !['trialing', 'active', 'past_due'].includes(sub.status)) return
   const rows = (await listEntitlements(uid)).filter(sameStripeMode)
   let keep: PremiumEntitlement | null = null
+  const parentPaid = Boolean(sub.metadata?.payer_uid)
   for (const row of rows) {
     if (row.external_id === sub.id || !isActiveEntitlement(row)) continue
+    // Codes / gifts never block a parent's purchase (decision 5)
+    if (parentPaid && (row.source === 'code' || row.source === 'gift' || row.source === 'staff')) continue
     if (row.source !== 'stripe') {
       keep = row
       break
@@ -420,7 +427,6 @@ export async function endDuplicateSubscription(sub: Stripe.Subscription, uid: st
 /** ERP list: newest Premium rows (any source), optional source / email filter. */
 export async function listPremiumMembers(filter: { source?: string | null; q?: string | null }) {
   const params = [
-    'select=id,user_uid,email,source,plan,status,current_period_end,cancel_at_period_end,external_id,customer_id,product_id,environment,created_at,updated_at',
     'order=updated_at.desc',
     'limit=300',
   ]
@@ -429,8 +435,11 @@ export async function listPremiumMembers(filter: { source?: string | null; q?: s
   }
   // Only characters an email / uid can have; PostgREST filter syntax and LIKE wildcards are dropped.
   const q = String(filter.q || '').trim().replace(/[^A-Za-z0-9@.+\-]/g, '').slice(0, 120)
-  if (q) params.push(`or=(email.ilike.*${encodeURIComponent(q)}*,user_uid.eq.${encodeURIComponent(q)})`)
-  const res = await rest(`premium_entitlements?${params.join('&')}`)
+  if (q) {
+    const byPayer = payerColumnReady() ? `,payer_uid.eq.${encodeURIComponent(q)}` : ''
+    params.push(`or=(email.ilike.*${encodeURIComponent(q)}*,user_uid.eq.${encodeURIComponent(q)}${byPayer})`)
+  }
+  const res = await selectRows(params.join('&'))
   if (!res.ok) throw new RefundError('DB_ERROR', `Loading Premium members failed (HTTP ${res.status}).`, 500)
   const rows = (await res.json()) as PremiumEntitlement[]
   const subIds = rows.filter((r) => r.source === 'stripe').map((r) => r.external_id)
@@ -443,8 +452,16 @@ export async function listPremiumMembers(filter: { source?: string | null; q?: s
         .then((r) => (r.ok ? (r.json() as Promise<{ entitlement_id: string | null; subscription_id: string | null }[]>) : []))
         .catch(() => [])
     : []
+  // Parent-paid rows: who pays, and Apple subscriptions the parent must cancel themselves (link ended)
+  const { familyAdminInfo } = await import('@lib/family/admin.server')
+  const family = await familyAdminInfo(rows).catch(() => null)
   return rows.map((row) => ({
     ...row,
+    payer_uid: row.payer_uid ?? null,
+    payer_nickname: row.payer_uid ? family?.nicknames.get(row.payer_uid) ?? null : null,
+    payer_email: row.payer_uid ? family?.emails.get(row.payer_uid) ?? null : null,
+    child_nickname: row.payer_uid ? family?.nicknames.get(row.user_uid) ?? null : null,
+    needs_manual_cancel: Boolean(family?.manualCancel.has(row.id)),
     refunds: refunds.filter((r) => r.entitlement_id === row.id || (row.source === 'stripe' && r.subscription_id === row.external_id)),
   }))
 }
