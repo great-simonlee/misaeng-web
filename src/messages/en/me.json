@@ -673,7 +673,7 @@
   },
   "jobAlerts": {
     "title": "Verify to get new job alerts",
-    "body": "Verify your school or workplace and we will send you the week’s new jobs every Monday around 1 PM. Premium members get them every weekday.",
+    "body": "Verify your school or workplace and we will send you the week’s new jobs every Monday around 1 PM. Premium members get them every day.",
     "pending": "We are reviewing your workplace verification. Alerts start once it is approved.",
     "verifySchool": "Verify school",
     "verifyWorkplace": "Verify workplace"

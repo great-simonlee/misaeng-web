@@ -92,8 +92,8 @@ export async function broadcastDigest(kind: DigestKind, body: Record<string, unk
 }
 
 /**
- * PREMIUM_ALERT_TIERS=on: Premium members get today's push (verified or not); free verified members get nothing on
- * Tue–Fri and, on Monday, one digest of the last 7 days instead. The first run after switching tells free members once.
+ * PREMIUM_ALERT_TIERS=on: Premium members get today's push (verified or not; every day incl. weekends since 2026-11-25);
+ * free verified members get nothing on the other days and, on Monday, one digest of the last 7 days instead. The first run after switching tells free members once.
  */
 async function sendTieredPostings(
   body: Record<string, unknown>,

@@ -27,8 +27,8 @@
       "chip": "212 companies"
     },
     "alerts": {
-      "title": "New job alerts every weekday",
-      "body": "New postings around 1 PM every weekday. Free members get one weekly digest on Mondays.",
+      "title": "New job alerts every day",
+      "body": "New postings around 1 PM every day, weekends included. Free members get one weekly digest on Mondays.",
       "chip": "App push"
     },
     "more": {
@@ -51,7 +51,7 @@
     },
     "values": {
       "weekly": "Mondays",
-      "daily": "Every weekday",
+      "daily": "Every day",
       "monFri": "Mon & Fri"
     },
     "note": "Free job alerts go to school or workplace verified members",

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Scheduled ERP runs (owner, 2026-11-17), driven from the misaeng.com server's crontab:
- *   postings   Mon–Fri — starts 10:00 New York time, app push at 13:00 (or when the run gets there, if later)
+ *   postings   every day incl. weekends (owner, 2026-11-25) — starts 10:00 New York time, app push at 13:00 (or when
+ *              the run gets there, if later)
  *   visa-news  Mon–Fri — starts 16:30 New York time; app push at 17:00 on Mon / Fri only (other days publish without a
  *              push, and the next push includes what they published)
  * The work itself is in ellieo-erp (lib/scheduledRuns.js): this script starts today's run and calls its next step
@@ -10,7 +11,7 @@
  *
  * Crontab (server clock is UTC; the script itself checks New York time, so DST needs no edit). The minute field
  * below is written `*\/15` so it does not end this comment; in the crontab drop the backslash:
- *   *\/15 14-21 * * 1-5 cd ~/misaeng-web-v2 && flock -n /tmp/misaeng-postings.lock node scripts/scheduled-runs.mjs postings >> ~/scheduled-runs.log 2>&1
+ *   *\/15 14-21 * * * cd ~/misaeng-web-v2 && flock -n /tmp/misaeng-postings.lock node scripts/scheduled-runs.mjs postings >> ~/scheduled-runs.log 2>&1
  *   *\/15 20-23 * * 1-5 cd ~/misaeng-web-v2 && flock -n /tmp/misaeng-visa-news.lock node scripts/scheduled-runs.mjs visa-news >> ~/scheduled-runs.log 2>&1
  * A call outside the job's window does nothing; a call while today's run is open picks it up again (e.g. after a
  * reboot); a call after today's run ended does nothing.
@@ -29,10 +30,16 @@
 import { existsSync, readFileSync } from 'node:fs'
 
 const JOBS = {
-  postings: { start: [10, 0], notify: [13, 0], until: [16, 0], pushDays: null },
-  'visa-news': { start: [16, 30], notify: [17, 0], until: [19, 0], pushDays: new Set(['Mon', 'Fri']) },
+  // days: New York weekdays the job runs on (postings every day since 2026-11-25: students can apply right away)
+  postings: { start: [10, 0], notify: [13, 0], until: [16, 0], pushDays: null, days: null },
+  'visa-news': {
+    start: [16, 30],
+    notify: [17, 0],
+    until: [19, 0],
+    pushDays: new Set(['Mon', 'Fri']),
+    days: new Set(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']),
+  },
 }
-const DAYS = new Set(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
 const MAX_RUN_MS = 3.5 * 3_600_000
 const MAX_FAILURES = 10
 
@@ -112,7 +119,7 @@ async function main() {
   const ny = newYork()
   const toMin = ([h, m]) => h * 60 + m
   if (from && ny.date < from) return
-  if (!now && !anyDay && (!DAYS.has(ny.day) || ny.minutes < toMin(plan.start) || ny.minutes >= toMin(plan.until))) return
+  if (!now && !anyDay && ((plan.days && !plan.days.has(ny.day)) || ny.minutes < toMin(plan.start) || ny.minutes >= toMin(plan.until))) return
 
   const notifyAt = now ? new Date().toISOString() : newYorkTime(ny.date, plan.notify)
   // --now / --any-day test runs always push
