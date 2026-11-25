@@ -165,9 +165,18 @@ export function cleanDetailsHtml(html: string | null | undefined) {
 
 export async function createListing(uid: string, input: ListingInput) {
   validate(input)
-  const license = input.brokered ? await activeLicense(uid) : null
+  // Owner 11-25: a verified Licensed Agent posts brokered listings only (no personal room / sublet listings);
+  // pending applicants still post personal ones until they're approved.
+  const license = await activeLicense(uid)
   if (input.brokered && !license) {
     throw new ListingError('Brokered listings are for verified Licensed Agents.', 'AGENT_REQUIRED', 403)
+  }
+  if (!input.brokered && license) {
+    throw new ListingError(
+      'Licensed Agents can post brokered listings only. Choose Brokered listing to post under your brokerage.',
+      'AGENT_BROKERED_ONLY',
+      403,
+    )
   }
   const paths = [...input.photos.flatMap((photo) => [photo.path, photo.thumb]), ...(input.floorPlan ? [input.floorPlan] : [])]
   if (new Set(paths).size !== paths.length) throw new ListingError('The same photo was sent twice.', 'INVALID')
