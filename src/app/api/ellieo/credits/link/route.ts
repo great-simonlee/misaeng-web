@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { getCreditsConfig, paymentsEnabled, topUpToken } from '@lib/ellieo/credits.server'
+import { isInHouse } from '@lib/ellieo/inHouse.server'
 
 import { errorResponse, loginRequired, notEllieo, signedInUid } from '../../_lib'
 
@@ -20,7 +21,8 @@ export async function POST(request: Request) {
     if (!uid) return loginRequired()
     const config = await getCreditsConfig()
     const platform = request.headers.get('x-platform')?.toLowerCase() === 'android' ? 'android' : 'ios'
-    const show = platform === 'android' ? config.topUpLinkAndroid : config.topUpLinkIOS
+    // In-house members never buy credits.
+    const show = !(await isInHouse(uid)) && (platform === 'android' ? config.topUpLinkAndroid : config.topUpLinkIOS)
     const origin = process.env.ELLIEO_PUBLIC_URL?.trim().replace(/\/+$/, '') || new URL(request.url).origin
     const locale = request.headers.get('x-locale') === 'vi' ? 'vi/' : ''
     return NextResponse.json({ url: `${origin}/${locale}nyc/credits?t=${encodeURIComponent(topUpToken(uid))}`, show, paymentsEnabled: paymentsEnabled() })

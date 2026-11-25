@@ -7,7 +7,7 @@ import { errorResponse, jsonBody, loginRequired, notEllieo, signedInUid } from '
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-/** { pack, t?, locale? } → { url } (Stripe Checkout). Signed in on the web, or with the app's top-up token. */
+/** { pack, code?, t?, locale? } → { url } (Stripe Checkout). Signed in on the web, or with the app's top-up token. */
 export async function POST(request: Request) {
   const blocked = notEllieo()
   if (blocked) return blocked
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     const uid = readTopUpToken(typeof body.t === 'string' ? body.t : null) ?? (await signedInUid())
     if (!uid) return loginRequired()
     const origin = process.env.ELLIEO_PUBLIC_URL?.trim().replace(/\/+$/, '') || new URL(request.url).origin
-    const { url } = await createCheckout({ uid, packId: String(body.pack ?? ''), origin, locale: String(body.locale ?? 'en') })
+    const { url } = await createCheckout({ uid, packId: String(body.pack ?? ''), origin, locale: String(body.locale ?? 'en'), code: typeof body.code === 'string' ? body.code : null })
     return NextResponse.json({ url })
   } catch (error) {
     return errorResponse(error, 'checkout')

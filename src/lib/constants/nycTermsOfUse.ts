@@ -702,23 +702,31 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
       blocks: [
         {
           type: 'p',
-          en: 'This Section applies only to Ellieo. Ellieo credits (“Credits”) are a prepaid balance used only on Ellieo for paid features such as brokered housing listings and Premium placement. They are separate from the Community Credits in Section 13.',
-          ko: '본 조는 Ellieo에만 적용됩니다. Ellieo 크레딧(이하 “크레딧”)은 중개 매물 게시, Premium 노출 등 Ellieo의 유료 기능에만 쓰이는 선불 잔액이며, 제13조의 커뮤니티 크레딧과는 별개입니다.',
+          en: 'This Section applies only to Ellieo. Ellieo credits (“Credits”) are a prepaid balance used only on Ellieo for paid features such as brokered housing listings and Premium placement. They are separate from the Community Credits in Section 13 and from Misaeng points, and can never be converted into or from them.',
+          ko: '본 조는 Ellieo에만 적용됩니다. Ellieo 크레딧(이하 “크레딧”)은 중개 매물 게시, Premium 노출 등 Ellieo의 유료 기능에만 쓰이는 선불 잔액이며, 제13조의 커뮤니티 크레딧 및 미생 포인트와는 별개이고 서로 전환할 수 없습니다.',
         },
         {
           type: 'ul',
           items: [
             {
-              en: 'Credit packs. Credits are sold in packs shown on the top-up page with their price, any bonus Credits and any applicable tax before you pay (for example, US$9.99 for 10 Credits, US$19.99 for 22, US$39.99 for 46, and US$79.99 for 96). Payments are processed by Stripe; we do not store your full card number.',
-              ko: '크레딧 패키지. 크레딧은 충전 화면에 표시된 패키지로 판매되며, 결제 전에 가격·보너스 크레딧·적용 세금이 표시됩니다(예: US$9.99에 10크레딧, US$19.99에 22, US$39.99에 46, US$79.99에 96). 결제는 Stripe가 처리하며 회사는 카드 번호 전체를 저장하지 않습니다.',
+              en: 'Credit packs. Credits can be obtained only by buying a credit pack (US$1 = 10 Credits). Packs are shown with their price, any bonus Credits and any applicable tax before you pay (for example, US$9.99 for 100 Credits, US$19.99 for 220, US$39.99 for 460, and US$79.99 for 960). Purchases on the web are processed by Stripe, and purchases in the Ellieo iOS app by Apple through the App Store; we do not store your full card number. Bonus Credits from a promotion are part of the purchase they come with.',
+              ko: '크레딧 패키지. 크레딧은 크레딧 패키지를 구매해야만 얻을 수 있습니다(US$1 = 10크레딧). 결제 전에 패키지의 가격·보너스 크레딧·적용 세금이 표시됩니다(예: US$9.99에 100크레딧, US$19.99에 220, US$39.99에 460, US$79.99에 960). 웹 결제는 Stripe가, Ellieo iOS 앱 내 결제는 App Store를 통해 Apple이 처리하며 회사는 카드 번호 전체를 저장하지 않습니다. 프로모션 보너스 크레딧은 함께 받은 구매의 일부입니다.',
             },
             {
-              en: 'Expiration. Paid Credits do not expire. Reward Credits, which the Company gives free of charge (for example for promotions or verification), expire 90 days after they are given and are always used before paid Credits.',
-              ko: '유효기간. 유료 크레딧은 소멸하지 않습니다. 회사가 무상으로 지급하는 리워드 크레딧(예: 프로모션, 인증 보상)은 지급 후 90일이 지나면 소멸하며, 항상 유료 크레딧보다 먼저 사용됩니다.',
+              en: 'Expiration. Credits you buy, including bonus Credits, do not expire. The Company does not give free Credits.',
+              ko: '유효기간. 구매한 크레딧(보너스 크레딧 포함)은 소멸하지 않습니다. 회사는 무상 크레딧을 지급하지 않습니다.',
             },
             {
-              en: 'Refunds. You may request a full refund of a credit pack within 7 days of purchase if none of that pack’s Credits has been used. Partial refunds are not available. Credits cannot be exchanged for cash, transferred, or sold.',
-              ko: '환불. 크레딧 패키지는 구매 후 7일 이내이고 그 패키지의 크레딧을 하나도 사용하지 않은 경우에 한해 전액 환불을 요청할 수 있습니다. 부분 환불은 제공하지 않습니다. 크레딧은 현금으로 바꾸거나 양도·판매할 수 없습니다.',
+              en: 'Refunds. You may request a full refund of a credit pack bought on the web within 7 days of purchase if none of that pack’s Credits has been used. Partial refunds are not available. Purchases made through the App Store are refunded by Apple under Apple’s policies. If a purchase is refunded or charged back after some of its Credits were used, the used Credits are taken from your other Credits, and any amount still owed must be paid before you can spend Credits again. Credits cannot be exchanged for cash, transferred, or sold.',
+              ko: '환불. 웹에서 구매한 크레딧 패키지는 구매 후 7일 이내이고 그 패키지의 크레딧을 하나도 사용하지 않은 경우에 한해 전액 환불을 요청할 수 있습니다. 부분 환불은 제공하지 않습니다. App Store에서 구매한 경우 Apple의 정책에 따라 Apple이 환불합니다. 크레딧 일부를 사용한 뒤 구매가 환불되거나 지급 거절(차지백)된 경우 사용한 크레딧만큼 다른 크레딧에서 차감되며, 남은 부족분을 결제하기 전에는 크레딧을 사용할 수 없습니다. 크레딧은 현금으로 바꾸거나 양도·판매할 수 없습니다.',
+            },
+            {
+              en: 'Discounts and bonuses. The Company may offer discounts on packs or listings, or bonus Credits on a purchase, for a limited time or to certain members. Each offer shows its terms before you pay, and offers cannot be combined unless stated.',
+              ko: '할인 및 보너스. 회사는 기간 또는 대상 회원을 정해 패키지·매물 할인이나 구매 보너스 크레딧을 제공할 수 있습니다. 각 혜택의 조건은 결제 전에 표시되며, 따로 명시하지 않는 한 중복 적용되지 않습니다.',
+            },
+            {
+              en: 'Company accounts. Accounts of the Company’s staff and affiliated brokerages, identified by a verified company email, use staff Credits that the Company provides each month. Staff Credits have no cash value, cannot be bought, refunded or transferred, expire when the next month’s Credits are provided, and are removed when the person leaves the Company, at which time their listings are deleted. Company accounts may hold only a limited share of Premium spots.',
+              ko: '회사 계정. 인증된 회사 이메일로 확인되는 회사 직원 및 관계 중개회사의 계정은 회사가 매월 제공하는 스태프 크레딧을 사용합니다. 스태프 크레딧은 현금 가치가 없고 구매·환불·양도할 수 없으며, 다음 달 크레딧이 제공될 때 소멸하고, 퇴사 시 삭제되며 그때 해당 계정의 매물도 삭제됩니다. 회사 계정은 Premium 자리 중 일부만 사용할 수 있습니다.',
             },
             {
               en: 'Paid listings. Brokered listings are shown for the period you pay for. Premium (Boost) days run from the moment they start and are not refunded if you mark the listing as rented, delete it, or the Company removes it for violating these Terms.',

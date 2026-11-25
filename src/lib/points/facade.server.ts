@@ -1,3 +1,4 @@
+import { BRAND } from '@lib/brand'
 import type { CommunityCreditEntry } from '@lib/constants/communityCredit'
 import { isStatusCommunityBoard } from '@lib/constants/nyc'
 import type { CommunityPost } from '@/types/nyc'
@@ -27,6 +28,8 @@ async function hook<L, N>(
   legacy: () => Promise<L>,
   ledger: (cutoverMs: number) => Promise<N>,
 ): Promise<HookResult<L, N>> {
+  // Ellieo has its own credits (paid only) and never earns or loses Misaeng points.
+  if (BRAND === 'ellieo') return { ok: false, engine: null, error: 'Misaeng points are off on Ellieo' }
   let engine: PointsEngine | null = null
   try {
     const state = await getPointsEngineState()

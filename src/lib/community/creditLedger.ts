@@ -1,3 +1,4 @@
+import { BRAND } from '@lib/brand'
 import { notifyUsers } from '@lib/push/notify.server'
 import {
   COMMUNITY_CREDIT_BONUS_RULES,
@@ -142,6 +143,8 @@ async function mutateAccount(
   uid: string,
   mutator: (account: CommunityCreditAccount) => CommunityCreditAccount,
 ): Promise<CommunityCreditAccount | null> {
+  // Ellieo: no Misaeng (legacy) credit is ever written.
+  if (BRAND === 'ellieo') return null
   if (!isCommunityCreditStorageConfigured()) return null
   const userId = String(uid || '').trim()
   if (!userId) return null

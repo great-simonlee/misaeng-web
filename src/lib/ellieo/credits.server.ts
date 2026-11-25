@@ -1,17 +1,23 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
-import { getSupabaseServiceClient } from '@lib/supabase/server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 
 import { activeLicense } from './agentLicense.server'
-import { CreditsError, getListingPrices, premiumPrice } from './listingPlans.server'
+import { CREDITS_PER_DOLLAR, CreditsError, db, rpc } from './creditsCore.server'
+import { isInHouse } from './inHouse.server'
+import { getListingPrices, premiumPrice } from './listingPlans.server'
+import { discounted, purchaseOffers } from './promotions.server'
 import { readCreditEvent } from './stripeWebhook'
 
 /**
- * Ellieo credit packs, Stripe Checkout, receipts and refunds (owner 11-25 final).
+ * Ellieo credit packs, Stripe Checkout, receipts and refunds (owner 11-25 final: $1 = 10 credits, credits only from
+ * payment; App Store purchases: appleCredits.server.ts).
  *
- *   Config     ellieo_settings 'credits' (Super Admin, ERP): packs, salesTaxRate, topUpLinkIOS / topUpLinkAndroid,
- *              refundDays, rewardDays, seller (receipt). Defaults below until agent_listing_pay.sql is run.
+ *   Config     ellieo_settings 'credits' (Super Admin, ERP): packs (with their App Store product ids), salesTaxRate,
+ *              topUpLinkIOS / topUpLinkAndroid (the web top-up link in the apps), refundDays, seller (receipt).
+ *   In-house   in-house members (inHouse.server.ts) can't buy: checkout is refused.
+ *   Offers     pack discounts and purchase bonuses (promotions.server.ts), automatic or with a code; the bonus credits
+ *              are part of the same paid lot (same unit value).
  *   Stripe     the SAME Stripe account as Misaeng (Misaeng LLC, owner 11-25): STRIPE_SECRET_KEY, or
  *              ELLIEO_STRIPE_SECRET_KEY to override. Card statements read "… ELLIEO" (descriptor suffix). Without a key
  *              the credits page says "Payments coming soon" and the API answers PAYMENTS_OFF.
@@ -27,38 +33,33 @@ import { readCreditEvent } from './stripeWebhook'
  *              again on the web; receipts use a signed link (?k=) so they can be opened and printed anywhere.
  */
 
-export type CreditPack = { id: string; priceCents: number; credits: number }
+export type CreditPack = { id: string; priceCents: number; credits: number; appleProductId?: string }
 export type CreditsConfig = {
   packs: CreditPack[]
   salesTaxRate: number
   topUpLinkIOS: boolean
   topUpLinkAndroid: boolean
   refundDays: number
-  rewardDays: number
   seller: { name: string; address: string; email: string }
 }
 
 export const DEFAULT_CREDITS_CONFIG: CreditsConfig = {
   packs: [
-    { id: 'pack10', priceCents: 999, credits: 10 },
-    { id: 'pack22', priceCents: 1999, credits: 22 },
-    { id: 'pack46', priceCents: 3999, credits: 46 },
-    { id: 'pack96', priceCents: 7999, credits: 96 },
+    { id: 'pack100', priceCents: 999, credits: 100, appleProductId: 'com.misaeng.ellieo.credits.100' },
+    { id: 'pack220', priceCents: 1999, credits: 220, appleProductId: 'com.misaeng.ellieo.credits.220' },
+    { id: 'pack460', priceCents: 3999, credits: 460, appleProductId: 'com.misaeng.ellieo.credits.460' },
+    { id: 'pack960', priceCents: 7999, credits: 960, appleProductId: 'com.misaeng.ellieo.credits.960' },
   ],
   salesTaxRate: 0,
-  topUpLinkIOS: true,
+  // The apps buy through the App Store now; the web link stays off there unless the ERP turns it on.
+  topUpLinkIOS: false,
   topUpLinkAndroid: true,
   refundDays: 7,
-  rewardDays: 90,
   seller: {
     name: 'Misaeng LLC (Ellieo)',
     address: '45 Rockefeller Plaza, Fl 20, New York, NY 10111, United States',
     email: 'info@ellieo.com',
   },
-}
-
-function db() {
-  return getSupabaseServiceClient()
 }
 
 let cached: { at: number; value: CreditsConfig } | null = null
@@ -71,13 +72,13 @@ function validConfig(v: unknown): v is CreditsConfig {
     if (!/^[a-z0-9_-]{2,30}$/.test(pack.id) || ids.has(pack.id)) return false
     ids.add(pack.id)
     if (!Number.isInteger(pack.priceCents) || pack.priceCents < 50 || pack.priceCents > 100_000) return false
-    if (!Number.isInteger(pack.credits) || pack.credits < 1 || pack.credits > 10_000) return false
+    if (!Number.isInteger(pack.credits) || pack.credits < 1 || pack.credits > 100_000) return false
+    if (pack.appleProductId !== undefined && !/^[a-z0-9._-]{3,100}$/i.test(pack.appleProductId)) return false
   }
   return (
     typeof c.salesTaxRate === 'number' && c.salesTaxRate >= 0 && c.salesTaxRate < 0.25 &&
     typeof c.topUpLinkIOS === 'boolean' && typeof c.topUpLinkAndroid === 'boolean' &&
     Number.isInteger(c.refundDays) && c.refundDays >= 0 && c.refundDays <= 60 &&
-    Number.isInteger(c.rewardDays) && c.rewardDays >= 1 && c.rewardDays <= 365 &&
     typeof c.seller?.name === 'string' && c.seller.name.length > 1 && typeof c.seller.address === 'string' &&
     typeof c.seller.email === 'string'
   )
@@ -86,14 +87,17 @@ function validConfig(v: unknown): v is CreditsConfig {
 export async function getCreditsConfig(): Promise<CreditsConfig> {
   if (cached && Date.now() - cached.at < 30_000) return cached.value
   const { data } = await db().from('ellieo_settings').select('value').eq('key', 'credits').maybeSingle<{ value: CreditsConfig }>()
-  const value = validConfig(data?.value) ? data!.value : DEFAULT_CREDITS_CONFIG
+  // Before credits_paid_only.sql the row still has the $1 = 1 credit packs: use the defaults until it is run.
+  const unit = await db().from('ellieo_settings').select('key').eq('key', 'credits_unit').maybeSingle()
+  const value = unit.data && validConfig(data?.value) ? data!.value : DEFAULT_CREDITS_CONFIG
   cached = { at: Date.now(), value }
   return value
 }
 
 export async function saveCreditsConfig(value: unknown, by: string) {
+  if (value && typeof value === 'object') delete (value as { rewardDays?: unknown }).rewardDays
   if (!validConfig(value)) {
-    throw new CreditsError('Credit settings are not valid (pack ids, $0.50–$1,000 prices, whole credits, tax rate under 25%).', 'INVALID_PRICES')
+    throw new CreditsError('Credit settings are not valid (pack ids, $0.50–$1,000 prices, whole credits, App Store product ids, tax rate under 25%).', 'INVALID_PRICES')
   }
   const { error } = await db()
     .from('ellieo_settings')
@@ -105,7 +109,7 @@ export async function saveCreditsConfig(value: unknown, by: string) {
 
 // MARK: - Packs with "what you can do with it"
 
-/** e.g. 46 credits → "1 Premium listing + a 7-day listing" (from the current prices). */
+/** e.g. 460 credits → "1 Premium listing + a 7-day listing" (from the current prices). */
 export async function packHints() {
   const [config, prices] = await Promise.all([getCreditsConfig(), getListingPrices()])
   const premium = premiumPrice(prices)
@@ -124,7 +128,7 @@ export async function packHints() {
         left -= r.price
       }
     }
-    const bonus = Math.max(0, pack.credits - Math.round(pack.priceCents / 100))
+    const bonus = Math.max(0, pack.credits - Math.round((pack.priceCents / 100) * CREDITS_PER_DOLLAR))
     return { ...pack, bonus, premiumListings: premiums, regularListings: listings }
   })
 }
@@ -216,24 +220,50 @@ async function stripe<T>(path: string, init: { method?: string; body?: URLSearch
   return data
 }
 
-/** Stripe Checkout for one pack; returns the Stripe page URL. */
-export async function createCheckout(input: { uid: string; packId: string; origin: string; locale: string }) {
-  if (!paymentsEnabled()) throw new CreditsError('Payments are coming soon.', 'PAYMENTS_OFF', 503)
+export function inHouseNoPurchase() {
+  return new CreditsError('In-house accounts use staff credits and can’t buy credits.', 'IN_HOUSE_NO_PURCHASE', 403)
+}
+
+/** What a pack costs this member now (discount, bonus) — the web page and the checkout use the same numbers. */
+export async function quotePack(input: { uid: string; packId: string; code?: string | null; appStore?: boolean }) {
   const config = await getCreditsConfig()
   const pack = config.packs.find((p) => p.id === input.packId)
   if (!pack) throw new CreditsError('Choose a credit pack.', 'INVALID')
+  const { discount, bonus } = await purchaseOffers({ uid: input.uid, packId: pack.id, code: input.code, appStore: input.appStore })
+  const priceCents = discounted(pack.priceCents, discount)
+  const bonusCredits = bonus ? Math.floor((pack.credits * bonus.percent) / 100) : 0
+  return {
+    pack,
+    priceCents,
+    discountCents: pack.priceCents - priceCents,
+    bonusCredits,
+    promotionIds: [discount?.id, bonus?.id].filter((id): id is string => Boolean(id)),
+    offers: [discount, bonus].filter(Boolean).map((p) => ({ kind: p!.kind, title: p!.title, percent: p!.percent })),
+  }
+}
+
+/** Stripe Checkout for one pack; returns the Stripe page URL. */
+export async function createCheckout(input: { uid: string; packId: string; origin: string; locale: string; code?: string | null }) {
+  if (!paymentsEnabled()) throw new CreditsError('Payments are coming soon.', 'PAYMENTS_OFF', 503)
+  if (await isInHouse(input.uid)) throw inHouseNoPurchase()
+  const config = await getCreditsConfig()
+  const quote = await quotePack({ uid: input.uid, packId: input.packId, code: input.code })
+  const pack = quote.pack
+  if (quote.priceCents < 50) throw new CreditsError('This offer makes the pack too cheap to charge.', 'INVALID')
   const profile = await getSupabaseProfile(input.uid).catch(() => null)
   const license = await activeLicense(input.uid).catch(() => null)
   const name = [profile?.firstName, profile?.lastName].map((p) => p?.trim()).filter(Boolean).join(' ')
-  const taxCents = Math.round(pack.priceCents * (config.salesTaxRate || 0))
+  const taxCents = Math.round(quote.priceCents * (config.salesTaxRate || 0))
+  const totalCredits = pack.credits + quote.bonusCredits
   const base = `${input.origin}/${input.locale === 'vi' ? 'vi/' : ''}nyc/credits`
   const params: Record<string, string | number | null | undefined> = {
     mode: 'payment',
     'line_items[0][quantity]': 1,
     'line_items[0][price_data][currency]': 'usd',
-    'line_items[0][price_data][unit_amount]': pack.priceCents,
-    'line_items[0][price_data][product_data][name]': `Ellieo credits · ${pack.credits}`,
-    'line_items[0][price_data][product_data][description]': '1 credit = $1 on Ellieo. Paid credits never expire.',
+    'line_items[0][price_data][unit_amount]': quote.priceCents,
+    'line_items[0][price_data][product_data][name]': `Ellieo credits · ${totalCredits}`,
+    'line_items[0][price_data][product_data][description]':
+      (quote.bonusCredits ? `${pack.credits} + ${quote.bonusCredits} bonus credits. ` : '') + 'Paid credits never expire.',
     success_url: `${base}?paid=1&session={CHECKOUT_SESSION_ID}`,
     cancel_url: `${base}?canceled=1`,
     client_reference_id: input.uid,
@@ -242,13 +272,17 @@ export async function createCheckout(input: { uid: string; packId: string; origi
     'metadata[user_uid]': input.uid,
     'metadata[pack_id]': pack.id,
     'metadata[credits]': pack.credits,
-    'metadata[pack_cents]': pack.priceCents,
+    'metadata[bonus_credits]': quote.bonusCredits,
+    'metadata[pack_cents]': quote.priceCents,
+    'metadata[list_cents]': pack.priceCents,
+    'metadata[discount_cents]': quote.discountCents,
+    'metadata[promotions]': quote.promotionIds.join(',') || undefined,
     'metadata[tax_cents]': taxCents,
     'metadata[buyer_name]': name || undefined,
     'metadata[brokerage]': license?.brokerage ?? undefined,
     'payment_intent_data[metadata][app]': 'ellieo_credits',
     'payment_intent_data[metadata][user_uid]': input.uid,
-    'payment_intent_data[description]': `Ellieo credits · ${pack.credits}`,
+    'payment_intent_data[description]': `Ellieo credits · ${totalCredits}`,
     // Same account as Misaeng: the card statement says it was Ellieo.
     'payment_intent_data[statement_descriptor_suffix]': 'ELLIEO',
     // Stripe emails its receipt to this address.
@@ -282,23 +316,30 @@ export async function handleStripeEvent(event: { type?: string; data?: { object?
       receiptUrl = pi?.latest_charge?.receipt_url ?? null
     }
     const meta = ((event.data?.object ?? {}) as { metadata?: Record<string, string> }).metadata ?? {}
-    const { data, error } = await db().rpc('ellieo_credit_purchase_complete', {
-      p_user: read.uid,
-      p_session: read.sessionId,
-      p_intent: read.paymentIntent,
-      p_pack: read.packId,
-      p_credits: read.credits,
-      p_amount_cents: read.amountCents,
-      p_tax_cents: read.taxCents,
-      p_currency: read.currency,
-      p_card_brand: brand,
-      p_last4: last4,
-      p_buyer_name: meta.buyer_name || read.name,
-      p_buyer_email: read.email,
-      p_brokerage: meta.brokerage || null,
-      p_receipt_url: receiptUrl,
-    } as never)
-    if (error) throw new CreditsError(error.message, 'SAVE_FAILED', 500)
+    // The member paid: the credits are theirs (an in-house member can't get here — checkout refuses them).
+    const data = await rpc('ellieo_credit_purchase_record', {
+      p: {
+        user: read.uid,
+        provider: 'stripe',
+        stripeSession: read.sessionId,
+        stripeIntent: read.paymentIntent,
+        packId: read.packId,
+        baseCredits: read.credits,
+        bonusCredits: Number(meta.bonus_credits) || 0,
+        amountCents: read.amountCents,
+        taxCents: read.taxCents,
+        listCents: Number(meta.list_cents) || read.amountCents,
+        discountCents: Number(meta.discount_cents) || 0,
+        currency: read.currency,
+        cardBrand: brand,
+        last4,
+        buyerName: meta.buyer_name || read.name,
+        buyerEmail: read.email,
+        brokerage: meta.brokerage || null,
+        receiptUrl,
+        promotionIds: (meta.promotions || '').split(',').filter((id) => /^[0-9a-f-]{36}$/i.test(id)),
+      },
+    })
     return { purchase: data }
   }
   const { data: purchase } = await db()
@@ -308,13 +349,12 @@ export async function handleStripeEvent(event: { type?: string; data?: { object?
     .maybeSingle<{ id: string }>()
   if (!purchase) return { ignored: 'no matching purchase' }
   if (read.kind === 'refunded' && !read.full) return { ignored: 'partial refund (not offered)' }
-  const { data, error } = await db().rpc('ellieo_credit_purchase_reverse', {
+  const data = await rpc('ellieo_credit_purchase_reverse', {
     p_purchase: purchase.id,
     p_status: read.kind === 'refunded' ? 'refunded' : 'disputed',
     p_note: read.kind === 'refunded' ? 'Refunded in Stripe' : 'Card dispute',
     p_by: 'stripe',
-  } as never)
-  if (error) throw new CreditsError(error.message, 'SAVE_FAILED', 500)
+  })
   return { reversed: data }
 }
 
@@ -323,10 +363,18 @@ export async function handleStripeEvent(event: { type?: string; data?: { object?
 export type PurchaseRow = {
   id: string
   user_id: string
-  stripe_session_id: string
+  provider: 'stripe' | 'apple'
+  stripe_session_id: string | null
   stripe_payment_intent: string | null
+  apple_transaction_id: string | null
+  apple_environment: string | null
+  product_id: string | null
   pack_id: string
   credits: number
+  base_credits: number | null
+  bonus_credits: number
+  list_cents: number | null
+  discount_cents: number
   amount_cents: number
   tax_cents: number
   currency: string
@@ -391,6 +439,9 @@ export async function decideRefund(input: { purchaseId: string; approve: boolean
     await db().rpc('ellieo_credit_refund_deny', { p_purchase: purchase.id, p_note: input.note ?? '', p_by: input.by } as never)
     return { status: 'paid' }
   }
+  if (purchase.provider === 'apple') {
+    throw new CreditsError('App Store purchases are refunded by Apple (reportaproblem.apple.com); the credits are taken back automatically.', 'NOT_REFUNDABLE', 409)
+  }
   if (!(await isRefundable(purchase.id))) {
     throw new CreditsError('Not refundable any more (some credits were used, or it is past the refund window).', 'NOT_REFUNDABLE', 409)
   }
@@ -399,13 +450,12 @@ export async function decideRefund(input: { purchaseId: string; approve: boolean
     body: form({ payment_intent: purchase.stripe_payment_intent, reason: 'requested_by_customer', 'metadata[app]': 'ellieo_credits' }),
     idempotencyKey: `ellieo-refund-${purchase.id}`,
   })
-  const { error } = await db().rpc('ellieo_credit_purchase_reverse', {
+  await rpc('ellieo_credit_purchase_reverse', {
     p_purchase: purchase.id,
     p_status: 'refunded',
     p_note: input.note || 'Refund approved',
     p_by: input.by,
-  } as never)
-  if (error) throw new CreditsError(error.message, 'SAVE_FAILED', 500)
+  })
   return { status: 'refunded' }
 }
 
@@ -416,7 +466,7 @@ export async function listPurchases(filter: { status?: string; uid?: string }, l
   const { data, error } = await query.returns<PurchaseRow[]>()
   if (error) {
     if (error.code === '42P01' || error.code === 'PGRST205') {
-      throw new CreditsError('Paid listings are not set up yet (run agent_listing_pay.sql).', 'SETUP_REQUIRED', 503)
+      throw new CreditsError('Credits are not set up yet (run credits_paid_only.sql).', 'SETUP_REQUIRED', 503)
     }
     throw new CreditsError(error.message, 'LOAD_FAILED', 500)
   }

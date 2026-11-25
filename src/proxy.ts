@@ -72,8 +72,27 @@ const ELLIEO_OWN_PATHS: Record<string, string> = {
   'child-safety': '/nyc/terms-of-use',
 }
 
+/**
+ * Misaeng points APIs (points, coffee chats and review questions paid with points, post boosts / unlocks, the old
+ * community credit). Ellieo has its own credits and never Misaeng points: on the Ellieo build these answer 404.
+ */
+const MISAENG_POINTS_API = [
+  /^\/api\/points(\/|$)/,
+  /^\/api\/internal\/points(\/|$)/,
+  /^\/api\/app\/coffee-chat(\/|$)/,
+  /^\/api\/app\/review-questions(\/|$)/,
+  /^\/api\/community\/[^/]+\/(unlock|boost)$/,
+  /^\/api\/community\/(credit|credit-reviews)$/,
+]
+
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
+  if (pathname.startsWith('/api/')) {
+    if (BRAND_CONFIG.id === 'ellieo' && MISAENG_POINTS_API.some((re) => re.test(pathname))) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
+    return NextResponse.next()
+  }
   const segments = pathname.split('/').filter(Boolean)
   const first = segments[0]
 
@@ -220,5 +239,16 @@ function isPrivateServicePath(path: string) {
 
 export const config = {
   // API·정적 파일·Next 내부 경로는 건너뛴다
-  matcher: ['/((?!api|_next|.*\\..*).*)'],
+  matcher: [
+    '/((?!api|_next|.*\\..*).*)',
+    // Ellieo: Misaeng points APIs are closed (MISAENG_POINTS_API)
+    '/api/points/:path*',
+    '/api/internal/points/:path*',
+    '/api/app/coffee-chat/:path*',
+    '/api/app/review-questions/:path*',
+    '/api/community/:id/unlock',
+    '/api/community/:id/boost',
+    '/api/community/credit',
+    '/api/community/credit-reviews',
+  ],
 }

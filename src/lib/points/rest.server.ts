@@ -4,6 +4,8 @@
  * setupRequired=true so callers can fall back to the legacy credit system instead of crashing.
  */
 
+import { BRAND } from '@lib/brand'
+
 function config() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
@@ -33,6 +35,8 @@ export async function pointsRest<T>(
   path: string,
   init: RequestInit & { prefer?: string } = {},
 ): Promise<T> {
+  // Ellieo never reads or writes Misaeng points (its credits live in ellieo_credit_*).
+  if (BRAND === 'ellieo') throw new PointsStoreError('Misaeng points are off on Ellieo.', false, 404, 'ELLIEO_NO_POINTS')
   const c = config()
   if (!c) throw new PointsStoreError('Supabase is not configured.', true)
   let res: Response

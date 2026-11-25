@@ -22,7 +22,7 @@ const TEXT = {
     title: 'Top up credits',
     lead: 'Credits pay for brokered listings and Premium (Boost) on Ellieo. Paid credits never expire.',
     soon: 'Payments coming soon',
-    soonBody: 'Buying credits online opens soon. Need credits now? Email info@ellieo.com and our team will add them.',
+    soonBody: 'Buying credits online opens soon. You can buy credits in the Ellieo iPhone app now. Questions? Email info@ellieo.com.',
     bonus: (n: number) => `+${n} bonus`,
     buy: 'Buy',
     credits: 'credits',
@@ -34,19 +34,21 @@ const TEXT = {
     canceled: 'Checkout canceled. Nothing was charged.',
     summaryTitle: 'Good to know',
     summary: [
-      '1 credit = $1. Paid credits never expire; free reward credits expire after 90 days and are used first.',
+      '$1 = 10 credits. Credits come only from purchases (plus any bonus on a purchase) and never expire.',
       'Refund: within 7 days of purchase if none of that pack’s credits were used — full refunds only, from your receipt.',
       'Premium (Boost) days are not refunded when a listing is marked rented or removed for breaking the rules.',
       'Licensed agents are responsible for listing accuracy and fair-housing and advertising rules (brokerage name, fees).',
     ],
     terms: 'Terms: Ellieo credits and paid listings',
     error: 'Something went wrong. Try again.',
+    code: 'Promo code',
+    codePlaceholder: 'Optional',
   },
   vi: {
     title: 'Nạp credit',
     lead: 'Credit dùng để đăng tin qua môi giới và Premium (Boost) trên Ellieo. Credit đã mua không hết hạn.',
     soon: 'Thanh toán sắp có',
-    soonBody: 'Tính năng mua credit trực tuyến sắp ra mắt. Cần credit ngay? Gửi email tới info@ellieo.com, đội ngũ Ellieo sẽ thêm cho bạn.',
+    soonBody: 'Tính năng mua credit trực tuyến sắp ra mắt. Bạn có thể mua credit ngay trong ứng dụng Ellieo trên iPhone. Thắc mắc? Gửi email tới info@ellieo.com.',
     bonus: (n: number) => `+${n} thưởng`,
     buy: 'Mua',
     credits: 'credit',
@@ -58,13 +60,15 @@ const TEXT = {
     canceled: 'Đã hủy thanh toán. Bạn chưa bị trừ tiền.',
     summaryTitle: 'Cần biết',
     summary: [
-      '1 credit = $1. Credit đã mua không hết hạn; credit thưởng miễn phí hết hạn sau 90 ngày và được dùng trước.',
+      '$1 = 10 credit. Credit chỉ có được khi mua (kèm thưởng của lần mua, nếu có) và không hết hạn.',
       'Hoàn tiền: trong vòng 7 ngày kể từ khi mua nếu chưa dùng credit nào của gói đó — chỉ hoàn toàn bộ, yêu cầu từ hóa đơn.',
       'Số ngày Premium (Boost) không được hoàn khi tin được đánh dấu đã cho thuê hoặc bị gỡ do vi phạm quy định.',
       'Môi giới có giấy phép chịu trách nhiệm về độ chính xác của tin và quy định nhà ở công bằng, quảng cáo (tên công ty môi giới, phí).',
     ],
     terms: 'Điều khoản: Credit Ellieo và tin đăng trả phí',
     error: 'Đã có lỗi. Vui lòng thử lại.',
+    code: 'Mã khuyến mãi',
+    codePlaceholder: 'Không bắt buộc',
   },
 } as const
 
@@ -80,6 +84,7 @@ export function EllieoTopUpScreen(props: {
   const text = props.locale === 'vi' ? TEXT.vi : TEXT.en
   const [token, setToken] = useState<string | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
+  const [code, setCode] = useState('')
   const [message, setMessage] = useState<{ tone: 'ok' | 'error' | 'info'; text: string; receipt?: string } | null>(null)
 
   useEffect(() => {
@@ -119,7 +124,7 @@ export function EllieoTopUpScreen(props: {
       const res = await fetch('/api/ellieo/credits/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pack: pack.id, t: token, locale: props.locale }),
+        body: JSON.stringify({ pack: pack.id, t: token, locale: props.locale, code: code.trim() || undefined }),
       })
       const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string; code?: string }
       if (res.status === 401) throw new Error(text.signIn)
@@ -159,7 +164,17 @@ export function EllieoTopUpScreen(props: {
           </p>
         </div>
       ) : null}
-      <ul className='mt-6 space-y-3'>
+      <label className='mt-6 flex items-center gap-3 text-sm text-[#3A4256]'>
+        <span className='shrink-0 font-semibold'>{text.code}</span>
+        <input
+          value={code}
+          onChange={(event) => setCode(event.target.value.toUpperCase())}
+          placeholder={text.codePlaceholder}
+          maxLength={24}
+          className='min-w-0 flex-1 rounded-xl border border-[#E8EAF0] px-3 py-2 uppercase tracking-wide'
+        />
+      </label>
+      <ul className='mt-4 space-y-3'>
         {props.packs.map((pack) => (
           <li key={pack.id} className='flex items-center gap-4 rounded-2xl border border-[#E8EAF0] bg-white p-4'>
             <div className='min-w-0 flex-1'>

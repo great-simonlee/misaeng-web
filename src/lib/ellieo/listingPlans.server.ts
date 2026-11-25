@@ -1,17 +1,23 @@
-import { getSupabaseServiceClient } from '@lib/supabase/server'
+import { CreditsError, db, isMissingTable, rpc, setupRequired, SQL_ERRORS } from './creditsCore.server'
+import { isInHouse } from './inHouse.server'
+import { discounted, listingDiscount } from './promotions.server'
+
+export { CreditsError } from './creditsCore.server'
 
 /**
- * Ellieo credits + paid brokered listings (owner 11-25 final). SQL: ellieo-app/shared/ellieo/db/agent_listing_pay.sql.
+ * Ellieo credits + paid brokered listings (owner 11-25 final). SQL: ellieo-app/shared/ellieo/db/agent_listing_pay.sql
+ * + credits_paid_only.sql.
  *
- *   Credits   1 credit = $1 list price. Lots: paid (bought or staff-granted, never expire) and reward (90 days, spent
- *             first). Balance from SQL. Packs + Stripe: credits.server.ts.
- *   Regular   7 / 14 / 28 days = 6 / 10 / 14 credits
- *   Premium   "Boost": the 28-day regular price + 25 credits for 7 days at the top of Housing (new = 39), shown 28 days
- *             from the Boost start; +7 days once for 25. Upgrading a regular listing costs the same 39 and restarts its
- *             28 days from the Boost start.
- *   Slots     3 Boosts at a time (NYC). Full → reservation paid up front; a new listing shows as a regular 28-day
- *             listing while it waits; cancelling refunds the held Boost part in full.
- *   Everyone  pays (no in-house exemption): staff give their own agents credits with an ERP grant.
+ *   Credits   $1 = 10 credits, only from payment (Stripe or App Store; credits.server.ts, appleCredits.server.ts).
+ *             Lots: paid (each tied to its purchase, never expire) and staff (in-house accounts only, monthly, $0;
+ *             inHouse.server.ts). Staff credits are spent first. A refund after use can leave a debt (balance below 0).
+ *   Regular   7 / 14 / 28 days = 60 / 100 / 140 credits
+ *   Premium   "Boost": the 28-day regular price + 250 credits for 7 days at the top of Housing (new = 390), shown 28 days
+ *             from the Boost start; +7 days once for 250. Upgrading a regular listing costs the same 390 and restarts
+ *             its 28 days from the Boost start.
+ *   Slots     3 Boosts at a time (NYC); in-house listings hold at most 1 of them. Full → reservation paid up front; a
+ *             new listing shows as a regular 28-day listing while it waits; cancelling gives the held part back.
+ *   Discounts automatic listing discounts (promotions.server.ts) lower the credits a plan costs.
  *
  * Prices, durations and the slot count live in ONE config: ellieo_settings 'listing_prices' (the Super Admin edits it
  * in the ERP), falling back to DEFAULT_LISTING_PRICES. Every endpoint reads getListingPrices(); the app reads them from
@@ -37,8 +43,8 @@ export type ListingPrices = {
 }
 
 export const DEFAULT_LISTING_PRICES: ListingPrices = {
-  regular: { '7': 6, '14': 10, '28': 14 },
-  premium: { mode: 'boost', bundlePrice: 39, boostPrice: 25, days: 7, totalDays: 28, extendPrice: 25, maxExtensions: 1 },
+  regular: { '7': 60, '14': 100, '28': 140 },
+  premium: { mode: 'boost', bundlePrice: 390, boostPrice: 250, days: 7, totalDays: 28, extendPrice: 250, maxExtensions: 1 },
   slots: 3,
 }
 
@@ -68,15 +74,15 @@ function validatePrices(value: unknown): value is ListingPrices {
   if (!v || typeof v !== 'object' || !v.regular || !v.premium) return false
   const days = Object.keys(v.regular)
   if (days.length === 0 || days.length > 6) return false
-  if (!days.every((d) => isWhole(Number(d), 1, 90) && isWhole(v.regular[d], 0, 10_000))) return false
+  if (!days.every((d) => isWhole(Number(d), 1, 90) && isWhole(v.regular[d], 0, 100_000))) return false
   const pr = v.premium
   return (
     (pr.mode === 'bundle' || pr.mode === 'boost') &&
-    isWhole(pr.bundlePrice, 0, 10_000) &&
-    isWhole(pr.boostPrice, 0, 10_000) &&
+    isWhole(pr.bundlePrice, 0, 100_000) &&
+    isWhole(pr.boostPrice, 0, 100_000) &&
     isWhole(pr.days, 1, 60) &&
     isWhole(pr.totalDays, pr.days, 90) &&
-    isWhole(pr.extendPrice, 0, 10_000) &&
+    isWhole(pr.extendPrice, 0, 100_000) &&
     isWhole(pr.maxExtensions, 0, 1) &&
     isWhole(v.slots, 0, 50) &&
     (pr.mode !== 'boost' || v.regular[String(pr.totalDays)] !== undefined)
@@ -99,66 +105,20 @@ export async function saveListingPrices(value: unknown, by: string) {
   return getListingPrices()
 }
 
-export class CreditsError extends Error {
-  constructor(
-    message: string,
-    readonly code: string,
-    readonly status = 400,
-  ) {
-    super(message)
-  }
-}
-
-const SQL_ERRORS: Record<string, [string, number]> = {
-  NOT_ENOUGH_CREDITS: ['Not enough credits. Top up to continue.', 402],
-  NOT_FOUND: ['Listing not found.', 404],
-  NOT_BROKERED: ['Only brokered listings have plans.', 400],
-  NOT_AVAILABLE: ['This listing can no longer be changed.', 409],
-  INVALID_PLAN: ['Pick 7, 14 or 28 days, or Premium.', 400],
-  PREMIUM_ACTIVE: ['This listing is already Premium.', 409],
-  ALREADY_RESERVED: ['This listing is already waiting for a Premium spot.', 409],
-  SLOTS_FULL: ['All Premium spots are taken. Reserve the next one instead.', 409],
-  SLOT_OPEN: ['A Premium spot is open now — buy Premium instead of reserving.', 409],
-  NOT_PREMIUM: ['Only an active Premium listing can be extended.', 409],
-  ALREADY_EXTENDED: ['Premium can be extended only once.', 409],
-  INVALID_AMOUNT: ['Enter an amount between 1 and 100,000.', 400],
-  INVALID_BUCKET: ['Choose paid or reward credits.', 400],
-  INVALID_PRICES: ['Prices are not valid.', 400],
-  NOTE_REQUIRED: ['Add a note (who it is for and why).', 400],
-  NOTHING_TO_ADJUST: ['There are no credits of that type to take back.', 409],
-  NOT_REFUNDABLE: ['This purchase can no longer be refunded (more than 7 days, or some credits were used).', 409],
-  INVALID: ['Invalid request.', 400],
-}
-
-function db() {
-  return getSupabaseServiceClient()
-}
-
-async function rpc<T>(name: string, args: Record<string, unknown>): Promise<T> {
-  const { data, error } = await db().rpc(name, args as never)
-  if (error) {
-    const code = /ellieo:([A-Z_]+)/.exec(error.message)?.[1]
-    if (code && SQL_ERRORS[code]) throw new CreditsError(SQL_ERRORS[code][0], code, SQL_ERRORS[code][1])
-    if (error.code === 'PGRST202' || error.code === '42883' || error.code === '42P01') {
-      throw new CreditsError('Paid listings are not set up yet (run agent_listing_pay.sql).', 'SETUP_REQUIRED', 503)
-    }
-    throw new CreditsError(`Credits failed: ${error.message}`, 'SERVER_ERROR', 500)
-  }
-  return data as T
-}
-
 // MARK: - Credits
 
+/** paid = bought credits left (minus any debt, so it can be below 0); staff = in-house monthly credits. */
 export async function creditBalance(uid: string) {
-  const rows = await rpc<{ paid: number; reward: number }[]>('ellieo_credit_balance', { p_user: uid })
+  const rows = await rpc<{ paid: number; staff: number; debt: number }[]>('ellieo_credit_balance', { p_user: uid })
   const paid = Number(rows?.[0]?.paid) || 0
-  const reward = Number(rows?.[0]?.reward) || 0
-  return { paid, reward, total: paid + reward }
+  const staff = Number(rows?.[0]?.staff) || 0
+  const debt = Number(rows?.[0]?.debt) || 0
+  return { paid, staff, debt, total: paid + staff }
 }
 
 type LedgerRow = {
   id: string
-  bucket: 'paid' | 'reward'
+  bucket: 'paid' | 'staff' | 'reward'
   amount: number
   remaining: number | null
   expires_at: string | null
@@ -178,9 +138,17 @@ const REASON_TITLES: Record<string, string> = {
   upgrade: 'Upgrade to Premium (Boost)',
   extend: 'Boost extension',
   reserve: 'Boost reservation',
-  refund: 'Refund',
+  refund: 'Boost reservation cancelled',
+  return: 'Boost reservation cancelled',
   reversal: 'Purchase refunded',
+  debt: 'Owed after a refund',
+  debt_paid: 'Applied to an earlier refund',
+  cleanup: 'Free credits removed',
   expire: 'Reward credits expired',
+  staff_grant: 'Monthly staff credits',
+  staff_topup: 'Staff credits added',
+  staff_expire: 'Last month’s staff credits',
+  staff_removed: 'Staff credits removed',
 }
 
 export async function creditLedger(uid: string, limit = 100) {
@@ -192,9 +160,7 @@ export async function creditLedger(uid: string, limit = 100) {
     .limit(Math.min(Math.max(limit, 1), 500))
     .returns<LedgerRow[]>()
   if (error) {
-    if (error.code === '42P01' || error.code === 'PGRST205') {
-      throw new CreditsError('Paid listings are not set up yet (run agent_listing_pay.sql).', 'SETUP_REQUIRED', 503)
-    }
+    if (isMissingTable(error.code)) throw setupRequired()
     throw new CreditsError(error.message, 'LOAD_FAILED', 500)
   }
   return (data ?? []).map((row) => ({
@@ -205,7 +171,7 @@ export async function creditLedger(uid: string, limit = 100) {
     title: REASON_TITLES[row.reason] ?? row.reason,
     note: row.note,
     refId: row.ref_id,
-    /** Reward grants: what's left and when it expires. */
+    /** Lots: what's left. */
     remaining: row.remaining,
     expiresAt: row.expires_at,
     createdBy: row.created_by,
@@ -213,38 +179,13 @@ export async function creditLedger(uid: string, limit = 100) {
   }))
 }
 
-/**
- * ERP: give credits (reason 'grant': never refundable, never revenue). Note required; staff email kept on the row.
- * Several members at once with `uids`.
- */
-export async function grantCredits(input: { uids: string[]; amount: number; bucket: string; note?: string | null; by: string }) {
-  if (!Number.isInteger(input.amount)) throw new CreditsError('Enter a whole number of credits.', 'INVALID_AMOUNT')
-  const note = input.note?.trim().slice(0, 200) || ''
-  if (note.length < 3) throw new CreditsError(SQL_ERRORS.NOTE_REQUIRED[0], 'NOTE_REQUIRED')
-  const uids = [...new Set(input.uids.map((uid) => uid.trim()).filter(Boolean))].slice(0, 100)
-  if (uids.length === 0) throw new CreditsError('Choose at least one member.', 'INVALID')
-  const results: { uid: string; ok: boolean; error?: string }[] = []
-  for (const uid of uids) {
-    try {
-      await rpc('ellieo_credit_grant', {
-        p_user: uid, p_amount: input.amount, p_bucket: input.bucket, p_reason: 'grant', p_ref: null, p_note: note, p_by: input.by,
-        p_reward_days: 90,
-      })
-      results.push({ uid, ok: true })
-    } catch (error) {
-      if (error instanceof CreditsError && error.code === 'SETUP_REQUIRED') throw error
-      results.push({ uid, ok: false, error: error instanceof Error ? error.message : 'Failed' })
-    }
-  }
-  return results
-}
-
-/** ERP (Super Admin): take credits back (negative correction from what is left of that bucket). */
-export async function adjustCredits(input: { uid: string; amount: number; bucket: string; note: string; by: string }) {
+/** ERP (Super Admin): take credits back from one purchase (negative only; never below what is left of it). */
+export async function adjustCredits(input: { purchaseId: string; amount: number; note: string; by: string }) {
+  if (!/^[0-9a-f-]{36}$/i.test(input.purchaseId)) throw new CreditsError('Choose the purchase to correct.', 'INVALID')
   const removed = await rpc<number>('ellieo_credit_adjust', {
-    p_user: input.uid, p_amount: input.amount, p_bucket: input.bucket, p_note: input.note?.trim() ?? '', p_by: input.by,
+    p_purchase: input.purchaseId, p_amount: input.amount, p_note: input.note?.trim() ?? '', p_by: input.by,
   })
-  return { removed, balance: await creditBalance(input.uid) }
+  return { removed }
 }
 
 export async function creditLiability() {
@@ -263,9 +204,10 @@ export async function promotePremium() {
   }
 }
 
-export async function premiumAvailability(slots: number) {
+/** Boost spots. For an in-house viewer the spots are also "full" while in-house listings hold their share. */
+export async function premiumAvailability(slots: number, inHouse = false) {
   const now = new Date().toISOString()
-  const [{ data: active }, { data: waiting }] = await Promise.all([
+  const [{ data: active }, { data: waiting }, inHouseHeld, inHouseSlots] = await Promise.all([
     db()
       .from('ellieo_listings')
       .select('premium_end')
@@ -280,16 +222,21 @@ export async function premiumAvailability(slots: number) {
       .select('id')
       .eq('status', 'waiting')
       .returns<{ id: string }[]>(),
+    inHouse ? rpc<number>('ellieo_premium_in_house_count', {}).catch(() => 0) : Promise.resolve(0),
+    inHouse ? rpc<number>('ellieo_in_house_boost_slots', {}).catch(() => 1) : Promise.resolve(0),
   ])
   const used = active?.length ?? 0
   const queue = waiting?.length ?? 0
+  const inHouseFull = inHouse && Number(inHouseHeld) >= Number(inHouseSlots)
   // The spot a new reservation gets: the (queue+1)-th Premium to end, if any.
   const ends = (active ?? []).map((row) => new Date(row.premium_end).getTime())
   const nextEnd = used >= slots && ends.length ? ends[Math.min(queue, ends.length - 1)] : null
   return {
     slots,
     used: Math.min(used, slots),
-    full: used >= slots,
+    full: used >= slots || inHouseFull,
+    /** In-house: the in-house share of the spots is taken (outside spots may still be open). */
+    inHouseFull,
     waiting: queue,
     /** Whole days until the next spot (for a new reservation) opens; null when a spot is open. */
     nextOpensInDays: nextEnd ? Math.max(1, Math.ceil((nextEnd - Date.now()) / 86_400_000)) : null,
@@ -300,17 +247,27 @@ export async function premiumAvailability(slots: number) {
 export async function planOptions(uid: string, topUp: { ios: boolean; android: boolean }) {
   await promotePremium()
   const p = await getListingPrices()
-  const [balance, premium] = await Promise.all([creditBalance(uid), premiumAvailability(p.slots)])
+  const inHouse = await isInHouse(uid).catch(() => false)
+  const [balance, premium, discount] = await Promise.all([
+    creditBalance(uid),
+    premiumAvailability(p.slots, inHouse),
+    listingDiscount(uid).catch(() => null),
+  ])
+  const off = (n: number) => discounted(n, discount)
   return {
-    /** Everything the app shows comes from here (one config). */
+    /** Everything the app shows comes from here (one config), after the member's listing discount. */
     prices: {
-      regular: p.regular,
-      premium: premiumPrice(p),
-      extend: extendPrice(p),
+      regular: Object.fromEntries(Object.entries(p.regular).map(([days, price]) => [days, off(price)])),
+      premium: off(premiumPrice(p)),
+      extend: off(extendPrice(p)),
       premiumMode: p.premium.mode,
-      boost: p.premium.boostPrice,
+      boost: off(p.premium.boostPrice),
       maxExtensions: p.premium.maxExtensions,
     },
+    /** Prices before the discount (null when there is none). */
+    listPrices: discount ? { regular: p.regular, premium: premiumPrice(p), extend: extendPrice(p) } : null,
+    discount: discount ? { percent: discount.percent, title: discount.title } : null,
+    inHouse,
     premiumDays: p.premium.days,
     premiumTotalDays: p.premium.totalDays,
     premium,
@@ -340,19 +297,23 @@ export async function purchase(
   notLive = false,
 ) {
   const p = await getListingPrices()
-  const regularTotal = p.regular[String(p.premium.totalDays)] ?? 0
+  // The member's in-house row must exist before the SQL counts in-house Boost spots.
+  await isInHouse(uid).catch(() => false)
+  const discount = await listingDiscount(uid).catch(() => null)
+  const off = (n: number) => discounted(n, discount)
+  const regularTotal = off(p.regular[String(p.premium.totalDays)] ?? 0)
   const reserveNow = action === 'reserve' && notLive && p.premium.mode === 'boost' ? regularTotal : 0
-  const price =
+  const listPrice =
     action === 'regular'
       ? p.regular[String(days)]
-      : action === 'premium'
+      : action === 'premium' || action === 'reserve'
         ? premiumPrice(p)
-        : action === 'reserve'
-          ? premiumPrice(p) - reserveNow
-          : extendPrice(p)
-  if (action === 'regular' && price === undefined) throw new CreditsError(SQL_ERRORS.INVALID_PLAN[0], 'INVALID_PLAN')
+        : extendPrice(p)
+  if (action === 'regular' && listPrice === undefined) throw new CreditsError(SQL_ERRORS.INVALID_PLAN[0], 'INVALID_PLAN')
+  const full = off(listPrice ?? 0)
+  const price = action === 'reserve' ? full - reserveNow : full
   if (action === 'extend' && p.premium.maxExtensions < 1) throw new CreditsError('Premium can’t be extended right now.', 'NO_EXTENSION', 409)
-  const result = await rpc<{ ok: boolean; paidUsed?: number; rewardUsed?: number; reservation?: string | null }>(
+  const result = await rpc<{ ok: boolean; reservation?: string | null }>(
     'ellieo_listing_purchase',
     {
       p_user: uid,
@@ -365,6 +326,7 @@ export async function purchase(
       p_slots: p.slots,
       p_premium_days: p.premium.days,
       p_total_days: p.premium.totalDays,
+      p_promotion: discount?.id ?? null,
     },
   )
   if (action !== 'reserve') await promotePremium()
