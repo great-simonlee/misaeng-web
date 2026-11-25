@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { checkReceiptKey, getPurchase, requestRefund } from '@lib/ellieo/credits.server'
 
-import { errorResponse, jsonBody, notEllieo } from '../../_lib'
+import { errorResponse, jsonBody, creditsOff, notEllieo } from '../../_lib'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -11,6 +11,8 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: Request) {
   const blocked = notEllieo()
   if (blocked) return blocked
+  const off = await creditsOff()
+  if (off) return off
   try {
     const body = await jsonBody(request)
     const id = String(body.id ?? '')

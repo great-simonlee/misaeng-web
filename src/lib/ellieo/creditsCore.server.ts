@@ -65,3 +65,23 @@ export async function rpc<T>(name: string, args: Record<string, unknown>): Promi
 export function isMissingTable(code: string | undefined) {
   return code === '42P01' || code === 'PGRST205'
 }
+
+let enabledCache: { at: number; value: boolean } | null = null
+
+/**
+ * Credits on/off (owner 11-25: the first TestFlight / release ships WITHOUT credits; they come in the next version).
+ * ellieo_settings 'credits_enabled' = { "enabled": true } turns them on; a missing row or table = OFF. While off: no
+ * balance, packs, checkout, App Store purchases or listing plans; brokered listings post and renew free like personal
+ * ones (30 days). 30 s cache.
+ */
+export async function creditsEnabled(): Promise<boolean> {
+  if (enabledCache && Date.now() - enabledCache.at < 30_000) return enabledCache.value
+  const { data } = await db()
+    .from('ellieo_settings')
+    .select('value')
+    .eq('key', 'credits_enabled')
+    .maybeSingle<{ value: { enabled?: unknown } }>()
+  const value = data?.value?.enabled === true
+  enabledCache = { at: Date.now(), value }
+  return value
+}

@@ -4,7 +4,7 @@ import { activeLicense } from '@lib/ellieo/agentLicense.server'
 import { getCreditsConfig } from '@lib/ellieo/credits.server'
 import { CreditsError, planOptions } from '@lib/ellieo/listingPlans.server'
 
-import { errorResponse, loginRequired, notEllieo, signedInUid } from '../../_lib'
+import { errorResponse, loginRequired, creditsOff, notEllieo, signedInUid } from '../../_lib'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -16,6 +16,8 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   const blocked = notEllieo()
   if (blocked) return blocked
+  const off = await creditsOff()
+  if (off) return off
   try {
     const uid = await signedInUid()
     if (!uid) return loginRequired()

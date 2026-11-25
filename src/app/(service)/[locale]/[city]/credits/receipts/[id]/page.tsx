@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { BRAND_CONFIG } from '@lib/brand'
 import { checkReceiptKey, getCreditsConfig, getPurchase, isRefundable } from '@lib/ellieo/credits.server'
 import { EllieoReceiptActions } from '@screens/ellieo/EllieoReceiptActions'
+import { creditsEnabled } from '@lib/ellieo/creditsCore.server'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,6 +26,7 @@ const STATUS: Record<string, string> = {
 /** Printable receipt for one credit pack (for expense reports). Opened with the signed link (?k=). */
 export default async function EllieoReceiptPage({ params, searchParams }: Props) {
   if (BRAND_CONFIG.theme !== 'ellieo') notFound()
+  if (!(await creditsEnabled().catch(() => false))) notFound()
   const [{ id, locale }, { k }] = await Promise.all([params, searchParams])
   if (!checkReceiptKey(id, k)) notFound()
   const purchase = await getPurchase(id)

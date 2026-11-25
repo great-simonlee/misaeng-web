@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { purchaseBySession, readTopUpToken, receiptPath } from '@lib/ellieo/credits.server'
 
-import { errorResponse, loginRequired, notEllieo, signedInUid } from '../../_lib'
+import { errorResponse, loginRequired, creditsOff, notEllieo, signedInUid } from '../../_lib'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -11,6 +11,8 @@ export const dynamic = 'force-dynamic'
 export async function GET(request: Request) {
   const blocked = notEllieo()
   if (blocked) return blocked
+  const off = await creditsOff()
+  if (off) return off
   try {
     const params = new URL(request.url).searchParams
     const uid = readTopUpToken(params.get('t')) ?? (await signedInUid())

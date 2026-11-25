@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { BRAND } from '@lib/brand'
 import { AgentLicenseError } from '@lib/ellieo/agentLicense.server'
+import { creditsEnabled } from '@lib/ellieo/creditsCore.server'
 import { CreditsError } from '@lib/ellieo/listingPlans.server'
 import { ListingError } from '@lib/ellieo/listings.server'
 import { MessagingError } from '@lib/ellieo/messaging.server'
@@ -11,6 +12,12 @@ import { resolveAuthenticatedUser } from '../agent-auth/lib/authHelpers'
 /** Ellieo-only routes: 404 on the Misaeng build (same codebase). */
 export function notEllieo() {
   return BRAND === 'ellieo' ? null : NextResponse.json({ error: 'Not found' }, { status: 404 })
+}
+
+/** Credits routes: 404 { code: 'CREDITS_OFF' } while credits are switched off (creditsEnabled). */
+export async function creditsOff() {
+  if (await creditsEnabled().catch(() => false)) return null
+  return NextResponse.json({ error: 'Credits are not available yet.', code: 'CREDITS_OFF' }, { status: 404 })
 }
 
 export async function signedInUid() {

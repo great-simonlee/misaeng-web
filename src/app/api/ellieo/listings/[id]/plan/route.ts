@@ -4,7 +4,7 @@ import { activeLicense } from '@lib/ellieo/agentLicense.server'
 import { cancelReservation, CreditsError, markRented, purchase } from '@lib/ellieo/listingPlans.server'
 import { getSupabaseServiceClient } from '@lib/supabase/server'
 
-import { errorResponse, jsonBody, loginRequired, notEllieo, signedInUid } from '../../../_lib'
+import { errorResponse, jsonBody, loginRequired, creditsOff, notEllieo, signedInUid } from '../../../_lib'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -18,6 +18,8 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const blocked = notEllieo()
   if (blocked) return blocked
+  const off = await creditsOff()
+  if (off) return off
   try {
     const uid = await signedInUid()
     if (!uid) return loginRequired()

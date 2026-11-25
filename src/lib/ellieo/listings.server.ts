@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { getSupabaseServiceClient } from '@lib/supabase/server'
 
 import { activeLicense, licensedOwners } from './agentLicense.server'
+import { creditsEnabled } from './creditsCore.server'
 import { CreditsError, parsePlan, planFacts, promotePremium, purchase, type PlanFacts } from './listingPlans.server'
 
 /**
@@ -174,8 +175,10 @@ export async function createListing(uid: string, input: ListingInput) {
   if (input.brokered && !license) {
     throw new ListingError('Brokered listings are for verified Licensed Agents.', 'AGENT_REQUIRED', 403)
   }
-  const choice = input.brokered ? parsePlan(input.listingPlan) : null
-  if (input.brokered && !choice) {
+  // Credits off (first release): brokered listings post free and live 30 days like personal ones; no plan.
+  const paid = Boolean(input.brokered) && (await creditsEnabled().catch(() => false))
+  const choice = paid ? parsePlan(input.listingPlan) : null
+  if (paid && !choice) {
     throw new ListingError('Choose how long to show this listing (7, 14 or 28 days, or Premium).', 'PLAN_REQUIRED')
   }
   if (!input.brokered && license) {
@@ -220,8 +223,8 @@ export async function createListing(uid: string, input: ListingInput) {
             brokerage: license.brokerage,
             broker_fee: input.brokerFee || 0,
             license_id: license.id,
-            // Hidden until the plan is paid (the board shows only expires_at > now).
-            expires_at: new Date().toISOString(),
+            // Hidden until the plan is paid (the board shows only expires_at > now); free → the default 30 days.
+            ...(paid ? { expires_at: new Date().toISOString() } : {}),
           }
         : {}),
     } as never)
@@ -245,7 +248,7 @@ export async function createListing(uid: string, input: ListingInput) {
       .eq('owner_id', uid)
     if (claimError) throw new ListingError(claimError.message, 'SAVE_FAILED', 500)
   }
-  if (license) await payForNewListing(uid, listing.id, choice)
+  if (license && paid) await payForNewListing(uid, listing.id, choice)
   const { data: fresh } = await db().from('ellieo_listings').select(LISTING_COLUMNS).eq('id', listing.id).single<ListingRow>()
   const [out] = await withBroker([toPublic(fresh ?? listing, uid)], [fresh ?? listing], uid)
   return out
@@ -329,7 +332,9 @@ async function withBroker<T extends ReturnType<typeof toPublic>>(
       .then(({ data, error }) => (error ? [] : data ?? [])),
     licensedOwners(rows.map((row) => row.owner_id)).catch(() => new Map()),
   ])
-  const plans = await planFacts(rows, viewer).catch(() => new Map<string, PlanFacts>())
+  const plans = (await creditsEnabled().catch(() => false))
+    ? await planFacts(rows, viewer).catch(() => new Map<string, PlanFacts>())
+    : new Map<string, PlanFacts>()
   const byId = new Map(extras.map((extra) => [extra.id, extra]))
   const owners = new Map(rows.map((row) => [row.id, row.owner_id]))
   return listings.map((listing) => {
@@ -420,8 +425,8 @@ export async function renewListing(id: string, uid: string) {
   if (license && row && !row.brokered) {
     throw new ListingError('Licensed Agents can post brokered listings only. This personal listing can’t be reposted.', 'AGENT_BROKERED_ONLY', 403)
   }
-  // Brokered listings are renewed by buying a plan again.
-  if (row?.brokered) {
+  // Brokered listings are renewed by buying a plan again (credits on); free renewals while credits are off.
+  if (row?.brokered && (await creditsEnabled().catch(() => false))) {
     throw new ListingError('Renew a brokered listing by choosing a plan (7, 14 or 28 days, or Premium).', 'PLAN_REQUIRED', 402)
   }
   const { data, error } = await db().rpc('ellieo_renew_listing', { p_listing: id, p_owner: uid } as never)

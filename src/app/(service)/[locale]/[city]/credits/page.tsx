@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { BRAND_CONFIG } from '@lib/brand'
 import { describeHint, getCreditsConfig, packHints, paymentsEnabled } from '@lib/ellieo/credits.server'
 import { EllieoTopUpScreen } from '@screens/ellieo/EllieoTopUpScreen'
+import { creditsEnabled } from '@lib/ellieo/creditsCore.server'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,6 +28,7 @@ function hintVi(h: { premiumListings: number; regularListings: number[] }) {
 /** ellieo.com/credits — credit packs (Stripe Checkout once Ellieo's keys are set; "coming soon" until then). */
 export default async function EllieoCreditsPage({ params }: Props) {
   if (BRAND_CONFIG.theme !== 'ellieo') notFound()
+  if (!(await creditsEnabled().catch(() => false))) notFound()
   const { locale } = await params
   const [config, hints] = await Promise.all([getCreditsConfig(), packHints().catch(() => [])])
   const packs = config.packs.map((pack) => {

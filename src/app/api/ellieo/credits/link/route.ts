@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { getCreditsConfig, paymentsEnabled, topUpToken } from '@lib/ellieo/credits.server'
 import { isInHouse } from '@lib/ellieo/inHouse.server'
 
-import { errorResponse, loginRequired, notEllieo, signedInUid } from '../../_lib'
+import { errorResponse, loginRequired, creditsOff, notEllieo, signedInUid } from '../../_lib'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -16,6 +16,8 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: Request) {
   const blocked = notEllieo()
   if (blocked) return blocked
+  const off = await creditsOff()
+  if (off) return off
   try {
     const uid = await signedInUid()
     if (!uid) return loginRequired()
