@@ -10,19 +10,95 @@ import { getSupabaseServiceClient } from '@lib/supabase/server'
  *   Slots     3 at a time (NYC); full → reservation paid up front, started in order; cancel = full refund
  *   In-house  license in_house (ERP only): free, no limits, no Premium slot
  *
- * Prices live here only; the app sends a plan, never a price.
+ * Prices, durations and the slot count live in ONE config: ellieo_settings 'listing_prices' (Super Admin edits it in
+ * the ERP), falling back to DEFAULT_LISTING_PRICES. Every endpoint reads getListingPrices(); the app reads them from
+ * the API and sends a plan, never a price. Premium is either a bundle (bundlePrice) or an add-on "Boost": the
+ * regular price for totalDays + boostPrice per `days` of Premium (extension = boostPrice).
  */
 
-export const PLAN_PRICES = {
-  regular: { 7: 6, 14: 10, 28: 14 } as Record<number, number>,
-  premium: 58,
-  extend: 46,
-} as const
-export const PREMIUM_SLOTS = 3
-export const PREMIUM_DAYS = 7
-export const PREMIUM_TOTAL_DAYS = 28
-export const INHOUSE_DAYS = 28
-const REGULAR_DAYS = [7, 14, 28]
+export type ListingPrices = {
+  /** Regular listing: days → credits. */
+  regular: Record<string, number>
+  premium: {
+    mode: 'bundle' | 'boost'
+    /** bundle: one price for `days` of Premium + shown `totalDays` in all. */
+    bundlePrice: number
+    /** boost: credits per `days` of Premium on top of the regular price for `totalDays`. */
+    boostPrice: number
+    days: number
+    totalDays: number
+    /** bundle: price of one extension (+`days`); boost: the extension costs boostPrice. */
+    extendPrice: number
+    maxExtensions: number
+  }
+  slots: number
+  inHouseDays: number
+}
+
+export const DEFAULT_LISTING_PRICES: ListingPrices = {
+  regular: { '7': 6, '14': 10, '28': 14 },
+  premium: { mode: 'bundle', bundlePrice: 58, boostPrice: 25, days: 7, totalDays: 28, extendPrice: 46, maxExtensions: 1 },
+  slots: 3,
+  inHouseDays: 28,
+}
+
+let cached: { at: number; value: ListingPrices } | null = null
+
+/** The one price config (30 s cache). Missing row / table → the defaults. */
+export async function getListingPrices(): Promise<ListingPrices> {
+  if (cached && Date.now() - cached.at < 30_000) return cached.value
+  const { data } = await db().from('ellieo_settings').select('value').eq('key', 'listing_prices').maybeSingle<{ value: ListingPrices }>()
+  const value = validatePrices(data?.value) ? data!.value : DEFAULT_LISTING_PRICES
+  cached = { at: Date.now(), value }
+  return value
+}
+
+export function premiumPrice(p: ListingPrices) {
+  return p.premium.mode === 'boost' ? (p.regular[String(p.premium.totalDays)] ?? 0) + p.premium.boostPrice : p.premium.bundlePrice
+}
+
+export function extendPrice(p: ListingPrices) {
+  return p.premium.mode === 'boost' ? p.premium.boostPrice : p.premium.extendPrice
+}
+
+const isWhole = (n: unknown, min: number, max: number) => Number.isInteger(n) && (n as number) >= min && (n as number) <= max
+
+function validatePrices(value: unknown): value is ListingPrices {
+  const v = value as ListingPrices | null
+  if (!v || typeof v !== 'object' || !v.regular || !v.premium) return false
+  const days = Object.keys(v.regular)
+  if (days.length === 0 || days.length > 6) return false
+  if (!days.every((d) => isWhole(Number(d), 1, 90) && isWhole(v.regular[d], 0, 10_000))) return false
+  const pr = v.premium
+  return (
+    (pr.mode === 'bundle' || pr.mode === 'boost') &&
+    isWhole(pr.bundlePrice, 0, 10_000) &&
+    isWhole(pr.boostPrice, 0, 10_000) &&
+    isWhole(pr.days, 1, 60) &&
+    isWhole(pr.totalDays, pr.days, 90) &&
+    isWhole(pr.extendPrice, 0, 10_000) &&
+    isWhole(pr.maxExtensions, 0, 1) &&
+    isWhole(v.slots, 0, 50) &&
+    isWhole(v.inHouseDays, 1, 365) &&
+    (pr.mode !== 'boost' || v.regular[String(pr.totalDays)] !== undefined)
+  )
+}
+
+/** ERP (Super Admin): replace the config. */
+export async function saveListingPrices(value: unknown, by: string) {
+  if (!validatePrices(value)) {
+    throw new CreditsError(
+      'Prices are not valid (whole credits; regular days 1–90; Premium days ≤ total days; boost needs a regular price for the total days).',
+      'INVALID_PRICES',
+    )
+  }
+  const { error } = await db()
+    .from('ellieo_settings')
+    .upsert({ key: 'listing_prices', value, updated_at: new Date().toISOString(), updated_by: by } as never, { onConflict: 'key' })
+  if (error) throw new CreditsError(error.message, 'SAVE_FAILED', 500)
+  cached = null
+  return getListingPrices()
+}
 
 export class CreditsError extends Error {
   constructor(
@@ -48,6 +124,7 @@ const SQL_ERRORS: Record<string, [string, number]> = {
   ALREADY_EXTENDED: ['Premium can be extended only once.', 409],
   INVALID_AMOUNT: ['Enter an amount between 1 and 100,000.', 400],
   INVALID_BUCKET: ['Choose paid or reward credits.', 400],
+  INVALID_PRICES: ['Prices are not valid.', 400],
 }
 
 function db() {
@@ -151,13 +228,14 @@ export async function grantCredits(input: { uid: string; amount: number; bucket:
 /** Starts waiting reservations when spots are free (no cron needed: called on board loads and purchases). */
 export async function promotePremium() {
   try {
-    await rpc('ellieo_premium_promote', {})
+    const p = await getListingPrices()
+    await rpc('ellieo_premium_promote', { p_slots: p.slots, p_premium_days: p.premium.days, p_total_days: p.premium.totalDays })
   } catch (error) {
     if (!(error instanceof CreditsError && error.code === 'SETUP_REQUIRED')) console.error('Ellieo premium promote error:', error)
   }
 }
 
-export async function premiumAvailability() {
+export async function premiumAvailability(slots: number) {
   const now = new Date().toISOString()
   const [{ data: active }, { data: waiting }] = await Promise.all([
     db()
@@ -179,11 +257,11 @@ export async function premiumAvailability() {
   const queue = waiting?.length ?? 0
   // The spot a new reservation gets: the (queue+1)-th Premium to end, if any.
   const ends = (active ?? []).map((row) => new Date(row.premium_end).getTime())
-  const nextEnd = used >= PREMIUM_SLOTS ? ends[Math.min(queue, ends.length - 1)] : null
+  const nextEnd = used >= slots && ends.length ? ends[Math.min(queue, ends.length - 1)] : null
   return {
-    slots: PREMIUM_SLOTS,
-    used: Math.min(used, PREMIUM_SLOTS),
-    full: used >= PREMIUM_SLOTS,
+    slots,
+    used: Math.min(used, slots),
+    full: used >= slots,
     waiting: queue,
     /** Whole days until the next spot (for a new reservation) opens; null when a spot is open. */
     nextOpensInDays: nextEnd ? Math.max(1, Math.ceil((nextEnd - Date.now()) / 86_400_000)) : null,
@@ -193,11 +271,20 @@ export async function premiumAvailability() {
 /** Composer / plan sheet: prices, Premium spots, my balance, in-house. */
 export async function planOptions(uid: string, inHouse: boolean) {
   await promotePremium()
-  const [balance, premium] = await Promise.all([creditBalance(uid), premiumAvailability()])
+  const p = await getListingPrices()
+  const [balance, premium] = await Promise.all([creditBalance(uid), premiumAvailability(p.slots)])
   return {
-    prices: { regular: PLAN_PRICES.regular, premium: PLAN_PRICES.premium, extend: PLAN_PRICES.extend },
-    premiumDays: PREMIUM_DAYS,
-    premiumTotalDays: PREMIUM_TOTAL_DAYS,
+    /** Everything the app shows comes from here (one config). */
+    prices: {
+      regular: p.regular,
+      premium: premiumPrice(p),
+      extend: extendPrice(p),
+      premiumMode: p.premium.mode,
+      boost: p.premium.boostPrice,
+      maxExtensions: p.premium.maxExtensions,
+    },
+    premiumDays: p.premium.days,
+    premiumTotalDays: p.premium.totalDays,
     premium,
     balance,
     inHouse,
@@ -210,25 +297,37 @@ export type PlanChoice = { plan: 'regular'; days: number } | { plan: 'premium'; 
 
 export function parsePlan(input: unknown): PlanChoice | null {
   const value = (input ?? {}) as { plan?: unknown; days?: unknown; reserve?: unknown }
-  if (value.plan === 'regular' && REGULAR_DAYS.includes(Number(value.days))) return { plan: 'regular', days: Number(value.days) }
+  if (value.plan === 'regular' && Number.isInteger(Number(value.days))) return { plan: 'regular', days: Number(value.days) }
   if (value.plan === 'premium') return { plan: 'premium', reserve: value.reserve === true }
   return null
 }
 
-/** One action on my brokered listing; price from PLAN_PRICES. */
+/** One action on my brokered listing; price from the one config (getListingPrices). */
 export async function purchase(uid: string, listingId: string, action: 'regular' | 'premium' | 'extend' | 'reserve' | 'free', days = 0) {
+  const p = await getListingPrices()
   const price =
     action === 'regular'
-      ? PLAN_PRICES.regular[days]
+      ? p.regular[String(days)]
       : action === 'premium' || action === 'reserve'
-        ? PLAN_PRICES.premium
+        ? premiumPrice(p)
         : action === 'extend'
-          ? PLAN_PRICES.extend
+          ? extendPrice(p)
           : 0
-  if (action === 'regular' && !price) throw new CreditsError(SQL_ERRORS.INVALID_PLAN[0], 'INVALID_PLAN')
+  if (action === 'regular' && price === undefined) throw new CreditsError(SQL_ERRORS.INVALID_PLAN[0], 'INVALID_PLAN')
+  if (action === 'extend' && p.premium.maxExtensions < 1) throw new CreditsError('Premium can’t be extended right now.', 'NO_EXTENSION', 409)
   const result = await rpc<{ ok: boolean; paidUsed?: number; rewardUsed?: number; reservation?: string | null }>(
     'ellieo_listing_purchase',
-    { p_user: uid, p_listing: listingId, p_action: action, p_days: action === 'free' ? days || INHOUSE_DAYS : days, p_price: price },
+    {
+      p_user: uid,
+      p_listing: listingId,
+      p_action: action,
+      p_days: action === 'free' ? days || p.inHouseDays : days,
+      p_price: price ?? 0,
+      p_regular_days: Object.keys(p.regular).map(Number),
+      p_slots: p.slots,
+      p_premium_days: p.premium.days,
+      p_total_days: p.premium.totalDays,
+    },
   )
   if (action !== 'reserve') await promotePremium()
   return { ...result, price }
