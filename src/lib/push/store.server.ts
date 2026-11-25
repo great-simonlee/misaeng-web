@@ -1,4 +1,13 @@
+import { BRAND } from '@lib/brand'
+
 import type { ApnsEnvironment } from './apns.server'
+
+/**
+ * Device table: the Ellieo server (same codebase, shared database) keeps the Ellieo app's devices apart from Misaeng's
+ * (ellieo_push_devices, topic com.misaeng.ellieo), so a push sent from ellieo.com never reaches a Misaeng phone and
+ * Misaeng's broadcasts never reach an Ellieo phone.
+ */
+const DEVICES = BRAND === 'ellieo' ? 'ellieo_push_devices' : 'push_devices'
 
 /*
  * Push devices, preferences and company follows (supabase/push.sql), through PostgREST with the service role key.
@@ -102,7 +111,7 @@ export async function savePushDevice(input: {
   environment: ApnsEnvironment
   locale: string
 }) {
-  await rest('push_devices?on_conflict=token', {
+  await rest(`${DEVICES}?on_conflict=token`, {
     method: 'POST',
     prefer: 'resolution=merge-duplicates,return=minimal',
     body: JSON.stringify({
@@ -118,19 +127,19 @@ export async function savePushDevice(input: {
 
 export async function deletePushDevice(token: string, userId?: string) {
   const owner = userId ? `&user_id=eq.${encodeURIComponent(userId)}` : ''
-  await rest(`push_devices?token=eq.${encodeURIComponent(token)}${owner}`, { method: 'DELETE', prefer: 'return=minimal' })
+  await rest(`${DEVICES}?token=eq.${encodeURIComponent(token)}${owner}`, { method: 'DELETE', prefer: 'return=minimal' })
 }
 
 export async function deletePushDevices(tokens: string[]) {
   if (tokens.length === 0) return
-  await rest(`push_devices?token=in.${encodeURIComponent(inList(tokens))}`, { method: 'DELETE', prefer: 'return=minimal' })
+  await rest(`${DEVICES}?token=in.${encodeURIComponent(inList(tokens))}`, { method: 'DELETE', prefer: 'return=minimal' })
 }
 
 export async function listPushDevices(userIds: string[]): Promise<PushDevice[]> {
   const ids = [...new Set(userIds.filter(Boolean))]
   if (ids.length === 0) return []
   const rows = await rest<PushDevice[]>(
-    `push_devices?user_id=in.${encodeURIComponent(inList(ids))}&select=token,user_id,platform,environment,locale`,
+    `${DEVICES}?user_id=in.${encodeURIComponent(inList(ids))}&select=token,user_id,platform,environment,locale`,
   ).catch(() => null)
   return rows ?? []
 }
@@ -142,7 +151,7 @@ export async function listPushUserIds(): Promise<string[]> {
   for (let offset = 0; offset < 200_000; offset += page) {
     const rows = await rest<{ user_id: string }[]>(
       // user_id is not unique: order by token too, or rows shift between pages and users are skipped
-      `push_devices?select=user_id&user_id=not.is.null&order=user_id,token&limit=${page}&offset=${offset}`,
+      `${DEVICES}?select=user_id&user_id=not.is.null&order=user_id,token&limit=${page}&offset=${offset}`,
     ).catch(() => null)
     for (const row of rows ?? []) if (row.user_id) ids.add(row.user_id)
     if (!rows || rows.length < page) break
@@ -248,7 +257,7 @@ export async function listCompanyFollowers(companyId: string): Promise<string[]>
 export async function deletePushDataForUser(userId: string) {
   if (!userId) return
   const id = encodeURIComponent(userId)
-  for (const table of ['push_devices', 'push_preferences', 'company_follows']) {
+  for (const table of [DEVICES, 'push_preferences', 'company_follows']) {
     try {
       await rest(`${table}?user_id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' })
     } catch (error) {

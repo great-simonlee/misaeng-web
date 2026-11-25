@@ -1,6 +1,8 @@
 import { createPrivateKey, sign } from 'node:crypto'
 import { connect, type ClientHttp2Session } from 'node:http2'
 
+import { BRAND } from '@lib/brand'
+
 /**
  * Apple Push Notification service (HTTP/2 + token auth). No SDK: a JWT signed with a .p8 key.
  * Either one "Sandbox & Production" key (APNS_KEY_ID + APNS_KEY), or one key per environment:
@@ -54,7 +56,9 @@ export function isApnsConfigured(environment?: ApnsEnvironment) {
   return environment ? Boolean(signingKey(environment)) : Boolean(signingKey('production') || signingKey('sandbox'))
 }
 
+/** Default topic: the Ellieo server always sends as the Ellieo app (never Misaeng's APNS_BUNDLE_ID). */
 function bundleId() {
+  if (BRAND === 'ellieo') return process.env.ELLIEO_APNS_BUNDLE_ID?.trim() || 'com.misaeng.ellieo'
   return process.env.APNS_BUNDLE_ID?.trim() || 'com.misaeng.nyc'
 }
 
