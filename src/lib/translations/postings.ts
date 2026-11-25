@@ -1,3 +1,4 @@
+import { BRAND } from '@lib/brand'
 import type { Locale } from '@lib/i18n/locales'
 import type { PublicPosting } from '@lib/company/postings'
 
@@ -92,7 +93,28 @@ export function localizePosting(
   const base = { sourceLocale: POSTING_SOURCE_LOCALE, displayLocale: locale }
   if (locale === POSTING_SOURCE_LOCALE) return { ...rest, i18n: { ...base, state: 'original' } }
   const translation = summaryTranslations?.[locale]
-  if (!translation) return { ...rest, i18n: { ...base, state: 'pending' } }
+  if (!translation) {
+    // Ellieo (English / Vietnamese only): no Korean summary text. Postings summarized before 2026-11-25 have no English
+    // and are never translated (owner: no backfill cost) → title, company, places, dates and the apply link only.
+    if (BRAND === 'ellieo') {
+      return {
+        ...rest,
+        summary: {
+          ...rest.summary,
+          overview: [],
+          qualifications: [],
+          preferred: [],
+          compensation: null,
+          benefits: [],
+          workType: '',
+          location: '',
+          applyNotes: [],
+        },
+        i18n: { ...base, state: 'pending' },
+      }
+    }
+    return { ...rest, i18n: { ...base, state: 'pending' } }
+  }
   return {
     ...rest,
     summary: {

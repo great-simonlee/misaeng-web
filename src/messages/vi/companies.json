@@ -96,6 +96,8 @@
     "listTitle": "Tin tuyển dụng",
     "listIntro": "{brand} tóm tắt điểm chính của các tin tuyển thực tập, new grad và có kinh nghiệm từ công ty Mỹ.",
     "listLink": "Xem tin tuyển dụng",
+    "noSummary": "Tin này chưa có bản tóm tắt.",
+    "viewOriginal": "Xem tin gốc",
     "backToCompanies": "Trang tuyển dụng công ty",
     "allLevels": "Tất cả",
     "allRegions": "Tất cả địa điểm",

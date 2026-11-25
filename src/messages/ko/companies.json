@@ -96,6 +96,8 @@
     "listTitle": "채용 공고",
     "listIntro": "미국 회사들의 인턴·신입·경력 공고를 {brand}에서 핵심만 정리했어요.",
     "listLink": "채용 공고 보기",
+    "noSummary": "이 공고는 아직 요약이 없어요.",
+    "viewOriginal": "원문 공고 보기",
     "backToCompanies": "회사별 채용 페이지",
     "allLevels": "전체",
     "allRegions": "전체 지역",

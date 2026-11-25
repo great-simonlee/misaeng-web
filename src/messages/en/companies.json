@@ -98,6 +98,8 @@
     "listTitle": "Job Postings",
     "listIntro": "{brand} sums up the key points of internship, new grad and experienced postings from US companies.",
     "listLink": "See job postings",
+    "noSummary": "No summary for this posting yet.",
+    "viewOriginal": "View the original posting",
     "backToCompanies": "Company careers pages",
     "allLevels": "All",
     "allRegions": "All locations",

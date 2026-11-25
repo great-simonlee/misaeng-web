@@ -60,7 +60,7 @@ function Teaser({ posting }: { posting: PublicPosting }) {
   const hidden = [...posting.summary.overview.slice(TEASER_LINES), ...posting.summary.qualifications].slice(0, 4)
 
   return (
-    <article lang={posting.i18n?.state === 'pending' ? posting.i18n.sourceLocale : undefined} className='space-y-3'>
+    <article lang={posting.i18n?.state === 'pending' && shown.length ? posting.i18n.sourceLocale : undefined} className='space-y-3'>
       {/* Logo-first card */}
       <section className='rounded-[1.75rem] bg-white p-5 shadow-[0_0_0_1px_var(--border),var(--ellieo-card-shadow)]'>
         <Link href={href(`/companies/${posting.company.slug}`)} className='flex items-center gap-3'>
@@ -85,6 +85,15 @@ function Teaser({ posting }: { posting: PublicPosting }) {
       {/* What you'll do */}
       <section className='rounded-[1.5rem] bg-[var(--surface)] p-5'>
         <h2 className='text-[17px] font-extrabold tracking-[-0.02em] text-[var(--foreground)]'>{t('postings.overviewTitle')}</h2>
+        {shown.length ? null : (
+          // An older posting with no English summary (Ellieo never pays to translate those): the original instead
+          <p className='mt-2.5 text-[14.5px] leading-relaxed text-[var(--muted-foreground)]'>
+            {t('postings.noSummary')}{' '}
+            <a href={posting.applyUrl} target='_blank' rel='noopener noreferrer' className='font-bold text-[var(--brand)]'>
+              {t('postings.viewOriginal')} ›
+            </a>
+          </p>
+        )}
         <ul className='mt-2.5 space-y-1.5 text-[14.5px] leading-relaxed text-[var(--muted-foreground)]'>
           {shown.map((line, index) => (
             <li key={index} className='flex gap-2.5'>
