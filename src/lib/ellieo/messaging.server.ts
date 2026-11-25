@@ -1,6 +1,8 @@
 import { after } from 'next/server'
 
-import { sendApns, type ApnsEnvironment } from '@lib/push/apns.server'
+import { BRAND } from '@lib/brand'
+import { findSchoolByEmail, getVerifiedSchool, getVerifiedSchools } from '@lib/constants/schools'
+import { sendApns, type ApnsEnvironment, type ApnsMessage } from '@lib/push/apns.server'
 import { getSupabaseServiceClient } from '@lib/supabase/server'
 import { getSupabaseProfile, type SupabaseProfileRecord } from '@lib/supabase/profile.server'
 import { listVerifiedSchools } from '@lib/verification/verifiedSchools'
@@ -44,19 +46,24 @@ const SQL_ERRORS: Record<string, [string, number]> = {
   RATE_LIMIT: ['Slow down a little and try again in a minute.', 429],
   NOT_FOUND: ['Chat not found.', 404],
   EMPTY: ['Type a message first.', 400],
+  // Group rooms (rooms.sql)
+  NOT_MEMBER: ['Join the room to send messages.', 403],
+  NOT_ALLOWED: ["You can't do that in this room.", 403],
+  REMOVED: ['You were removed from this room. You can rejoin after 24 hours.', 403],
 }
 
 function db() {
   return getSupabaseServiceClient()
 }
 
-async function rpc<T>(name: string, args: Record<string, unknown>): Promise<T> {
+export async function rpc<T>(name: string, args: Record<string, unknown>): Promise<T> {
   const { data, error } = await db().rpc(name, args as never)
   if (error) {
     const code = /ellieo:([A-Z_]+)/.exec(error.message)?.[1]
     if (code && SQL_ERRORS[code]) throw new MessagingError(SQL_ERRORS[code][0], code, SQL_ERRORS[code][1])
     if (error.code === 'PGRST202' || error.code === '42883' || error.code === '42P01') {
-      throw new MessagingError('Messaging is not set up yet (run messaging.sql).', 'SETUP_REQUIRED', 503)
+      const file = name.startsWith('ellieo_room') || name === 'ellieo_unread_totals' ? 'rooms.sql' : 'messaging.sql'
+      throw new MessagingError(`Messaging is not set up yet (run ${file}).`, 'SETUP_REQUIRED', 503)
     }
     throw new MessagingError(`Messaging failed: ${error.message}`, 'SERVER_ERROR', 500)
   }
@@ -77,7 +84,7 @@ export type PersonOut = {
   professional: boolean
 }
 
-type PersonRow = {
+export type PersonRow = {
   pid: string
   nickname: string
   name: string
@@ -86,7 +93,7 @@ type PersonRow = {
   professional: boolean
 }
 
-function person(row: PersonRow): PersonOut {
+export function person(row: PersonRow): PersonOut {
   return {
     id: row.pid,
     handle: row.nickname,
@@ -111,11 +118,16 @@ export function fold(text: string) {
 
 const words = (text: string) => fold(text).split(/[\s.]+/).filter(Boolean)
 
+export type VerifiedSchoolRef = { id: string; name: string; shortName: string }
+
 export type Membership = {
   /** Onboarded (name + Ellieo ID) and verified (school, or a work email under review / approved). */
   canMessage: boolean
   reason: 'PROFILE_INCOMPLETE' | 'NOT_VERIFIED' | 'SUSPENDED' | null
   me: PersonOut | null
+  /** Verified schools (their "Your school" rooms) and whether a work email is verified (Young Professionals). */
+  schools: VerifiedSchoolRef[]
+  workVerified: boolean
 }
 
 /** Dev only (never on production): lets an unverified test account message (ELLIEO_MESSAGING_ALLOW_UNVERIFIED=1). */
@@ -139,6 +151,18 @@ function directoryRow(uid: string, profile: SupabaseProfileRecord | null) {
 
   const school = schoolVerified ? (schools[0]?.name ?? profile?.verifiedSchoolName ?? null) : null
   const schoolId = schools[0]?.id ?? profile?.verifiedSchoolId ?? ''
+  // Every verified school with a known id (the id is what a school room is keyed on).
+  const schoolRefs: VerifiedSchoolRef[] = []
+  for (const entry of schools) {
+    const known = getVerifiedSchool(entry.id) ?? findSchoolByEmail(entry.email, getVerifiedSchools())
+    const id = (entry.id ?? known?.id ?? '').trim().toLowerCase()
+    if (!id || !/^[a-z0-9-]{1,40}$/.test(id) || schoolRefs.some((s) => s.id === id)) continue
+    schoolRefs.push({ id, name: known?.fullName ?? entry.name, shortName: known?.shortName ?? entry.name })
+  }
+  if (schoolRefs.length === 0 && profile?.verifiedSchoolId && schoolVerified) {
+    const known = getVerifiedSchool(profile.verifiedSchoolId)
+    if (known) schoolRefs.push({ id: known.id, name: known.fullName, shortName: known.shortName })
+  }
   const initials = (school ?? '')
     .split(/\s+/)
     .filter((w) => /^\p{Lu}/u.test(w))
@@ -148,6 +172,8 @@ function directoryRow(uid: string, profile: SupabaseProfileRecord | null) {
 
   return {
     reason,
+    schools: schoolRefs,
+    workVerified,
     row: {
       uid,
       nickname: nickname || uid.slice(0, 20),
@@ -159,6 +185,8 @@ function directoryRow(uid: string, profile: SupabaseProfileRecord | null) {
       nick_key: fold(nickname).replace(/\s/g, ''),
       school_key: schoolKeys.length ? ` ${[...new Set(schoolKeys)].join(' ')} ` : '',
       active: reason === null,
+      school_ids: schoolRefs.map((s) => s.id),
+      work_verified: workVerified,
       updated_at: new Date().toISOString(),
     },
   }
@@ -176,19 +204,28 @@ export async function syncMember(uid: string, force = false): Promise<Membership
   const hit = synced.get(uid)
   if (!force && hit && Date.now() - hit.at < SYNC_TTL_MS) return hit.membership
   const profile = await getSupabaseProfile(uid)
-  const { reason, row } = directoryRow(uid, profile)
-  const { data, error } = await db()
-    .from('ellieo_people')
-    .upsert(row as never, { onConflict: 'uid' })
-    .select('pid, nickname, name, photo_url, school, professional')
-    .single()
+  const { reason, row, schools, workVerified } = directoryRow(uid, profile)
+  const upsert = (values: Record<string, unknown>) =>
+    db()
+      .from('ellieo_people')
+      .upsert(values as never, { onConflict: 'uid' })
+      .select('pid, nickname, name, photo_url, school, professional')
+      .single()
+  let { data, error } = await upsert(row)
+  if (error && /school_ids|work_verified/.test(error.message)) {
+    // rooms.sql not run yet: the 1:1 directory still works without the room fields.
+    const rest: Record<string, unknown> = { ...row }
+    delete rest.school_ids
+    delete rest.work_verified
+    ;({ data, error } = await upsert(rest))
+  }
   if (error) {
     if (error.code === '42P01' || error.code === 'PGRST205') {
       throw new MessagingError('Messaging is not set up yet (run messaging.sql).', 'SETUP_REQUIRED', 503)
     }
     throw new MessagingError(`Messaging failed: ${error.message}`, 'SERVER_ERROR', 500)
   }
-  const membership: Membership = { canMessage: reason === null, reason, me: person(data as PersonRow) }
+  const membership: Membership = { canMessage: reason === null, reason, me: person(data as unknown as PersonRow), schools, workVerified }
   if (synced.size > 5000) synced.clear()
   synced.set(uid, { at: Date.now(), membership })
   return membership
@@ -198,6 +235,27 @@ const REASON_TEXT: Record<NonNullable<Membership['reason']>, string> = {
   PROFILE_INCOMPLETE: 'Add your name and Ellieo ID first.',
   NOT_VERIFIED: 'Verify your school or work email to message people.',
   SUSPENDED: 'Your account is suspended.',
+}
+
+/**
+ * After onboarding / a profile or verification change on Ellieo: copy the member into the directory right away, so
+ * friends can find them in search before they ever open Messages. Runs after the response and never throws.
+ * Ellieo builds only, so Misaeng-only accounts on the shared staging never land in ellieo_people.
+ */
+export function syncMemberSoon(uid: string | null | undefined) {
+  if (BRAND !== 'ellieo' || !uid) return
+  const run = async () => {
+    try {
+      await syncMember(uid, true)
+    } catch (error) {
+      if (!(error instanceof MessagingError && error.code === 'SETUP_REQUIRED')) console.error('Ellieo directory sync error:', error)
+    }
+  }
+  try {
+    after(run)
+  } catch {
+    void run()
+  }
 }
 
 /** Writes (send, requests, open a chat) need a complete, verified account. */
@@ -213,11 +271,11 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 export const isUuid = (value: unknown): value is string => typeof value === 'string' && UUID.test(value)
 
 /** An ISO timestamp as the API returned it (kept as text: Postgres keeps microseconds). */
-const isTimestamp = (value: unknown): value is string =>
+export const isTimestamp = (value: unknown): value is string =>
   typeof value === 'string' && value.length <= 40 && /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(value) && !Number.isNaN(Date.parse(value))
 
 /** Public id → uid. `activeOnly`: only people who can be found / messaged now. */
-async function uidFor(pid: unknown, activeOnly: boolean) {
+export async function uidFor(pid: unknown, activeOnly: boolean) {
   if (!isUuid(pid)) throw new MessagingError('Person not found.', 'NOT_FOUND', 404)
   let query = db().from('ellieo_people').select('uid').eq('pid', pid)
   if (activeOnly) query = query.eq('active', true)
@@ -242,7 +300,8 @@ export async function searchPeople(uid: string, query: string) {
 // MARK: - Settings
 
 export type ChatSettings = {
-  audience: 'friends' | 'verified' | 'everyone'
+  /** Who can message me (owner 11-24: two choices). */
+  audience: 'friends' | 'verified'
   readReceipts: boolean
   notifications: boolean
   preview: boolean
@@ -256,12 +315,12 @@ type SettingsRow = {
   inbox_key: string
 }
 
-async function settingsRow(uid: string): Promise<SettingsRow> {
+export async function settingsRow(uid: string): Promise<SettingsRow> {
   return rpc<SettingsRow>('ellieo_settings', { p_user: uid })
 }
 
 const settingsOut = (row: SettingsRow): ChatSettings => ({
-  audience: row.audience,
+  audience: row.audience === 'friends' ? 'friends' : 'verified',
   readReceipts: row.read_receipts,
   notifications: row.notifications,
   preview: row.preview,
@@ -271,8 +330,10 @@ export async function updateSettings(uid: string, patch: Partial<ChatSettings>) 
   await settingsRow(uid)
   const update: Record<string, unknown> = { updated_at: new Date().toISOString() }
   if (patch.audience !== undefined) {
-    if (!['friends', 'verified', 'everyone'].includes(patch.audience)) throw new MessagingError('Pick who can message you.', 'INVALID')
-    update.audience = patch.audience
+    // An older app may still send 'everyone': that choice became 'verified'.
+    const audience = (patch.audience as string) === 'everyone' ? 'verified' : patch.audience
+    if (!['friends', 'verified'].includes(audience)) throw new MessagingError('Pick who can message you.', 'INVALID')
+    update.audience = audience
   }
   for (const [key, column] of [
     ['readReceipts', 'read_receipts'],
@@ -297,7 +358,7 @@ function realtimeConfig(inboxKey: string) {
   }
 }
 
-const inboxTopic = (inboxKey: string) => `ellieo:u:${inboxKey}`
+export const inboxTopic = (inboxKey: string) => `ellieo:u:${inboxKey}`
 
 /** GET /api/ellieo/me: who I am on Ellieo, whether I can message, my chat settings and my realtime channel. */
 export async function messagingMe(uid: string) {
@@ -515,7 +576,16 @@ export function cleanBody(raw: unknown) {
   return body
 }
 
-type SendRow = { message_id: string; created_at: string; duplicate: boolean; peer_id: string; peer_muted: boolean; peer_accepted: boolean }
+type SendRow = {
+  message_id: string
+  created_at: string
+  duplicate: boolean
+  peer_id: string
+  peer_muted: boolean
+  peer_accepted: boolean
+  /** false: they blocked me — stored for me only. The answer below looks exactly like a delivered message. */
+  delivered?: boolean
+}
 
 export async function sendMessage(uid: string, roomId: string, input: { clientId?: unknown; body?: unknown }) {
   const { me } = await requireMember(uid)
@@ -531,8 +601,9 @@ export async function sendMessage(uid: string, roomId: string, input: { clientId
   const sent = rows[0]
   if (!sent) throw new MessagingError('Chat not found.', 'NOT_FOUND', 404)
   if (!sent.duplicate) {
-    signalUsers([uid, sent.peer_id], { k: 'message', r: roomId })
-    if (!sent.peer_muted) pushMessage({ to: sent.peer_id, roomId, from: me, body, request: !sent.peer_accepted })
+    const delivered = sent.delivered !== false
+    signalUsers(delivered ? [uid, sent.peer_id] : [uid], { k: 'message', r: roomId })
+    if (delivered && !sent.peer_muted) pushMessage({ to: sent.peer_id, roomId, from: me, body, request: !sent.peer_accepted })
   }
   return {
     id: sent.message_id,
@@ -597,23 +668,39 @@ export async function readAll(uid: string) {
 
 // MARK: - Realtime signals
 
-type Signal = { k: 'message' | 'read' | 'social'; r?: string }
+/** message / read / social: 1:1 and friends · room: a group room changed (new message, removed, members). */
+export type Signal = { k: 'message' | 'read' | 'social' | 'room'; r?: string }
 
-/** Fire-and-forget after the response: one broadcast per member's inbox channel. Never throws. */
-function signalUsers(uids: string[], signal: Signal) {
-  const run = async () => {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
-    const unique = [...new Set(uids.filter(Boolean))]
-    if (!url || !key || unique.length === 0) return
+/** Runs after the response (or right away outside a request). Never throws. */
+export function afterResponse(run: () => Promise<void>) {
+  const safe = async () => {
     try {
-      const { data } = await db().from('ellieo_chat_settings').select('inbox_key').in('user_id', unique)
-      const topics = ((data ?? []) as { inbox_key: string }[]).map((row) => inboxTopic(row.inbox_key))
-      if (topics.length === 0) return
+      await run()
+    } catch (error) {
+      console.error('Ellieo background error:', error)
+    }
+  }
+  try {
+    after(safe)
+  } catch {
+    void safe()
+  }
+}
+
+/** Broadcasts one signal to many inbox channels, 100 per request. */
+export async function broadcast(topics: string[], signal: Signal) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
+  const unique = [...new Set(topics.filter(Boolean))]
+  if (!url || !key || unique.length === 0) return
+  for (let i = 0; i < unique.length; i += 100) {
+    try {
       const res = await fetch(`${url.replace(/\/+$/, '')}/realtime/v1/api/broadcast`, {
         method: 'POST',
         headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: topics.map((topic) => ({ topic, event: 'ellieo', payload: signal, private: false })) }),
+        body: JSON.stringify({
+          messages: unique.slice(i, i + 100).map((topic) => ({ topic, event: 'ellieo', payload: signal, private: false })),
+        }),
         signal: AbortSignal.timeout(4000),
       })
       if (!res.ok) console.error('Ellieo broadcast failed:', res.status, (await res.text()).slice(0, 200))
@@ -621,11 +708,16 @@ function signalUsers(uids: string[], signal: Signal) {
       console.error('Ellieo broadcast error:', error)
     }
   }
-  try {
-    after(run)
-  } catch {
-    void run()
-  }
+}
+
+/** Fire-and-forget after the response: one broadcast per member's inbox channel. Never throws. */
+export function signalUsers(uids: string[], signal: Signal) {
+  afterResponse(async () => {
+    const unique = [...new Set(uids.filter(Boolean))]
+    if (unique.length === 0) return
+    const { data } = await db().from('ellieo_chat_settings').select('inbox_key').in('user_id', unique)
+    await broadcast(((data ?? []) as { inbox_key: string }[]).map((row) => inboxTopic(row.inbox_key)), signal)
+  })
 }
 
 // MARK: - Push (Ellieo app devices)
@@ -662,58 +754,104 @@ export async function deletePushDevice(token: unknown, uid: string | null) {
   await query
 }
 
-const PUSH_TEXT = {
+export const PUSH_TEXT = {
   en: { hidden: 'New message', request: 'Message request' },
   vi: { hidden: 'Tin nhắn mới', request: 'Tin nhắn chờ' },
 } as const
 
+export type PushLocale = keyof typeof PUSH_TEXT
+
 /**
- * New 1:1 message → the receiver's Ellieo devices, after the response. Skipped when they muted the chat (checked by
- * the caller) or turned message notifications off; "Show message preview" off hides the text. Blocked senders never
- * get this far (the send is refused).
+ * App icon number per member: unread 1:1 messages + unread in joined rooms, muted chats left out (ellieo_unread_totals
+ * in rooms.sql — the app counts the same way when it updates the icon itself). Empty when rooms.sql isn't run yet.
  */
-function pushMessage(input: { to: string; roomId: string; from: PersonOut | null; body: string; request: boolean }) {
-  const run = async () => {
-    try {
-      const settings = await settingsRow(input.to)
-      if (!settings.notifications) return
-      const { data } = await db().from('ellieo_push_devices').select('token, environment, locale').eq('user_id', input.to)
-      const devices = (data ?? []) as { token: string; environment: ApnsEnvironment; locale: string }[]
-      if (devices.length === 0) return
-      const dead: string[] = []
-      for (const locale of ['en', 'vi'] as const) {
-        const group = devices.filter((d) => (d.locale === 'vi' ? 'vi' : 'en') === locale)
-        if (group.length === 0) continue
-        const text = PUSH_TEXT[locale]
-        const name = input.from?.name ?? 'Ellieo'
-        const results = await sendApns(
-          group,
-          {
-            title: name,
-            ...(input.request ? { subtitle: text.request } : {}),
-            body: settings.preview ? previewLine(input.body) : text.hidden,
-            threadId: `ellieo-dm-${input.roomId}`,
-            data: { type: 'ellieo_dm', room: input.roomId },
-          },
-          { topic: ELLIEO_TOPIC() },
-        )
-        dead.push(...results.filter((r) => r.unregistered).map((r) => r.token))
-        const failed = results.filter((r) => !r.ok && !r.unregistered)
-        if (failed.length) console.error('Ellieo push failed:', failed.map((r) => `${r.status} ${r.reason}`).join(', '))
-      }
-      if (dead.length) await db().from('ellieo_push_devices').delete().in('token', dead)
-    } catch (error) {
-      console.error('Ellieo push error:', error)
-    }
-  }
+export async function unreadTotals(uids: string[]) {
+  const totals = new Map<string, number>()
+  if (uids.length === 0) return totals
   try {
-    after(run)
-  } catch {
-    void run()
+    for (let i = 0; i < uids.length; i += 500) {
+      const rows = await rpc<{ user_id: string; total: number }[]>('ellieo_unread_totals', { p_uids: uids.slice(i, i + 500) })
+      for (const row of rows) totals.set(row.user_id, Math.min(Number(row.total) || 0, 999))
+    }
+  } catch (error) {
+    if (!(error instanceof MessagingError && error.code === 'SETUP_REQUIRED')) console.error('Ellieo badge error:', error)
+  }
+  return totals
+}
+
+type Device = { token: string; environment: ApnsEnvironment; locale: string; user_id: string }
+
+/**
+ * Sends one notification per member to their Ellieo devices (they're already filtered for mute / notifications by the
+ * caller), with each member's badge. Devices that APNs says are gone are deleted. Never throws.
+ */
+export async function pushToMembers(
+  members: { uid: string; preview: boolean }[],
+  build: (locale: PushLocale, preview: boolean) => Omit<ApnsMessage, 'badge'>,
+) {
+  if (members.length === 0) return
+  try {
+    const uids = members.map((m) => m.uid)
+    const devices: Device[] = []
+    for (let i = 0; i < uids.length; i += 200) {
+      const { data } = await db()
+        .from('ellieo_push_devices')
+        .select('token, environment, locale, user_id')
+        .in('user_id', uids.slice(i, i + 200))
+      devices.push(...((data ?? []) as Device[]))
+    }
+    if (devices.length === 0) return
+    const badges = await unreadTotals([...new Set(devices.map((d) => d.user_id))])
+    const preview = new Map(members.map((m) => [m.uid, m.preview]))
+    // Same locale + preview + badge → one APNs batch.
+    const groups = new Map<string, { locale: PushLocale; preview: boolean; badge?: number; devices: Device[] }>()
+    for (const device of devices) {
+      const locale: PushLocale = device.locale === 'vi' ? 'vi' : 'en'
+      const showText = preview.get(device.user_id) ?? true
+      const badge = badges.get(device.user_id)
+      const key = `${locale}|${showText}|${badge ?? ''}`
+      const group = groups.get(key) ?? { locale, preview: showText, badge, devices: [] }
+      group.devices.push(device)
+      groups.set(key, group)
+    }
+    const dead: string[] = []
+    for (const group of groups.values()) {
+      const message = build(group.locale, group.preview)
+      const results = await sendApns(
+        group.devices,
+        { ...message, ...(group.badge !== undefined ? { badge: group.badge } : {}) },
+        { topic: ELLIEO_TOPIC() },
+      )
+      dead.push(...results.filter((r) => r.unregistered).map((r) => r.token))
+      const failed = results.filter((r) => !r.ok && !r.unregistered)
+      if (failed.length) console.error('Ellieo push failed:', failed.map((r) => `${r.status} ${r.reason}`).join(', '))
+    }
+    if (dead.length) await db().from('ellieo_push_devices').delete().in('token', dead)
+  } catch (error) {
+    console.error('Ellieo push error:', error)
   }
 }
 
-function previewLine(text: string, max = 120) {
+/**
+ * New 1:1 message → the receiver's Ellieo devices, after the response, with their total unread as the icon badge.
+ * Skipped when they muted the chat (checked by the caller) or turned message notifications off; "Show message
+ * preview" off hides the text. A message withheld by a block never gets here (the caller checks `delivered`).
+ */
+function pushMessage(input: { to: string; roomId: string; from: PersonOut | null; body: string; request: boolean }) {
+  afterResponse(async () => {
+    const settings = await settingsRow(input.to)
+    if (!settings.notifications) return
+    await pushToMembers([{ uid: input.to, preview: settings.preview }], (locale, preview) => ({
+      title: input.from?.name ?? 'Ellieo',
+      ...(input.request ? { subtitle: PUSH_TEXT[locale].request } : {}),
+      body: preview ? previewLine(input.body) : PUSH_TEXT[locale].hidden,
+      threadId: `ellieo-dm-${input.roomId}`,
+      data: { type: 'ellieo_dm', room: input.roomId },
+    }))
+  })
+}
+
+export function previewLine(text: string, max = 120) {
   const plain = text.replace(/\s+/g, ' ').trim()
   return plain.length > max ? `${plain.slice(0, max - 1)}…` : plain
 }

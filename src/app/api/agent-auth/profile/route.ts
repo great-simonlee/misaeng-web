@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { syncMemberSoon } from '@lib/ellieo/messaging.server'
 
 import { resolveAuthenticatedUser } from '../lib/authHelpers'
 import { apiErrorMessage } from '@lib/i18n/apiError'
@@ -168,6 +169,8 @@ export async function PATCH(request: Request) {
         console.error('Nickname release error:', error)
       })
     }
+    // Ellieo: the member shows up in people search as soon as onboarding / a profile change is saved.
+    syncMemberSoon(user.uid)
     return NextResponse.json({ ok: true, profile })
   } catch (error) {
     if (nicknameChanged && typeof patch.nickname === 'string') {

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { syncMemberSoon } from '@lib/ellieo/messaging.server'
 
 import { ApiMessageError, apiErrorMessage } from '@lib/i18n/apiError'
 import { getRequestT } from '@lib/i18n/server'
@@ -246,6 +247,7 @@ export async function POST(request: Request) {
         ...primarySchoolPatch(target),
         verifiedSchools: [target, ...schools.filter((item) => item.email !== target.email)],
       })
+      syncMemberSoon(user.uid)
       return NextResponse.json({ ok: true, schools: listVerifiedSchools(saved), profile: saved })
     }
 
@@ -309,6 +311,8 @@ export async function POST(request: Request) {
         console.error('Community credit award (school) error:', creditError)
       }
 
+      // Ellieo: verified → searchable (and their school's room) right away, not only after opening Messages.
+      syncMemberSoon(user.uid)
       return NextResponse.json({
         ok: true,
         schoolName: verified.schoolName,

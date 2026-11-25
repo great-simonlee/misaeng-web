@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { syncMemberSoon } from '@lib/ellieo/messaging.server'
 import { isSupabaseAuthMode } from '@lib/auth/accounts.server'
 import { confirmVerificationCode, sendVerificationCode } from '@lib/auth/verificationMail.server'
 
@@ -220,6 +221,8 @@ export async function POST(request: Request) {
         userNickname: savedRequest.userNickname,
       })
 
+      // Ellieo: verified (pending review counts) → searchable right away.
+      syncMemberSoon(user.uid)
       return NextResponse.json({ ok: true, profile })
     }
 
