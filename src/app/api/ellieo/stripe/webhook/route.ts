@@ -7,7 +7,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 /**
- * Stripe → Ellieo credits (Ellieo's own Stripe account; env ELLIEO_STRIPE_WEBHOOK_SECRET). Events:
+ * Stripe → Ellieo credits. Same Stripe account as Misaeng (Misaeng LLC), but its own webhook endpoint
+ * (https://ellieo.com/api/ellieo/stripe/webhook) with its own signing secret ELLIEO_STRIPE_WEBHOOK_SECRET. Events:
  * checkout.session.completed / async_payment_succeeded (adds the pack's paid credits, idempotent),
  * charge.refunded and charge.dispute.created (take the pack's credits back). Others are acknowledged and ignored.
  */

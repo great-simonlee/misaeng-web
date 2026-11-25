@@ -12,11 +12,15 @@ import { readCreditEvent } from './stripeWebhook'
  *
  *   Config     ellieo_settings 'credits' (Super Admin, ERP): packs, salesTaxRate, topUpLinkIOS / topUpLinkAndroid,
  *              refundDays, rewardDays, seller (receipt). Defaults below until agent_listing_pay.sql is run.
- *   Checkout   one-time Stripe Checkout per pack (price_data inline, so no Stripe products to set up). Not live until
- *              ELLIEO_STRIPE_SECRET_KEY is set (Ellieo's own Stripe account doesn't exist yet) — then the credits page
- *              says "Payments coming soon" and the API answers PAYMENTS_OFF.
- *   Webhook    /api/ellieo/stripe/webhook (ELLIEO_STRIPE_WEBHOOK_SECRET): a paid session adds one paid lot (idempotent
- *              on the session id); a refund or dispute made in Stripe takes the lot back.
+ *   Stripe     the SAME Stripe account as Misaeng (Misaeng LLC, owner 11-25): STRIPE_SECRET_KEY, or
+ *              ELLIEO_STRIPE_SECRET_KEY to override. Card statements read "… ELLIEO" (descriptor suffix). Without a key
+ *              the credits page says "Payments coming soon" and the API answers PAYMENTS_OFF.
+ *   Checkout   one-time Stripe Checkout per pack (price_data inline, so no Stripe products to set up). Every Ellieo
+ *              object carries metadata app = 'ellieo_credits'; Misaeng's webhook only acts on Premium subscriptions,
+ *              so the two never touch each other's payments.
+ *   Webhook    /api/ellieo/stripe/webhook — its own endpoint in the same Stripe account, with its own signing secret
+ *              (ELLIEO_STRIPE_WEBHOOK_SECRET): a paid session adds one paid lot (idempotent on the session id); a
+ *              refund or dispute made in Stripe takes the lot back.
  *   Refunds    within refundDays (7) and only if none of that pack's credits was used, full only: the member asks from
  *              the receipt page → ERP approves → Stripe refund → the lot is taken back.
  *   App link   the app opens ellieo.com/credits with a short-lived signed token (?t=) so the member doesn't sign in
@@ -178,8 +182,9 @@ export function receiptPath(purchaseId: string) {
 
 // MARK: - Stripe (REST, no SDK)
 
+/** Misaeng's Stripe account (Misaeng LLC) unless Ellieo is given its own key. */
 export function stripeKey() {
-  return process.env.ELLIEO_STRIPE_SECRET_KEY?.trim() || ''
+  return process.env.ELLIEO_STRIPE_SECRET_KEY?.trim() || process.env.STRIPE_SECRET_KEY?.trim() || ''
 }
 
 export function paymentsEnabled() {
@@ -244,6 +249,8 @@ export async function createCheckout(input: { uid: string; packId: string; origi
     'payment_intent_data[metadata][app]': 'ellieo_credits',
     'payment_intent_data[metadata][user_uid]': input.uid,
     'payment_intent_data[description]': `Ellieo credits · ${pack.credits}`,
+    // Same account as Misaeng: the card statement says it was Ellieo.
+    'payment_intent_data[statement_descriptor_suffix]': 'ELLIEO',
     // Stripe emails its receipt to this address.
     'payment_intent_data[receipt_email]': profile?.email ?? undefined,
     'automatic_tax[enabled]': 'false',
