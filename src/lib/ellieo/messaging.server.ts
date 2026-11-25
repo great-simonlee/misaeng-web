@@ -786,8 +786,8 @@ type Device = { token: string; environment: ApnsEnvironment; locale: string; use
  * caller), with each member's badge. Devices that APNs says are gone are deleted. Never throws.
  */
 export async function pushToMembers(
-  members: { uid: string; preview: boolean }[],
-  build: (locale: PushLocale, preview: boolean) => Omit<ApnsMessage, 'badge'>,
+  members: { uid: string; preview: boolean; count?: number }[],
+  build: (locale: PushLocale, preview: boolean, count: number) => Omit<ApnsMessage, 'badge'>,
 ) {
   if (members.length === 0) return
   try {
@@ -802,21 +802,22 @@ export async function pushToMembers(
     }
     if (devices.length === 0) return
     const badges = await unreadTotals([...new Set(devices.map((d) => d.user_id))])
-    const preview = new Map(members.map((m) => [m.uid, m.preview]))
-    // Same locale + preview + badge → one APNs batch.
-    const groups = new Map<string, { locale: PushLocale; preview: boolean; badge?: number; devices: Device[] }>()
+    const byUid = new Map(members.map((m) => [m.uid, m]))
+    // Same locale + preview + count + badge → one APNs batch.
+    const groups = new Map<string, { locale: PushLocale; preview: boolean; count: number; badge?: number; devices: Device[] }>()
     for (const device of devices) {
       const locale: PushLocale = device.locale === 'vi' ? 'vi' : 'en'
-      const showText = preview.get(device.user_id) ?? true
+      const showText = byUid.get(device.user_id)?.preview ?? true
+      const count = byUid.get(device.user_id)?.count ?? 1
       const badge = badges.get(device.user_id)
-      const key = `${locale}|${showText}|${badge ?? ''}`
-      const group = groups.get(key) ?? { locale, preview: showText, badge, devices: [] }
+      const key = `${locale}|${showText}|${count}|${badge ?? ''}`
+      const group = groups.get(key) ?? { locale, preview: showText, count, badge, devices: [] }
       group.devices.push(device)
       groups.set(key, group)
     }
     const dead: string[] = []
     for (const group of groups.values()) {
-      const message = build(group.locale, group.preview)
+      const message = build(group.locale, group.preview, group.count)
       const results = await sendApns(
         group.devices,
         { ...message, ...(group.badge !== undefined ? { badge: group.badge } : {}) },

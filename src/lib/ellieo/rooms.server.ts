@@ -40,6 +40,8 @@ export const ROOM_RULES = {
   /** Signals beyond this many members are skipped (the apps poll); pushes stop at `pushCap`. Fine for staging scale. */
   signalCap: 5000,
   pushCap: 1000,
+  /** At most one push per room per member in this window; the next one says "N new messages". */
+  pushWindowSeconds: 180,
 } as const
 
 type RoomRow = {
@@ -114,12 +116,13 @@ async function ensureSchoolRooms(schools: { id: string; name: string; shortName:
   for (const school of schools) {
     if (ensuredSchools.has(school.id)) continue
     const short = school.shortName || school.name
+    // Vietnamese-student rooms (owner 11-24): "NYU Vietnamese Students" / "Sinh viên Việt Nam NYU".
     await rpc<string>('ellieo_room_ensure_school', {
       p_school: school.id,
-      p_name: `${short} students`,
-      p_name_vi: `Sinh viên ${short}`,
-      p_summary: `Verified ${school.name} students only: classes, housing, events and rides home`,
-      p_summary_vi: `Chỉ dành cho sinh viên ${school.name} đã xác minh: lớp học, nhà ở, sự kiện và đi chung xe`,
+      p_name: `${short} Vietnamese Students`,
+      p_name_vi: `Sinh viên Việt Nam ${short}`,
+      p_summary: `Vietnamese students at ${school.name}, verified only: classes, housing, Tết and rides home`,
+      p_summary_vi: `Sinh viên Việt Nam tại ${school.name}, đã xác minh: lớp học, nhà ở, Tết và đi chung xe`,
     })
     ensuredSchools.add(school.id)
   }
@@ -283,18 +286,34 @@ function tellMembers(roomId: string, senderUid: string, message?: { from: Person
       { k: 'room', r: roomId },
     )
     if (!message) return
-    const targets = recipients
+    const eligible = recipients
       .filter((r) => r.user_id !== senderUid && !r.muted && r.notifications && !r.blocked_sender)
       .slice(0, ROOM_RULES.pushCap)
-      .map((r) => ({ uid: r.user_id, preview: r.preview }))
+    if (eligible.length === 0) return
+    // Throttle: only members not pushed for this room in the last 3 minutes; `messages` = how many since their last push.
+    const claimed = await rpc<{ user_id: string; messages: number }[]>('ellieo_room_push_claim', {
+      p_room: roomId,
+      p_uids: eligible.map((r) => r.user_id),
+      p_seconds: ROOM_RULES.pushWindowSeconds,
+    })
+    const counts = new Map(claimed.map((c) => [c.user_id, Number(c.messages) || 1]))
+    const targets = eligible
+      .filter((r) => counts.has(r.user_id))
+      .map((r) => ({ uid: r.user_id, preview: r.preview, count: counts.get(r.user_id) ?? 1 }))
     if (targets.length === 0) return
     const rows = await rpc<RoomRow[]>('ellieo_room_list', { p_me: senderUid, p_room: roomId })
     const room = rows[0]
     const title = (locale: PushLocale) => (locale === 'vi' && room?.name_vi ? room.name_vi : (room?.name ?? 'Ellieo'))
     const name = message.from?.name ?? 'Ellieo'
-    await pushToMembers(targets, (locale, preview) => ({
+    const many = (locale: PushLocale, count: number) => (locale === 'vi' ? `${count} tin nhắn mới` : `${count} new messages`)
+    await pushToMembers(targets, (locale, preview, count) => ({
       title: title(locale),
-      body: preview ? `${name}: ${previewLine(message.body, 110)}` : PUSH_TEXT[locale].hidden,
+      // Held-back messages: "3 new messages · Linh: …" (or just "3 new messages" with previews off).
+      body: preview
+        ? `${count > 1 ? `${many(locale, count)} · ` : ''}${name}: ${previewLine(message.body, 110)}`
+        : count > 1
+          ? many(locale, count)
+          : PUSH_TEXT[locale].hidden,
       threadId: `ellieo-room-${roomId}`,
       data: { type: 'ellieo_room', room: roomId, slug: room?.slug ?? '' },
     }))
