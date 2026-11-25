@@ -696,6 +696,47 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
       ],
     },
     {
+      id: 'ellieo-credits',
+      title: '13A. Ellieo Credits and Paid Listings',
+      titleKo: '13A. Ellieo 크레딧 및 유료 매물',
+      blocks: [
+        {
+          type: 'p',
+          en: 'This Section applies only to Ellieo. Ellieo credits (“Credits”) are a prepaid balance used only on Ellieo for paid features such as brokered housing listings and Premium placement. They are separate from the Community Credits in Section 13.',
+          ko: '본 조는 Ellieo에만 적용됩니다. Ellieo 크레딧(이하 “크레딧”)은 중개 매물 게시, Premium 노출 등 Ellieo의 유료 기능에만 쓰이는 선불 잔액이며, 제13조의 커뮤니티 크레딧과는 별개입니다.',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Credit packs. Credits are sold in packs shown on the top-up page with their price, any bonus Credits and any applicable tax before you pay (for example, US$9.99 for 10 Credits, US$19.99 for 22, US$39.99 for 46, and US$79.99 for 96). Payments are processed by Stripe; we do not store your full card number.',
+              ko: '크레딧 패키지. 크레딧은 충전 화면에 표시된 패키지로 판매되며, 결제 전에 가격·보너스 크레딧·적용 세금이 표시됩니다(예: US$9.99에 10크레딧, US$19.99에 22, US$39.99에 46, US$79.99에 96). 결제는 Stripe가 처리하며 회사는 카드 번호 전체를 저장하지 않습니다.',
+            },
+            {
+              en: 'Expiration. Paid Credits do not expire. Reward Credits, which the Company gives free of charge (for example for promotions or verification), expire 90 days after they are given and are always used before paid Credits.',
+              ko: '유효기간. 유료 크레딧은 소멸하지 않습니다. 회사가 무상으로 지급하는 리워드 크레딧(예: 프로모션, 인증 보상)은 지급 후 90일이 지나면 소멸하며, 항상 유료 크레딧보다 먼저 사용됩니다.',
+            },
+            {
+              en: 'Refunds. You may request a full refund of a credit pack within 7 days of purchase if none of that pack’s Credits has been used. Partial refunds are not available. Credits cannot be exchanged for cash, transferred, or sold.',
+              ko: '환불. 크레딧 패키지는 구매 후 7일 이내이고 그 패키지의 크레딧을 하나도 사용하지 않은 경우에 한해 전액 환불을 요청할 수 있습니다. 부분 환불은 제공하지 않습니다. 크레딧은 현금으로 바꾸거나 양도·판매할 수 없습니다.',
+            },
+            {
+              en: 'Paid listings. Brokered listings are shown for the period you pay for. Premium (Boost) days run from the moment they start and are not refunded if you mark the listing as rented, delete it, or the Company removes it for violating these Terms.',
+              ko: '유료 매물. 중개 매물은 결제한 기간 동안 노출됩니다. Premium(Boost) 기간은 시작 시점부터 진행되며, 회원이 매물을 거래 완료(Rented)로 표시하거나 삭제한 경우, 또는 본 약관 위반으로 회사가 삭제한 경우 남은 기간은 환불되지 않습니다.',
+            },
+            {
+              en: 'Licensed agents. Members who post brokered listings are responsible for the accuracy of each listing and for complying with fair-housing, advertising, and broker-fee laws, including clearly showing the brokerage name and any fee a tenant must pay (see Sections 9 and 11). The Company may remove listings and suspend Licensed Agent status for violations.',
+              ko: '라이선스 중개인. 중개 매물을 게시하는 회원은 각 매물 정보의 정확성과 공정주택·광고·중개수수료 관련 법령 준수(브로커리지 이름과 임차인이 부담하는 수수료의 명확한 표시 포함)에 책임을 집니다(제9조, 제11조 참고). 위반 시 회사는 매물을 삭제하고 Licensed Agent 자격을 정지할 수 있습니다.',
+            },
+            {
+              en: 'Changes. The Company may change prices, packs, and paid features for future purchases. Credits you have already bought keep their value.',
+              ko: '변경. 회사는 이후 구매분에 대해 가격·패키지·유료 기능을 변경할 수 있습니다. 이미 구매한 크레딧의 가치는 유지됩니다.',
+            },
+          ],
+        },
+      ],
+    },
+    {
       id: 'ip',
       title: '14. Company Intellectual Property',
       titleKo: '14. 회사의 지식재산권',

@@ -157,29 +157,6 @@ export async function activeLicense(uid: string) {
   return statusOf(row) === 'approved' ? row : null
 }
 
-/** In-house staff (the owner's own brokerage, set only in the ERP): free brokered listings, no Premium slots. */
-export async function isInHouse(licenseId: string) {
-  const { data, error } = await db().from(TABLE).select('in_house').eq('id', licenseId).maybeSingle<{ in_house: boolean }>()
-  return !error && Boolean(data?.in_house)
-}
-
-/** ERP: mark a license in-house (or not). */
-export async function setInHouse(id: string, inHouse: boolean) {
-  const { data, error } = await db().from(TABLE).update({ in_house: inHouse } as never).eq('id', id).select('id')
-  if (error) {
-    if (/in_house/.test(error.message)) throw new AgentLicenseError('Run agent_listing_pay.sql first.', 'SETUP_REQUIRED', 503)
-    throw new AgentLicenseError(error.message, 'SAVE_FAILED', 500)
-  }
-  if (!data?.length) throw new AgentLicenseError('Application not found.', 'NOT_FOUND', 404)
-}
-
-/** In-house flags for the ERP list (empty before agent_listing_pay.sql). */
-async function inHouseIds(ids: string[]) {
-  if (ids.length === 0) return new Set<string>()
-  const { data, error } = await db().from(TABLE).select('id, in_house').in('id', ids).returns<{ id: string; in_house: boolean }[]>()
-  return new Set(error ? [] : (data ?? []).filter((row) => row.in_house).map((row) => row.id))
-}
-
 /** Licensed Agent badge for many owners at once (listing board). Missing table → nobody. */
 export async function licensedOwners(uids: string[]) {
   const out = new Map<string, { brokerage: string }>()
@@ -311,7 +288,6 @@ export async function listForReview(filter: ReviewFilter, limit = 200) {
       personal.set(uid, (await personalListingIds(uid)).length)
     }),
   )
-  const inHouse = await inHouseIds(rows.map((row) => row.id))
   const { count } = await db().from(TABLE).select('id', { count: 'exact', head: true }).eq('status', 'pending')
   return {
     applications: rows.map((row) => ({
@@ -332,8 +308,6 @@ export async function listForReview(filter: ReviewFilter, limit = 200) {
       hasPhoto: Boolean(row.photo_path),
       /** Decided and the photo is gone (30-day retention). */
       photoDeleted: !row.photo_path && row.status !== 'pending',
-      /** In-house staff: free brokered listings, no Premium slots (ERP only). */
-      inHouse: inHouse.has(row.id),
       /** Pending: personal listings approval would take down. */
       personalListings: personal.get(row.user_id) ?? 0,
     })),

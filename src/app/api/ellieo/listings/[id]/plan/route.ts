@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 
-import { activeLicense, isInHouse } from '@lib/ellieo/agentLicense.server'
+import { activeLicense } from '@lib/ellieo/agentLicense.server'
 import { cancelReservation, CreditsError, markRented, purchase } from '@lib/ellieo/listingPlans.server'
+import { getSupabaseServiceClient } from '@lib/supabase/server'
 
 import { errorResponse, jsonBody, loginRequired, notEllieo, signedInUid } from '../../../_lib'
 
@@ -10,9 +11,9 @@ export const dynamic = 'force-dynamic'
 
 /**
  * My listing's plan. { action }:
- *   renew { days: 7|14|28 }  · premium (new Premium or upgrade a regular one) · extend (+7 days Premium, once)
- *   reserve (Premium spots full: paid now, starts in order) · cancel_reservation (full refund) · rented
- * Prices are the server's; in-house staff renew for free.
+ *   renew { days }  · premium (Boost a new or regular listing; restarts its 28 days) · extend (+7 days Boost, once)
+ *   reserve (Boost spots full: paid now, starts in order) · cancel_reservation (full refund of the held part) · rented
+ * Prices come from the one config; the app never sends one.
  */
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const blocked = notEllieo()
@@ -31,15 +32,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       await cancelReservation(uid, id)
       return NextResponse.json({ ok: true })
     }
-    const license = await activeLicense(uid)
-    if (!license) throw new CreditsError('Brokered listings are for verified Licensed Agents.', 'AGENT_REQUIRED', 403)
-    const inHouse = await isInHouse(license.id)
-    if (inHouse) {
-      if (action !== 'renew') throw new CreditsError('In-house listings are free and never take a Premium spot.', 'IN_HOUSE', 400)
-      return NextResponse.json(await purchase(uid, id, 'free'))
-    }
+    if (!(await activeLicense(uid))) throw new CreditsError('Brokered listings are for verified Licensed Agents.', 'AGENT_REQUIRED', 403)
     if (action === 'renew') return NextResponse.json(await purchase(uid, id, 'regular', Number(body.days)))
-    if (action === 'premium' || action === 'extend' || action === 'reserve') return NextResponse.json(await purchase(uid, id, action))
+    if (action === 'premium' || action === 'extend') return NextResponse.json(await purchase(uid, id, action))
+    if (action === 'reserve') {
+      const { data } = await getSupabaseServiceClient()
+        .from('ellieo_listings')
+        .select('status, expires_at')
+        .eq('id', id)
+        .maybeSingle<{ status: string; expires_at: string }>()
+      const live = data?.status === 'live' && new Date(data.expires_at).getTime() > Date.now()
+      return NextResponse.json(await purchase(uid, id, 'reserve', 0, !live))
+    }
     return NextResponse.json({ error: 'Unknown action.', code: 'INVALID' }, { status: 400 })
   } catch (error) {
     return errorResponse(error, 'listing plan')

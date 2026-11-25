@@ -7,7 +7,6 @@ import {
   decideAgentLicense,
   licensePhotoUrl,
   listForReview,
-  setInHouse,
   type ReviewFilter,
 } from '@lib/ellieo/agentLicense.server'
 
@@ -22,7 +21,6 @@ export const dynamic = 'force-dynamic'
  *   POST { action: 'photo', id }                                → { url, expiresIn, mimeType } (60 s signed link)
  *   POST { action: 'approve', id, expiresOn }                   → { application } (member pushed)
  *   POST { action: 'reject', id, rejectReason }                 → { application } (member pushed)
- *   POST { action: 'in_house', id, inHouse }                    → { ok } (free brokered listings, no Premium slots)
  */
 function authorized(request: Request) {
   const given = request.headers.get('x-internal-secret')?.trim() || ''
@@ -60,10 +58,6 @@ export async function POST(request: Request) {
     if (!/^[0-9a-f-]{36}$/i.test(id)) return NextResponse.json({ error: 'id is required.' }, { status: 400 })
     if (action === 'photo') {
       return NextResponse.json(await licensePhotoUrl(id), { headers: { 'Cache-Control': 'no-store' } })
-    }
-    if (action === 'in_house') {
-      await setInHouse(id, body.inHouse === true)
-      return NextResponse.json({ ok: true })
     }
     if (action === 'approve' || action === 'reject') {
       const application = await decideAgentLicense({

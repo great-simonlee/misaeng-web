@@ -2,17 +2,29 @@ import { timingSafeEqual } from 'node:crypto'
 
 import { NextResponse } from 'next/server'
 
-import { adminFindUserByEmail } from '@lib/auth/supabaseAuth.server'
-import { creditBalance, creditLedger, CreditsError, grantCredits } from '@lib/ellieo/listingPlans.server'
+import { decideRefund, listPurchases, receiptPath, searchMembers } from '@lib/ellieo/credits.server'
+import {
+  adjustCredits,
+  creditBalance,
+  creditLedger,
+  creditLiability,
+  CreditsError,
+  grantCredits,
+} from '@lib/ellieo/listingPlans.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 /**
- * ERP → Ellieo credits (no real payments yet: staff load credits by hand).
- * Header `x-internal-secret: $INTERNAL_PUSH_SECRET`, `x-admin-id` = staff email.
- *   GET  ?uid= or ?email=                                  → { uid, email, balance, ledger }
- *   POST { uid, amount, bucket: paid|reward, note }        → { balance }
+ * ERP → Ellieo credits. Header `x-internal-secret: $INTERNAL_PUSH_SECRET`, `x-admin-id` = staff email.
+ *   GET ?q=<email | name | Ellieo ID | uid>          → { members: [{ uid, name, nickname, email }] }
+ *   GET ?uid=                                        → { uid, balance, ledger, purchases }
+ *   GET ?view=refunds                                → { purchases } (refund requests)
+ *   GET ?view=purchases                              → { purchases } (latest)
+ *   GET ?view=liability                              → { liability }
+ *   POST { action: 'grant', uids[], amount, bucket, note }   → { results }   (note required)
+ *   POST { action: 'adjust', uid, amount (< 0), bucket, note } → { removed, balance }  (ERP checks Super Admin)
+ *   POST { action: 'refund', id, approve, note }             → { status }
  */
 function authorized(request: Request) {
   const given = request.headers.get('x-internal-secret')?.trim() || ''
@@ -26,21 +38,42 @@ function failure(error: unknown) {
   return NextResponse.json({ error: 'Credits request failed.' }, { status: 500 })
 }
 
+function purchaseOut(row: Awaited<ReturnType<typeof listPurchases>>[number]) {
+  return {
+    id: row.id,
+    uid: row.user_id,
+    packId: row.pack_id,
+    credits: row.credits,
+    amountCents: row.amount_cents,
+    taxCents: row.tax_cents,
+    status: row.status,
+    buyerName: row.buyer_name,
+    buyerEmail: row.buyer_email,
+    brokerage: row.brokerage,
+    card: row.card_last4 ? `${row.card_brand ?? 'card'} ·${row.card_last4}` : null,
+    refundReason: row.refund_reason,
+    refundRequestedAt: row.refund_requested_at,
+    refundDecidedBy: row.refund_decided_by,
+    refundNote: row.refund_note,
+    createdAt: row.created_at,
+    receipt: receiptPath(row.id),
+  }
+}
+
 export async function GET(request: Request) {
   if (!authorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
     const params = new URL(request.url).searchParams
-    let uid = params.get('uid')?.trim() || ''
-    let email: string | null = null
-    if (!uid && params.get('email')) {
-      const user = await adminFindUserByEmail(params.get('email')!.trim().toLowerCase())
-      if (!user) return NextResponse.json({ error: 'No Ellieo member with that email.' }, { status: 404 })
-      uid = user.id
-      email = user.email ?? null
-    }
-    if (!uid) return NextResponse.json({ error: 'uid or email is required.' }, { status: 400 })
-    const [balance, ledger] = await Promise.all([creditBalance(uid), creditLedger(uid, 200)])
-    return NextResponse.json({ uid, email, balance, ledger }, { headers: { 'Cache-Control': 'no-store' } })
+    const view = params.get('view')
+    if (view === 'refunds') return NextResponse.json({ purchases: (await listPurchases({ status: 'refund_requested' })).map(purchaseOut) })
+    if (view === 'purchases') return NextResponse.json({ purchases: (await listPurchases({}, 100)).map(purchaseOut) })
+    if (view === 'liability') return NextResponse.json({ liability: await creditLiability() })
+    const q = params.get('q')?.trim()
+    if (q) return NextResponse.json({ members: await searchMembers(q) })
+    const uid = params.get('uid')?.trim()
+    if (!uid) return NextResponse.json({ error: 'Search by email, name or uid.' }, { status: 400 })
+    const [balance, ledger, purchases] = await Promise.all([creditBalance(uid), creditLedger(uid, 200), listPurchases({ uid }, 50)])
+    return NextResponse.json({ uid, balance, ledger, purchases: purchases.map(purchaseOut) }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
     return failure(error)
   }
@@ -50,16 +83,22 @@ export async function POST(request: Request) {
   if (!authorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
     const body = ((await request.json().catch(() => null)) ?? {}) as Record<string, unknown>
-    const uid = String(body.uid ?? '').trim()
-    if (!uid) return NextResponse.json({ error: 'uid is required.' }, { status: 400 })
-    const balance = await grantCredits({
-      uid,
-      amount: Number(body.amount),
-      bucket: String(body.bucket ?? 'paid'),
-      note: typeof body.note === 'string' ? body.note : null,
-      by: request.headers.get('x-admin-id')?.trim() || 'erp',
-    })
-    return NextResponse.json({ balance })
+    const by = request.headers.get('x-admin-id')?.trim() || 'erp'
+    const action = String(body.action ?? '')
+    if (action === 'grant') {
+      const uids = Array.isArray(body.uids) ? body.uids.map(String) : [String(body.uid ?? '')]
+      const results = await grantCredits({ uids, amount: Number(body.amount), bucket: String(body.bucket ?? 'paid'), note: String(body.note ?? ''), by })
+      return NextResponse.json({ results })
+    }
+    if (action === 'adjust') {
+      return NextResponse.json(
+        await adjustCredits({ uid: String(body.uid ?? ''), amount: Number(body.amount), bucket: String(body.bucket ?? 'paid'), note: String(body.note ?? ''), by }),
+      )
+    }
+    if (action === 'refund') {
+      return NextResponse.json(await decideRefund({ purchaseId: String(body.id ?? ''), approve: body.approve === true, note: String(body.note ?? ''), by }))
+    }
+    return NextResponse.json({ error: 'Unknown action.' }, { status: 400 })
   } catch (error) {
     return failure(error)
   }

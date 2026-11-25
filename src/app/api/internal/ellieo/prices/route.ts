@@ -2,15 +2,16 @@ import { timingSafeEqual } from 'node:crypto'
 
 import { NextResponse } from 'next/server'
 
+import { DEFAULT_CREDITS_CONFIG, getCreditsConfig, paymentsEnabled, saveCreditsConfig } from '@lib/ellieo/credits.server'
 import { CreditsError, DEFAULT_LISTING_PRICES, extendPrice, getListingPrices, premiumPrice, saveListingPrices } from '@lib/ellieo/listingPlans.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 /**
- * ERP (Super Admin) → the one listing price config (ellieo_settings 'listing_prices').
+ * ERP (Super Admin) → the one config: listing prices + credit packs / tax / top-up links / seller.
  * Header `x-internal-secret: $INTERNAL_PUSH_SECRET`, `x-admin-id` = staff email.
- *   GET → { prices, defaults, computed: { premium, extend } }   PUT { prices } → same
+ *   GET → { prices, credits, defaults, computed, paymentsEnabled }   PUT { prices?, credits? } → same
  */
 function authorized(request: Request) {
   const given = request.headers.get('x-internal-secret')?.trim() || ''
@@ -19,8 +20,14 @@ function authorized(request: Request) {
 }
 
 async function payload() {
-  const prices = await getListingPrices()
-  return { prices, defaults: DEFAULT_LISTING_PRICES, computed: { premium: premiumPrice(prices), extend: extendPrice(prices) } }
+  const [prices, credits] = await Promise.all([getListingPrices(), getCreditsConfig()])
+  return {
+    prices,
+    credits,
+    defaults: { prices: DEFAULT_LISTING_PRICES, credits: DEFAULT_CREDITS_CONFIG },
+    computed: { premium: premiumPrice(prices), extend: extendPrice(prices) },
+    paymentsEnabled: paymentsEnabled(),
+  }
 }
 
 export async function GET(request: Request) {
@@ -31,8 +38,10 @@ export async function GET(request: Request) {
 export async function PUT(request: Request) {
   if (!authorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
-    const body = ((await request.json().catch(() => null)) ?? {}) as { prices?: unknown }
-    await saveListingPrices(body.prices, request.headers.get('x-admin-id')?.trim() || 'erp')
+    const body = ((await request.json().catch(() => null)) ?? {}) as { prices?: unknown; credits?: unknown }
+    const by = request.headers.get('x-admin-id')?.trim() || 'erp'
+    if (body.prices !== undefined) await saveListingPrices(body.prices, by)
+    if (body.credits !== undefined) await saveCreditsConfig(body.credits, by)
     return NextResponse.json(await payload())
   } catch (error) {
     if (error instanceof CreditsError) return NextResponse.json({ error: error.message, code: error.code }, { status: error.status })

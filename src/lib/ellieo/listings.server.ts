@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import { getSupabaseServiceClient } from '@lib/supabase/server'
 
-import { activeLicense, isInHouse, licensedOwners } from './agentLicense.server'
+import { activeLicense, licensedOwners } from './agentLicense.server'
 import { CreditsError, parsePlan, planFacts, promotePremium, purchase, type PlanFacts } from './listingPlans.server'
 
 /**
@@ -174,9 +174,8 @@ export async function createListing(uid: string, input: ListingInput) {
   if (input.brokered && !license) {
     throw new ListingError('Brokered listings are for verified Licensed Agents.', 'AGENT_REQUIRED', 403)
   }
-  const inHouse = license ? await isInHouse(license.id) : false
-  const choice = input.brokered && !inHouse ? parsePlan(input.listingPlan) : null
-  if (input.brokered && !inHouse && !choice) {
+  const choice = input.brokered ? parsePlan(input.listingPlan) : null
+  if (input.brokered && !choice) {
     throw new ListingError('Choose how long to show this listing (7, 14 or 28 days, or Premium).', 'PLAN_REQUIRED')
   }
   if (!input.brokered && license) {
@@ -246,24 +245,22 @@ export async function createListing(uid: string, input: ListingInput) {
       .eq('owner_id', uid)
     if (claimError) throw new ListingError(claimError.message, 'SAVE_FAILED', 500)
   }
-  if (license) await payForNewListing(uid, listing.id, inHouse, choice)
+  if (license) await payForNewListing(uid, listing.id, choice)
   const { data: fresh } = await db().from('ellieo_listings').select(LISTING_COLUMNS).eq('id', listing.id).single<ListingRow>()
   const [out] = await withBroker([toPublic(fresh ?? listing, uid)], [fresh ?? listing], uid)
   return out
 }
 
 /**
- * Brokered: in-house → free 28 days; otherwise the chosen plan is paid now (Premium with every spot taken →
- * a paid reservation: the listing stays hidden until its spot starts). A failed payment soft-deletes the listing.
+ * Brokered: the chosen plan is paid now (Premium with every spot taken → a paid reservation; the listing shows as a
+ * regular 28-day listing meanwhile). A failed payment soft-deletes the listing.
  */
-async function payForNewListing(uid: string, id: string, inHouse: boolean, choice: ReturnType<typeof parsePlan>) {
+async function payForNewListing(uid: string, id: string, choice: ReturnType<typeof parsePlan>) {
   try {
-    if (inHouse) await purchase(uid, id, 'free')
-    else if (choice?.plan === 'regular') await purchase(uid, id, 'regular', choice.days)
-    else if (choice?.plan === 'premium' && choice.reserve) {
-      await db().from('ellieo_listings').update({ status: 'removed', removed_reason: 'waiting_premium', removed_at: new Date().toISOString() } as never).eq('id', id)
-      await purchase(uid, id, 'reserve')
-    } else await purchase(uid, id, 'premium')
+    if (choice?.plan === 'regular') await purchase(uid, id, 'regular', choice.days)
+    // Boost spots full: shown as a regular 28-day listing now, Boost starts when a spot frees.
+    else if (choice?.plan === 'premium' && choice.reserve) await purchase(uid, id, 'reserve', 0, true)
+    else await purchase(uid, id, 'premium')
   } catch (error) {
     await db().from('ellieo_listings').update({ status: 'deleted', deleted_at: new Date().toISOString() } as never).eq('id', id)
     if (error instanceof CreditsError) throw new ListingError(error.message, error.code, error.status)
@@ -383,7 +380,7 @@ export async function listListings(viewer: string | null, limit = 50) {
       .select(LISTING_COLUMNS)
       .eq('owner_id', viewer)
       .eq('brokered', true)
-      .or('status.in.(live,expired),removed_reason.eq.waiting_premium')
+      .in('status', ['live', 'expired'])
       .order('posted_at', { ascending: false })
       .limit(20)
       .returns<ListingRow[]>()
@@ -423,12 +420,8 @@ export async function renewListing(id: string, uid: string) {
   if (license && row && !row.brokered) {
     throw new ListingError('Licensed Agents can post brokered listings only. This personal listing can’t be reposted.', 'AGENT_BROKERED_ONLY', 403)
   }
-  // Brokered listings are renewed by buying a plan again (in-house staff: free).
+  // Brokered listings are renewed by buying a plan again.
   if (row?.brokered) {
-    if (license && (await isInHouse(license.id))) {
-      await purchase(uid, id, 'free')
-      return
-    }
     throw new ListingError('Renew a brokered listing by choosing a plan (7, 14 or 28 days, or Premium).', 'PLAN_REQUIRED', 402)
   }
   const { data, error } = await db().rpc('ellieo_renew_listing', { p_listing: id, p_owner: uid } as never)
