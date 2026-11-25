@@ -354,6 +354,13 @@ export async function getListing(id: string, viewer: string | null) {
 }
 
 export async function renewListing(id: string, uid: string) {
+  // A Licensed Agent can't bring a personal listing back (brokered only, owner 11-25).
+  if (await activeLicense(uid)) {
+    const { data: row } = await db().from('ellieo_listings').select('brokered').eq('id', id).maybeSingle<{ brokered: boolean }>()
+    if (row && !row.brokered) {
+      throw new ListingError('Licensed Agents can post brokered listings only. This personal listing can’t be reposted.', 'AGENT_BROKERED_ONLY', 403)
+    }
+  }
   const { data, error } = await db().rpc('ellieo_renew_listing', { p_listing: id, p_owner: uid } as never)
   if (error) throw new ListingError(error.message, 'SAVE_FAILED', 500)
   if (!data) throw new ListingError('This listing can no longer be reposted.', 'NOT_RENEWABLE', 404)

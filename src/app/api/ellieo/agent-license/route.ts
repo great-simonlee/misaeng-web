@@ -7,7 +7,7 @@ import { errorResponse, loginRequired, notEllieo, signedInUid } from '../_lib'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-/** My Licensed Agent status: { status: none|pending|approved|rejected|expired, licenseType, brokerage, expiresOn, rejectReason, … } */
+/** My Licensed Agent status: { status: none|pending|approved|rejected|expired, brokerage, expiresOn, rejectReason, listingsTakenDown, … } */
 export async function GET() {
   const blocked = notEllieo()
   if (blocked) return blocked
@@ -21,7 +21,7 @@ export async function GET() {
 }
 
 /**
- * Apply (multipart): licenseNumber, licenseType (broker | salesperson), holderName, brokerage, contact (business phone
+ * Apply (multipart): licenseNumber, holderName, brokerage, contact (business phone
  * or email), expiresOn (yyyy-mm-dd, optional), photo = JPEG of the license / pocket card (the app shrinks it).
  * The photo is stored privately; only staff see it, through a 60-second link.
  */
@@ -41,7 +41,6 @@ export async function POST(request: Request) {
       uid,
       {
         licenseNumber: text('licenseNumber'),
-        licenseType: text('licenseType'),
         holderName: text('holderName'),
         brokerage: text('brokerage'),
         contact: text('contact'),

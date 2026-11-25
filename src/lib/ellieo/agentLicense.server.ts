@@ -16,13 +16,17 @@ import { afterResponse, pushToMembers } from './messaging.server'
  *
  * Status: none → pending → approved | rejected; an approved license past expires_on reads as "expired" (badge hidden,
  * the member applies again). Only `approved` and not expired counts as a Licensed Agent.
+ *
+ * Owner 11-25 (agent_license_2.sql): no license type (shown as "Licensed Professional · {brokerage}"); approval takes
+ * down the member's personal listings (status 'removed', reason 'licensed_agent'); license photos are deleted 30 days
+ * after the decision (purgeLicensePhotos, run by /api/internal/ellieo/purge-files).
  */
 
 export const AGENT_LICENSE_BUCKET = 'ellieo-agent-licenses'
 const TABLE = 'ellieo_agent_licenses'
 const PHOTO_MAX_BYTES = 5 * 1024 * 1024
-const LICENSE_TYPES = ['broker', 'salesperson'] as const
-export type LicenseType = (typeof LICENSE_TYPES)[number]
+export const PHOTO_KEEP_DAYS = 30
+export const PROFESSIONAL_LABEL = 'Licensed Professional'
 export type AgentStatus = 'none' | 'pending' | 'approved' | 'rejected' | 'expired'
 
 export class AgentLicenseError extends Error {
@@ -43,7 +47,7 @@ type Row = {
   id: string
   user_id: string
   license_number: string
-  license_type: LicenseType
+  license_type: string | null
   holder_name: string
   brokerage: string
   contact: string
@@ -81,7 +85,6 @@ function toMember(row: Row | null) {
   const status = statusOf(row)
   return {
     status,
-    licenseType: row?.license_type ?? null,
     brokerage: row?.brokerage ?? null,
     holderName: row?.holder_name ?? null,
     licenseNumber: row?.license_number ?? null,
@@ -89,6 +92,8 @@ function toMember(row: Row | null) {
     expiresOn: status === 'approved' || status === 'expired' ? row?.expires_on ?? null : null,
     rejectReason: status === 'rejected' ? row?.reject_reason ?? null : null,
     appliedAt: row?.created_at ?? null,
+    /** Approved: personal listings taken down when the license was approved (sheet note). */
+    listingsTakenDown: 0,
   }
 }
 
@@ -108,7 +113,32 @@ async function latestRow(uid: string): Promise<Row | null> {
 }
 
 export async function agentLicenseState(uid: string) {
-  return toMember(await latestRow(uid))
+  const row = await latestRow(uid)
+  const state = toMember(row)
+  if (state.status === 'approved') state.listingsTakenDown = await removedListingCount(uid)
+  return state
+}
+
+async function removedListingCount(uid: string) {
+  const { count, error } = await db()
+    .from('ellieo_listings')
+    .select('id', { count: 'exact', head: true })
+    .eq('owner_id', uid)
+    .eq('status', 'removed')
+    .eq('removed_reason', 'licensed_agent')
+  return error ? 0 : count ?? 0
+}
+
+/** Personal (non-brokered) listings that are up or repostable: what approval takes down. */
+async function personalListingIds(uid: string) {
+  const { data, error } = await db()
+    .from('ellieo_listings')
+    .select('id')
+    .eq('owner_id', uid)
+    .eq('brokered', false)
+    .in('status', ['live', 'expired'])
+    .returns<{ id: string }[]>()
+  return error ? [] : (data ?? []).map((row) => row.id)
 }
 
 /** Never throws: for /api/app/me and listings (a missing table means "none"). */
@@ -129,23 +159,22 @@ export async function activeLicense(uid: string) {
 
 /** Licensed Agent badge for many owners at once (listing board). Missing table → nobody. */
 export async function licensedOwners(uids: string[]) {
-  const out = new Map<string, { brokerage: string; licenseType: LicenseType }>()
+  const out = new Map<string, { brokerage: string }>()
   if (uids.length === 0) return out
   const { data, error } = await db()
     .from(TABLE)
-    .select('user_id, brokerage, license_type, expires_on')
+    .select('user_id, brokerage, expires_on')
     .in('user_id', [...new Set(uids)].slice(0, 200))
     .eq('status', 'approved')
     .gte('expires_on', todayNY())
-    .returns<{ user_id: string; brokerage: string; license_type: LicenseType; expires_on: string }[]>()
+    .returns<{ user_id: string; brokerage: string; expires_on: string }[]>()
   if (error) return out
-  for (const row of data ?? []) out.set(row.user_id, { brokerage: row.brokerage, licenseType: row.license_type })
+  for (const row of data ?? []) out.set(row.user_id, { brokerage: row.brokerage })
   return out
 }
 
 export type AgentApplication = {
   licenseNumber: string
-  licenseType: string
   holderName: string
   brokerage: string
   contact: string
@@ -161,7 +190,6 @@ function validate(input: AgentApplication) {
   }
   const number = clean(input.licenseNumber).toUpperCase().replace(/\s/g, '')
   if (!/^[A-Z0-9-]{4,20}$/.test(number)) fail('Enter your NY license number (letters and numbers, as on the license).')
-  if (!(LICENSE_TYPES as readonly string[]).includes(input.licenseType)) fail('Choose Broker or Salesperson.')
   const holderName = clean(input.holderName)
   if (holderName.length < 2 || holderName.length > 80) fail('Enter your full name as it appears on the license.')
   const brokerage = clean(input.brokerage)
@@ -175,7 +203,7 @@ function validate(input: AgentApplication) {
     fail('Expiration date is not valid.')
   }
   if (expiresOn && expiresOn < todayNY()) fail('This license has expired. Renew it with NY DOS first.')
-  return { number, holderName, brokerage, contact, expiresOn, licenseType: input.licenseType as LicenseType }
+  return { number, holderName, brokerage, contact, expiresOn }
 }
 
 function isJpeg(bytes: Uint8Array) {
@@ -204,20 +232,24 @@ export async function applyAgentLicense(uid: string, input: AgentApplication, ph
     .upload(path, bytes, { contentType: 'image/jpeg', upsert: false })
   if (uploadError) throw new AgentLicenseError(`Upload failed: ${uploadError.message}`, 'UPLOAD_FAILED', 500)
 
-  const { data, error } = await db()
-    .from(TABLE)
-    .insert({
-      user_id: uid,
-      license_number: fields.number,
-      license_type: fields.licenseType,
-      holder_name: fields.holderName,
-      brokerage: fields.brokerage,
-      contact: fields.contact,
-      applicant_expires_on: fields.expiresOn,
-      photo_path: path,
-    } as never)
-    .select(COLUMNS)
-    .single<Row>()
+  const insert = (extra: Record<string, unknown>) =>
+    db()
+      .from(TABLE)
+      .insert({
+        user_id: uid,
+        license_number: fields.number,
+        holder_name: fields.holderName,
+        brokerage: fields.brokerage,
+        contact: fields.contact,
+        applicant_expires_on: fields.expiresOn,
+        photo_path: path,
+        ...extra,
+      } as never)
+      .select(COLUMNS)
+      .single<Row>()
+  let { data, error } = await insert({})
+  // Before agent_license_2.sql license_type is still required: store the old placeholder (never shown).
+  if (error?.code === '23502') ({ data, error } = await insert({ license_type: 'broker' }))
   if (error || !data) {
     await db().storage.from(AGENT_LICENSE_BUCKET).remove([path])
     if (error?.code === '23505') throw new AgentLicenseError('Your application is already in review.', 'ALREADY_PENDING', 409)
@@ -250,6 +282,12 @@ export async function listForReview(filter: ReviewFilter, limit = 200) {
       profiles.set(uid, { email: profile?.email ?? null, nickname: profile?.nickname ?? null, name: name || null })
     }),
   )
+  const personal = new Map<string, number>()
+  await Promise.all(
+    [...new Set(rows.filter((row) => row.status === 'pending').map((row) => row.user_id))].map(async (uid) => {
+      personal.set(uid, (await personalListingIds(uid)).length)
+    }),
+  )
   const { count } = await db().from(TABLE).select('id', { count: 'exact', head: true }).eq('status', 'pending')
   return {
     applications: rows.map((row) => ({
@@ -258,7 +296,6 @@ export async function listForReview(filter: ReviewFilter, limit = 200) {
       member: profiles.get(row.user_id) ?? null,
       status: statusOf(row),
       licenseNumber: row.license_number,
-      licenseType: row.license_type,
       holderName: row.holder_name,
       brokerage: row.brokerage,
       contact: row.contact,
@@ -269,6 +306,10 @@ export async function listForReview(filter: ReviewFilter, limit = 200) {
       reviewedAt: row.reviewed_at,
       createdAt: row.created_at,
       hasPhoto: Boolean(row.photo_path),
+      /** Decided and the photo is gone (30-day retention). */
+      photoDeleted: !row.photo_path && row.status !== 'pending',
+      /** Pending: personal listings approval would take down. */
+      personalListings: personal.get(row.user_id) ?? 0,
     })),
     counts: { pending: count ?? 0 },
     setupRequired: false,
@@ -318,21 +359,71 @@ export async function decideAgentLicense(input: {
     .maybeSingle<Row>()
   if (error) throw new AgentLicenseError(error.message, 'SAVE_FAILED', 500)
   if (!data) throw new AgentLicenseError('Application not found or already reviewed.', 'ALREADY_DECIDED', 409)
-  notifyDecision(data)
-  return toMember(data)
+  const takenDown = data.status === 'approved' ? await takeDownPersonalListings(data.user_id) : 0
+  notifyDecision(data, takenDown)
+  return { ...toMember(data), listingsTakenDown: takenDown }
+}
+
+/**
+ * Owner 11-25: Licensed Agents post brokered listings only, so approval takes down their personal listings —
+ * hidden with a reason, not deleted (status 'removed'; before agent_license_2.sql: 'expired', and renew refuses them).
+ */
+async function takeDownPersonalListings(uid: string) {
+  const ids = await personalListingIds(uid)
+  if (ids.length === 0) return 0
+  const now = new Date().toISOString()
+  let { error } = await db()
+    .from('ellieo_listings')
+    .update({ status: 'removed', removed_at: now, removed_reason: 'licensed_agent' } as never)
+    .in('id', ids)
+  if (error) ({ error } = await db().from('ellieo_listings').update({ status: 'expired', expires_at: now } as never).in('id', ids))
+  if (error) console.error('Ellieo agent listing takedown failed:', error.message)
+  return error ? 0 : ids.length
+}
+
+/**
+ * Deletes license photos 30 days after the decision (approved or rejected): the file first, then photo_path.
+ * Called by /api/internal/ellieo/purge-files. Missing table → nothing to do.
+ */
+export async function purgeLicensePhotos(batch = 200) {
+  const cutoff = new Date(Date.now() - PHOTO_KEEP_DAYS * 86_400_000).toISOString()
+  const { data, error } = await db()
+    .from(TABLE)
+    .select('id, photo_path')
+    .neq('status', 'pending')
+    .not('photo_path', 'is', null)
+    .lte('reviewed_at', cutoff)
+    .limit(batch)
+    .returns<{ id: string; photo_path: string }[]>()
+  if (missingTable(error)) return { deleted: 0 }
+  if (error) throw new AgentLicenseError(error.message, 'PURGE_FAILED', 500)
+  const rows = (data ?? []) as { id: string; photo_path: string }[]
+  if (rows.length === 0) return { deleted: 0 }
+  const { error: removeError } = await db().storage.from(AGENT_LICENSE_BUCKET).remove(rows.map((row) => row.photo_path))
+  if (removeError) throw new AgentLicenseError(removeError.message, 'PURGE_FAILED', 500)
+  const ids = rows.map((row) => row.id)
+  let { error: rowError } = await db()
+    .from(TABLE)
+    .update({ photo_path: null, photo_deleted_at: new Date().toISOString() } as never)
+    .in('id', ids)
+  if (rowError) ({ error: rowError } = await db().from(TABLE).update({ photo_path: null } as never).in('id', ids))
+  if (rowError) throw new AgentLicenseError(rowError.message, 'PURGE_FAILED', 500)
+  return { deleted: rows.length }
 }
 
 // MARK: - Push + in-app notification
 
 const MONTHS_VI = (date: Date) => `tháng ${date.getUTCMonth() + 1}/${date.getUTCFullYear()}`
 
-function decisionText(row: Row, locale: string) {
+function decisionText(row: Row, locale: string, takenDown: number) {
   const until = row.expires_on ? new Date(`${row.expires_on}T00:00:00Z`) : null
   if (locale === 'vi') {
     return row.status === 'approved'
       ? {
           title: 'Bạn đã có huy hiệu Licensed Agent',
-          body: `Đã xác minh giấy phép môi giới NY${until ? ` (đến ${MONTHS_VI(until)})` : ''}. Giờ bạn có thể đăng tin qua môi giới.`,
+          body: `Đã xác minh giấy phép NY${until ? ` (đến ${MONTHS_VI(until)})` : ''}. Giờ bạn có thể đăng tin qua môi giới.${
+            takenDown > 0 ? ' Các tin cá nhân trước đây của bạn đã được gỡ — Licensed Agent chỉ đăng tin qua môi giới.' : ''
+          }`,
         }
       : { title: 'Chưa thể xác minh giấy phép', body: row.reject_reason || 'Xem lý do và gửi lại trong Tôi.' }
   }
@@ -341,21 +432,23 @@ function decisionText(row: Row, locale: string) {
         title: 'You’re a verified Licensed Agent',
         body: `Your NY license is verified${
           until ? ` until ${until.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })}` : ''
-        }. You can now post brokered listings.`,
+        }. You can now post brokered listings.${
+          takenDown > 0 ? ' Your earlier personal listings were taken down — Licensed Agents post brokered listings only.' : ''
+        }`,
       }
     : { title: 'License not verified', body: row.reject_reason || 'See why and apply again in Me.' }
 }
 
-function notifyDecision(row: Row) {
+function notifyDecision(row: Row, takenDown: number) {
   afterResponse(async () => {
     const data = { type: 'ellieo_agent_license', status: row.status }
     await recordNotifications({
       type: 'ellieo_agent_license',
       userIds: [row.user_id],
-      build: (_t, locale) => ({ ...decisionText(row, locale), data, threadId: `ellieo-agent-${row.id}` }),
+      build: (_t, locale) => ({ ...decisionText(row, locale, takenDown), data, threadId: `ellieo-agent-${row.id}` }),
     })
     await pushToMembers([{ uid: row.user_id, preview: true }], (locale) => ({
-      ...decisionText(row, locale),
+      ...decisionText(row, locale, takenDown),
       threadId: 'ellieo-agent-license',
       data,
     }))
