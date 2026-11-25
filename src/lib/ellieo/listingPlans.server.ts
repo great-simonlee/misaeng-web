@@ -1,0 +1,302 @@
+import { getSupabaseServiceClient } from '@lib/supabase/server'
+
+/**
+ * Ellieo credits + paid brokered listings (owner 11-25). SQL: ellieo-app/shared/ellieo/db/agent_listing_pay.sql.
+ *
+ *   Credits   1 credit = $1. paid (never expire) + reward (90 days, spent first). Ledger rows; balance from SQL.
+ *             No real top-up yet (Ellieo has no Stripe account): ERP grants credits by hand.
+ *   Regular   7 / 14 / 28 days = 6 / 10 / 14 credits
+ *   Premium   58 credits = 7 days in a Premium slot + shown 28 days in all from the Premium start; +7 days once for 46
+ *   Slots     3 at a time (NYC); full → reservation paid up front, started in order; cancel = full refund
+ *   In-house  license in_house (ERP only): free, no limits, no Premium slot
+ *
+ * Prices live here only; the app sends a plan, never a price.
+ */
+
+export const PLAN_PRICES = {
+  regular: { 7: 6, 14: 10, 28: 14 } as Record<number, number>,
+  premium: 58,
+  extend: 46,
+} as const
+export const PREMIUM_SLOTS = 3
+export const PREMIUM_DAYS = 7
+export const PREMIUM_TOTAL_DAYS = 28
+export const INHOUSE_DAYS = 28
+const REGULAR_DAYS = [7, 14, 28]
+
+export class CreditsError extends Error {
+  constructor(
+    message: string,
+    readonly code: string,
+    readonly status = 400,
+  ) {
+    super(message)
+  }
+}
+
+const SQL_ERRORS: Record<string, [string, number]> = {
+  NOT_ENOUGH_CREDITS: ['Not enough credits. Top up to continue.', 402],
+  NOT_FOUND: ['Listing not found.', 404],
+  NOT_BROKERED: ['Only brokered listings have plans.', 400],
+  NOT_AVAILABLE: ['This listing can no longer be changed.', 409],
+  INVALID_PLAN: ['Pick 7, 14 or 28 days, or Premium.', 400],
+  PREMIUM_ACTIVE: ['This listing is already Premium.', 409],
+  ALREADY_RESERVED: ['This listing is already waiting for a Premium spot.', 409],
+  SLOTS_FULL: ['All Premium spots are taken. Reserve the next one instead.', 409],
+  SLOT_OPEN: ['A Premium spot is open now — buy Premium instead of reserving.', 409],
+  NOT_PREMIUM: ['Only an active Premium listing can be extended.', 409],
+  ALREADY_EXTENDED: ['Premium can be extended only once.', 409],
+  INVALID_AMOUNT: ['Enter an amount between 1 and 100,000.', 400],
+  INVALID_BUCKET: ['Choose paid or reward credits.', 400],
+}
+
+function db() {
+  return getSupabaseServiceClient()
+}
+
+async function rpc<T>(name: string, args: Record<string, unknown>): Promise<T> {
+  const { data, error } = await db().rpc(name, args as never)
+  if (error) {
+    const code = /ellieo:([A-Z_]+)/.exec(error.message)?.[1]
+    if (code && SQL_ERRORS[code]) throw new CreditsError(SQL_ERRORS[code][0], code, SQL_ERRORS[code][1])
+    if (error.code === 'PGRST202' || error.code === '42883' || error.code === '42P01') {
+      throw new CreditsError('Paid listings are not set up yet (run agent_listing_pay.sql).', 'SETUP_REQUIRED', 503)
+    }
+    throw new CreditsError(`Credits failed: ${error.message}`, 'SERVER_ERROR', 500)
+  }
+  return data as T
+}
+
+// MARK: - Credits
+
+export async function creditBalance(uid: string) {
+  const rows = await rpc<{ paid: number; reward: number }[]>('ellieo_credit_balance', { p_user: uid })
+  const paid = Number(rows?.[0]?.paid) || 0
+  const reward = Number(rows?.[0]?.reward) || 0
+  return { paid, reward, total: paid + reward }
+}
+
+type LedgerRow = {
+  id: string
+  bucket: 'paid' | 'reward'
+  amount: number
+  remaining: number | null
+  expires_at: string | null
+  reason: string
+  ref_id: string | null
+  note: string | null
+  created_by: string | null
+  created_at: string
+}
+
+const REASON_TITLES: Record<string, string> = {
+  grant: 'Credits added by Ellieo',
+  topup: 'Top-up',
+  listing: 'Brokered listing',
+  premium: 'Premium listing',
+  upgrade: 'Upgrade to Premium',
+  extend: 'Premium +7 days',
+  reserve: 'Premium reservation',
+  refund: 'Refund',
+  expire: 'Reward credits expired',
+}
+
+export async function creditLedger(uid: string, limit = 100) {
+  const { data, error } = await db()
+    .from('ellieo_credit_ledger')
+    .select('id, bucket, amount, remaining, expires_at, reason, ref_id, note, created_by, created_at')
+    .eq('user_id', uid)
+    .order('created_at', { ascending: false })
+    .limit(Math.min(Math.max(limit, 1), 500))
+    .returns<LedgerRow[]>()
+  if (error) {
+    if (error.code === '42P01' || error.code === 'PGRST205') {
+      throw new CreditsError('Paid listings are not set up yet (run agent_listing_pay.sql).', 'SETUP_REQUIRED', 503)
+    }
+    throw new CreditsError(error.message, 'LOAD_FAILED', 500)
+  }
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    bucket: row.bucket,
+    amount: row.amount,
+    reason: row.reason,
+    title: REASON_TITLES[row.reason] ?? row.reason,
+    note: row.note,
+    refId: row.ref_id,
+    /** Reward grants: what's left and when it expires. */
+    remaining: row.remaining,
+    expiresAt: row.expires_at,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+  }))
+}
+
+/** ERP: add credits by hand (no real payments yet). */
+export async function grantCredits(input: { uid: string; amount: number; bucket: string; note?: string | null; by: string }) {
+  if (!Number.isInteger(input.amount)) throw new CreditsError('Enter a whole number of credits.', 'INVALID_AMOUNT')
+  await rpc('ellieo_credit_grant', {
+    p_user: input.uid,
+    p_amount: input.amount,
+    p_bucket: input.bucket,
+    p_reason: 'grant',
+    p_ref: null,
+    p_note: input.note?.trim().slice(0, 200) || null,
+    p_by: input.by,
+  })
+  return creditBalance(input.uid)
+}
+
+// MARK: - Premium slots
+
+/** Starts waiting reservations when spots are free (no cron needed: called on board loads and purchases). */
+export async function promotePremium() {
+  try {
+    await rpc('ellieo_premium_promote', {})
+  } catch (error) {
+    if (!(error instanceof CreditsError && error.code === 'SETUP_REQUIRED')) console.error('Ellieo premium promote error:', error)
+  }
+}
+
+export async function premiumAvailability() {
+  const now = new Date().toISOString()
+  const [{ data: active }, { data: waiting }] = await Promise.all([
+    db()
+      .from('ellieo_listings')
+      .select('premium_end')
+      .eq('status', 'live')
+      .eq('plan', 'premium')
+      .gt('premium_end', now)
+      .gt('expires_at', now)
+      .order('premium_end', { ascending: true })
+      .returns<{ premium_end: string }[]>(),
+    db()
+      .from('ellieo_premium_reservations')
+      .select('id')
+      .eq('status', 'waiting')
+      .returns<{ id: string }[]>(),
+  ])
+  const used = active?.length ?? 0
+  const queue = waiting?.length ?? 0
+  // The spot a new reservation gets: the (queue+1)-th Premium to end, if any.
+  const ends = (active ?? []).map((row) => new Date(row.premium_end).getTime())
+  const nextEnd = used >= PREMIUM_SLOTS ? ends[Math.min(queue, ends.length - 1)] : null
+  return {
+    slots: PREMIUM_SLOTS,
+    used: Math.min(used, PREMIUM_SLOTS),
+    full: used >= PREMIUM_SLOTS,
+    waiting: queue,
+    /** Whole days until the next spot (for a new reservation) opens; null when a spot is open. */
+    nextOpensInDays: nextEnd ? Math.max(1, Math.ceil((nextEnd - Date.now()) / 86_400_000)) : null,
+  }
+}
+
+/** Composer / plan sheet: prices, Premium spots, my balance, in-house. */
+export async function planOptions(uid: string, inHouse: boolean) {
+  await promotePremium()
+  const [balance, premium] = await Promise.all([creditBalance(uid), premiumAvailability()])
+  return {
+    prices: { regular: PLAN_PRICES.regular, premium: PLAN_PRICES.premium, extend: PLAN_PRICES.extend },
+    premiumDays: PREMIUM_DAYS,
+    premiumTotalDays: PREMIUM_TOTAL_DAYS,
+    premium,
+    balance,
+    inHouse,
+  }
+}
+
+// MARK: - Purchases
+
+export type PlanChoice = { plan: 'regular'; days: number } | { plan: 'premium'; reserve?: boolean }
+
+export function parsePlan(input: unknown): PlanChoice | null {
+  const value = (input ?? {}) as { plan?: unknown; days?: unknown; reserve?: unknown }
+  if (value.plan === 'regular' && REGULAR_DAYS.includes(Number(value.days))) return { plan: 'regular', days: Number(value.days) }
+  if (value.plan === 'premium') return { plan: 'premium', reserve: value.reserve === true }
+  return null
+}
+
+/** One action on my brokered listing; price from PLAN_PRICES. */
+export async function purchase(uid: string, listingId: string, action: 'regular' | 'premium' | 'extend' | 'reserve' | 'free', days = 0) {
+  const price =
+    action === 'regular'
+      ? PLAN_PRICES.regular[days]
+      : action === 'premium' || action === 'reserve'
+        ? PLAN_PRICES.premium
+        : action === 'extend'
+          ? PLAN_PRICES.extend
+          : 0
+  if (action === 'regular' && !price) throw new CreditsError(SQL_ERRORS.INVALID_PLAN[0], 'INVALID_PLAN')
+  const result = await rpc<{ ok: boolean; paidUsed?: number; rewardUsed?: number; reservation?: string | null }>(
+    'ellieo_listing_purchase',
+    { p_user: uid, p_listing: listingId, p_action: action, p_days: action === 'free' ? days || INHOUSE_DAYS : days, p_price: price },
+  )
+  if (action !== 'reserve') await promotePremium()
+  return { ...result, price }
+}
+
+export async function cancelReservation(uid: string, listingId: string) {
+  const ok = await rpc<boolean>('ellieo_premium_cancel', { p_user: uid, p_listing: listingId })
+  if (!ok) throw new CreditsError('No reservation to cancel.', 'NOT_FOUND', 404)
+}
+
+/** Owner marks a listing rented: off the board (status removed, reason rented). No refund of unused days. */
+export async function markRented(uid: string, listingId: string) {
+  // A waiting reservation for it is cancelled (and refunded) first.
+  await rpc('ellieo_premium_cancel', { p_user: uid, p_listing: listingId }).catch(() => null)
+  const now = new Date().toISOString()
+  const { data, error } = await db()
+    .from('ellieo_listings')
+    .update({ status: 'removed', removed_reason: 'rented', removed_at: now, rented_at: now } as never)
+    .eq('id', listingId)
+    .eq('owner_id', uid)
+    .in('status', ['live', 'expired', 'removed'])
+    .select('id')
+  if (error) throw new CreditsError(error.message, 'SAVE_FAILED', 500)
+  if (!data?.length) throw new CreditsError('Listing not found.', 'NOT_FOUND', 404)
+}
+
+/** Owner-only plan facts for my listings (days left, Premium days left, what I can do next). */
+export type PlanFacts = {
+  plan: 'regular' | 'premium' | 'inhouse' | null
+  planDays: number | null
+  premiumActive: boolean
+  premiumDaysLeft: number | null
+  premiumExtended: boolean
+  reservation: { position: number } | null
+}
+
+export async function planFacts(rows: { id: string; owner_id: string }[], viewer: string | null) {
+  const out = new Map<string, PlanFacts & { premiumActive: boolean }>()
+  if (rows.length === 0) return out
+  const { data, error } = await db()
+    .from('ellieo_listings')
+    .select('id, plan, plan_days, premium_start, premium_end, premium_extended')
+    .in('id', rows.map((row) => row.id))
+    .returns<{ id: string; plan: PlanFacts['plan']; plan_days: number | null; premium_start: string | null; premium_end: string | null; premium_extended: boolean }[]>()
+  if (error) return out
+  const mineIds = rows.filter((row) => viewer && row.owner_id === viewer).map((row) => row.id)
+  const positions = new Map<string, number>()
+  if (mineIds.length) {
+    const { data: queue } = await db()
+      .from('ellieo_premium_reservations')
+      .select('listing_id, created_at')
+      .eq('status', 'waiting')
+      .order('created_at', { ascending: true })
+      .returns<{ listing_id: string; created_at: string }[]>()
+    ;(queue ?? []).forEach((row, index) => positions.set(row.listing_id, index + 1))
+  }
+  const now = Date.now()
+  for (const row of data ?? []) {
+    const end = row.premium_end ? new Date(row.premium_end).getTime() : 0
+    const active = row.plan === 'premium' && end > now
+    out.set(row.id, {
+      plan: row.plan,
+      planDays: row.plan_days,
+      premiumActive: active,
+      premiumDaysLeft: active ? Math.max(1, Math.ceil((end - now) / 86_400_000)) : null,
+      premiumExtended: row.premium_extended,
+      reservation: positions.has(row.id) ? { position: positions.get(row.id)! } : null,
+    })
+  }
+  return out
+}

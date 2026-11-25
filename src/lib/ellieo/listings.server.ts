@@ -2,7 +2,8 @@ import { randomUUID } from 'node:crypto'
 
 import { getSupabaseServiceClient } from '@lib/supabase/server'
 
-import { activeLicense, licensedOwners } from './agentLicense.server'
+import { activeLicense, isInHouse, licensedOwners } from './agentLicense.server'
+import { CreditsError, parsePlan, planFacts, promotePremium, purchase, type PlanFacts } from './listingPlans.server'
 
 /**
  * Ellieo housing listings posted from the app (tables ellieo_listings / ellieo_files, made by
@@ -107,6 +108,8 @@ export type ListingInput = {
   brokered?: boolean
   /** Dollars the tenant pays the agent; 0 / null = no fee (NYC FARE Act: never the landlord's agent fee). */
   brokerFee?: number | null
+  /** Brokered, not in-house: { plan: 'regular', days: 7|14|28 } or { plan: 'premium', reserve? } — never a price. */
+  listingPlan?: unknown
 }
 
 type ListingRow = {
@@ -171,6 +174,11 @@ export async function createListing(uid: string, input: ListingInput) {
   if (input.brokered && !license) {
     throw new ListingError('Brokered listings are for verified Licensed Agents.', 'AGENT_REQUIRED', 403)
   }
+  const inHouse = license ? await isInHouse(license.id) : false
+  const choice = input.brokered && !inHouse ? parsePlan(input.listingPlan) : null
+  if (input.brokered && !inHouse && !choice) {
+    throw new ListingError('Choose how long to show this listing (7, 14 or 28 days, or Premium).', 'PLAN_REQUIRED')
+  }
   if (!input.brokered && license) {
     throw new ListingError(
       'Licensed Agents can post brokered listings only. Choose Brokered listing to post under your brokerage.',
@@ -208,7 +216,14 @@ export async function createListing(uid: string, input: ListingInput) {
       details_html: cleanDetailsHtml(input.detailsHtml),
       cover_thumb: input.photos[0].thumb,
       ...(license
-        ? { brokered: true, brokerage: license.brokerage, broker_fee: input.brokerFee || 0, license_id: license.id }
+        ? {
+            brokered: true,
+            brokerage: license.brokerage,
+            broker_fee: input.brokerFee || 0,
+            license_id: license.id,
+            // Hidden until the plan is paid (the board shows only expires_at > now).
+            expires_at: new Date().toISOString(),
+          }
         : {}),
     } as never)
     .select(LISTING_COLUMNS)
@@ -231,8 +246,29 @@ export async function createListing(uid: string, input: ListingInput) {
       .eq('owner_id', uid)
     if (claimError) throw new ListingError(claimError.message, 'SAVE_FAILED', 500)
   }
-  const [out] = await withBroker([toPublic(listing, uid)], [listing])
+  if (license) await payForNewListing(uid, listing.id, inHouse, choice)
+  const { data: fresh } = await db().from('ellieo_listings').select(LISTING_COLUMNS).eq('id', listing.id).single<ListingRow>()
+  const [out] = await withBroker([toPublic(fresh ?? listing, uid)], [fresh ?? listing], uid)
   return out
+}
+
+/**
+ * Brokered: in-house → free 28 days; otherwise the chosen plan is paid now (Premium with every spot taken →
+ * a paid reservation: the listing stays hidden until its spot starts). A failed payment soft-deletes the listing.
+ */
+async function payForNewListing(uid: string, id: string, inHouse: boolean, choice: ReturnType<typeof parsePlan>) {
+  try {
+    if (inHouse) await purchase(uid, id, 'free')
+    else if (choice?.plan === 'regular') await purchase(uid, id, 'regular', choice.days)
+    else if (choice?.plan === 'premium' && choice.reserve) {
+      await db().from('ellieo_listings').update({ status: 'removed', removed_reason: 'waiting_premium', removed_at: new Date().toISOString() } as never).eq('id', id)
+      await purchase(uid, id, 'reserve')
+    } else await purchase(uid, id, 'premium')
+  } catch (error) {
+    await db().from('ellieo_listings').update({ status: 'deleted', deleted_at: new Date().toISOString() } as never).eq('id', id)
+    if (error instanceof CreditsError) throw new ListingError(error.message, error.code, error.status)
+    throw error
+  }
 }
 
 const DAY = 86_400_000
@@ -266,6 +302,10 @@ function toPublic(row: ListingRow, viewer?: string | null) {
 }
 
 export type PublicListing = ReturnType<typeof toPublic> & {
+  /** Premium slot right now (top of Housing, highlighted). */
+  premium?: boolean
+  /** Owner only: plan, days left in Premium, extension used, place in the Premium line. */
+  planInfo?: PlanFacts | null
   brokered?: boolean
   brokerage?: string | null
   brokerFee?: number | null
@@ -277,7 +317,11 @@ export type PublicListing = ReturnType<typeof toPublic> & {
  * Brokered fields + the Licensed Agent badge, read apart from LISTING_COLUMNS so the board keeps working before
  * agent_license.sql is run (then everything reads as not brokered).
  */
-async function withBroker<T extends ReturnType<typeof toPublic>>(listings: T[], rows: Pick<ListingRow, 'id' | 'owner_id'>[]) {
+async function withBroker<T extends ReturnType<typeof toPublic>>(
+  listings: T[],
+  rows: Pick<ListingRow, 'id' | 'owner_id'>[],
+  viewer: string | null = null,
+) {
   if (listings.length === 0) return listings as (T & PublicListing)[]
   const [extras, agents] = await Promise.all([
     db()
@@ -288,6 +332,7 @@ async function withBroker<T extends ReturnType<typeof toPublic>>(listings: T[], 
       .then(({ data, error }) => (error ? [] : data ?? [])),
     licensedOwners(rows.map((row) => row.owner_id)).catch(() => new Map()),
   ])
+  const plans = await planFacts(rows, viewer).catch(() => new Map<string, PlanFacts>())
   const byId = new Map(extras.map((extra) => [extra.id, extra]))
   const owners = new Map(rows.map((row) => [row.id, row.owner_id]))
   return listings.map((listing) => {
@@ -298,12 +343,15 @@ async function withBroker<T extends ReturnType<typeof toPublic>>(listings: T[], 
       brokerage: extra?.brokered ? extra.brokerage : null,
       brokerFee: extra?.brokered ? extra.broker_fee ?? 0 : null,
       licensedAgent: agents.has(owners.get(listing.id) ?? ''),
+      premium: Boolean(plans.get(listing.id)?.premiumActive && listing.status === 'live'),
+      planInfo: listing.mine ? plans.get(listing.id) ?? null : null,
     }
   })
 }
 
 /** The board: live listings, newest first, plus the viewer's own expired one (for the repost bar). */
 export async function listListings(viewer: string | null, limit = 50) {
+  await promotePremium()
   const { data, error } = await db()
     .from('ellieo_listings')
     .select(LISTING_COLUMNS)
@@ -313,9 +361,12 @@ export async function listListings(viewer: string | null, limit = 50) {
     .limit(Math.min(Math.max(limit, 1), 100))
     .returns<ListingRow[]>()
   if (error) throw new ListingError(error.message, 'LOAD_FAILED', 500)
-  const listings = await withBroker((data ?? []).map((row) => toPublic(row, viewer)), data ?? [])
+  const listed = await withBroker((data ?? []).map((row) => toPublic(row, viewer)), data ?? [], viewer)
+  // Premium spots first, then newest.
+  const listings = [...listed.filter((l) => l.premium), ...listed.filter((l) => !l.premium)]
 
   let mineExpired: PublicListing[] = []
+  let mineBrokered: PublicListing[] = []
   if (viewer) {
     const { data: expired } = await db()
       .from('ellieo_listings')
@@ -326,8 +377,20 @@ export async function listListings(viewer: string | null, limit = 50) {
       .limit(5)
       .returns<ListingRow[]>()
     mineExpired = (expired ?? []).map((row) => toPublic(row, viewer))
+    // My brokered listings in every state I can still act on (renew, Premium, reservation, rented).
+    const { data: mine } = await db()
+      .from('ellieo_listings')
+      .select(LISTING_COLUMNS)
+      .eq('owner_id', viewer)
+      .eq('brokered', true)
+      .or('status.in.(live,expired),removed_reason.eq.waiting_premium')
+      .order('posted_at', { ascending: false })
+      .limit(20)
+      .returns<ListingRow[]>()
+    const waitingOrOpen = mine ?? []
+    mineBrokered = await withBroker(waitingOrOpen.map((row) => toPublic(row, viewer)), waitingOrOpen, viewer)
   }
-  return { listings, mineExpired }
+  return { listings, mineExpired, mineBrokered }
 }
 
 /** One listing with all its photos (large + thumb, in order). Expired ones only for their owner. */
@@ -349,17 +412,24 @@ export async function getListing(id: string, viewer: string | null) {
     photos.push({ url: publicFileUrl(file.path)!, thumbUrl: publicFileUrl(thumb?.path) })
   }
   const floorPlan = files?.find((file) => file.role === 'floor_plan')
-  const [listing] = await withBroker([toPublic(row, viewer)], [row])
+  const [listing] = await withBroker([toPublic(row, viewer)], [row], viewer)
   return { ...listing, photos, floorPlanUrl: publicFileUrl(floorPlan?.path) }
 }
 
 export async function renewListing(id: string, uid: string) {
+  const { data: row } = await db().from('ellieo_listings').select('brokered').eq('id', id).maybeSingle<{ brokered: boolean }>()
+  const license = await activeLicense(uid)
   // A Licensed Agent can't bring a personal listing back (brokered only, owner 11-25).
-  if (await activeLicense(uid)) {
-    const { data: row } = await db().from('ellieo_listings').select('brokered').eq('id', id).maybeSingle<{ brokered: boolean }>()
-    if (row && !row.brokered) {
-      throw new ListingError('Licensed Agents can post brokered listings only. This personal listing can’t be reposted.', 'AGENT_BROKERED_ONLY', 403)
+  if (license && row && !row.brokered) {
+    throw new ListingError('Licensed Agents can post brokered listings only. This personal listing can’t be reposted.', 'AGENT_BROKERED_ONLY', 403)
+  }
+  // Brokered listings are renewed by buying a plan again (in-house staff: free).
+  if (row?.brokered) {
+    if (license && (await isInHouse(license.id))) {
+      await purchase(uid, id, 'free')
+      return
     }
+    throw new ListingError('Renew a brokered listing by choosing a plan (7, 14 or 28 days, or Premium).', 'PLAN_REQUIRED', 402)
   }
   const { data, error } = await db().rpc('ellieo_renew_listing', { p_listing: id, p_owner: uid } as never)
   if (error) throw new ListingError(error.message, 'SAVE_FAILED', 500)

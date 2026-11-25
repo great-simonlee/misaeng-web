@@ -79,8 +79,8 @@ export function proxy(request: NextRequest) {
 
   if (!BRAND_CONFIG.hasCorporateSite) {
     if (!first) return redirectTo(request, servicePathFor(request, '/nyc'), 307)
-    // partners and the Ellieo intro page live under the city on ellieo (/nyc/partners, /nyc/about)
-    if ((first === 'partners' || first === 'about') && segments.length === 1) {
+    // partners, the Ellieo intro page and the credit top-up live under the city on ellieo (/nyc/partners, /nyc/about, /nyc/credits)
+    if ((first === 'partners' || first === 'about' || first === 'credits') && segments.length === 1) {
       return redirectTo(request, servicePathFor(request, `/nyc/${first}`), 307)
     }
     // Ellieo's own legal pages and contact (temporary: these may become Ellieo pages later)
