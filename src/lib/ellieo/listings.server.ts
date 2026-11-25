@@ -2,6 +2,8 @@ import { randomUUID } from 'node:crypto'
 
 import { getSupabaseServiceClient } from '@lib/supabase/server'
 
+import { activeLicense, licensedOwners } from './agentLicense.server'
+
 /**
  * Ellieo housing listings posted from the app (tables ellieo_listings / ellieo_files, made by
  * ellieo-app/shared/ellieo/db/retention.sql). The app shrinks photos before upload (≤1600 px + a 400 px thumb);
@@ -101,6 +103,10 @@ export type ListingInput = {
   /** In order; the first is the cover. */
   photos: { path: string; thumb: string }[]
   floorPlan?: string | null
+  /** Brokered listing (Licensed Agents only): the brokerage comes from the approved license. */
+  brokered?: boolean
+  /** Dollars the tenant pays the agent; 0 / null = no fee (NYC FARE Act: never the landlord's agent fee). */
+  brokerFee?: number | null
 }
 
 type ListingRow = {
@@ -143,6 +149,9 @@ function validate(input: ListingInput) {
   if (count < LISTING_RULES.photosMin || count > LISTING_RULES.photosMax) {
     fail(`Add ${LISTING_RULES.photosMin}–${LISTING_RULES.photosMax} photos.`, 'PHOTO_COUNT')
   }
+  if (input.brokered && input.brokerFee != null && (!Number.isInteger(input.brokerFee) || input.brokerFee < 0 || input.brokerFee > 100_000)) {
+    fail('Broker fee must be between $0 and $100,000.')
+  }
 }
 
 /** Only <b>, <u> and <br> survive (what the app's editor makes); everything else becomes plain text. */
@@ -156,6 +165,10 @@ export function cleanDetailsHtml(html: string | null | undefined) {
 
 export async function createListing(uid: string, input: ListingInput) {
   validate(input)
+  const license = input.brokered ? await activeLicense(uid) : null
+  if (input.brokered && !license) {
+    throw new ListingError('Brokered listings are for verified Licensed Agents.', 'AGENT_REQUIRED', 403)
+  }
   const paths = [...input.photos.flatMap((photo) => [photo.path, photo.thumb]), ...(input.floorPlan ? [input.floorPlan] : [])]
   if (new Set(paths).size !== paths.length) throw new ListingError('The same photo was sent twice.', 'INVALID')
 
@@ -185,6 +198,9 @@ export async function createListing(uid: string, input: ListingInput) {
       youtube_id: input.youtubeId || null,
       details_html: cleanDetailsHtml(input.detailsHtml),
       cover_thumb: input.photos[0].thumb,
+      ...(license
+        ? { brokered: true, brokerage: license.brokerage, broker_fee: input.brokerFee || 0, license_id: license.id }
+        : {}),
     } as never)
     .select(LISTING_COLUMNS)
     .single<ListingRow>()
@@ -206,7 +222,8 @@ export async function createListing(uid: string, input: ListingInput) {
       .eq('owner_id', uid)
     if (claimError) throw new ListingError(claimError.message, 'SAVE_FAILED', 500)
   }
-  return toPublic(listing, uid)
+  const [out] = await withBroker([toPublic(listing, uid)], [listing])
+  return out
 }
 
 const DAY = 86_400_000
@@ -239,7 +256,42 @@ function toPublic(row: ListingRow, viewer?: string | null) {
   }
 }
 
-export type PublicListing = ReturnType<typeof toPublic>
+export type PublicListing = ReturnType<typeof toPublic> & {
+  brokered?: boolean
+  brokerage?: string | null
+  brokerFee?: number | null
+  /** The poster is a verified Licensed Agent right now (badge). */
+  licensedAgent?: boolean
+}
+
+/**
+ * Brokered fields + the Licensed Agent badge, read apart from LISTING_COLUMNS so the board keeps working before
+ * agent_license.sql is run (then everything reads as not brokered).
+ */
+async function withBroker<T extends ReturnType<typeof toPublic>>(listings: T[], rows: Pick<ListingRow, 'id' | 'owner_id'>[]) {
+  if (listings.length === 0) return listings as (T & PublicListing)[]
+  const [extras, agents] = await Promise.all([
+    db()
+      .from('ellieo_listings')
+      .select('id, brokered, brokerage, broker_fee')
+      .in('id', rows.map((row) => row.id))
+      .returns<{ id: string; brokered: boolean; brokerage: string | null; broker_fee: number | null }[]>()
+      .then(({ data, error }) => (error ? [] : data ?? [])),
+    licensedOwners(rows.map((row) => row.owner_id)).catch(() => new Map()),
+  ])
+  const byId = new Map(extras.map((extra) => [extra.id, extra]))
+  const owners = new Map(rows.map((row) => [row.id, row.owner_id]))
+  return listings.map((listing) => {
+    const extra = byId.get(listing.id)
+    return {
+      ...listing,
+      brokered: Boolean(extra?.brokered),
+      brokerage: extra?.brokered ? extra.brokerage : null,
+      brokerFee: extra?.brokered ? extra.broker_fee ?? 0 : null,
+      licensedAgent: agents.has(owners.get(listing.id) ?? ''),
+    }
+  })
+}
 
 /** The board: live listings, newest first, plus the viewer's own expired one (for the repost bar). */
 export async function listListings(viewer: string | null, limit = 50) {
@@ -252,7 +304,7 @@ export async function listListings(viewer: string | null, limit = 50) {
     .limit(Math.min(Math.max(limit, 1), 100))
     .returns<ListingRow[]>()
   if (error) throw new ListingError(error.message, 'LOAD_FAILED', 500)
-  const listings = (data ?? []).map((row) => toPublic(row, viewer))
+  const listings = await withBroker((data ?? []).map((row) => toPublic(row, viewer)), data ?? [])
 
   let mineExpired: PublicListing[] = []
   if (viewer) {
@@ -288,7 +340,8 @@ export async function getListing(id: string, viewer: string | null) {
     photos.push({ url: publicFileUrl(file.path)!, thumbUrl: publicFileUrl(thumb?.path) })
   }
   const floorPlan = files?.find((file) => file.role === 'floor_plan')
-  return { ...toPublic(row, viewer), photos, floorPlanUrl: publicFileUrl(floorPlan?.path) }
+  const [listing] = await withBroker([toPublic(row, viewer)], [row])
+  return { ...listing, photos, floorPlanUrl: publicFileUrl(floorPlan?.path) }
 }
 
 export async function renewListing(id: string, uid: string) {

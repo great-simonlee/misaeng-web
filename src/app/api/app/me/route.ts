@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
+import { BRAND } from '@lib/brand'
 import { isMisaengEmail } from '@lib/constants/nyc'
+import { agentLicenseStateSafe } from '@lib/ellieo/agentLicense.server'
 import { getVerifiedSchool, resolveSchoolFromEmail } from '@lib/constants/schools'
 import { getSchoolRegistry } from '@lib/supabase/schoolRegistry.server'
 import { isPhoneSmsEnabled } from '@lib/constants/verificationSafety'
@@ -105,6 +107,8 @@ export async function GET(request: Request) {
         number: profile?.phone ?? user.phoneNumber ?? null,
         smsEnabled: isPhoneSmsEnabled(),
       },
+      // Ellieo: the Licensed Agent badge (none | pending | approved | rejected | expired, + type / brokerage / expiry).
+      ...(BRAND === 'ellieo' ? { agentLicense: await agentLicenseStateSafe(user.uid) } : {}),
     },
     { headers: { 'Cache-Control': 'no-store' } },
   )

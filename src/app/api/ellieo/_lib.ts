@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { BRAND } from '@lib/brand'
+import { AgentLicenseError } from '@lib/ellieo/agentLicense.server'
 import { ListingError } from '@lib/ellieo/listings.server'
 import { MessagingError } from '@lib/ellieo/messaging.server'
 
@@ -20,7 +21,7 @@ export function loginRequired() {
 }
 
 export function errorResponse(error: unknown, where: string) {
-  if (error instanceof ListingError || error instanceof MessagingError) {
+  if (error instanceof ListingError || error instanceof MessagingError || error instanceof AgentLicenseError) {
     return NextResponse.json({ error: error.message, code: error.code }, { status: error.status })
   }
   console.error(`Ellieo ${where} error:`, error)
