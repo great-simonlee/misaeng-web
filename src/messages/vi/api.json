@@ -67,7 +67,9 @@
     "nickname": {
       "tooShort": "Biệt danh phải có ít nhất {min} ký tự",
       "tooLong": "Biệt danh tối đa {max} ký tự",
-      "invalidChars": "Chỉ dùng chữ cái tiếng Anh và dấu \".\""
+      "invalidChars": "Chỉ dùng chữ cái tiếng Anh và dấu \".\"",
+      "dotEdge": "Biệt danh không được bắt đầu hoặc kết thúc bằng dấu \".\"",
+      "doubleDot": "Biệt danh không được có hai dấu \"..\" liền nhau"
     },
     "nicknameTaken": "Biệt danh này đã có người dùng. Vui lòng thử biệt danh khác.",
     "nicknameTakenShort": "Biệt danh này đã có người dùng.",

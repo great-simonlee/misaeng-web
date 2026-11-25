@@ -4,6 +4,7 @@ import { AuthProvider } from '@hooks/useAuth'
 import { ToastProvider } from '@hooks/useToast'
 import { ConsentLocaleProvider } from '@components/consent/ConsentLocaleProvider'
 import { ReconsentGate } from '@components/consent/ReconsentGate'
+import { NicknameResetGate } from '@components/NicknameResetGate'
 import { BRAND, BRAND_CONFIG } from '@lib/brand'
 import { LocaleProvider } from '@lib/i18n/client'
 import type { Locale } from '@lib/i18n/locales'
@@ -38,6 +39,7 @@ export function RootDocument({
         <ConsentLocaleProvider>
           <ToastProvider>
             {service ? <PreferredLocaleSync /> : null}
+            <NicknameResetGate />
             <SiteHeader />
 
             <SiteMain>

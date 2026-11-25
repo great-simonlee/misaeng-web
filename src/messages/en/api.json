@@ -73,7 +73,9 @@
     "nickname": {
       "tooShort": "Your nickname must be at least {min} characters",
       "tooLong": "Your nickname can be up to {max} characters",
-      "invalidChars": "Use only English letters and \".\""
+      "invalidChars": "Use only English letters and \".\"",
+      "dotEdge": "Your nickname can't start or end with \".\"",
+      "doubleDot": "Your nickname can't have \"..\" in a row"
     },
     "nicknameTaken": "That nickname is already taken. Please try another one.",
     "nicknameTakenShort": "That nickname is already taken.",

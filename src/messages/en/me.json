@@ -3,11 +3,23 @@
     "checkFailed": "Couldn't check that nickname.",
     "available": "This nickname is available",
     "taken": "That nickname is already taken.",
-    "ruleHint": "Use only English letters, Korean (Hangul) and \".\"",
+    "ruleHint": "English letters and \".\" only, 3–20 characters",
     "errors": {
       "tooShort": "Your nickname needs at least {min} characters",
       "tooLong": "Your nickname can be up to {max} characters",
-      "invalidChars": "Use only English letters, Korean (Hangul) and \".\""
+      "invalidChars": "Use only English letters and \".\"",
+      "dotEdge": "Your nickname can't start or end with \".\"",
+      "doubleDot": "Your nickname can't have \"..\" in a row"
+    },
+    "reset": {
+      "title": "Choose a new nickname",
+      "body": "Nicknames can now use only English letters and \".\". Your current nickname \"{nickname}\" can't be used anymore, so please pick a new one to continue.",
+      "label": "New nickname",
+      "placeholder": "e.g. alex.kim",
+      "save": "Save and continue",
+      "saving": "Saving…",
+      "saved": "Your nickname was updated",
+      "logout": "Log out"
     }
   },
   "profile": {
