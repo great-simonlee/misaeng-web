@@ -15,7 +15,6 @@ import {
 import {
   isProxyNicknameLanguage,
   randomProxyNickname,
-  type ProxyNicknameLanguage,
 } from '@lib/community/proxyAuthor'
 import { isValidNickname } from '@lib/constants/profile'
 import { parseLocale } from '@lib/i18n/locales'
@@ -47,9 +46,9 @@ function authorized(request: Request) {
 
 const bad = (error: string, status = 400) => NextResponse.json({ error }, { status })
 
-async function freeNickname(language: ProxyNicknameLanguage): Promise<string | null> {
+async function freeNickname(): Promise<string | null> {
   for (let attempt = 0; attempt < 30; attempt += 1) {
-    const candidate = randomProxyNickname(language)
+    const candidate = randomProxyNickname()
     if (!(await isNicknameTakenByOther(candidate, null))) return candidate
   }
   return null
@@ -59,7 +58,8 @@ export async function GET(request: Request) {
   if (!authorized(request)) return bad('Unauthorized', 401)
   const language = new URL(request.url).searchParams.get('language')
   if (!isProxyNicknameLanguage(language)) return bad('language must be ko or en')
-  const nickname = await freeNickname(language)
+  // ko or en both get an English nickname now (members' rule since 2026-11-25)
+  const nickname = await freeNickname()
   if (!nickname) return bad('No free nickname found. Try again.', 503)
   return NextResponse.json({ nickname })
 }
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
   const body = ((await request.json().catch(() => null)) || {}) as Record<string, unknown>
 
   const nickname = String(body.nickname || '').trim()
-  if (!isValidNickname(nickname)) return bad('Nickname must be 2-20 Korean or English letters.')
+  if (!isValidNickname(nickname)) return bad('Nickname must be 3-20 English letters or ".", with no "." at the start or end and no "..".')
   const addedBy = String(body.addedBy || '').trim().toLowerCase()
   if (!addedBy) return bad('addedBy is required.')
   const sourceLocale = parseLocale(String(body.sourceLocale || '')) ?? 'ko'

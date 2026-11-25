@@ -74,6 +74,8 @@ export async function PATCH(request: Request) {
             min: 'min' in nicknameIssue ? nicknameIssue.min : undefined,
             max: 'max' in nicknameIssue ? nicknameIssue.max : undefined,
           }),
+          code: 'NICKNAME_INVALID',
+          reason: nicknameIssue.code,
         },
         { status: 400 },
       )

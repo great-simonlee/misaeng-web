@@ -36,6 +36,8 @@ export async function GET(request: Request) {
           min: 'min' in issue ? issue.min : undefined,
           max: 'max' in issue ? issue.max : undefined,
         }),
+        code: 'NICKNAME_INVALID',
+        reason: issue.code,
       })
     }
   }

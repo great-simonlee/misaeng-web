@@ -73,7 +73,9 @@
     "nickname": {
       "tooShort": "닉네임은 {min}자 이상이어야 해요",
       "tooLong": "닉네임은 {max}자까지예요",
-      "invalidChars": "영문 알파벳과 \".\" 만 사용할 수 있어요"
+      "invalidChars": "영문 알파벳과 \".\" 만 사용할 수 있어요",
+      "dotEdge": "\".\"로 시작하거나 끝날 수 없어요",
+      "doubleDot": "\".\"을 두 번 연달아 쓸 수 없어요"
     },
     "nicknameTaken": "이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요.",
     "nicknameTakenShort": "이미 사용 중인 닉네임이에요.",

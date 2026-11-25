@@ -4,6 +4,7 @@ import { AuthProvider } from '@hooks/useAuth'
 import { ToastProvider } from '@hooks/useToast'
 import { ConsentLocaleProvider } from '@components/consent/ConsentLocaleProvider'
 import { ReconsentGate } from '@components/consent/ReconsentGate'
+import { NicknameResetGate } from '@components/NicknameResetGate'
 import { AnalyticsTracker } from '@components/analytics/AnalyticsTracker'
 import { BRAND } from '@lib/brand'
 import { LocaleProvider } from '@lib/i18n/client'
@@ -37,6 +38,7 @@ export function RootDocument({
           <ToastProvider>
             {service ? <PreferredLocaleSync /> : null}
             {service && BRAND === 'misaeng' ? <ProfileSetupPrompt /> : null}
+            <NicknameResetGate />
             <SiteHeader />
 
             <SiteMain>
