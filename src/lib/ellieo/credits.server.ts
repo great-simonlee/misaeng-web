@@ -244,8 +244,8 @@ export async function quotePack(input: { uid: string; packId: string; code?: str
 
 /** Stripe Checkout for one pack; returns the Stripe page URL. */
 export async function createCheckout(input: { uid: string; packId: string; origin: string; locale: string; code?: string | null }) {
-  if (!paymentsEnabled()) throw new CreditsError('Payments are coming soon.', 'PAYMENTS_OFF', 503)
   if (await isInHouse(input.uid)) throw inHouseNoPurchase()
+  if (!paymentsEnabled()) throw new CreditsError('Payments are coming soon.', 'PAYMENTS_OFF', 503)
   const config = await getCreditsConfig()
   const quote = await quotePack({ uid: input.uid, packId: input.packId, code: input.code })
   const pack = quote.pack
