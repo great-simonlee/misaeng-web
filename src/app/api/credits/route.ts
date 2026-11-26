@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { isAppleCreditsConfigured } from '@lib/agents/appleCredits.server'
-import { getCreditsConfig, quotePack } from '@lib/agents/credits.server'
+import { getCreditsConfig, googleProductIdOf, quotePack } from '@lib/agents/credits.server'
+import { isGoogleCreditsConfigured } from '@lib/agents/googleCredits.server'
 import { isInHouse } from '@lib/agents/inHouse.server'
 import { creditBalance, creditLedger } from '@lib/agents/listingPlans.server'
 
@@ -12,7 +13,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * My credits: { balance: { paid, staff, debt, total }, ledger, inHouse, canBuy, packs: [{ id, credits, bonusCredits,
- * priceCents, appleProductId, offers }], appStore, topUp: { ios, android } }. A member with no rows gets a real zero
+ * priceCents, appleProductId, googleProductId, offers }], appStore, playStore, topUp: { ios, android } }. A member with no rows gets a real zero
  * balance (never sample numbers). In-house members: staff credits only, canBuy = false (no Top up).
  */
 export async function GET() {
@@ -36,6 +37,7 @@ export async function GET() {
               bonusCredits: quote?.bonusCredits ?? 0,
               priceCents: pack.priceCents,
               appleProductId: pack.appleProductId ?? null,
+              googleProductId: googleProductIdOf(pack),
               offers: quote?.offers ?? [],
             }
           }),
@@ -48,6 +50,7 @@ export async function GET() {
         canBuy: !inHouse,
         packs,
         appStore: isAppleCreditsConfigured(),
+        playStore: isGoogleCreditsConfigured(),
         topUp: { ios: !inHouse && config.topUpLinkIOS, android: !inHouse && config.topUpLinkAndroid },
       },
       { headers: { 'Cache-Control': 'no-store' } },

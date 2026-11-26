@@ -35,7 +35,13 @@ import { readCreditEvent } from './stripeWebhook'
  *              again on the web; receipts use a signed link (?k=) so they can be opened and printed anywhere.
  */
 
-export type CreditPack = { id: string; priceCents: number; credits: number; appleProductId?: string }
+/** appleProductId = App Store consumable; googleProductId = Play one-time product (defaults to the App Store id). */
+export type CreditPack = { id: string; priceCents: number; credits: number; appleProductId?: string; googleProductId?: string }
+
+/** The Play product id of a pack: its own googleProductId, else the same id as on the App Store. */
+export function googleProductIdOf(pack: CreditPack) {
+  return pack.googleProductId ?? pack.appleProductId ?? null
+}
 export type CreditsConfig = {
   packs: CreditPack[]
   salesTaxRate: number
@@ -76,6 +82,7 @@ function validConfig(v: unknown): v is CreditsConfig {
     if (!Number.isInteger(pack.priceCents) || pack.priceCents < 50 || pack.priceCents > 100_000) return false
     if (!Number.isInteger(pack.credits) || pack.credits < 1 || pack.credits > 100_000) return false
     if (pack.appleProductId !== undefined && !/^[a-z0-9._-]{3,100}$/i.test(pack.appleProductId)) return false
+    if (pack.googleProductId !== undefined && !/^[a-z0-9._]{3,100}$/.test(pack.googleProductId)) return false
   }
   return (
     typeof c.salesTaxRate === 'number' && c.salesTaxRate >= 0 && c.salesTaxRate < 0.25 &&
@@ -365,11 +372,13 @@ export async function handleStripeEvent(event: { type?: string; data?: { object?
 export type PurchaseRow = {
   id: string
   user_id: string
-  provider: 'stripe' | 'apple'
+  provider: 'stripe' | 'apple' | 'google'
   stripe_session_id: string | null
   stripe_payment_intent: string | null
   apple_transaction_id: string | null
   apple_environment: string | null
+  google_order_id?: string | null
+  google_environment?: string | null
   product_id: string | null
   pack_id: string
   credits: number
@@ -443,6 +452,9 @@ export async function decideRefund(input: { purchaseId: string; approve: boolean
   }
   if (purchase.provider === 'apple') {
     throw new CreditsError('App Store purchases are refunded by Apple (reportaproblem.apple.com); the credits are taken back automatically.', 'NOT_REFUNDABLE', 409)
+  }
+  if (purchase.provider === 'google') {
+    throw new CreditsError('Google Play purchases are refunded in the Play Console or by Google; the credits are taken back automatically.', 'NOT_REFUNDABLE', 409)
   }
   if (!(await isRefundable(purchase.id))) {
     throw new CreditsError('Not refundable any more (some credits were used, or it is past the refund window).', 'NOT_REFUNDABLE', 409)

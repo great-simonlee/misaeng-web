@@ -66,7 +66,7 @@ function purchaseOut(row: Awaited<ReturnType<typeof listPurchases>>[number]) {
     buyerName: row.buyer_name,
     buyerEmail: row.buyer_email,
     brokerage: row.brokerage,
-    card: row.provider === 'apple' ? `App Store${row.apple_environment && row.apple_environment !== 'Production' ? ` (${row.apple_environment})` : ''}` : row.card_last4 ? `${row.card_brand ?? 'card'} ·${row.card_last4}` : null,
+    card: row.provider === 'apple' ? `App Store${row.apple_environment && row.apple_environment !== 'Production' ? ` (${row.apple_environment})` : ''}` : row.provider === 'google' ? `Google Play${row.google_environment === 'test' ? ' (test)' : ''}` : row.card_last4 ? `${row.card_brand ?? 'card'} ·${row.card_last4}` : null,
     refundReason: row.refund_reason,
     refundRequestedAt: row.refund_requested_at,
     refundDecidedBy: row.refund_decided_by,

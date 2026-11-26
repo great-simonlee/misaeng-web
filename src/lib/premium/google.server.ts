@@ -32,7 +32,8 @@ import { getPointsConfig } from '@lib/points/config.server'
 
 export const GOOGLE_PRODUCT_ID = 'misaeng_premium'
 const BASE_PLANS: Record<string, PremiumPlan> = { monthly: 'monthly', season: 'season', annual: 'annual' }
-const API = 'https://androidpublisher.googleapis.com/androidpublisher/v3/applications'
+export const PLAY_API = 'https://androidpublisher.googleapis.com/androidpublisher/v3/applications'
+const API = PLAY_API
 
 export class GooglePlayError extends Error {
   constructor(
@@ -106,7 +107,8 @@ async function ownerOfGoogleAccount(accountId: string | undefined): Promise<stri
 
 let cachedToken: { value: string; exp: number } | null = null
 
-async function accessToken(): Promise<string> {
+/** OAuth token for the Play Developer API (shared with Misaeng credits: src/lib/agents/googleCredits.server.ts). */
+export async function accessToken(): Promise<string> {
   if (cachedToken && cachedToken.exp > Date.now() + 60_000) return cachedToken.value
   const sa = serviceAccount()
   if (!sa) throw new GooglePlayError('Google Play purchases are not configured.', 503)
