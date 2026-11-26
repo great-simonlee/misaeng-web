@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 
 import { getSupabaseServiceClient } from '@lib/supabase/server'
-import type { HousingListing, HousingRoomType } from '@/types/nyc'
+import type { HousingListing, HousingRoomType, HousingUnitType } from '@/types/nyc'
 
 import { activeLicense, licensedOwners, licenseTypeLabel } from './agentLicense.server'
 import { creditsEnabled } from './creditsCore.server'
@@ -507,12 +507,22 @@ export async function purgeDueFiles(batch = 500) {
 
 // MARK: - Misaeng housing feed (agent listings next to Misaeng's own ERP listings)
 
-const KIND_UNIT: Record<string, { unitType: string; room: HousingRoomType | null }> = {
-  privateRoom: { unitType: 'room', room: 'regular-bedroom' },
-  sharedRoom: { unitType: 'room', room: 'regular-bedroom' },
-  studio: { unitType: 'studio', room: 'studio' },
-  apartment: { unitType: 'entire', room: 'entire' },
-  sublet: { unitType: 'sublet', room: null },
+/** A room listing prices one bedroom; a whole unit is priced by the unit rent row alone (no duplicate room row). */
+const KIND_ROOM: Record<string, HousingRoomType | null> = {
+  privateRoom: 'regular-bedroom',
+  sharedRoom: 'regular-bedroom',
+  studio: null,
+  apartment: null,
+  sublet: null,
+}
+
+/** HousingUnitType from beds / baths (the apps and web label these: studio, 1b1b … 4-plus). */
+function unitTypeOf(kind: string, beds: number, baths: number): HousingUnitType {
+  if (kind === 'studio' || beds < 1) return 'studio'
+  if (beds === 1) return '1b1b'
+  if (beds === 2) return baths >= 2 ? '2b2b' : '2b1b'
+  if (beds === 3) return baths >= 2 ? '3b2b' : '3b1b'
+  return '4-plus'
 }
 
 function plainDetails(html: string | null) {
@@ -533,8 +543,9 @@ function toHousingListing(
   photos: string[],
   extra: { brokerFee: number | null; listedBy: ListingDisclosure | null; premium: boolean },
 ): HousingListing {
-  const unit = KIND_UNIT[row.kind] ?? KIND_UNIT.apartment
+  const room = KIND_ROOM[row.kind] ?? null
   const beds = row.beds ?? (row.kind === 'studio' ? 0 : 1)
+  const baths = row.baths == null ? 1 : Number(row.baths)
   const posted = new Date(row.posted_at).getTime()
   return {
     id: `agent-${row.id}`,
@@ -554,15 +565,15 @@ function toHousingListing(
     unit: {
       unitNumber: null,
       bedrooms: beds,
-      bathrooms: row.baths == null ? 1 : Number(row.baths),
+      bathrooms: baths,
       price: row.rent,
       availableDate: row.move_in,
       available: true,
-      rooms: unit.room ? [{ type: unit.room, price: row.rent }] : [],
+      rooms: room ? [{ type: room, price: row.rent }] : [],
       promotions: [],
       images: photos,
       youtubeUrl: row.youtube_id ? `https://www.youtube.com/watch?v=${row.youtube_id}` : null,
-      unitType: (unit.unitType as HousingListing['unit']['unitType']) ?? null,
+      unitType: unitTypeOf(row.kind, beds, baths),
     },
     description: plainDetails(row.details_html),
     roommateWaiting: null,
