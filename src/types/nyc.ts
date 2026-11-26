@@ -222,6 +222,28 @@ export interface HousingListing extends TranslationFields {
   status: PostStatus
   /** 보는 언어로 바꾼 결과 (API 응답에만 있음, src/lib/translations) */
   i18n?: ContentI18n
+  /**
+   * NY 광고 표시 (19 NYCRR 175.25): 누가 중개하는지 — 브로커리지, 담당 에이전트 이름·면허 종류, 연락처.
+   * Misaeng 자체(ERP) 매물은 ERP 담당 에이전트 + misaeng_settings 'brokerage'(Fact Real Estate), 에이전트 매물은 승인된 면허.
+   */
+  listedBy?: HousingListedBy | null
+  /** 세입자가 내는 비용 (NYC FARE Act). brokerFee 0 = 중개 수수료 없음 */
+  tenantFees?: { brokerFee: number } | null
+  /** 에이전트 매물 (src/lib/agents/listings.server.ts): misaeng_listings id, Premium, 만료 */
+  agentListing?: { id: string; premium: boolean; expiresAt: string; period: string } | null
+}
+
+export type HousingListedBy = {
+  brokerage: string
+  agentName: string | null
+  licenseType: string | null
+  /** "Licensed Real Estate Salesperson" 등 */
+  licenseLabel: string | null
+  phone: string | null
+  email: string | null
+  responsibleBroker?: string | null
+  officeAddress?: string | null
+  source: 'agent' | 'misaeng'
 }
 
 /** @deprecated HousingListing 사용 */

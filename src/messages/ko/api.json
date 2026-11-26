@@ -498,6 +498,16 @@
         "lastTitle": "마지막 미생 소식이에요",
         "lastBody": "오늘 새 채용 공고 {postings}개, 새 비자 소식 {visaNews}건. 자녀는 앞으로도 알림을 계속 받아요."
       }
+    },
+    "agentLicense": {
+      "approved": {
+        "title": "부동산 에이전트 인증이 완료됐어요",
+        "body": "NY 면허가 확인됐어요 (유효 {until}). 이제 매물을 올릴 수 있어요."
+      },
+      "rejected": {
+        "title": "에이전트 인증이 반려됐어요",
+        "body": "마이페이지에서 사유를 확인하고 다시 신청해 주세요."
+      }
     }
   },
   "reviewDocs": {

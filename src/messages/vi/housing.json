@@ -577,5 +577,13 @@
     "rent": "Rent",
     "roommate": "Roommates & sublets",
     "aria": "Housing type"
+  },
+  "listedBy": {
+    "title": "Đăng bởi",
+    "licensedAgent": "Licensed Agent",
+    "brokerFee": "Phí môi giới người thuê trả: {amount}",
+    "noFee": "Người thuê không trả phí môi giới",
+    "fairHousing": "Thông báo Nhà ở Công bằng",
+    "disclosure": "Thông báo chống phân biệt đối xử về nhà ở của NY"
   }
 }

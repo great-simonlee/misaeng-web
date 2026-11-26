@@ -828,6 +828,55 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
       ],
     },
     {
+      id: 'agent-credits',
+      title: '14A. Licensed Agent Accounts, Credits, and Paid Listings',
+      titleKo: '14A. 라이선스 에이전트 계정, 크레딧 및 유료 매물',
+      blocks: [
+        {
+          type: 'p',
+          en: 'This Section applies to Misaeng’s Licensed Agent accounts. New York real-estate licensees may apply to post housing listings on Misaeng. Licensed Agent status on Misaeng is reviewed and granted separately from any other service of the Company. Misaeng credits (“Credits”) are a prepaid balance used only for Licensed Agent listings and Premium placement on Misaeng. They are separate from Misaeng Points (Section 13) and from credits on any other service, and can never be converted into or from them.',
+          ko: '본 조는 미생의 라이선스 에이전트 계정에 적용됩니다. 뉴욕주 부동산 면허 소지자는 미생에 매물을 게시하기 위해 신청할 수 있으며, 미생의 라이선스 에이전트 자격은 회사의 다른 서비스와 별도로 심사·부여됩니다. 미생 크레딧(이하 “크레딧”)은 미생의 라이선스 에이전트 매물과 Premium 노출에만 쓰이는 선불 잔액으로, 미생 포인트(제13조) 및 다른 서비스의 크레딧과 별개이며 서로 전환할 수 없습니다.',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Verification. To apply, you provide your NY license number, license type, name as on the license, brokerage, business contact, and photos of your license or pocket card, a government ID, and a selfie. Staff review them manually against the New York Department of State record; we do not create face templates or use automated facial recognition. The photos are kept in private storage, seen only by authorized staff, and deleted 30 days after the decision (see the Privacy Policy). Status ends when the license expires.',
+              ko: '인증. 신청 시 뉴욕 면허 번호, 면허 종류, 면허상 이름, 소속 브로커리지, 업무 연락처와 함께 면허증(또는 포켓 카드), 정부 발급 신분증, 셀카 사진을 제출합니다. 직원이 뉴욕주 국무부(DOS) 기록과 수동으로 대조하며, 얼굴 템플릿을 만들거나 자동 얼굴 인식을 사용하지 않습니다. 사진은 비공개 저장소에 보관되어 권한 있는 직원만 볼 수 있고, 결정 후 30일이 지나면 삭제됩니다(개인정보처리방침 참고). 면허가 만료되면 자격도 종료됩니다.',
+            },
+            {
+              en: 'Credit packs. Credits can be obtained only by buying a credit pack (US$1 = 10 Credits), shown with its price, any bonus Credits, and any applicable tax before you pay (for example, US$9.99 for 100 Credits, US$19.99 for 220, US$39.99 for 460, and US$79.99 for 960). Web purchases are processed by Stripe and purchases in the Misaeng iOS app by Apple through the App Store; we do not store your full card number. Bonus Credits from a promotion are part of the purchase they come with. Credits you buy do not expire, and the Company does not give free Credits except staff Credits below.',
+              ko: '크레딧 패키지. 크레딧은 크레딧 패키지를 구매해야만 얻을 수 있으며(US$1 = 10크레딧), 결제 전에 가격·보너스 크레딧·적용 세금이 표시됩니다(예: US$9.99에 100크레딧, US$19.99에 220, US$39.99에 460, US$79.99에 960). 웹 결제는 Stripe가, 미생 iOS 앱 내 결제는 App Store를 통해 Apple이 처리하며 회사는 카드 번호 전체를 저장하지 않습니다. 프로모션 보너스 크레딧은 함께 받은 구매의 일부입니다. 구매한 크레딧은 소멸하지 않으며, 아래 스태프 크레딧 외에 회사는 무상 크레딧을 지급하지 않습니다.',
+            },
+            {
+              en: 'Refunds. You may request a full refund of a credit pack bought on the web within 7 days of purchase if none of that pack’s Credits has been used; partial refunds are not available. App Store purchases are refunded by Apple under Apple’s policies. If a purchase is refunded or charged back after some of its Credits were used, the used Credits are taken from your other Credits, and any amount still owed must be paid before you can spend Credits again. Credits cannot be exchanged for cash, transferred, or sold.',
+              ko: '환불. 웹에서 구매한 크레딧 패키지는 구매 후 7일 이내이고 그 패키지의 크레딧을 하나도 사용하지 않은 경우에 한해 전액 환불을 요청할 수 있으며, 부분 환불은 제공하지 않습니다. App Store 구매는 Apple의 정책에 따라 Apple이 환불합니다. 크레딧 일부를 사용한 뒤 구매가 환불되거나 지급 거절된 경우 사용한 크레딧만큼 다른 크레딧에서 차감되며, 부족분을 결제하기 전에는 크레딧을 사용할 수 없습니다. 크레딧은 현금으로 바꾸거나 양도·판매할 수 없습니다.',
+            },
+            {
+              en: 'Discounts and bonuses. The Company may offer discounts on packs or listings, or bonus Credits on a purchase, for a limited time or to certain members. Each offer shows its terms before you pay, and offers cannot be combined unless stated.',
+              ko: '할인 및 보너스. 회사는 기간 또는 대상 회원을 정해 패키지·매물 할인이나 구매 보너스 크레딧을 제공할 수 있습니다. 각 혜택의 조건은 결제 전에 표시되며, 따로 명시하지 않는 한 중복 적용되지 않습니다.',
+            },
+            {
+              en: 'Company accounts. Accounts of the Company’s staff and affiliated brokerages, identified by a verified company email, use staff Credits provided each month. Staff Credits have no cash value, cannot be bought, refunded or transferred, expire when the next month’s Credits are provided, and are removed when the person leaves, at which time their listings are deleted. Company accounts may hold only a limited share of Premium spots and still need Licensed Agent verification.',
+              ko: '회사 계정. 인증된 회사 이메일로 확인되는 회사 직원 및 관계 중개회사의 계정은 매월 제공되는 스태프 크레딧을 사용합니다. 스태프 크레딧은 현금 가치가 없고 구매·환불·양도할 수 없으며, 다음 달 크레딧이 제공될 때 소멸하고, 퇴사 시 삭제되며 그때 해당 계정의 매물도 삭제됩니다. 회사 계정은 Premium 자리 중 일부만 사용할 수 있고, 라이선스 에이전트 인증도 동일하게 받아야 합니다.',
+            },
+            {
+              en: 'Paid listings. Listings are shown for the period you pay for. Premium (Boost) days run from the moment they start and are not refunded if you mark the listing as rented, delete it, or the Company removes it for violating these Terms.',
+              ko: '유료 매물. 매물은 결제한 기간 동안 노출됩니다. Premium(Boost) 기간은 시작 시점부터 진행되며, 회원이 거래 완료로 표시하거나 삭제한 경우, 또는 본 약관 위반으로 회사가 삭제한 경우 남은 기간은 환불되지 않습니다.',
+            },
+            {
+              en: 'Your responsibilities. Each listing shows your name, license type, brokerage, and business contact, and any fee the tenant must pay. You are responsible for its accuracy and for complying with New York advertising rules (including 19 NYCRR 175.25), the NYC FARE Act, and fair-housing laws (see Sections 9 and 11). Members can report listings; the Company may remove listings and suspend Licensed Agent status for violations.',
+              ko: '회원의 책임. 각 매물에는 회원의 이름, 면허 종류, 브로커리지, 업무 연락처와 임차인이 부담하는 수수료가 표시됩니다. 회원은 매물 정보의 정확성과 뉴욕주 광고 규정(19 NYCRR 175.25 포함), 뉴욕시 FARE Act, 공정주택 법령 준수(제9조, 제11조 참고)에 책임을 집니다. 다른 회원이 매물을 신고할 수 있으며, 위반 시 회사는 매물을 삭제하고 라이선스 에이전트 자격을 정지할 수 있습니다.',
+            },
+            {
+              en: 'Changes. The Company may change prices, packs, and paid features for future purchases. Credits you have already bought keep their value.',
+              ko: '변경. 회사는 이후 구매분에 대해 가격·패키지·유료 기능을 변경할 수 있습니다. 이미 구매한 크레딧의 가치는 유지됩니다.',
+            },
+          ],
+        },
+      ],
+    },
+    {
       id: 'ip',
       title: '15. Company Intellectual Property',
       titleKo: '15. 회사의 지식재산권',

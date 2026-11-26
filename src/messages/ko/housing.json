@@ -565,5 +565,13 @@
     "rent": "렌트",
     "roommate": "룸메이트·서블렛",
     "aria": "하우징 종류"
+  },
+  "listedBy": {
+    "title": "중개 정보",
+    "licensedAgent": "라이선스 에이전트",
+    "brokerFee": "세입자 중개 수수료 {amount}",
+    "noFee": "세입자 중개 수수료 없음",
+    "fairHousing": "공정주택 안내 (Fair Housing Notice)",
+    "disclosure": "NY 주택 차별 금지 안내서"
   }
 }

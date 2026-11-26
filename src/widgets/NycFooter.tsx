@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useCityInfo, useCityPath } from '@hooks/useCity'
 import { BRAND_CONFIG, brandConfig } from '@lib/brand'
 import { useT } from '@lib/i18n/client'
+import { FAIR_HOUSING_NOTICE_URL } from '@widgets/nyc/HousingListedBy'
 
 /** 문구: nav.footer.links.<key> */
 const COMMUNITY_LINK_PATHS = [
@@ -160,6 +161,18 @@ export function NycFooter() {
               >
                 Privacy Policy
               </Link>
+              <span className='text-white/20' aria-hidden>
+                ·
+              </span>
+              {/* Brokerage advertising (owner 11-26): NY DOS Fair Housing Notice on every page */}
+              <a
+                href={FAIR_HOUSING_NOTICE_URL}
+                target='_blank'
+                rel='noreferrer'
+                className='text-white/45 touch-manipulation transition hover:text-white'
+              >
+                Fair Housing Notice
+              </a>
             </nav>
           </div>
           <div className='flex items-center gap-1.5'>

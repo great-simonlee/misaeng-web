@@ -396,6 +396,43 @@ export const NYC_PRIVACY_POLICY: LegalDocument = {
       ],
     },
     {
+      id: 'agent-verification-privacy',
+      title: '5A. Licensed Agent Verification (ID and Selfie)',
+      titleKo: '5A. 라이선스 에이전트 인증 (신분증·셀카)',
+      blocks: [
+        {
+          type: 'p',
+          en: 'If you apply for a Licensed Agent account, we collect your NY real-estate license number and type, the name on the license, brokerage, business contact, license expiration date, and three photos: your license or pocket card, a government-issued ID, and a selfie taken in the app. We ask for your consent on the application screen before the photos are sent, and record when you agreed.',
+          ko: '라이선스 에이전트 계정을 신청하면 뉴욕 부동산 면허 번호와 종류, 면허상 이름, 브로커리지, 업무 연락처, 면허 만료일, 그리고 사진 3장(면허증 또는 포켓 카드, 정부 발급 신분증, 앱에서 찍은 셀카)을 수집합니다. 사진을 보내기 전에 신청 화면에서 동의를 받고, 동의한 시점을 기록합니다.',
+        },
+        {
+          type: 'ul',
+          items: [
+            {
+              en: 'Purpose: only to confirm that you are the licensee named in the New York Department of State record, to prevent impersonation and fraudulent listings, and to show your name, license type, brokerage and business contact on your listings as New York advertising rules require.',
+              ko: '목적: 회원이 뉴욕주 국무부 기록상의 면허 소지자 본인인지 확인하고, 사칭과 허위 매물을 막으며, 뉴욕 광고 규정에 따라 매물에 이름·면허 종류·브로커리지·업무 연락처를 표시하기 위해서만 사용합니다.',
+            },
+            {
+              en: 'Manual review only: authorized staff compare the photos by eye. We do not create face geometry, face templates, or other biometric identifiers, and we do not use automated facial recognition.',
+              ko: '수동 심사만: 권한 있는 직원이 눈으로 사진을 비교합니다. 얼굴 형상·얼굴 템플릿 등 생체 식별자를 만들지 않으며 자동 얼굴 인식을 사용하지 않습니다.',
+            },
+            {
+              en: 'Storage and access: the photos are kept in a private storage bucket, never published, and opened only through short-lived links by staff with the review permission.',
+              ko: '보관과 접근: 사진은 비공개 저장소에 보관되며 공개되지 않고, 심사 권한이 있는 직원만 짧은 시간 동안 유효한 링크로 열람합니다.',
+            },
+            {
+              en: 'Retention: the three photos are deleted 30 days after we approve or reject the application. The license details (not the photos) are kept while your Licensed Agent status is active and as required for our records.',
+              ko: '보관 기간: 사진 3장은 신청을 승인하거나 반려한 날로부터 30일 후 삭제됩니다. 면허 정보(사진 제외)는 라이선스 에이전트 자격이 유지되는 동안, 그리고 기록 보관에 필요한 범위에서 보관합니다.',
+            },
+            {
+              en: 'Sharing: we do not sell or share these photos. We may disclose them only if required by law.',
+              ko: '제공: 이 사진은 판매하거나 공유하지 않으며, 법률상 요구되는 경우에만 제공할 수 있습니다.',
+            },
+          ],
+        },
+      ],
+    },
+    {
       id: 'purpose',
       title: '6. How We Use Information',
       titleKo: '6. 이용 목적',

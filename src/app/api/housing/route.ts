@@ -10,6 +10,8 @@ import { getListingArea } from '@lib/constants/housingMock'
 import { matchesHousingFilter, readHousingFilter } from '@lib/housing/listFilter'
 import { normalizeHousingListing } from '@lib/housing/normalize'
 import type { HousingListing } from '@/types/nyc'
+import { agentHousingListings } from '@lib/agents/listings.server'
+import { getBrokerageSettings, withMisaengDisclosure } from '@lib/agents/brokerage.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -19,10 +21,16 @@ export async function GET(request: Request) {
     const params = new URL(request.url).searchParams
     const city = parseCityId(params.get('city'))
     const locale = await getRequestLocale(request)
-    const listings = localizeListings(
-      await listStoredHousingListings(city ?? undefined),
-      locale,
-    ).map(toPublicHousingListing)
+    const [stored, agents, brokerage] = await Promise.all([
+      listStoredHousingListings(city ?? undefined),
+      agentHousingListings(city),
+      getBrokerageSettings(),
+    ])
+    // Misaeng's own (ERP) listings get the brokerage disclosure; licensed agents' listings (Premium first) carry their own.
+    const listings = [
+      ...agents,
+      ...localizeListings(withMisaengDisclosure(stored, brokerage), locale),
+    ].map(toPublicHousingListing)
     // ?limit= (web list, owner 11-23): open listings newest first, filtered here, one page at a time.
     // Without it the full list as before (apps, hub).
     const limit = pageLimit(params.get('limit'))

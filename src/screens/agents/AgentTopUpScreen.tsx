@@ -1,0 +1,242 @@
+'use client'
+
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+
+/**
+ * misaeng.com/credits — buy credit packs with Stripe Checkout (the app's "Top up" opens this with a signed ?t= token).
+ * Payments stay off until Misaeng's Stripe keys are set: then this shows "Payments coming soon".
+ */
+
+export type TopUpPack = {
+  id: string
+  priceCents: number
+  credits: number
+  bonus: number
+  hint: string
+  hintVi: string
+}
+
+const TEXT = {
+  ko: {
+    title: '크레딧 충전',
+    lead: '크레딧은 Misaeng에서 라이선스 에이전트 매물 등록과 Premium(Boost)에 쓰여요. 구매한 크레딧은 만료되지 않아요.',
+    soon: '결제 준비 중',
+    soonBody: '웹 결제는 곧 열려요. 지금은 Misaeng iPhone 앱에서 크레딧을 살 수 있어요. 문의: info@misaeng.com',
+    bonus: (n: number) => `+${n} 보너스`,
+    buy: '구매',
+    credits: '크레딧',
+    tax: (rate: string) => `결제 시 판매세(${rate}%)가 더해져요.`,
+    signIn: '앱에서 Misaeng을 열고 충전을 누르거나, misaeng.com에 로그인해 크레딧을 구매하세요.',
+    paid: '결제가 완료됐어요. 곧 크레딧이 들어와요.',
+    added: (n: number) => `${n} 크레딧이 충전됐어요.`,
+    receipt: '영수증 보기',
+    canceled: '결제가 취소됐어요. 청구된 금액은 없어요.',
+    summaryTitle: '알아두세요',
+    summary: [
+      '$1 = 10 크레딧. 크레딧은 구매로만 생기고(구매 보너스 포함) 만료되지 않아요.',
+      '환불: 구매 후 7일 이내, 그 팩의 크레딧을 하나도 쓰지 않았을 때만 전액 환불돼요 (영수증에서 요청).',
+      '임대 완료 처리하거나 규정 위반으로 내려간 매물의 Premium(Boost) 일수는 환불되지 않아요.',
+      '라이선스 에이전트는 매물 정확성, 공정주택·광고 규정(브로커리지 이름, 비용 표시)에 책임이 있어요.',
+    ],
+    terms: '약관: Misaeng 크레딧과 유료 매물',
+    error: '문제가 생겼어요. 다시 시도해 주세요.',
+    code: '프로모션 코드',
+    codePlaceholder: '선택',
+  },
+  en: {
+    title: 'Top up credits',
+    lead: 'Credits pay for licensed agent listings and Premium (Boost) on Misaeng. Paid credits never expire.',
+    soon: 'Payments coming soon',
+    soonBody: 'Buying credits online opens soon. You can buy credits in the Misaeng iPhone app now. Questions? Email info@misaeng.com.',
+    bonus: (n: number) => `+${n} bonus`,
+    buy: 'Buy',
+    credits: 'credits',
+    tax: (rate: string) => `Sales tax (${rate}%) is added at checkout.`,
+    signIn: 'Open Misaeng in the app and tap Top up, or sign in on misaeng.com to buy credits.',
+    paid: 'Payment received — your credits will appear in a moment.',
+    added: (n: number) => `${n} credits added to your account.`,
+    receipt: 'View receipt',
+    canceled: 'Checkout canceled. Nothing was charged.',
+    summaryTitle: 'Good to know',
+    summary: [
+      '$1 = 10 credits. Credits come only from purchases (plus any bonus on a purchase) and never expire.',
+      'Refund: within 7 days of purchase if none of that pack’s credits were used — full refunds only, from your receipt.',
+      'Premium (Boost) days are not refunded when a listing is marked rented or removed for breaking the rules.',
+      'Licensed agents are responsible for listing accuracy and fair-housing and advertising rules (brokerage name, fees).',
+    ],
+    terms: 'Terms: Misaeng credits and paid listings',
+    error: 'Something went wrong. Try again.',
+    code: 'Promo code',
+    codePlaceholder: 'Optional',
+  },
+  vi: {
+    title: 'Nạp credit',
+    lead: 'Credit dùng để đăng tin qua môi giới và Premium (Boost) trên Misaeng. Credit đã mua không hết hạn.',
+    soon: 'Thanh toán sắp có',
+    soonBody: 'Tính năng mua credit trực tuyến sắp ra mắt. Bạn có thể mua credit ngay trong ứng dụng Misaeng trên iPhone. Thắc mắc? Gửi email tới info@misaeng.com.',
+    bonus: (n: number) => `+${n} thưởng`,
+    buy: 'Mua',
+    credits: 'credit',
+    tax: (rate: string) => `Thuế bán hàng (${rate}%) được cộng khi thanh toán.`,
+    signIn: 'Mở ứng dụng Misaeng và nhấn Nạp credit, hoặc đăng nhập trên misaeng.com để mua credit.',
+    paid: 'Đã nhận thanh toán — credit sẽ vào tài khoản trong giây lát.',
+    added: (n: number) => `Đã thêm ${n} credit vào tài khoản của bạn.`,
+    receipt: 'Xem hóa đơn',
+    canceled: 'Đã hủy thanh toán. Bạn chưa bị trừ tiền.',
+    summaryTitle: 'Cần biết',
+    summary: [
+      '$1 = 10 credit. Credit chỉ có được khi mua (kèm thưởng của lần mua, nếu có) và không hết hạn.',
+      'Hoàn tiền: trong vòng 7 ngày kể từ khi mua nếu chưa dùng credit nào của gói đó — chỉ hoàn toàn bộ, yêu cầu từ hóa đơn.',
+      'Số ngày Premium (Boost) không được hoàn khi tin được đánh dấu đã cho thuê hoặc bị gỡ do vi phạm quy định.',
+      'Môi giới có giấy phép chịu trách nhiệm về độ chính xác của tin và quy định nhà ở công bằng, quảng cáo (tên công ty môi giới, phí).',
+    ],
+    terms: 'Điều khoản: Credit Misaeng và tin đăng trả phí',
+    error: 'Đã có lỗi. Vui lòng thử lại.',
+    code: 'Mã khuyến mãi',
+    codePlaceholder: 'Không bắt buộc',
+  },
+} as const
+
+const dollars = (cents: number) => `$${(cents / 100).toFixed(2)}`
+
+export function AgentTopUpScreen(props: {
+  locale: string
+  packs: TopUpPack[]
+  paymentsEnabled: boolean
+  salesTaxRate: number
+  termsHref: string
+}) {
+  const text = props.locale === 'vi' ? TEXT.vi : props.locale === 'en' ? TEXT.en : TEXT.ko
+  const [token, setToken] = useState<string | null>(null)
+  const [busy, setBusy] = useState<string | null>(null)
+  const [code, setCode] = useState('')
+  const [message, setMessage] = useState<{ tone: 'ok' | 'error' | 'info'; text: string; receipt?: string } | null>(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const t = params.get('t')
+    if (t) {
+      try {
+        sessionStorage.setItem('misaeng-topup-token', t)
+      } catch {}
+    }
+    let stored: string | null = null
+    try {
+      stored = sessionStorage.getItem('misaeng-topup-token')
+    } catch {}
+    setToken(t || stored)
+    if (params.get('canceled')) setMessage({ tone: 'info', text: text.canceled })
+    const session = params.get('session')
+    if (params.get('paid') && session) {
+      setMessage({ tone: 'ok', text: text.paid })
+      let tries = 0
+      const poll = async () => {
+        tries += 1
+        const q = new URLSearchParams({ id: session, ...(t || stored ? { t: (t || stored)! } : {}) })
+        const res = await fetch(`/api/credits/session?${q}`).catch(() => null)
+        const data = (await res?.json().catch(() => null)) as { done?: boolean; credits?: number; receipt?: string } | null
+        if (data?.done) setMessage({ tone: 'ok', text: text.added(data.credits ?? 0), receipt: data.receipt })
+        else if (tries < 10) setTimeout(poll, 2000)
+      }
+      void poll()
+    }
+  }, [text])
+
+  async function buy(pack: TopUpPack) {
+    setBusy(pack.id)
+    setMessage(null)
+    try {
+      const res = await fetch('/api/credits/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pack: pack.id, t: token, locale: props.locale, code: code.trim() || undefined }),
+      })
+      const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string; code?: string }
+      if (res.status === 401) throw new Error(text.signIn)
+      if (!res.ok || !data.url) throw new Error(data.error || text.error)
+      window.location.href = data.url
+    } catch (error) {
+      setMessage({ tone: 'error', text: error instanceof Error ? error.message : text.error })
+      setBusy(null)
+    }
+  }
+
+  const tone = { ok: 'border-emerald-200 bg-emerald-50 text-emerald-800', error: 'border-red-200 bg-red-50 text-red-700', info: 'border-slate-200 bg-slate-50 text-slate-700' }
+
+  return (
+    <main className='mx-auto w-full max-w-xl px-4 py-10'>
+      <h1 className='text-3xl font-bold text-[#12131A]'>{text.title}</h1>
+      <p className='mt-2 text-sm text-[#3A4256]'>{text.lead}</p>
+      {message ? (
+        <div className={`mt-4 rounded-xl border px-4 py-3 text-sm ${tone[message.tone]}`}>
+          {message.text}
+          {message.receipt ? (
+            <Link href={message.receipt} className='ml-2 font-semibold underline'>
+              {text.receipt}
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
+      {!props.paymentsEnabled ? (
+        <div className='mt-6 rounded-2xl border border-[#FFD60A] bg-[#FFFBEA] p-4'>
+          <p className='text-sm font-bold text-[#12131A]'>{text.soon}</p>
+          <p className='mt-1 text-sm text-[#3A4256]'>
+            {text.soonBody.split('info@misaeng.com')[0]}
+            <a className='font-semibold text-[#0057D9]' href='mailto:info@misaeng.com'>
+              info@misaeng.com
+            </a>
+            {text.soonBody.split('info@misaeng.com')[1]}
+          </p>
+        </div>
+      ) : null}
+      <label className='mt-6 flex items-center gap-3 text-sm text-[#3A4256]'>
+        <span className='shrink-0 font-semibold'>{text.code}</span>
+        <input
+          value={code}
+          onChange={(event) => setCode(event.target.value.toUpperCase())}
+          placeholder={text.codePlaceholder}
+          maxLength={24}
+          className='min-w-0 flex-1 rounded-xl border border-[#E8EAF0] px-3 py-2 uppercase tracking-wide'
+        />
+      </label>
+      <ul className='mt-4 space-y-3'>
+        {props.packs.map((pack) => (
+          <li key={pack.id} className='flex items-center gap-4 rounded-2xl border border-[#E8EAF0] bg-white p-4'>
+            <div className='min-w-0 flex-1'>
+              <p className='text-lg font-bold text-[#12131A]'>
+                {pack.credits} {text.credits}
+                {pack.bonus > 0 ? (
+                  <span className='ml-2 rounded-md bg-[#FFD60A] px-2 py-0.5 text-xs font-bold text-[#12131A]'>{text.bonus(pack.bonus)}</span>
+                ) : null}
+              </p>
+              <p className='mt-0.5 text-xs text-[#5B6070]'>{props.locale === 'vi' ? pack.hintVi : pack.hint}</p>
+            </div>
+            <button
+              type='button'
+              disabled={!props.paymentsEnabled || busy !== null}
+              onClick={() => void buy(pack)}
+              className='shrink-0 rounded-full bg-[#0057D9] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-40'
+            >
+              {busy === pack.id ? '…' : `${text.buy} · ${dollars(pack.priceCents)}`}
+            </button>
+          </li>
+        ))}
+      </ul>
+      {props.salesTaxRate > 0 ? (
+        <p className='mt-3 text-xs text-[#5B6070]'>{text.tax((props.salesTaxRate * 100).toFixed(3).replace(/\.?0+$/, ''))}</p>
+      ) : null}
+      <section className='mt-8 rounded-2xl bg-[#F3F5F9] p-4'>
+        <h2 className='text-sm font-bold text-[#12131A]'>{text.summaryTitle}</h2>
+        <ul className='mt-2 list-disc space-y-1 pl-5 text-xs text-[#3A4256]'>
+          {text.summary.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+        <Link href={props.termsHref} className='mt-3 inline-block text-xs font-semibold text-[#0057D9]'>
+          {text.terms} →
+        </Link>
+      </section>
+    </main>
+  )
+}

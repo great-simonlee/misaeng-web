@@ -52,6 +52,7 @@ import type { HousingListing } from '@/types/nyc'
 import { EmptyState } from '@widgets/nyc/EmptyState'
 import { PerkBadge } from '@widgets/nyc/HousingPostCard'
 import { HousingRoommateIntro } from '@widgets/nyc/HousingRoommateIntro'
+import { HousingListedBy } from '@widgets/nyc/HousingListedBy'
 import { PostLikeButton } from '@widgets/nyc/PostLikeButton'
 
 const HousingLocationMap = dynamic(
@@ -620,6 +621,7 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
             )}
 
             <HousingDescriptionSection listing={listing} className='mt-5' />
+            <HousingListedBy listing={listing} className='mt-5' />
 
             <div className='mt-6 flex flex-col gap-2.5 border-t border-black/[0.04] pt-5 sm:flex-row sm:items-stretch'>
               {supportConfig?.housingChat ? (

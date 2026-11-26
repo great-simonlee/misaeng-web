@@ -577,5 +577,13 @@
     "rent": "Rent",
     "roommate": "Roommates & sublets",
     "aria": "Housing type"
+  },
+  "listedBy": {
+    "title": "Listed by",
+    "licensedAgent": "Licensed Agent",
+    "brokerFee": "Broker fee paid by tenant: {amount}",
+    "noFee": "No broker fee for the tenant",
+    "fairHousing": "Fair Housing Notice",
+    "disclosure": "NY Housing & Anti-Discrimination Disclosure"
   }
 }

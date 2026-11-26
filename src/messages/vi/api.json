@@ -498,6 +498,16 @@
         "lastTitle": "Bản tin Misaeng cuối cùng",
         "lastBody": "Hôm nay có {postings} tin tuyển dụng và {visaNews} tin visa mới. Con vẫn tiếp tục nhận thông báo."
       }
+    },
+    "agentLicense": {
+      "approved": {
+        "title": "Bạn đã được xác minh là Licensed Agent",
+        "body": "Giấy phép NY đã được xác minh (đến {until}). Giờ bạn có thể đăng tin."
+      },
+      "rejected": {
+        "title": "Chưa thể xác minh giấy phép",
+        "body": "Xem lý do trong mục Tôi và gửi lại."
+      }
     }
   },
   "reviewDocs": {

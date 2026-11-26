@@ -6,6 +6,7 @@ import {
   isAppleIapConfigured,
   syncAppleSubscription,
 } from '@lib/premium/apple.server'
+import { handleAppleNotification } from '@lib/agents/appleCredits.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -23,7 +24,19 @@ export async function POST(request: Request) {
   const payload = decodeJws<{ notificationType?: string; data?: { signedTransactionInfo?: string } }>(
     body.signedPayload,
   )
-  const tx = decodeJws<{ originalTransactionId?: string; transactionId?: string }>(payload?.data?.signedTransactionInfo)
+  const tx = decodeJws<{ originalTransactionId?: string; transactionId?: string; productId?: string }>(
+    payload?.data?.signedTransactionInfo,
+  )
+  // Agent credit packs (consumables, com.misaeng.nyc.credits.*) share this one App Store URL: refunds take the
+  // pack's credits back (src/lib/agents/appleCredits.server.ts); everything else is a Premium subscription.
+  if (tx?.productId?.startsWith('com.misaeng.nyc.credits.')) {
+    try {
+      return NextResponse.json({ ok: true, ...(await handleAppleNotification(body.signedPayload)) })
+    } catch (error) {
+      console.error('[premium/apple/notifications] credits', payload?.notificationType, error)
+      return NextResponse.json({ error: 'Failed to process the notification.' }, { status: 500 })
+    }
+  }
   const id = tx?.originalTransactionId || tx?.transactionId
   if (!id) return NextResponse.json({ ok: true })
   try {

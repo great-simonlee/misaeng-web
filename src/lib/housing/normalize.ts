@@ -1,5 +1,6 @@
 import { pickTranslationFields } from '@lib/translations/content'
 import type {
+  HousingListedBy,
   HousingListing,
   HousingPartWall,
   HousingRoomType,
@@ -309,6 +310,37 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
     createdAt: asNumber(data.createdAt, Date.now()),
     updatedAt: asNumber(data.updatedAt, Date.now()),
     status,
+    listedBy: normalizeListedBy(data.listedBy),
+    tenantFees:
+      data.tenantFees && typeof data.tenantFees === 'object'
+        ? { brokerFee: Math.max(0, asNumber((data.tenantFees as Record<string, unknown>).brokerFee, 0)) }
+        : null,
+    agentListing:
+      data.agentListing && typeof data.agentListing === 'object'
+        ? (data.agentListing as HousingListing['agentListing'])
+        : null,
     ...pickTranslationFields(data),
+  }
+}
+
+/** Disclosure block (who lists it); null when missing or without a brokerage. */
+function normalizeListedBy(value: unknown): HousingListedBy | null {
+  if (!value || typeof value !== 'object') return null
+  const raw = value as Record<string, unknown>
+  const text = (key: string) => String(raw[key] ?? '').trim() || null
+  const brokerage = text('brokerage')
+  const agentName = text('agentName')
+  // ERP listings carry only the agent; the brokerage is added from settings (src/lib/agents/brokerage.server.ts).
+  if (!brokerage && !agentName) return null
+  return {
+    brokerage: brokerage ?? '',
+    agentName,
+    licenseType: text('licenseType'),
+    licenseLabel: text('licenseLabel'),
+    phone: text('phone'),
+    email: text('email'),
+    responsibleBroker: text('responsibleBroker'),
+    officeAddress: text('officeAddress'),
+    source: raw.source === 'agent' ? 'agent' : 'misaeng',
   }
 }
