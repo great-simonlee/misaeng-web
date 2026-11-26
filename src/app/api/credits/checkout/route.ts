@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const body = await jsonBody(request)
     const uid = readTopUpToken(typeof body.t === 'string' ? body.t : null) ?? (await signedInUid())
     if (!uid) return loginRequired()
-    const origin = process.env.ELLIEO_PUBLIC_URL?.trim().replace(/\/+$/, '') || new URL(request.url).origin
+    const origin = (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL)?.trim().replace(/\/+$/, '') || new URL(request.url).origin
     const { url } = await createCheckout({ uid, packId: String(body.pack ?? ''), origin, locale: String(body.locale ?? 'en'), code: typeof body.code === 'string' ? body.code : null })
     return NextResponse.json({ url })
   } catch (error) {

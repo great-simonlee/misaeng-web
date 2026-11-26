@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Stripe → Misaeng credits. Same Stripe account as Misaeng (Misaeng LLC), but its own webhook endpoint
- * (https://misaeng.com/api/agents/stripe/webhook) with its own signing secret MISAENG_CREDITS_STRIPE_WEBHOOK_SECRET. Events:
+ * (https://misaeng.com/api/credits/stripe/webhook) with its own signing secret MISAENG_CREDITS_STRIPE_WEBHOOK_SECRET. Events:
  * checkout.session.completed / async_payment_succeeded (adds the pack's paid credits, idempotent),
  * charge.refunded and charge.dispute.created (take the pack's credits back). Others are acknowledged and ignored.
  */

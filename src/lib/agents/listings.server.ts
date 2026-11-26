@@ -647,6 +647,8 @@ export async function reportListing(input: { id: string; uid: string; reason: st
     .from('misaeng_listing_reports')
     .insert({ listing_id: uuid, reporter: input.uid, reason: input.reason, note: input.note?.slice(0, 500) || null } as never)
   if (error?.code === '23505') return { already: true }
+  // Unknown listing id (foreign key): 404, not a server error.
+  if (error?.code === '23503') throw new ListingError('Listing not found.', 'NOT_FOUND', 404)
   if (error) throw new ListingError(error.message, 'SAVE_FAILED', 500)
   const { data: row } = await db().from('misaeng_listings').select('reports').eq('id', uuid).maybeSingle<{ reports: number }>()
   await db().from('misaeng_listings').update({ reports: (row?.reports ?? 0) + 1 } as never).eq('id', uuid)

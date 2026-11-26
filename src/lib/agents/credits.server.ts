@@ -20,14 +20,14 @@ import { readCreditEvent } from './stripeWebhook'
  *   In-house   in-house members (inHouse.server.ts) can't buy: checkout is refused.
  *   Offers     pack discounts and purchase bonuses (promotions.server.ts), automatic or with a code; the bonus credits
  *              are part of the same paid lot (same unit value).
- *   Stripe     the SAME Stripe account as Misaeng (Misaeng LLC, owner 11-25): STRIPE_SECRET_KEY, or
- *              ELLIEO_STRIPE_SECRET_KEY to override. Card statements read "… ELLIEO" (descriptor suffix). Without a key
+ *   Stripe     Misaeng's Stripe account (Misaeng LLC): STRIPE_SECRET_KEY. Card statements read "… CREDITS"
+ *              (descriptor suffix). Without a key
  *              the credits page says "Payments coming soon" and the API answers PAYMENTS_OFF.
  *   Checkout   one-time Stripe Checkout per pack (price_data inline, so no Stripe products to set up). Every Misaeng
  *              object carries metadata app = 'misaeng_credits'; Misaeng's webhook only acts on Premium subscriptions,
  *              so the two never touch each other's payments.
  *   Webhook    /api/credits/stripe/webhook — its own endpoint in the same Stripe account, with its own signing secret
- *              (ELLIEO_STRIPE_WEBHOOK_SECRET): a paid session adds one paid lot (idempotent on the session id); a
+ *              (MISAENG_CREDITS_STRIPE_WEBHOOK_SECRET): a paid session adds one paid lot (idempotent on the session id); a
  *              refund or dispute made in Stripe takes the lot back.
  *   Refunds    within refundDays (7) and only if none of that pack's credits was used, full only: the member asks from
  *              the receipt page → ERP approves → Stripe refund → the lot is taken back.

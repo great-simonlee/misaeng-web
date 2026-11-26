@@ -21,7 +21,7 @@ import { isInHouse } from './inHouse.server'
  *              refused (not finished) so they can ask Apple for a refund.
  *   Refunds    App Store Server Notifications V2 (/api/premium/apple/notifications (shared with Premium)): REFUND / REVOKE → the transaction is
  *              read back and, if Apple revoked it, the credits are taken back (debt if they were used).
- *   Env        ELLIEO_APPLE_IAP_KEY_ID / _ISSUER_ID / _PRIVATE_KEY, or Misaeng's APPLE_IAP_* (same developer team).
+ *   Env        APPLE_IAP_KEY_ID / _ISSUER_ID / _PRIVATE_KEY (Misaeng's, shared with Premium).
  *              MISAENG_APPLE_IAP_LOCAL_TEST=1 (never in production): trust Xcode StoreKit-testing transactions, which the
  *              App Store Server API doesn't know.
  */

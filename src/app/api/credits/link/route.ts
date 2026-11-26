@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const platform = request.headers.get('x-platform')?.toLowerCase() === 'android' ? 'android' : 'ios'
     // In-house members never buy credits.
     const show = !(await isInHouse(uid)) && (platform === 'android' ? config.topUpLinkAndroid : config.topUpLinkIOS)
-    const origin = process.env.ELLIEO_PUBLIC_URL?.trim().replace(/\/+$/, '') || new URL(request.url).origin
+    const origin = (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL)?.trim().replace(/\/+$/, '') || new URL(request.url).origin
     const locale = request.headers.get('x-locale') === 'vi' ? 'vi/' : ''
     return NextResponse.json({ url: `${origin}/${locale}nyc/credits?t=${encodeURIComponent(topUpToken(uid))}`, show, paymentsEnabled: paymentsEnabled() })
   } catch (error) {
