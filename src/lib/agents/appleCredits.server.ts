@@ -1,6 +1,7 @@
 import { createPrivateKey, sign } from 'node:crypto'
 
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
+import { appAccountTokenFor } from '@lib/premium/apple.server'
 
 import { inHouseNoPurchase, getCreditsConfig, quotePack } from './credits.server'
 import { CreditsError, db, rpc } from './creditsCore.server'
@@ -12,7 +13,7 @@ import { isInHouse } from './inHouse.server'
  * on misaeng-web): what the app sends is never trusted on its own — the transaction is read back from the App Store
  * Server API (Get Transaction Info), production first, then sandbox (TestFlight / Xcode sandbox).
  *
- *   Account    the app buys with appAccountToken = the member's uid, so a transaction can't be claimed by someone else.
+ *   Account    the app buys with the member's appAccountToken (the Premium one), so a transaction can't be claimed by someone else.
  *   Credits    one paid lot per transaction id (idempotent); amountCents = the price Apple charged (USD) — that is what
  *              one credit is worth for revenue / liability. Purchase bonuses apply; pack discounts don't (Apple sets
  *              the price).
@@ -127,7 +128,13 @@ export async function claimAppleTransaction(input: { uid: string; transactionId:
   const config = await getCreditsConfig()
   const pack = config.packs.find((p) => p.appleProductId && p.appleProductId === tx.productId)
   if (!pack) throw new CreditsError('This App Store product is not a Misaeng credit pack.', 'INVALID', 400)
-  if (tx.appAccountToken && tx.appAccountToken.toLowerCase() !== input.uid.toLowerCase()) {
+  // Misaeng buys with the member's Premium appAccountToken (premium_apple_accounts; uids aren't UUIDs), or the uid.
+  const ownToken = tx.appAccountToken ? await appAccountTokenFor(input.uid).catch(() => null) : null
+  if (
+    tx.appAccountToken &&
+    tx.appAccountToken.toLowerCase() !== input.uid.toLowerCase() &&
+    tx.appAccountToken.toLowerCase() !== (ownToken ?? '').toLowerCase()
+  ) {
     throw new CreditsError('This purchase was made by another Misaeng account.', 'OTHER_ACCOUNT', 409)
   }
   // Already recorded (the app retried, or the notification came first): just answer.
