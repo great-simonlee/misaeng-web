@@ -12,9 +12,16 @@ import { isConsentUiLanguage } from '@lib/consent/copy'
 
 const DEFAULT_BUCKET = 'housing'
 const FALLBACK_BUCKET = 'avatars'
-const POLICY_PATH = 'legal/policy.json'
+/**
+ * Misaeng and Ellieo share members but not their legal texts (2026-11-26): each brand has its own policy and its own
+ * "latest consent" pointer, so agreeing on one site never re-asks (or wrongly satisfies) the other. Misaeng keeps the
+ * original paths; Ellieo reads/writes legal/ellieo/…. The shared legacy pointer is still read as a fallback when the
+ * record there was made on the same brand.
+ */
+const POLICY_PATH = BRAND === 'ellieo' ? 'legal/ellieo/policy.json' : 'legal/policy.json'
 const LOG_PREFIX = 'legal/consent-logs/'
 const LATEST_PREFIX = 'legal/consent-latest/'
+const BRAND_LATEST_PREFIX = `legal/${BRAND}/consent-latest/`
 const WRITE_LOG_PREFIX = 'legal/write-consent-logs/'
 const WRITE_LATEST_PREFIX = 'legal/write-consent-latest/'
 
@@ -89,6 +96,10 @@ function logObjectPath(id: string) {
 
 function latestObjectPath(userId: string) {
   return `${LATEST_PREFIX}${safeSegment(userId)}.json`
+}
+
+function brandLatestObjectPath(userId: string) {
+  return `${BRAND_LATEST_PREFIX}${safeSegment(userId)}.json`
 }
 
 function asChangeType(value: unknown, fallback: LegalChangeType): LegalChangeType {
@@ -210,7 +221,11 @@ export async function getLatestConsent(userId: string): Promise<ConsentLog | nul
   const id = String(userId || '').trim()
   if (!id || !isLegalConsentStorageConfigured()) return null
   const bucket = await resolveBucket()
-  return normalizeLog(await fetchJsonObject(bucket, latestObjectPath(id)))
+  const own = normalizeLog(await fetchJsonObject(bucket, brandLatestObjectPath(id)))
+  if (own) return own
+  // Before brand pointers: the shared pointer counts only if it was written on this brand.
+  const legacy = normalizeLog(await fetchJsonObject(bucket, latestObjectPath(id)))
+  return legacy && legacy.brand === BRAND ? legacy : null
 }
 
 export function needsReconsent(
@@ -287,7 +302,9 @@ export async function appendConsentLog(input: {
 
   const bucket = await resolveBucket()
   await upsertJsonObject(bucket, logObjectPath(id), log)
-  await upsertJsonObject(bucket, latestObjectPath(log.user_id), log)
+  await upsertJsonObject(bucket, brandLatestObjectPath(log.user_id), log)
+  // Misaeng also keeps the shared pointer (older readers); Ellieo never overwrites it.
+  if (BRAND === 'misaeng') await upsertJsonObject(bucket, latestObjectPath(log.user_id), log)
   return log
 }
 
