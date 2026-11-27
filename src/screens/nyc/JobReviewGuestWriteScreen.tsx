@@ -369,6 +369,11 @@ export function JobReviewGuestWriteScreen() {
       )
       return
     }
+    // Every step needs its 「어땠나요?」 text (owner 11-26; the server refuses it too)
+    if (normalizedTimeline.some((entry) => !htmlToPlainText(entry.stageReviewHtml || ''))) {
+      toastError(t('jobReview.write.errors.stageReviewRequired'))
+      return
+    }
     const incomplete = timeline.find(
       (entry) =>
         isJobReviewTimelineEntryFilled(entry) &&

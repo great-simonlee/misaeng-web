@@ -230,6 +230,8 @@
       "cptOptTimelineRequired": "Please add at least one timeline step.",
       "jobReviewTypeRequired": "Please choose a type: internship, entry-level, experienced, or contract.",
       "jobReviewTimelineRequired": "Please add at least one hiring step.",
+      "jobReviewStageReviewRequired": "Fill in “How did it go?” for every timeline step. It helps the next applicants a lot.",
+      "jobReviewTipsRequired": "Add “Things to watch out for.” It helps the next applicants a lot.",
       "jobReviewSourceRequired": "Please choose how we reached you.",
       "jobReviewOutcomeRequired": "Please choose the final result.",
       "cityRequired": "Please check the city."

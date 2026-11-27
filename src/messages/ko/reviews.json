@@ -421,7 +421,7 @@
     },
     "timeline": {
       "editingDescription": "단계·플랫폼·서류·인터뷰·결과를 고친 뒤 「수정 완료」를 눌러 주세요.",
-      "stageReviewHint": "질문, 분위기, 준비 팁, 피드백 등 이 단계에서 겪은 내용을 자유롭게 적어 주세요.",
+      "stageReviewHint": "다음 지원자에게 큰 도움이 돼요. 질문, 분위기, 준비한 것까지 최대한 자세히 적어 주세요.",
       "stageReviewPlaceholder": "예: Phone은 30분 정도였고, resume deep dive + behavioral 위주였습니다.",
       "autoCommitHint": "날짜와 내용을 적고 다음 칸으로 넘어가면, 버튼을 누르지 않아도 기록이 자동으로 추가·저장돼요."
     },
@@ -433,6 +433,7 @@
         "tipsTooLong": "조심해야 할 점은 {max}자 이내로 작성해 주세요",
         "timelineRequiredEdit": "진행 기록을 최소 1건 남겨 주세요. 날짜와 내용을 입력한 뒤 「이 기록 추가」를 눌러 주세요",
         "timelineRequired": "진행 기록(날짜 + 내용)을 최소 1건 입력한 뒤 「이 기록 추가」를 눌러 주세요",
+        "stageReviewRequired": "진행 기록마다 「어땠나요?」를 적어 주세요. 비어 있는 기록을 눌러 내용을 채워 주세요",
         "outcomeRequired": "최종 결과를 선택해 주세요",
         "sourceRequired": "어떤 경로로 연락받으셨는지 선택해 주세요"
       },
@@ -441,7 +442,7 @@
       "moreSettingsTitle": "글 정보 수정",
       "moreSettingsHint": "제목·회사·조심해야 할 점을 바꾸고 싶을 때만 열어 주세요",
       "tipsTitle": "조심해야 할 점",
-      "tipsDescription": "다음 사람이 실수하지 않도록 꼭 알려주고 싶은 팁",
+      "tipsDescription": "다음 사람이 실수하지 않도록 꼭 알려주고 싶은 팁을 최대한 자세히 적어 주세요. 다음 지원자에게 큰 도움이 돼요.",
       "tipsPlaceholder": "예: 인터뷰 전에 팀의 최근 프로젝트를 꼭 찾아보세요. Handshake보다 LinkedIn referral 응답률이 높았습니다.",
       "outcomeSection": "최종 결과는 어떻게 됐나요?",
       "outcomeEditHint": "진행 상황이 바뀌면 여기서 함께 바꿔 주세요",

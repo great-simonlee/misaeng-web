@@ -237,6 +237,8 @@ export function JobReviewWriteScreen({
           timeline: loadedTimeline,
         }
         editBaselineRef.current = JSON.stringify(fromPost)
+        // 조심해야 할 점 is required now (owner 11-26): an older review without it opens 글 정보 right away
+        if (!htmlToPlainText(fromPost.contentHtml || '')) setShowMoreSettings(true)
 
         // 제출 전에 자동 저장된 수정본이 글보다 최신이면 그걸 이어서 보여 준다.
         const editDraftUid = `${uid}:edit:${postId}`
@@ -294,6 +296,8 @@ export function JobReviewWriteScreen({
 
     const plain = htmlToPlainText(contentHtml)
     if (!plain) {
+      // Editing an older review without 조심해야 할 점: open 글 정보 so the field is right there
+      if (isEdit) setShowMoreSettings(true)
       toastError(
         isEdit
           ? t('jobReview.write.errors.tipsEmptyEdit')
@@ -319,6 +323,11 @@ export function JobReviewWriteScreen({
           ? t('jobReview.write.errors.timelineRequiredEdit')
           : t('jobReview.write.errors.timelineRequired'),
       )
+      return
+    }
+    // Every step needs its 「어땠나요?」 text (owner 11-26; the server refuses it too)
+    if (normalizedTimeline.some((entry) => !htmlToPlainText(entry.stageReviewHtml || ''))) {
+      toastError(t('jobReview.write.errors.stageReviewRequired'))
       return
     }
     const incomplete = timeline.find(

@@ -423,7 +423,7 @@
     },
     "timeline": {
       "editingDescription": "Sửa Giai đoạn, Nền tảng, Hồ sơ, Phỏng vấn hoặc Kết quả, rồi nhấn \"Sửa xong\".",
-      "stageReviewHint": "Chia sẻ những gì bạn trải qua ở giai đoạn này: câu hỏi, không khí, mẹo chuẩn bị, phản hồi, bất cứ điều gì.",
+      "stageReviewHint": "Điều này giúp ích rất nhiều cho người ứng tuyển sau. Hãy viết càng chi tiết càng tốt: câu hỏi, không khí, những gì bạn đã chuẩn bị.",
       "stageReviewPlaceholder": "VD: Phone screen khoảng 30 phút, chủ yếu đào sâu resume + câu hỏi behavioral.",
       "autoCommitHint": "Khi bạn thêm ngày và chi tiết rồi chuyển sang mục tiếp theo, mục này sẽ tự động được thêm và lưu. Không cần nhấn nút."
     },
@@ -435,6 +435,7 @@
         "tipsTooLong": "Phần \"Cần lưu ý\" không quá {max} ký tự",
         "timelineRequiredEdit": "Vui lòng giữ ít nhất 1 mục tiến trình. Thêm ngày và chi tiết, rồi nhấn \"Thêm mục này\"",
         "timelineRequired": "Thêm ít nhất 1 mục tiến trình (ngày + chi tiết), rồi nhấn \"Thêm mục này\"",
+        "stageReviewRequired": "Hãy điền “Diễn ra thế nào?” cho từng bước trong tiến trình. Chạm vào bước còn trống để bổ sung",
         "outcomeRequired": "Vui lòng chọn kết quả cuối cùng",
         "sourceRequired": "Vui lòng chọn bạn được liên hệ qua đâu"
       },
@@ -443,7 +444,7 @@
       "moreSettingsTitle": "Sửa chi tiết bài viết",
       "moreSettingsHint": "Chỉ mở mục này nếu bạn muốn đổi tiêu đề, công ty hoặc \"Cần lưu ý\"",
       "tipsTitle": "Cần lưu ý",
-      "tipsDescription": "Những mẹo bạn thật sự muốn người sau biết để không mắc lỗi tương tự",
+      "tipsDescription": "Những mẹo bạn thật sự muốn người sau biết để không mắc lỗi tương tự. Hãy viết càng chi tiết càng tốt — điều này giúp ích rất nhiều cho người ứng tuyển sau.",
       "tipsPlaceholder": "VD: Tìm hiểu các dự án gần đây của team trước khi phỏng vấn. Referral qua LinkedIn được phản hồi tốt hơn nhiều so với Handshake.",
       "outcomeSection": "Kết quả cuối cùng là gì?",
       "outcomeEditHint": "Nếu có thay đổi, hãy cập nhật cả ở đây",

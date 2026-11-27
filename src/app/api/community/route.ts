@@ -22,6 +22,8 @@ import {
 import {
   getJobReviewTypeLabel,
   isJobReviewOutcomeId,
+  jobReviewMissingRequired,
+  JOB_REVIEW_TIPS_REQUIRED_CODE,
   isJobReviewTypeId,
   normalizeJobReviewTimeline,
   normalizeJobReviewTips,
@@ -651,6 +653,20 @@ export async function POST(request: Request) {
     if (jobReviewTimeline.length === 0) {
       return NextResponse.json(
         { error: t('community.write.jobReviewTimelineRequired') },
+        { status: 400 },
+      )
+    }
+    const missingRequired = jobReviewMissingRequired(jobReviewTimeline, jobReviewTips)
+    if (missingRequired) {
+      return NextResponse.json(
+        {
+          error: t(
+            missingRequired === JOB_REVIEW_TIPS_REQUIRED_CODE
+              ? 'community.write.jobReviewTipsRequired'
+              : 'community.write.jobReviewStageReviewRequired',
+          ),
+          code: missingRequired,
+        },
         { status: 400 },
       )
     }

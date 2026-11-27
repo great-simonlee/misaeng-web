@@ -29,6 +29,8 @@ import { CONTENT_BLOCKED_CODE, findBlockedContent } from '@lib/community/content
 import {
   getJobReviewTypeLabel,
   isJobReviewOutcomeId,
+  jobReviewMissingRequired,
+  JOB_REVIEW_TIPS_REQUIRED_CODE,
   isJobReviewTypeId,
   normalizeJobReviewTimeline,
   normalizeJobReviewTips,
@@ -185,6 +187,20 @@ export async function POST(request: Request) {
     return bad(t('community.write.jobReviewTimelineRequired'))
   }
   const jobReviewTips = normalizeJobReviewTips(body.jobReviewTips) || null
+  const missingRequired = jobReviewMissingRequired(jobReviewTimeline, jobReviewTips)
+  if (missingRequired) {
+    return NextResponse.json(
+      {
+        error: t(
+          missingRequired === JOB_REVIEW_TIPS_REQUIRED_CODE
+            ? 'community.write.jobReviewTipsRequired'
+            : 'community.write.jobReviewStageReviewRequired',
+        ),
+        code: missingRequired,
+      },
+      { status: 400 },
+    )
+  }
   // 욕설·혐오·성희롱 표현 (src/lib/community/contentFilter.ts)
   if (findBlockedContent(nickname, title, plain, body.jobReviewTimeline, jobReviewTips, body.jobReviewIndustry)) {
     return NextResponse.json(

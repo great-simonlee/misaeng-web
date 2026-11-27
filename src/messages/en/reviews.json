@@ -423,7 +423,7 @@
     },
     "timeline": {
       "editingDescription": "Edit Stage, Platform, Documents, Interview or Result, then tap \"Done editing\".",
-      "stageReviewHint": "Share what you went through at this stage: questions, vibe, prep tips, feedback, anything.",
+      "stageReviewHint": "This helps the next applicants a lot. Share as much detail as you can: the questions, the vibe, how you prepared.",
       "stageReviewPlaceholder": "e.g. The phone screen was about 30 minutes, mostly a resume deep dive + behavioral questions.",
       "autoCommitHint": "Once you add a date and details and move to the next field, the entry is added and saved automatically. No button needed."
     },
@@ -435,6 +435,7 @@
         "tipsTooLong": "Keep \"Watch out for\" under {max} characters",
         "timelineRequiredEdit": "Please keep at least 1 progress entry. Add a date and details, then tap \"Add this entry\"",
         "timelineRequired": "Add at least 1 progress entry (date + details), then tap \"Add this entry\"",
+        "stageReviewRequired": "Fill in “How did it go?” for every timeline step. Tap an empty step to add it",
         "outcomeRequired": "Please choose the final result",
         "sourceRequired": "Please choose how we reached you"
       },
@@ -443,7 +444,7 @@
       "moreSettingsTitle": "Edit post details",
       "moreSettingsHint": "Open this only if you want to change the title, company or \"Watch out for\"",
       "tipsTitle": "Watch out for",
-      "tipsDescription": "Tips you really want the next person to know so they don't make the same mistakes",
+      "tipsDescription": "Tips you really want the next person to know so they don't make the same mistakes. The more detail, the better — it helps the next applicants a lot.",
       "tipsPlaceholder": "e.g. Look up the team's recent projects before your interview. LinkedIn referrals got a much better response rate than Handshake.",
       "outcomeSection": "What was the final result?",
       "outcomeEditHint": "If things change, update it here too",

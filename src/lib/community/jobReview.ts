@@ -405,6 +405,23 @@ export function isJobReviewTimelineEntryFilled(entry: JobReviewTimelineEntry) {
   )
 }
 
+/**
+ * Required on every job review (owner 2026-11-26): each 진행기록 step's 「어땠나요?」 text and 「조심해야 할 점」.
+ * Returns the error code of the first thing missing, or null. Create and edit (web, apps, guest) all check this, so an
+ * old review saved without them must be filled in before it can be saved again (viewing old reviews is unchanged).
+ */
+export const JOB_REVIEW_STAGE_REVIEW_REQUIRED_CODE = 'JOB_REVIEW_STAGE_REVIEW_REQUIRED'
+export const JOB_REVIEW_TIPS_REQUIRED_CODE = 'JOB_REVIEW_TIPS_REQUIRED'
+
+export function jobReviewMissingRequired(
+  timeline: JobReviewTimelineEntry[],
+  tips: string | null | undefined,
+): typeof JOB_REVIEW_STAGE_REVIEW_REQUIRED_CODE | typeof JOB_REVIEW_TIPS_REQUIRED_CODE | null {
+  if (timeline.some((entry) => !hasStageReviewContent(entry))) return JOB_REVIEW_STAGE_REVIEW_REQUIRED_CODE
+  if (!String(tips ?? '').trim()) return JOB_REVIEW_TIPS_REQUIRED_CODE
+  return null
+}
+
 export function isJobReviewTimelineEntryComplete(entry: JobReviewTimelineEntry) {
   if (!entry.date.trim()) return false
   return Boolean(
