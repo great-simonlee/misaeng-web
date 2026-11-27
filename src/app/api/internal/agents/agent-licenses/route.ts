@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 import {
   AgentLicenseError,
   decideAgentLicense,
+  editAgentLicense,
   licensePhotoUrl,
   listForReview,
   type ReviewFilter,
@@ -22,6 +23,9 @@ export const dynamic = 'force-dynamic'
  *   POST { action: 'photo', id, kind: license|id|selfie }       → { url, expiresIn, mimeType } (60 s signed link)
  *   POST { action: 'approve', id, expiresOn, licenseType? }     → { application } (member pushed)
  *   POST { action: 'reject', id, rejectReason }                 → { application } (member pushed)
+ *   POST { action: 'edit', id, holderName?, brokerage?, contact?, licenseType? }
+ *        → { application, changed, inHouse } — pending or approved only; in-house agents keep the configured
+ *          brokerage; logged with x-admin-id (no push)
  */
 function authorized(request: Request) {
   const given = request.headers.get('x-internal-secret')?.trim() || ''
@@ -71,6 +75,19 @@ export async function POST(request: Request) {
         reviewer: request.headers.get('x-admin-id')?.trim() || 'erp',
       })
       return NextResponse.json({ application })
+    }
+    if (action === 'edit') {
+      const text = (value: unknown) => (typeof value === 'string' ? value : null)
+      return NextResponse.json(
+        await editAgentLicense({
+          id,
+          holderName: text(body.holderName),
+          brokerage: text(body.brokerage),
+          contact: text(body.contact),
+          licenseType: text(body.licenseType),
+          editor: request.headers.get('x-admin-id')?.trim() || 'erp',
+        }),
+      )
     }
     return NextResponse.json({ error: 'Unknown action.' }, { status: 400 })
   } catch (error) {

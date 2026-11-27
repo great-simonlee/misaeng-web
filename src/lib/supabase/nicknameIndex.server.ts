@@ -213,6 +213,13 @@ function ensureBackfilled(): Promise<void> {
   return backfillPromise
 }
 
+/** Exact nickname (case-insensitive) → the member's uid, or null. Read-only (ERP member search). */
+export async function uidForNickname(nickname: string): Promise<string | null> {
+  const key = toNicknameKey(nickname)
+  if (!key) return null
+  return (await readIndex(key).catch(() => null))?.uid ?? null
+}
+
 /** 다른 사용자가 이미 쓰고 있는 닉네임이면 true */
 export async function isNicknameTakenByOther(
   nickname: string,

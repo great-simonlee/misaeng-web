@@ -3,7 +3,8 @@ import { randomUUID } from 'node:crypto'
 import { getSupabaseServiceClient } from '@lib/supabase/server'
 import type { HousingListing, HousingRoomType, HousingUnitType } from '@/types/nyc'
 
-import { activeLicense, licensedOwners, licenseTypeLabel } from './agentLicense.server'
+import { activeLicense, inHouseBrokerageName, isInHouseAgent, licensedOwners, licenseTypeLabel } from './agentLicense.server'
+import { getBrokerageSettings } from './brokerage.server'
 import { creditsEnabled } from './creditsCore.server'
 import { CreditsError, parsePlan, planFacts, promotePremium, purchase, type PlanFacts } from './listingPlans.server'
 
@@ -226,7 +227,7 @@ export async function createListing(uid: string, input: ListingInput) {
       details_html: cleanDetailsHtml(input.detailsHtml),
       cover_thumb: input.photos[0].thumb,
       brokered: true,
-      brokerage: license.brokerage,
+      brokerage: (await isInHouseAgent(uid)) ? (await inHouseBrokerageName()).slice(0, 80) : license.brokerage,
       broker_fee: input.brokerFee || 0,
       license_id: license.id,
       // Hidden until the plan is paid (the board shows only expires_at > now); free → the default 30 days.
@@ -361,6 +362,10 @@ async function withBroker<T extends ReturnType<typeof toPublic>>(
       .then(({ data, error }) => (error ? [] : data ?? [])),
     licensedOwners(rows.map((row) => row.owner_id)).catch(() => new Map()),
   ])
+  // In-house agents always list under the configured brokerage (Fact Real Estate), whatever their row says.
+  const lockedBrokerage = [...agents.values()].some((agent) => agent.inHouse)
+    ? (await getBrokerageSettings()).name
+    : null
   const plans = (await creditsEnabled().catch(() => false))
     ? await planFacts(rows, viewer).catch(() => new Map<string, PlanFacts>())
     : new Map<string, PlanFacts>()
@@ -369,15 +374,17 @@ async function withBroker<T extends ReturnType<typeof toPublic>>(
   return listings.map((listing) => {
     const extra = byId.get(listing.id)
     const agent = agents.get(owners.get(listing.id) ?? '')
+    // The license row (staff can edit it in the ERP) wins over the copy saved on the listing when it was posted.
+    const brokerage = (agent?.inHouse && lockedBrokerage) || agent?.brokerage || extra?.brokerage || null
     return {
       ...listing,
       brokered: Boolean(extra?.brokered),
-      brokerage: extra?.brokered ? extra.brokerage : null,
+      brokerage: extra?.brokered ? brokerage : null,
       brokerFee: extra?.brokered ? extra.broker_fee ?? 0 : null,
       licensedAgent: Boolean(agent),
       listedBy: agent
         ? {
-            brokerage: extra?.brokerage || agent.brokerage,
+            brokerage: brokerage || agent.brokerage,
             agentName: agent.holderName,
             licenseType: agent.licenseType,
             licenseLabel: licenseTypeLabel(agent.licenseType),

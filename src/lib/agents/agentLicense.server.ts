@@ -13,7 +13,12 @@ import { notifyUsers } from '@lib/push/notify.server'
  *           after agreeing to the ID / face image notice (manual review only, no face templates, deleted 30 days
  *           after the decision)
  *   staff (ERP Misaeng → Licensed Agents, through /api/internal/agents/agent-licenses): list, 60-second photo
- *           links, approve with the expiration date, reject with a reason → push + in-app notice
+ *           links, approve with the expiration date, reject with a reason → push + in-app notice; edit the display
+ *           details (holder name, brokerage, contact, license type) of a pending or approved agent (owner 11-26)
+ *
+ * In-house agents (misaeng_in_house active, e.g. @misaeng.com) always list under the configured brokerage
+ * (misaeng_settings 'brokerage' → Fact Real Estate): the application, the approval and staff edits store that name,
+ * and the listing disclosure (listings.server.ts) shows it whatever the row says.
  *
  * Status: none → pending → approved | rejected; an approved license past expires_on reads as "expired" (badge hidden,
  * the member applies again). Only `approved` and not expired counts as a Licensed Agent.
@@ -148,7 +153,7 @@ export async function activeLicense(uid: string) {
 
 /** Licensed Agent badge for many owners at once (listing board). Missing table → nobody. */
 export async function licensedOwners(uids: string[]) {
-  const out = new Map<string, { brokerage: string; holderName: string; licenseType: string | null; contact: string }>()
+  const out = new Map<string, { brokerage: string; holderName: string; licenseType: string | null; contact: string; inHouse: boolean }>()
   if (uids.length === 0) return out
   const { data, error } = await db()
     .from(TABLE)
@@ -158,10 +163,49 @@ export async function licensedOwners(uids: string[]) {
     .gte('expires_on', todayNY())
     .returns<{ user_id: string; brokerage: string; holder_name: string; license_type: string | null; contact: string; expires_on: string }[]>()
   if (error) return out
+  const inHouse = await activeInHouse((data ?? []).map((row) => row.user_id))
   for (const row of data ?? []) {
-    out.set(row.user_id, { brokerage: row.brokerage, holderName: row.holder_name, licenseType: row.license_type, contact: row.contact })
+    out.set(row.user_id, {
+      brokerage: row.brokerage,
+      holderName: row.holder_name,
+      licenseType: row.license_type,
+      contact: row.contact,
+      inHouse: inHouse.has(row.user_id),
+    })
   }
   return out
+}
+
+// MARK: - In-house brokerage
+
+/**
+ * Active in-house members among these uids, from misaeng_in_house only (cheap, for the listing board). A qualifying
+ * member is put in that table the first time isInHouse() sees them, which the application and approval below do.
+ */
+async function activeInHouse(uids: string[]) {
+  const out = new Set<string>()
+  if (uids.length === 0) return out
+  const { data, error } = await db()
+    .from('misaeng_in_house')
+    .select('user_id')
+    .in('user_id', [...new Set(uids)].slice(0, 200))
+    .eq('status', 'active')
+    .returns<{ user_id: string }[]>()
+  if (error) return out
+  for (const row of data ?? []) out.add(row.user_id)
+  return out
+}
+
+/** Is this member in-house right now (adds a qualifying member, see inHouse.server.ts)? Never throws. */
+export async function isInHouseAgent(uid: string) {
+  const { isInHouse } = await import('./inHouse.server')
+  return isInHouse(uid).catch(() => false)
+}
+
+/** The configured brokerage name (misaeng_settings 'brokerage' → Fact Real Estate). */
+export async function inHouseBrokerageName() {
+  const { getBrokerageSettings } = await import('./brokerage.server')
+  return (await getBrokerageSettings()).name
 }
 
 export type AgentApplication = {
@@ -179,7 +223,7 @@ export type AgentApplication = {
 
 const clean = (value: unknown) => String(value ?? '').trim().replace(/\s+/g, ' ')
 
-function validate(input: AgentApplication) {
+function validate(input: AgentApplication, forcedBrokerage: string | null = null) {
   const fail = (message: string) => {
     throw new AgentLicenseError(message, 'INVALID')
   }
@@ -187,12 +231,10 @@ function validate(input: AgentApplication) {
   if (!/^[A-Z0-9-]{4,20}$/.test(number)) fail('Enter your NY license number (letters and numbers, as on the license).')
   const holderName = clean(input.holderName)
   if (holderName.length < 2 || holderName.length > 80) fail('Enter your full name as it appears on the license.')
-  const brokerage = clean(input.brokerage)
+  const brokerage = forcedBrokerage ?? clean(input.brokerage)
   if (brokerage.length < 2 || brokerage.length > 80) fail('Enter your brokerage name.')
   const contact = clean(input.contact)
-  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)
-  const isPhone = contact.replace(/\D/g, '').length >= 10 && /^[+\d\s().-]+$/.test(contact)
-  if (contact.length > 120 || !(isEmail || isPhone)) fail('Enter a business phone number or email.')
+  if (!validContact(contact)) fail('Enter a business phone number or email.')
   const expiresOn = input.expiresOn ? clean(input.expiresOn) : null
   if (expiresOn && (!/^\d{4}-\d{2}-\d{2}$/.test(expiresOn) || Number.isNaN(Date.parse(expiresOn)))) {
     fail('Expiration date is not valid.')
@@ -204,6 +246,13 @@ function validate(input: AgentApplication) {
     throw new AgentLicenseError('Agree to the ID and selfie notice to continue.', 'CONSENT_REQUIRED')
   }
   return { number, holderName, brokerage, contact, expiresOn, licenseType }
+}
+
+/** Business phone (10+ digits) or email, 5–120 characters (the table's check). */
+function validContact(contact: string) {
+  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)
+  const isPhone = contact.replace(/\D/g, '').length >= 10 && /^[+\d\s().-]+$/.test(contact)
+  return contact.length >= 5 && contact.length <= 120 && (isEmail || isPhone)
 }
 
 function isJpeg(bytes: Uint8Array) {
@@ -231,7 +280,8 @@ export async function applyAgentLicense(
   input: AgentApplication,
   photos: { license: File | null; id: File | null; selfie: File | null },
 ) {
-  const fields = validate(input)
+  // In-house agents list under the configured brokerage, whatever they typed.
+  const fields = validate(input, (await isInHouseAgent(uid)) ? (await inHouseBrokerageName()).slice(0, 80) : null)
   const files = {
     license: await readJpeg(photos.license, 'Add a photo of your license or pocket card.'),
     id: await readJpeg(photos.id, 'Add a photo of your government ID.'),
@@ -312,6 +362,13 @@ export async function listForReview(filter: ReviewFilter, limit = 200) {
     }),
   )
   const { count } = await db().from(TABLE).select('id', { count: 'exact', head: true }).eq('status', 'pending')
+  // In-house (brokerage locked) for open applications and approved agents; staff edit history per license.
+  const openUids = [...new Set(rows.filter((row) => row.status !== 'rejected').map((row) => row.user_id))]
+  const inHouse = new Set(
+    (await Promise.all(openUids.map(async (uid) => ((await isInHouseAgent(uid)) ? uid : null)))).filter(Boolean) as string[],
+  )
+  const lockedBrokerage = inHouse.size > 0 ? await inHouseBrokerageName() : null
+  const edits = await editHistories(rows.map((row) => row.id))
   return {
     applications: rows.map((row) => ({
       id: row.id,
@@ -334,6 +391,11 @@ export async function listForReview(filter: ReviewFilter, limit = 200) {
       photos: { license: Boolean(row.photo_path), id: Boolean(row.id_photo_path), selfie: Boolean(row.selfie_path) },
       /** Decided and the photos are gone (30-day retention). */
       photoDeleted: !row.photo_path && !row.id_photo_path && !row.selfie_path && row.status !== 'pending',
+      /** In-house: the brokerage is always the configured one (shown locked in the ERP). */
+      inHouse: inHouse.has(row.user_id),
+      lockedBrokerage: inHouse.has(row.user_id) ? lockedBrokerage : null,
+      /** Staff edits of the details, newest first. */
+      edits: edits.get(row.id) ?? [],
     })),
     counts: { pending: count ?? 0 },
     setupRequired: false,
@@ -383,6 +445,10 @@ export async function decideAgentLicense(input: {
     if (reason.length < 3) throw new AgentLicenseError('Enter a reject reason (the member sees it).', 'INVALID')
     Object.assign(patch, { status: 'rejected', reject_reason: reason.slice(0, 300) })
   }
+  if (input.action === 'approve') {
+    const { data: pending } = await db().from(TABLE).select('user_id').eq('id', input.id).maybeSingle<{ user_id: string }>()
+    if (pending && (await isInHouseAgent(pending.user_id))) patch.brokerage = (await inHouseBrokerageName()).slice(0, 80)
+  }
   const { data, error } = await db()
     .from(TABLE)
     .update(patch as never)
@@ -394,6 +460,113 @@ export async function decideAgentLicense(input: {
   if (!data) throw new AgentLicenseError('Application not found or already reviewed.', 'ALREADY_DECIDED', 409)
   notifyDecision(data)
   return toMember(data)
+}
+
+// MARK: - Staff edits (details shown on the listing disclosure)
+
+export type AgentLicenseEdit = {
+  at: string
+  by: string
+  changes: Record<string, { from: string | null; to: string | null }>
+}
+
+/**
+ * Edit history lives in misaeng_settings 'agent_license_edits:<license id>' → { history: [...] } (newest first, last
+ * 50), so no table change is needed; updated_by / updated_at there are the latest edit.
+ */
+const EDITS_KEY = 'agent_license_edits:'
+
+async function editHistories(ids: string[]) {
+  const out = new Map<string, AgentLicenseEdit[]>()
+  if (ids.length === 0) return out
+  const { data, error } = await db()
+    .from('misaeng_settings')
+    .select('key, value')
+    .in('key', ids.map((id) => EDITS_KEY + id))
+    .returns<{ key: string; value: { history?: AgentLicenseEdit[] } | null }[]>()
+  if (error) return out
+  for (const row of data ?? []) {
+    if (Array.isArray(row.value?.history)) out.set(row.key.slice(EDITS_KEY.length), row.value.history)
+  }
+  return out
+}
+
+export type AgentLicenseEditInput = {
+  id: string
+  holderName?: string | null
+  brokerage?: string | null
+  contact?: string | null
+  licenseType?: string | null
+  editor: string
+}
+
+/**
+ * ERP: change the display details of a pending or approved (incl. expired) license — holder name, brokerage, contact,
+ * license type. Omitted fields stay. In-house agents always get the configured brokerage. The listing disclosure
+ * reads the license row on every request, so /api/housing and listing detail change at once.
+ */
+export async function editAgentLicense(input: AgentLicenseEditInput) {
+  const fail = (message: string): never => {
+    throw new AgentLicenseError(message, 'INVALID')
+  }
+  const { data: row, error } = await db().from(TABLE).select(COLUMNS).eq('id', input.id).maybeSingle<Row>()
+  if (missingTable(error)) throw new AgentLicenseError('Agent verification is not set up yet.', 'SETUP_REQUIRED', 503)
+  if (error) throw new AgentLicenseError(error.message, 'LOAD_FAILED', 500)
+  if (!row) throw new AgentLicenseError('License not found.', 'NOT_FOUND', 404)
+  if (row.status === 'rejected') throw new AgentLicenseError('A rejected application cannot be edited.', 'NOT_EDITABLE', 409)
+
+  const next = { holder_name: row.holder_name, brokerage: row.brokerage, contact: row.contact, license_type: row.license_type }
+  if (input.holderName != null) {
+    const holderName = clean(input.holderName)
+    if (holderName.length < 2 || holderName.length > 80) fail('Name must be 2–80 characters.')
+    next.holder_name = holderName
+  }
+  if (input.brokerage != null) {
+    const brokerage = clean(input.brokerage)
+    if (brokerage.length < 2 || brokerage.length > 80) fail('Brokerage must be 2–80 characters.')
+    next.brokerage = brokerage
+  }
+  if (input.contact != null) {
+    const contact = clean(input.contact)
+    if (!validContact(contact)) fail('Contact must be a business phone number (10+ digits) or an email, up to 120 characters.')
+    next.contact = contact
+  }
+  if (input.licenseType != null) {
+    const licenseType = clean(input.licenseType)
+    if (!(LICENSE_TYPES as readonly string[]).includes(licenseType)) fail('Pick a license type: salesperson, associate_broker or broker.')
+    next.license_type = licenseType
+  }
+  const inHouse = await isInHouseAgent(row.user_id)
+  if (inHouse) next.brokerage = (await inHouseBrokerageName()).slice(0, 80)
+
+  const changes: AgentLicenseEdit['changes'] = {}
+  for (const key of Object.keys(next) as (keyof typeof next)[]) {
+    if ((next[key] ?? null) !== (row[key] ?? null)) changes[key] = { from: row[key] ?? null, to: next[key] ?? null }
+  }
+  if (Object.keys(changes).length === 0) return { application: toMember(row), changed: false, inHouse }
+
+  const now = new Date().toISOString()
+  const by = input.editor.slice(0, 200)
+  const { data: saved, error: saveError } = await db()
+    .from(TABLE)
+    .update({ ...next, updated_at: now } as never)
+    .eq('id', row.id)
+    .neq('status', 'rejected')
+    .select(COLUMNS)
+    .maybeSingle<Row>()
+  if (saveError) throw new AgentLicenseError(saveError.message, 'SAVE_FAILED', 500)
+  if (!saved) throw new AgentLicenseError('License not found or no longer editable.', 'NOT_EDITABLE', 409)
+
+  // Audit (best effort after the save: a failed log is reported, not rolled back).
+  const history = (await editHistories([row.id])).get(row.id) ?? []
+  const { error: logError } = await db()
+    .from('misaeng_settings')
+    .upsert(
+      { key: EDITS_KEY + row.id, value: { history: [{ at: now, by, changes }, ...history].slice(0, 50) }, updated_at: now, updated_by: by } as never,
+      { onConflict: 'key' },
+    )
+  if (logError) console.error('Misaeng agent license edit log error:', logError.message)
+  return { application: toMember(saved), changed: true, inHouse }
 }
 
 /**

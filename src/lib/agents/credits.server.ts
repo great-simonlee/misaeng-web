@@ -487,12 +487,34 @@ export async function listPurchases(filter: { status?: string; uid?: string }, l
   return data ?? []
 }
 
-/** Member search for the ERP: uid, email (auth), or name / nickname. */
+/**
+ * Member search for the ERP: uid, email (auth), exact nickname (nickname index), or part of a Licensed Agent's name
+ * on their license / an in-house email. Profiles are files, so other partial name searches are not possible.
+ */
 export async function searchMembers(q: string) {
   const query = q.trim()
   if (!query) return []
   const out = new Map<string, { uid: string; name: string | null; nickname: string | null; email: string | null }>()
   if (/^[0-9a-f-]{36}$/i.test(query)) out.set(query, { uid: query, name: null, nickname: null, email: null })
+  if (!query.includes('@')) {
+    const { uidForNickname } = await import('@lib/supabase/nicknameIndex.server')
+    const uid = await uidForNickname(query).catch(() => null)
+    if (uid) out.set(uid, { uid, name: null, nickname: null, email: null })
+  }
+  if (query.length >= 2) {
+    const like = `%${query.replace(/[%_\\,()]/g, ' ').trim()}%`
+    const [licenses, staff] = await Promise.all([
+      db().from('misaeng_agent_licenses').select('user_id, holder_name').ilike('holder_name', like).order('created_at', { ascending: false }).limit(20)
+        .returns<{ user_id: string; holder_name: string }[]>(),
+      db().from('misaeng_in_house').select('user_id, email').ilike('email', like).limit(20).returns<{ user_id: string; email: string }[]>(),
+    ])
+    for (const row of licenses.data ?? []) {
+      if (!out.has(row.user_id)) out.set(row.user_id, { uid: row.user_id, name: row.holder_name, nickname: null, email: null })
+    }
+    for (const row of staff.data ?? []) {
+      if (!out.has(row.user_id)) out.set(row.user_id, { uid: row.user_id, name: null, nickname: null, email: row.email })
+    }
+  }
   if (query.includes('@')) {
     const { adminFindUserByEmail } = await import('@lib/auth/supabaseAuth.server')
     const { uidForAuthUser } = await import('@lib/auth/accounts.server')
