@@ -13,7 +13,7 @@ import { notifyUsers } from '@lib/push/notify.server'
  *           after agreeing to the ID / face image notice (manual review only, no face templates, deleted 30 days
  *           after the decision)
  *   staff (ERP Misaeng → Licensed Agents, through /api/internal/agents/agent-licenses): list, 60-second photo
- *           links, approve with the expiration date, reject with a reason → push + in-app notice; edit the display
+ *           links, approve with the expiration date, reject with an internal reason (never sent to the member) → push + in-app notice; edit the display
  *           details (holder name, brokerage, contact, license type) of a pending or approved agent (owner 11-26)
  *
  * Business contact (owner 11-26): both a phone and an email are required (NY 175.25 wants contact details on every
@@ -142,7 +142,8 @@ function toMember(row: Row | null) {
     contactPhone: row ? contactOf(row).phone : null,
     /** yyyy-mm-dd; approved / expired only. */
     expiresOn: status === 'approved' || status === 'expired' ? row?.expires_on ?? null : null,
-    rejectReason: status === 'rejected' ? row?.reject_reason ?? null : null,
+    /** Always null: the staff's reject reason stays internal (members are told to email info@misaeng.com). Kept for older builds. */
+    rejectReason: null,
     appliedAt: row?.created_at ?? null,
   }
 }
@@ -540,7 +541,7 @@ export async function decideAgentLicense(input: {
     }
   } else {
     const reason = clean(input.rejectReason)
-    if (reason.length < 3) throw new AgentLicenseError('Enter a reject reason (the member sees it).', 'INVALID')
+    if (reason.length < 3) throw new AgentLicenseError('Enter a reject reason (internal: the member does not see it).', 'INVALID')
     Object.assign(patch, { status: 'rejected', reject_reason: reason.slice(0, 300) })
   }
   if (input.action === 'approve') {
@@ -743,7 +744,8 @@ function notifyDecision(row: Row) {
           }
         : {
             title: t('api.push.agentLicense.rejected.title'),
-            body: row.reject_reason || t('api.push.agentLicense.rejected.body'),
+            // The staff's reason stays internal; members are pointed to info@misaeng.com.
+            body: t('api.push.agentLicense.rejected.body'),
             data: { type: 'agent_license', status: 'rejected' },
             threadId: `agent-license-${row.id}`,
           },

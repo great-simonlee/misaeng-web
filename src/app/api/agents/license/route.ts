@@ -7,7 +7,7 @@ import { errorResponse, loginRequired, notMisaeng, signedInUid } from '@lib/agen
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-/** My Licensed Agent status (Misaeng only): { status: none|pending|approved|rejected|expired, brokerage, licenseType, expiresOn, rejectReason, … } */
+/** My Licensed Agent status (Misaeng only): { status: none|pending|approved|rejected|expired, brokerage, licenseType, expiresOn, rejectReason (always null: internal), … } */
 export async function GET() {
   const blocked = notMisaeng()
   if (blocked) return blocked
