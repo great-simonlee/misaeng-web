@@ -11,10 +11,14 @@ export { CreditsError } from './creditsCore.server'
  *   Credits   $1 = 10 credits, only from payment (Stripe or App Store; credits.server.ts, appleCredits.server.ts).
  *             Lots: paid (each tied to its purchase, never expire) and staff (in-house accounts only, monthly, $0;
  *             inHouse.server.ts). Staff credits are spent first. A refund after use can leave a debt (balance below 0).
- *   Regular   7 / 14 / 28 days = 60 / 100 / 140 credits
- *   Premium   "Boost": the 28-day regular price + 250 credits for 7 days at the top of Housing (new = 390), shown 28 days
- *             from the Boost start; +7 days once for 250. Upgrading a regular listing costs the same 390 and restarts
- *             its 28 days from the Boost start.
+ *   Regular   7 / 14 / 28 days = 20 / 40 / 70 credits (owner 11-26: fit the 100 / 220 / 460 / 960 packs exactly)
+ *   Premium   "Boost": the 28-day regular price + 150 credits for 7 days at the top of Housing (new = 220), shown 28 days
+ *             from the Boost start; +7 days once for 150.
+ *   Upgrade   Boost on a listing that is already up (owner 11-26) costs only the Boost price (150) and keeps the
+ *             listing's own end date (its regular days are not charged again or restarted). If fewer days are left than
+ *             the Boost window, the end date moves to the Boost's end at no extra charge, so a Boost is never cut short.
+ *             A reservation on a live listing holds only the Boost price too. Bundle mode: the old rule (full price,
+ *             restarts totalDays). SQL: supabase/agent_boost_upgrade.sql.
  *   Slots     3 Boosts at a time (NYC); in-house listings hold at most 1 of them. Full → reservation paid up front; a
  *             new listing shows as a regular 28-day listing while it waits; cancelling gives the held part back.
  *   Discounts automatic listing discounts (promotions.server.ts) lower the credits a plan costs.
@@ -43,8 +47,8 @@ export type ListingPrices = {
 }
 
 export const DEFAULT_LISTING_PRICES: ListingPrices = {
-  regular: { '7': 60, '14': 100, '28': 140 },
-  premium: { mode: 'boost', bundlePrice: 390, boostPrice: 250, days: 7, totalDays: 28, extendPrice: 250, maxExtensions: 1 },
+  regular: { '7': 20, '14': 40, '28': 70 },
+  premium: { mode: 'boost', bundlePrice: 220, boostPrice: 150, days: 7, totalDays: 28, extendPrice: 150, maxExtensions: 1 },
   slots: 3,
 }
 
@@ -61,6 +65,11 @@ export async function getListingPrices(): Promise<ListingPrices> {
 
 export function premiumPrice(p: ListingPrices) {
   return p.premium.mode === 'boost' ? (p.regular[String(p.premium.totalDays)] ?? 0) + p.premium.boostPrice : p.premium.bundlePrice
+}
+
+/** Boost on a listing that is already up: the Boost part only (boost mode); bundle mode → the full Premium price. */
+export function upgradePrice(p: ListingPrices) {
+  return p.premium.mode === 'boost' ? p.premium.boostPrice : p.premium.bundlePrice
 }
 
 export function extendPrice(p: ListingPrices) {
@@ -259,13 +268,15 @@ export async function planOptions(uid: string, topUp: { ios: boolean; android: b
     prices: {
       regular: Object.fromEntries(Object.entries(p.regular).map(([days, price]) => [days, off(price)])),
       premium: off(premiumPrice(p)),
+      /** Boost on a listing that is already up (keeps its end date). */
+      upgrade: off(upgradePrice(p)),
       extend: off(extendPrice(p)),
       premiumMode: p.premium.mode,
       boost: off(p.premium.boostPrice),
       maxExtensions: p.premium.maxExtensions,
     },
     /** Prices before the discount (null when there is none). */
-    listPrices: discount ? { regular: p.regular, premium: premiumPrice(p), extend: extendPrice(p) } : null,
+    listPrices: discount ? { regular: p.regular, premium: premiumPrice(p), upgrade: upgradePrice(p), extend: extendPrice(p) } : null,
     discount: discount ? { percent: discount.percent, title: discount.title } : null,
     inHouse,
     premiumDays: p.premium.days,
@@ -313,24 +324,38 @@ export async function purchase(
   const full = off(listPrice ?? 0)
   const price = action === 'reserve' ? full - reserveNow : full
   if (action === 'extend' && p.premium.maxExtensions < 1) throw new CreditsError('Premium can’t be extended right now.', 'NO_EXTENSION', 409)
-  const result = await rpc<{ ok: boolean; reservation?: string | null }>(
-    'misaeng_listing_purchase',
-    {
-      p_user: uid,
-      p_listing: listingId,
-      p_action: action,
-      p_days: days,
-      p_price: price ?? 0,
-      p_now_price: reserveNow,
-      p_regular_days: Object.keys(p.regular).map(Number),
-      p_slots: p.slots,
-      p_premium_days: p.premium.days,
-      p_total_days: p.premium.totalDays,
-      p_promotion: discount?.id ?? null,
-    },
-  )
+  // Boost on a listing that is already up: the SQL charges (or holds) only this and keeps the listing's end date.
+  // Null in bundle mode (old rule: full price, restarts totalDays). The SQL decides "already up" under its row lock.
+  const upgrade = (action === 'premium' || action === 'reserve') && p.premium.mode === 'boost' ? off(p.premium.boostPrice) : null
+  type Result = { ok: boolean; reservation?: string | null; charged?: number }
+  const args = {
+    p_user: uid,
+    p_listing: listingId,
+    p_action: action,
+    p_days: days,
+    p_price: price ?? 0,
+    p_now_price: reserveNow,
+    p_regular_days: Object.keys(p.regular).map(Number),
+    p_slots: p.slots,
+    p_premium_days: p.premium.days,
+    p_total_days: p.premium.totalDays,
+    p_promotion: discount?.id ?? null,
+  }
+  let result: Result
+  if (upgrade === null) {
+    result = await rpc<Result>('misaeng_listing_purchase', args)
+  } else {
+    try {
+      result = await rpc<Result>('misaeng_listing_purchase', { ...args, p_upgrade_price: upgrade })
+    } catch (error) {
+      // Before agent_boost_upgrade.sql runs the function has no p_upgrade_price: the old rule (full price, restart).
+      if (!(error instanceof CreditsError && error.code === 'SETUP_REQUIRED')) throw error
+      result = await rpc<Result>('misaeng_listing_purchase', args)
+    }
+  }
   if (action !== 'reserve') await promotePremium()
-  return { ...result, price }
+  /** price: what was taken (or held) now. */
+  return { ...result, price: typeof result?.charged === 'number' ? result.charged : price }
 }
 
 export async function cancelReservation(uid: string, listingId: string) {
