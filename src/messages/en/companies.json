@@ -187,6 +187,13 @@
     "timing": {
       "posted3d": "Posted in last 3 days",
       "closing7d": "Closes within 7 days"
+    },
+    "anyTerm": "All intern seasons",
+    "internTerm": {
+      "spring": "Spring {year} internship",
+      "summer": "Summer {year} internship",
+      "fall": "Fall {year} internship",
+      "winter": "Winter {year} internship"
     }
   },
   "industries": {

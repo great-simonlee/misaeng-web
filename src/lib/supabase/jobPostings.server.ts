@@ -11,6 +11,7 @@ import type { Locale } from '@lib/i18n/locales'
 import { DEGREE_LABELS, JOB_FUNCTIONS, type DegreeLevel, type JobFunction } from '@lib/constants/postingCopy'
 import { previousPayFor, storedPay, type PayHistoryRow } from '@lib/company/postingPay'
 import { minDegreeOf } from '@lib/company/postingList'
+import { internTermFor } from '@lib/jobs/internTerm'
 
 /*
  * 채용 공고는 ellieo-erp 관리자 화면(Jobs → Postings)에서 검토하고 Supabase Postgres에 있다
@@ -40,6 +41,7 @@ const PUBLIC_COLUMNS = [
   'created_at',
   'closed_at',
   'summary_translations',
+  'intern_term',
 ].join(',')
 
 type PostingRow = {
@@ -75,6 +77,8 @@ type PostingRow = {
   closed_at?: string | null
   /** 다른 언어 요약 (ellieo-erp/supabase/job_posting_translations.sql) */
   summary_translations?: unknown
+  /** 인턴 시작 시즌 "2026-summer" (ellieo-erp job_postings.intern_term, 없는 DB도 있음) */
+  intern_term?: string | null
 }
 
 function getSupabaseUrl() {
@@ -85,8 +89,8 @@ function getSupabaseSecretKey() {
   return process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || null
 }
 
-/** ellieo-erp/supabase/job_posting_function.sql, job_posting_deadline.sql 로 추가되는 컬럼 */
-const OPTIONAL_COLUMNS = ['job_function', 'apply_by', 'tags', 'summary_translations']
+/** ellieo-erp/supabase/job_posting_function.sql, job_posting_deadline.sql 등으로 추가되는 컬럼 (intern_term: 인턴 시즌) */
+const OPTIONAL_COLUMNS = ['job_function', 'apply_by', 'tags', 'summary_translations', 'intern_term']
 
 const LEVELS: PostingLevel[] = ['intern', 'new_grad', 'experienced']
 
@@ -188,6 +192,8 @@ function toStoredPosting(row: PostingRow, company: ListedCompany | undefined, hi
     },
     title: row.title,
     level: row.level as PostingLevel,
+    // 인턴 시즌: ERP 컬럼이 있으면 그 값, 없으면 제목·근무 형태에서 추정 (인턴 공고만)
+    internTerm: internTermFor({ level: row.level, column: row.intern_term, title: row.title, workType: text(row.summary?.workType) }),
     jobFunction: JOB_FUNCTIONS.includes(row.job_function as JobFunction)
       ? (row.job_function as JobFunction)
       : null,

@@ -16,6 +16,11 @@ export type PublicPosting = {
   company: { id: string; slug: string; name: string; logoUrl: string | null; industry: string }
   title: string
   level: PostingLevel
+  /**
+   * 인턴 시작 시즌 "YYYY-season" (season: spring|summer|fall|winter), 예: "2026-summer".
+   * 인턴 공고만, 모르면 null. src/lib/jobs/internTerm.ts
+   */
+  internTerm: string | null
   /** null: 직무 분류 전 (job_posting_function.sql 실행 전) */
   jobFunction: JobFunction | null
   workArrangement: WorkArrangement

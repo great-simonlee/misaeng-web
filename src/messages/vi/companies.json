@@ -187,7 +187,14 @@
     "daysLeft_one": "{count} day left",
     "regionsMore_one": "{regions} + {count} more",
     "showMorePostings_one": "Show {count} more job",
-    "resultCount_one": "{count} job"
+    "resultCount_one": "{count} job",
+    "anyTerm": "Mọi kỳ thực tập",
+    "internTerm": {
+      "spring": "Thực tập mùa xuân {year}",
+      "summer": "Thực tập mùa hè {year}",
+      "fall": "Thực tập mùa thu {year}",
+      "winter": "Thực tập mùa đông {year}"
+    }
   },
   "industries": {
     "tech": "Công nghệ",

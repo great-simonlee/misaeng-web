@@ -11,6 +11,7 @@ import { cityFirst, daysUntil, fetchPostings, matchesKind, type PostingKind, typ
 import { BRAND_CONFIG } from '@lib/brand'
 import { JOB_FUNCTION_LABELS, JOB_FUNCTIONS, type JobFunction } from '@lib/constants/postingCopy'
 import { useT } from '@lib/i18n/client'
+import { internTermOrder, splitInternTerm } from '@lib/jobs/internTerm'
 import { BoardPageShell } from '@widgets/nyc/BoardPageShell'
 import { ChipScrollRow } from '@widgets/nyc/ChipScrollRow'
 import { CompanyHeroPanel } from '@widgets/nyc/CompanyBrand'
@@ -49,6 +50,8 @@ export function PostingListScreen() {
   const [jobFunction, setJobFunction] = useState<'all' | JobFunction>('all')
   const [query, setQuery] = useState('')
   const [timing, setTiming] = useState<Timing>('all')
+  // 인턴 시즌 "2026-summer" (인턴 공고만 가진 값)
+  const [term, setTerm] = useState('all')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -84,10 +87,11 @@ export function PostingListScreen() {
         matchesTiming(p, timing, now) &&
         (region === 'all' || p.regions.includes(region)) &&
         (jobFunction === 'all' || p.jobFunction === jobFunction) &&
+        (term === 'all' || p.internTerm === term) &&
         (!key || normalize(`${p.company.name} ${p.title}`).includes(key)),
     )
-  }, [postings, kind, region, jobFunction, query, timing])
-  const shown = useWindowedList(filtered.length, PAGE_SIZE, JSON.stringify([kind, region, jobFunction, query, timing]))
+  }, [postings, kind, region, jobFunction, query, timing, term])
+  const shown = useWindowedList(filtered.length, PAGE_SIZE, JSON.stringify([kind, region, jobFunction, query, timing, term]))
 
   // 등록·마감 시점 칩 (해당 공고가 있는 것만)
   const timings = useMemo(() => {
@@ -105,6 +109,18 @@ export function PostingListScreen() {
       ),
     [postings],
   )
+
+  // 인턴 시즌 칩 (공고가 있는 시즌만, 이른 시즌부터): "2026 여름 인턴"
+  const terms = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const p of postings) if (p.internTerm) counts.set(p.internTerm, (counts.get(p.internTerm) ?? 0) + 1)
+    return [...counts.entries()]
+      .sort((a, b) => internTermOrder(a[0]) - internTermOrder(b[0]))
+      .flatMap(([id, count]) => {
+        const parts = splitInternTerm(id)
+        return parts ? [[id, t(`postings.internTerm.${parts.season}`, { year: parts.year }), count] as const] : []
+      })
+  }, [postings, t])
 
   // 구분: 인턴·신입·한국어 우대·한국 근무 (공고가 있는 것만)
   const kinds = useMemo(() => kindCounts(postings, t), [postings, t])
@@ -153,6 +169,15 @@ export function PostingListScreen() {
                 active={timing === id}
                 onClick={() => setTiming(id)}
               />
+            ))}
+          </ChipScrollRow>
+        ) : null}
+        {terms.length ? (
+          <ChipScrollRow
+            leading={<Chip label={t('postings.anyTerm')} active={term === 'all'} onClick={() => setTerm('all')} />}
+          >
+            {terms.map(([id, label, count]) => (
+              <Chip key={id} label={label} count={count} active={term === id} onClick={() => setTerm(id)} />
             ))}
           </ChipScrollRow>
         ) : null}

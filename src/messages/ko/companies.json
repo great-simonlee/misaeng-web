@@ -180,6 +180,13 @@
     "timing": {
       "posted3d": "최근 3일 등록",
       "closing7d": "마감 7일 이내"
+    },
+    "anyTerm": "전체 인턴 시즌",
+    "internTerm": {
+      "spring": "{year} 봄 인턴",
+      "summer": "{year} 여름 인턴",
+      "fall": "{year} 가을 인턴",
+      "winter": "{year} 겨울 인턴"
     }
   },
   "industries": {
