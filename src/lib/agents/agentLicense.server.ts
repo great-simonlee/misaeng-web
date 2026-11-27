@@ -272,7 +272,7 @@ function validate(input: AgentApplication, forcedBrokerage: string | null = null
     throw new AgentLicenseError(message, 'INVALID')
   }
   const number = clean(input.licenseNumber).toUpperCase().replace(/\s/g, '')
-  if (!/^[A-Z0-9-]{4,20}$/.test(number)) fail('Enter your NY license number (letters and numbers, as on the license).')
+  if (!/^[A-Z0-9-]{4,20}$/.test(number)) fail('Enter your U.S. real estate license number (letters and numbers, as on the license).')
   const holderName = clean(input.holderName)
   if (holderName.length < 2 || holderName.length > 80) fail('Enter your full name as it appears on the license.')
   const brokerage = forcedBrokerage ?? clean(input.brokerage)
@@ -282,7 +282,7 @@ function validate(input: AgentApplication, forcedBrokerage: string | null = null
   if (expiresOn && (!/^\d{4}-\d{2}-\d{2}$/.test(expiresOn) || Number.isNaN(Date.parse(expiresOn)))) {
     fail('Expiration date is not valid.')
   }
-  if (expiresOn && expiresOn < todayNY()) fail('This license has expired. Renew it with NY DOS first.')
+  if (expiresOn && expiresOn < todayNY()) fail('This license has expired. Renew it first.')
   const licenseType = input.licenseType ? clean(input.licenseType) : null
   if (licenseType && !(LICENSE_TYPES as readonly string[]).includes(licenseType)) fail('Pick a license type.')
   if (!input.photoConsent) {

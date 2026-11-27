@@ -504,7 +504,7 @@
     "agentLicense": {
       "approved": {
         "title": "Bạn đã được xác minh là Licensed Agent",
-        "body": "Giấy phép NY đã được xác minh (đến {until}). Giờ bạn có thể đăng tin."
+        "body": "Giấy phép bất động sản Hoa Kỳ đã được xác minh (đến {until}). Giờ bạn có thể đăng tin."
       },
       "rejected": {
         "title": "Chưa thể xác minh giấy phép",

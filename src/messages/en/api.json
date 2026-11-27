@@ -504,7 +504,7 @@
     "agentLicense": {
       "approved": {
         "title": "You’re a verified Licensed Agent",
-        "body": "Your NY license is verified (until {until}). You can now post listings."
+        "body": "Your U.S. real estate license is verified (until {until}). You can now post listings."
       },
       "rejected": {
         "title": "Agent verification not approved",
