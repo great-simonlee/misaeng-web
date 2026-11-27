@@ -16,6 +16,11 @@ import { notifyUsers } from '@lib/push/notify.server'
  *           links, approve with the expiration date, reject with a reason → push + in-app notice; edit the display
  *           details (holder name, brokerage, contact, license type) of a pending or approved agent (owner 11-26)
  *
+ * Business contact (owner 11-26): both a phone and an email are required (NY 175.25 wants contact details on every
+ * listing). They live in contact_phone / contact_email (supabase/agent_contact_split.sql); `contact` keeps
+ * "phone · email" for older app builds. Before that SQL has run, only `contact` is written and the two are read back
+ * from it (see hasSplitColumns).
+ *
  * In-house agents (misaeng_in_house active, e.g. @misaeng.com) always list under the configured brokerage
  * (misaeng_settings 'brokerage' → Fact Real Estate): the application, the approval and staff edits store that name,
  * and the listing disclosure (listings.server.ts) shows it whatever the row says.
@@ -68,6 +73,9 @@ type Row = {
   holder_name: string
   brokerage: string
   contact: string
+  /** supabase/agent_contact_split.sql; missing before it runs (then read from `contact`). */
+  contact_email?: string | null
+  contact_phone?: string | null
   applicant_expires_on: string | null
   photo_path: string | null
   id_photo_path: string | null
@@ -80,8 +88,28 @@ type Row = {
   created_at: string
 }
 
-const COLUMNS =
+const BASE_COLUMNS =
   'id, user_id, license_number, license_type, holder_name, brokerage, contact, applicant_expires_on, photo_path, id_photo_path, selfie_path, status, expires_on, reject_reason, reviewed_by, reviewed_at, created_at'
+const SPLIT_COLUMNS = 'contact_email, contact_phone'
+
+/**
+ * Has supabase/agent_contact_split.sql run (contact_email / contact_phone exist)? A yes is kept for the process; a no
+ * is checked again after a minute, so the server starts using the columns soon after the SQL runs, without a restart.
+ */
+let splitColumns: { ok: boolean; at: number } | null = null
+async function hasSplitColumns() {
+  if (splitColumns && (splitColumns.ok || Date.now() - splitColumns.at < 60_000)) return splitColumns.ok
+  const { error } = await db().from(TABLE).select(SPLIT_COLUMNS).limit(1)
+  // Only a missing column (42703 / PostgREST schema cache) means "not yet"; other errors are not cached.
+  const missing = Boolean(error && (error.code === '42703' || error.code === 'PGRST204' || /column|schema cache/i.test(error.message ?? '')))
+  if (error && !missing) return false
+  splitColumns = { ok: !error, at: Date.now() }
+  return splitColumns.ok
+}
+
+async function columns() {
+  return (await hasSplitColumns()) ? `${BASE_COLUMNS}, ${SPLIT_COLUMNS}` : BASE_COLUMNS
+}
 
 /** Table not there yet (SQL not run): read as "never applied". */
 function missingTable(error: { code?: string; message?: string } | null) {
@@ -108,7 +136,10 @@ function toMember(row: Row | null) {
     holderName: row?.holder_name ?? null,
     licenseNumber: row?.license_number ?? null,
     licenseType: row?.license_type ?? null,
+    /** "phone · email" (older app builds show this one line). */
     contact: row?.contact ?? null,
+    contactEmail: row ? contactOf(row).email : null,
+    contactPhone: row ? contactOf(row).phone : null,
     /** yyyy-mm-dd; approved / expired only. */
     expiresOn: status === 'approved' || status === 'expired' ? row?.expires_on ?? null : null,
     rejectReason: status === 'rejected' ? row?.reject_reason ?? null : null,
@@ -121,7 +152,7 @@ export type AgentLicenseState = ReturnType<typeof toMember>
 async function latestRow(uid: string): Promise<Row | null> {
   const { data, error } = await db()
     .from(TABLE)
-    .select(COLUMNS)
+    .select(await columns())
     .eq('user_id', uid)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -153,15 +184,23 @@ export async function activeLicense(uid: string) {
 
 /** Licensed Agent badge for many owners at once (listing board). Missing table → nobody. */
 export async function licensedOwners(uids: string[]) {
-  const out = new Map<string, { brokerage: string; holderName: string; licenseType: string | null; contact: string; inHouse: boolean }>()
+  const out = new Map<
+    string,
+    { brokerage: string; holderName: string; licenseType: string | null; phone: string | null; email: string | null; inHouse: boolean }
+  >()
   if (uids.length === 0) return out
+  const split = await hasSplitColumns()
   const { data, error } = await db()
     .from(TABLE)
-    .select('user_id, brokerage, holder_name, license_type, contact, expires_on')
+    .select(`user_id, brokerage, holder_name, license_type, contact, expires_on${split ? `, ${SPLIT_COLUMNS}` : ''}`)
     .in('user_id', [...new Set(uids)].slice(0, 200))
     .eq('status', 'approved')
     .gte('expires_on', todayNY())
-    .returns<{ user_id: string; brokerage: string; holder_name: string; license_type: string | null; contact: string; expires_on: string }[]>()
+    .returns<
+      (Pick<Row, 'user_id' | 'brokerage' | 'holder_name' | 'license_type' | 'contact' | 'contact_email' | 'contact_phone'> & {
+        expires_on: string
+      })[]
+    >()
   if (error) return out
   const inHouse = await activeInHouse((data ?? []).map((row) => row.user_id))
   for (const row of data ?? []) {
@@ -169,7 +208,7 @@ export async function licensedOwners(uids: string[]) {
       brokerage: row.brokerage,
       holderName: row.holder_name,
       licenseType: row.license_type,
-      contact: row.contact,
+      ...contactOf(row),
       inHouse: inHouse.has(row.user_id),
     })
   }
@@ -216,7 +255,11 @@ export type AgentApplication = {
   photoConsent?: boolean
   holderName: string
   brokerage: string
-  contact: string
+  /** Business email + phone, both required (owner 11-26). */
+  contactEmail?: string | null
+  contactPhone?: string | null
+  /** Older app builds: one business phone or email (used only when both fields above are empty). */
+  contact?: string | null
   /** yyyy-mm-dd, optional. */
   expiresOn?: string | null
 }
@@ -233,8 +276,7 @@ function validate(input: AgentApplication, forcedBrokerage: string | null = null
   if (holderName.length < 2 || holderName.length > 80) fail('Enter your full name as it appears on the license.')
   const brokerage = forcedBrokerage ?? clean(input.brokerage)
   if (brokerage.length < 2 || brokerage.length > 80) fail('Enter your brokerage name.')
-  const contact = clean(input.contact)
-  if (!validContact(contact)) fail('Enter a business phone number or email.')
+  const contact = contactInput(input)
   const expiresOn = input.expiresOn ? clean(input.expiresOn) : null
   if (expiresOn && (!/^\d{4}-\d{2}-\d{2}$/.test(expiresOn) || Number.isNaN(Date.parse(expiresOn)))) {
     fail('Expiration date is not valid.')
@@ -248,11 +290,64 @@ function validate(input: AgentApplication, forcedBrokerage: string | null = null
   return { number, holderName, brokerage, contact, expiresOn, licenseType }
 }
 
-/** Business phone (10+ digits) or email, 5–120 characters (the table's check). */
-function validContact(contact: string) {
-  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)
-  const isPhone = contact.replace(/\D/g, '').length >= 10 && /^[+\d\s().-]+$/.test(contact)
-  return contact.length >= 5 && contact.length <= 120 && (isEmail || isPhone)
+// MARK: - Business contact (phone + email)
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const EMAIL_MAX = 90
+const PHONE_MAX = 25
+
+/** Lower-cased business email, or null when it is not one. */
+export function normalizeAgentEmail(value: unknown) {
+  const email = clean(value).toLowerCase()
+  return email.length <= EMAIL_MAX && EMAIL_RE.test(email) ? email : null
+}
+
+/** US numbers as "(212) 555-0123" (a leading 1 dropped); other 10–15 digit numbers as typed. Null when not a phone. */
+export function normalizeAgentPhone(value: unknown) {
+  const phone = clean(value)
+  if (!/^[+\d\s().-]+$/.test(phone)) return null
+  let digits = phone.replace(/\D/g, '')
+  if (digits.length === 11 && digits.startsWith('1')) digits = digits.slice(1)
+  if (digits.length === 10) return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+  return digits.length >= 10 && digits.length <= 15 && phone.length <= PHONE_MAX ? phone : null
+}
+
+/** The `contact` column (5–120 characters): "phone · email", or the one there is. */
+function joinContact(phone: string | null, email: string | null) {
+  return [phone, email].filter(Boolean).join(' · ')
+}
+
+/** Phone and email of a row: the split columns when set, else read out of `contact` ("phone · email" or one of them). */
+function contactOf(row: Pick<Row, 'contact' | 'contact_email' | 'contact_phone'>) {
+  const parts = (row.contact ?? '').split('·').map((part) => part.trim()).filter(Boolean)
+  return {
+    phone: row.contact_phone || parts.map(normalizeAgentPhone).find(Boolean) || null,
+    email: row.contact_email || parts.map(normalizeAgentEmail).find(Boolean) || null,
+  }
+}
+
+/**
+ * Both business email and phone, required; codes CONTACT_EMAIL_REQUIRED / CONTACT_EMAIL_INVALID /
+ * CONTACT_PHONE_REQUIRED / CONTACT_PHONE_INVALID. An older build sends only `contact` (a phone or an email): taken
+ * as before.
+ */
+function contactInput(input: Pick<AgentApplication, 'contactEmail' | 'contactPhone' | 'contact'>) {
+  const rawEmail = clean(input.contactEmail)
+  const rawPhone = clean(input.contactPhone)
+  const legacy = clean(input.contact)
+  if (!rawEmail && !rawPhone && legacy) {
+    const phone = normalizeAgentPhone(legacy)
+    const email = phone ? null : normalizeAgentEmail(legacy)
+    if (!phone && !email) throw new AgentLicenseError('Enter a business phone number or email.', 'INVALID')
+    return { phone, email, contact: joinContact(phone, email) }
+  }
+  if (!rawEmail) throw new AgentLicenseError('Enter your business email.', 'CONTACT_EMAIL_REQUIRED')
+  const email = normalizeAgentEmail(rawEmail)
+  if (!email) throw new AgentLicenseError('Enter a valid business email (name@company.com).', 'CONTACT_EMAIL_INVALID')
+  if (!rawPhone) throw new AgentLicenseError('Enter your business phone number.', 'CONTACT_PHONE_REQUIRED')
+  const phone = normalizeAgentPhone(rawPhone)
+  if (!phone) throw new AgentLicenseError('Enter a business phone number with at least 10 digits.', 'CONTACT_PHONE_INVALID')
+  return { phone, email, contact: joinContact(phone, email) }
 }
 
 function isJpeg(bytes: Uint8Array) {
@@ -319,7 +414,8 @@ export async function applyAgentLicense(
       license_type: fields.licenseType,
       holder_name: fields.holderName,
       brokerage: fields.brokerage,
-      contact: fields.contact,
+      contact: fields.contact.contact,
+      ...((await hasSplitColumns()) ? { contact_email: fields.contact.email, contact_phone: fields.contact.phone } : {}),
       applicant_expires_on: fields.expiresOn,
       photo_path: paths.license,
       id_photo_path: paths.id,
@@ -327,7 +423,7 @@ export async function applyAgentLicense(
       consent_at: new Date().toISOString(),
       consent_version: PHOTO_CONSENT_VERSION,
     } as never)
-    .select(COLUMNS)
+    .select(await columns())
     .single<Row>()
   if (error || !data) {
     await cleanup()
@@ -343,7 +439,7 @@ export async function applyAgentLicense(
 export type ReviewFilter = 'pending' | 'approved' | 'rejected' | 'expired' | 'all'
 
 export async function listForReview(filter: ReviewFilter, limit = 200) {
-  let query = db().from(TABLE).select(COLUMNS).order('created_at', { ascending: filter !== 'pending' ? false : true })
+  let query = db().from(TABLE).select(await columns()).order('created_at', { ascending: filter !== 'pending' ? false : true })
   const today = todayNY()
   if (filter === 'pending' || filter === 'rejected') query = query.eq('status', filter)
   if (filter === 'approved') query = query.eq('status', 'approved').gte('expires_on', today)
@@ -381,6 +477,8 @@ export async function listForReview(filter: ReviewFilter, limit = 200) {
       holderName: row.holder_name,
       brokerage: row.brokerage,
       contact: row.contact,
+      contactEmail: contactOf(row).email,
+      contactPhone: contactOf(row).phone,
       applicantExpiresOn: row.applicant_expires_on,
       expiresOn: row.expires_on,
       rejectReason: row.reject_reason,
@@ -454,7 +552,7 @@ export async function decideAgentLicense(input: {
     .update(patch as never)
     .eq('id', input.id)
     .eq('status', 'pending')
-    .select(COLUMNS)
+    .select(await columns())
     .maybeSingle<Row>()
   if (error) throw new AgentLicenseError(error.message, 'SAVE_FAILED', 500)
   if (!data) throw new AgentLicenseError('Application not found or already reviewed.', 'ALREADY_DECIDED', 409)
@@ -495,6 +593,9 @@ export type AgentLicenseEditInput = {
   id: string
   holderName?: string | null
   brokerage?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  /** Older ERP: one phone or email, replacing the matching one. */
   contact?: string | null
   licenseType?: string | null
   editor: string
@@ -509,13 +610,21 @@ export async function editAgentLicense(input: AgentLicenseEditInput) {
   const fail = (message: string): never => {
     throw new AgentLicenseError(message, 'INVALID')
   }
-  const { data: row, error } = await db().from(TABLE).select(COLUMNS).eq('id', input.id).maybeSingle<Row>()
+  const { data: row, error } = await db().from(TABLE).select(await columns()).eq('id', input.id).maybeSingle<Row>()
   if (missingTable(error)) throw new AgentLicenseError('Agent verification is not set up yet.', 'SETUP_REQUIRED', 503)
   if (error) throw new AgentLicenseError(error.message, 'LOAD_FAILED', 500)
   if (!row) throw new AgentLicenseError('License not found.', 'NOT_FOUND', 404)
   if (row.status === 'rejected') throw new AgentLicenseError('A rejected application cannot be edited.', 'NOT_EDITABLE', 409)
 
-  const next = { holder_name: row.holder_name, brokerage: row.brokerage, contact: row.contact, license_type: row.license_type }
+  const current = contactOf(row)
+  const before = {
+    holder_name: row.holder_name,
+    brokerage: row.brokerage,
+    contact_phone: current.phone,
+    contact_email: current.email,
+    license_type: row.license_type,
+  }
+  const next = { ...before }
   if (input.holderName != null) {
     const holderName = clean(input.holderName)
     if (holderName.length < 2 || holderName.length > 80) fail('Name must be 2–80 characters.')
@@ -526,10 +635,22 @@ export async function editAgentLicense(input: AgentLicenseEditInput) {
     if (brokerage.length < 2 || brokerage.length > 80) fail('Brokerage must be 2–80 characters.')
     next.brokerage = brokerage
   }
-  if (input.contact != null) {
-    const contact = clean(input.contact)
-    if (!validContact(contact)) fail('Contact must be a business phone number (10+ digits) or an email, up to 120 characters.')
-    next.contact = contact
+  if (input.contactEmail != null) {
+    const email = normalizeAgentEmail(input.contactEmail)
+    if (!email) throw new AgentLicenseError('Enter a valid business email (name@company.com).', 'CONTACT_EMAIL_INVALID')
+    next.contact_email = email
+  }
+  if (input.contactPhone != null) {
+    const phone = normalizeAgentPhone(input.contactPhone)
+    if (!phone) throw new AgentLicenseError('Enter a business phone number with at least 10 digits.', 'CONTACT_PHONE_INVALID')
+    next.contact_phone = phone
+  }
+  if (input.contact != null && input.contactEmail == null && input.contactPhone == null) {
+    const phone = normalizeAgentPhone(input.contact)
+    const email = phone ? null : normalizeAgentEmail(input.contact)
+    if (!phone && !email) fail('Contact must be a business phone number (10+ digits) or an email.')
+    if (phone) next.contact_phone = phone
+    if (email) next.contact_email = email
   }
   if (input.licenseType != null) {
     const licenseType = clean(input.licenseType)
@@ -541,7 +662,7 @@ export async function editAgentLicense(input: AgentLicenseEditInput) {
 
   const changes: AgentLicenseEdit['changes'] = {}
   for (const key of Object.keys(next) as (keyof typeof next)[]) {
-    if ((next[key] ?? null) !== (row[key] ?? null)) changes[key] = { from: row[key] ?? null, to: next[key] ?? null }
+    if ((next[key] ?? null) !== (before[key] ?? null)) changes[key] = { from: before[key] ?? null, to: next[key] ?? null }
   }
   if (Object.keys(changes).length === 0) return { application: toMember(row), changed: false, inHouse }
 
@@ -549,10 +670,17 @@ export async function editAgentLicense(input: AgentLicenseEditInput) {
   const by = input.editor.slice(0, 200)
   const { data: saved, error: saveError } = await db()
     .from(TABLE)
-    .update({ ...next, updated_at: now } as never)
+    .update({
+      holder_name: next.holder_name,
+      brokerage: next.brokerage,
+      license_type: next.license_type,
+      contact: joinContact(next.contact_phone, next.contact_email) || row.contact,
+      ...((await hasSplitColumns()) ? { contact_email: next.contact_email, contact_phone: next.contact_phone } : {}),
+      updated_at: now,
+    } as never)
     .eq('id', row.id)
     .neq('status', 'rejected')
-    .select(COLUMNS)
+    .select(await columns())
     .maybeSingle<Row>()
   if (saveError) throw new AgentLicenseError(saveError.message, 'SAVE_FAILED', 500)
   if (!saved) throw new AgentLicenseError('License not found or no longer editable.', 'NOT_EDITABLE', 409)

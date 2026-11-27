@@ -23,7 +23,7 @@ export const dynamic = 'force-dynamic'
  *   POST { action: 'photo', id, kind: license|id|selfie }       → { url, expiresIn, mimeType } (60 s signed link)
  *   POST { action: 'approve', id, expiresOn, licenseType? }     → { application } (member pushed)
  *   POST { action: 'reject', id, rejectReason }                 → { application } (member pushed)
- *   POST { action: 'edit', id, holderName?, brokerage?, contact?, licenseType? }
+ *   POST { action: 'edit', id, holderName?, brokerage?, contactEmail?, contactPhone?, licenseType? } (contact? = older ERP)
  *        → { application, changed, inHouse } — pending or approved only; in-house agents keep the configured
  *          brokerage; logged with x-admin-id (no push)
  */
@@ -83,6 +83,8 @@ export async function POST(request: Request) {
           id,
           holderName: text(body.holderName),
           brokerage: text(body.brokerage),
+          contactEmail: text(body.contactEmail),
+          contactPhone: text(body.contactPhone),
           contact: text(body.contact),
           licenseType: text(body.licenseType),
           editor: request.headers.get('x-admin-id')?.trim() || 'erp',

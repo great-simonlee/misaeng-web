@@ -337,12 +337,6 @@ export type ListingDisclosure = {
   source: 'agent' | 'misaeng'
 }
 
-function contactParts(contact: string | null | undefined) {
-  const value = (contact ?? '').trim()
-  if (!value) return { phone: null, email: null }
-  return /@/.test(value) ? { phone: null, email: value } : { phone: value, email: null }
-}
-
 /**
  * Brokered fields + the Licensed Agent badge, read apart from LISTING_COLUMNS so the board keeps working before
  * agent_license.sql is run (then everything reads as not brokered).
@@ -388,7 +382,9 @@ async function withBroker<T extends ReturnType<typeof toPublic>>(
             agentName: agent.holderName,
             licenseType: agent.licenseType,
             licenseLabel: licenseTypeLabel(agent.licenseType),
-            ...contactParts(agent.contact),
+            // Both (owner 11-26: business phone + email required; older rows may have one).
+            phone: agent.phone,
+            email: agent.email,
             source: 'agent' as const,
           }
         : null,

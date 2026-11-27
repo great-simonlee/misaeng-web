@@ -22,7 +22,8 @@ export async function GET() {
 
 /**
  * Apply (multipart): licenseNumber, licenseType (salesperson | associate_broker | broker, optional), holderName,
- * brokerage, contact (business phone or email), expiresOn (yyyy-mm-dd, optional), photoConsent = 'true' (the ID /
+ * brokerage, contactEmail + contactPhone (business, both required — 400 CONTACT_EMAIL_REQUIRED / CONTACT_EMAIL_INVALID /
+ * CONTACT_PHONE_REQUIRED / CONTACT_PHONE_INVALID; older builds' single `contact` is still taken), expiresOn (yyyy-mm-dd, optional), photoConsent = 'true' (the ID /
  * face image notice), and three JPEGs the app shrinks: photo (license or pocket card), idPhoto (government ID),
  * selfie. Stored privately; staff see them through 60-second links and they are deleted 30 days after the decision.
  */
@@ -49,6 +50,9 @@ export async function POST(request: Request) {
         photoConsent: text('photoConsent') === 'true',
         holderName: text('holderName'),
         brokerage: text('brokerage'),
+        contactEmail: text('contactEmail'),
+        contactPhone: text('contactPhone'),
+        // Older app builds send one phone-or-email `contact`.
         contact: text('contact'),
         expiresOn: text('expiresOn') || null,
       },
