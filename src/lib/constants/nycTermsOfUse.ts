@@ -709,8 +709,8 @@ export const NYC_TERMS_OF_USE: LegalDocument = {
           type: 'ul',
           items: [
             {
-              en: 'Credit packs. Credits can be obtained only by buying a credit pack (US$1 = 10 Credits). Packs are shown with their price, any bonus Credits and any applicable tax before you pay (for example, US$9.99 for 100 Credits, US$19.99 for 220, US$39.99 for 460, and US$79.99 for 960). Purchases on the web are processed by Stripe, and purchases in the Ellieo iOS app by Apple through the App Store; we do not store your full card number. Bonus Credits from a promotion are part of the purchase they come with.',
-              ko: '크레딧 패키지. 크레딧은 크레딧 패키지를 구매해야만 얻을 수 있습니다(US$1 = 10크레딧). 결제 전에 패키지의 가격·보너스 크레딧·적용 세금이 표시됩니다(예: US$9.99에 100크레딧, US$19.99에 220, US$39.99에 460, US$79.99에 960). 웹 결제는 Stripe가, Ellieo iOS 앱 내 결제는 App Store를 통해 Apple이 처리하며 회사는 카드 번호 전체를 저장하지 않습니다. 프로모션 보너스 크레딧은 함께 받은 구매의 일부입니다.',
+              en: 'Credit packs. Credits can be obtained only by buying a credit pack (US$1 = 10 Credits). Packs are shown with their price, any bonus Credits and any applicable tax before you pay (for example, US$9.99 for 100 Credits, US$18.99 for 220, US$36.99 for 460, and US$69.99 for 960). Purchases on the web are processed by Stripe, and purchases in the Ellieo iOS app by Apple through the App Store; we do not store your full card number. Bonus Credits from a promotion are part of the purchase they come with.',
+              ko: '크레딧 패키지. 크레딧은 크레딧 패키지를 구매해야만 얻을 수 있습니다(US$1 = 10크레딧). 결제 전에 패키지의 가격·보너스 크레딧·적용 세금이 표시됩니다(예: US$9.99에 100크레딧, US$18.99에 220, US$36.99에 460, US$69.99에 960). 웹 결제는 Stripe가, Ellieo iOS 앱 내 결제는 App Store를 통해 Apple이 처리하며 회사는 카드 번호 전체를 저장하지 않습니다. 프로모션 보너스 크레딧은 함께 받은 구매의 일부입니다.',
             },
             {
               en: 'Expiration. Credits you buy, including bonus Credits, do not expire. The Company does not give free Credits.',
