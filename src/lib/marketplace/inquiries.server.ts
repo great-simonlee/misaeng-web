@@ -7,6 +7,7 @@ import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import { enc, pointsRest, PointsStoreError } from '@lib/points/rest.server'
 import type { CommunityPost } from '@/types/nyc'
 import { notifyUsers } from '@lib/push/notify.server'
+import { markThreadRead } from '@lib/push/inbox.server'
 
 /*
  * 중고거래 문의 스레드 (supabase/marketplace_inquiries.sql). One thread per listing and buyer; both sides add
@@ -248,6 +249,9 @@ export async function openThread(uid: string, inquiryId: string) {
       body: JSON.stringify(seller ? { seller_unread: 0 } : { buyer_unread: 0 }),
     }).catch(() => null)
   }
+  // Its rows in the 알림 inbox are read too (same threadId as pushMessage), so the bell and the app icon number
+  // follow on every platform — they stayed at 1 until the 알림 screen was opened (owner 11-27). Never throws.
+  await markThreadRead(uid, `marketplace-${inquiryId}`)
   const [post, them] = await Promise.all([
     getStoredCommunityPost(thread.post_id).catch(() => null),
     person(seller ? thread.buyer_id : thread.seller_id),

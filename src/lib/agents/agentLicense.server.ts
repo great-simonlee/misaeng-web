@@ -3,6 +3,8 @@ import { randomUUID } from 'node:crypto'
 import { getSupabaseServiceClient } from '@lib/supabase/server'
 import { getSupabaseProfile } from '@lib/supabase/profile.server'
 import { notifyUsers } from '@lib/push/notify.server'
+import { sendStaffPush, SUPER_ADMIN_EMAIL } from '@lib/support/staffPush.server'
+import { BRAND_CONFIG } from '@lib/brand'
 
 /**
  * Misaeng "Licensed Agent" accounts for New York real-estate agents (owner 2026-11-26, ported from Ellieo). Table
@@ -432,7 +434,33 @@ export async function applyAgentLicense(
     if (missingTable(error)) throw new AgentLicenseError('Agent verification is not set up yet.', 'SETUP_REQUIRED', 503)
     throw new AgentLicenseError(error?.message ?? 'Save failed', 'SAVE_FAILED', 500)
   }
+  alertNewAgentApplication(uid, fields)
   return toMember(data)
+}
+
+const LICENSE_TYPE_LABELS: Record<string, string> = {
+  salesperson: 'Salesperson',
+  associate_broker: 'Associate Broker',
+  broker: 'Broker',
+}
+
+/**
+ * New agent application → push in the Misaeng ERP app to the Super Admin only (like sign-ups and workplace requests;
+ * owner 11-27). Tap → Misaeng › Users, that member. English like every staff-app text. Never throws.
+ */
+function alertNewAgentApplication(
+  uid: string,
+  fields: { holderName: string; brokerage: string; number: string; licenseType: string | null },
+) {
+  void sendStaffPush([SUPER_ADMIN_EMAIL], {
+    title: 'Agent verification request',
+    subtitle: [BRAND_CONFIG.name, fields.licenseType ? LICENSE_TYPE_LABELS[fields.licenseType] ?? '' : '']
+      .filter(Boolean)
+      .join(' · '),
+    body: `${fields.holderName} · ${fields.brokerage} · #${fields.number}`,
+    threadId: 'agent-verification',
+    data: { type: 'agent_license', uid },
+  }).catch((error) => console.error('[agent application alert]', error))
 }
 
 // MARK: - Staff (ERP)
