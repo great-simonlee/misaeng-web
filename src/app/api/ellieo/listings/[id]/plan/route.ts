@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * My listing's plan. { action }:
- *   renew { days }  · premium (Boost a new or regular listing; restarts its 28 days) · extend (+7 days Boost, once)
+ *   renew { days }  · premium (Boost; on a listing that is up: Boost price only, keeps its end date) · extend (+7 days Boost, once)
  *   reserve (Boost spots full: paid now, starts in order) · cancel_reservation (full refund of the held part) · rented
  * Prices come from the one config; the app never sends one.
  */

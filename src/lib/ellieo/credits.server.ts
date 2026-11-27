@@ -46,9 +46,9 @@ export type CreditsConfig = {
 export const DEFAULT_CREDITS_CONFIG: CreditsConfig = {
   packs: [
     { id: 'pack100', priceCents: 999, credits: 100, appleProductId: 'com.misaeng.ellieo.credits.100' },
-    { id: 'pack220', priceCents: 1999, credits: 220, appleProductId: 'com.misaeng.ellieo.credits.220' },
-    { id: 'pack460', priceCents: 3999, credits: 460, appleProductId: 'com.misaeng.ellieo.credits.460' },
-    { id: 'pack960', priceCents: 7999, credits: 960, appleProductId: 'com.misaeng.ellieo.credits.960' },
+    { id: 'pack220', priceCents: 1899, credits: 220, appleProductId: 'com.misaeng.ellieo.credits.220' },
+    { id: 'pack460', priceCents: 3699, credits: 460, appleProductId: 'com.misaeng.ellieo.credits.460' },
+    { id: 'pack960', priceCents: 6999, credits: 960, appleProductId: 'com.misaeng.ellieo.credits.960' },
   ],
   salesTaxRate: 0,
   // The apps buy through the App Store now; the web link stays off there unless the ERP turns it on.

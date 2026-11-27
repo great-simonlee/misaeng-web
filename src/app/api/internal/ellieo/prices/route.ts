@@ -3,7 +3,7 @@ import { timingSafeEqual } from 'node:crypto'
 import { NextResponse } from 'next/server'
 
 import { DEFAULT_CREDITS_CONFIG, getCreditsConfig, paymentsEnabled, saveCreditsConfig } from '@lib/ellieo/credits.server'
-import { CreditsError, DEFAULT_LISTING_PRICES, extendPrice, getListingPrices, premiumPrice, saveListingPrices } from '@lib/ellieo/listingPlans.server'
+import { CreditsError, DEFAULT_LISTING_PRICES, extendPrice, getListingPrices, premiumPrice, saveListingPrices, upgradePrice } from '@lib/ellieo/listingPlans.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -25,7 +25,7 @@ async function payload() {
     prices,
     credits,
     defaults: { prices: DEFAULT_LISTING_PRICES, credits: DEFAULT_CREDITS_CONFIG },
-    computed: { premium: premiumPrice(prices), extend: extendPrice(prices) },
+    computed: { premium: premiumPrice(prices), upgrade: upgradePrice(prices), extend: extendPrice(prices) },
     paymentsEnabled: paymentsEnabled(),
   }
 }
