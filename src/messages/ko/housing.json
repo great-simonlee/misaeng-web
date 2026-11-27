@@ -86,7 +86,8 @@
     "regular-bedroom": "Regular",
     "flexroom": "Flex",
     "entire": "유닛 전체",
-    "studio": "Studio"
+    "studio": "Studio",
+    "other": "기타"
   },
   "unitTypes": {
     "studio": "Studio",

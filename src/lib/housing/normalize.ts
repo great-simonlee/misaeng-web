@@ -49,6 +49,7 @@ const ROOM_TYPES = new Set([
   'flexroom',
   'entire',
   'studio',
+  'other',
 ])
 
 const UNIT_TYPES = new Set([
@@ -251,6 +252,7 @@ export function normalizeHousingListing(raw: unknown): HousingListing | null {
             personalIncome: String(incomeRaw.personalIncome || '').trim() || undefined,
             personalGuarantor:
               String(incomeRaw.personalGuarantor || '').trim() || undefined,
+            ...(incomeRaw.guarantorCompany === false ? { guarantorCompany: false } : {}),
           }
         : null,
       latestMoveInAllowedDays:

@@ -1,0 +1,1388 @@
+{
+  "areas": [
+    "Manhattan",
+    "Brooklyn",
+    "Queens",
+    "Bronx",
+    "Staten Island",
+    "New Jersey"
+  ],
+  "zips": {
+    "10001": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Chelsea",
+        "Hudson Yards",
+        "Midtown"
+      ]
+    },
+    "10002": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Lower East Side",
+        "Chinatown",
+        "Two Bridges"
+      ]
+    },
+    "10003": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "East Village",
+        "Gramercy",
+        "Union Square",
+        "Greenwich Village"
+      ]
+    },
+    "10004": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Financial District",
+        "Battery Park City"
+      ]
+    },
+    "10005": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Financial District"
+      ]
+    },
+    "10006": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Financial District"
+      ]
+    },
+    "10007": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Tribeca",
+        "Financial District"
+      ]
+    },
+    "10009": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "East Village",
+        "Alphabet City"
+      ]
+    },
+    "10010": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Flatiron",
+        "Gramercy",
+        "Kips Bay"
+      ]
+    },
+    "10011": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Chelsea",
+        "West Village",
+        "Flatiron"
+      ]
+    },
+    "10012": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "SoHo",
+        "Greenwich Village",
+        "NoHo",
+        "Nolita"
+      ]
+    },
+    "10013": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Tribeca",
+        "SoHo",
+        "Chinatown",
+        "Little Italy"
+      ]
+    },
+    "10014": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "West Village",
+        "Meatpacking District"
+      ]
+    },
+    "10016": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Murray Hill",
+        "Kips Bay",
+        "NoMad"
+      ]
+    },
+    "10017": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Midtown",
+        "Murray Hill",
+        "Turtle Bay"
+      ]
+    },
+    "10018": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Midtown",
+        "Hudson Yards"
+      ]
+    },
+    "10019": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Hell's Kitchen",
+        "Midtown"
+      ]
+    },
+    "10020": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Midtown"
+      ]
+    },
+    "10021": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Upper East Side",
+        "Lenox Hill"
+      ]
+    },
+    "10022": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Midtown",
+        "Sutton Place"
+      ]
+    },
+    "10023": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Upper West Side",
+        "Lincoln Square"
+      ]
+    },
+    "10024": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Upper West Side"
+      ]
+    },
+    "10025": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Upper West Side",
+        "Manhattan Valley",
+        "Morningside Heights"
+      ]
+    },
+    "10026": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Harlem"
+      ]
+    },
+    "10027": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Harlem",
+        "Morningside Heights"
+      ]
+    },
+    "10028": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Upper East Side",
+        "Yorkville"
+      ]
+    },
+    "10029": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "East Harlem"
+      ]
+    },
+    "10030": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Harlem"
+      ]
+    },
+    "10031": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Hamilton Heights",
+        "Harlem"
+      ]
+    },
+    "10032": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Washington Heights",
+        "Hamilton Heights"
+      ]
+    },
+    "10033": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Washington Heights"
+      ]
+    },
+    "10034": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Inwood"
+      ]
+    },
+    "10035": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "East Harlem"
+      ]
+    },
+    "10036": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Midtown",
+        "Hell's Kitchen",
+        "Times Square"
+      ]
+    },
+    "10037": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Harlem"
+      ]
+    },
+    "10038": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Financial District",
+        "Seaport",
+        "Two Bridges"
+      ]
+    },
+    "10039": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Harlem"
+      ]
+    },
+    "10040": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Washington Heights",
+        "Inwood"
+      ]
+    },
+    "10044": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Roosevelt Island"
+      ]
+    },
+    "10065": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Upper East Side",
+        "Lenox Hill"
+      ]
+    },
+    "10069": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Upper West Side"
+      ]
+    },
+    "10075": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Upper East Side"
+      ]
+    },
+    "10128": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Upper East Side",
+        "Carnegie Hill",
+        "Yorkville"
+      ]
+    },
+    "10280": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Battery Park City"
+      ]
+    },
+    "10281": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Battery Park City"
+      ]
+    },
+    "10282": {
+      "area": "Manhattan",
+      "neighborhoods": [
+        "Battery Park City",
+        "Tribeca"
+      ]
+    },
+    "10301": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "St. George",
+        "Tompkinsville"
+      ]
+    },
+    "10302": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "Port Richmond"
+      ]
+    },
+    "10303": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "Mariners Harbor"
+      ]
+    },
+    "10304": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "Stapleton",
+        "Grasmere"
+      ]
+    },
+    "10305": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "Rosebank",
+        "South Beach"
+      ]
+    },
+    "10306": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "New Dorp",
+        "Midland Beach"
+      ]
+    },
+    "10307": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "Tottenville"
+      ]
+    },
+    "10308": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "Great Kills"
+      ]
+    },
+    "10309": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "Charleston",
+        "Rossville"
+      ]
+    },
+    "10310": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "West Brighton"
+      ]
+    },
+    "10312": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "Eltingville",
+        "Annadale"
+      ]
+    },
+    "10314": {
+      "area": "Staten Island",
+      "neighborhoods": [
+        "Willowbrook",
+        "New Springville",
+        "Bulls Head"
+      ]
+    },
+    "10451": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Concourse",
+        "Mott Haven"
+      ]
+    },
+    "10452": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Highbridge",
+        "Concourse"
+      ]
+    },
+    "10453": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Morris Heights",
+        "University Heights"
+      ]
+    },
+    "10454": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Mott Haven",
+        "Port Morris"
+      ]
+    },
+    "10455": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Mott Haven",
+        "Longwood"
+      ]
+    },
+    "10456": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Morrisania",
+        "Claremont"
+      ]
+    },
+    "10457": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Tremont",
+        "Mount Hope"
+      ]
+    },
+    "10458": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Fordham",
+        "Belmont"
+      ]
+    },
+    "10459": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Longwood",
+        "Hunts Point"
+      ]
+    },
+    "10460": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "West Farms",
+        "Crotona Park"
+      ]
+    },
+    "10461": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Morris Park",
+        "Westchester Square"
+      ]
+    },
+    "10462": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Parkchester",
+        "Van Nest"
+      ]
+    },
+    "10463": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Riverdale",
+        "Kingsbridge",
+        "Spuyten Duyvil"
+      ]
+    },
+    "10464": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "City Island"
+      ]
+    },
+    "10465": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Throggs Neck"
+      ]
+    },
+    "10466": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Wakefield"
+      ]
+    },
+    "10467": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Norwood",
+        "Williamsbridge"
+      ]
+    },
+    "10468": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Kingsbridge Heights",
+        "Fordham"
+      ]
+    },
+    "10469": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Eastchester",
+        "Baychester"
+      ]
+    },
+    "10470": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Woodlawn"
+      ]
+    },
+    "10471": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Riverdale"
+      ]
+    },
+    "10472": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Soundview"
+      ]
+    },
+    "10473": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Castle Hill",
+        "Clason Point"
+      ]
+    },
+    "10474": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Hunts Point"
+      ]
+    },
+    "10475": {
+      "area": "Bronx",
+      "neighborhoods": [
+        "Co-op City"
+      ]
+    },
+    "11101": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Long Island City"
+      ]
+    },
+    "11102": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Astoria"
+      ]
+    },
+    "11103": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Astoria"
+      ]
+    },
+    "11104": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Sunnyside"
+      ]
+    },
+    "11105": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Astoria"
+      ]
+    },
+    "11106": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Astoria",
+        "Long Island City"
+      ]
+    },
+    "11109": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Long Island City"
+      ]
+    },
+    "11201": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Brooklyn Heights",
+        "Downtown Brooklyn",
+        "DUMBO",
+        "Cobble Hill",
+        "Boerum Hill"
+      ]
+    },
+    "11203": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "East Flatbush"
+      ]
+    },
+    "11204": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Bensonhurst",
+        "Mapleton"
+      ]
+    },
+    "11205": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Fort Greene",
+        "Clinton Hill"
+      ]
+    },
+    "11206": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Williamsburg",
+        "Bushwick"
+      ]
+    },
+    "11207": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "East New York",
+        "Bushwick"
+      ]
+    },
+    "11208": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "East New York",
+        "Cypress Hills"
+      ]
+    },
+    "11209": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Bay Ridge"
+      ]
+    },
+    "11210": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Flatbush",
+        "Midwood"
+      ]
+    },
+    "11211": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Williamsburg"
+      ]
+    },
+    "11212": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Brownsville"
+      ]
+    },
+    "11213": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Crown Heights"
+      ]
+    },
+    "11214": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Bath Beach",
+        "Bensonhurst"
+      ]
+    },
+    "11215": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Park Slope",
+        "Windsor Terrace"
+      ]
+    },
+    "11216": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Bedford-Stuyvesant",
+        "Crown Heights"
+      ]
+    },
+    "11217": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Park Slope",
+        "Boerum Hill",
+        "Prospect Heights"
+      ]
+    },
+    "11218": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Kensington",
+        "Windsor Terrace"
+      ]
+    },
+    "11219": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Borough Park"
+      ]
+    },
+    "11220": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Sunset Park"
+      ]
+    },
+    "11221": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Bushwick",
+        "Bedford-Stuyvesant"
+      ]
+    },
+    "11222": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Greenpoint"
+      ]
+    },
+    "11223": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Gravesend"
+      ]
+    },
+    "11224": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Coney Island"
+      ]
+    },
+    "11225": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Crown Heights",
+        "Prospect Lefferts Gardens"
+      ]
+    },
+    "11226": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Flatbush"
+      ]
+    },
+    "11228": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Dyker Heights"
+      ]
+    },
+    "11229": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Sheepshead Bay",
+        "Homecrest"
+      ]
+    },
+    "11230": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Midwood"
+      ]
+    },
+    "11231": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Carroll Gardens",
+        "Red Hook",
+        "Cobble Hill"
+      ]
+    },
+    "11232": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Sunset Park",
+        "Greenwood Heights"
+      ]
+    },
+    "11233": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Bedford-Stuyvesant",
+        "Ocean Hill"
+      ]
+    },
+    "11234": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Marine Park",
+        "Mill Basin",
+        "Canarsie"
+      ]
+    },
+    "11235": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Brighton Beach",
+        "Sheepshead Bay",
+        "Manhattan Beach"
+      ]
+    },
+    "11236": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Canarsie"
+      ]
+    },
+    "11237": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Bushwick"
+      ]
+    },
+    "11238": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Prospect Heights",
+        "Clinton Hill"
+      ]
+    },
+    "11239": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "East New York"
+      ]
+    },
+    "11249": {
+      "area": "Brooklyn",
+      "neighborhoods": [
+        "Williamsburg"
+      ]
+    },
+    "11354": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Flushing"
+      ]
+    },
+    "11355": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Flushing"
+      ]
+    },
+    "11356": {
+      "area": "Queens",
+      "neighborhoods": [
+        "College Point"
+      ]
+    },
+    "11357": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Whitestone"
+      ]
+    },
+    "11358": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Flushing",
+        "Auburndale"
+      ]
+    },
+    "11360": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Bayside"
+      ]
+    },
+    "11361": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Bayside"
+      ]
+    },
+    "11362": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Little Neck",
+        "Douglaston"
+      ]
+    },
+    "11363": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Little Neck",
+        "Douglaston"
+      ]
+    },
+    "11364": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Oakland Gardens"
+      ]
+    },
+    "11365": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Fresh Meadows"
+      ]
+    },
+    "11366": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Fresh Meadows"
+      ]
+    },
+    "11367": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Kew Gardens Hills"
+      ]
+    },
+    "11368": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Corona"
+      ]
+    },
+    "11369": {
+      "area": "Queens",
+      "neighborhoods": [
+        "East Elmhurst"
+      ]
+    },
+    "11370": {
+      "area": "Queens",
+      "neighborhoods": [
+        "East Elmhurst",
+        "Jackson Heights"
+      ]
+    },
+    "11372": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Jackson Heights"
+      ]
+    },
+    "11373": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Elmhurst"
+      ]
+    },
+    "11374": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Rego Park"
+      ]
+    },
+    "11375": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Forest Hills"
+      ]
+    },
+    "11377": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Woodside"
+      ]
+    },
+    "11378": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Maspeth"
+      ]
+    },
+    "11379": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Middle Village"
+      ]
+    },
+    "11385": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Ridgewood",
+        "Glendale"
+      ]
+    },
+    "11411": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Cambria Heights"
+      ]
+    },
+    "11412": {
+      "area": "Queens",
+      "neighborhoods": [
+        "St. Albans"
+      ]
+    },
+    "11413": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Springfield Gardens"
+      ]
+    },
+    "11414": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Howard Beach"
+      ]
+    },
+    "11415": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Kew Gardens"
+      ]
+    },
+    "11416": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Ozone Park"
+      ]
+    },
+    "11417": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Ozone Park"
+      ]
+    },
+    "11418": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Richmond Hill"
+      ]
+    },
+    "11419": {
+      "area": "Queens",
+      "neighborhoods": [
+        "South Richmond Hill"
+      ]
+    },
+    "11420": {
+      "area": "Queens",
+      "neighborhoods": [
+        "South Ozone Park"
+      ]
+    },
+    "11421": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Woodhaven"
+      ]
+    },
+    "11422": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Rosedale"
+      ]
+    },
+    "11423": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Hollis"
+      ]
+    },
+    "11426": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Bellerose"
+      ]
+    },
+    "11427": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Queens Village"
+      ]
+    },
+    "11428": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Queens Village"
+      ]
+    },
+    "11429": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Queens Village"
+      ]
+    },
+    "11432": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Jamaica",
+        "Jamaica Estates"
+      ]
+    },
+    "11433": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Jamaica"
+      ]
+    },
+    "11434": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Jamaica",
+        "Springfield Gardens"
+      ]
+    },
+    "11435": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Jamaica",
+        "Briarwood"
+      ]
+    },
+    "11436": {
+      "area": "Queens",
+      "neighborhoods": [
+        "South Ozone Park"
+      ]
+    },
+    "11691": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Far Rockaway"
+      ]
+    },
+    "11692": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Arverne"
+      ]
+    },
+    "11693": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Rockaway Beach",
+        "Broad Channel"
+      ]
+    },
+    "11694": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Rockaway Park",
+        "Belle Harbor"
+      ]
+    },
+    "11697": {
+      "area": "Queens",
+      "neighborhoods": [
+        "Breezy Point"
+      ]
+    },
+    "07010": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Cliffside Park"
+      ]
+    },
+    "07020": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Edgewater"
+      ]
+    },
+    "07024": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Fort Lee"
+      ]
+    },
+    "07030": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Hoboken"
+      ]
+    },
+    "07047": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "North Bergen"
+      ]
+    },
+    "07086": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Weehawken"
+      ]
+    },
+    "07087": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Union City"
+      ]
+    },
+    "07093": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "West New York"
+      ]
+    },
+    "07094": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Secaucus"
+      ]
+    },
+    "07302": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Jersey City - Downtown",
+        "Jersey City - Paulus Hook"
+      ]
+    },
+    "07304": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Jersey City - Bergen-Lafayette"
+      ]
+    },
+    "07305": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Jersey City - Greenville"
+      ]
+    },
+    "07306": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Jersey City - Journal Square"
+      ]
+    },
+    "07307": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Jersey City - The Heights"
+      ]
+    },
+    "07310": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Jersey City - Newport"
+      ]
+    },
+    "07311": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Jersey City - Exchange Place"
+      ]
+    },
+    "07601": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Hackensack"
+      ]
+    },
+    "07631": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Englewood"
+      ]
+    },
+    "07632": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Englewood Cliffs"
+      ]
+    },
+    "07650": {
+      "area": "New Jersey",
+      "neighborhoods": [
+        "Palisades Park"
+      ]
+    }
+  },
+  "amenities": [
+    "24-Hour Attended Lobby",
+    "Concierge Service",
+    "Elevator",
+    "Fitness Center",
+    "Mail Room",
+    "Laundry Room",
+    "Resident Lounge",
+    "Rooftop Outdoor Space",
+    "Rooftop Lounge",
+    "Pet Friendly",
+    "Garage Parking",
+    "Bike Room",
+    "Storage Space",
+    "Working Space",
+    "Business Meeting Room",
+    "Indoor Pool",
+    "Outdoor Pool",
+    "Sauna",
+    "Sundeck",
+    "BBQ Grills",
+    "Garden",
+    "Dog Run",
+    "Children's Playroom",
+    "Media Room",
+    "Pilates Studio",
+    "Yoga Studio",
+    "Recovery Room",
+    "Indoor Basketball Court",
+    "Indoor Pickleball Court",
+    "Indoor Squash Court",
+    "Tennis Courts",
+    "Indoor Golf Simulator",
+    "Bowling Alley",
+    "Billiards Room",
+    "Poker Room",
+    "Arcade Room",
+    "Ping Pong Table",
+    "Valet Service",
+    "Live-in Super",
+    "Wheelchair Access"
+  ],
+  "utilities": [
+    "Heat",
+    "Hot Water",
+    "Gas",
+    "Electricity",
+    "Water",
+    "Sewer"
+  ],
+  "appliances": [
+    "Dishwasher",
+    "Microwave",
+    "Oven",
+    "Refrigerator",
+    "Washer",
+    "Dryer",
+    "Air Conditioning"
+  ],
+  "roomTypes": [
+    "master-w-bath",
+    "master-wo-bath",
+    "regular-bedroom",
+    "flexroom",
+    "other"
+  ],
+  "partWalls": [
+    "Full wall",
+    "Regular wall",
+    "Curtain only"
+  ]
+}

@@ -7,6 +7,8 @@ export const USAGE_METRICS = {
   placesTextSearch: 'google.places.text_search',
   placesDetails: 'google.places.details',
   geocode: 'google.geocode',
+  /** Agent listing subway walk times (elements per request) */
+  distanceMatrix: 'google.distance_matrix',
   staticMap: 'google.static_map',
   mapViewHousing: 'map_view.housing',
   mapViewFoodPlace: 'map_view.food_place',

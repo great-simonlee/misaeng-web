@@ -28,6 +28,7 @@ export const HOUSING_ROOM_TYPE_ORDER: HousingRoomType[] = [
   'master-wo-bath',
   'regular-bedroom',
   'flexroom',
+  'other',
 ]
 
 const ERP_ROOM_TYPE_ENUM: Record<string, HousingRoomType> = {
@@ -618,7 +619,7 @@ export function formatPropertyIncomeRequirements(
   if (income?.personalGuarantor) {
     parts.push(t('income.guarantor', { multiple: income.personalGuarantor }))
   }
-  parts.push(t('income.guarantorCompany'))
+  if (income?.guarantorCompany !== false) parts.push(t('income.guarantorCompany'))
   return parts.join(' · ')
 }
 

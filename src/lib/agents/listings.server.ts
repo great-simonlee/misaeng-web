@@ -1,12 +1,14 @@
 import { randomUUID } from 'node:crypto'
 
 import { getSupabaseServiceClient } from '@lib/supabase/server'
-import type { HousingListing, HousingRoomType, HousingUnitType } from '@/types/nyc'
+import type { HousingListing, HousingProperty, HousingRoom, HousingRoomType, HousingUnitType } from '@/types/nyc'
+import { HOUSING_NEIGHBORHOODS } from '@lib/constants/housingMock'
 
 import { activeLicense, inHouseBrokerageName, isInHouseAgent, licensedOwners, licenseTypeLabel } from './agentLicense.server'
 import { getBrokerageSettings } from './brokerage.server'
 import { creditsEnabled } from './creditsCore.server'
 import { CreditsError, parsePlan, planFacts, promotePremium, purchase, type PlanFacts } from './listingPlans.server'
+import { LISTING_VOCAB, locateListing, zipInfo } from './listingLocation.server'
 
 /**
  * Listings posted by Misaeng's verified Licensed Agents (owner 2026-11-26; ported from Ellieo's brokered listings).
@@ -102,7 +104,7 @@ export type ListingInput = {
   neighborhood?: string | null
   rent: number
   period?: string
-  /** yyyy-mm-dd; null = available now. */
+  /** yyyy-mm-dd, required (owner 11-27). */
   moveIn?: string | null
   youtubeId?: string | null
   detailsHtml?: string | null
@@ -118,6 +120,29 @@ export type ListingInput = {
   brokerFee?: number | null
   /** Brokered, not in-house: { plan: 'regular', days: 7|14|28 } or { plan: 'premium', reserve? } — never a price. */
   listingPlan?: unknown
+  /** Each room with its own monthly price (owner 11-27): [{ type, price }], types from listingOptions.json roomTypes. */
+  rooms?: unknown
+  /** Building info like staff listings' 건물 정보 (all optional; see cleanBuilding). */
+  building?: unknown
+  /** Number + street ("45-15 Vernon Blvd"): private, only for the nearby subway. Required for NYC-table ZIPs. */
+  streetAddress?: string | null
+}
+
+/** Building info as stored (misaeng_listings.building) — the staff listing (HousingProperty) shape. */
+type ListingBuilding = Pick<HousingProperty, 'amenities' | 'appliances'> & {
+  includedUtility: string[]
+  partWall: string[]
+  amenityFee: { type: 'optional' | 'mandatory'; amount: number | null; period: 'monthly' | 'yearly'; per: 'person' | 'unit' } | null
+  incomeRequirements: { personalIncome?: string; personalGuarantor?: string; guarantorCompany?: boolean } | null
+}
+
+type ListingDetails = {
+  rooms: { type: HousingRoomType; price: number }[] | null
+  building: ListingBuilding | null
+  street_address: string | null
+  latitude: number | null
+  longitude: number | null
+  subway: string[] | null
 }
 
 type ListingRow = {
@@ -139,10 +164,113 @@ type ListingRow = {
   status: 'live' | 'expired' | 'archived' | 'deleted' | 'removed'
   posted_at: string
   expires_at: string
-}
+} & Partial<ListingDetails>
 
 const LISTING_COLUMNS =
   'id, owner_id, kind, zip, city, area, neighborhood, beds, baths, rent, period, move_in, youtube_id, details_html, cover_thumb, status, posted_at, expires_at'
+/** supabase/agent_listing_details.sql — read and written only once the columns exist (hasDetailColumns). */
+const DETAIL_COLUMNS = 'rooms, building, street_address, latitude, longitude, subway'
+
+let detailColumns: { ok: boolean; at: number } | null = null
+
+/** agent_listing_details.sql has run (checked again every minute until it has). */
+async function hasDetailColumns() {
+  if (detailColumns && (detailColumns.ok || Date.now() - detailColumns.at < 60_000)) return detailColumns.ok
+  const { error } = await db().from('misaeng_listings').select(DETAIL_COLUMNS).limit(1)
+  const missing = Boolean(error && (error.code === '42703' || error.code === 'PGRST204' || /column|schema cache/i.test(error.message ?? '')))
+  if (error && !missing) return false
+  detailColumns = { ok: !error, at: Date.now() }
+  return detailColumns.ok
+}
+
+async function listingColumns() {
+  return (await hasDetailColumns()) ? `${LISTING_COLUMNS}, ${DETAIL_COLUMNS}` : LISTING_COLUMNS
+}
+
+const isWhole = (n: unknown, min: number, max: number): n is number => Number.isInteger(n) && (n as number) >= min && (n as number) <= max
+
+/** Rooms from the app: known types, whole dollars, at most 10. Throws on anything else. */
+function cleanRooms(value: unknown): { type: HousingRoomType; price: number }[] | null {
+  if (value == null) return null
+  if (!Array.isArray(value) || value.length > 10) throw new ListingError('Add up to 10 rooms.', 'INVALID')
+  const rooms = value.map((item) => {
+    const room = (item ?? {}) as { type?: unknown; price?: unknown }
+    if (typeof room.type !== 'string' || !LISTING_VOCAB.roomTypes.has(room.type)) throw new ListingError('Pick a room type.', 'INVALID')
+    if (!isWhole(room.price, 1, LISTING_RULES.rentMax)) {
+      throw new ListingError(`Room rent must be between $1 and $${LISTING_RULES.rentMax.toLocaleString('en-US')}.`, 'INVALID')
+    }
+    return { type: room.type as HousingRoomType, price: room.price }
+  })
+  return rooms.length ? rooms : null
+}
+
+/** Only the words the apps can translate (listingOptions.json), each once. */
+function pick(values: unknown, allowed: Set<string>) {
+  if (!Array.isArray(values)) return []
+  return [...new Set(values.filter((v): v is string => typeof v === 'string' && allowed.has(v)))]
+}
+
+/** "40" / 40 → "40" (income multiples, 1–200; guarantor 0 = no guarantor needed). */
+function multiple(value: unknown, min: number) {
+  if (value == null || value === '') return undefined
+  const n = Number(value)
+  if (!Number.isFinite(n) || n < min || n > 200 || (n * 10) % 1 !== 0) throw new ListingError('Income requirement must be 1–200x.', 'INVALID')
+  return String(n)
+}
+
+/** Building info from the app in the staff listing shape; null when nothing was set. */
+function cleanBuilding(value: unknown): ListingBuilding | null {
+  if (!value || typeof value !== 'object') return null
+  const raw = value as Record<string, unknown>
+  const fee = raw.amenityFee && typeof raw.amenityFee === 'object' ? (raw.amenityFee as Record<string, unknown>) : null
+  if (fee && fee.amount != null && !isWhole(fee.amount, 0, 10_000)) throw new ListingError('Amenity fee must be $0–$10,000.', 'INVALID')
+  const income = raw.incomeRequirements && typeof raw.incomeRequirements === 'object' ? (raw.incomeRequirements as Record<string, unknown>) : null
+  const building: ListingBuilding = {
+    amenities: pick(raw.amenities, LISTING_VOCAB.amenities),
+    includedUtility: pick(raw.includedUtility, LISTING_VOCAB.utilities),
+    appliances: pick(raw.appliances, LISTING_VOCAB.appliances),
+    partWall: pick(raw.partWall, LISTING_VOCAB.partWalls),
+    amenityFee:
+      fee && fee.amount != null
+        ? {
+            type: fee.type === 'mandatory' ? 'mandatory' : 'optional',
+            amount: fee.amount as number,
+            period: fee.period === 'yearly' ? 'yearly' : 'monthly',
+            per: fee.per === 'person' ? 'person' : 'unit',
+          }
+        : null,
+    incomeRequirements: income
+      ? {
+          personalIncome: multiple(income.personalIncome, 1),
+          personalGuarantor: multiple(income.personalGuarantor, 0),
+          ...(income.guarantorCompany === false ? { guarantorCompany: false } : {}),
+        }
+      : null,
+  }
+  const inc = building.incomeRequirements
+  if (inc && !inc.personalIncome && !inc.personalGuarantor && inc.guarantorCompany !== false) building.incomeRequirements = null
+  const empty =
+    !building.amenities.length && !building.includedUtility.length && !building.appliances.length &&
+    !building.partWall.length && !building.amenityFee && !building.incomeRequirements
+  return empty ? null : building
+}
+
+/** "45-15 Vernon Blvd": starts with the building number. */
+function cleanStreet(value: unknown) {
+  const street = String(value ?? '').trim().replace(/\s+/g, ' ')
+  if (!street) return null
+  if (street.length < 3 || street.length > 120 || !/^\d/.test(street)) {
+    throw new ListingError('Enter the building number and street (e.g. 45-15 Vernon Blvd).', 'INVALID')
+  }
+  return street
+}
+
+/** yyyy-mm-dd that is a real date and not in the past (New York day). */
+function moveInOK(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T12:00:00Z`))) return false
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date())
+  return value >= today
+}
 
 function validate(input: ListingInput) {
   const fail = (message: string, code = 'INVALID') => {
@@ -150,13 +278,19 @@ function validate(input: ListingInput) {
   }
   if (!(KINDS as readonly string[]).includes(input.kind)) fail('Pick a listing type.')
   if (!/^\d{5}$/.test(input.zip ?? '')) fail('Enter a 5-digit ZIP code.')
-  if (!input.area?.trim() || input.area.length > 60) fail('Pick an area.')
+  // New York (and the NJ towns next to it): the ZIP must be one the composer offers; area and neighborhood follow it.
+  const zip = (input.city ?? 'nyc') === 'nyc' ? zipInfo(input.zip) : null
+  if ((input.city ?? 'nyc') === 'nyc' && !zip) fail('Pick a ZIP code from the list.')
+  if (zip && input.neighborhood && !zip.neighborhoods.includes(input.neighborhood.trim())) fail('Pick a neighborhood from the list.')
+  if (!zip && (!input.area?.trim() || input.area.length > 60)) fail('Pick an area.')
   if ((input.neighborhood?.length ?? 0) > 60) fail('Neighborhood is too long.')
   if (!Number.isInteger(input.rent) || input.rent < 1 || input.rent > LISTING_RULES.rentMax) {
     fail(`Rent must be between $1 and $${LISTING_RULES.rentMax.toLocaleString('en-US')}.`)
   }
   if (input.period && !(PERIODS as readonly string[]).includes(input.period)) fail('Pick daily, weekly or monthly.')
-  if (input.moveIn && !/^\d{4}-\d{2}-\d{2}$/.test(input.moveIn)) fail('Move-in date is not valid.')
+  if (!input.moveIn) fail('Pick a move-in date.', 'MOVE_IN_REQUIRED')
+  if (input.moveIn && !moveInOK(input.moveIn)) fail('Move-in date is not valid.')
+  if (zip && !String(input.streetAddress ?? '').trim()) fail('Enter the building address (number and street).', 'ADDRESS_REQUIRED')
   if (input.youtubeId && !/^[A-Za-z0-9_-]{11}$/.test(input.youtubeId)) fail('YouTube link is not valid.')
   if ((input.detailsHtml?.length ?? 0) > LISTING_RULES.detailsMax) fail('Details are too long.')
   const count = input.photos?.length ?? 0
@@ -184,6 +318,12 @@ export function cleanDetailsHtml(html: string | null | undefined) {
 
 export async function createListing(uid: string, input: ListingInput) {
   validate(input)
+  const rooms = cleanRooms(input.rooms)
+  const building = cleanBuilding(input.building)
+  const street = cleanStreet(input.streetAddress)
+  const zip = (input.city ?? 'nyc') === 'nyc' ? zipInfo(input.zip) : null
+  const area = zip?.area ?? input.area.trim()
+  const neighborhood = zip ? input.neighborhood?.trim() || zip.neighborhoods[0] : input.neighborhood?.trim() || null
   // Owner 11-25: a verified Licensed Agent posts brokered listings only (no personal room / sublet listings);
   // pending applicants still post personal ones until they're approved.
   const license = await activeLicense(uid)
@@ -209,6 +349,10 @@ export async function createListing(uid: string, input: ListingInput) {
     throw new ListingError('Some photos expired or were not uploaded. Add them again.', 'PHOTO_MISSING')
   }
 
+  // Nearby subway from the street address (never blocks posting: not found → no subway card).
+  const details = await hasDetailColumns()
+  const located = details && street ? await locateListing(street, input.zip, area) : null
+  const columns = await listingColumns()
   const { data: listing, error } = await db()
     .from('misaeng_listings')
     .insert({
@@ -218,8 +362,8 @@ export async function createListing(uid: string, input: ListingInput) {
       city: input.city ?? 'nyc',
       beds: input.beds ?? null,
       baths: input.baths ?? null,
-      area: input.area.trim(),
-      neighborhood: input.neighborhood?.trim() || null,
+      area,
+      neighborhood,
       rent: input.rent,
       period: input.period ?? 'monthly',
       move_in: input.moveIn || null,
@@ -232,8 +376,18 @@ export async function createListing(uid: string, input: ListingInput) {
       license_id: license.id,
       // Hidden until the plan is paid (the board shows only expires_at > now); free → the default 30 days.
       ...(paid ? { expires_at: new Date().toISOString() } : {}),
+      ...(details
+        ? {
+            rooms,
+            building,
+            street_address: street,
+            latitude: located?.latitude ?? null,
+            longitude: located?.longitude ?? null,
+            subway: located?.subway.length ? located.subway : null,
+          }
+        : {}),
     } as never)
-    .select(LISTING_COLUMNS)
+    .select(columns)
     .single<ListingRow>()
   if (error || !listing) throw new ListingError(error?.message ?? 'Save failed', 'SAVE_FAILED', 500)
 
@@ -254,7 +408,7 @@ export async function createListing(uid: string, input: ListingInput) {
     if (claimError) throw new ListingError(claimError.message, 'SAVE_FAILED', 500)
   }
   if (paid) await payForNewListing(uid, listing.id, choice)
-  const { data: fresh } = await db().from('misaeng_listings').select(LISTING_COLUMNS).eq('id', listing.id).single<ListingRow>()
+  const { data: fresh } = await db().from('misaeng_listings').select(columns).eq('id', listing.id).single<ListingRow>()
   const [out] = await withBroker([toPublic(fresh ?? listing, uid)], [fresh ?? listing], uid)
   return out
 }
@@ -297,6 +451,7 @@ function toPublic(row: ListingRow, viewer?: string | null) {
     moveIn: row.move_in,
     youtubeId: row.youtube_id,
     detailsHtml: row.details_html,
+    rooms: row.rooms ?? null,
     coverUrl: publicFileUrl(row.cover_thumb),
     status: row.status,
     postedAt: row.posted_at,
@@ -440,7 +595,7 @@ export async function listListings(viewer: string | null, limit = 50) {
 
 /** One listing with all its photos (large + thumb, in order). Expired ones only for their owner. */
 export async function getListing(id: string, viewer: string | null) {
-  const { data: row } = await db().from('misaeng_listings').select(LISTING_COLUMNS).eq('id', id).maybeSingle<ListingRow>()
+  const { data: row } = await db().from('misaeng_listings').select(await listingColumns()).eq('id', id).maybeSingle<ListingRow>()
   if (!row) return null
   if (row.status !== 'live' && row.owner_id !== viewer) return null
   if (row.status === 'deleted' || row.status === 'archived') return null
@@ -540,16 +695,30 @@ function plainDetails(html: string | null) {
     .trim()
 }
 
-/** One agent listing in Misaeng's HousingListing shape (id prefixed `agent-`, so it never collides with ERP ids). */
+const FILTER_AREAS = new Set<string>(HOUSING_NEIGHBORHOODS)
+
+/**
+ * One agent listing in Misaeng's HousingListing shape (id prefixed `agent-`, so it never collides with ERP ids).
+ * Area: the neighborhood when it is one of the Housing area chips ("Long Island City", "Upper West Side" …), else the
+ * borough, so agent and staff listings land on the same filter chips. The street address and coordinates are never
+ * included (the public card shows "neighborhood, borough" only).
+ */
 function toHousingListing(
   row: ListingRow,
-  photos: string[],
+  media: { photos: string[]; floorPlan: string | null },
   extra: { brokerFee: number | null; listedBy: ListingDisclosure | null; premium: boolean },
 ): HousingListing {
   const room = KIND_ROOM[row.kind] ?? null
   const beds = row.beds ?? (row.kind === 'studio' ? 0 : 1)
   const baths = row.baths == null ? 1 : Number(row.baths)
   const posted = new Date(row.posted_at).getTime()
+  // Rooms the agent priced one by one win; otherwise a room listing prices its one bedroom (as before).
+  const rooms: HousingRoom[] = row.rooms?.length
+    ? row.rooms.filter((r) => r && r.price > 0).map((r) => ({ type: r.type, price: r.price }))
+    : room
+      ? [{ type: room, price: row.rent }]
+      : []
+  const building = row.building ?? null
   return {
     id: `agent-${row.id}`,
     city: (row.city as HousingListing['city']) ?? 'nyc',
@@ -557,13 +726,17 @@ function toHousingListing(
       address: '',
       displayedAddress: [row.neighborhood, row.area].filter(Boolean).join(', ') || row.area,
       buildingName: null,
-      area: row.area,
+      area: row.neighborhood && FILTER_AREAS.has(row.neighborhood) ? row.neighborhood : row.area,
       zipcode: row.zip,
       latitude: null,
       longitude: null,
-      subway: [],
-      amenities: [],
-      appliances: [],
+      subway: Array.isArray(row.subway) ? row.subway.filter((line) => typeof line === 'string') : [],
+      amenities: building?.amenities ?? [],
+      appliances: building?.appliances ?? [],
+      includedUtility: building?.includedUtility ?? [],
+      partWall: (building?.partWall?.length ? building.partWall : null) as HousingProperty['partWall'],
+      amenityFee: building?.amenityFee ?? null,
+      incomeRequirements: building?.incomeRequirements ?? null,
     },
     unit: {
       unitNumber: null,
@@ -572,9 +745,10 @@ function toHousingListing(
       price: row.rent,
       availableDate: row.move_in,
       available: true,
-      rooms: room ? [{ type: room, price: row.rent }] : [],
+      rooms,
       promotions: [],
-      images: photos,
+      images: media.photos,
+      layoutImage: media.floorPlan,
       youtubeUrl: row.youtube_id ? `https://www.youtube.com/watch?v=${row.youtube_id}` : null,
       unitType: unitTypeOf(row.kind, beds, baths),
     },
@@ -600,7 +774,7 @@ export async function agentHousingListings(city?: string | null): Promise<Housin
     await promotePremium().catch(() => null)
     let query = db()
       .from('misaeng_listings')
-      .select(LISTING_COLUMNS)
+      .select(await listingColumns())
       .eq('status', 'live')
       .gt('expires_at', new Date().toISOString())
       .order('posted_at', { ascending: false })
@@ -613,17 +787,25 @@ export async function agentHousingListings(city?: string | null): Promise<Housin
       .from('misaeng_files')
       .select('path, role, position, listing_id')
       .in('listing_id', data.map((row) => row.id))
-      .eq('role', 'photo')
+      .in('role', ['photo', 'floor_plan'])
       .order('position', { ascending: true })
       .returns<{ path: string; role: string; position: number | null; listing_id: string }[]>()
     const photos = new Map<string, string[]>()
+    const floorPlans = new Map<string, string>()
     for (const file of files ?? []) {
+      if (file.role === 'floor_plan') {
+        floorPlans.set(file.listing_id, publicFileUrl(file.path)!)
+        continue
+      }
       const list = photos.get(file.listing_id) ?? []
       list.push(publicFileUrl(file.path)!)
       photos.set(file.listing_id, list)
     }
     const out = data.map((row, index) =>
-      toHousingListing(row, photos.get(row.id) ?? [publicFileUrl(row.cover_thumb)].filter((u): u is string => Boolean(u)), {
+      toHousingListing(row, {
+        photos: photos.get(row.id) ?? [publicFileUrl(row.cover_thumb)].filter((u): u is string => Boolean(u)),
+        floorPlan: floorPlans.get(row.id) ?? null,
+      }, {
         brokerFee: enriched[index].brokerFee ?? 0,
         listedBy: enriched[index].listedBy ?? null,
         premium: Boolean(enriched[index].premium),
@@ -642,9 +824,9 @@ export async function agentHousingListing(id: string): Promise<HousingListing | 
   if (!/^[0-9a-f-]{36}$/i.test(uuid)) return null
   const listing = await getListing(uuid, null).catch(() => null)
   if (!listing || listing.status !== 'live') return null
-  const { data: row } = await db().from('misaeng_listings').select(LISTING_COLUMNS).eq('id', uuid).maybeSingle<ListingRow>()
+  const { data: row } = await db().from('misaeng_listings').select(await listingColumns()).eq('id', uuid).maybeSingle<ListingRow>()
   if (!row) return null
-  return toHousingListing(row, listing.photos.map((photo) => photo.url), {
+  return toHousingListing(row, { photos: listing.photos.map((photo) => photo.url), floorPlan: listing.floorPlanUrl }, {
     brokerFee: listing.brokerFee ?? 0,
     listedBy: listing.listedBy ?? null,
     premium: Boolean(listing.premium),

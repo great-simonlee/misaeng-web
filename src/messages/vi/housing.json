@@ -86,7 +86,8 @@
     "regular-bedroom": "Regular",
     "flexroom": "Flex",
     "entire": "Nguyên căn",
-    "studio": "Studio"
+    "studio": "Studio",
+    "other": "Khác"
   },
   "unitTypes": {
     "studio": "Studio",

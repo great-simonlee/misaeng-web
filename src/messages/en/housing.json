@@ -86,7 +86,8 @@
     "regular-bedroom": "Regular",
     "flexroom": "Flex",
     "entire": "Entire unit",
-    "studio": "Studio"
+    "studio": "Studio",
+    "other": "Other"
   },
   "unitTypes": {
     "studio": "Studio",

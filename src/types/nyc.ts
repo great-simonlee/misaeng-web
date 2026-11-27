@@ -45,6 +45,8 @@ export type HousingRoomType =
   | 'flexroom'
   | 'entire'
   | 'studio'
+  /** Agent listings only: a room that is none of the above */
+  | 'other'
 
 /** ERP unit.promotions[] 항목 */
 export type HousingUnitPromotion = {
@@ -89,6 +91,8 @@ export interface HousingProperty {
   incomeRequirements?: {
     personalIncome?: string
     personalGuarantor?: string
+    /** false = no guarantor companies (agent listings); absent = accepted (staff listings) */
+    guarantorCompany?: boolean
   } | null
   latestMoveInAllowedDays?: number | null
 }
