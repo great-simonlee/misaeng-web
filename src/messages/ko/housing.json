@@ -568,7 +568,7 @@
   },
   "listedBy": {
     "title": "중개 정보",
-    "licensedAgent": "라이선스 에이전트",
+    "licensedAgent": "라이센스 에이전트",
     "brokerFee": "세입자 중개 수수료 {amount}",
     "noFee": "세입자 중개 수수료 없음",
     "fairHousing": "공정주택 안내 (Fair Housing Notice)",
