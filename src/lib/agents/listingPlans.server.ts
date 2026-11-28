@@ -46,9 +46,11 @@ export type ListingPrices = {
   slots: number
 }
 
+// v3 (owner 11-27, ~1.6× v2, rounded to tens): 7일 30 · 14일 60 · 28일 110 · Premium 350 (= 110 + Boost 240) · 연장 240.
+// The live value is misaeng_settings.listing_prices (supabase/agent_listing_prices_v3.sql); this is only the fallback.
 export const DEFAULT_LISTING_PRICES: ListingPrices = {
-  regular: { '7': 20, '14': 40, '28': 70 },
-  premium: { mode: 'boost', bundlePrice: 220, boostPrice: 150, days: 7, totalDays: 28, extendPrice: 150, maxExtensions: 1 },
+  regular: { '7': 30, '14': 60, '28': 110 },
+  premium: { mode: 'boost', bundlePrice: 350, boostPrice: 240, days: 7, totalDays: 28, extendPrice: 240, maxExtensions: 1 },
   slots: 3,
 }
 

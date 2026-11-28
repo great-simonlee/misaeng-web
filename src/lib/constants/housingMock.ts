@@ -21,6 +21,7 @@ export {
   formatHousingCreditOfferLabel,
   formatHousingDateShort,
   formatHousingAvailableDate,
+  isHousingAvailableNow,
   formatListingBedBath,
   formatPropertyAmenityFee,
   formatHousingPartWall,

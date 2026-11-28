@@ -31,7 +31,10 @@ export const LISTING_RULES = {
 } as const
 
 /** The app's listing types (ListingWriteView.Kind). */
-const KINDS = ['privateRoom', 'sharedRoom', 'studio', 'apartment', 'sublet'] as const
+// Owner 11-27: the app posts apartment (0 bedrooms → studio), privateRoom, sublet (whole unit) or subletRoom (one room).
+// sharedRoom stays accepted for listings posted before.
+const KINDS = ['privateRoom', 'sharedRoom', 'studio', 'apartment', 'sublet', 'subletRoom'] as const
+const ROOM_KINDS = new Set(['privateRoom', 'sharedRoom', 'subletRoom'])
 const PERIODS = ['daily', 'weekly', 'monthly'] as const
 const ROLES = ['photo', 'thumb', 'floor_plan'] as const
 export type UploadRole = (typeof ROLES)[number]
@@ -126,6 +129,10 @@ export type ListingInput = {
   building?: unknown
   /** Number + street ("45-15 Vernon Blvd"): private, only for the nearby subway. Required for NYC-table ZIPs. */
   streetAddress?: string | null
+  /** "12A" (upper case); with the street and ZIP it must not match another live listing */
+  unitNumber?: string | null
+  /** Lease offer: "N개월 계약 시 X개월 무료", "$X 크레딧" */
+  promotion?: { leaseTerm?: unknown; freeMonth?: unknown; rentCredit?: unknown } | null
 }
 
 /** Building info as stored (misaeng_listings.building) — the staff listing (HousingProperty) shape. */
@@ -146,6 +153,8 @@ type ListingDetails = {
 }
 
 type ListingRow = {
+  /** agent_listing_unit.sql */
+  promotion?: { leaseTerm: number; freeMonth: number; rentCredit: number } | null
   id: string
   owner_id: string
   kind: string
@@ -184,7 +193,8 @@ async function hasDetailColumns() {
 }
 
 async function listingColumns() {
-  return (await hasDetailColumns()) ? `${LISTING_COLUMNS}, ${DETAIL_COLUMNS}` : LISTING_COLUMNS
+  const base = (await hasDetailColumns()) ? `${LISTING_COLUMNS}, ${DETAIL_COLUMNS}` : LISTING_COLUMNS
+  return (await hasUnitColumn()) ? `${base}, promotion` : base
 }
 
 const isWhole = (n: unknown, min: number, max: number): n is number => Number.isInteger(n) && (n as number) >= min && (n as number) <= max
@@ -192,7 +202,8 @@ const isWhole = (n: unknown, min: number, max: number): n is number => Number.is
 /** Rooms from the app: known types, whole dollars, at most 10. Throws on anything else. */
 function cleanRooms(value: unknown): { type: HousingRoomType; price: number }[] | null {
   if (value == null) return null
-  if (!Array.isArray(value) || value.length > 10) throw new ListingError('Add up to 10 rooms.', 'INVALID')
+  // Owner 11-27: up to 4 rooms per listing
+  if (!Array.isArray(value) || value.length > 4) throw new ListingError('Add up to 4 rooms.', 'INVALID')
   const rooms = value.map((item) => {
     const room = (item ?? {}) as { type?: unknown; price?: unknown }
     if (typeof room.type !== 'string' || !LISTING_VOCAB.roomTypes.has(room.type)) throw new ListingError('Pick a room type.', 'INVALID')
@@ -265,6 +276,72 @@ function cleanStreet(value: unknown) {
   return street
 }
 
+/** "apt 12a" → "12A". Letters, digits and "-" only, at most 12. */
+function cleanUnit(value: unknown) {
+  const unit = String(value ?? '')
+    .toUpperCase()
+    .replace(/^\s*(APT\.?|APARTMENT|UNIT|SUITE|STE\.?|#)\s*/, '')
+    .replace(/[^A-Z0-9-]/g, '')
+  if (!unit) return null
+  if (unit.length > 12) throw new ListingError('The unit number is too long.', 'INVALID')
+  return unit
+}
+
+/** Lease term 1–36 months, free months 0–6 in halves (fewer than the term), credit $0–20,000. Null when nothing. */
+function cleanPromotion(value: ListingInput['promotion']) {
+  if (!value || typeof value !== 'object') return null
+  const lease = Number(value.leaseTerm ?? 12)
+  const free = Number(value.freeMonth ?? 0)
+  const credit = Number(value.rentCredit ?? 0)
+  if (!Number.isInteger(lease) || lease < 1 || lease > 36) throw new ListingError('Lease term must be 1–36 months.', 'INVALID')
+  if (!Number.isFinite(free) || free < 0 || free > 6 || Math.round(free * 2) !== free * 2 || (free > 0 && free >= lease)) {
+    throw new ListingError('Free months must be 0–6 (halves allowed) and shorter than the lease.', 'INVALID')
+  }
+  if (!Number.isInteger(credit) || credit < 0 || credit > 20000) throw new ListingError('Credit must be $0–20,000.', 'INVALID')
+  if (free === 0 && credit === 0) return null
+  return { leaseTerm: lease, freeMonth: free, rentCredit: credit }
+}
+
+const STREET_WORDS: Record<string, string> = {
+  STREET: 'ST', AVENUE: 'AVE', AV: 'AVE', ROAD: 'RD', BOULEVARD: 'BLVD', PLACE: 'PL', DRIVE: 'DR', LANE: 'LN',
+  COURT: 'CT', TERRACE: 'TER', PARKWAY: 'PKWY', EAST: 'E', WEST: 'W', NORTH: 'N', SOUTH: 'S',
+}
+
+/** "43-10 Crescent Street" and "43-10 crescent st." → "43-10 CRESCENT ST" (for the duplicate check). */
+function streetKey(street: string) {
+  return street
+    .toUpperCase()
+    .replace(/[.,]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => STREET_WORDS[word] ?? word.replace(/^(\d+)(ST|ND|RD|TH)$/, '$1'))
+    .join(' ')
+}
+
+let unitColumn: { ok: boolean; at: number } | null = null
+/** agent_listing_unit.sql has run (checked again every minute until it has). */
+async function hasUnitColumn() {
+  if (unitColumn && (unitColumn.ok || Date.now() - unitColumn.at < 60_000)) return unitColumn.ok
+  const { error } = await db().from('misaeng_listings').select('unit_number').limit(1)
+  unitColumn = { ok: !error, at: Date.now() }
+  return unitColumn.ok
+}
+
+/** A live listing already advertises this address + unit (owner 11-27: one ad per unit). */
+async function duplicateLive(zip: string, street: string, unit: string | null) {
+  const { data } = await db()
+    .from('misaeng_listings')
+    .select('id, street_address, unit_number')
+    .eq('status', 'live')
+    .eq('zip', zip)
+    .gt('expires_at', new Date().toISOString())
+    .limit(500)
+  const key = streetKey(street)
+  return ((data ?? []) as { street_address: string | null; unit_number: string | null }[]).some(
+    (row) => row.street_address && streetKey(row.street_address) === key && (row.unit_number ?? null) === unit,
+  )
+}
+
 /** yyyy-mm-dd that is a real date and not in the past (New York day). */
 function moveInOK(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T12:00:00Z`))) return false
@@ -298,9 +375,10 @@ function validate(input: ListingInput) {
     fail(`Add ${LISTING_RULES.photosMin}–${LISTING_RULES.photosMax} photos.`, 'PHOTO_COUNT')
   }
   if (input.city != null && !['nyc', 'boston', 'dc'].includes(input.city)) fail('Pick a city.')
-  if (input.beds != null && (!Number.isInteger(input.beds) || input.beds < 0 || input.beds > 10)) fail('Bedrooms must be 0–10.')
-  if (input.baths != null && (!Number.isFinite(input.baths) || input.baths < 0 || input.baths > 10 || (input.baths * 2) % 1 !== 0)) {
-    fail('Bathrooms must be 0–10 (halves allowed).')
+  if (input.beds != null && (!Number.isInteger(input.beds) || input.beds < 0 || input.beds > 3)) fail('Bedrooms must be 0–3.')
+  // Whole numbers, at most 3 bedrooms / 3 bathrooms (owner 11-27)
+  if (input.baths != null && (!Number.isInteger(input.baths) || input.baths < 0 || input.baths > 3)) {
+    fail('Bathrooms must be a whole number, 0–3.')
   }
   if (input.brokerFee != null && (!Number.isInteger(input.brokerFee) || input.brokerFee < 0 || input.brokerFee > 100_000)) {
     fail('Broker fee must be between $0 and $100,000.')
@@ -318,10 +396,26 @@ export function cleanDetailsHtml(html: string | null | undefined) {
 
 export async function createListing(uid: string, input: ListingInput) {
   validate(input)
-  const rooms = cleanRooms(input.rooms)
+  // A whole unit with 0 bedrooms is a studio; a room listing is exactly one room, priced by the rent.
+  const kind = input.kind === 'apartment' && input.beds === 0 ? 'studio' : input.kind
+  const cleaned = cleanRooms(input.rooms)
+  const rooms = ROOM_KINDS.has(kind)
+    ? cleaned?.length
+      ? [{ type: cleaned[0].type, price: input.rent }]
+      : null
+    : kind === 'studio'
+      ? null
+      : cleaned
   const building = cleanBuilding(input.building)
   const street = cleanStreet(input.streetAddress)
+  const unit = cleanUnit(input.unitNumber)
+  const promotion = cleanPromotion(input.promotion)
   const zip = (input.city ?? 'nyc') === 'nyc' ? zipInfo(input.zip) : null
+  const withUnit = await hasUnitColumn()
+  if (zip && withUnit && !unit) throw new ListingError('Enter the unit number.', 'UNIT_REQUIRED')
+  if (street && withUnit && (await duplicateLive(input.zip, street, unit))) {
+    throw new ListingError('This address and unit are already advertised on Misaeng.', 'DUPLICATE_UNIT', 409)
+  }
   const area = zip?.area ?? input.area.trim()
   const neighborhood = zip ? input.neighborhood?.trim() || zip.neighborhoods[0] : input.neighborhood?.trim() || null
   // Owner 11-25: a verified Licensed Agent posts brokered listings only (no personal room / sublet listings);
@@ -357,7 +451,7 @@ export async function createListing(uid: string, input: ListingInput) {
     .from('misaeng_listings')
     .insert({
       owner_id: uid,
-      kind: input.kind,
+      kind,
       zip: input.zip,
       city: input.city ?? 'nyc',
       beds: input.beds ?? null,
@@ -381,6 +475,7 @@ export async function createListing(uid: string, input: ListingInput) {
             rooms,
             building,
             street_address: street,
+            ...(withUnit ? { unit_number: unit, promotion } : {}),
             latitude: located?.latitude ?? null,
             longitude: located?.longitude ?? null,
             subway: located?.subway.length ? located.subway : null,
@@ -669,6 +764,7 @@ export async function purgeDueFiles(batch = 500) {
 const KIND_ROOM: Record<string, HousingRoomType | null> = {
   privateRoom: 'regular-bedroom',
   sharedRoom: 'regular-bedroom',
+  subletRoom: 'regular-bedroom',
   studio: null,
   apartment: null,
   sublet: null,
@@ -746,7 +842,8 @@ function toHousingListing(
       availableDate: row.move_in,
       available: true,
       rooms,
-      promotions: [],
+      // The agent's lease offer, staff shape: Housing shows N개월 무료 / $X 크레딧 and the Net price
+      promotions: row.promotion ? [row.promotion] : [],
       images: media.photos,
       layoutImage: media.floorPlan,
       youtubeUrl: row.youtube_id ? `https://www.youtube.com/watch?v=${row.youtube_id}` : null,

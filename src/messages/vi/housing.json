@@ -149,7 +149,8 @@
       "female_one": "{count} woman"
     },
     "loadingLabel": "Đang tải tin đăng",
-    "loadingDescription": "Đang tải tin đăng…"
+    "loadingDescription": "Đang tải tin đăng…",
+    "moveInNow": "Vào ở ngay"
   },
   "roommateIntro": {
     "title": "Roommate đang chờ",

@@ -8,6 +8,7 @@ import { hrefForHousingListing } from '@lib/constants/cities'
 import { usePagedGallery } from '@hooks/usePagedGallery'
 import {
   formatHousingAvailableDate,
+  isHousingAvailableNow,
   formatListingBedBath,
   getHousingRoomLabel,
   getHousingRoomNet,
@@ -171,9 +172,9 @@ export function HousingPostCard({
             <span className='mx-1 text-[#d0d4db]'>·</span>
             {formatListingBedBath(listing)}
             <span className='mx-1 text-[#d0d4db]'>·</span>
-            {t('card.moveIn', {
-              date: formatHousingAvailableDate(availableDate) || t('card.moveInTbd'),
-            })}
+            {isHousingAvailableNow(availableDate)
+              ? t('card.moveInNow')
+              : t('card.moveIn', { date: formatHousingAvailableDate(availableDate) || t('card.moveInTbd') })}
           </p>
         </Link>
 

@@ -149,7 +149,8 @@
       "female_other": "{count} women"
     },
     "loadingLabel": "Loading listings",
-    "loadingDescription": "Loading listings…"
+    "loadingDescription": "Loading listings…",
+    "moveInNow": "Available now"
   },
   "roommateIntro": {
     "title": "Roommates waiting",

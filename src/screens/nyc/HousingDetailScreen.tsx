@@ -14,6 +14,7 @@ import { useSupportConfig } from '@lib/support/client'
 import { AppInquiryModal } from '@widgets/nyc/AppInquiryModal'
 import {
   formatHousingAvailableDate,
+  isHousingAvailableNow,
   formatListingBedBath,
   formatPropertyAmenityFee,
   formatHousingPartWall,
@@ -514,11 +515,9 @@ export function HousingDetailScreen({ postId }: HousingDetailScreenProps) {
                 {formatListingBedBath(listing)}
               </p>
               <p className='text-[13px] font-medium text-[var(--muted)]'>
-                {t('card.moveIn', {
-                  date:
-                    formatHousingAvailableDate(availableDate) ||
-                    t('card.moveInTbd'),
-                })}
+                {isHousingAvailableNow(availableDate)
+              ? t('card.moveInNow')
+              : t('card.moveIn', { date: formatHousingAvailableDate(availableDate) || t('card.moveInTbd') })}
               </p>
             </div>
 

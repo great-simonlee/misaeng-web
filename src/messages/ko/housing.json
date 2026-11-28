@@ -146,7 +146,8 @@
       "female_other": "여 {count}"
     },
     "loadingLabel": "매물 불러오는 중",
-    "loadingDescription": "매물을 불러오는 중입니다"
+    "loadingDescription": "매물을 불러오는 중입니다",
+    "moveInNow": "바로 입주"
   },
   "roommateIntro": {
     "title": "기다리는 룸메이트",

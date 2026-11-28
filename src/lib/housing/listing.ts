@@ -538,6 +538,14 @@ export function formatHousingDateShort(value: string): string {
   return trimmed
 }
 
+/** The move-in date is today or already past (New York day): show "바로 입주", never a date that's gone by. */
+export function isHousingAvailableNow(value: string | null | undefined): boolean {
+  const day = String(value ?? '').trim().slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return false
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date())
+  return day <= today
+}
+
 export function formatHousingAvailableDate(value: string): string {
   return formatHousingDateShort(value)
 }
